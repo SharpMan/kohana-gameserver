@@ -21,7 +21,7 @@ public class EffectInstanceDate extends EffectInstance {
     }
 
     public EffectInstanceDate(EffectInstance Parent, int Year, int Mounth, int Day, int Hour, int Minute) {
-        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.hidden, Parent.rawZone, Parent.delay, Parent.triggers, Parent.order);
+        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.rawZone, Parent.delay, Parent.triggers, Parent.visibleInTooltip, Parent.visibleInFightLog, Parent.visibleInBuffUi);
         this.Year = Year;
         this.Mounth = (byte) Mounth;
         this.Day = (byte) Day;
@@ -65,16 +65,6 @@ public class EffectInstanceDate extends EffectInstance {
                 append(Hour, rhs.Hour).
                 append(Minute, rhs.Minute).
                 isEquals();
-    }
-
-    @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        super.writeExternal(objectOutput);
-        objectOutput.writeInt(Year);
-        objectOutput.writeByte(Mounth);
-        objectOutput.writeByte(Day);
-        objectOutput.writeByte(Hour);
-        objectOutput.writeByte(Minute);
     }
 
     @Override

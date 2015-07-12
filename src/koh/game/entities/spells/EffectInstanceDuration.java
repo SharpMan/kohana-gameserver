@@ -21,7 +21,7 @@ public class EffectInstanceDuration extends EffectInstance  {
     public byte hours, minutes;
 
     public EffectInstanceDuration(EffectInstance Parent, int days, byte hours, byte minutes) {
-        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.hidden, Parent.rawZone, Parent.delay, Parent.triggers, Parent.order);
+        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.rawZone, Parent.delay, Parent.triggers, Parent.visibleInTooltip, Parent.visibleInFightLog, Parent.visibleInBuffUi);
         this.days = days;
         this.hours = hours;
         this.minutes = minutes;
@@ -53,13 +53,6 @@ public class EffectInstanceDuration extends EffectInstance  {
         this.minutes = buf.get();
     }
     
-    @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        super.writeExternal(objectOutput);
-        objectOutput.writeInt(this.days);
-        objectOutput.writeByte(hours);
-        objectOutput.writeByte(minutes);
-    }
 
     @Override
     public void toBinary(IoBuffer buf) {

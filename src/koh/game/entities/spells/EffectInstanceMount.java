@@ -21,7 +21,7 @@ public class EffectInstanceMount extends EffectInstance {
     public int mountId;
 
     public EffectInstanceMount(EffectInstance Parent, Double date, int modelId, int mountId) {
-        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.hidden, Parent.rawZone, Parent.delay, Parent.triggers, Parent.order);
+        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.rawZone, Parent.delay, Parent.triggers, Parent.visibleInTooltip, Parent.visibleInFightLog, Parent.visibleInBuffUi);
         this.date = date;
         this.modelId = modelId;
         this.mountId = mountId;
@@ -51,14 +51,6 @@ public class EffectInstanceMount extends EffectInstance {
         this.date = buf.getDouble();
         this.modelId = buf.getInt();
         this.mountId = buf.getInt();
-    }
-
-    @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        super.writeExternal(objectOutput);
-        objectOutput.writeDouble(this.date);
-        objectOutput.writeInt(this.modelId);
-        objectOutput.writeInt(this.mountId);
     }
 
     @Override

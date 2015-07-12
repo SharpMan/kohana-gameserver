@@ -44,11 +44,10 @@ public class EffectInstance implements Serializable {
     public int effectUid, effectId, targetId;
     public String targetMask;
     public int duration, random, group;
-    public boolean hidden;
     public String rawZone;
     public int delay;
     public String triggers;
-    public int order;
+    public boolean visibleInTooltip, visibleInFightLog, visibleInBuffUi;
 
     private int zoneShape, zoneSize, zoneMinSize, zoneEfficiencyPercent, zoneMaxEfficiency;
     public boolean initialized;
@@ -92,7 +91,6 @@ public class EffectInstance implements Serializable {
         }
         EffectInstance rhs = (EffectInstance) obj;
         return new EqualsBuilder().
-                // if deriving: appendSuper(super.equals(obj)).
                 append(effectUid, rhs.effectUid).
                 append(effectId, rhs.effectId).
                 append(targetMask, rhs.targetMask).
@@ -100,36 +98,20 @@ public class EffectInstance implements Serializable {
                 append(duration, rhs.duration).
                 append(random, rhs.random).
                 append(group, rhs.group).
-                append(hidden, rhs.hidden).
                 append(rawZone, rhs.rawZone).
                 append(delay, rhs.delay).
                 append(triggers, rhs.triggers).
-                append(order, rhs.order).
+                append(visibleInTooltip, rhs.visibleInTooltip).
+                append(visibleInFightLog, rhs.visibleInFightLog).
+                append(visibleInBuffUi, rhs.visibleInBuffUi).
                 isEquals();
     }
 
-    /*@Override
-     public int hashCode() {
-     int hash = 5;
-     hash = 89 * hash + this.effectUid;
-     hash = 89 * hash + this.effectId;
-     hash = 89 * hash + this.targetId;
-     hash = 89 * hash + Objects.hashCode(this.targetMask);
-     hash = 89 * hash + this.duration;
-     hash = 89 * hash + this.random;
-     hash = 89 * hash + this.group;
-     hash = 89 * hash + (this.hidden ? 1 : 0);
-     hash = 89 * hash + Objects.hashCode(this.rawZone);
-     hash = 89 * hash + this.delay;
-     hash = 89 * hash + Objects.hashCode(this.triggers);
-     hash = 89 * hash + this.order;
-     return hash;
-     }*/
     public EffectInstance Clone() {
-        return new EffectInstance(effectUid, effectId, targetId, targetMask, duration, random, group, hidden, rawZone, delay, triggers, order);
+        return new EffectInstance(effectUid, effectId, targetId, targetMask, duration, random, group, rawZone, delay, triggers, visibleInTooltip, visibleInFightLog, visibleInBuffUi);
     }
 
-    public EffectInstance(int effectUid, int effectId, int targetId, String targetMask, int duration, int random, int group, boolean hidden, String rawZone, int delay, String triggers, int order) {
+    public EffectInstance(int effectUid, int effectId, int targetId, String targetMask, int duration, int random, int group, String rawZone, int delay, String triggers, boolean visibleInTooltip, boolean visibleInFightLog, boolean visibleInBuffUi) {
         this.effectUid = effectUid;
         this.effectId = effectId;
         this.targetId = targetId;
@@ -137,11 +119,12 @@ public class EffectInstance implements Serializable {
         this.duration = duration;
         this.random = random;
         this.group = group;
-        this.hidden = hidden;
         this.rawZone = rawZone;
         this.delay = delay;
         this.triggers = triggers;
-        this.order = order;
+        this.visibleInTooltip = visibleInTooltip;
+        this.visibleInFightLog = visibleInFightLog;
+        this.visibleInBuffUi = visibleInBuffUi;
     }
 
     public EffectInstance(int effectId) {
@@ -152,11 +135,9 @@ public class EffectInstance implements Serializable {
         this.duration = 0;
         this.random = 0;
         this.group = 0;
-        this.hidden = false;
         this.rawZone = "";
         this.delay = 0;
         this.triggers = "";
-        this.order = 0;
     }
 
     public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect) {
@@ -179,7 +160,7 @@ public class EffectInstance implements Serializable {
         Boolean exclusiveMaskCasterOnly;
         Boolean verify;
         int maskState;
-        if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/  )) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
+        if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
             return (false);
         };
         boolean targetIsCaster = (pTargetId.ID == pCasterId.ID);
@@ -349,9 +330,6 @@ public class EffectInstance implements Serializable {
          this.zoneSize = 63;*/
     }
 
-    /*public EffectInstance(int effectId) {
-     this.effectId = effectId;
-     }*/
     public Effect Template() {
         return D2oDao.getEffect(this.effectId);
     }
@@ -367,26 +345,12 @@ public class EffectInstance implements Serializable {
         this.duration = buf.getInt();
         this.random = buf.getInt();
         this.group = buf.getInt();
-        this.hidden = BufUtils.readBoolean(buf);
+        this.visibleInTooltip = BufUtils.readBoolean(buf);
+        this.visibleInBuffUi = BufUtils.readBoolean(buf);
+        this.visibleInFightLog = BufUtils.readBoolean(buf);
         this.rawZone = BufUtils.readUTF(buf);
         this.delay = buf.getInt();
         this.triggers = BufUtils.readUTF(buf);
-        this.order = buf.getInt();
-    }
-
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        objectOutput.writeInt(this.effectUid);
-        objectOutput.writeInt(this.effectId);
-        objectOutput.writeInt(this.targetId);
-        writeUTF(objectOutput, this.targetMask);
-        objectOutput.writeInt(this.duration);
-        objectOutput.writeInt(this.random);
-        objectOutput.writeInt(this.group);
-        writeBoolean(objectOutput, this.hidden);
-        writeUTF(objectOutput, this.rawZone);
-        objectOutput.writeInt(this.delay);
-        writeUTF(objectOutput, this.triggers);
-        objectOutput.writeInt(this.order);
     }
 
     public void toBinary(IoBuffer buf) {
@@ -397,11 +361,12 @@ public class EffectInstance implements Serializable {
         buf.putInt(this.duration);
         buf.putInt(this.random);
         buf.putInt(this.group);
-        writeBoolean(buf, this.hidden);
+        writeBoolean(buf, this.visibleInTooltip);
+        writeBoolean(buf, this.visibleInBuffUi);
+        writeBoolean(buf, this.visibleInFightLog);
         writeUTF(buf, this.rawZone);
         buf.putInt(this.delay);
         writeUTF(buf, this.triggers);
-        buf.putInt(this.order);
     }
 
     public void totalClear() {
@@ -412,11 +377,12 @@ public class EffectInstance implements Serializable {
         duration = 0;
         random = 0;
         group = 0;
-        hidden = false;
         rawZone = null;
         delay = 0;
         triggers = null;
-        order = 0;
+        this.visibleInBuffUi = false;
+        this.visibleInFightLog = false;
+        this.visibleInTooltip = false;
         try {
             this.finalize();
         } catch (Throwable tr) {

@@ -3,6 +3,7 @@ package koh.game.entities.spells;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+import koh.protocol.client.BufUtils;
 import static koh.protocol.client.BufUtils.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -45,6 +46,7 @@ public class EffectInstanceDice extends EffectInstanceInteger {
 
     public EffectInstanceDice(IoBuffer buf) {
         super(null);
+        this.visibleInTooltip = BufUtils.readBoolean(buf);
         this.random = buf.getInt();
         this.rawZone = readUTF(buf);
         this.targetId = buf.getInt();
@@ -52,13 +54,13 @@ public class EffectInstanceDice extends EffectInstanceInteger {
         this.effectId = buf.getInt();
         this.diceNum = buf.getInt();
         this.duration = buf.getInt();
-        this.order = buf.getInt();
+        this.visibleInFightLog = BufUtils.readBoolean(buf);
         this.effectUid = buf.getInt();
-        this.hidden = readBoolean(buf);
         this.diceSide = buf.getInt();
         this.value = buf.getInt();
-        this.triggers = readUTF(buf);
+        this.visibleInBuffUi = BufUtils.readBoolean(buf);
         this.delay = buf.getInt();
+        this.triggers = readUTF(buf);
         this.group = buf.getInt();
     }
 
@@ -76,26 +78,8 @@ public class EffectInstanceDice extends EffectInstanceInteger {
     }
 
     @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        objectOutput.writeInt(this.random);
-        writeUTF(objectOutput, this.rawZone);
-        objectOutput.writeInt(this.targetId);
-        writeUTF(objectOutput, this.targetMask);
-        objectOutput.writeInt(this.effectId);
-        objectOutput.writeInt(this.diceNum);
-        objectOutput.writeInt(this.duration);
-        objectOutput.writeInt(this.order);
-        objectOutput.writeInt(this.effectUid);
-        writeBoolean(objectOutput, this.hidden);
-        objectOutput.writeInt(this.diceSide);
-        objectOutput.writeInt(this.value);
-        writeUTF(objectOutput, this.triggers);
-        objectOutput.writeInt(this.delay);
-        objectOutput.writeInt(this.group);
-    }
-
-    @Override
     public void toBinary(IoBuffer buf) {
+        BufUtils.writeBoolean(buf, visibleInTooltip);
         buf.putInt(this.random);
         writeUTF(buf, this.rawZone);
         buf.putInt(this.targetId);
@@ -103,13 +87,13 @@ public class EffectInstanceDice extends EffectInstanceInteger {
         buf.putInt(this.effectId);
         buf.putInt(this.diceNum);
         buf.putInt(this.duration);
-        buf.putInt(this.order);
+        BufUtils.writeBoolean(buf, visibleInFightLog);
         buf.putInt(this.effectUid);
-        writeBoolean(buf, this.hidden);
         buf.putInt(this.diceSide);
         buf.putInt(this.value);
-        writeUTF(buf, this.triggers);
+        BufUtils.writeBoolean(buf, visibleInBuffUi);
         buf.putInt(this.delay);
+        writeUTF(buf, this.triggers);
         buf.putInt(this.group);
     }
 

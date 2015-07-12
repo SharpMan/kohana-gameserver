@@ -20,7 +20,7 @@ public class EffectInstanceString extends EffectInstance {
     public String text;
 
     public EffectInstanceString(EffectInstance Parent, String text) {
-        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.hidden, Parent.rawZone, Parent.delay, Parent.triggers, Parent.order);
+        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.rawZone, Parent.delay, Parent.triggers, Parent.visibleInTooltip, Parent.visibleInFightLog, Parent.visibleInBuffUi);
         this.text = text;
     }
 
@@ -44,12 +44,6 @@ public class EffectInstanceString extends EffectInstance {
     public EffectInstanceString(IoBuffer buf) {
         super(buf);
         this.text = BufUtils.readUTF(buf);
-    }
-    
-    @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        super.writeExternal(objectOutput);
-         BufUtils.writeUTF(objectOutput, text);
     }
 
     @Override

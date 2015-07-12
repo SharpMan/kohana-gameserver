@@ -74,11 +74,11 @@ public class InventoryItem {
     }
 
     public ObjectItem ObjectItem(int WithQuantity) {
-        return new ObjectItem(this.Position, this.TemplateId, ObjectEffects(Effects.stream().filter(x -> !x.hidden).collect(Collectors.toList())), this.ID, WithQuantity);
+        return new ObjectItem(this.Position, this.TemplateId, ObjectEffects(Effects.stream().filter(x -> x.visibleInTooltip).collect(Collectors.toList())), this.ID, WithQuantity);
     }
 
     public ObjectItem ObjectItem() {
-        return new ObjectItem(this.Position, this.TemplateId, ObjectEffects(Effects.stream().filter(x -> !x.hidden).collect(Collectors.toList())), this.ID, this.Quantity);
+        return new ObjectItem(this.Position, this.TemplateId, ObjectEffects(Effects.stream().filter(x -> x.visibleInTooltip).collect(Collectors.toList())), this.ID, this.Quantity);
     }
 
     public ItemSuperTypeEnum GetSuperType() {

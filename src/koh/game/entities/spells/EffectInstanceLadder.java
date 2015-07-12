@@ -45,11 +45,6 @@ public class EffectInstanceLadder extends EffectInstanceCreature {
         this.monsterCount = buf.getInt();
     }
     
-    @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        super.writeExternal(objectOutput);
-        objectOutput.writeInt(this.monsterCount);
-    }
 
     @Override
     public void toBinary(IoBuffer buf) {

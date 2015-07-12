@@ -20,7 +20,7 @@ public class EffectInstanceMinMax extends EffectInstance {
     public int MaxValue;
 
     public EffectInstanceMinMax(EffectInstance Parent, int MinValue, int MaxValue) {
-        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.hidden, Parent.rawZone, Parent.delay, Parent.triggers, Parent.order);
+        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.rawZone, Parent.delay, Parent.triggers, Parent.visibleInTooltip, Parent.visibleInFightLog, Parent.visibleInBuffUi);
         this.MinValue = MinValue;
         this.MaxValue = MaxValue;
     }
@@ -49,12 +49,6 @@ public class EffectInstanceMinMax extends EffectInstance {
         this.MaxValue = buf.getInt();
     }
     
-    @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        super.writeExternal(objectOutput);
-        objectOutput.writeInt(this.MinValue);
-        objectOutput.writeInt(this.MaxValue);
-    }
 
     @Override
     public void toBinary(IoBuffer buf) {

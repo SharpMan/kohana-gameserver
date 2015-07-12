@@ -19,7 +19,7 @@ public class EffectInstanceCreature extends EffectInstance {
     public int monsterFamilyId;
 
     public EffectInstanceCreature(EffectInstance Parent, int monsterFamilyId) {
-        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.hidden, Parent.rawZone, Parent.delay, Parent.triggers, Parent.order);
+        super(Parent.effectUid, Parent.effectId, Parent.targetId, Parent.targetMask, Parent.duration, Parent.random, Parent.group, Parent.rawZone, Parent.delay, Parent.triggers, Parent.visibleInTooltip, Parent.visibleInFightLog, Parent.visibleInBuffUi);
         this.monsterFamilyId = monsterFamilyId;
     }
 
@@ -46,11 +46,6 @@ public class EffectInstanceCreature extends EffectInstance {
         return new EffectInstanceCreature(this, this.monsterFamilyId);
     }
 
-    @Override
-    public void writeExternal(ObjectOutput objectOutput) throws IOException {
-        super.writeExternal(objectOutput);
-        objectOutput.writeInt(this.monsterFamilyId);
-    }
 
     @Override
     public void toBinary(IoBuffer buf) {
