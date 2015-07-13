@@ -36,6 +36,8 @@ public class ItemSet {
     public boolean bonusIsSecret;
     public EffectInstance[][] effects; //Dice
     private GenericStats[] myStats;
+    
+    //TODO: Create Cache  ObjectEffect[] toObjectEffects
 
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

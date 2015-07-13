@@ -31,7 +31,7 @@ public class InventoryItem {
     private int Position;
     private int Owner;
     private int Quantity;
-    public List<EffectInstance> Effects;
+    public List<ObjectEffect> Effects; //FIXME : Think if we should migrate to Array or not , trought newArray = ArraysUtils.add(T[] Array,T Element);
     public boolean NeedInsert, NeedRemove;
     public List<String> ColumsToUpdate = null;
 
@@ -41,9 +41,9 @@ public class InventoryItem {
 
     private GenericStats myStats;
 
-    public static InventoryItem Instance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<EffectInstance> Effects) {
+    public static InventoryItem Instance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
         if (ItemDAO.Cache.get(TemplateId).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-            if (Effects.stream().anyMatch(x -> x.effectId == 995)) {
+            if (Effects.stream().anyMatch(x -> x.actionId == 995)) {
                 Main.Logs().writeDebug("Contains Aninal");
                 return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, false);
             } else {
@@ -51,7 +51,7 @@ public class InventoryItem {
                 return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, true);
             }
         } else if (ItemDAO.Cache.get(TemplateId).TypeId == 97) {
-            if (Effects.stream().anyMatch(x -> x.effectId == 995)) {
+            if (Effects.stream().anyMatch(x -> x.actionId == 995)) {
                 Main.Logs().writeDebug("Contains AninalM");
                 return new MountInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, false);
             } else {
@@ -64,7 +64,7 @@ public class InventoryItem {
         }
     }
 
-    public InventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<EffectInstance> Effects) {
+    public InventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
         this.ID = ID;
         this.TemplateId = TemplateId;
         this.Position = Position;
@@ -74,11 +74,11 @@ public class InventoryItem {
     }
 
     public ObjectItem ObjectItem(int WithQuantity) {
-        return new ObjectItem(this.Position, this.TemplateId, ObjectEffects(Effects.stream().filter(x -> x.visibleInTooltip).collect(Collectors.toList())), this.ID, WithQuantity);
+        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.Template().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, WithQuantity);
     }
 
     public ObjectItem ObjectItem() {
-        return new ObjectItem(this.Position, this.TemplateId, ObjectEffects(Effects.stream().filter(x -> x.visibleInTooltip).collect(Collectors.toList())), this.ID, this.Quantity);
+        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.Template().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.Quantity);
     }
 
     public ItemSuperTypeEnum GetSuperType() {
@@ -98,11 +98,11 @@ public class InventoryItem {
     }
 
     public short Apparrance() {
-        EffectInstanceInteger effect = (EffectInstanceInteger) this.GetEffect(972);
+        ObjectEffectInteger effect = (ObjectEffectInteger) this.GetEffect(972);
         if (effect == null) {
             return this.Template().appearanceId;
         } else {
-            EffectInstanceInteger type = (EffectInstanceInteger) this.GetEffect(970);
+            ObjectEffectInteger type = (ObjectEffectInteger) this.GetEffect(970);
             if (type == null) {
                 return this.Template().appearanceId;
             }
@@ -147,15 +147,11 @@ public class InventoryItem {
     }
 
     public boolean hasEffect(int id) {
-        return this.Effects.stream().anyMatch(x -> x.effectId == id);
+        return this.Effects.stream().anyMatch(x -> x.actionId == id);
     }
 
-    public EffectInstance GetEffect(int id) {
-        try {
-            return this.Effects.stream().filter(x -> x.effectId == id).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+    public ObjectEffect GetEffect(int id) {
+        return this.Effects.stream().filter(x -> x.actionId == id).findFirst().orElse(null);
     }
 
     public ItemTemplate Template() {
@@ -167,18 +163,18 @@ public class InventoryItem {
     }
 
     public void RemoveEffect(int id) {
-        if (this.Effects.removeIf(x -> x.effectId == id)) {
+        if (this.Effects.removeIf(x -> x.actionId == id)) {
             this.NotifiedColumn("effects");
         }
     }
 
-    public List<EffectInstance> getEffects() {
+    public List<ObjectEffect> getEffects() {
         this.NotifiedColumn("effects");
         return Effects;
     }
 
-    public List<EffectInstance> getEffectsCopy() {
-        List<EffectInstance> effects = new ArrayList<>();
+    public List<ObjectEffect> getEffectsCopy() {
+        List<ObjectEffect> effects = new ArrayList<>();
         this.Effects.stream().forEach((e) -> { //TODO: Parralel Stream
             effects.add(e.Clone());
         });
@@ -199,13 +195,13 @@ public class InventoryItem {
         this.NotifiedColumn("position");
     }
 
-    public boolean Equals(Collection<EffectInstance> Effects) {
-        EffectInstance Get = null;
+    public boolean Equals(Collection<ObjectEffect> Effects) {
+        ObjectEffect Get = null;
         if (Effects.size() != this.Effects.size()) {
             return false;
         }
-        for (EffectInstance e : Effects) {
-            Get = this.GetEffect(e.effectId);
+        for (ObjectEffect e : Effects) {
+            Get = this.GetEffect(e.actionId);
             if (Get == null || !Get.equals(e)) {
                 return false;
             }
@@ -213,44 +209,13 @@ public class InventoryItem {
         return true;
     }
 
-    public static List<EffectInstance> DeserializeEffects(byte[] binary) {
+    public static List<ObjectEffect> DeserializeEffects(byte[] binary) {
         IoBuffer buf = IoBuffer.wrap(binary);
         int len = buf.getInt();
-        List<EffectInstance> Effects = new ArrayList<>();
+        List<ObjectEffect> Effects = new ArrayList<>();
         for (int i = 0; i < len; i++) {
-            switch (buf.get()) {
-                case 1:
-                    Effects.add(new EffectInstance(buf));
-                    break;
-                case 2:
-                    Effects.add(new EffectInstanceInteger(buf));
-                    break;
-                case 3:
-                    Effects.add(new EffectInstanceDice(buf));
-                    break;
-                case 4:
-                    Effects.add(new EffectInstanceDate(buf));
-                    break;
-                case 5:
-                    Effects.add(new EffectInstanceMinMax(buf));
-                    break;
-                case 6:
-                    Effects.add(new EffectInstanceCreature(buf));
-                    break;
-                case 7:
-                    Effects.add(new EffectInstanceDuration(buf));
-                    break;
-                case 8:
-                    Effects.add(new EffectInstanceLadder(buf));
-                    break;
-                case 9:
-                    Effects.add(new EffectInstanceMount(buf));
-                    break;
-                case 10:
-                    Effects.add(new EffectInstanceString(buf));
-                    break;
-
-            }
+            Effects.add(ObjectEffect.Instance(buf.getInt()));
+            Effects.get(i).deserialize(buf);
         }
         buf.clear();
         return Effects;
@@ -261,57 +226,13 @@ public class InventoryItem {
         buff.setAutoExpand(true);
 
         buff.putInt(Effects.size());
-        for (EffectInstance e : Effects) {
-            buff.put(e.SerializationIdentifier());
-            e.toBinary(buff);
+        for (ObjectEffect e : Effects) {
+            buff.putInt(e.getTypeId());
+            e.serialize(buff);
         }
 
         buff.flip();
         return buff;
-    }
-
-    public ObjectEffect[] ObjectEffects(List<EffectInstance> effects) {
-        ObjectEffect[] array = new ObjectEffect[effects.size()];
-        for (int i = 0; i < array.length; ++i) {
-            //EffectInstanceCreate 
-            if (effects.get(i) instanceof EffectInstanceDuration) {
-                array[i] = new ObjectEffectDuration((effects.get(i)).effectId, ((EffectInstanceDuration) effects.get(i)).days, ((EffectInstanceDuration) effects.get(i)).hours, ((EffectInstanceDuration) effects.get(i)).minutes);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceLadder) {
-                array[i] = new ObjectEffectLadder((effects.get(i)).effectId, ((EffectInstanceLadder) effects.get(i)).monsterFamilyId, ((EffectInstanceLadder) effects.get(i)).monsterCount);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceCreature) {
-                array[i] = new ObjectEffectCreature((effects.get(i)).effectId, ((EffectInstanceCreature) effects.get(i)).monsterFamilyId);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceMount) {
-                array[i] = new ObjectEffectMount((effects.get(i)).effectId, ((EffectInstanceMount) effects.get(i)).date, ((EffectInstanceMount) effects.get(i)).modelId, ((EffectInstanceMount) effects.get(i)).mountId);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceString) {
-                array[i] = new ObjectEffectString((effects.get(i)).effectId, ((EffectInstanceString) effects.get(i)).text);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceMinMax) {
-                array[i] = new ObjectEffectMinMax((effects.get(i)).effectId, ((EffectInstanceMinMax) effects.get(i)).MinValue, ((EffectInstanceMinMax) effects.get(i)).MaxValue);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceDate) {
-                array[i] = new ObjectEffectDate((effects.get(i)).effectId, ((EffectInstanceDate) effects.get(i)).Year, ((EffectInstanceDate) effects.get(i)).Mounth, ((EffectInstanceDate) effects.get(i)).Day, ((EffectInstanceDate) effects.get(i)).Hour, ((EffectInstanceDate) effects.get(i)).Minute);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceDice) {
-                array[i] = new ObjectEffectDice((effects.get(i)).effectId, ((EffectInstanceDice) effects.get(i)).diceNum, ((EffectInstanceDice) effects.get(i)).diceSide, ((EffectInstanceInteger) effects.get(i)).value);
-                continue;
-            }
-            if (effects.get(i) instanceof EffectInstanceInteger) {
-                array[i] = new ObjectEffectInteger((effects.get(i)).effectId, ((EffectInstanceInteger) effects.get(i)).value);
-            }
-
-        }
-        return array;
     }
 
     public boolean AreConditionFilled(Player character) {
@@ -335,14 +256,14 @@ public class InventoryItem {
         this.myStats = new GenericStats();
 
         StatsEnum Stat;
-        for (EffectInstance e : this.Effects) {
-            if (e instanceof EffectInstanceInteger) {
-                Stat = StatsEnum.valueOf(e.effectId);
+        for (ObjectEffect e : this.Effects) {
+            if (e instanceof ObjectEffectInteger) {
+                Stat = StatsEnum.valueOf(e.actionId);
                 if (Stat == null) {
-                    Main.Logs().writeError("Undefinied Stat id " + e.effectId);
+                    Main.Logs().writeError("Undefinied Stat id " + e.actionId);
                     continue;
                 }
-                this.myStats.AddItem(Stat, ((EffectInstanceInteger) e).value);
+                this.myStats.AddItem(Stat, ((ObjectEffectInteger) e).value);
             }
         }
         Stat = null;
@@ -362,9 +283,9 @@ public class InventoryItem {
             Position = 0;
             Owner = 0;
             Quantity = 0;
-            for (EffectInstance e : Effects) {
-                e.totalClear();
-            }
+            /*for (ObjectEffect e : Effects) {
+             e.totalClear();
+             }*/
             Effects.clear();
             Effects = null;
             NeedInsert = false;

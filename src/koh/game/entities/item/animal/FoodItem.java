@@ -14,5 +14,7 @@ public class FoodItem {
         this.Stats = Stats;
         this.StatsPoints = StatsPoints;
     }
+    
+    
 
 }

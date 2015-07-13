@@ -27,6 +27,9 @@ import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
 import koh.protocol.messages.game.inventory.items.ObjectFeedMessage;
 import koh.protocol.messages.game.inventory.items.ObjectModifiedMessage;
 import koh.protocol.messages.game.inventory.items.ObjectSetPositionMessage;
+import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
+import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 
 /**
  *
@@ -79,7 +82,7 @@ public class InventoryHandler {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        EffectInstanceInteger obviXp = (EffectInstanceInteger) Item.GetEffect(974), obviSkin = (EffectInstanceInteger) Item.GetEffect(972);
+        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviSkin = (ObjectEffectInteger) Item.GetEffect(972);
         if (obviXp == null || obviSkin == null) {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
@@ -92,7 +95,7 @@ public class InventoryHandler {
             Client.Character.InventoryCache.RemoveApparence(Item.Apparrance());
         }
         Item.RemoveEffect(972);
-        Item.getEffects().add(((EffectInstanceInteger) obviSkin.Clone()).SetValue(Message.skinId));
+        Item.getEffects().add(((ObjectEffectInteger) obviSkin.Clone()).SetValue(Message.skinId));
         Client.Send(new ObjectModifiedMessage(Item.ObjectItem()));
         if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.Template().appearanceId != 0) {
             Client.Character.InventoryCache.AddApparence(Item.Apparrance());
@@ -123,8 +126,8 @@ public class InventoryHandler {
             }
 
         } else if (Item.isLivingObject()) {
-            EffectInstanceInteger obviXp = (EffectInstanceInteger) Item.GetEffect(974), obviType = (EffectInstanceInteger) Item.GetEffect(973), obviState = (EffectInstanceInteger) Item.GetEffect(971), obviSkin = (EffectInstanceInteger) Item.GetEffect(972), obviItem = (EffectInstanceInteger) Item.GetEffect(970);
-            EffectInstanceDate obviTime = (EffectInstanceDate) Item.GetEffect(808);
+            ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972), obviItem = (ObjectEffectInteger) Item.GetEffect(970);
+            ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808);
             if (obviItem == null || obviType == null || obviType.value != Food.Template().TypeId || obviTime == null || obviXp == null || obviState == null) {
                 Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
                 return;
@@ -144,13 +147,13 @@ public class InventoryHandler {
                 Client.Character.InventoryCache.UpdateObjectquantity(Item, newqua);
             }
             Item.RemoveEffect(974);
-            Item.getEffects().add(((EffectInstanceInteger) obviXp.Clone()).SetValue(oldxp + xp));
+            Item.getEffects().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
             //FIXME : if(state < 2) But useles...
             Item.RemoveEffect(971);
-            Item.getEffects().add(((EffectInstanceInteger) obviState.Clone()).SetValue(state + 1));
+            Item.getEffects().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
             Item.RemoveEffect(808);
             Calendar now = Calendar.getInstance();
-            Item.getEffects().add(((EffectInstanceDate) new EffectInstanceDate(obviTime, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE))));
+            Item.getEffects().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte)now.get(Calendar.MONTH), (byte)now.get(Calendar.DAY_OF_MONTH),(byte)now.get(Calendar.HOUR), (byte)now.get(Calendar.MINUTE))));
 
             Client.Send(new ObjectModifiedMessage(Item.ObjectItem()));
             Client.Character.Send(new InventoryWeightMessage(Client.Character.InventoryCache.Weight(), Client.Character.InventoryCache.WeightTotal()));
@@ -167,8 +170,8 @@ public class InventoryHandler {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        EffectInstanceInteger obviXp = (EffectInstanceInteger) Item.GetEffect(974), obviType = (EffectInstanceInteger) Item.GetEffect(973), obviState = (EffectInstanceInteger) Item.GetEffect(971), obviSkin = (EffectInstanceInteger) Item.GetEffect(972), obviTemplate = (EffectInstanceInteger) Item.GetEffect(970);
-        EffectInstanceDate obviTime = (EffectInstanceDate) Item.GetEffect(808), exchangeTime = (EffectInstanceDate) Item.GetEffect(983);
+        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972), obviTemplate = (ObjectEffectInteger) Item.GetEffect(970);
+        ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808), exchangeTime = (ObjectEffectDate) Item.GetEffect(983);
         if (obviTemplate == null || obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
@@ -176,7 +179,7 @@ public class InventoryHandler {
         if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED/* && Item.Template().appearanceId != 0*/) {
             Client.Character.InventoryCache.RemoveApparence(Item.Apparrance());
         }
-        Client.Character.InventoryCache.TryCreateItem(obviTemplate.value, Client.Character, 1, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), new ArrayList<EffectInstance>() {
+        Client.Character.InventoryCache.TryCreateItem(obviTemplate.value, Client.Character, 1, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), new ArrayList<ObjectEffect>() {
             {
                 add(obviTemplate.Clone());
                 add(obviXp.Clone());

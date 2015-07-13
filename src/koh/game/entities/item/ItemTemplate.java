@@ -1,6 +1,7 @@
 package koh.game.entities.item;
 
 import com.google.common.base.Strings;
+import java.util.Arrays;
 import koh.game.conditions.ConditionExpression;
 import koh.game.dao.ItemDAO;
 import koh.game.entities.spells.EffectInstance;
@@ -45,6 +46,15 @@ public class ItemTemplate {
             }
         }
         return m_criteriaExpression;
+    }
+
+    
+    public EffectInstance GetEffect(int uid) {
+        return Arrays.stream(possibleEffects).filter(x -> x.effectUid == uid).findFirst().orElse(null);
+    }
+    
+    public boolean isVisibleInTooltip(int Effect){
+        return Arrays.stream(this.possibleEffects).anyMatch(x -> x.effectId == Effect && x.visibleInTooltip);
     }
 
     public ItemSet ItemSet() {

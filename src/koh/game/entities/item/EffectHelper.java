@@ -9,14 +9,7 @@ import koh.game.Main;
 import koh.game.entities.spells.*;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.types.game.data.items.ObjectEffect;
-import koh.protocol.types.game.data.items.effects.ObjectEffectCreature;
-import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
-import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
-import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
-import koh.protocol.types.game.data.items.effects.ObjectEffectLadder;
-import koh.protocol.types.game.data.items.effects.ObjectEffectMinMax;
-import koh.protocol.types.game.data.items.effects.ObjectEffectMount;
-import koh.protocol.types.game.data.items.effects.ObjectEffectString;
+import koh.protocol.types.game.data.items.effects.*;
 import koh.utils.Couple;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.mina.core.buffer.IoBuffer;
@@ -60,10 +53,10 @@ public class EffectHelper {
         return buff;
     }
 
-    public static int RandomValue(Couple<Integer,Integer> Couple) {
-        return RandomValue(Couple.first,Couple.second);
+    public static int RandomValue(Couple<Integer, Integer> Couple) {
+        return RandomValue(Couple.first, Couple.second);
     }
-    
+
     public static int RandomValue(int i1, int i2) {
         Random rand = new Random();
         return rand.nextInt(i2 - i1 + 1) + i1;
@@ -160,53 +153,97 @@ public class EffectHelper {
         return Effects;
     }
 
-    public static List<EffectInstance> GenerateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
-        List<EffectInstance> Effects = new ArrayList<>();
+    public static List<ObjectEffect> GenerateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
+        List<ObjectEffect> Effects = new ArrayList<>();
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
                 Main.Logs().writeDebug(e.toString());
                 if (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId)) {
-                    Effects.add(e);
+                    Effects.add(new ObjectEffectDice(e.effectId, ((EffectInstanceDice) e).diceNum, ((EffectInstanceDice) e).diceSide, ((EffectInstanceDice) e).value));
                     continue;
                 }
                 if (ArrayUtils.contains(LivingObjectEffect, e.effectId)) {
-                    Effects.add(new EffectInstanceInteger(e, ((EffectInstanceDice) e).value));
+                    Effects.add(new ObjectEffectInteger(e.effectId, ((EffectInstanceDice) e).value));
                     continue;
                 }
                 if (ArrayUtils.contains(DateEffect, e.effectId)) {
                     Calendar now = Calendar.getInstance();
-                    Effects.add(new EffectInstanceDate(e, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE)));
+                    Effects.add(new ObjectEffectDate(e.effectId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR_OF_DAY), (byte) now.get(Calendar.MINUTE)));
                     continue;
                 }
                 if (ArrayUtils.contains(MonsterEffect, e.effectId)) {
-                    Effects.add(new EffectInstanceCreature(e, ((EffectInstanceDice) e).diceNum));
+                    Effects.add(new ObjectEffectCreature(e.effectId, ((EffectInstanceDice) e).diceNum));
                     continue;
                 }
                 if (ArrayUtils.contains(LadderEffects, e.effectId)) {
-                    Effects.add(new EffectInstanceLadder(e, ((EffectInstanceDice) e).diceNum, 0));
+                    Effects.add(new ObjectEffectLadder(e.effectId, ((EffectInstanceDice) e).diceNum, 0));
                     continue;
                 }
 
                 short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 if (GenType == EffectGenerationType.MaxEffects) {
-                    Effects.add(new EffectInstanceInteger(e, !e.Template().operator.equalsIgnoreCase("-") ? num1 : num2));
+                    Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;
                 }
                 if (GenType == EffectGenerationType.MinEffects) {
-                    Effects.add(new EffectInstanceInteger(e, !e.Template().operator.equalsIgnoreCase("-") ? num2 : num1));
+                    Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num2 : num1));
                     continue;
                 }
                 if ((int) num2 == 0) {
-                    Effects.add(new EffectInstanceInteger(e, num1));
+                    Effects.add(new ObjectEffectInteger(e.effectId, num1));
                 } else {
-                    Effects.add(new EffectInstanceInteger(e, (short) RandomValue((int) num2, (int) num1 + 1)));
+                    Effects.add(new ObjectEffectInteger(e.effectId, (short) RandomValue((int) num2, (int) num1 + 1)));
                 }
             } else {
                 throw new Error("Effect not suport" + e.toString());
             }
         }
         return Effects;
+    }
+    
+    public static ObjectEffect[] ObjectEffects(List<EffectInstance> effects) {
+        ObjectEffect[] array = new ObjectEffect[effects.size()];
+        for (int i = 0; i < array.length; ++i) {
+            //EffectInstanceCreate 
+            if (effects.get(i) instanceof EffectInstanceDuration) {
+                array[i] = new ObjectEffectDuration((effects.get(i)).effectId, ((EffectInstanceDuration) effects.get(i)).days, ((EffectInstanceDuration) effects.get(i)).hours, ((EffectInstanceDuration) effects.get(i)).minutes);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceLadder) {
+                array[i] = new ObjectEffectLadder((effects.get(i)).effectId, ((EffectInstanceLadder) effects.get(i)).monsterFamilyId, ((EffectInstanceLadder) effects.get(i)).monsterCount);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceCreature) {
+                array[i] = new ObjectEffectCreature((effects.get(i)).effectId, ((EffectInstanceCreature) effects.get(i)).monsterFamilyId);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceMount) {
+                array[i] = new ObjectEffectMount((effects.get(i)).effectId, ((EffectInstanceMount) effects.get(i)).date, ((EffectInstanceMount) effects.get(i)).modelId, ((EffectInstanceMount) effects.get(i)).mountId);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceString) {
+                array[i] = new ObjectEffectString((effects.get(i)).effectId, ((EffectInstanceString) effects.get(i)).text);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceMinMax) {
+                array[i] = new ObjectEffectMinMax((effects.get(i)).effectId, ((EffectInstanceMinMax) effects.get(i)).MinValue, ((EffectInstanceMinMax) effects.get(i)).MaxValue);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceDate) {
+                array[i] = new ObjectEffectDate((effects.get(i)).effectId, ((EffectInstanceDate) effects.get(i)).Year, ((EffectInstanceDate) effects.get(i)).Mounth, ((EffectInstanceDate) effects.get(i)).Day, ((EffectInstanceDate) effects.get(i)).Hour, ((EffectInstanceDate) effects.get(i)).Minute);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceDice) {
+                array[i] = new ObjectEffectDice((effects.get(i)).effectId, ((EffectInstanceDice) effects.get(i)).diceNum, ((EffectInstanceDice) effects.get(i)).diceSide, ((EffectInstanceInteger) effects.get(i)).value);
+                continue;
+            }
+            if (effects.get(i) instanceof EffectInstanceInteger) {
+                array[i] = new ObjectEffectInteger((effects.get(i)).effectId, ((EffectInstanceInteger) effects.get(i)).value);
+            }
+
+        }
+        return array;
     }
 
 }

@@ -20,6 +20,7 @@ import koh.game.entities.item.animal.*;
 import koh.game.entities.spells.*;
 import koh.game.utils.Settings;
 import koh.game.utils.StringUtil;
+import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.utils.Enumerable;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -43,7 +44,7 @@ public class ItemDAO {
         synchronized (Cache) {
             try {
                 ResultSet RS = MySQL.executeQuery("SELECT * from " + table + " where owner =" + player + ";", Settings.GetStringElement("Database.Name"), 0);
-                List<EffectInstance> Effects;
+                List<ObjectEffect> Effects;
                 while (RS.next()) {
                     Effects = DeserializeEffects(RS.getBytes("effects"));
                     Cache.put(RS.getInt("id"), InventoryItem.Instance(RS.getInt("id"), RS.getInt("template"), RS.getInt("position"), RS.getInt("owner"), RS.getInt("stack"), Effects));
@@ -81,8 +82,9 @@ public class ItemDAO {
             RS = executeQuery("SELECT id FROM `storage_items` ORDER BY id DESC LIMIT 1;", Settings.GetStringElement("Database.Name"));
             if (!RS.first()) {
                 NextStorageID = 0;
+            } else {
+                NextStorageID = RS.getInt("id");
             }
-            NextStorageID = RS.getInt("id");
             NextStorageID++;
             MySQL.closeResultSet(RS);
         } catch (SQLException e) {
@@ -267,7 +269,7 @@ public class ItemDAO {
                         } else {
                             this.MonsterBoosts = new MonsterBooster[RS.getString("monster_food").split(",").length];
                             for (int i = 0; i < this.MonsterBoosts.length; ++i) {
-                                this.MonsterBoosts[i] = new MonsterBooster(Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[0]), Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[1]), Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[2]), Enumerable.StringToIntArray(RS.getString("monster_food").split(",")[i].split(";")[3], ":"), Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[4]));
+                                this.MonsterBoosts[i] = new MonsterBooster(Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[0]), Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[1]), Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[2]), Enumerable.StringToIntArray(RS.getString("monster_food").split(",")[i].split(";")[3], ":"), Integer.parseInt(RS.getString("monster_food").split(",")[i].split(";")[4]), RS.getString("monster_food").split(",")[i].split(";").length > 5 ? RS.getString("monster_food").split(",")[i].split(";")[5] : null);
                             }
                         }
                         this.minDurationBeforeMeal = RS.getInt("min_duration_before_meal");

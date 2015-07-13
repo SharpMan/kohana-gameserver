@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.ItemDAO;
-import static koh.game.dao.ItemDAO.Insert;
-import static koh.game.dao.ItemDAO.Update;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -31,7 +29,6 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.KamasUpdateMessage;
 import koh.protocol.messages.game.inventory.items.ObjectAddedMessage;
@@ -42,7 +39,10 @@ import koh.protocol.messages.game.inventory.items.ObjectMovementMessage;
 import koh.protocol.messages.game.inventory.items.ObjectQuantityMessage;
 import koh.protocol.messages.game.inventory.items.SetUpdateMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarRemovedMessage;
+import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.ObjectItem;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
+import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import koh.protocol.types.game.look.EntityLook;
 import koh.protocol.types.game.look.SubEntity;
 
@@ -94,11 +94,11 @@ public class CharacterInventory {
         return true;
     }
 
-    public boolean TryMergeItem(int TemplateId, List<EffectInstance> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem) {
+    public boolean TryMergeItem(int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem) {
         return TryMergeItem(TemplateId, Stats, Slot, Quantity, RemoveItem, true);
     }
 
-    public boolean TryMergeItem(int TemplateId, List<EffectInstance> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
+    public boolean TryMergeItem(int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
         if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.ItemsCache.values()) {
                 if (Item.Equals(Stats) && Item.TemplateId == TemplateId && Item.Slot() == Slot) {
@@ -196,8 +196,8 @@ public class CharacterInventory {
                     Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
                     return;
                 }
-                EffectInstanceInteger obviXp = (EffectInstanceInteger) Item.GetEffect(974), obviType = (EffectInstanceInteger) Item.GetEffect(973), obviState = (EffectInstanceInteger) Item.GetEffect(971), obviSkin = (EffectInstanceInteger) Item.GetEffect(972);
-                EffectInstanceDate obviTime = (EffectInstanceDate) Item.GetEffect(808), exchangeTime = (EffectInstanceDate) Item.GetEffect(983);
+                ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972);
+                ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808), exchangeTime = (ObjectEffectDate) Item.GetEffect(983);
                 if (exItem.GetEffect(970) != null) {
                     PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet est déjà associé à un objet d'apparance.");
                     return;
@@ -215,7 +215,7 @@ public class CharacterInventory {
                     //this.Player.GetEntityLook().skins.remove(this.Player.GetEntityLook().skins.indexOf(exItem.Apparrance()));
                 }
 
-                exItem.getEffects().add(new EffectInstanceInteger(970, Item.TemplateId));
+                exItem.getEffects().add(new ObjectEffectInteger(970, Item.TemplateId));
                 exItem.getEffects().add(obviXp.Clone());
                 exItem.getEffects().add(obviTime.Clone());
                 exItem.getEffects().add(obviType.Clone());
@@ -395,11 +395,11 @@ public class CharacterInventory {
         }
     }
 
-    public static InventoryItem TryCreateItem(int templateId, Player Character, int quantity, byte position, List<EffectInstance> Stats) {
+    public static InventoryItem TryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats) {
         return TryCreateItem(templateId, Character, quantity, position, Stats, false);
     }
 
-    public static InventoryItem TryCreateItem(int templateId, Player Character, int quantity, byte position, List<EffectInstance> Stats, boolean Merge) {
+    public static InventoryItem TryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
         if (!ItemDAO.Cache.containsKey(templateId)) // Template inexistant
         {
             return null;

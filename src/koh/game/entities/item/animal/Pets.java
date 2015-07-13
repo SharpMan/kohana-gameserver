@@ -2,8 +2,11 @@ package koh.game.entities.item.animal;
 
 import com.google.common.primitives.Ints;
 import java.util.Arrays;
+import koh.game.dao.ItemDAO;
 import koh.game.entities.item.ItemTemplate;
 import koh.game.entities.spells.EffectInstance;
+import koh.game.entities.spells.EffectInstanceDice;
+import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -24,12 +27,7 @@ public class Pets {
     }
 
     public EffectInstance getEffect(int id) {
-        try {
-            return Arrays.stream(possibleEffects).filter(x -> x.effectId == id).findFirst().get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+       return Arrays.stream(possibleEffects).filter(x -> x.effectId == id).findFirst().orElse(null);
     }
 
     public String toString() {
@@ -47,14 +45,14 @@ public class Pets {
                         System.out.println("You must set " + io);
                     }
                 } /*else {
-                 EffectInstanceDice a = (EffectInstanceDice) Arrays.stream(possibleEffects).filter(x -> x.effectId == i).findFirst().get();
-                 int total = (int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide;
-                 if (total != (int) (b.StatsBoost * (Hormone / b.Point))) {
-                 System.out.println("ErreurEffect stat " + i + " Familier " + Id + " StatsNormalMax " + ((int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide) + " != " + b.StatsBoost * (Hormone / b.Point));
-                 int maySet = total / (Hormone / b.Point);
-                 System.out.println("Familier" + ItemDAO.Cache.get(Id).nameId + "ID " + Id + " Monster " + b.MonsterFamily + " you should put " + b.MonsterFamily + ";" + b.DeathNumber + ";" + b.Point + ";" + Enumerable.Join(b.Stats, ':') + ";" + maySet);
-                 }
-                 }*/
+                    EffectInstanceDice a = (EffectInstanceDice) Arrays.stream(possibleEffects).filter(x -> x.effectId == i).findFirst().get();
+                    int total = (int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide;
+                    if (total != (int) (b.getStatsBoost(i) * (Hormone / b.Point))) {
+                        System.out.println("ErreurEffect stat " + i + " Familier " + Id + " StatsNormalMax " + ((int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide) + " != " + b.getStatsBoost(i)  * (Hormone / b.Point));
+                        int maySet = total / (Hormone / b.Point);
+                        System.out.println("Familier" + ItemDAO.Cache.get(Id).nameId + "ID " + Id + " Monster " + b.MonsterFamily + " you should put " + b.MonsterFamily + ";" + b.DeathNumber + ";" + b.Point + ";" + Enumerable.Join(b.Stats, ':') + ";" + maySet);
+                    }
+                }*/
 
             }
         }

@@ -1,6 +1,5 @@
 package koh.game.entities;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,13 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import koh.game.Main;
 import koh.game.dao.AccountDataDAO;
 import koh.game.dao.ItemDAO;
 import koh.game.dao.PlayerDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
-import koh.game.entities.spells.EffectInstance;
 import koh.protocol.client.BufUtils;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.PlayerStateEnum;
@@ -24,10 +21,9 @@ import koh.protocol.messages.game.inventory.storage.StorageObjectRemoveMessage;
 import koh.protocol.messages.game.inventory.storage.StorageObjectUpdateMessage;
 import koh.protocol.types.game.friend.FriendInformations;
 import koh.protocol.types.game.context.roleplay.BasicGuildInformations;
+import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.ObjectItem;
-import koh.protocol.types.game.friend.FriendOnlineInformations;
-import koh.protocol.types.game.friend.IgnoredInformations;
-import koh.protocol.types.game.friend.IgnoredOnlineInformations;
+import koh.protocol.types.game.friend.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -107,7 +103,7 @@ public class AccountData {
         return true;
     }
 
-    public boolean TryMergeItem(Player Player, int TemplateId, List<EffectInstance> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
+    public boolean TryMergeItem(Player Player, int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
         if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.ItemsCache.values()) {
                 if (Item.Equals(Stats) && Item.TemplateId == TemplateId && Item.Slot() == Slot) {

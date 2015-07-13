@@ -1,8 +1,5 @@
 package koh.game.entities.item.animal;
 
-import com.j256.ormlite.field.DataType;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,11 +12,10 @@ import koh.game.dao.ItemDAO;
 import koh.game.dao.PetsDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
-import koh.game.entities.spells.EffectInstance;
-import koh.game.entities.spells.EffectInstanceDate;
-import koh.game.entities.spells.EffectInstanceInteger;
 import koh.protocol.client.enums.ItemsEnum;
 import koh.protocol.messages.game.inventory.items.ObjectModifiedMessage;
+import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.effects.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -63,10 +59,10 @@ public class PetsInventoryItem extends InventoryItem {
         buf = null;
     }
 
-    public PetsInventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<EffectInstance> Effects, boolean Create) {
+    public PetsInventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects, boolean Create) {
         super(ID, TemplateId, Position, Owner, Quantity, Effects);
         if (!Create) {
-            this.Entity = PetsDAO.Get(((EffectInstanceInteger) this.GetEffect(995)).value);
+            this.Entity = PetsDAO.Get(((ObjectEffectInteger) this.GetEffect(995)).value);
             if (this.Entity != null) {
                 this.Initialize();
             }
@@ -79,7 +75,7 @@ public class PetsInventoryItem extends InventoryItem {
             this.SerializeInformations();
             this.RemoveEffect(995);
 
-            this.Effects.add(new EffectInstanceInteger(new EffectInstance(0, 995, 0, "", 0, 0, 0, false, "C", 0, "", 0), this.Entity.PetsID));
+            this.Effects.add(new ObjectEffectInteger(955, this.Entity.PetsID));
             this.NotifiedColumn("effects");
 
             PetsDAO.Insert(this.Entity);
@@ -163,19 +159,19 @@ public class PetsInventoryItem extends InventoryItem {
 
     public void UpdateDate() {
         Calendar now = Calendar.getInstance();
-        ((EffectInstanceDate) this.GetEffect(808)).SetDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE));
+        ((ObjectEffectDate) this.GetEffect(808)).SetDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE));
     }
 
     public void UpdateFood(int food) {
-        ((EffectInstanceInteger) this.GetEffect(807)).value = food;
+        ((ObjectEffectInteger) this.GetEffect(807)).value = food;
     }
 
-    public void Boost(int EffectI, int Count) {
-        EffectInstance Effect = this.GetEffect(EffectI);
+    public void Boost(int EffectID, int Count) {
+        ObjectEffect Effect = this.GetEffect(EffectID);
         if (Effect == null) {
-            this.Effects.add(new EffectInstanceInteger(this.Animal().getEffect(EffectI), Count));
+            this.Effects.add(new ObjectEffectInteger(EffectID, Count));
         } else {
-            ((EffectInstanceInteger) Effect).value += Count;
+            ((ObjectEffectInteger) Effect).value += Count;
         }
         this.Entity.lastEat = System.currentTimeMillis() + "";
         this.NotifiedColumn("effects");

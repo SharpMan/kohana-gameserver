@@ -8,10 +8,6 @@ import koh.game.dao.ItemDAO;
 import koh.game.dao.MountDAO;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.animal.MountInventoryItem;
-import koh.game.entities.spells.EffectInstance;
-import koh.game.entities.spells.EffectInstanceDuration;
-import koh.game.entities.spells.EffectInstanceMount;
-import koh.game.entities.spells.EffectInstanceString;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
@@ -23,6 +19,8 @@ import koh.protocol.messages.game.context.mount.*;
 import koh.protocol.messages.game.inventory.exchanges.ExchangeHandleMountsStableMessage;
 import koh.protocol.messages.game.inventory.exchanges.ExchangeRequestOnMountStockMessage;
 import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
+import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.effects.*;
 
 /**
  *
@@ -126,11 +124,11 @@ public class MountHandler {
                         break;
                     }
 
-                    InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, MountDAO.Model(Client.Character.MountInfo.Mount.model).ScroolId, 63, Client.Character.ID, 1, new ArrayList<EffectInstance>() {
+                    InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, MountDAO.Model(Client.Character.MountInfo.Mount.model).ScroolId, 63, Client.Character.ID, 1, new ArrayList<ObjectEffect>() {
                         {
-                            add(new EffectInstanceDuration(new EffectInstance(0, 998, 0, "", 0, 0, 0, false, "C", 0, "", 0), 37, (byte) 0, (byte) 0));
-                            add(new EffectInstanceMount(new EffectInstance(0, 995, 0, "", 0, 0, 0, false, "C", 0, "", 0), (double) Instant.now().toEpochMilli(), Client.Character.MountInfo.Mount.model, Client.Character.MountInfo.Entity.AnimalID));
-                            add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), Client.Character.NickName));
+                            add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
+                            add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.Character.MountInfo.Mount.model, Client.Character.MountInfo.Entity.AnimalID));
+                            add(new ObjectEffectString(987, Client.Character.NickName));
                         }
                     });
                     if (Client.Character.InventoryCache.Add(Item, true)) {
@@ -150,8 +148,7 @@ public class MountHandler {
     }
 
     @HandlerAttribute(ID = MountInformationRequestMessage.M_ID)
-    public static void HandleMountInformationRequestMessage(WorldClient Client, MountInformationRequestMessage Message
-    ) {
+    public static void HandleMountInformationRequestMessage(WorldClient Client, MountInformationRequestMessage Message) {
         if (Client.Character.InventoryCache.GetMount(Message.Id) == null) {
             return;
         } else {

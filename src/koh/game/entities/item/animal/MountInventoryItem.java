@@ -2,16 +2,13 @@ package koh.game.entities.item.animal;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import koh.game.dao.ExpDAO;
 import koh.game.dao.ItemDAO;
 import koh.game.dao.MountDAO;
 import koh.game.dao.PetsDAO;
 import koh.game.entities.item.InventoryItem;
-import koh.game.entities.spells.EffectInstance;
-import koh.game.entities.spells.EffectInstanceDuration;
-import koh.game.entities.spells.EffectInstanceInteger;
-import koh.game.entities.spells.EffectInstanceMount;
+import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.effects.*;
 import koh.protocol.types.game.mount.MountClientData;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.mina.core.buffer.IoBuffer;
@@ -26,10 +23,10 @@ public class MountInventoryItem extends InventoryItem {
     public MountInventoryItemEntity Entity;
     public MountClientData Mount;
 
-    public MountInventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<EffectInstance> Effects, boolean Create) {
+    public MountInventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects, boolean Create) {
         super(ID, TemplateId, Position, Owner, Quantity, Effects);
         if (!Create) {
-            this.Entity = PetsDAO.GetMount(((EffectInstanceMount) this.GetEffect(995)).mountId);
+            this.Entity = PetsDAO.GetMount(((ObjectEffectMount) this.GetEffect(995)).mountId);
             if (this.Entity != null) {
                 this.Initialize();
             }
@@ -37,8 +34,8 @@ public class MountInventoryItem extends InventoryItem {
         if (Create) {
             this.RemoveEffect(995);
             this.RemoveEffect(998);
-            this.Effects.add(new EffectInstanceMount(new EffectInstance(0, 995, 0, "", 0, 0, 0, false, "C", 0, "", 0), (double) Instant.now().toEpochMilli(), 10, 0));
-            this.Effects.add(new EffectInstanceDuration(new EffectInstance(0, 998, 0, "", 0, 0, 0, false, "C", 0, "", 0), 37, (byte) 0, (byte) 0));
+            this.Effects.add(new ObjectEffectMount(955, (double) Instant.now().toEpochMilli(), 10, 0));
+            this.Effects.add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
         }
         if (this.Entity == null) {
             this.Entity = new MountInventoryItemEntity();
@@ -61,8 +58,8 @@ public class MountInventoryItem extends InventoryItem {
             this.RemoveEffect(995);
             this.RemoveEffect(998);
 
-            this.Effects.add(new EffectInstanceMount(new EffectInstance(0, 995, 0, "", 0, 0, 0, false, "C", 0, "", 0), (double) Instant.now().toEpochMilli(), MountDAO.Cache.get(this.TemplateId).Id, this.Entity.AnimalID));
-            this.Effects.add(new EffectInstanceDuration(new EffectInstance(0, 998, 0, "", 0, 0, 0, false, "C", 0, "", 0), 37, (byte) 0, (byte) 0));
+            this.Effects.add(new ObjectEffectMount(955, (double) Instant.now().toEpochMilli(), MountDAO.Cache.get(this.TemplateId).Id, this.Entity.AnimalID));
+            this.Effects.add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
             this.NotifiedColumn("effects");
 
             PetsDAO.Insert(this.Entity);
