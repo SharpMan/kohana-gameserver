@@ -94,7 +94,7 @@ public class InventoryItem {
     }
 
     public boolean isLivingObject() {
-        return this.Template().TypeId == 113;
+        return this.Template().TypeId == 113 || (this.GetEffect(970) != null && this.GetEffect(971) != null);
     }
 
     public short Apparrance() {
@@ -194,6 +194,7 @@ public class InventoryItem {
         this.Position = Slot.value();
         this.NotifiedColumn("position");
     }
+    
 
     public boolean Equals(Collection<ObjectEffect> Effects) {
         ObjectEffect Get = null;

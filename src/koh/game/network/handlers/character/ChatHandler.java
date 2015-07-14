@@ -367,7 +367,7 @@ public class ChatHandler {
                         if (Client.Character.InventoryCache.Add(Item, true)) {
                             Item.NeedInsert = true;
                         }
-                        PlayerController.SendServerMessage(Client, ItemDAO.Cache.get(Id).nameId + " added to your inventory");
+                        PlayerController.SendServerMessage(Client, String.format("%s  added to your inventory with %s stats", ItemDAO.Cache.get(Id).nameId, Type.toString()));
 
                     } catch (Exception e) {
                         e.printStackTrace();

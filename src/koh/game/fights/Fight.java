@@ -616,7 +616,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         // Status en attente de fin de tour
         if (this.CurrentFighter instanceof CharacterFighter && ((CharacterFighter) CurrentFighter).Character.Client == null && this.CurrentFighter.Team.GetAliveFighters().count() > 1L) {
-            System.out.println(this.CurrentFighter.Team.GetAliveFighters().count());
             this.FightLoopState = FightLoopState.STATE_END_TURN;
         } else {
             this.FightLoopState = FightLoopState.STATE_WAIT_TURN;
@@ -1185,6 +1184,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         return null;
+    }
+    
+    public FightTeam GetLoosers(){
+        return this.GetEnnemyTeam(this.GetWinners());
     }
 
     /// <summary>

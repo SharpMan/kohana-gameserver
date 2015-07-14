@@ -128,7 +128,7 @@ public class InventoryHandler {
         } else if (Item.isLivingObject()) {
             ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972), obviItem = (ObjectEffectInteger) Item.GetEffect(970);
             ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808);
-            if (obviItem == null || obviType == null || obviType.value != Food.Template().TypeId || obviTime == null || obviXp == null || obviState == null) {
+            if (obviItem == null || obviType == null || obviType.value != Food.Template().TypeId || obviTime == null || obviXp == null || obviState == null || obviSkin == null) {
                 Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
                 return;
             }
@@ -144,7 +144,7 @@ public class InventoryHandler {
             if (newqua == 0) {
                 Client.Character.InventoryCache.RemoveItem(Food);
             } else {
-                Client.Character.InventoryCache.UpdateObjectquantity(Item, newqua);
+                Client.Character.InventoryCache.UpdateObjectquantity(Food, newqua);
             }
             Item.RemoveEffect(974);
             Item.getEffects().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
@@ -153,7 +153,7 @@ public class InventoryHandler {
             Item.getEffects().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
             Item.RemoveEffect(808);
             Calendar now = Calendar.getInstance();
-            Item.getEffects().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte)now.get(Calendar.MONTH), (byte)now.get(Calendar.DAY_OF_MONTH),(byte)now.get(Calendar.HOUR), (byte)now.get(Calendar.MINUTE))));
+            Item.getEffects().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
 
             Client.Send(new ObjectModifiedMessage(Item.ObjectItem()));
             Client.Character.Send(new InventoryWeightMessage(Client.Character.InventoryCache.Weight(), Client.Character.InventoryCache.WeightTotal()));

@@ -50,7 +50,7 @@ public class PlayerDAO {
                     copy.addAll(myCharacterByTime);
                 }
                 for (Couple<Long, Player> ref : copy) {
-                    if (System.currentTimeMillis() > ref.first && !copy.stream().filter(x -> x.second.AccountId() == ref.second.AccountId()).anyMatch(x -> x.second.GetFighter() == null)) { //On décharge pas les combattants.
+                    if (System.currentTimeMillis() > ref.first && ref.second.Account.Characters.stream().allMatch(Character -> Character.GetFighter() == null)) { //On décharge pas les combattants.
                         synchronized (AccountInUnload) {
                             DelCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
                             AccountInUnload.add(ref.second.Account.ID);

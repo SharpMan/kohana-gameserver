@@ -8,6 +8,7 @@ import koh.game.fights.FightState;
 import koh.game.fights.FightTypeEnum;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
+import koh.game.fights.types.ChallengeFight;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
@@ -137,15 +138,16 @@ public class CharacterFighter extends Fighter {
         this.Character.SetFighter(null);
         if (this.Character.IsInWorld) {
             this.Character.Client.EndGameAction(GameActionTypeEnum.FIGHT);
+            this.Character.Send(new GameContextDestroyMessage());
+            this.Character.Send(new GameContextCreateMessage((byte) 1));
+            this.Character.RefreshStats();
+            if (!(this.Fight instanceof ChallengeFight) && this.Team.Id == this.Fight.GetLoosers().Id) {
+                this.Character.teleport(this.Character.SavedMap, this.Character.SavedCell);
+            } else {
+                this.Character.CurrentMap.SpawnActor(this.Character);
+                this.Character.Send(new CurrentMapMessage(this.Character.CurrentMap.Id, "649ae451ca33ec53bbcbcc33becf15f4"));
+            }
         }
-        this.Character.Send(new GameContextDestroyMessage());
-        this.Character.Send(new GameContextCreateMessage((byte) 1));
-        this.Character.RefreshStats();
-        if (this.Character.IsInWorld) {
-            this.Character.CurrentMap.SpawnActor(this.Character);
-        }
-        this.Character.Send(new CurrentMapMessage(this.Character.CurrentMap.Id, "649ae451ca33ec53bbcbcc33becf15f4"));
-
     }
 
     @Override
@@ -171,8 +173,8 @@ public class CharacterFighter extends Fighter {
                 Stats.GetEffect(StatsEnum.WeaponDamagesBonusPercent), Stats.GetEffect(StatsEnum.AddDamagePercent), Stats.GetEffect(StatsEnum.TrapBonus),
                 Stats.GetEffect(StatsEnum.Trap_Damage_Percent), Stats.GetEffect(StatsEnum.GlyphBonusPercent), Stats.GetEffect(StatsEnum.PermanentDamagePercent), Stats.GetEffect(StatsEnum.Add_TackleBlock),
                 Stats.GetEffect(StatsEnum.Add_TackleEvade), Stats.GetEffect(StatsEnum.Add_RETRAIT_PA), Stats.GetEffect(StatsEnum.Add_RETRAIT_PM), Stats.GetEffect(StatsEnum.PushDamageBonus),
-                Stats.GetEffect(StatsEnum.CriticalDamageBonus), Stats.GetEffect(StatsEnum.NeutralDamageBonus), Stats.GetEffect(StatsEnum.EarthDamageBonus),
-                Stats.GetEffect(StatsEnum.WaterDamageBonus), Stats.GetEffect(StatsEnum.AirDamageBonus), Stats.GetEffect(StatsEnum.FireDamageBonus),
+                Stats.GetEffect(StatsEnum.CriticalDamageBonus), Stats.GetEffect(StatsEnum.Add_Neutral_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Earth_Damages_Bonus),
+                Stats.GetEffect(StatsEnum.Add_Water_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Air_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Fire_Damages_Bonus),
                 Stats.GetEffect(StatsEnum.DodgePALostProbability), Stats.GetEffect(StatsEnum.DodgePMLostProbability), Stats.GetEffect(StatsEnum.NeutralElementResistPercent),
                 Stats.GetEffect(StatsEnum.EarthElementResistPercent), Stats.GetEffect(StatsEnum.WaterElementResistPercent), Stats.GetEffect(StatsEnum.AirElementResistPercent),
                 Stats.GetEffect(StatsEnum.FireElementResistPercent), Stats.GetEffect(StatsEnum.NeutralElementReduction), Stats.GetEffect(StatsEnum.EarthElementReduction),

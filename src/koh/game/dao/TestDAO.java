@@ -42,6 +42,7 @@ public class TestDAO {
             p.execute();
 
             MySQL.closePreparedStatement(p);
+            MySQL.commitDatabase();
         } catch (SQLException e) {
             e.printStackTrace();
         }

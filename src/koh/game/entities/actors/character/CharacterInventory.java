@@ -90,6 +90,9 @@ public class CharacterInventory {
                 this.AddApparence(Item.Apparrance());
             }
             Player.RefreshEntitie();
+            Player.Stats.Merge(Item.GetStats());
+            Player.Life += Item.GetStats().GetTotal(StatsEnum.Vitality);
+            Player.RefreshStats();
         }
         return true;
     }
@@ -101,13 +104,12 @@ public class CharacterInventory {
     public boolean TryMergeItem(int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
         if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.ItemsCache.values()) {
-                if (Item.Equals(Stats) && Item.TemplateId == TemplateId && Item.Slot() == Slot) {
+                if (Item.TemplateId == TemplateId && Item.Slot() == Slot && !(RemoveItem != null && RemoveItem.ID == Item.ID) && Item.Equals(Stats)) {
                     if (RemoveItem != null) {
                         this.RemoveFromDic(RemoveItem.ID);
                         RemoveItem.NeedInsert = false;
                         ItemDAO.Remove(RemoveItem, "character_items");
                         RemoveItem.ColumsToUpdate = null;
-                        //TodoClearIT
                         if (Send) {
                             Player.Send(new ObjectDeletedMessage(RemoveItem.ID));
                         }
@@ -205,7 +207,7 @@ public class CharacterInventory {
                 if (obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
                     return;
                 }
-                if (exItem.GetEffect(983) != null) {
+                if (exItem.GetEffect(983) != null || exItem.GetQuantity() != 1) {
 
                     PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet ne peut pas être associé." + exItem.GetEffect(983).toString());
                     return;
@@ -232,7 +234,6 @@ public class CharacterInventory {
                     this.UpdateObjectquantity(Item, Item.GetQuantity() - 1);
                 }
                 if (exItem.Apparrance() != 0) {
-                    //this.Player.GetEntityLook().skins.add(exItem.Apparrance());
                     this.AddApparence(exItem.Apparrance());
                 }
 
@@ -269,7 +270,7 @@ public class CharacterInventory {
 
             if (Item.GetQuantity() > 1) {
                 /*InventoryItem NewItem = */
-                TryCreateItem(Item.TemplateId, this.Player, 1, Slot.value(), Item.Effects);
+                TryCreateItem(Item.TemplateId, this.Player, 1, Slot.value(), Item.getEffectsCopy());
                 this.UpdateObjectquantity(Item, Item.GetQuantity() - 1);
                 return;
             }
@@ -305,9 +306,12 @@ public class CharacterInventory {
         } else {
             if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
                 //Retire les stats
-                Player.Stats.UnMerge(Item.GetStats());
+                this.Player.Stats.UnMerge(Item.GetStats());
                 this.Player.Life -= Item.GetStats().GetTotal(StatsEnum.Vitality);
-                Player.RefreshStats();
+                if (Player.Life <= 0) {
+                    Player.Life = 1;
+                }
+                this.Player.RefreshStats();
             }
             // On tente de fusionner
             if (Item.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET || !this.TryMergeItem(Item.TemplateId, Item.Effects, Slot, Item.GetQuantity(), Item)) {
@@ -389,6 +393,7 @@ public class CharacterInventory {
                 this.Player.Life -= itemSet.GetStats(count).GetTotal(StatsEnum.Vitality);
             }
         } catch (NullPointerException e) {
+            e.printStackTrace();
         }
         if (send) {
             this.Player.RefreshStats();;

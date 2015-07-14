@@ -106,7 +106,7 @@ public class AccountData {
     public boolean TryMergeItem(Player Player, int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
         if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.ItemsCache.values()) {
-                if (Item.Equals(Stats) && Item.TemplateId == TemplateId && Item.Slot() == Slot) {
+                if (Item.TemplateId == TemplateId && Item.Slot() == Slot && !(RemoveItem != null && RemoveItem.ID == Item.ID) && Item.Equals(Stats) ) {
                     if (RemoveItem != null) {
                         this.RemoveFromDic(RemoveItem.ID);
                         RemoveItem.NeedInsert = false;

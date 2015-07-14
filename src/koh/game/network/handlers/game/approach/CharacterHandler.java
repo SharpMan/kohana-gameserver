@@ -33,6 +33,7 @@ import koh.protocol.messages.game.character.stats.CharacterStatsListMessage;
 import koh.protocol.messages.game.chat.EnabledChannelsMessage;
 import koh.protocol.messages.game.context.mount.MountRidingMessage;
 import koh.protocol.messages.game.context.mount.MountSetMessage;
+import koh.protocol.messages.game.context.mount.MountXpRatioMessage;
 import koh.protocol.messages.game.context.notification.NotificationListMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmoteListMessage;
 import koh.protocol.messages.game.context.roleplay.fight.arena.GameRolePlayArenaUpdatePlayerInfosMessage;
@@ -147,6 +148,7 @@ public class CharacterHandler {
                 Client.Send(new CharacterCapabilitiesMessage(4095));
                 if (Client.Character.MountInfo.Mount != null) {
                     Client.Send(new MountSetMessage(Client.Character.MountInfo.Mount));
+                    Client.Send(new MountXpRatioMessage(Client.Character.MountInfo.Ratio));
                     Client.Send(new MountRidingMessage(true));
                 }
                 Client.getAccount().last_login = new Timestamp(System.currentTimeMillis());
@@ -172,8 +174,8 @@ public class CharacterHandler {
                 Client.Character.Stats.GetEffect(StatsEnum.WeaponDamagesBonusPercent), Client.Character.Stats.GetEffect(StatsEnum.AddDamagePercent), Client.Character.Stats.GetEffect(StatsEnum.TrapBonus),
                 Client.Character.Stats.GetEffect(StatsEnum.Trap_Damage_Percent), Client.Character.Stats.GetEffect(StatsEnum.GlyphBonusPercent), Client.Character.Stats.GetEffect(StatsEnum.PermanentDamagePercent), Client.Character.Stats.GetEffect(StatsEnum.Add_TackleBlock),
                 Client.Character.Stats.GetEffect(StatsEnum.Add_TackleEvade), Client.Character.Stats.GetEffect(StatsEnum.Add_RETRAIT_PA), Client.Character.Stats.GetEffect(StatsEnum.Add_RETRAIT_PM), Client.Character.Stats.GetEffect(StatsEnum.PushDamageBonus),
-                Client.Character.Stats.GetEffect(StatsEnum.CriticalDamageBonus), Client.Character.Stats.GetEffect(StatsEnum.NeutralDamageBonus), Client.Character.Stats.GetEffect(StatsEnum.EarthDamageBonus),
-                Client.Character.Stats.GetEffect(StatsEnum.WaterDamageBonus), Client.Character.Stats.GetEffect(StatsEnum.AirDamageBonus), Client.Character.Stats.GetEffect(StatsEnum.FireDamageBonus),
+                Client.Character.Stats.GetEffect(StatsEnum.CriticalDamageBonus), Client.Character.Stats.GetEffect(StatsEnum.Add_Neutral_Damages_Bonus), Client.Character.Stats.GetEffect(StatsEnum.Add_Earth_Damages_Bonus),
+                Client.Character.Stats.GetEffect(StatsEnum.Add_Water_Damages_Bonus), Client.Character.Stats.GetEffect(StatsEnum.Add_Air_Damages_Bonus), Client.Character.Stats.GetEffect(StatsEnum.Add_Fire_Damages_Bonus),
                 Client.Character.Stats.GetEffect(StatsEnum.DodgePALostProbability), Client.Character.Stats.GetEffect(StatsEnum.DodgePMLostProbability), Client.Character.Stats.GetEffect(StatsEnum.NeutralElementResistPercent),
                 Client.Character.Stats.GetEffect(StatsEnum.EarthElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.WaterElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.AirElementResistPercent),
                 Client.Character.Stats.GetEffect(StatsEnum.FireElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.NeutralElementReduction), Client.Character.Stats.GetEffect(StatsEnum.EarthElementReduction),

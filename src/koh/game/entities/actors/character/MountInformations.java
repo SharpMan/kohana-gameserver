@@ -105,6 +105,7 @@ public class MountInformations {
         while (this.Mount.experience >= ExpDAO.GetFloorByLevel(this.Mount.level + 1).Mount && this.Mount.level < 100) {
             levelUp();
         }
+
         this.Save();
     }
 
@@ -128,6 +129,8 @@ public class MountInformations {
             this.myStats = null;
             this.EnableStats(true);
         }
+        this.Mount.experienceForLevel = ExpDAO.GetFloorByLevel(this.Mount.level).Mount;
+        this.Mount.experienceForNextLevel = ExpDAO.GetFloorByLevel(this.Mount.level == 100 ? 100 : this.Mount.level + 1).Mount;
     }
 
     public byte[] Serialize() {

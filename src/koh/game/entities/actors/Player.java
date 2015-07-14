@@ -35,7 +35,6 @@ import koh.game.utils.Observer;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.AggressableStatusEnum;
 import koh.protocol.client.enums.AlignmentSideEnum;
-import koh.protocol.client.enums.BreedEnum;
 import koh.protocol.client.enums.CompassTypeEnum;
 import koh.protocol.client.enums.PlayerStateEnum;
 import koh.protocol.client.enums.PlayerStatusEnum;
@@ -246,7 +245,6 @@ public class Player extends IGameActor implements Observer {
         }
         this.CurrentMap.SpawnActor(this);
         Client.Send(new CurrentMapMessage(CurrentMap.Id, "649ae451ca33ec53bbcbcc33becf15f4"));
-        Client.Send(new BasicNoOperationMessage());
         if (this.Followers != null) {
             this.Followers.parallelStream().forEach(e -> e.Send(new CompassUpdatePartyMemberMessage(CompassTypeEnum.COMPASS_TYPE_PARTY, this.CurrentMap.Cordinates(), this.ID)));
         }
@@ -269,13 +267,13 @@ public class Player extends IGameActor implements Observer {
                 Client.Send(new CharacterLoadingCompleteMessage());
                 ChatChannel.Register(Client);
                 PlayerController.SendServerMessage(Client, Settings.GetStringElement("World.onLogged"), Settings.GetStringElement("World.onLoggedColor"));
-               // Client.Send(new BasicNoOperationMessage());
+                // Client.Send(new BasicNoOperationMessage());
                 Client.Send(new AlignmentRankUpdateMessage(this.AlignmentGrade, false));
                 Client.SequenceMessage();
                 if (this.Guild != null) {
                     this.Guild.registerPlayer(this);
                 }
-               
+
                 //GuildWarn
             }
         } catch (Exception e) {
@@ -305,7 +303,7 @@ public class Player extends IGameActor implements Observer {
             e.printStackTrace();
         }
     }
-    
+
     public void RefreshStats() {
         RefreshStats(true);
     }
@@ -514,45 +512,45 @@ public class Player extends IGameActor implements Observer {
 
         this.Experience += Value;
 
-        ExpLevel Floor;
+        if (this.Level != ExpDAO.maxLEVEL) {
 
-        Integer LastLevel = this.Level;
+            ExpLevel Floor;
 
-        do {
-            Floor = ExpDAO.GetFloorByLevel(this.Level + 1);
+            Integer LastLevel = this.Level;
+            do {
+                Floor = ExpDAO.GetFloorByLevel(this.Level + 1);
+                if (Floor.Player < this.Experience) {
+                    this.Level++;
+                    this.StatPoints += 5;
+                    this.SpellPoints++;
 
-            if (Floor.Player < this.Experience) {
-                this.Level++;
-                this.StatPoints += 5;
-                this.SpellPoints++;
-
-                if (this.Level == 100) {
-                    this.Stats.AddBase(StatsEnum.ActionPoints, 1);
-                }
-                // Apprend des nouveaux sorts
-                for (LearnableSpell learnableSpell : SpellDAO.LearnableSpells.get((int) this.Breed)) {
-                    if ((int) learnableSpell.ObtainLevel > (int) Level && this.mySpells.HasSpell(learnableSpell.Spell)) {
-                        this.mySpells.RemoveSpell(this, learnableSpell.Spell);
-                    } else if ((int) learnableSpell.ObtainLevel <= (int) Level && !this.mySpells.HasSpell(learnableSpell.Spell)) {
-                        this.mySpells.AddSpell(learnableSpell.Spell, (byte) 1, this.mySpells.getFreeSlot(), this.Client);
+                    if (this.Level == 100) {
+                        this.Stats.AddBase(StatsEnum.ActionPoints, 1);
                     }
+                    // Apprend des nouveaux sorts
+                    for (LearnableSpell learnableSpell : SpellDAO.LearnableSpells.get((int) this.Breed)) {
+                        if ((int) learnableSpell.ObtainLevel > (int) Level && this.mySpells.HasSpell(learnableSpell.Spell)) {
+                            this.mySpells.RemoveSpell(this, learnableSpell.Spell);
+                        } else if ((int) learnableSpell.ObtainLevel <= (int) Level && !this.mySpells.HasSpell(learnableSpell.Spell)) {
+                            this.mySpells.AddSpell(learnableSpell.Spell, (byte) 1, this.mySpells.getFreeSlot(), this.Client);
+                        }
+                    }
+
                 }
+            } while (Floor.Player < this.Experience && this.Level != 200);
+
+            if (this.Level != LastLevel) {
+                this.Life = this.MaxLife();
+                this.Send(new CharacterLevelUpMessage((byte) this.Level));
+                //Friends
+                this.CurrentMap.sendToField(new CharacterLevelUpInformationMessage((byte) this.Level, this.NickName, this.ID));
 
             }
-        } while (Floor.Player < this.Experience && this.Level != 200);
 
-        if (this.Level != LastLevel) {
-            this.Life = this.MaxLife();
-            this.Send(new CharacterLevelUpMessage((byte) this.Level));
-            //Friends
-            this.CurrentMap.sendToField(new CharacterLevelUpInformationMessage((byte) this.Level, this.NickName, this.ID));
-
+            if (this.Client != null) {
+                this.RefreshStats();
+            }
         }
-
-        if (this.Client != null) {
-            this.RefreshStats();
-        }
-
     }
 
     private void UpdateRegenedLife() {

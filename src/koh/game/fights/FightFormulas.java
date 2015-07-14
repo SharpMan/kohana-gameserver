@@ -10,6 +10,7 @@ import koh.game.fights.fighters.CharacterFighter;
 import koh.game.utils.Settings;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.messages.game.context.mount.MountSetMessage;
 
 /**
  *
@@ -71,7 +72,7 @@ public class FightFormulas {
     }
 
     private static long XpNeededAtLevel(int lvl) {
-        return (ExpDAO.PersoXpMax(lvl) - ExpDAO.PersoXpMin(lvl));
+        return (ExpDAO.PersoXpMax(lvl) - ExpDAO.PersoXpMin(lvl == 200 ? 199 : lvl));
     }
 
     public static long GuildXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
@@ -143,6 +144,10 @@ public class FightFormulas {
         }
 
         Fighter.Character.MountInfo.addExperience((long) Math.round(xp * pToMount * coeff));
+
+        if (xp > 0) {
+            Fighter.Character.Send(new MountSetMessage(Fighter.Character.MountInfo.Mount));
+        }
 
         return (long) Math.round(xp * pToMount * coeff);
     }

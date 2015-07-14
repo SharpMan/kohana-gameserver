@@ -54,7 +54,7 @@ public class ItemTemplate {
     }
     
     public boolean isVisibleInTooltip(int Effect){
-        return Arrays.stream(this.possibleEffects).anyMatch(x -> x.effectId == Effect && x.visibleInTooltip);
+        return !Arrays.stream(this.possibleEffects).anyMatch(x -> x.effectId == Effect && !x.visibleInTooltip);
     }
 
     public ItemSet ItemSet() {

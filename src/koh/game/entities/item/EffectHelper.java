@@ -183,10 +183,12 @@ public class EffectHelper {
                 short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 if (GenType == EffectGenerationType.MaxEffects) {
+                    System.out.println("ka1");
                     Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;
                 }
                 if (GenType == EffectGenerationType.MinEffects) {
+                    System.out.println("ka");
                     Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num2 : num1));
                     continue;
                 }
