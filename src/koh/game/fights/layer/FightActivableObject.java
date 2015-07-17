@@ -58,8 +58,11 @@ public abstract class FightActivableObject implements IFightObject {
     public abstract void Appear(FightTeam dispatcher);
 
     public abstract void DisappearForAll();
+    
+    public FightActivableObject(){
+        
+    }
 
-    //TODO addObject
     public FightActivableObject(BuffActiveType activeType, Fight fight, Fighter caster, EffectCast castInfos, short cell, int duration, Color color, GameActionFightInvisibilityStateEnum visibleState, byte size, GameActionMarkCellsTypeEnum shap) {
         ID = (short) fight.NextTriggerUid.incrementAndGet();
         m_fight = fight;

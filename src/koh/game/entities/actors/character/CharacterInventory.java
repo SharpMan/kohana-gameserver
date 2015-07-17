@@ -392,11 +392,10 @@ public class CharacterInventory {
                 Player.Stats.UnMerge(itemSet.GetStats(count));
                 this.Player.Life -= itemSet.GetStats(count).GetTotal(StatsEnum.Vitality);
             }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        if (send) {
-            this.Player.RefreshStats();;
+            if (send) {
+                this.Player.RefreshStats();;
+            }
+        } catch (NullPointerException e) { //Well confortable than check nullable ItemSet , nulltables ItemSet with this count of items .. ect
         }
     }
 

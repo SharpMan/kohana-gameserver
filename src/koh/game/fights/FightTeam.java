@@ -135,7 +135,7 @@ public class FightTeam {
     }
 
     public void EndFight() {
-        this.myFighters.removeIf(x -> x.Invocator != null); // On delete les invocations
+        this.myFighters.removeIf(x -> x.Summoner != null); // On delete les invocations
         //this.myFighters.RemoveAll(x =  > x is DoubleFighter);  // On delete les doubles
     }
 

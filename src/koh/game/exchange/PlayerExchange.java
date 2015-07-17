@@ -265,7 +265,7 @@ public class PlayerExchange extends Exchange {
                 this.myClient1.Character.InventoryCache.ChangeOwner(Item, this.myClient2.Character);
             } else {
                 this.myClient1.Character.InventoryCache.UpdateObjectquantity(Item, Item.GetQuantity() - ItemData.getValue());
-                CharacterInventory.TryCreateItem(Item.TemplateId, this.myClient2.Character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.Effects, true);
+                CharacterInventory.TryCreateItem(Item.TemplateId, this.myClient2.Character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 
@@ -280,7 +280,7 @@ public class PlayerExchange extends Exchange {
                 this.myClient2.Character.InventoryCache.ChangeOwner(Item, this.myClient1.Character);
             } else {
                 this.myClient2.Character.InventoryCache.UpdateObjectquantity(Item, Item.GetQuantity() - ItemData.getValue());
-                CharacterInventory.TryCreateItem(Item.TemplateId, this.myClient1.Character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.Effects, true);
+                CharacterInventory.TryCreateItem(Item.TemplateId, this.myClient1.Character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 

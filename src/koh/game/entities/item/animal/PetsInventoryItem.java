@@ -75,7 +75,7 @@ public class PetsInventoryItem extends InventoryItem {
             this.SerializeInformations();
             this.RemoveEffect(995);
 
-            this.Effects.add(new ObjectEffectInteger(955, this.Entity.PetsID));
+            this.Effects.add(new ObjectEffectInteger(995, this.Entity.PetsID));
             this.NotifiedColumn("effects");
 
             PetsDAO.Insert(this.Entity);

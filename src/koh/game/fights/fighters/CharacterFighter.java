@@ -42,8 +42,8 @@ public class CharacterFighter extends Fighter {
 
     public CharacterFighter(Fight Fight, WorldClient Client) {
         super(Fight, null);
+        this.TurnReady = false;
         this.Character = Client.Character;
-        this.ID = this.Character.ID;
 
         this.Character.SetFight(Fight);
         this.Character.SetFighter(this);
@@ -55,16 +55,15 @@ public class CharacterFighter extends Fighter {
         if (super.Life() == 0) {
             super.setLife(1);
         }
-        this.MaxLife = this.Character.MaxLife();
         this.entityLook = EntityLookParser.Copy(this.Character.GetEntityLook());
     }
 
     @Override
     public GameFightMinimalStats GetGameFightMinimalStats(Player character) {
         if (this.Fight.FightState == FightState.STATE_PLACE) {
-            return new GameFightMinimalStatsPreparation(this.Life(), this.MaxLife, this.Character.MaxLife(), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.PushDamageReduction), this.Stats.GetTotal(StatsEnum.CriticalDamageReduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character), this.Initiative(false));
+            return new GameFightMinimalStatsPreparation(this.Life(), this.MaxLife(), this.Character.MaxLife(), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.GetTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character), this.Initiative(false));
         }
-        return new GameFightMinimalStats(this.Life(), this.MaxLife, this.Character.MaxLife(), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.PushDamageReduction), this.Stats.GetTotal(StatsEnum.CriticalDamageReduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
+        return new GameFightMinimalStats(this.Life(), this.MaxLife(), this.Character.MaxLife(), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.GetTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
     }
 
     @Override
@@ -159,10 +158,15 @@ public class CharacterFighter extends Fighter {
     public void Send(Message Packet) {
         this.Character.Send(Packet);
     }
+    
+    @Override
+    public int MaxLife(){
+        return this.Character.MaxLife();
+    }
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
         return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) Character.Experience, (double) ExpDAO.PersoXpMin(Character.Level), (double) ExpDAO.PersoXpMax(Character.Level), Character.Kamas, Character.StatPoints, 0, Character.SpellPoints, Character.GetActorAlignmentExtendInformations(),
-                Life(), MaxLife, Character.Energy, PlayerEnum.MaxEnergy,
+                Life(), MaxLife(), Character.Energy, PlayerEnum.MaxEnergy,
                 (short) this.AP(), (short) this.MP(),
                 new CharacterBaseCharacteristic(this.Initiative(true), 0, Stats.GetItem(StatsEnum.Initiative), 0, 0), Stats.GetEffect(StatsEnum.Prospecting), Stats.GetEffect(StatsEnum.ActionPoints),
                 Stats.GetEffect(StatsEnum.MovementPoints), Stats.GetEffect(StatsEnum.Strength), Stats.GetEffect(StatsEnum.Vitality),
@@ -172,14 +176,14 @@ public class CharacterFighter extends Fighter {
                 Stats.GetEffect(StatsEnum.CriticalMiss), Stats.GetEffect(StatsEnum.Add_Heal_Bonus), Stats.GetEffect(StatsEnum.AllDamagesBonus),
                 Stats.GetEffect(StatsEnum.WeaponDamagesBonusPercent), Stats.GetEffect(StatsEnum.AddDamagePercent), Stats.GetEffect(StatsEnum.TrapBonus),
                 Stats.GetEffect(StatsEnum.Trap_Damage_Percent), Stats.GetEffect(StatsEnum.GlyphBonusPercent), Stats.GetEffect(StatsEnum.PermanentDamagePercent), Stats.GetEffect(StatsEnum.Add_TackleBlock),
-                Stats.GetEffect(StatsEnum.Add_TackleEvade), Stats.GetEffect(StatsEnum.Add_RETRAIT_PA), Stats.GetEffect(StatsEnum.Add_RETRAIT_PM), Stats.GetEffect(StatsEnum.PushDamageBonus),
-                Stats.GetEffect(StatsEnum.CriticalDamageBonus), Stats.GetEffect(StatsEnum.Add_Neutral_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Earth_Damages_Bonus),
+                Stats.GetEffect(StatsEnum.Add_TackleEvade), Stats.GetEffect(StatsEnum.Add_RETRAIT_PA), Stats.GetEffect(StatsEnum.Add_RETRAIT_PM), Stats.GetEffect(StatsEnum.Add_Push_Damages_Bonus),
+                Stats.GetEffect(StatsEnum.Add_Critical_Damages), Stats.GetEffect(StatsEnum.Add_Neutral_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Earth_Damages_Bonus),
                 Stats.GetEffect(StatsEnum.Add_Water_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Air_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Fire_Damages_Bonus),
                 Stats.GetEffect(StatsEnum.DodgePALostProbability), Stats.GetEffect(StatsEnum.DodgePMLostProbability), Stats.GetEffect(StatsEnum.NeutralElementResistPercent),
                 Stats.GetEffect(StatsEnum.EarthElementResistPercent), Stats.GetEffect(StatsEnum.WaterElementResistPercent), Stats.GetEffect(StatsEnum.AirElementResistPercent),
                 Stats.GetEffect(StatsEnum.FireElementResistPercent), Stats.GetEffect(StatsEnum.NeutralElementReduction), Stats.GetEffect(StatsEnum.EarthElementReduction),
                 Stats.GetEffect(StatsEnum.WaterElementReduction), Stats.GetEffect(StatsEnum.AirElementReduction), Stats.GetEffect(StatsEnum.FireElementReduction),
-                Stats.GetEffect(StatsEnum.PushDamageReduction), Stats.GetEffect(StatsEnum.CriticalDamageReduction), Stats.GetEffect(StatsEnum.PvpNeutralElementResistPercent),
+                Stats.GetEffect(StatsEnum.Add_Push_Damages_Reduction), Stats.GetEffect(StatsEnum.Add_Critical_Damages_Reduction), Stats.GetEffect(StatsEnum.PvpNeutralElementResistPercent),
                 Stats.GetEffect(StatsEnum.PvpEarthElementResistPercent), Stats.GetEffect(StatsEnum.PvpWaterElementResistPercent), Stats.GetEffect(StatsEnum.PvpAirElementResistPercent),
                 Stats.GetEffect(StatsEnum.PvpFireElementResistPercent), Stats.GetEffect(StatsEnum.PvpNeutralElementReduction), Stats.GetEffect(StatsEnum.PvpEarthElementReduction),
                 Stats.GetEffect(StatsEnum.PvpWaterElementReduction), Stats.GetEffect(StatsEnum.PvpAirElementReduction), Stats.GetEffect(StatsEnum.PvpFireElementReduction),

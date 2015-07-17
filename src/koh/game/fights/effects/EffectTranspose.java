@@ -2,7 +2,9 @@ package koh.game.fights.effects;
 
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
+import koh.game.fights.fighters.StaticFighter;
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
 
 /**
@@ -13,8 +15,8 @@ public class EffectTranspose extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            if (CastInfos.SpellId == 445) {
+        for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.States.HasState(FightStateEnum.Porté) && !target.States.HasState(FightStateEnum.Inébranlable) && !target.States.HasState(FightStateEnum.Enraciné) && !target.States.HasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+           if (CastInfos.SpellId == 445) {
                 if (Target.Team == CastInfos.Caster.Team) {
                     continue;
                 }

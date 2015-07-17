@@ -8,6 +8,7 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.effects.buff.BuffPorteur;
+import koh.game.fights.fighters.StaticFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
@@ -24,7 +25,7 @@ public class EffectPush extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         byte Direction = 0;
-        for (Fighter Target : CastInfos.Targets.stream().filter(target -> !target.States.HasState(FightStateEnum.Porté) && !target.States.HasState(FightStateEnum.Inébranlable) && !target.States.HasState(FightStateEnum.Enraciné) && !target.States.HasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.States.HasState(FightStateEnum.Porté) && !target.States.HasState(FightStateEnum.Inébranlable) && !target.States.HasState(FightStateEnum.Enraciné) && !target.States.HasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (CastInfos.EffectType) {
                 case Push_Back:
                     if (Pathfinder.InLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {

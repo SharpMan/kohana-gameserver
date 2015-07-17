@@ -204,6 +204,7 @@ public class MySQL {
         Main.Logs().writeInfo(MapDAO.FindSubways() + " MapSubways catched");
         Main.Logs().writeInfo(SpellDAO.FindLevels() + " SpellLevels catched ");
         Main.Logs().writeInfo(SpellDAO.FindAll() + " Spells catched ");
+        Main.Logs().writeInfo(SpellDAO.FindBombs() + " SpellBombs catched ");
         Main.Logs().writeInfo(GuildEmblemDAO.FindAll() + " GuildEmblems catched ");
         Main.Logs().writeInfo(SpellDAO.FindLearnables() + " LearnableSpells catched ");
         Main.Logs().writeInfo(ItemDAO.FindAll() + " ItemTemplates catched ");
@@ -223,6 +224,9 @@ public class MySQL {
         Main.Logs().writeInfo(GuildDAO.FindMembers() + " GuildMembers catched");
         Main.Logs().writeInfo(JobDAO.FindAllGatheringInfos() + " GatheringJob LevelInfos catched");
         Main.Logs().writeInfo(JobDAO.FindAllSkills() + " InteractiveSkills LevelInfos catched");
+        Main.Logs().writeInfo(MonsterDAO.FindAll() + " Monster Templates catched");
+        Main.Logs().writeInfo(MonsterDAO.FindGrades() + " Monster Grades catched");
+        Main.Logs().writeInfo(MonsterDAO.FindDrops() + " Monster Drops catched");
     }
 
     public synchronized Savepoint commitDatabase(boolean createSavePoint) {

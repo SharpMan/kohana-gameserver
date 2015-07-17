@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
+import koh.game.Main;
 import koh.game.actions.GameFight;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.D2oDao;
@@ -296,7 +297,9 @@ public class Player extends IGameActor implements Observer {
             }
             this.Client = null;
             for (Player p : this.Account.Characters) {
-                PlayerDAO.myCharacterByTime.add(new Couple<Long, Player>(System.currentTimeMillis() + Settings.GetIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
+                PlayerDAO.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + Settings.GetIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
+                Main.Logs().writeError(p.NickName + " aded");
+                new Exception().printStackTrace();
             }
 
         } catch (Exception e) {
@@ -423,7 +426,6 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void setEnabldPvp(byte Stat) {
-        System.out.println(Stat);
         this.PvPEnabled = Stat;
         this.OnAligmenentSideChanged();
     }

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.layer.FightActivableObject;
+import koh.game.fights.layer.FightBomb;
 
 /**
  *
@@ -43,7 +44,21 @@ public class FightCell {
         for (IFightObject Object : myFightObjects) {
             if (Object instanceof FightActivableObject) {
                 FightActivableObject activableObject = (FightActivableObject) Object;
-                if (activableObject.ActivationType == BuffActiveType.ACTIVE_BEGINTURN) {
+                if (activableObject.ActivationType == BuffActiveType.ACTIVE_BEGINTURN || activableObject instanceof FightBomb) {
+                    activableObject.LoadTargets(fighter);
+                    activableObject.Activate(fighter);
+                }
+            }
+        }
+
+        return -1;
+    }
+    
+    public int EndTurn(Fighter fighter){
+        for (IFightObject Object : myFightObjects) {
+            if (Object instanceof FightActivableObject) {
+                FightActivableObject activableObject = (FightActivableObject) Object;
+                if (activableObject.ActivationType == BuffActiveType.ACTIVE_ENDTURN || activableObject instanceof FightBomb) {
                     activableObject.LoadTargets(fighter);
                     activableObject.Activate(fighter);
                 }
@@ -87,11 +102,11 @@ public class FightCell {
     }
 
     public Fighter[] GetObjectsAsFighter() {
-        return this.myFightObjects.stream().filter(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER).map(x -> (Fighter) x).toArray(Fighter[]::new);
+        return this.myFightObjects.stream().filter(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER ||  x.ObjectType() == FightObjectType.OBJECT_STATIC).map(x -> (Fighter) x).toArray(Fighter[]::new);
     }
 
     public List<Fighter> GetObjectsAsFighterList() {
-        return this.myFightObjects.stream().filter(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER).map(x -> (Fighter) x).collect(Collectors.toList());
+        return this.myFightObjects.stream().filter(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER ||  x.ObjectType() == FightObjectType.OBJECT_STATIC).map(x -> (Fighter) x).collect(Collectors.toList());
     }
 
     public List<Fighter> GetObjectsAsFighterList(Predicate<? super IFightObject> prdct) {
@@ -99,14 +114,14 @@ public class FightCell {
     }
 
     public Fighter HasEnnemy(FightTeam Team) {
-        if (!this.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.HasGameObject(FightObjectType.OBJECT_CAWOTTE)) {
+        if (!this.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.HasGameObject(FightObjectType.OBJECT_STATIC)) {
             return null;
         }
         return (this.GetObjectsAsFighter()[0].Team.Id != Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not ID ...
     }
 
     public Fighter HasFriend(FightTeam Team) {
-        if (!this.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.HasGameObject(FightObjectType.OBJECT_CAWOTTE)) {
+        if (!this.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.HasGameObject(FightObjectType.OBJECT_STATIC)) {
             return null;
         }
         return (this.GetObjectsAsFighter()[0].Team.Id == Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not ID ...
@@ -128,7 +143,7 @@ public class FightCell {
     }
 
     public void onObjectAdded(IFightObject fightObject) {
-        if (fightObject.ObjectType() == FightObjectType.OBJECT_FIGHTER) {
+        if (fightObject instanceof Fighter) {
             Fighter fighter = (Fighter) fightObject;
             for (IFightObject Object : myFightObjects) {
                 if (Object instanceof FightActivableObject) {

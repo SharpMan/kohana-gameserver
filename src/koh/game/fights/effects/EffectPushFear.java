@@ -13,7 +13,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
 public class EffectPushFear extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int ApplyEffect(EffectCast CastInfos) { //TODO : Prise compte etat
         byte direction = Pathfinder.GetDirection(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
         short targetFighterCell = Pathfinder.NextCell(CastInfos.Caster.CellId(), direction);
 

@@ -29,7 +29,7 @@ public class FightWorker {
     }
 
     public void SummonFighter(Fighter fighter) {
-        int index = myFightersTurn.indexOf(fighter.Invocator) + 1;
+        int index = myFightersTurn.indexOf(fighter.Summoner) + 1;
         if (index == 0) {
             index = myFightersTurn.size();
         }

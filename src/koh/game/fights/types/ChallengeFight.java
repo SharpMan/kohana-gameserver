@@ -81,7 +81,7 @@ public class ChallengeFight extends Fight {
 
     @Override
     public GameFightEndMessage LeftEndMessage(Fighter f) {
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.Invocator == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == f.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.IsAlive(), (byte) x.Level(), new FightResultExperienceData[]{new FightResultExperienceData()})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.Summoner == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == f.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.IsAlive(), (byte) x.Level(), new FightResultExperienceData[]{new FightResultExperienceData()})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
     @Override

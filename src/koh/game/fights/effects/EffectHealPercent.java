@@ -43,8 +43,8 @@ public class EffectHealPercent extends EffectBase {
         Heal = Heal * (Target.Life() / 100);
 
         // Si le soin est superieur a sa vie actuelle
-        if (Target.Life() + Heal > Target.MaxLife) {
-            Heal = Target.MaxLife - Target.Life();
+        if (Target.Life() + Heal > Target.MaxLife()) {
+            Heal = Target.MaxLife() - Target.Life();
         }
 
         // Affectation

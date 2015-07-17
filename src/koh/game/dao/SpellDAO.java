@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import koh.d2o.entities.SpellBomb;
 import koh.game.MySQL;
 import koh.game.entities.spells.*;
 import koh.game.utils.Settings;
@@ -21,6 +22,7 @@ public class SpellDAO {
     public static final Map<Integer, SpellLevel> LevelCache = Collections.synchronizedMap(new HashMap<>());
     public static final Map<Integer, Spell> Spells = Collections.synchronizedMap(new HashMap<>());
     public static final Map<Integer, ArrayList<LearnableSpell>> LearnableSpells = Collections.synchronizedMap(new HashMap<>());
+    public static final Map<Integer, SpellBomb> Bombs = Collections.synchronizedMap(new HashMap<>());
 
     public static int FindAll() {
         try {
@@ -38,6 +40,33 @@ public class SpellDAO {
                         for (int i = 0; i < RS.getString("spell_levels").split(",").length; i++) {
                             this.spellLevels[i] = LevelCache.get(Integer.parseInt(RS.getString("spell_levels").split(",")[i]));
                         }
+                    }
+                });
+                i++;
+            }
+            MySQL.closeResultSet(RS);
+            return i;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public static int FindBombs() {
+        try {
+            int i = 0;
+            ResultSet RS = MySQL.executeQuery("SELECT * from spell_bombs", Settings.GetStringElement("Database.Name"), 0);
+
+            while (RS.next()) {
+                Bombs.put(RS.getInt("id"), new SpellBomb() {
+                    {
+                        Id = RS.getInt("id");
+                        chainReactionSpellId = RS.getInt("chain_reaction_spellId");
+                        explodSpellId = RS.getInt("explod_spell_id");
+                        wallId = RS.getInt("wall_id");
+                        instantSpellId = RS.getInt("instant_spell_id");
+                        comboCoeff = RS.getInt("combo_coeff");
+                        wallSpellId = RS.getInt("wall_spell_id");
                     }
                 });
                 i++;
@@ -105,6 +134,7 @@ public class SpellDAO {
                         this.effects = new EffectInstanceDice[buf.getInt()];
                         for (int i = 0; i < this.effects.length; i++) {
                             this.effects[i] = new EffectInstanceDice(buf);
+                        
                         }
                         buf.clear();
 
@@ -115,6 +145,7 @@ public class SpellDAO {
                         }
                         buf.clear();
                         buf = null;
+                        
                     }
                 });
                 i++;

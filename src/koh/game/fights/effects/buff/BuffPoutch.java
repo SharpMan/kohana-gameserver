@@ -53,7 +53,7 @@ public class BuffPoutch extends BuffEffect {
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true))).GetCells(Target.CellId())) {
                 FightCell FightCell = Target.Fight.GetCell(Cell);
                 if (FightCell != null) {
-                    if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
+                    if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
 
                         for (Fighter Target : FightCell.GetObjectsAsFighter()) {
                             if (Effect.IsValidTarget(this.Target, Target) && EffectInstanceDice.verifySpellEffectMask(this.Target, Target, Effect)) {

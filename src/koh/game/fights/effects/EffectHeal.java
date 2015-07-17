@@ -25,8 +25,8 @@ public class EffectHeal extends EffectBase {
         }
 
         // Si le soin est superieur a sa vie actuelle
-        if (Target.Life() + Heal.getValue() > Target.MaxLife) {
-            Heal.setValue(Target.MaxLife - Target.Life());
+        if (Target.Life() + Heal.getValue() > Target.MaxLife()) {
+            Heal.setValue(Target.MaxLife() - Target.Life());
         }
 
         // Affectation

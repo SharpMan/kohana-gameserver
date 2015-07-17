@@ -159,7 +159,7 @@ public class ContextHandler {
     public static void HandleGameMapMovementRequestMessage(WorldClient Client, GameMapMovementRequestMessage Message) {
 
         if (Message.keyMovements.length <= 0) {
-            Main.Logs().writeDebug("Empty Path" + Client.getIP());
+            Main.Logs().writeError("Empty Path" + Client.getIP());
             Client.Send(new BasicNoOperationMessage());
             return;
         }

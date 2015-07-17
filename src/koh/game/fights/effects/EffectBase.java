@@ -235,6 +235,17 @@ public abstract class EffectBase {
             this.put(StatsEnum.MaximizeEffects, new EffectAlterJet());
             this.put(StatsEnum.MinimizeEffects, new EffectAlterJet());
 
+            //Roublard
+            this.put(StatsEnum.ACTION_SUMMON_BOMB, new EffectSummonBomb());
+            this.put(StatsEnum.Combo_Dammages, new EffectStats());
+            this.put(StatsEnum.EXPAND_SIZE, new EffectExpandSize());
+            this.put(StatsEnum.ENABLE_BOMB, new EffectEnableBomb());
+            this.put(StatsEnum.Damage_Neutral_Per_Pm_Percent, new EffectDamage());
+            this.put(StatsEnum.Damage_Air_Per_Pm_Percent, new EffectDamage());
+            this.put(StatsEnum.Damage_Water_Per_Pm_Percent, new EffectDamage());
+            this.put(StatsEnum.Damage_Fire_Per_Pm_Percent, new EffectDamage());
+            this.put(StatsEnum.Damage_Earth_Per_Pm_Percent, new EffectDamage());
+
         }
     };
 

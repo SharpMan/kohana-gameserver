@@ -151,7 +151,6 @@ public class JobBook {
         if (Skill.isForgemagus) {
             return new SkillActionDescriptionCraft(Skill.ID, Job.Probability());
         } else if (Skill.gatheredRessourceItem != -1) {
-            System.out.println(Skill.gatheredRessourceItem);
             return new SkillActionDescriptionCollect(Skill.ID, (byte) 30, Job.Quantity(Skill.levelMin).first, Job.Quantity(Skill.levelMin).second);
         } else {
             return new SkillActionDescriptionCraft(Skill.ID, (byte) 100);

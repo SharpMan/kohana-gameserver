@@ -11,7 +11,9 @@ import jregex.REFlags;
 import koh.d2o.entities.Effect;
 import koh.game.Main;
 import koh.game.dao.D2oDao;
+import koh.game.dao.MonsterDAO;
 import koh.game.fights.Fighter;
+import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.BufUtils;
 import static koh.protocol.client.BufUtils.writeBoolean;
@@ -185,7 +187,7 @@ public class EffectInstance implements Serializable {
             if (((((targetIsCarried) && (!((pEffect.ZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.ZoneShape() == SpellShapeEnum.a))))) {
                 return (true);
             };
-            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) /*&& (!(Monster.getMonsterById(monsterInfo.creatureGenericId).canPlay))*/)) {
+            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(MonsterDAO.Cache.get(monsterInfo.creatureGenericId).canPlay)))) {
                 targetMaskPattern = ((isTargetAlly) ? "agsj" : "ASJ");
             } else {
                 if (targetInfos.stats.summoned) {
@@ -205,6 +207,7 @@ public class EffectInstance implements Serializable {
         };
         r = new Pattern("[" + targetMaskPattern + "]", REFlags.DOTALL);
         verify = r.matcher(pEffect.targetMask).find();
+
         if (verify) {
             exclusiveMasks = exclusiveTargetMasks.matcher(pEffect.targetMask);
             boolean verifyInitialized = false;
@@ -244,6 +247,9 @@ public class EffectInstance implements Serializable {
                         break;
                     case 'F':
                         verify = ((monsterInfo != null) && ((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
+                        if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
+                            return true;
+                        }
                         break;
                     case 'z':
                         break;
@@ -259,6 +265,9 @@ public class EffectInstance implements Serializable {
                     case 'p':
                         break;
                     case 'P':
+                        if (pTargetId instanceof BombFighter) { //TEmpororaire = bug
+                            verify = true;
+                        }
                         break;
                     case 'T':
                         break;

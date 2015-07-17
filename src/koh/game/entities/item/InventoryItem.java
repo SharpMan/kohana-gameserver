@@ -43,22 +43,9 @@ public class InventoryItem {
 
     public static InventoryItem Instance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
         if (ItemDAO.Cache.get(TemplateId).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-            if (Effects.stream().anyMatch(x -> x.actionId == 995)) {
-                Main.Logs().writeDebug("Contains Aninal");
-                return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, false);
-            } else {
-                Main.Logs().writeDebug("Create Animal");
-                return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, true);
-            }
+            return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
         } else if (ItemDAO.Cache.get(TemplateId).TypeId == 97) {
-            if (Effects.stream().anyMatch(x -> x.actionId == 995)) {
-                Main.Logs().writeDebug("Contains AninalM");
-                return new MountInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, false);
-            } else {
-                Main.Logs().writeDebug("Create AnimalM");
-                return new MountInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, true);
-            }
-
+            return new MountInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
         } else {
             return new InventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects);
         }
@@ -162,7 +149,13 @@ public class InventoryItem {
         return CharacterInventoryPositionEnum.valueOf((byte) this.Position);
     }
 
-    public void RemoveEffect(int id) {
+    public void RemoveEffect(int... id) {
+        for (int i : id) {
+            this.RemoveEffect(i);
+        }
+    }
+
+    private void RemoveEffect(int id) {
         if (this.Effects.removeIf(x -> x.actionId == id)) {
             this.NotifiedColumn("effects");
         }
@@ -194,7 +187,6 @@ public class InventoryItem {
         this.Position = Slot.value();
         this.NotifiedColumn("position");
     }
-    
 
     public boolean Equals(Collection<ObjectEffect> Effects) {
         ObjectEffect Get = null;

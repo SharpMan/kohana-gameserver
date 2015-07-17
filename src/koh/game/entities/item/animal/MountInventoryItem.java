@@ -32,9 +32,8 @@ public class MountInventoryItem extends InventoryItem {
             }
         }
         if (Create) {
-            this.RemoveEffect(995);
-            this.RemoveEffect(998);
-            this.Effects.add(new ObjectEffectMount(955, (double) Instant.now().toEpochMilli(), 10, 0));
+            this.RemoveEffect(995,998);
+            this.Effects.add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), 10, 0));
             this.Effects.add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
         }
         if (this.Entity == null) {
@@ -58,7 +57,7 @@ public class MountInventoryItem extends InventoryItem {
             this.RemoveEffect(995);
             this.RemoveEffect(998);
 
-            this.Effects.add(new ObjectEffectMount(955, (double) Instant.now().toEpochMilli(), MountDAO.Cache.get(this.TemplateId).Id, this.Entity.AnimalID));
+            this.Effects.add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), MountDAO.Cache.get(this.TemplateId).Id, this.Entity.AnimalID));
             this.Effects.add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
             this.NotifiedColumn("effects");
 

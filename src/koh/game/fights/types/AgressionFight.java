@@ -100,10 +100,10 @@ public class AgressionFight extends Fight {
 
     @Override
     public GameFightEndMessage LeftEndMessage(Fighter Leaver) { //Fixme je ai le call des classes implement comme ça faut trouver une solution
-        short LossedHonor = FightFormulas.HonorPoint(Leaver, this.GetEnnemyTeam(Leaver.Team).GetFighters().filter(x -> x.Invocator == null), Leaver.Team.GetFighters().filter(x -> x.Invocator == null), true, false);
+        short LossedHonor = FightFormulas.HonorPoint(Leaver, this.GetEnnemyTeam(Leaver.Team).GetFighters().filter(x -> x.Summoner == null), Leaver.Team.GetFighters().filter(x -> x.Summoner == null), true, false);
         ((CharacterFighter) Leaver).Character.addHonor(LossedHonor, true);
         ((CharacterFighter) Leaver).Character.Dishonor += FightFormulas.CalculateEarnedDishonor(Leaver);
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.Invocator == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == Leaver.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.IsAlive(), (byte) x.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) x).Character.AlignmentGrade, ExpDAO.GetFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade).PvP, ExpDAO.GetFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) x).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) x).Character.Honor, x.ID == Leaver.ID ? LossedHonor : 0)})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.Summoner == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == Leaver.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.IsAlive(), (byte) x.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) x).Character.AlignmentGrade, ExpDAO.GetFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade).PvP, ExpDAO.GetFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) x).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) x).Character.Honor, x.ID == Leaver.ID ? LossedHonor : 0)})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
 }

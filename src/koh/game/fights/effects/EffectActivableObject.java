@@ -42,11 +42,12 @@ public class EffectActivableObject extends EffectBase {
         return -1;
     }
 
-    public Color GetColor(int Spell) {
+    public static Color GetColor(int Spell) {
         switch (Spell) {
             case 77:
             case 13:
                 return Color.BLUE;
+            case 2825:
             case 10:
                 return Color.RED;
             case 69:
@@ -63,8 +64,11 @@ public class EffectActivableObject extends EffectBase {
             case 71:
                 return Color.VIOLET;
             case 73:
+            case 2833:
             case 15:
                 return Color.LIGHTBLUE;
+            case 2829:
+                return Color.GREEN;
             default:
                 return Color.BROWN;
         }

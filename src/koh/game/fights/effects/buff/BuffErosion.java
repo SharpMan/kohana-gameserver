@@ -22,11 +22,11 @@ public class BuffErosion extends BuffEffect {
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         float pdamage = this.CastInfos.RandomJet(Target) / 100.00f;
-        int BuffValue = this.Target.MaxLife - (int) (DamageValue.getValue() * pdamage);
+        int BuffValue = this.Target.MaxLife() - (int) (DamageValue.getValue() * pdamage);
         if (BuffValue < 0) {
             BuffValue = 0;
         }
-        this.Target.MaxLife = (BuffValue);
+        this.Target.setLifeMax(BuffValue);
 
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
