@@ -16,7 +16,7 @@ public class EffectTranspose extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.States.HasState(FightStateEnum.Porté) && !target.States.HasState(FightStateEnum.Inébranlable) && !target.States.HasState(FightStateEnum.Enraciné) && !target.States.HasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
-           if (CastInfos.SpellId == 445) {
+            if (CastInfos.SpellId == 445) {
                 if (Target.Team == CastInfos.Caster.Team) {
                     continue;
                 }
@@ -39,9 +39,14 @@ public class EffectTranspose extends EffectBase {
                 return -3;
             }
 
-            CastInfos.Caster.myCell.onObjectAdded(CastInfos.Caster);
-            Target.myCell.onObjectAdded(Target);
-
+            int Result = CastInfos.Caster.myCell.onObjectAdded(CastInfos.Caster);
+            if (Result == -3) {
+                return Result;
+            }
+            Result = Target.myCell.onObjectAdded(Target);
+            if (Result == -3) {
+                return Result;
+            }
         }
         return -1;
     }

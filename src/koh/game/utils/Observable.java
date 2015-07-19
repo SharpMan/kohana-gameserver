@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class Observable<O extends Observer> {
 
     private volatile boolean changed;
-    protected CopyOnWriteArrayList<O> observers;
+    public CopyOnWriteArrayList<O> observers;
     //private ReentrantLock notifyLock = new ReentrantLock();
 
     public Observable() {

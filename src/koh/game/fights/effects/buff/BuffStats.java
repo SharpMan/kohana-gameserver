@@ -1,5 +1,6 @@
 package koh.game.fights.effects.buff;
 
+import koh.game.controllers.PlayerController;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
@@ -33,6 +34,7 @@ public class BuffStats extends BuffEffect {
 
     @Override
     public int RemoveEffect() {
+        
         this.Target.Stats.GetEffect(this.CastInfos.EffectType).additionnal -= this.Value1;
 
         return super.RemoveEffect();

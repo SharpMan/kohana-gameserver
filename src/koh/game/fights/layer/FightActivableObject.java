@@ -18,6 +18,7 @@ import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffActiveType;
+import koh.game.fights.fighters.BombFighter;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.GameActionMarkCellsTypeEnum;
@@ -58,9 +59,9 @@ public abstract class FightActivableObject implements IFightObject {
     public abstract void Appear(FightTeam dispatcher);
 
     public abstract void DisappearForAll();
-    
-    public FightActivableObject(){
-        
+
+    public FightActivableObject() {
+
     }
 
     public FightActivableObject(BuffActiveType activeType, Fight fight, Fighter caster, EffectCast castInfos, short cell, int duration, Color color, GameActionFightInvisibilityStateEnum visibleState, byte size, GameActionMarkCellsTypeEnum shap) {
@@ -122,18 +123,18 @@ public abstract class FightActivableObject implements IFightObject {
         }
     }
 
-    public void LoadEnnemyTargetsAndActive(Fighter target) {
+    public int LoadEnnemyTargetsAndActive(Fighter target) {
         FightCell Cell = null;
         for (short cell : AffectedCells) {
             Cell = m_fight.GetCell(cell);
             if (Cell != null) {
-                Targets.addAll(Cell.GetObjectsAsFighterList(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER && !Targets.contains(x) && ((Fighter)x).IsEnnemyWith(target)));
+                Targets.addAll(Cell.GetObjectsAsFighterList(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER && !Targets.contains(x) && ((Fighter) x).IsEnnemyWith(target)));
             }
         }
-        this.Activate(target);
+        return this.Activate(target);
     }
 
-    public synchronized void Activate(Fighter activator) {
+    public synchronized int Activate(Fighter activator) {
         Activated = true;
         if (this.ObjectType() == FightObjectType.OBJECT_TRAP) {
             Remove();
@@ -145,14 +146,16 @@ public abstract class FightActivableObject implements IFightObject {
             EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.spellId, Cell.Id, 100, Effect, m_caster, Targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
             CastInfos.IsTrap = this.ObjectType() == FightObjectType.OBJECT_TRAP;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {
-                break;
+                Targets.clear();
+                activator.Fight.EndSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
+                return -3;
             }
         }
 
         Targets.clear();
 
         activator.Fight.EndSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-
+        return -1;
     }
 
     public void DecrementDuration() {
@@ -169,6 +172,10 @@ public abstract class FightActivableObject implements IFightObject {
         for (short cell : AffectedCells) {
             this.m_fight.GetCell(cell).RemoveObject(this);
         }
+        if (this.m_fight.m_activableObjects.containsKey(this.m_caster)) {
+            this.m_fight.m_activableObjects.get(this.m_caster).remove(this);
+        }
+
     }
 
     public abstract GameActionMarkTypeEnum GameActionMarkType();

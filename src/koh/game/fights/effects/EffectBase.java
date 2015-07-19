@@ -245,7 +245,9 @@ public abstract class EffectBase {
             this.put(StatsEnum.Damage_Water_Per_Pm_Percent, new EffectDamage());
             this.put(StatsEnum.Damage_Fire_Per_Pm_Percent, new EffectDamage());
             this.put(StatsEnum.Damage_Earth_Per_Pm_Percent, new EffectDamage());
-
+            this.put(StatsEnum.Ends_Round , new EffectFinishTour());
+            this.put(StatsEnum.CREATE_ILLUSION , new EffectCreateIllusion());
+            this.put(StatsEnum.Refoullage, new EffectPoutch());
         }
     };
 

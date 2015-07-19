@@ -12,13 +12,18 @@ import koh.game.fights.types.ChallengeFight;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
+import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_MAKE_INVISIBLE;
+import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.PlayerEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
+import koh.protocol.messages.game.actions.fight.GameActionFightInvisibleDetectedMessage;
+import koh.protocol.messages.game.actions.fight.GameActionFightVanishMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.character.stats.FighterStatsListMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
+import koh.protocol.messages.game.context.fight.character.GameFightRefreshFighterMessage;
 import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
@@ -66,9 +71,11 @@ public class CharacterFighter extends Fighter {
         return new GameFightMinimalStats(this.Life(), this.MaxLife(), this.Character.MaxLife(), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.GetTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
     }
 
+    public int fakeContextualId = -1000;
+
     @Override
     public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Character.NickName, this.Character.PlayerStatus(), (byte) this.Level(), this.Character.GetActorAlignmentInformations(), this.Character.Breed, this.Character.Sexe());
+        return new GameFightCharacterInformations(((fakeContextualId != -1000 && !this.IsMyFriend(character)) ? this.fakeContextualId : this.ID), this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Character.NickName, this.Character.PlayerStatus(), (byte) this.Level(), this.Character.GetActorAlignmentInformations(), this.Character.Breed, this.Character.Sexe());
     }
 
     @Override
@@ -98,12 +105,34 @@ public class CharacterFighter extends Fighter {
         return super.EndTurn();
     }
 
+    public void CleanClone() {
+        boolean updated = false;
+        for (Fighter Clone : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.Summoner == this)::iterator) {
+            Clone.TryDie(this.ID);
+            updated = true;
+        }
+        if (updated) {
+            this.Fight.observers.stream().filter(x -> !this.IsMyFriend(((Player) x))).forEach(o -> ((Player) o).Send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
+            this.fakeContextualId = -1000;
+            this.Buffs.Dispell(2763);
+            this.Send(this.FighterStatsListMessagePacket());
+        }
+    }
+
     @Override
     public int BeginTurn() {
+        this.CleanClone();
         if (this.Character.Client == null && this.TurnRunning <= 0) {
             return this.TryDie(this.ID, true);
         }
         return super.BeginTurn();
+    }
+
+    @Override
+    public int TryDie(int Caster, boolean Force) {
+
+        this.CleanClone();
+        return super.TryDie(Caster, Force);
     }
 
     @Override
@@ -158,9 +187,9 @@ public class CharacterFighter extends Fighter {
     public void Send(Message Packet) {
         this.Character.Send(Packet);
     }
-    
+
     @Override
-    public int MaxLife(){
+    public int MaxLife() {
         return this.Character.MaxLife();
     }
 

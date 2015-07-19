@@ -1,6 +1,5 @@
 package koh.game.fights.effects;
 
-import java.util.Arrays;
 import koh.game.fights.FightCell;
 import koh.game.fights.IFightObject;
 import koh.game.fights.layer.FightGlyph;
@@ -14,7 +13,12 @@ public class EffectTriggersGlyph extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         FightCell Cell = CastInfos.Caster.Fight.GetCell(CastInfos.CellId);
-        Arrays.stream(Cell.GetObjects(IFightObject.FightObjectType.OBJECT_GLYPHE)).forEach(Glyph -> ((FightGlyph) Glyph).LoadEnnemyTargetsAndActive(CastInfos.Caster));
+        for (IFightObject Glyph : Cell.GetObjects(IFightObject.FightObjectType.OBJECT_GLYPHE)) {
+            int Score = ((FightGlyph) Glyph).LoadEnnemyTargetsAndActive(CastInfos.Caster);
+            if (Score == -3) {
+                return Score;
+            }
+        }
 
         return -1;
     }

@@ -158,6 +158,19 @@ public class Pathfinder {
         }
     }
 
+    public static short NextCell(short Cell, byte Direction, int Time) {
+        try {
+            short Cell2 = MapPoint.fromCellId(Cell).getNearestCellInDirection(Direction).get_cellId();
+            
+            for (int i = 1; i < Time; i++) {
+                Cell2 = MapPoint.fromCellId(Cell2).getNearestCellInDirection(Direction).get_cellId();
+            }
+            return Cell2;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
     public static byte GetDirection(DofusMap Map, int BeginCell, int EndCell) {
         return MapPoint.fromCellId(BeginCell).orientationTo(MapPoint.fromCellId(EndCell));
     }

@@ -20,6 +20,7 @@ import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffPorter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.CharacterFighter;
+import koh.game.fights.fighters.IllusionFighter;
 import koh.game.fights.layer.FightBomb;
 import koh.game.fights.types.AgressionFight;
 import koh.game.utils.Settings;
@@ -166,6 +167,12 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             this.Fight.sendToField(new GameActionFightDeathMessage(GameActionTypeEnum.FIGHT_KILLFIGHTER.value, CasterId, this.ID));
 
             this.Team.GetAliveFighters().filter(x -> x.Summoner != null && x.Summoner.ID == this.ID).forEach(Fighter -> Fighter.TryDie(this.ID, true));
+
+            if (this.Fight.m_activableObjects.containsKey(this)) {
+                this.Fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
+            }
+
+            myCell.RemoveObject(this);
 
             this.Fight.EndSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH, false);
 
@@ -415,11 +422,20 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public byte GetVisibleStateFor(Player Character) {
-        if (Character == null || Character.Client == null || Character.GetFighter() == null || Character.GetFight() != this.Fight) {
+        if (this.Team.GetAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.Summoner.ID == this.ID)) {
+            return GameActionFightInvisibilityStateEnum.VISIBLE.value;
+        } else if (Character == null || Character.Client == null || Character.GetFighter() == null || Character.GetFight() != this.Fight) {
             return this.VisibleState.value;
         } else {
             return !Character.GetFighter().IsFriendlyWith(this) || this.VisibleState == GameActionFightInvisibilityStateEnum.VISIBLE ? this.VisibleState.value : GameActionFightInvisibilityStateEnum.DETECTED.value;
         }
+    }
+
+    public boolean IsMyFriend(Player Character) {
+        if (Character == null || Character.Client == null || Character.GetFighter() == null || Character.GetFight() != this.Fight) {
+            return false;
+        }
+        return Character.GetFighter().IsFriendlyWith(this);
     }
 
     public int Initiative(boolean Base) { //FIXME : Considerate Stats ?

@@ -258,6 +258,7 @@ public class EffectInstance implements Serializable {
                     case 'K':
                         break;
                     case 'o':
+                        verify = true;
                         break;
                     case 'O':
                         verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.ID == pTriggeringSpellCasterId)));

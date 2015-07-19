@@ -46,7 +46,10 @@ public class FightCell {
                 FightActivableObject activableObject = (FightActivableObject) Object;
                 if (activableObject.ActivationType == BuffActiveType.ACTIVE_BEGINTURN || activableObject instanceof FightBomb) {
                     activableObject.LoadTargets(fighter);
-                    activableObject.Activate(fighter);
+                    int Result = activableObject.Activate(fighter);
+                    if(Result == -3){
+                        return -3;
+                    }
                 }
             }
         }
@@ -60,7 +63,10 @@ public class FightCell {
                 FightActivableObject activableObject = (FightActivableObject) Object;
                 if (activableObject.ActivationType == BuffActiveType.ACTIVE_ENDTURN || activableObject instanceof FightBomb) {
                     activableObject.LoadTargets(fighter);
-                    activableObject.Activate(fighter);
+                    int Result = activableObject.Activate(fighter);
+                    if(Result == -3){
+                        return -3;
+                    }
                 }
             }
         }
@@ -136,13 +142,13 @@ public class FightCell {
             this.myFightObjects.add(fightObject);
         }
         if (runEvent) {
-            onObjectAdded(fightObject);
+            return onObjectAdded(fightObject);
         }
 
         return -1;
     }
 
-    public void onObjectAdded(IFightObject fightObject) {
+    public int onObjectAdded(IFightObject fightObject) {
         if (fightObject instanceof Fighter) {
             Fighter fighter = (Fighter) fightObject;
             for (IFightObject Object : myFightObjects) {
@@ -152,12 +158,15 @@ public class FightCell {
                     if (activableObject.ActivationType == BuffActiveType.ACTIVE_ENDMOVE) {
                         if (!fighter.Dead()) {
                             activableObject.LoadTargets(fighter);
-                            activableObject.Activate(fighter);
+                            int Result = activableObject.Activate(fighter);
+                            if(Result == -3)
+                                return Result;
                         }
                     }
                 }
             }
         }
+        return -1;
     }
 
     public void RemoveObject(IFightObject Object) {

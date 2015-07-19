@@ -3,7 +3,6 @@ package koh.game.fights.layer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import javafx.scene.paint.Color;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -32,7 +31,7 @@ public class FightBomb extends FightActivableObject {
     public HashMap<Short, Short> Cells = new HashMap<>();
     public BombFighter[] Owner = new BombFighter[2];
 
-    public FightBomb(Fighter Caster, SpellLevel Spell, Color color, Short[] Cells,BombFighter[] Members) {
+    public FightBomb(Fighter Caster, SpellLevel Spell, Color color, Short[] Cells, BombFighter[] Members) {
         m_fight = Caster.Fight;
         ID = (short) m_fight.NextTriggerUid.incrementAndGet();
         m_caster = Caster;
@@ -86,9 +85,20 @@ public class FightBomb extends FightActivableObject {
 
     @Override
     public void DisappearForAll() {
+        //m_fight.StartSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         this.Cells.keySet().stream().forEach((cell) -> {
             this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.ID, this.Cells.get(cell)));
         });
+        //m_fight.EndSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
+    }
+
+    @Override
+    public synchronized int Activate(Fighter activator) {
+        Targets.removeIf(Fighter -> Fighter instanceof BombFighter);
+        if (Targets.isEmpty()) {
+            return -1;
+        }
+        return super.Activate(activator);
     }
 
     @Override

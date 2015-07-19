@@ -136,7 +136,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected short AgeBonus = 0, lootShareLimitMalus = 0;
 
     protected Map<String, CancellableExecutorRunnable> myTimers = new HashMap<>();
-    protected HashMap<Fighter, ArrayList<FightActivableObject>> m_activableObjects = new HashMap<>();
+    public HashMap<Fighter, ArrayList<FightActivableObject>> m_activableObjects = new HashMap<>();
     private final Object $mutex_lock = new Object();
     public FightWorker myWorker = new FightWorker(this);
     public AtomicInteger NextTriggerUid = new AtomicInteger();
@@ -258,10 +258,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public void LaunchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend) {
-        LaunchSpell(Fighter, SpellLevel, CellId, friend, false,true);
+        LaunchSpell(Fighter, SpellLevel, CellId, friend, false, true);
     }
 
-    public void LaunchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend, boolean fakeLaunch,boolean imTargeted) {
+    public void LaunchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend, boolean fakeLaunch, boolean imTargeted) {
         if (this.FightState != FightState.STATE_ACTIVE) {
             return;
         }
@@ -305,14 +305,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         boolean silentCast = Arrays.stream(Effects).allMatch(x -> !ArrayUtils.contains(EffectNotSilenced, x.EffectType()));
 
-        /*this.sendToField((player) -> {
-         player.Send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, targetFighter.ID, TargetId, CellId, 
-         (byte) (isCCfinal ? 2 : 1), (!targetFighter.IsVisibleFor(player) || silentCast), targetLevel.spellId, targetLevel.grade, 
-         new short[0]));
-         });*/
         if (!fakeLaunch) {
             for (Player player : this.Observable$stream()) {
-                player.Send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), (!Fighter.IsVisibleFor(player) || silentCast), SpellLevel.spellId, SpellLevel.grade, new short[0]/*short[] portalsIds*/));
+                player.Send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), SpellLevel.spellId == 2763 ? true : (!Fighter.IsVisibleFor(player) || silentCast), SpellLevel.spellId, SpellLevel.grade, new short[0]/*short[] portalsIds*/));
             }
         }
 
@@ -332,11 +327,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                 } else if (Effect.targetMask.equals("a,A") && Fighter.GetCarriedActor() != 0 & Fighter.ID == Target.ID) {
                                     continue;
                                 }
-                                if(Fighter instanceof BombFighter && Target.States.HasState(FightStateEnum.Kaboom)){
+                                if (Fighter instanceof BombFighter && Target.States.HasState(FightStateEnum.Kaboom)) {
                                     continue;
                                 }
-                                if(!imTargeted && Target.ID == Fighter.ID)
+                                if (!imTargeted && Target.ID == Fighter.ID) {
                                     continue;
+                                }
                                 /*if(Effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect)){
                                  continue;
                                  }*/
@@ -397,7 +393,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, Fighter.ID, Fighter.ID, (short) -SpellLevel.ApCost));
         }
 
-        if (!fakeLaunch && Fighter.VisibleState == GameActionFightInvisibilityStateEnum.INVISIBLE && silentCast) {
+        if (!fakeLaunch && Fighter.VisibleState == GameActionFightInvisibilityStateEnum.INVISIBLE && silentCast && SpellLevel.spellId != 2763) {
             this.sendToField(new ShowCellMessage(Fighter.ID, Fighter.CellId()));
         }
 
@@ -1131,9 +1127,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public int GetNextContextualId() {
-        int id = contextualIdProvider.incrementAndGet();
+        int id = contextualIdProvider.decrementAndGet();
         while (AnyFighterMatchId(id)) {
-            id = contextualIdProvider.incrementAndGet();
+            id = contextualIdProvider.decrementAndGet();
         }
         return id;
     }

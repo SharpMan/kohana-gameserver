@@ -27,6 +27,15 @@ public abstract class StaticFighter extends Fighter {
     public StaticFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
         super(Fight, Summoner);
     }
+    
+    public void AdjustStats() {
+        this.Stats.AddBase(StatsEnum.Vitality, (short) ((double) this.Stats.GetEffect(StatsEnum.Vitality).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+        this.Stats.AddBase(StatsEnum.Intelligence, (short) ((double) this.Stats.GetEffect(StatsEnum.Intelligence).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+        this.Stats.AddBase(StatsEnum.Chance, (short) ((double) this.Stats.GetEffect(StatsEnum.Chance).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+        this.Stats.AddBase(StatsEnum.Strength, (short) ((double) this.Stats.GetEffect(StatsEnum.Strength).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+        this.Stats.AddBase(StatsEnum.Agility, (short) ((double) this.Stats.GetEffect(StatsEnum.Agility).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+        this.Stats.AddBase(StatsEnum.Wisdom, (short) ((double) this.Stats.GetEffect(StatsEnum.Wisdom).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+    }
 
     @Override
     public int MaxAP() {

@@ -2,31 +2,31 @@ package koh.game.fights.fighters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import koh.game.Main;
 import koh.game.dao.SpellDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.cells.Zone;
+import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.mob.MonsterGrade;
-import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.fights.Fight;
+import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectActivableObject;
-import koh.game.fights.effects.EffectBase;
-import koh.game.fights.effects.EffectCast;
 import koh.game.fights.layer.FightBomb;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
-import koh.protocol.client.enums.FightDispellableEnum;
+import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
-import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
+import koh.protocol.client.enums.TextInformationTypeEnum;
+import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
 import koh.protocol.types.game.context.fight.FightTeamMemberMonsterInformations;
 import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import koh.protocol.types.game.look.EntityLook;
-import koh.utils.Couple;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -41,18 +41,11 @@ public class BombFighter extends StaticFighter {
         this.Grade = Monster;
         super.InitFighter(this.Grade.GetStats(), Fight.GetNextContextualId());
         this.entityLook = EntityLookParser.Copy(this.Grade.Monster().GetEntityLook());
-        this.AdjustStats();
+        super.AdjustStats();
         super.setLife(this.Life());
     }
 
-    private void AdjustStats() {
-        this.Stats.GetEffect(StatsEnum.Vitality).Base = (short) ((double) this.Stats.GetEffect(StatsEnum.Vitality).Base * (1.0 + (double) this.Summoner.Level() / 100.0));
-        this.Stats.GetEffect(StatsEnum.Intelligence).Base = (short) ((double) this.Stats.GetEffect(StatsEnum.Intelligence).Base * (1.0 + (double) this.Summoner.Level() / 100.0));
-        this.Stats.GetEffect(StatsEnum.Chance).Base = (short) ((double) this.Stats.GetEffect(StatsEnum.Chance).Base * (1.0 + (double) this.Summoner.Level() / 100.0));
-        this.Stats.GetEffect(StatsEnum.Strength).Base = (short) ((double) this.Stats.GetEffect(StatsEnum.Strength).Base * (1.0 + (double) this.Summoner.Level() / 100.0));
-        this.Stats.GetEffect(StatsEnum.Agility).Base = (short) ((double) this.Stats.GetEffect(StatsEnum.Agility).Base * (1.0 + (double) this.Summoner.Level() / 100.0));
-        this.Stats.GetEffect(StatsEnum.Wisdom).Base = (short) ((double) this.Stats.GetEffect(StatsEnum.Wisdom).Base * (1.0 + (double) this.Summoner.Level() / 100.0));
-    }
+    
 
     @Override
     public void CalculDamages(StatsEnum Effect, MutableInt Jet) {
@@ -87,19 +80,59 @@ public class BombFighter extends StaticFighter {
         }
     }
 
+    public boolean Boosted = false;
+
+    public synchronized void SlefMurder(int Caster) {
+        if (Boosted) {
+            return;
+        }
+        int TotalCombo = 0;
+        ArrayList<BombFighter> Targets = new ArrayList<>(6);
+        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true))).GetCells(this.CellId())) {
+            FightCell FightCell = Fight.GetCell(aCell);
+            if (FightCell != null) {
+                if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
+                    for (Fighter Target : FightCell.GetObjectsAsFighter()) {
+                        if (Target.ID == this.ID) {
+                            continue;
+                        }
+                        if (Target instanceof BombFighter && ((BombFighter) Target).Grade.monsterId == this.Grade.monsterId && ((BombFighter) Target).Summoner == this.Summoner && !((BombFighter) Target).Boosted) {
+                            Targets.add((BombFighter) Target);
+                            TotalCombo += 40;
+                        }
+                    }
+                }
+            }
+        }
+        if (TotalCombo == 0) {
+            return;
+        }
+        Fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
+        Stats.AddBoost(StatsEnum.Combo_Dammages, TotalCombo);
+        this.Boosted = true;
+        for (Fighter Bomb : Targets) {
+            Bomb.Stats.AddBoost(StatsEnum.Combo_Dammages, TotalCombo);
+            Boosted = true;
+        }
+        Targets.forEach(Bomb -> Bomb.TryDie(Caster, true));
+    }
+
     @Override
     public int TryDie(int CasterId, boolean force) {
         if (this.Life() <= 0 || force) {
+            SlefMurder(CasterId);
             Fight.LaunchSpell(this, SpellDAO.Spells.get(SpellDAO.Bombs.get(this.Grade.monsterId).explodSpellId).SpellLevel(this.Grade.Grade), this.CellId(), true, true, false);
+            if (this.FightBombs != null) {
+                this.FightBombs.forEach(Bomb -> Bomb.Remove());
+            }
         }
         return super.TryDie(CasterId, force);
     }
-    
+
     public ArrayList<FightBomb> FightBombs;
-    
-    
-    public void addBomb(FightBomb Bomb){
-        if(FightBombs == null){
+
+    public void addBomb(FightBomb Bomb) {
+        if (FightBombs == null) {
             FightBombs = new ArrayList<>(4);
         }
         this.FightBombs.add(Bomb);
@@ -108,19 +141,25 @@ public class BombFighter extends StaticFighter {
     @Override
     public int OnCellChanged() {
         if (this.myCell != null) {
-            if(this.FightBombs != null){
+            if (this.Dead()) {
+                return -2;
+            }
+            if (this.FightBombs != null) {
                 this.FightBombs.forEach(Bomb -> Bomb.Remove());
             }
+            if (this.myCell.HasGameObject(FightObjectType.OBJECT_BOMB)) {
+                Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).Remove());
+            }
             Short[] Cells;
-            for (Fighter Friend : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.Summoner == this.Summoner && Pathfinder.InLine(null, this.CellId(), Fighter.CellId()) && this.Grade.monsterId == ((BombFighter)Fighter).Grade.monsterId)::iterator) {
+            for (Fighter Friend : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.Summoner == this.Summoner && Pathfinder.InLine(null, this.CellId(), Fighter.CellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
                 int Distance = Pathfinder.GoalDistance(null, CellId(), Friend.CellId());
                 Main.Logs().writeDebug("Distance = " + Distance);
                 if (Distance >= 2 && Distance <= 6) {
                     Cells = Pathfinder.GetLineCellsBetween(Fight, this.CellId(), Pathfinder.GetDirection(null, this.CellId(), Friend.CellId()), Friend.CellId());
                     if (Cells != null) {
-                        Cells = (Short[])ArrayUtils.removeElement(Cells, this.CellId());
-                        Cells = (Short[])ArrayUtils.removeElement(Cells, Friend.CellId());
-                        FightBomb Bomb = new FightBomb(this.Summoner, SpellDAO.Spells.get(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId).SpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId), Cells,new BombFighter[]{this,(BombFighter)Friend});
+                        Cells = (Short[]) ArrayUtils.removeElement(Cells, this.CellId());
+                        Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.CellId());
+                        FightBomb Bomb = new FightBomb(this.Summoner, SpellDAO.Spells.get(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId).SpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
                         Fight.AddActivableObject(this.Summoner, Bomb);
                     }
                 }
