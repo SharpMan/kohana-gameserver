@@ -20,12 +20,12 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class EffectHelper {
 
-    public static int[] DateEffect = new int[]{805, 808, 983, 998}; //971
+    public static final int[] DateEffect = new int[]{805, 808, 983, 998}; //971
     public static final int DAMAGE_EFFECT_CATEGORY = 2;
-    public static int[] MonsterEffect = new int[]{185, 621, 1011, 905};
-    public static int[] LadderEffects = new int[]{717};
-    public static int[] LivingObjectEffect = new int[]{973, 971, 972, 974};
-    public static int[] unRandomablesEffects = new int[]{
+    public static final int[] MonsterEffect = new int[]{185, 621, 1011, 905};
+    public static final int[] LadderEffects = new int[]{717};
+    public static final int[] LivingObjectEffect = new int[]{973, 971, 972, 974};
+    public static final int[] unRandomablesEffects = new int[]{
         96,//Effect_DamageWater
         97,//Effect_DamageEarth
         98,//Effect_DamageAir
@@ -36,7 +36,8 @@ public class EffectHelper {
         93,//Effect_StealHPAir
         94,//Effect_StealHPFire
         95,//Effect_StealHPNeutral
-        101//Effect_RemoveAP
+        101,//Effect_RemoveAP
+        108//Heal
     };
 
     public static IoBuffer SerializeEffectInstanceDice(EffectInstance[] Effects) {
@@ -201,7 +202,7 @@ public class EffectHelper {
         }
         return Effects;
     }
-    
+
     public static ObjectEffect[] ObjectEffects(List<EffectInstance> effects) {
         ObjectEffect[] array = new ObjectEffect[effects.size()];
         for (int i = 0; i < array.length; ++i) {

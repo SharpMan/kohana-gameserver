@@ -114,7 +114,7 @@ public class FightCell {
     public List<Fighter> GetObjectsAsFighterList() {
         return this.myFightObjects.stream().filter(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER ||  x.ObjectType() == FightObjectType.OBJECT_STATIC).map(x -> (Fighter) x).collect(Collectors.toList());
     }
-
+    
     public List<Fighter> GetObjectsAsFighterList(Predicate<? super IFightObject> prdct) {
         return this.myFightObjects.stream().filter(prdct).map(x -> (Fighter) x).collect(Collectors.toList());
     }

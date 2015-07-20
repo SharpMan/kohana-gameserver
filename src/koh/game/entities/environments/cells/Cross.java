@@ -77,30 +77,30 @@ public class Cross implements IZone {
             if (index >= (int) this.MinRadius) {
                 if (!this.Diagonal) {
                     if (!disabledDirection.contains(DirectionsEnum.DOWN_RIGHT)) {
-                        Cross.AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y(), list1);
+                        AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y(), list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.UP_LEFT)) {
-                        Cross.AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y(), list1);
+                        AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y(), list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.UP_RIGHT)) {
-                        Cross.AddCellIfValid(mapPoint.get_x(), mapPoint.get_y() + index, list1);
+                        AddCellIfValid(mapPoint.get_x(), mapPoint.get_y() + index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.DOWN_LEFT)) {
-                        Cross.AddCellIfValid(mapPoint.get_x(), mapPoint.get_y() - index, list1);
+                        AddCellIfValid(mapPoint.get_x(), mapPoint.get_y() - index, list1);
                     }
                 }
                 if (this.Diagonal || this.AllDirections) {
                     if (!disabledDirection.contains(DirectionsEnum.DOWN)) {
-                        Cross.AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() - index, list1);
+                        AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() - index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.UP)) {
-                        Cross.AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() + index, list1);
+                        AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() + index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.RIGHT)) {
-                        Cross.AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() + index, list1);
+                        AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() + index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.LEFT)) {
-                        Cross.AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() - index, list1);
+                        AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() - index, list1);
                     }
                 }
             }

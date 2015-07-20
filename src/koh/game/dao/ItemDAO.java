@@ -29,17 +29,17 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author Neo-Craft
  */
 public class ItemDAO {
-
+    
     public static final Map<Integer, ItemTemplate> Cache = Collections.synchronizedMap(new HashMap<>());
     public static final Map<Integer, ItemSet> Sets = Collections.synchronizedMap(new HashMap<>());
     public static final Map<Integer, Pets> Pets = Collections.synchronizedMap(new HashMap<>());
     //@Param1 = ItemType @Param2 = ItemSuperType
-    public static final Map<Integer, Integer> SuperTypes = Collections.synchronizedMap(new HashMap<>());
+    public static final Map<Integer, ItemType> SuperTypes = Collections.synchronizedMap(new HashMap<>());
     public static volatile int NextID;
     public static volatile int NextStorageID;
     public static volatile int NextPetsID = 1;
     public static volatile int NextMountsID = 1;
-
+    
     public static void InitInventoryCache(int player, Map<Integer, InventoryItem> Cache, String table) {
         synchronized (Cache) {
             try {
@@ -56,20 +56,20 @@ public class ItemDAO {
             }
         }
     }
-
+    
     public synchronized static void DistinctItems() {
         try {
             //TestDAO.SetMaxEffects(15254, new EffectInstance[]{new EffectInstanceDice(new EffectInstance(0, 128, 0, "", 0, 0, 0, false, "C", 0, "", 0), 0, 1, 0)});
             PreparedStatement p = MySQL.prepareQuery("DELETE from `character_items` WHERE owner = ?;", MySQL.Connection());
             p.setInt(1, -1);
             p.execute();
-
+            
             MySQL.closePreparedStatement(p);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
+    
     public synchronized static void InitializeNextIdentifiant() {
         try {
             ResultSet RS = executeQuery("SELECT id FROM `character_items` ORDER BY id DESC LIMIT 1;", Settings.GetStringElement("Database.Name"));
@@ -91,11 +91,11 @@ public class ItemDAO {
             e.printStackTrace();
         }
     }
-
+    
     public static boolean Insert(InventoryItem Item, boolean Clear, String Table) {
         try {
             PreparedStatement p = MySQL.prepareQuery("INSERT INTO `" + Table + "` VALUES (?,?,?,?,?,?);", MySQL.Connection());
-
+            
             p.setInt(1, Item.ID);
             p.setInt(2, Item.GetOwner());
             p.setInt(3, Item.TemplateId);
@@ -115,7 +115,7 @@ public class ItemDAO {
             return false;
         }
     }
-
+    
     public static boolean Update(InventoryItem Item, boolean Clear, String Table) {
         try {
             int i = 1;
@@ -123,9 +123,9 @@ public class ItemDAO {
             Query = Item.ColumsToUpdate.stream().map((s) -> s + " =?,").reduce(Query, String::concat);
             Query = StringUtil.removeLastChar(Query);
             Query += " WHERE id = ?;";
-
+            
             PreparedStatement p = MySQL.prepareQuery(Query, MySQL.Connection());
-
+            
             Item.ColumsToUpdate.add("id");
             for (String s : Item.ColumsToUpdate) {
                 setValue(p, s, i++, Item);
@@ -137,14 +137,14 @@ public class ItemDAO {
             if (Clear) {
                 Item.totalClear();
             }
-
+            
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
-
+    
     public static void setValue(PreparedStatement p, String Column, int Seq, InventoryItem Item) {
         try {
             switch (Column) {
@@ -164,19 +164,19 @@ public class ItemDAO {
                     p.setBytes(Seq, Item.SerializeEffectInstanceDice().array());
                     //p.setBlob(Seq, new SerialBlob(Item.SerializeEffectInstanceDice()));
                     break;
-
+                
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    
     public static boolean Remove(InventoryItem Item, String Table) {
         try {
             PreparedStatement p = MySQL.prepareQuery("DELETE from `" + Table + "` WHERE id = ?;", MySQL.Connection());
             p.setInt(1, Item.ID);
             p.execute();
-
+            
             MySQL.closePreparedStatement(p);
             return true;
         } catch (SQLException e) {
@@ -184,13 +184,22 @@ public class ItemDAO {
             return false;
         }
     }
-
+    
     public static int FindItemTypes() {
         try {
             int i = 0;
             ResultSet RS = MySQL.executeQuery("SELECT * from item_types", Settings.GetStringElement("Database.Name"), 0);
             while (RS.next()) {
-                SuperTypes.put(RS.getInt("id"), RS.getInt("super_type_id"));
+                SuperTypes.put(RS.getInt("id"), new ItemType() {
+                    {                        
+                        SuperType = RS.getInt("super_type_id");
+                        plural = RS.getBoolean("plural");
+                        gender = RS.getInt("gender");
+                        rawZone = RS.getString("raw_zone");
+                        needUseConfirm = RS.getBoolean("need_use_confirm");
+                        mimickable = RS.getBoolean("mimickable");
+                    }
+                });
                 i++;
             }
             MySQL.closeResultSet(RS);
@@ -200,17 +209,17 @@ public class ItemDAO {
             return 0;
         }
     }
-
+    
     public static int FindItemSets() {
         try {
             int i = 0;
             ResultSet RS = MySQL.executeQuery("SELECT * from item_sets", Settings.GetStringElement("Database.Name"), 0);
-
+            
             while (RS.next()) {
                 Sets.put(RS.getInt("id"), new ItemSet() {
                     {
                         id = RS.getInt("id");
-
+                        
                         this.items = new int[RS.getString("items").split(",").length];
                         for (int i = 0; i < RS.getString("items").split(",").length; i++) {
                             this.items[i] = Integer.parseInt(RS.getString("items").split(",")[i]);
@@ -232,12 +241,12 @@ public class ItemDAO {
             return 0;
         }
     }
-
+    
     public static int FindPets() {
         try {
             int i = 0;
             ResultSet RS = MySQL.executeQuery("SELECT * from item_pets", Settings.GetStringElement("Database.Name"), 0);
-
+            
             while (RS.next()) {
                 Pets.put(RS.getInt("id"), new Pets() {
                     {
@@ -302,14 +311,14 @@ public class ItemDAO {
             e.printStackTrace();
             return 0;
         }
-
+        
     }
-
+    
     public static int FindAll() {
         try {
             int i = 0;
             ResultSet RS = MySQL.executeQuery("SELECT * from item_templates", Settings.GetStringElement("Database.Name"), 0);
-
+            
             while (RS.next()) {
                 Cache.put(RS.getInt("id"), new ItemTemplate() {
                     {
@@ -367,7 +376,7 @@ public class ItemDAO {
                         } else {
                             this.favoriteSubAreas = new int[0];
                         }
-
+                        
                         this.favoriteSubAreasBonus = RS.getInt("favorite_sub_areas_bonus");
                     }
                 });
@@ -380,12 +389,12 @@ public class ItemDAO {
             return 0;
         }
     }
-
+    
     public static int FindWeapons() {
         try {
             int i = 0;
             ResultSet RS = MySQL.executeQuery("SELECT * from item_templates_weapons", Settings.GetStringElement("Database.Name"), 0);
-
+            
             while (RS.next()) {
                 Cache.put(RS.getInt("id"), new Weapon() {
                     {
@@ -443,7 +452,7 @@ public class ItemDAO {
                         } else {
                             this.favoriteSubAreas = new int[0];
                         }
-
+                        
                         this.favoriteSubAreasBonus = RS.getInt("favorite_sub_areas_bonus");
                         this.range = RS.getInt("range");
                         this.criticalHitBonus = RS.getInt("range");
@@ -455,7 +464,7 @@ public class ItemDAO {
                         this.apCost = RS.getInt("ap_cost");
                         this.castInLine = RS.getBoolean("cast_in_line");
                         this.castTestLos = RS.getBoolean("cast_test_los");
-
+                        
                     }
                 });
                 i++;
@@ -467,7 +476,7 @@ public class ItemDAO {
             return 0;
         }
     }
-
+    
     public static EffectInstance[] ReadInstance(IoBuffer buf) {
         EffectInstance[] possibleEffectstype = new EffectInstance[buf.getInt()];
         for (int i = 0; i < possibleEffectstype.length; ++i) {
@@ -492,5 +501,5 @@ public class ItemDAO {
         }
         return possibleEffectstype;
     }
-
+    
 }

@@ -46,6 +46,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.LAYING_GLYPH, new EffectActivableObject());
             this.put(StatsEnum.LAYING_TRAP_LEVEL, new EffectActivableObject());
             this.put(StatsEnum.Reveals_Invisible, new EffectPerception());
+            this.put(StatsEnum.LAYING_PORTAIL, new EffectActivableObject());
 
             // 1 PA,PM Utilisé = X Pdv perdu
             this.put(StatsEnum.Lose_PV_By_Using_PA, new EffectDamagePerPA());

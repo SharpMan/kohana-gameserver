@@ -2,7 +2,7 @@ package koh.game.actions.requests;
 
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.dao.GuildDAO;
-import koh.game.entities.guild.GuildMember;
+import koh.game.entities.guilds.GuildMember;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.GuildInvitationStateEnum;

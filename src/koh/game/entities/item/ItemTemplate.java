@@ -50,7 +50,7 @@ public class ItemTemplate {
 
     
     public EffectInstance GetEffect(int uid) {
-        return Arrays.stream(possibleEffects).filter(x -> x.effectUid == uid).findFirst().orElse(null);
+        return Arrays.stream(possibleEffects).filter(x -> x.effectId == uid).findFirst().orElse(null);
     }
     
     public boolean isVisibleInTooltip(int Effect){
@@ -61,8 +61,10 @@ public class ItemTemplate {
         return this.itemSetId < 0 ? null : ItemDAO.Sets.get(this.itemSetId);
     }
 
+   
+    
     public ItemSuperTypeEnum GetSuperType() {
-        return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(TypeId));
+        return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(TypeId).SuperType);
     }
 
     public static boolean CanPlaceInSlot(ItemSuperTypeEnum Type, CharacterInventoryPositionEnum Slot) {

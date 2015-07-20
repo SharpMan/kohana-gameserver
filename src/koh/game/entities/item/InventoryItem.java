@@ -69,7 +69,7 @@ public class InventoryItem {
     }
 
     public ItemSuperTypeEnum GetSuperType() {
-        return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(Template().TypeId));
+        return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(Template().TypeId).SuperType);
     }
 
     public boolean isEquiped() {
@@ -143,6 +143,14 @@ public class InventoryItem {
 
     public ItemTemplate Template() {
         return ItemDAO.Cache.get(TemplateId);
+    }
+    
+     public ItemType ItemType(){
+        return ItemDAO.SuperTypes.get(Template().TypeId);
+    }
+    
+    public Weapon WeaponTemplate() {
+        return (Weapon)ItemDAO.Cache.get(TemplateId);
     }
 
     public CharacterInventoryPositionEnum Slot() {

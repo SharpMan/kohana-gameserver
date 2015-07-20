@@ -2,12 +2,13 @@ package koh.game.dao;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.GenericRawResults;
-import com.j256.ormlite.table.TableUtils;
 import java.util.HashMap;
 import java.util.List;
 import koh.game.Main;
 import static koh.game.dao.PetsDAO.doOpenConnectionSource;
-import koh.game.entities.guild.*;
+import koh.game.entities.guilds.Guild;
+import koh.game.entities.guilds.GuildEntity;
+import koh.game.entities.guilds.GuildMember;
 import koh.protocol.types.game.guild.GuildEmblem;
 
 /**

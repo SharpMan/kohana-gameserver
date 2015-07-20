@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import koh.game.dao.ExpDAO;
 import koh.game.entities.actors.character.ScoreType;
-import koh.game.entities.guild.GuildMember;
+import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.utils.Settings;

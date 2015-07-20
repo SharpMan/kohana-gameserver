@@ -1,7 +1,6 @@
 package koh.game.fights.effects;
 
 import javafx.scene.paint.Color;
-import koh.game.fights.IFightObject;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.layer.FightActivableObject;
 import koh.game.fights.layer.FightGlyph;
@@ -33,6 +32,11 @@ public class EffectActivableObject extends EffectBase {
                     return -1;
                 }
                 obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), CastInfos.Effect.ZoneShape() == SpellShapeEnum.G ? GameActionMarkCellsTypeEnum.CELLS_SQUARE : CastInfos.Effect.ZoneShape() == SpellShapeEnum.Q ? GameActionMarkCellsTypeEnum.CELLS_CROSS : GameActionMarkCellsTypeEnum.CELLS_CIRCLE);
+                break;
+            case LAYING_PORTAIL:
+                if (!CastInfos.Caster.Fight.CanPutObject(CastInfos.CellId)) {
+                    return -1;
+                }
                 break;
         }
 

@@ -28,6 +28,8 @@ import koh.game.entities.environments.IWorldField;
 import koh.game.entities.environments.MovementPath;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
+import koh.game.entities.item.EffectHelper;
+import koh.game.entities.item.InventoryItem;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.maps.pathfinding.Path;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -42,18 +44,21 @@ import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.ActionIdEnum;
+import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.FightOptionsEnum;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.FighterRefusedReasonEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.SequenceTypeEnum;
+import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.StatsEnum;
 import static koh.protocol.client.enums.StatsEnum.ADD_BASE_DAMAGE_SPELL;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightTackledMessage;
 import koh.protocol.messages.game.actions.SequenceEndMessage;
 import koh.protocol.messages.game.actions.SequenceStartMessage;
+import koh.protocol.messages.game.actions.fight.GameActionFightCloseCombatMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightPointsVariationMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightSpellCastMessage;
@@ -94,6 +99,7 @@ import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import koh.protocol.types.game.context.fight.GameFightSpellCooldown;
 import koh.protocol.types.game.context.roleplay.party.NamedPartyTeam;
 import koh.protocol.types.game.context.roleplay.party.NamedPartyTeamWithOutcome;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
 import koh.protocol.types.game.idol.Idol;
 import koh.utils.Couple;
 import org.apache.commons.lang3.ArrayUtils;
@@ -265,6 +271,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (this.FightState != FightState.STATE_ACTIVE) {
             return;
         }
+        if (SpellLevel.id == 10461 && Fighter instanceof CharacterFighter && ((CharacterFighter) Fighter).Character.InventoryCache.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
+            this.LaunchWeapon(((CharacterFighter) Fighter), CellId);
+            return;
+        }
 
         // La cible si elle existe
         Fighter TargetE = this.HasEnnemyInCell(CellId, Fighter.Team);
@@ -400,6 +410,96 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (!fakeLaunch) {
             this.EndSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
         }
+    }
+
+    public void LaunchWeapon(CharacterFighter Fighter, short CellId) {
+        // Combat encore en cour ?
+        if (this.FightState != FightState.STATE_ACTIVE) {
+            return;
+        }
+        if (Fighter != this.CurrentFighter) {
+            return;
+        }
+        InventoryItem Weapon = Fighter.Character.InventoryCache.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
+        if (Weapon.Template().TypeId == 83) { //Pière d'Ame
+            return;
+        }
+        // La cible si elle existe
+        Fighter TargetE = this.HasEnnemyInCell(CellId, Fighter.Team);
+        if (TargetE == null) {
+            TargetE = this.HasFriendInCell(CellId, Fighter.Team);
+        }
+        int TargetId = TargetE == null ? -1 : TargetE.ID;
+
+        if (!(Pathfinder.GoalDistance(Map, CellId, Fighter.CellId()) <= Weapon.WeaponTemplate().range && Pathfinder.GoalDistance(Map, CellId, Fighter.CellId()) >= Weapon.WeaponTemplate().minRange && Fighter.AP() >= Weapon.WeaponTemplate().apCost)) {
+            Fighter.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
+            return;
+        }
+
+        
+        this.StartSequence(SequenceTypeEnum.SEQUENCE_WEAPON);
+        
+        
+        Fighter.UsedAP += Weapon.WeaponTemplate().apCost;
+
+        boolean IsCc = false;
+
+        int TauxCC = Weapon.WeaponTemplate().criticalHitProbability - Fighter.Stats.GetTotal(StatsEnum.Add_CriticalHit);
+        if (TauxCC < 2) {
+            TauxCC = 2;
+        }
+        if (Fight.RANDOM.nextInt(TauxCC) == 0) {
+            IsCc = true;
+        }
+
+        IsCc &= !Fighter.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
+
+        ArrayList<Fighter> Targets = new ArrayList<>(4);
+
+        for (short Cell : (new Zone(SpellShapeEnum.valueOf(Weapon.ItemType().zoneShape()), Weapon.ItemType().zoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true))).GetCells(CellId)) {
+            FightCell FightCell = this.GetCell(Cell);
+            if (FightCell != null) {
+                if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+                    Targets.addAll(FightCell.GetObjectsAsFighterList());
+                }
+            }
+        }
+
+        Targets.removeIf(F -> F.Dead());
+        Targets.remove(Fighter);
+        ObjectEffectDice[] Effects = Weapon.getEffects().stream().filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId)).map(x -> (ObjectEffectDice) x).toArray(ObjectEffectDice[]::new);
+
+        double num1 = Fight.RANDOM.nextDouble();
+        
+        double num2 = (double) Arrays.stream(Effects).mapToInt(Effect -> ((EffectInstanceDice) Weapon.Template().GetEffect(Effect.actionId)).random).sum();
+        boolean flag = false;
+
+        this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), false, Weapon.Template().id));
+
+        EffectInstanceDice EffectFather;
+        for (ObjectEffectDice Effect : Effects) {
+            EffectFather = (EffectInstanceDice) Weapon.Template().GetEffect(Effect.actionId);
+            if (EffectFather.random > 0) {
+                if (!flag) {
+                    if (num1 > (double) EffectFather.random / num2) {
+                        num1 -= (double) EffectFather.random / num2;
+                        continue;
+                    } else {
+                        flag = true;
+                    }
+                } else {
+                    continue;
+                }
+            }
+            EffectCast CastInfos = new EffectCast(StatsEnum.valueOf(Effect.actionId), 0, CellId, num1, EffectFather, Fighter, Targets, true, StatsEnum.NONE, 0, null);
+            CastInfos.targetKnownCellId = CellId;
+            if (EffectBase.TryApplyEffect(CastInfos) == -3) {
+                break;
+            }
+        }
+
+        this.sendToField(new GameActionFightPointsVariationMessage(!IsCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, Fighter.ID, Fighter.ID, (short) Weapon.WeaponTemplate().apCost));
+        this.EndSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
     }
 
     public boolean CanLaunchSpell(Fighter Fighter, SpellLevel Spell, short CurrentCell, short CellId, int TargetId) {
