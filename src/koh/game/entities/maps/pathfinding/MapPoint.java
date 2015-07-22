@@ -362,4 +362,8 @@ public class MapPoint {
         return CELLPOS[cell].y;
     }
 
+   public Point coordinates() {
+        return new Point(this._nX,this._nY);
+    }
+
 }

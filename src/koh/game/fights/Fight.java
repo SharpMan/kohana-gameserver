@@ -5,10 +5,12 @@ import koh.game.fights.layer.FightActivableObject;
 import koh.game.fights.layer.FightGlyph;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -142,7 +144,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected short AgeBonus = 0, lootShareLimitMalus = 0;
 
     protected Map<String, CancellableExecutorRunnable> myTimers = new HashMap<>();
-    public HashMap<Fighter, ArrayList<FightActivableObject>> m_activableObjects = new HashMap<>();
+    public Map<Fighter, CopyOnWriteArrayList<FightActivableObject>> m_activableObjects = Collections.synchronizedMap(new HashMap<>());
     private final Object $mutex_lock = new Object();
     public FightWorker myWorker = new FightWorker(this);
     public AtomicInteger NextTriggerUid = new AtomicInteger();
@@ -1125,7 +1127,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 Fighter.Send(new GameFightShowFighterMessage(Actor.GetGameContextActorInformations(Fighter.Character)));
             });
             Fighter.Send(new GameEntitiesDispositionMessage(this.AliveFighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
-            Fighter.Send(new GameFightResumeMessage(GetFightDispellableEffectExtendedInformations(), GetAllGameActionMark(), this.myWorker.FightTurn, (int) (System.currentTimeMillis() - this.FightTime), Idols(), Fighter.SpellsController.myinitialCooldown.entrySet().stream().map(x -> new GameFightSpellCooldown(x.getKey(), x.getValue().initialCooldown)).toArray(GameFightSpellCooldown[]::new), SummonCount(), BombCount()));
+            Fighter.Send(new GameFightResumeMessage(GetFightDispellableEffectExtendedInformations(), GetAllGameActionMark(), this.myWorker.FightTurn, (int) (System.currentTimeMillis() - this.FightTime), Idols(), Fighter.SpellsController.myinitialCooldown.entrySet().stream().map(x -> new GameFightSpellCooldown(x.getKey(), x.getValue().initialCooldown)).toArray(GameFightSpellCooldown[]::new), (byte) Fighter.Team.GetAliveFighters().filter(x -> x.Summoner() == Fighter.ID && !(x instanceof BombFighter)).count(), (byte) Fighter.Team.GetAliveFighters().filter(x -> x.Summoner() == Fighter.ID && (x instanceof BombFighter)).count()));
             Fighter.Send(FightTurnListMessage());
             Fighter.Send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.GetGameContextActorInformations(Fighter.Character)).toArray(GameFightFighterInformations[]::new)));
 
@@ -1146,7 +1148,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public GameActionMark[] GetAllGameActionMark() {
         GameActionMark[] GameActionMarks = new GameActionMark[0];
-        for (ArrayList<FightActivableObject> objs : this.m_activableObjects.values()) {
+        for (CopyOnWriteArrayList<FightActivableObject> objs : this.m_activableObjects.values()) {
             for (FightActivableObject Object : objs) {
                 GameActionMarks = ArrayUtils.add(GameActionMarks, Object.GetHiddenGameActionMark());
             }
@@ -1381,7 +1383,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void AddActivableObject(Fighter caster, FightActivableObject obj) {
         if (!m_activableObjects.containsKey(caster)) {
-            m_activableObjects.put(caster, new ArrayList<>());
+            m_activableObjects.put(caster, new CopyOnWriteArrayList<>());
         }
         m_activableObjects.get(caster).add(obj);
     }
@@ -1472,7 +1474,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     @Override
     public void ActorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection) {
-        ((Fighter) Actor).SetCell(myCells.get(newCell));
+        //((Fighter) Actor).SetCell(myCells.get(newCell));
         Actor.Direction = newDirection;
     }
 

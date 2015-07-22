@@ -1,7 +1,9 @@
 package koh.game.fights;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import javafx.scene.paint.Color;
 import koh.game.dao.SpellDAO;
@@ -21,7 +23,9 @@ import koh.game.fights.effects.buff.BuffPorter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
+import koh.game.fights.layer.FightActivableObject;
 import koh.game.fights.layer.FightBomb;
+import koh.game.fights.layer.FightPortal;
 import koh.game.fights.types.AgressionFight;
 import koh.game.utils.Settings;
 import koh.protocol.client.Message;
@@ -30,6 +34,7 @@ import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.GameActionTypeEnum;
 import koh.protocol.client.enums.SequenceTypeEnum;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.messages.game.actions.fight.GameActionFightActivateGlyphTrapMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightDeathMessage;
 import koh.protocol.messages.game.context.ShowCellMessage;
 import koh.protocol.types.game.context.EntityDispositionInformations;
@@ -93,6 +98,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int SetCell(FightCell Cell, boolean RunEvent) {
         if (this.myCell != null) {
             this.myCell.RemoveObject(this); // On vire le fighter de la cell:
+            if (this.myCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
+                ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Enable(this,true);
+            }
             if (this.Fight.FightState == FightState.STATE_PLACE && ArrayUtils.contains(previousPositions, myCell.Id)) {
                 this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
             }
@@ -170,6 +178,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
             if (this.Fight.m_activableObjects.containsKey(this)) {
                 this.Fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
+
             }
 
             myCell.RemoveObject(this);
@@ -202,6 +211,11 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int EndTurn() {
+        this.Fight.m_activableObjects.values().stream().forEach((Objects) -> {
+            Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
+                ((FightPortal) Object).Enable(this);
+            });
+        });
         this.SpellsController.EndTurn();
         int buffResult = this.Buffs.EndTurn();
         if (buffResult != -1) {

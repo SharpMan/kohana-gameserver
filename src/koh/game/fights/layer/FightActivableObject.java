@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import koh.game.dao.SpellDAO;
 import koh.game.entities.environments.cells.Zone;
+import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstance;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -53,6 +54,8 @@ public abstract class FightActivableObject implements IFightObject {
     public byte Size;
     public GameActionMarkCellsTypeEnum Shape;
     public short ID;
+    
+    protected MapPoint CachedMapPoints;
 
     public abstract void AppearForAll();
 
@@ -70,7 +73,7 @@ public abstract class FightActivableObject implements IFightObject {
         m_caster = caster;
         m_spellId = castInfos.SpellId;
         m_spell_level = castInfos.SpellLevel.grade;
-        m_actionEffect = SpellDAO.Spells.get(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1];
+        try{ m_actionEffect = SpellDAO.Spells.get(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1]; } catch(NullPointerException | ArrayIndexOutOfBoundsException e) {}
         Cell = fight.GetCell(cell);
         ActivationType = activeType;
         Color = color;
@@ -81,6 +84,7 @@ public abstract class FightActivableObject implements IFightObject {
         Size = size;
         Shape = shap;
 
+        if(m_actionEffect != null)
         for (EffectInstanceDice effect : m_actionEffect.effects) {
             if (EffectCast.IsDamageEffect(effect.EffectType())) {
                 Priority--;
@@ -91,7 +95,7 @@ public abstract class FightActivableObject implements IFightObject {
         }
 
         // On ajout l'objet a toutes les cells qu'il affecte
-        for (short cellId : AffectedCells) {
+        for (short cellId : this.AffectedCells) {
             if (m_fight.GetCell(cellId) != null) {
                 m_fight.GetCell(cellId).AddObject(this);
             }
@@ -122,6 +126,10 @@ public abstract class FightActivableObject implements IFightObject {
                 break;
         }
     }
+    
+    public void Enable(Fighter fighter){
+        
+    }
 
     public int LoadEnnemyTargetsAndActive(Fighter target) {
         FightCell Cell = null;
@@ -134,6 +142,13 @@ public abstract class FightActivableObject implements IFightObject {
         return this.Activate(target);
     }
 
+    public MapPoint MapPoint(){
+        if(CachedMapPoints == null){
+            this.CachedMapPoints = MapPoint.fromCellId(this.CellId());
+        }
+        return this.CachedMapPoints;
+    }
+    
     public synchronized int Activate(Fighter activator) {
         Activated = true;
         if (this.ObjectType() == FightObjectType.OBJECT_TRAP) {

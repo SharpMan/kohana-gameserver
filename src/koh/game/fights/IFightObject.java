@@ -16,7 +16,8 @@ public interface IFightObject {
         OBJECT_TRAP(2),
         OBJECT_GLYPHE(3),
         OBJECT_STATIC(4),
-        OBJECT_BOMB(5);
+        OBJECT_BOMB(5),
+        OBJECT_PORTAL(6);
 
         public byte value;
 

@@ -100,7 +100,7 @@ public class Pathfinder {
 
     public static boolean IsStopCell(Fight Fight, FightTeam Team, short CellId, Fighter Fighter) {
         // Un piege etc ?
-        if (Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_TRAP) || Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_BOMB)) {
+        if (Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_TRAP) || Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_BOMB) || Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
             //Fight.GetCell(CellId).GetObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
             return true;
         }

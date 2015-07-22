@@ -1,9 +1,12 @@
 package koh.game.fights.effects;
 
 import javafx.scene.paint.Color;
+import koh.game.fights.Fight;
+import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.layer.FightActivableObject;
 import koh.game.fights.layer.FightGlyph;
+import koh.game.fights.layer.FightPortal;
 import koh.game.fights.layer.FightTrap;
 import koh.protocol.client.enums.GameActionMarkCellsTypeEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
@@ -37,6 +40,7 @@ public class EffectActivableObject extends EffectBase {
                 if (!CastInfos.Caster.Fight.CanPutObject(CastInfos.CellId)) {
                     return -1;
                 }
+                obj = new FightPortal(CastInfos.Caster.Fight, CastInfos.Caster, CastInfos, CastInfos.CellId);
                 break;
         }
 
