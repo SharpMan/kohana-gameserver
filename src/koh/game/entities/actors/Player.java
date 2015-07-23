@@ -299,7 +299,6 @@ public class Player extends IGameActor implements Observer {
             for (Player p : this.Account.Characters) {
                 PlayerDAO.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + Settings.GetIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
                 Main.Logs().writeError(p.NickName + " aded");
-                new Exception().printStackTrace();
             }
 
         } catch (Exception e) {
@@ -506,8 +505,12 @@ public class Player extends IGameActor implements Observer {
         this.Followers.addIfAbsent(ch);
         ch.Send(new CompassUpdatePartyMemberMessage(CompassTypeEnum.COMPASS_TYPE_PARTY, this.CurrentMap.Cordinates(), this.ID));
     }
-
+    
     public void AddExperience(long Value) {
+        AddExperience(Value,true);
+    }
+
+    public void AddExperience(long Value,boolean notice) {
         if (!this.myInitialized) {
             this.Initialize();
         }
@@ -549,7 +552,7 @@ public class Player extends IGameActor implements Observer {
 
             }
 
-            if (this.Client != null) {
+            if (this.Client != null && notice) {
                 this.RefreshStats();
             }
         }

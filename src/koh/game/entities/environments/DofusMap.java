@@ -95,7 +95,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
                 this.registerPlayer((Player) Actor);
             }
         }
-
+        System.out.println(((GameRolePlayActorInformations) Actor.GetGameContextActorInformations(null)).toString());
         this.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) Actor.GetGameContextActorInformations(null)));
         this.myGameActors.put(Actor.ID, Actor);
 

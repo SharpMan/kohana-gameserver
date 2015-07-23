@@ -32,6 +32,7 @@ import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
+import koh.game.entities.maps.pathfinding.LinkedCellsManager;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.maps.pathfinding.Path;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -42,8 +43,10 @@ import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.fighters.*;
+import koh.game.fights.layer.FightPortal;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
+import koh.game.utils.Three;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
@@ -56,6 +59,7 @@ import koh.protocol.client.enums.SequenceTypeEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.StatsEnum;
 import static koh.protocol.client.enums.StatsEnum.ADD_BASE_DAMAGE_SPELL;
+import static koh.protocol.client.enums.StatsEnum.AddDamagePercent;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightTackledMessage;
 import koh.protocol.messages.game.actions.SequenceEndMessage;
@@ -268,6 +272,66 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     public void LaunchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend) {
         LaunchSpell(Fighter, SpellLevel, CellId, friend, false, true);
     }
+    //TODO ActionIdConverter.ACTION_FIGHT_DISABLE_PORTAL
+
+    private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter Fighter, int param1) {
+        return getTargetThroughPortal(Fighter, param1, false);
+    }
+
+    private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter Fighter, int param1, boolean param2) {
+        MapPoint _loc3_ = null;
+        int damagetoReturn = 0;
+        MapPoint _loc16_;
+        FightPortal[] Portails = new FightPortal[0];
+        for (CopyOnWriteArrayList<FightActivableObject> Objects : this.m_activableObjects.values()) {
+            for (FightActivableObject Object : Objects) {
+                if (Object instanceof FightPortal && ((FightPortal) Object).Enabled) {
+                    Portails = ArrayUtils.add(Portails, (FightPortal) Object);
+                    if (Object.CellId() == param1) {
+                        _loc3_ = Object.MapPoint();
+                    }
+                }
+            }
+        }
+        if (Portails.length < 2) {
+            return new Three<>(param1, new int[0], 0);
+        }
+        if (_loc3_ == null) {
+            return new Three<>(param1, new int[0], 0);
+        }
+        final int[] _loc10_ = LinkedCellsManager.getLinks(_loc3_, Arrays.stream(Portails)/*.filter(x -> x.m_caster.Team == Fighter.Team)*/.map(x -> x.MapPoint()).toArray(MapPoint[]::new));
+        MapPoint _loc11_ = MapPoint.fromCellId(_loc10_[/*_loc10_.length == 0 ? 0 :*/_loc10_.length - 1]);
+        MapPoint _loc12_ = MapPoint.fromCellId(Fighter.CellId());
+        if (_loc12_ == null) {
+            return new Three<>(param1, new int[0], 0);
+        }
+        int _loc13_ = _loc3_.get_x() - _loc12_.get_x() + _loc11_.get_x();
+        int _loc14_ = _loc3_.get_y() - _loc12_.get_y() + _loc11_.get_y();
+        if (!MapPoint.isInMap(_loc13_, _loc14_)) {
+            return /*AtouinConstants.MAP_CELLS_COUNT + 1*/ new Three<>(561, new int[0], 0);
+        }
+        _loc16_ = MapPoint.fromCoords(_loc13_, _loc14_);
+        /* if (param2) {
+         _loc17_ = new int[]{_loc12_.get_cellId(), _loc3_.get_cellId()};
+         //LinkedCellsManager.getInstance().drawLinks("spellEntryLink",_loc17_,10,TARGET_COLOR.color,1);
+         if (_loc16_.get_cellId() < 560) {
+         _loc18_ = new int[]{_loc11_.get_cellId(), _loc16_.get_cellId()};
+         //LinkedCellsManager.getInstance().drawLinks("spellExitLink",_loc18_,6,TARGET_COLOR.color,1);
+         }
+         }
+         for (int i : _loc10_) {
+         damagetoReturn += Arrays.stream(Portails).filter(y -> y.CellId() == i).findFirst().get().damageValue;
+         }*/
+        int[] PortailIds = new int[_loc10_.length];
+        FightPortal Portal;
+        for (int i = 0; i < _loc10_.length; i++) {
+            final int ID = _loc10_[i];
+            Portal = Arrays.stream(Portails).filter(y -> y.CellId() == ID).findFirst().get();
+            damagetoReturn += Portal.damageValue;
+            PortailIds[i] = Portal.ID;
+        }
+        return new Three<>((int) _loc16_.get_cellId(), PortailIds, damagetoReturn);
+    }
 
     public void LaunchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend, boolean fakeLaunch, boolean imTargeted) {
         if (this.FightState != FightState.STATE_ACTIVE) {
@@ -278,6 +342,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
 
+        int DamagePercentBoosted = 0; //BadCode por Portla
         // La cible si elle existe
         Fighter TargetE = this.HasEnnemyInCell(CellId, Fighter.Team);
         if (friend && TargetE == null) {
@@ -318,8 +383,18 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         boolean silentCast = Arrays.stream(Effects).allMatch(x -> !ArrayUtils.contains(EffectNotSilenced, x.EffectType()));
 
         if (!fakeLaunch) {
+            Three<Integer, int[], Integer> Informations = null;
+            if (this.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
+                Informations = this.getTargetThroughPortal(Fighter, CellId, true);
+                CellId = Informations.first.shortValue();
+                DamagePercentBoosted = Informations.tree;
+                Fighter.Stats.AddBoost(AddDamagePercent, DamagePercentBoosted);
+            }
             for (Player player : this.Observable$stream()) {
-                player.Send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), SpellLevel.spellId == 2763 ? true : (!Fighter.IsVisibleFor(player) || silentCast), SpellLevel.spellId, SpellLevel.grade, new short[0]/*short[] portalsIds*/));
+                player.Send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), SpellLevel.spellId == 2763 ? true : (!Fighter.IsVisibleFor(player) || silentCast), SpellLevel.spellId, SpellLevel.grade, Informations == null ? new int[0] : Informations.second));
+            }
+            if (Informations != null) {
+                Informations.Clear();
             }
         }
 
@@ -330,6 +405,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             Targets.put(Effect, new ArrayList<>());
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true))).GetCells(CellId)) {
                 FightCell FightCell = this.GetCell(Cell);
+                if (FightCell != null && FightCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
+
+                }
                 if (FightCell != null) {
                     if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
                         for (Fighter Target : FightCell.GetObjectsAsFighter()) {
@@ -411,6 +489,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         if (!fakeLaunch) {
             this.EndSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
+            Fighter.Stats.AddBoost(AddDamagePercent, -DamagePercentBoosted);
         }
     }
 
@@ -438,10 +517,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
 
-        
         this.StartSequence(SequenceTypeEnum.SEQUENCE_WEAPON);
-        
-        
+
         Fighter.UsedAP += Weapon.WeaponTemplate().apCost;
 
         boolean IsCc = false;
@@ -472,7 +549,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         ObjectEffectDice[] Effects = Weapon.getEffects().stream().filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId)).map(x -> (ObjectEffectDice) x).toArray(ObjectEffectDice[]::new);
 
         double num1 = Fight.RANDOM.nextDouble();
-        
+
         double num2 = (double) Arrays.stream(Effects).mapToInt(Effect -> ((EffectInstanceDice) Weapon.Template().GetEffect(Effect.actionId)).random).sum();
         boolean flag = false;
 
@@ -1303,7 +1380,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         });
         this.myCells.clear();
         this.myTimers.clear();
-        //this.Glyphes.Clear();
         this.myWorker.Dispose();
         this.myTeam1.Dispose();
         this.myTeam2.Dispose();

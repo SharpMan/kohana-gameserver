@@ -49,14 +49,14 @@ public class ChallengeFight extends Fight {
         for (Fighter Fighter : (Iterable<Fighter>) Loosers.GetFighters()::iterator) {
             super.AddNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
             this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultExperienceData[]{new FightResultExperienceData()}));
-         }
+        }
 
         for (Fighter Fighter : (Iterable<Fighter>) Winners.GetFighters()::iterator) {
             super.AddNamedParty(Fighter, FightOutcomeEnum.RESULT_VICTORY);
             AtomicReference<Long> xpTotal = new AtomicReference<>();
             xpTotal.set(FightFormulas.XPDefie(Fighter, Winners.GetFighters(), Loosers.GetFighters()));
             long GuildXp = FightFormulas.GuildXpEarned((CharacterFighter) Fighter, xpTotal), MountXp = FightFormulas.MountXpEarned((CharacterFighter) Fighter, xpTotal);
-            ((CharacterFighter) Fighter).Character.AddExperience(xpTotal.get());
+            ((CharacterFighter) Fighter).Character.AddExperience(xpTotal.get(), false);
             this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
                     this.experience = ((CharacterFighter) Fighter).Character.Experience;

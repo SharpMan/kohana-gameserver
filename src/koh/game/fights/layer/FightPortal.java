@@ -100,7 +100,7 @@ public class FightPortal extends FightActivableObject {
         FightPortal[] Portails = new FightPortal[0];
         for (CopyOnWriteArrayList<FightActivableObject> Objects : this.m_fight.m_activableObjects.values()) {
             for (FightActivableObject Object : Objects) {
-                if (Object instanceof FightPortal && ((FightPortal) Object).Enabled && Object.ID != this.ID) {
+                if (Object instanceof FightPortal && ((FightPortal) Object).Enabled && Object.ID != this.ID && Object.m_caster.Team == this.m_caster.Team) {
                     Portails = ArrayUtils.add(Portails, (FightPortal) Object);
                 }
             }
@@ -113,8 +113,8 @@ public class FightPortal extends FightActivableObject {
             return -1;
         }
 
-        int[] Links = LinkedCellsManager.getLinks(this.MapPoint(), Arrays.stream(Portails).map(Portail -> Portail.MapPoint()).toArray(MapPoint[]::new));
-        System.out.println(Enumerable.Join(Links));
+        final int[] Links = LinkedCellsManager.getLinks(this.MapPoint(), Arrays.stream(Portails).map(Portail -> Portail.MapPoint()).toArray(MapPoint[]::new));
+        //System.out.println(Enumerable.Join(Links));
         FightPortal lastPortal = Arrays.stream(Portails).filter(x -> x.CellId() == (short) Links[Links.length - 1]).findFirst().get();
 
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.ID, ID, false));

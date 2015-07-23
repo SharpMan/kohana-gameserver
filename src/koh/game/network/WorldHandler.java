@@ -1,5 +1,6 @@
 package koh.game.network;
 
+import java.net.InetSocketAddress;
 import koh.game.Logs;
 import koh.game.Main;
 import koh.game.utils.Settings;
@@ -36,7 +37,7 @@ public class WorldHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object arg1) throws Exception {
         Message message = (Message) arg1;
-        Main.Logs().writeDebug(new StringBuilder("[DEBUG] Client recv >> ").append(message.getClass().getSimpleName()).toString());
+        Main.Logs().writeDebug(new StringBuilder("[DEBUG] ").append(session.getRemoteAddress()).append(" recv >> ").append(message.getClass().getSimpleName()).toString());
 
         Object objClient = session.getAttribute("session");
         if (objClient != null && objClient instanceof WorldClient) {
@@ -54,7 +55,7 @@ public class WorldHandler extends IoHandlerAdapter {
     @Override
     public void messageSent(IoSession session, Object arg1) throws Exception {
         Message message = (Message) arg1;
-        Main.Logs().writeDebug(new StringBuilder("[DEBUG] Client send >> ").append(message.getClass().getSimpleName()).toString());
+        Main.Logs().writeDebug(new StringBuilder("[DEBUG] Client send >> ").append(session.getRemoteAddress()).append(" ").append(message.getClass().getSimpleName()).toString());
 
     }
 

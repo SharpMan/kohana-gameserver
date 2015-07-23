@@ -177,7 +177,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             this.Team.GetAliveFighters().filter(x -> x.Summoner != null && x.Summoner.ID == this.ID).forEach(Fighter -> Fighter.TryDie(this.ID, true));
 
             if (this.Fight.m_activableObjects.containsKey(this)) {
-                this.Fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
+                this.Fight.m_activableObjects.get(this).parallelStream().forEach(y -> y.Remove());
 
             }
 
