@@ -44,14 +44,15 @@ public class ChallengeFight extends Fight {
     @Override
     public void EndFight(FightTeam Winners, FightTeam Loosers) {
 
-        this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.FightTime, this.AgeBonus, this.lootShareLimitMalus);
-
-        for (Fighter Fighter : (Iterable<Fighter>) Loosers.GetFighters()::iterator) {
-            super.AddNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultExperienceData[]{new FightResultExperienceData()}));
+        if(this.FightTime == -1){
+            this.myResult = new GameFightEndMessage(0, this.AgeBonus, this.lootShareLimitMalus);
+            super.EndFight();
+            return;
         }
-
-        for (Fighter Fighter : (Iterable<Fighter>) Winners.GetFighters()::iterator) {
+        
+        this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.FightTime, this.AgeBonus, this.lootShareLimitMalus);
+        
+         for (Fighter Fighter : (Iterable<Fighter>) Winners.GetFighters()::iterator) {
             super.AddNamedParty(Fighter, FightOutcomeEnum.RESULT_VICTORY);
             AtomicReference<Long> xpTotal = new AtomicReference<>();
             xpTotal.set(FightFormulas.XPDefie(Fighter, Winners.GetFighters(), Loosers.GetFighters()));
@@ -76,12 +77,19 @@ public class ChallengeFight extends Fight {
             }}));
         }
 
+        for (Fighter Fighter : (Iterable<Fighter>) Loosers.GetFighters()::iterator) {
+            super.AddNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultExperienceData[0]));
+        }
+
+       
+
         super.EndFight();
     }
 
     @Override
     public GameFightEndMessage LeftEndMessage(Fighter f) {
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.Summoner == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == f.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.IsAlive(), (byte) x.Level(), new FightResultExperienceData[]{new FightResultExperienceData()})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.Summoner == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == f.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, FightTime== -1 ? true : x.IsAlive(), (byte) x.Level(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
     @Override

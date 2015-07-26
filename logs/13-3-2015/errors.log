@@ -1,0 +1,39 @@
+mars 13, 2015 10:37:08 PM org.reflections.Reflections scan
+INFOS: Reflections took 145 ms to scan 1 urls, producing 1 keys and 28 values 
+mars 13, 2015 10:37:08 PM org.reflections.Reflections scan
+INFOS: Reflections took 150 ms to scan 1 urls, producing 2 keys and 31 values 
+[22:37:26] Undefinied Stat id 800
+[22:37:26] Undefinied Stat id 807
+[22:37:26] Undefinied Stat id 806
+[22:37:26] Undefinied Stat id 153
+[22:37:26] Undefinied Stat id 10
+[22:37:26] Undefinied Stat id 10
+[22:37:26] Undefinied Stat id 984
+[22:37:26] Undefinied Stat id 981
+[22:37:26] Undefinied Stat id 724
+[22:37:26] Undefinied Stat id 99
+[22:37:26] Undefinied Stat id 97
+[22:37:26] Undefinied Stat id 970
+[22:37:26] Undefinied Stat id 974
+[22:37:26] Undefinied Stat id 973
+[22:37:26] Undefinied Stat id 971
+[22:37:26] Undefinied Stat id 972
+[22:37:26] Undefinied Stat id 110
+[22:37:32] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:32] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:32] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:32] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:32] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:32] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:32] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:35] An error occurred: Could not evaluate null: no value set for the variable.
+[22:37:40] [ERROR] Unknown Message Header Handler 6290/127.0.0.1:47236
+[22:37:54] [ERROR] Unknown Message Header Handler 3143/127.0.0.1:47236

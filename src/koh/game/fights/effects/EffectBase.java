@@ -246,9 +246,16 @@ public abstract class EffectBase {
             this.put(StatsEnum.Damage_Water_Per_Pm_Percent, new EffectDamage());
             this.put(StatsEnum.Damage_Fire_Per_Pm_Percent, new EffectDamage());
             this.put(StatsEnum.Damage_Earth_Per_Pm_Percent, new EffectDamage());
-            this.put(StatsEnum.Ends_Round , new EffectFinishTour());
-            this.put(StatsEnum.CREATE_ILLUSION , new EffectCreateIllusion());
+            this.put(StatsEnum.Ends_Round, new EffectFinishTour());
+            this.put(StatsEnum.CREATE_ILLUSION, new EffectCreateIllusion());
             this.put(StatsEnum.Refoullage, new EffectPoutch());
+            
+            //Eliatrope
+            this.put(StatsEnum.LOST_PDV_PERCENT,new EffectLostPdvPercent());
+            this.put(StatsEnum.PORTAL_TELEPORTATION, new EffectPortalTeleportation());
+            this.put(StatsEnum.ADD_SPELL_PO, new EffectSpellDommage());
+            this.put(StatsEnum.BACK_CELL, new EffectPush());
+            this.put(StatsEnum.DISABLE_PORTAL, new EffectDisablePortal());
         }
     };
 

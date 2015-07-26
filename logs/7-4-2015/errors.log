@@ -1,0 +1,43 @@
+avr. 07, 2015 10:41:20 PM org.reflections.Reflections scan
+INFOS: Reflections took 186 ms to scan 1 urls, producing 1 keys and 54 values 
+avr. 07, 2015 10:41:20 PM org.reflections.Reflections scan
+INFOS: Reflections took 242 ms to scan 1 urls, producing 2 keys and 70 values 
+[22:42:29] Undefinied Stat id 800
+[22:42:29] Undefinied Stat id 807
+[22:42:29] Undefinied Stat id 806
+[22:42:29] Undefinied Stat id 153
+[22:42:29] Undefinied Stat id 10
+[22:42:29] Undefinied Stat id 10
+[22:42:29] Undefinied Stat id 285
+[22:42:29] Undefinied Stat id 281
+[22:42:29] Undefinied Stat id 288
+[22:42:29] Undefinied Stat id 283
+[22:42:31] Undefinied Stat id 800
+[22:42:31] Undefinied Stat id 807
+[22:42:31] Undefinied Stat id 806
+[22:42:31] Undefinied Stat id 10
+[22:42:31] Undefinied Stat id 10
+java.lang.NullPointerException
+	at koh.game.entities.actors.Player.OnDisconnect(Player.java:212)
+	at koh.game.network.WorldClient.close(WorldClient.java:296)
+	at koh.game.network.WorldHandler.sessionClosed(WorldHandler.java:86)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain$TailFilter.sessionClosed(DefaultIoFilterChain.java:793)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain.callNextSessionClosed(DefaultIoFilterChain.java:504)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain.access$900(DefaultIoFilterChain.java:48)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain$EntryImpl$1.sessionClosed(DefaultIoFilterChain.java:923)
+	at org.apache.mina.filter.codec.ProtocolCodecFilter.sessionClosed(ProtocolCodecFilter.java:367)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain.callNextSessionClosed(DefaultIoFilterChain.java:504)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain.access$900(DefaultIoFilterChain.java:48)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain$EntryImpl$1.sessionClosed(DefaultIoFilterChain.java:923)
+	at org.apache.mina.core.filterchain.IoFilterAdapter.sessionClosed(IoFilterAdapter.java:88)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain.callNextSessionClosed(DefaultIoFilterChain.java:504)
+	at org.apache.mina.core.filterchain.DefaultIoFilterChain.fireSessionClosed(DefaultIoFilterChain.java:497)
+	at org.apache.mina.core.service.IoServiceListenerSupport.fireSessionDestroyed(IoServiceListenerSupport.java:244)
+	at org.apache.mina.core.polling.AbstractPollingIoProcessor.removeNow(AbstractPollingIoProcessor.java:604)
+	at org.apache.mina.core.polling.AbstractPollingIoProcessor.removeSessions(AbstractPollingIoProcessor.java:564)
+	at org.apache.mina.core.polling.AbstractPollingIoProcessor.access$800(AbstractPollingIoProcessor.java:67)
+	at org.apache.mina.core.polling.AbstractPollingIoProcessor$Processor.run(AbstractPollingIoProcessor.java:1129)
+	at org.apache.mina.util.NamePreservingRunnable.run(NamePreservingRunnable.java:64)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)

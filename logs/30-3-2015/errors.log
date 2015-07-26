@@ -1,0 +1,9 @@
+mars 30, 2015 10:36:31 PM org.reflections.Reflections scan
+INFOS: Reflections took 154 ms to scan 1 urls, producing 1 keys and 42 values 
+mars 30, 2015 10:36:32 PM org.reflections.Reflections scan
+INFOS: Reflections took 179 ms to scan 1 urls, producing 2 keys and 49 values 
+Exception in thread "Timer-1" java.lang.NullPointerException
+	at koh.game.dao.PlayerDAO.DelCharacter(PlayerDAO.java:270)
+	at koh.game.dao.PlayerDAO$1.run(PlayerDAO.java:49)
+	at java.util.TimerThread.mainLoop(Timer.java:555)
+	at java.util.TimerThread.run(Timer.java:505)

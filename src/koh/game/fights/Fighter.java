@@ -20,6 +20,7 @@ import koh.game.fights.Fight.FightLoopState;
 import koh.game.fights.effects.EffectActivableObject;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffPorter;
+import koh.game.fights.effects.buff.BuffSpellDommage;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
@@ -99,7 +100,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (this.myCell != null) {
             this.myCell.RemoveObject(this); // On vire le fighter de la cell:
             if (this.myCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-                ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Enable(this,true);
+                ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Enable(this, true);
             }
             if (this.Fight.FightState == FightState.STATE_PLACE && ArrayUtils.contains(previousPositions, myCell.Id)) {
                 this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
@@ -177,7 +178,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             this.Team.GetAliveFighters().filter(x -> x.Summoner != null && x.Summoner.ID == this.ID).forEach(Fighter -> Fighter.TryDie(this.ID, true));
 
             if (this.Fight.m_activableObjects.containsKey(this)) {
-                this.Fight.m_activableObjects.get(this).parallelStream().forEach(y -> y.Remove());
+                this.Fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
 
             }
 
@@ -197,6 +198,11 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int BeginTurn() {
+        if (this.Fight.m_activableObjects.containsKey(this)) {
+            this.Fight.m_activableObjects.get(this).stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
+                ((FightPortal) Object).ForceEnable(this);
+            });
+        }
 
         int buffResult = this.Buffs.BeginTurn();
         if (buffResult != -1) {
@@ -347,6 +353,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public Short[] GetCastZone(SpellLevel spellLevel) {
         int num = spellLevel.range;
+        for (BuffEffect Buff : (Iterable<BuffEffect>) this.Buffs.GetAllBuffs().filter(Buff -> Buff instanceof BuffSpellDommage)::iterator) {
+            num += Buff.CastInfos.Effect.value;
+        }
+
         if (spellLevel.rangeCanBeBoosted) {
             int val1 = num + this.Stats.GetTotal(StatsEnum.Add_Range);
             if (val1 < spellLevel.minRange) {

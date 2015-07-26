@@ -72,21 +72,45 @@ public class FightPortal extends FightActivableObject {
         Enable(fighter, false);
     }
 
+    public boolean DisabledByCaster = false;
+
+    public void ForceEnable(Fighter fighter) {
+        if (DisabledByCaster) {
+            if (!this.Cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.Cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+                this.onEnable(fighter);
+            }
+            this.DisabledByCaster = false;
+        }
+    }
+
     public synchronized void Enable(Fighter fighter, boolean check) {
-        if (Enabled || (check && turnUsed == m_fight.myWorker.FightTurn) || this.Cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) || this.Cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+        if (DisabledByCaster || Enabled || (check && turnUsed == m_fight.myWorker.FightTurn) || this.Cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) || this.Cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
             return;
         }
+        this.onEnable(fighter);
+    }
+
+    public void onEnable(Fighter fighter) {
         this.Enabled = true;
         m_fight.StartSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        //m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH, this.m_caster.ID, this.ID, fighter.ID, this.m_spellId));
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, fighter.ID, this.ID, true));
         m_fight.EndSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
+    }
 
+    public void Disable(Fighter fighter) {
+        if (!Enabled) {
+            return;
+        }
+        this.Enabled = false;
+        this.DisabledByCaster = true;
+        m_fight.StartSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
+        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, fighter.ID, this.ID, false));
+        m_fight.EndSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
     }
 
     @Override
     public synchronized int Activate(Fighter activator) {
-        if (Arrays.stream(new Exception().getStackTrace()).filter(Method -> Method.getMethodName().equalsIgnoreCase("Activate")).count() > 1) { //Il viens de rejoindre la team rofl on le tue pas
+        if (Arrays.stream(new Exception().getStackTrace()).filter(Method -> Method.getMethodName().equalsIgnoreCase("FightPortal.Activate")).count() > 1) { //Il viens de rejoindre la team rofl on le tue pas
             return -1;
         }
         if (!Enabled) {

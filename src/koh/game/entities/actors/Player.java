@@ -315,15 +315,15 @@ public class Player extends IGameActor implements Observer {
             this.UpdateRegenedLife();
         }
         if (Client != null) {
+            if (Client.GetParty() != null) {
+                Client.GetParty().UpdateMember(this);
+            }
             if (Logged && GetFighter() != null && GetFight().FightState == FightState.STATE_PLACE) {
                 GetFighter().Stats.Reset();
                 GetFighter().Stats.Merge(this.Stats);
                 Client.Send(((CharacterFighter) GetFighter()).FighterStatsListMessagePacket());
             } else {
                 CharacterHandler.SendCharacterStatsListMessage(this.Client);
-            }
-            if (Client.GetParty() != null) {
-                Client.GetParty().UpdateMember(this);
             }
         }
     }
@@ -505,12 +505,12 @@ public class Player extends IGameActor implements Observer {
         this.Followers.addIfAbsent(ch);
         ch.Send(new CompassUpdatePartyMemberMessage(CompassTypeEnum.COMPASS_TYPE_PARTY, this.CurrentMap.Cordinates(), this.ID));
     }
-    
+
     public void AddExperience(long Value) {
-        AddExperience(Value,true);
+        AddExperience(Value, true);
     }
 
-    public void AddExperience(long Value,boolean notice) {
+    public void AddExperience(long Value, boolean notice) {
         if (!this.myInitialized) {
             this.Initialize();
         }
@@ -575,7 +575,7 @@ public class Player extends IGameActor implements Observer {
     @Override
     public void Observer$update(Observable o, Object arg) {
         if (arg instanceof Message) {
-            if (o instanceof DofusMap && this.Client != null && GetFight() != null) {
+            if (o instanceof DofusMap && (GetFight() != null || GetFighter() != null)) {
                 return;
             }
             if (Client != null && IsInWorld) {

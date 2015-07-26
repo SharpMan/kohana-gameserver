@@ -1,0 +1,1539 @@
+[00:05:06] MySQL Database Connected
+[00:05:06] 16 Breeds catched
+[00:05:06] 256 Heads catched
+[00:05:06] 566 Effects catched
+[00:05:07] 4 SuperAreas catched
+[00:05:07] 48 Areas catched
+[00:05:08] 334 SubAreas catched
+[00:05:09] 11267 DofusMaps catched
+[00:05:09] 9761 StatedElements catched
+[00:05:09] 13349 InteractiveElements catched
+[00:05:09] 1485 HouseInformations catched
+[00:05:09] 556 InteractiveDoors catched
+[00:05:09] 3530 MapPositions uncatched
+[00:05:09] 14681 MapPositions catched
+[00:05:09] 42 MapZaaps catched
+[00:05:09] 79 MapSubways catched
+[00:05:09] 15612 SpellLevels catched 
+[00:05:09] 4972 Spells catched 
+[00:05:09] 4 SpellBombs catched 
+[00:05:09] 316 GuildEmblems catched 
+[00:05:09] 1179 LearnableSpells catched 
+[00:05:10] 10063 ItemTemplates catched 
+[00:05:10] 4355 Weapons catched 
+[00:05:10] 366 ItemSets catched 
+[00:05:10] 171 ItemTypes catched 
+[00:05:10] 114 ItemPets catched 
+[00:05:10] 2476 NpcTemplates catched 
+[00:05:10] 787 NpcSpawns catched 
+[00:05:10] 94 NpcItems catched 
+[00:05:10] 19801 NpcMessages catched 
+[00:05:10] 7 NpcReplies catched 
+[00:05:10] 353 Triggers catched
+[00:05:10] 1277 Paddocks catched
+[00:05:10] 72 Mounts catched
+[00:05:10] 3 Guild catched
+[00:05:10] 2 GuildMembers catched
+[00:05:10] 11 GatheringJob LevelInfos catched
+[00:05:10] 233 InteractiveSkills LevelInfos catched
+[00:05:10] 2210 Monster Templates catched
+[00:05:11] 11688 Monster Grades catched
+[00:05:11] 8021 Monster Drops catched
+[00:05:11] 128 Handlers Readed
+[00:05:12] 175 Messages Readed
+[00:05:12] WorldServer start in 5928 ms.
+[00:06:25] MySQL Database Connected
+[00:06:25] 16 Breeds catched
+[00:06:25] 256 Heads catched
+[00:06:25] 566 Effects catched
+[00:06:26] 4 SuperAreas catched
+[00:06:26] 48 Areas catched
+[00:06:27] 334 SubAreas catched
+[00:06:27] 11267 DofusMaps catched
+[00:06:28] 9761 StatedElements catched
+[00:06:28] 13349 InteractiveElements catched
+[00:06:28] 1485 HouseInformations catched
+[00:06:28] 556 InteractiveDoors catched
+[00:06:28] 3530 MapPositions uncatched
+[00:06:28] 14681 MapPositions catched
+[00:06:28] 42 MapZaaps catched
+[00:06:28] 79 MapSubways catched
+[00:06:28] 15612 SpellLevels catched 
+[00:06:28] 4972 Spells catched 
+[00:06:28] 4 SpellBombs catched 
+[00:06:28] 316 GuildEmblems catched 
+[00:06:28] 1179 LearnableSpells catched 
+[00:06:28] 10063 ItemTemplates catched 
+[00:06:28] 4355 Weapons catched 
+[00:06:28] 366 ItemSets catched 
+[00:06:28] 171 ItemTypes catched 
+[00:06:28] 114 ItemPets catched 
+[00:06:29] 2476 NpcTemplates catched 
+[00:06:29] 787 NpcSpawns catched 
+[00:06:29] 94 NpcItems catched 
+[00:06:29] 19801 NpcMessages catched 
+[00:06:29] 7 NpcReplies catched 
+[00:06:29] 353 Triggers catched
+[00:06:29] 1277 Paddocks catched
+[00:06:29] 72 Mounts catched
+[00:06:29] 3 Guild catched
+[00:06:29] 2 GuildMembers catched
+[00:06:29] 11 GatheringJob LevelInfos catched
+[00:06:29] 233 InteractiveSkills LevelInfos catched
+[00:06:29] 2210 Monster Templates catched
+[00:06:29] 11688 Monster Grades catched
+[00:06:29] 8021 Monster Drops catched
+[00:06:30] 128 Handlers Readed
+[00:06:30] 175 Messages Readed
+[00:06:31] WorldServer start in 5982 ms.
+[00:09:10] MySQL Database Connected
+[00:09:10] 16 Breeds catched
+[00:09:10] 256 Heads catched
+[00:09:10] 566 Effects catched
+[00:09:10] 4 SuperAreas catched
+[00:09:10] 48 Areas catched
+[00:09:11] 334 SubAreas catched
+[00:09:12] 11267 DofusMaps catched
+[00:09:12] 9761 StatedElements catched
+[00:09:12] 13349 InteractiveElements catched
+[00:09:12] 1485 HouseInformations catched
+[00:09:12] 556 InteractiveDoors catched
+[00:09:12] 3530 MapPositions uncatched
+[00:09:12] 14681 MapPositions catched
+[00:09:12] 42 MapZaaps catched
+[00:09:12] 79 MapSubways catched
+[00:09:13] 15612 SpellLevels catched 
+[00:09:13] 4972 Spells catched 
+[00:09:13] 4 SpellBombs catched 
+[00:09:13] 316 GuildEmblems catched 
+[00:09:13] 1179 LearnableSpells catched 
+[00:09:13] 10063 ItemTemplates catched 
+[00:09:13] 4355 Weapons catched 
+[00:09:13] 366 ItemSets catched 
+[00:09:13] 171 ItemTypes catched 
+[00:09:13] 114 ItemPets catched 
+[00:09:13] 2476 NpcTemplates catched 
+[00:09:13] 787 NpcSpawns catched 
+[00:09:13] 94 NpcItems catched 
+[00:09:13] 19801 NpcMessages catched 
+[00:09:13] 7 NpcReplies catched 
+[00:09:14] 353 Triggers catched
+[00:09:14] 1277 Paddocks catched
+[00:09:14] 72 Mounts catched
+[00:09:14] 3 Guild catched
+[00:09:14] 2 GuildMembers catched
+[00:09:14] 11 GatheringJob LevelInfos catched
+[00:09:14] 233 InteractiveSkills LevelInfos catched
+[00:09:14] 2210 Monster Templates catched
+[00:09:14] 11688 Monster Grades catched
+[00:09:14] 8021 Monster Drops catched
+[00:09:15] 128 Handlers Readed
+[00:09:15] 175 Messages Readed
+[00:09:15] WorldServer start in 5971 ms.
+[01:00:12] MySQL Database Connected
+[01:00:12] 16 Breeds catched
+[01:00:12] 256 Heads catched
+[01:00:12] 566 Effects catched
+[01:00:13] 4 SuperAreas catched
+[01:00:13] 48 Areas catched
+[01:00:14] 334 SubAreas catched
+[01:00:14] 11267 DofusMaps catched
+[01:00:14] 9761 StatedElements catched
+[01:00:15] 13349 InteractiveElements catched
+[01:00:15] 1485 HouseInformations catched
+[01:00:15] 556 InteractiveDoors catched
+[01:00:15] 3530 MapPositions uncatched
+[01:00:15] 14681 MapPositions catched
+[01:00:15] 42 MapZaaps catched
+[01:00:15] 79 MapSubways catched
+[01:00:15] 15612 SpellLevels catched 
+[01:00:15] 4972 Spells catched 
+[01:00:15] 4 SpellBombs catched 
+[01:00:15] 316 GuildEmblems catched 
+[01:00:15] 1179 LearnableSpells catched 
+[01:00:15] 10063 ItemTemplates catched 
+[01:00:15] 4355 Weapons catched 
+[01:00:15] 366 ItemSets catched 
+[01:00:15] 171 ItemTypes catched 
+[01:00:15] 114 ItemPets catched 
+[01:00:16] 2476 NpcTemplates catched 
+[01:00:16] 787 NpcSpawns catched 
+[01:00:16] 94 NpcItems catched 
+[01:00:16] 19801 NpcMessages catched 
+[01:00:16] 7 NpcReplies catched 
+[01:00:16] 353 Triggers catched
+[01:00:16] 1277 Paddocks catched
+[01:00:16] 72 Mounts catched
+[01:00:16] 3 Guild catched
+[01:00:16] 2 GuildMembers catched
+[01:00:16] 11 GatheringJob LevelInfos catched
+[01:00:16] 233 InteractiveSkills LevelInfos catched
+[01:00:16] 2210 Monster Templates catched
+[01:00:16] 11688 Monster Grades catched
+[01:00:16] 8021 Monster Drops catched
+[01:00:17] 128 Handlers Readed
+[01:00:18] 175 Messages Readed
+[01:00:18] WorldServer start in 5717 ms.
+[01:02:39] MySQL Database Connected
+[01:02:39] 16 Breeds catched
+[01:02:39] 256 Heads catched
+[01:02:39] 566 Effects catched
+[01:02:40] 4 SuperAreas catched
+[01:02:40] 48 Areas catched
+[01:02:41] 334 SubAreas catched
+[01:02:41] 11267 DofusMaps catched
+[01:02:42] 9761 StatedElements catched
+[01:02:42] 13349 InteractiveElements catched
+[01:02:42] 1485 HouseInformations catched
+[01:02:42] 556 InteractiveDoors catched
+[01:02:42] 3530 MapPositions uncatched
+[01:02:42] 14681 MapPositions catched
+[01:02:42] 42 MapZaaps catched
+[01:02:42] 79 MapSubways catched
+[01:02:42] 15612 SpellLevels catched 
+[01:02:42] 4972 Spells catched 
+[01:02:42] 4 SpellBombs catched 
+[01:02:42] 316 GuildEmblems catched 
+[01:02:42] 1179 LearnableSpells catched 
+[01:02:42] 10063 ItemTemplates catched 
+[01:02:42] 4355 Weapons catched 
+[01:02:42] 366 ItemSets catched 
+[01:02:42] 171 ItemTypes catched 
+[01:02:42] 114 ItemPets catched 
+[01:02:43] 2476 NpcTemplates catched 
+[01:02:43] 787 NpcSpawns catched 
+[01:02:43] 94 NpcItems catched 
+[01:02:43] 19801 NpcMessages catched 
+[01:02:43] 7 NpcReplies catched 
+[01:02:43] 353 Triggers catched
+[01:02:43] 1277 Paddocks catched
+[01:02:43] 72 Mounts catched
+[01:02:43] 3 Guild catched
+[01:02:43] 2 GuildMembers catched
+[01:02:43] 11 GatheringJob LevelInfos catched
+[01:02:43] 233 InteractiveSkills LevelInfos catched
+[01:02:43] 2210 Monster Templates catched
+[01:02:43] 11688 Monster Grades catched
+[01:02:43] 8021 Monster Drops catched
+[01:02:44] 128 Handlers Readed
+[01:02:44] 175 Messages Readed
+[01:02:45] WorldServer start in 5769 ms.
+[01:04:03] MySQL Database Connected
+[01:04:03] 16 Breeds catched
+[01:04:03] 256 Heads catched
+[01:04:03] 566 Effects catched
+[01:04:04] 4 SuperAreas catched
+[01:04:04] 48 Areas catched
+[01:04:05] 334 SubAreas catched
+[01:04:05] 11267 DofusMaps catched
+[01:04:05] 9761 StatedElements catched
+[01:04:05] 13349 InteractiveElements catched
+[01:04:05] 1485 HouseInformations catched
+[01:04:05] 556 InteractiveDoors catched
+[01:04:06] 3530 MapPositions uncatched
+[01:04:06] 14681 MapPositions catched
+[01:04:06] 42 MapZaaps catched
+[01:04:06] 79 MapSubways catched
+[01:04:06] 15612 SpellLevels catched 
+[01:04:06] 4972 Spells catched 
+[01:04:06] 4 SpellBombs catched 
+[01:04:06] 316 GuildEmblems catched 
+[01:04:06] 1179 LearnableSpells catched 
+[01:04:06] 10063 ItemTemplates catched 
+[01:04:06] 4355 Weapons catched 
+[01:04:06] 366 ItemSets catched 
+[01:04:06] 171 ItemTypes catched 
+[01:04:06] 114 ItemPets catched 
+[01:04:07] 2476 NpcTemplates catched 
+[01:04:07] 787 NpcSpawns catched 
+[01:04:07] 94 NpcItems catched 
+[01:04:07] 19801 NpcMessages catched 
+[01:04:07] 7 NpcReplies catched 
+[01:04:07] 353 Triggers catched
+[01:04:07] 1277 Paddocks catched
+[01:04:07] 72 Mounts catched
+[01:04:07] 3 Guild catched
+[01:04:07] 2 GuildMembers catched
+[01:04:07] 11 GatheringJob LevelInfos catched
+[01:04:07] 233 InteractiveSkills LevelInfos catched
+[01:04:07] 2210 Monster Templates catched
+[01:04:07] 11688 Monster Grades catched
+[01:04:07] 8021 Monster Drops catched
+[01:04:08] 128 Handlers Readed
+[01:04:08] 175 Messages Readed
+[01:04:08] WorldServer start in 5882 ms.
+[01:07:16] MySQL Database Connected
+[01:07:16] 16 Breeds catched
+[01:07:16] 256 Heads catched
+[01:07:16] 566 Effects catched
+[01:07:17] 4 SuperAreas catched
+[01:07:17] 48 Areas catched
+[01:07:18] 334 SubAreas catched
+[01:07:19] 11267 DofusMaps catched
+[01:07:19] 9761 StatedElements catched
+[01:07:19] 13349 InteractiveElements catched
+[01:07:19] 1485 HouseInformations catched
+[01:07:19] 556 InteractiveDoors catched
+[01:07:19] 3530 MapPositions uncatched
+[01:07:19] 14681 MapPositions catched
+[01:07:19] 42 MapZaaps catched
+[01:07:19] 79 MapSubways catched
+[01:07:19] 15612 SpellLevels catched 
+[01:07:19] 4972 Spells catched 
+[01:07:19] 4 SpellBombs catched 
+[01:07:19] 316 GuildEmblems catched 
+[01:07:19] 1179 LearnableSpells catched 
+[01:07:19] 10063 ItemTemplates catched 
+[01:07:20] 4355 Weapons catched 
+[01:07:20] 366 ItemSets catched 
+[01:07:20] 171 ItemTypes catched 
+[01:07:20] 114 ItemPets catched 
+[01:07:20] 2476 NpcTemplates catched 
+[01:07:20] 787 NpcSpawns catched 
+[01:07:20] 94 NpcItems catched 
+[01:07:20] 19801 NpcMessages catched 
+[01:07:20] 7 NpcReplies catched 
+[01:07:20] 353 Triggers catched
+[01:07:20] 1277 Paddocks catched
+[01:07:20] 72 Mounts catched
+[01:07:20] 3 Guild catched
+[01:07:20] 2 GuildMembers catched
+[01:07:20] 11 GatheringJob LevelInfos catched
+[01:07:20] 233 InteractiveSkills LevelInfos catched
+[01:07:20] 2210 Monster Templates catched
+[01:07:20] 11688 Monster Grades catched
+[01:07:20] 8021 Monster Drops catched
+[01:07:21] 128 Handlers Readed
+[01:07:22] 175 Messages Readed
+[01:07:22] WorldServer start in 5745 ms.
+[01:08:32] MySQL Database Connected
+[01:08:32] 16 Breeds catched
+[01:08:32] 256 Heads catched
+[01:08:32] 566 Effects catched
+[01:08:32] 4 SuperAreas catched
+[01:08:32] 48 Areas catched
+[01:08:33] 334 SubAreas catched
+[01:08:34] 11267 DofusMaps catched
+[01:08:34] 9761 StatedElements catched
+[01:08:34] 13349 InteractiveElements catched
+[01:08:34] 1485 HouseInformations catched
+[01:08:34] 556 InteractiveDoors catched
+[01:08:34] 3530 MapPositions uncatched
+[01:08:34] 14681 MapPositions catched
+[01:08:34] 42 MapZaaps catched
+[01:08:34] 79 MapSubways catched
+[01:08:34] 15612 SpellLevels catched 
+[01:08:34] 4972 Spells catched 
+[01:08:34] 4 SpellBombs catched 
+[01:08:34] 316 GuildEmblems catched 
+[01:08:34] 1179 LearnableSpells catched 
+[01:08:35] 10063 ItemTemplates catched 
+[01:08:35] 4355 Weapons catched 
+[01:08:35] 366 ItemSets catched 
+[01:08:35] 171 ItemTypes catched 
+[01:08:35] 114 ItemPets catched 
+[01:08:35] 2476 NpcTemplates catched 
+[01:08:35] 787 NpcSpawns catched 
+[01:08:35] 94 NpcItems catched 
+[01:08:35] 19801 NpcMessages catched 
+[01:08:35] 7 NpcReplies catched 
+[01:08:35] 353 Triggers catched
+[01:08:35] 1277 Paddocks catched
+[01:08:35] 72 Mounts catched
+[01:08:35] 3 Guild catched
+[01:08:35] 2 GuildMembers catched
+[01:08:35] 11 GatheringJob LevelInfos catched
+[01:08:35] 233 InteractiveSkills LevelInfos catched
+[01:08:35] 2210 Monster Templates catched
+[01:08:36] 11688 Monster Grades catched
+[01:08:36] 8021 Monster Drops catched
+[01:08:36] 128 Handlers Readed
+[01:08:37] 175 Messages Readed
+[01:08:37] WorldServer start in 5629 ms.
+[01:12:19] MySQL Database Connected
+[01:12:19] 16 Breeds catched
+[01:12:19] 256 Heads catched
+[01:12:19] 566 Effects catched
+[01:12:20] 4 SuperAreas catched
+[01:12:20] 48 Areas catched
+[01:12:21] 334 SubAreas catched
+[01:12:21] 11267 DofusMaps catched
+[01:12:21] 9761 StatedElements catched
+[01:12:22] 13349 InteractiveElements catched
+[01:12:22] 1485 HouseInformations catched
+[01:12:22] 556 InteractiveDoors catched
+[01:12:22] 3530 MapPositions uncatched
+[01:12:22] 14681 MapPositions catched
+[01:12:22] 42 MapZaaps catched
+[01:12:22] 79 MapSubways catched
+[01:12:22] 15612 SpellLevels catched 
+[01:12:22] 4972 Spells catched 
+[01:12:22] 4 SpellBombs catched 
+[01:12:22] 316 GuildEmblems catched 
+[01:12:22] 1179 LearnableSpells catched 
+[01:12:22] 10063 ItemTemplates catched 
+[01:12:22] 4355 Weapons catched 
+[01:12:22] 366 ItemSets catched 
+[01:12:22] 171 ItemTypes catched 
+[01:12:22] 114 ItemPets catched 
+[01:12:22] 2476 NpcTemplates catched 
+[01:12:22] 787 NpcSpawns catched 
+[01:12:23] 94 NpcItems catched 
+[01:12:23] 19801 NpcMessages catched 
+[01:12:23] 7 NpcReplies catched 
+[01:12:23] 353 Triggers catched
+[01:12:23] 1277 Paddocks catched
+[01:12:23] 72 Mounts catched
+[01:12:23] 3 Guild catched
+[01:12:23] 2 GuildMembers catched
+[01:12:23] 11 GatheringJob LevelInfos catched
+[01:12:23] 233 InteractiveSkills LevelInfos catched
+[01:12:23] 2210 Monster Templates catched
+[01:12:23] 11688 Monster Grades catched
+[01:12:23] 8021 Monster Drops catched
+[01:12:24] 128 Handlers Readed
+[01:12:24] 175 Messages Readed
+[01:12:24] WorldServer start in 5433 ms.
+[01:23:42] MySQL Database Connected
+[01:23:42] 16 Breeds catched
+[01:23:42] 256 Heads catched
+[01:23:42] 566 Effects catched
+[01:23:43] 4 SuperAreas catched
+[01:23:43] 48 Areas catched
+[01:23:44] 334 SubAreas catched
+[01:23:45] 11267 DofusMaps catched
+[01:23:45] 9761 StatedElements catched
+[01:23:45] 13349 InteractiveElements catched
+[01:23:45] 1485 HouseInformations catched
+[01:23:45] 556 InteractiveDoors catched
+[01:23:45] 3530 MapPositions uncatched
+[01:23:45] 14681 MapPositions catched
+[01:23:45] 42 MapZaaps catched
+[01:23:45] 79 MapSubways catched
+[01:23:45] 15612 SpellLevels catched 
+[01:23:45] 4972 Spells catched 
+[01:23:45] 4 SpellBombs catched 
+[01:23:45] 316 GuildEmblems catched 
+[01:23:45] 1179 LearnableSpells catched 
+[01:23:45] 10063 ItemTemplates catched 
+[01:23:45] 4355 Weapons catched 
+[01:23:46] 366 ItemSets catched 
+[01:23:46] 171 ItemTypes catched 
+[01:23:46] 114 ItemPets catched 
+[01:23:46] 2476 NpcTemplates catched 
+[01:23:46] 787 NpcSpawns catched 
+[01:23:46] 94 NpcItems catched 
+[01:23:46] 19801 NpcMessages catched 
+[01:23:46] 7 NpcReplies catched 
+[01:23:46] 353 Triggers catched
+[01:23:46] 1277 Paddocks catched
+[01:23:46] 72 Mounts catched
+[01:23:46] 3 Guild catched
+[01:23:46] 2 GuildMembers catched
+[01:23:46] 11 GatheringJob LevelInfos catched
+[01:23:46] 233 InteractiveSkills LevelInfos catched
+[01:23:46] 2210 Monster Templates catched
+[01:23:46] 11688 Monster Grades catched
+[01:23:46] 8021 Monster Drops catched
+[01:23:47] 128 Handlers Readed
+[01:23:47] 175 Messages Readed
+[01:23:48] WorldServer start in 5675 ms.
+[01:28:04] MySQL Database Connected
+[01:28:04] 16 Breeds catched
+[01:28:04] 256 Heads catched
+[01:28:04] 566 Effects catched
+[01:28:05] 4 SuperAreas catched
+[01:28:05] 48 Areas catched
+[01:28:06] 334 SubAreas catched
+[01:28:07] 11267 DofusMaps catched
+[01:28:07] 9761 StatedElements catched
+[01:28:07] 13349 InteractiveElements catched
+[01:28:07] 1485 HouseInformations catched
+[01:28:07] 556 InteractiveDoors catched
+[01:28:07] 3530 MapPositions uncatched
+[01:28:07] 14681 MapPositions catched
+[01:28:07] 42 MapZaaps catched
+[01:28:07] 79 MapSubways catched
+[01:28:07] 15612 SpellLevels catched 
+[01:28:07] 4972 Spells catched 
+[01:28:07] 4 SpellBombs catched 
+[01:28:07] 316 GuildEmblems catched 
+[01:28:07] 1179 LearnableSpells catched 
+[01:28:07] 10063 ItemTemplates catched 
+[01:28:07] 4355 Weapons catched 
+[01:28:07] 366 ItemSets catched 
+[01:28:07] 171 ItemTypes catched 
+[01:28:08] 114 ItemPets catched 
+[01:28:08] 2476 NpcTemplates catched 
+[01:28:08] 787 NpcSpawns catched 
+[01:28:08] 94 NpcItems catched 
+[01:28:08] 19801 NpcMessages catched 
+[01:28:08] 7 NpcReplies catched 
+[01:28:08] 353 Triggers catched
+[01:28:08] 1277 Paddocks catched
+[01:28:08] 72 Mounts catched
+[01:28:08] 3 Guild catched
+[01:28:08] 2 GuildMembers catched
+[01:28:08] 11 GatheringJob LevelInfos catched
+[01:28:08] 233 InteractiveSkills LevelInfos catched
+[01:28:08] 2210 Monster Templates catched
+[01:28:08] 11688 Monster Grades catched
+[01:28:08] 8021 Monster Drops catched
+[01:28:09] 128 Handlers Readed
+[01:28:09] 175 Messages Readed
+[01:28:09] WorldServer start in 5435 ms.
+[01:28:51] MySQL Database Connected
+[01:28:51] 16 Breeds catched
+[01:28:51] 256 Heads catched
+[01:28:51] 566 Effects catched
+[01:28:52] 4 SuperAreas catched
+[01:28:52] 48 Areas catched
+[01:28:53] 334 SubAreas catched
+[01:28:53] 11267 DofusMaps catched
+[01:28:53] 9761 StatedElements catched
+[01:28:54] 13349 InteractiveElements catched
+[01:28:54] 1485 HouseInformations catched
+[01:28:54] 556 InteractiveDoors catched
+[01:28:54] 3530 MapPositions uncatched
+[01:28:54] 14681 MapPositions catched
+[01:28:54] 42 MapZaaps catched
+[01:28:54] 79 MapSubways catched
+[01:28:54] 15612 SpellLevels catched 
+[01:28:54] 4972 Spells catched 
+[01:28:54] 4 SpellBombs catched 
+[01:28:54] 316 GuildEmblems catched 
+[01:28:54] 1179 LearnableSpells catched 
+[01:28:54] 10063 ItemTemplates catched 
+[01:28:54] 4355 Weapons catched 
+[01:28:54] 366 ItemSets catched 
+[01:28:54] 171 ItemTypes catched 
+[01:28:54] 114 ItemPets catched 
+[01:28:55] 2476 NpcTemplates catched 
+[01:28:55] 787 NpcSpawns catched 
+[01:28:55] 94 NpcItems catched 
+[01:28:55] 19801 NpcMessages catched 
+[01:28:55] 7 NpcReplies catched 
+[01:28:55] 353 Triggers catched
+[01:28:55] 1277 Paddocks catched
+[01:28:55] 72 Mounts catched
+[01:28:55] 3 Guild catched
+[01:28:55] 2 GuildMembers catched
+[01:28:55] 11 GatheringJob LevelInfos catched
+[01:28:55] 233 InteractiveSkills LevelInfos catched
+[01:28:55] 2210 Monster Templates catched
+[01:28:55] 11688 Monster Grades catched
+[01:28:55] 8021 Monster Drops catched
+[01:28:56] 128 Handlers Readed
+[01:28:56] 175 Messages Readed
+[01:30:42] MySQL Database Connected
+[01:30:42] 16 Breeds catched
+[01:30:42] 256 Heads catched
+[01:30:42] 566 Effects catched
+[01:30:42] 4 SuperAreas catched
+[01:30:42] 48 Areas catched
+[01:30:43] 334 SubAreas catched
+[01:30:44] 11267 DofusMaps catched
+[01:30:44] 9761 StatedElements catched
+[01:30:44] 13349 InteractiveElements catched
+[01:30:44] 1485 HouseInformations catched
+[01:30:44] 556 InteractiveDoors catched
+[01:30:44] 3530 MapPositions uncatched
+[01:30:44] 14681 MapPositions catched
+[01:30:44] 42 MapZaaps catched
+[01:30:44] 79 MapSubways catched
+[01:30:44] 15612 SpellLevels catched 
+[01:30:44] 4972 Spells catched 
+[01:30:44] 4 SpellBombs catched 
+[01:30:44] 316 GuildEmblems catched 
+[01:30:44] 1179 LearnableSpells catched 
+[01:30:44] 10063 ItemTemplates catched 
+[01:30:45] 4355 Weapons catched 
+[01:30:45] 366 ItemSets catched 
+[01:30:45] 171 ItemTypes catched 
+[01:30:45] 114 ItemPets catched 
+[01:30:45] 2476 NpcTemplates catched 
+[01:30:45] 787 NpcSpawns catched 
+[01:30:45] 94 NpcItems catched 
+[01:30:45] 19801 NpcMessages catched 
+[01:30:45] 7 NpcReplies catched 
+[01:30:45] 353 Triggers catched
+[01:30:45] 1277 Paddocks catched
+[01:30:45] 72 Mounts catched
+[01:30:45] 3 Guild catched
+[01:30:45] 2 GuildMembers catched
+[01:30:45] 11 GatheringJob LevelInfos catched
+[01:30:45] 233 InteractiveSkills LevelInfos catched
+[01:30:45] 2210 Monster Templates catched
+[01:30:45] 11688 Monster Grades catched
+[01:30:45] 8021 Monster Drops catched
+[01:30:46] 128 Handlers Readed
+[01:30:47] 175 Messages Readed
+[01:30:47] WorldServer start in 5380 ms.
+[02:31:52] MySQL Database Connected
+[02:31:52] 16 Breeds catched
+[02:31:52] 256 Heads catched
+[02:31:52] 566 Effects catched
+[02:31:52] 4 SuperAreas catched
+[02:31:52] 48 Areas catched
+[02:31:53] 334 SubAreas catched
+[02:31:54] 11267 DofusMaps catched
+[02:31:54] 9761 StatedElements catched
+[02:31:54] 13349 InteractiveElements catched
+[02:31:54] 1485 HouseInformations catched
+[02:31:54] 556 InteractiveDoors catched
+[02:31:55] 3530 MapPositions uncatched
+[02:31:55] 14681 MapPositions catched
+[02:31:55] 42 MapZaaps catched
+[02:31:55] 79 MapSubways catched
+[02:31:55] 15612 SpellLevels catched 
+[02:31:55] 4972 Spells catched 
+[02:31:55] 4 SpellBombs catched 
+[02:31:55] 316 GuildEmblems catched 
+[02:31:55] 1179 LearnableSpells catched 
+[02:31:55] 10063 ItemTemplates catched 
+[02:31:55] 4355 Weapons catched 
+[02:31:55] 366 ItemSets catched 
+[02:31:55] 171 ItemTypes catched 
+[02:31:55] 114 ItemPets catched 
+[02:31:56] 2476 NpcTemplates catched 
+[02:31:56] 787 NpcSpawns catched 
+[02:31:56] 94 NpcItems catched 
+[02:31:56] 19801 NpcMessages catched 
+[02:31:56] 7 NpcReplies catched 
+[02:31:56] 353 Triggers catched
+[02:31:56] 1277 Paddocks catched
+[02:31:56] 72 Mounts catched
+[02:31:56] 3 Guild catched
+[02:31:56] 2 GuildMembers catched
+[02:31:56] 11 GatheringJob LevelInfos catched
+[02:31:56] 233 InteractiveSkills LevelInfos catched
+[02:31:56] 2210 Monster Templates catched
+[02:31:56] 11688 Monster Grades catched
+[02:31:56] 8021 Monster Drops catched
+[02:31:57] 128 Handlers Readed
+[02:31:57] 175 Messages Readed
+[02:31:58] WorldServer start in 6099 ms.
+[02:34:11] MySQL Database Connected
+[02:34:11] 16 Breeds catched
+[02:34:11] 256 Heads catched
+[02:34:11] 566 Effects catched
+[02:34:12] 4 SuperAreas catched
+[02:34:12] 48 Areas catched
+[02:34:13] 334 SubAreas catched
+[02:34:13] 11267 DofusMaps catched
+[02:34:14] 9761 StatedElements catched
+[02:34:14] 13349 InteractiveElements catched
+[02:34:14] 1485 HouseInformations catched
+[02:34:14] 556 InteractiveDoors catched
+[02:34:14] 3530 MapPositions uncatched
+[02:34:14] 14681 MapPositions catched
+[02:34:14] 42 MapZaaps catched
+[02:34:14] 79 MapSubways catched
+[02:34:14] 15612 SpellLevels catched 
+[02:34:14] 4972 Spells catched 
+[02:34:14] 4 SpellBombs catched 
+[02:34:14] 316 GuildEmblems catched 
+[02:34:14] 1179 LearnableSpells catched 
+[02:34:14] 10063 ItemTemplates catched 
+[02:34:14] 4355 Weapons catched 
+[02:34:14] 366 ItemSets catched 
+[02:34:14] 171 ItemTypes catched 
+[02:34:14] 114 ItemPets catched 
+[02:34:15] 2476 NpcTemplates catched 
+[02:34:15] 787 NpcSpawns catched 
+[02:34:15] 94 NpcItems catched 
+[02:34:15] 19801 NpcMessages catched 
+[02:34:15] 7 NpcReplies catched 
+[02:34:15] 353 Triggers catched
+[02:34:15] 1277 Paddocks catched
+[02:34:15] 72 Mounts catched
+[02:34:15] 3 Guild catched
+[02:34:15] 2 GuildMembers catched
+[02:34:15] 11 GatheringJob LevelInfos catched
+[02:34:15] 233 InteractiveSkills LevelInfos catched
+[02:34:15] 2210 Monster Templates catched
+[02:34:15] 11688 Monster Grades catched
+[02:34:15] 8021 Monster Drops catched
+[02:34:16] 128 Handlers Readed
+[02:34:16] 175 Messages Readed
+[02:34:17] WorldServer start in 5830 ms.
+[11:20:47] MySQL Database Connected
+[11:20:47] 16 Breeds catched
+[11:20:47] 256 Heads catched
+[11:20:47] 566 Effects catched
+[11:20:47] 4 SuperAreas catched
+[11:20:47] 48 Areas catched
+[11:20:48] 334 SubAreas catched
+[11:20:49] 11267 DofusMaps catched
+[11:20:49] 9761 StatedElements catched
+[11:20:49] 13349 InteractiveElements catched
+[11:20:49] 1485 HouseInformations catched
+[11:20:49] 556 InteractiveDoors catched
+[11:20:49] 3530 MapPositions uncatched
+[11:20:49] 14681 MapPositions catched
+[11:20:49] 42 MapZaaps catched
+[11:20:49] 79 MapSubways catched
+[11:20:49] 15612 SpellLevels catched 
+[11:20:49] 4972 Spells catched 
+[11:20:49] 4 SpellBombs catched 
+[11:20:49] 316 GuildEmblems catched 
+[11:20:49] 1179 LearnableSpells catched 
+[11:20:50] 10063 ItemTemplates catched 
+[11:20:50] 4355 Weapons catched 
+[11:20:50] 366 ItemSets catched 
+[11:20:50] 171 ItemTypes catched 
+[11:20:50] 114 ItemPets catched 
+[11:20:50] 2476 NpcTemplates catched 
+[11:20:50] 787 NpcSpawns catched 
+[11:20:50] 94 NpcItems catched 
+[11:20:50] 19801 NpcMessages catched 
+[11:20:50] 7 NpcReplies catched 
+[11:20:50] 353 Triggers catched
+[11:20:50] 1277 Paddocks catched
+[11:20:50] 72 Mounts catched
+[11:20:50] 3 Guild catched
+[11:20:50] 2 GuildMembers catched
+[11:20:50] 11 GatheringJob LevelInfos catched
+[11:20:51] 233 InteractiveSkills LevelInfos catched
+[11:20:51] 2210 Monster Templates catched
+[11:20:51] 11688 Monster Grades catched
+[11:20:51] 8021 Monster Drops catched
+[11:20:51] 128 Handlers Readed
+[11:20:52] 175 Messages Readed
+[11:20:52] WorldServer start in 5534 ms.
+[11:33:06] MySQL Database Connected
+[11:33:07] 16 Breeds catched
+[11:33:07] 256 Heads catched
+[11:33:07] 566 Effects catched
+[11:33:07] 4 SuperAreas catched
+[11:33:07] 48 Areas catched
+[11:33:08] 334 SubAreas catched
+[11:33:09] 11267 DofusMaps catched
+[11:33:09] 9761 StatedElements catched
+[11:33:09] 13349 InteractiveElements catched
+[11:33:09] 1485 HouseInformations catched
+[11:33:09] 556 InteractiveDoors catched
+[11:33:09] 3530 MapPositions uncatched
+[11:33:09] 14681 MapPositions catched
+[11:33:09] 42 MapZaaps catched
+[11:33:09] 79 MapSubways catched
+[11:33:09] 15612 SpellLevels catched 
+[11:33:09] 4972 Spells catched 
+[11:33:09] 4 SpellBombs catched 
+[11:33:09] 316 GuildEmblems catched 
+[11:33:09] 1179 LearnableSpells catched 
+[11:33:09] 10063 ItemTemplates catched 
+[11:33:10] 4355 Weapons catched 
+[11:33:10] 366 ItemSets catched 
+[11:33:10] 171 ItemTypes catched 
+[11:33:10] 114 ItemPets catched 
+[11:33:10] 2476 NpcTemplates catched 
+[11:33:10] 787 NpcSpawns catched 
+[11:33:10] 94 NpcItems catched 
+[11:33:10] 19801 NpcMessages catched 
+[11:33:10] 7 NpcReplies catched 
+[11:33:10] 353 Triggers catched
+[11:33:10] 1277 Paddocks catched
+[11:33:10] 72 Mounts catched
+[11:33:10] 3 Guild catched
+[11:33:10] 2 GuildMembers catched
+[11:33:10] 11 GatheringJob LevelInfos catched
+[11:33:10] 233 InteractiveSkills LevelInfos catched
+[11:33:10] 2210 Monster Templates catched
+[11:33:10] 11688 Monster Grades catched
+[11:33:10] 8021 Monster Drops catched
+[11:33:11] 128 Handlers Readed
+[11:33:12] 175 Messages Readed
+[11:33:12] WorldServer start in 5490 ms.
+[11:37:27] MySQL Database Connected
+[11:37:27] 16 Breeds catched
+[11:37:27] 256 Heads catched
+[11:37:27] 566 Effects catched
+[11:37:28] 4 SuperAreas catched
+[11:37:28] 48 Areas catched
+[11:37:29] 334 SubAreas catched
+[11:37:29] 11267 DofusMaps catched
+[11:37:29] 9761 StatedElements catched
+[11:37:29] 13349 InteractiveElements catched
+[11:37:29] 1485 HouseInformations catched
+[11:37:29] 556 InteractiveDoors catched
+[11:37:29] 3530 MapPositions uncatched
+[11:37:29] 14681 MapPositions catched
+[11:37:29] 42 MapZaaps catched
+[11:37:29] 79 MapSubways catched
+[11:37:30] 15612 SpellLevels catched 
+[11:37:30] 4972 Spells catched 
+[11:37:30] 4 SpellBombs catched 
+[11:37:30] 316 GuildEmblems catched 
+[11:37:30] 1179 LearnableSpells catched 
+[11:37:30] 10063 ItemTemplates catched 
+[11:37:30] 4355 Weapons catched 
+[11:37:30] 366 ItemSets catched 
+[11:37:30] 171 ItemTypes catched 
+[11:37:30] 114 ItemPets catched 
+[11:37:30] 2476 NpcTemplates catched 
+[11:37:30] 787 NpcSpawns catched 
+[11:37:30] 94 NpcItems catched 
+[11:37:30] 19801 NpcMessages catched 
+[11:37:30] 7 NpcReplies catched 
+[11:37:31] 353 Triggers catched
+[11:37:31] 1277 Paddocks catched
+[11:37:31] 72 Mounts catched
+[11:37:31] 3 Guild catched
+[11:37:31] 2 GuildMembers catched
+[11:37:31] 11 GatheringJob LevelInfos catched
+[11:37:31] 233 InteractiveSkills LevelInfos catched
+[11:37:31] 2210 Monster Templates catched
+[11:37:31] 11688 Monster Grades catched
+[11:37:31] 8021 Monster Drops catched
+[11:37:32] 128 Handlers Readed
+[11:37:32] 175 Messages Readed
+[11:37:32] WorldServer start in 5383 ms.
+[11:42:34] MySQL Database Connected
+[11:42:34] 16 Breeds catched
+[11:42:34] 256 Heads catched
+[11:42:34] 566 Effects catched
+[11:42:35] 4 SuperAreas catched
+[11:42:35] 48 Areas catched
+[11:42:36] 334 SubAreas catched
+[11:42:36] 11267 DofusMaps catched
+[11:42:36] 9761 StatedElements catched
+[11:42:37] 13349 InteractiveElements catched
+[11:42:37] 1485 HouseInformations catched
+[11:42:37] 556 InteractiveDoors catched
+[11:42:37] 3530 MapPositions uncatched
+[11:42:37] 14681 MapPositions catched
+[11:42:37] 42 MapZaaps catched
+[11:42:37] 79 MapSubways catched
+[11:42:37] 15612 SpellLevels catched 
+[11:42:37] 4972 Spells catched 
+[11:42:37] 4 SpellBombs catched 
+[11:42:37] 316 GuildEmblems catched 
+[11:42:37] 1179 LearnableSpells catched 
+[11:42:37] 10063 ItemTemplates catched 
+[11:42:37] 4355 Weapons catched 
+[11:42:37] 366 ItemSets catched 
+[11:42:37] 171 ItemTypes catched 
+[11:42:37] 114 ItemPets catched 
+[11:42:38] 2476 NpcTemplates catched 
+[11:42:38] 787 NpcSpawns catched 
+[11:42:38] 94 NpcItems catched 
+[11:42:38] 19801 NpcMessages catched 
+[11:42:38] 7 NpcReplies catched 
+[11:42:38] 353 Triggers catched
+[11:42:38] 1277 Paddocks catched
+[11:42:38] 72 Mounts catched
+[11:42:38] 3 Guild catched
+[11:42:38] 2 GuildMembers catched
+[11:42:38] 11 GatheringJob LevelInfos catched
+[11:42:38] 233 InteractiveSkills LevelInfos catched
+[11:42:38] 2210 Monster Templates catched
+[11:42:38] 11688 Monster Grades catched
+[11:42:38] 8021 Monster Drops catched
+[11:42:39] 128 Handlers Readed
+[11:42:39] 175 Messages Readed
+[11:42:39] WorldServer start in 5611 ms.
+[11:45:56] MySQL Database Connected
+[11:45:56] 16 Breeds catched
+[11:45:56] 256 Heads catched
+[11:45:56] 566 Effects catched
+[11:45:56] 4 SuperAreas catched
+[11:45:57] 48 Areas catched
+[11:45:58] 334 SubAreas catched
+[11:45:58] 11267 DofusMaps catched
+[11:45:58] 9761 StatedElements catched
+[11:45:58] 13349 InteractiveElements catched
+[11:45:58] 1485 HouseInformations catched
+[11:45:58] 556 InteractiveDoors catched
+[11:45:58] 3530 MapPositions uncatched
+[11:45:58] 14681 MapPositions catched
+[11:45:58] 42 MapZaaps catched
+[11:45:58] 79 MapSubways catched
+[11:45:59] 15612 SpellLevels catched 
+[11:45:59] 4972 Spells catched 
+[11:45:59] 4 SpellBombs catched 
+[11:45:59] 316 GuildEmblems catched 
+[11:45:59] 1179 LearnableSpells catched 
+[11:45:59] 10063 ItemTemplates catched 
+[11:45:59] 4355 Weapons catched 
+[11:45:59] 366 ItemSets catched 
+[11:45:59] 171 ItemTypes catched 
+[11:45:59] 114 ItemPets catched 
+[11:45:59] 2476 NpcTemplates catched 
+[11:45:59] 787 NpcSpawns catched 
+[11:45:59] 94 NpcItems catched 
+[11:45:59] 19801 NpcMessages catched 
+[11:45:59] 7 NpcReplies catched 
+[11:46:00] 353 Triggers catched
+[11:46:00] 1277 Paddocks catched
+[11:46:00] 72 Mounts catched
+[11:46:00] 3 Guild catched
+[11:46:00] 2 GuildMembers catched
+[11:46:00] 11 GatheringJob LevelInfos catched
+[11:46:00] 233 InteractiveSkills LevelInfos catched
+[11:46:00] 2210 Monster Templates catched
+[11:46:00] 11688 Monster Grades catched
+[11:46:00] 8021 Monster Drops catched
+[11:46:00] 128 Handlers Readed
+[11:46:01] 175 Messages Readed
+[11:46:01] WorldServer start in 5508 ms.
+[11:48:28] MySQL Database Connected
+[11:48:28] 16 Breeds catched
+[11:48:28] 256 Heads catched
+[11:48:28] 566 Effects catched
+[11:48:29] 4 SuperAreas catched
+[11:48:29] 48 Areas catched
+[11:48:30] 334 SubAreas catched
+[11:48:30] 11267 DofusMaps catched
+[11:48:30] 9761 StatedElements catched
+[11:48:30] 13349 InteractiveElements catched
+[11:48:30] 1485 HouseInformations catched
+[11:48:30] 556 InteractiveDoors catched
+[11:48:30] 3530 MapPositions uncatched
+[11:48:30] 14681 MapPositions catched
+[11:48:30] 42 MapZaaps catched
+[11:48:30] 79 MapSubways catched
+[11:48:31] 15612 SpellLevels catched 
+[11:48:31] 4972 Spells catched 
+[11:48:31] 4 SpellBombs catched 
+[11:48:31] 316 GuildEmblems catched 
+[11:48:31] 1179 LearnableSpells catched 
+[11:48:31] 10063 ItemTemplates catched 
+[11:48:31] 4355 Weapons catched 
+[11:48:31] 366 ItemSets catched 
+[11:48:31] 171 ItemTypes catched 
+[11:48:31] 114 ItemPets catched 
+[11:48:31] 2476 NpcTemplates catched 
+[11:48:31] 787 NpcSpawns catched 
+[11:48:31] 94 NpcItems catched 
+[11:48:31] 19801 NpcMessages catched 
+[11:48:31] 7 NpcReplies catched 
+[11:48:31] 353 Triggers catched
+[11:48:31] 1277 Paddocks catched
+[11:48:31] 72 Mounts catched
+[11:48:31] 3 Guild catched
+[11:48:31] 2 GuildMembers catched
+[11:48:31] 11 GatheringJob LevelInfos catched
+[11:48:32] 233 InteractiveSkills LevelInfos catched
+[11:48:32] 2210 Monster Templates catched
+[11:48:32] 11688 Monster Grades catched
+[11:48:32] 8021 Monster Drops catched
+[11:48:32] 128 Handlers Readed
+[11:48:33] 175 Messages Readed
+[11:48:33] WorldServer start in 5346 ms.
+[11:54:17] MySQL Database Connected
+[11:54:17] 16 Breeds catched
+[11:54:17] 256 Heads catched
+[11:54:17] 566 Effects catched
+[11:54:17] 4 SuperAreas catched
+[11:54:17] 48 Areas catched
+[11:54:18] 334 SubAreas catched
+[11:54:19] 11267 DofusMaps catched
+[11:54:19] 9761 StatedElements catched
+[11:54:19] 13349 InteractiveElements catched
+[11:54:19] 1485 HouseInformations catched
+[11:54:19] 556 InteractiveDoors catched
+[11:54:19] 3530 MapPositions uncatched
+[11:54:19] 14681 MapPositions catched
+[11:54:19] 42 MapZaaps catched
+[11:54:19] 79 MapSubways catched
+[11:54:19] 15612 SpellLevels catched 
+[11:54:19] 4972 Spells catched 
+[11:54:19] 4 SpellBombs catched 
+[11:54:19] 316 GuildEmblems catched 
+[11:54:19] 1179 LearnableSpells catched 
+[11:54:20] 10063 ItemTemplates catched 
+[11:54:20] 4355 Weapons catched 
+[11:54:20] 366 ItemSets catched 
+[11:54:20] 171 ItemTypes catched 
+[11:54:20] 114 ItemPets catched 
+[11:54:20] 2476 NpcTemplates catched 
+[11:54:20] 787 NpcSpawns catched 
+[11:54:20] 94 NpcItems catched 
+[11:54:20] 19801 NpcMessages catched 
+[11:54:20] 7 NpcReplies catched 
+[11:54:20] 353 Triggers catched
+[11:54:20] 1277 Paddocks catched
+[11:54:20] 72 Mounts catched
+[11:54:20] 3 Guild catched
+[11:54:20] 2 GuildMembers catched
+[11:54:20] 11 GatheringJob LevelInfos catched
+[11:54:20] 233 InteractiveSkills LevelInfos catched
+[11:54:20] 2210 Monster Templates catched
+[11:54:20] 11688 Monster Grades catched
+[11:54:20] 8021 Monster Drops catched
+[11:54:21] 128 Handlers Readed
+[11:54:22] 175 Messages Readed
+[11:54:22] WorldServer start in 5314 ms.
+[11:58:35] MySQL Database Connected
+[11:58:35] 16 Breeds catched
+[11:58:35] 256 Heads catched
+[11:58:35] 566 Effects catched
+[11:58:36] 4 SuperAreas catched
+[11:58:36] 48 Areas catched
+[11:58:37] 334 SubAreas catched
+[11:58:37] 11267 DofusMaps catched
+[11:58:37] 9761 StatedElements catched
+[11:58:37] 13349 InteractiveElements catched
+[11:58:37] 1485 HouseInformations catched
+[11:58:37] 556 InteractiveDoors catched
+[11:58:38] 3530 MapPositions uncatched
+[11:58:38] 14681 MapPositions catched
+[11:58:38] 42 MapZaaps catched
+[11:58:38] 79 MapSubways catched
+[11:58:38] 15612 SpellLevels catched 
+[11:58:38] 4972 Spells catched 
+[11:58:38] 4 SpellBombs catched 
+[11:58:38] 316 GuildEmblems catched 
+[11:58:38] 1179 LearnableSpells catched 
+[11:58:38] 10063 ItemTemplates catched 
+[11:58:38] 4355 Weapons catched 
+[11:58:38] 366 ItemSets catched 
+[11:58:38] 171 ItemTypes catched 
+[11:58:38] 114 ItemPets catched 
+[11:58:38] 2476 NpcTemplates catched 
+[11:58:38] 787 NpcSpawns catched 
+[11:58:38] 94 NpcItems catched 
+[11:58:39] 19801 NpcMessages catched 
+[11:58:39] 7 NpcReplies catched 
+[11:58:39] 353 Triggers catched
+[11:58:39] 1277 Paddocks catched
+[11:58:39] 72 Mounts catched
+[11:58:39] 3 Guild catched
+[11:58:39] 2 GuildMembers catched
+[11:58:39] 11 GatheringJob LevelInfos catched
+[11:58:39] 233 InteractiveSkills LevelInfos catched
+[11:58:39] 2210 Monster Templates catched
+[11:58:39] 11688 Monster Grades catched
+[11:58:39] 8021 Monster Drops catched
+[11:58:40] 128 Handlers Readed
+[11:58:40] 175 Messages Readed
+[11:58:40] WorldServer start in 5398 ms.
+[12:25:25] MySQL Database Connected
+[12:25:25] 16 Breeds catched
+[12:25:25] 256 Heads catched
+[12:25:25] 566 Effects catched
+[12:25:25] 4 SuperAreas catched
+[12:25:25] 48 Areas catched
+[12:25:26] 334 SubAreas catched
+[12:25:27] 11267 DofusMaps catched
+[12:25:27] 9761 StatedElements catched
+[12:25:27] 13349 InteractiveElements catched
+[12:25:27] 1485 HouseInformations catched
+[12:25:27] 556 InteractiveDoors catched
+[12:25:27] 3530 MapPositions uncatched
+[12:25:27] 14681 MapPositions catched
+[12:25:27] 42 MapZaaps catched
+[12:25:27] 79 MapSubways catched
+[12:25:27] 15612 SpellLevels catched 
+[12:25:27] 4972 Spells catched 
+[12:25:27] 4 SpellBombs catched 
+[12:25:27] 316 GuildEmblems catched 
+[12:25:27] 1179 LearnableSpells catched 
+[12:25:28] 10063 ItemTemplates catched 
+[12:25:28] 4355 Weapons catched 
+[12:25:28] 366 ItemSets catched 
+[12:25:28] 171 ItemTypes catched 
+[12:25:28] 114 ItemPets catched 
+[12:25:28] 2476 NpcTemplates catched 
+[12:25:28] 787 NpcSpawns catched 
+[12:25:28] 94 NpcItems catched 
+[12:25:28] 19801 NpcMessages catched 
+[12:25:28] 7 NpcReplies catched 
+[12:25:28] 353 Triggers catched
+[12:25:28] 1277 Paddocks catched
+[12:25:28] 72 Mounts catched
+[12:25:28] 3 Guild catched
+[12:25:28] 2 GuildMembers catched
+[12:25:28] 11 GatheringJob LevelInfos catched
+[12:25:28] 233 InteractiveSkills LevelInfos catched
+[12:25:28] 2210 Monster Templates catched
+[12:25:28] 11688 Monster Grades catched
+[12:25:28] 8021 Monster Drops catched
+[12:25:29] 128 Handlers Readed
+[12:25:30] 175 Messages Readed
+[12:25:30] WorldServer start in 5240 ms.
+[13:56:32] MySQL Database Connected
+[13:56:32] 16 Breeds catched
+[13:56:32] 256 Heads catched
+[13:56:32] 566 Effects catched
+[13:56:32] 4 SuperAreas catched
+[13:56:32] 48 Areas catched
+[13:56:33] 334 SubAreas catched
+[13:56:34] 11267 DofusMaps catched
+[13:56:34] 9761 StatedElements catched
+[13:56:34] 13349 InteractiveElements catched
+[13:56:34] 1485 HouseInformations catched
+[13:56:34] 556 InteractiveDoors catched
+[13:56:34] 3530 MapPositions uncatched
+[13:56:34] 14681 MapPositions catched
+[13:56:34] 42 MapZaaps catched
+[13:56:34] 79 MapSubways catched
+[13:56:35] 15612 SpellLevels catched 
+[13:56:35] 4972 Spells catched 
+[13:56:35] 4 SpellBombs catched 
+[13:56:35] 316 GuildEmblems catched 
+[13:56:35] 1179 LearnableSpells catched 
+[13:56:35] 10063 ItemTemplates catched 
+[13:56:35] 4355 Weapons catched 
+[13:56:35] 366 ItemSets catched 
+[13:56:35] 171 ItemTypes catched 
+[13:56:35] 114 ItemPets catched 
+[13:56:36] 2476 NpcTemplates catched 
+[13:56:36] 787 NpcSpawns catched 
+[13:56:36] 94 NpcItems catched 
+[13:56:36] 19801 NpcMessages catched 
+[13:56:36] 7 NpcReplies catched 
+[13:56:36] 353 Triggers catched
+[13:56:36] 1277 Paddocks catched
+[13:56:36] 72 Mounts catched
+[13:56:36] 3 Guild catched
+[13:56:36] 2 GuildMembers catched
+[13:56:36] 11 GatheringJob LevelInfos catched
+[13:56:36] 233 InteractiveSkills LevelInfos catched
+[13:56:36] 2210 Monster Templates catched
+[13:56:36] 11688 Monster Grades catched
+[13:56:36] 8021 Monster Drops catched
+[13:56:37] 128 Handlers Readed
+[13:56:37] 175 Messages Readed
+[13:56:37] WorldServer start in 6083 ms.
+[14:12:20] MySQL Database Connected
+[14:12:20] 16 Breeds catched
+[14:12:20] 256 Heads catched
+[14:12:20] 566 Effects catched
+[14:12:20] 4 SuperAreas catched
+[14:12:20] 48 Areas catched
+[14:12:21] 334 SubAreas catched
+[14:12:22] 11267 DofusMaps catched
+[14:12:22] 9761 StatedElements catched
+[14:12:22] 13349 InteractiveElements catched
+[14:12:22] 1485 HouseInformations catched
+[14:12:22] 556 InteractiveDoors catched
+[14:12:22] 3530 MapPositions uncatched
+[14:12:22] 14681 MapPositions catched
+[14:12:22] 42 MapZaaps catched
+[14:12:22] 79 MapSubways catched
+[14:12:22] 15612 SpellLevels catched 
+[14:12:22] 4972 Spells catched 
+[14:12:22] 4 SpellBombs catched 
+[14:12:22] 316 GuildEmblems catched 
+[14:12:22] 1179 LearnableSpells catched 
+[14:12:23] 10063 ItemTemplates catched 
+[14:12:23] 4355 Weapons catched 
+[14:12:23] 366 ItemSets catched 
+[14:12:23] 171 ItemTypes catched 
+[14:12:23] 114 ItemPets catched 
+[14:12:23] 2476 NpcTemplates catched 
+[14:12:23] 787 NpcSpawns catched 
+[14:12:23] 94 NpcItems catched 
+[14:12:23] 19801 NpcMessages catched 
+[14:12:23] 7 NpcReplies catched 
+[14:12:23] 353 Triggers catched
+[14:12:23] 1277 Paddocks catched
+[14:12:23] 72 Mounts catched
+[14:12:23] 3 Guild catched
+[14:12:23] 2 GuildMembers catched
+[14:12:23] 11 GatheringJob LevelInfos catched
+[14:12:24] 233 InteractiveSkills LevelInfos catched
+[14:12:24] 2210 Monster Templates catched
+[14:12:24] 11688 Monster Grades catched
+[14:12:24] 8021 Monster Drops catched
+[14:12:24] 128 Handlers Readed
+[14:12:25] 175 Messages Readed
+[14:12:25] WorldServer start in 5591 ms.
+[14:15:15] MySQL Database Connected
+[14:15:15] 16 Breeds catched
+[14:15:15] 256 Heads catched
+[14:15:15] 566 Effects catched
+[14:15:15] 4 SuperAreas catched
+[14:15:15] 48 Areas catched
+[14:15:16] 334 SubAreas catched
+[14:15:17] 11267 DofusMaps catched
+[14:15:17] 9761 StatedElements catched
+[14:15:17] 13349 InteractiveElements catched
+[14:15:17] 1485 HouseInformations catched
+[14:15:17] 556 InteractiveDoors catched
+[14:15:17] 3530 MapPositions uncatched
+[14:15:17] 14681 MapPositions catched
+[14:15:17] 42 MapZaaps catched
+[14:15:17] 79 MapSubways catched
+[14:15:17] 15612 SpellLevels catched 
+[14:15:17] 4972 Spells catched 
+[14:15:17] 4 SpellBombs catched 
+[14:15:17] 316 GuildEmblems catched 
+[14:15:17] 1179 LearnableSpells catched 
+[14:15:18] 10063 ItemTemplates catched 
+[14:15:18] 4355 Weapons catched 
+[14:15:18] 366 ItemSets catched 
+[14:15:18] 171 ItemTypes catched 
+[14:15:18] 114 ItemPets catched 
+[14:15:18] 2476 NpcTemplates catched 
+[14:15:18] 787 NpcSpawns catched 
+[14:15:18] 94 NpcItems catched 
+[14:15:18] 19801 NpcMessages catched 
+[14:15:18] 7 NpcReplies catched 
+[14:15:18] 353 Triggers catched
+[14:15:18] 1277 Paddocks catched
+[14:15:18] 72 Mounts catched
+[14:15:18] 3 Guild catched
+[14:15:18] 2 GuildMembers catched
+[14:15:18] 11 GatheringJob LevelInfos catched
+[14:15:18] 233 InteractiveSkills LevelInfos catched
+[14:15:18] 2210 Monster Templates catched
+[14:15:18] 11688 Monster Grades catched
+[14:15:18] 8021 Monster Drops catched
+[14:15:19] 128 Handlers Readed
+[14:15:20] 175 Messages Readed
+[14:15:20] WorldServer start in 5540 ms.
+[14:17:24] MySQL Database Connected
+[14:17:24] 16 Breeds catched
+[14:17:24] 256 Heads catched
+[14:17:24] 566 Effects catched
+[14:17:24] 4 SuperAreas catched
+[14:17:24] 48 Areas catched
+[14:17:25] 334 SubAreas catched
+[14:17:26] 11267 DofusMaps catched
+[14:17:26] 9761 StatedElements catched
+[14:17:26] 13349 InteractiveElements catched
+[14:17:26] 1485 HouseInformations catched
+[14:17:26] 556 InteractiveDoors catched
+[14:17:26] 3530 MapPositions uncatched
+[14:17:26] 14681 MapPositions catched
+[14:17:26] 42 MapZaaps catched
+[14:17:26] 79 MapSubways catched
+[14:17:26] 15612 SpellLevels catched 
+[14:17:27] 4972 Spells catched 
+[14:17:27] 4 SpellBombs catched 
+[14:17:27] 316 GuildEmblems catched 
+[14:17:27] 1179 LearnableSpells catched 
+[14:17:27] 10063 ItemTemplates catched 
+[14:17:27] 4355 Weapons catched 
+[14:17:27] 366 ItemSets catched 
+[14:17:27] 171 ItemTypes catched 
+[14:17:27] 114 ItemPets catched 
+[14:17:27] 2476 NpcTemplates catched 
+[14:17:27] 787 NpcSpawns catched 
+[14:17:27] 94 NpcItems catched 
+[14:17:27] 19801 NpcMessages catched 
+[14:17:27] 7 NpcReplies catched 
+[14:17:27] 353 Triggers catched
+[14:17:27] 1277 Paddocks catched
+[14:17:27] 72 Mounts catched
+[14:17:27] 3 Guild catched
+[14:17:27] 2 GuildMembers catched
+[14:17:27] 11 GatheringJob LevelInfos catched
+[14:17:28] 233 InteractiveSkills LevelInfos catched
+[14:17:28] 2210 Monster Templates catched
+[14:17:28] 11688 Monster Grades catched
+[14:17:28] 8021 Monster Drops catched
+[14:17:28] 128 Handlers Readed
+[14:17:29] 175 Messages Readed
+[14:17:29] WorldServer start in 5442 ms.
+[14:25:30] MySQL Database Connected
+[14:25:30] 16 Breeds catched
+[14:25:30] 256 Heads catched
+[14:25:30] 566 Effects catched
+[14:25:31] 4 SuperAreas catched
+[14:25:31] 48 Areas catched
+[14:25:32] 334 SubAreas catched
+[14:25:32] 11267 DofusMaps catched
+[14:25:32] 9761 StatedElements catched
+[14:25:32] 13349 InteractiveElements catched
+[14:25:32] 1485 HouseInformations catched
+[14:25:32] 556 InteractiveDoors catched
+[14:25:33] 3530 MapPositions uncatched
+[14:25:33] 14681 MapPositions catched
+[14:25:33] 42 MapZaaps catched
+[14:25:33] 79 MapSubways catched
+[14:25:33] 15612 SpellLevels catched 
+[14:25:33] 4972 Spells catched 
+[14:25:33] 4 SpellBombs catched 
+[14:25:33] 316 GuildEmblems catched 
+[14:25:33] 1179 LearnableSpells catched 
+[14:25:33] 10063 ItemTemplates catched 
+[14:25:33] 4355 Weapons catched 
+[14:25:33] 366 ItemSets catched 
+[14:25:33] 171 ItemTypes catched 
+[14:25:33] 114 ItemPets catched 
+[14:25:34] 2476 NpcTemplates catched 
+[14:25:34] 787 NpcSpawns catched 
+[14:25:34] 94 NpcItems catched 
+[14:25:34] 19801 NpcMessages catched 
+[14:25:34] 7 NpcReplies catched 
+[14:25:34] 353 Triggers catched
+[14:25:34] 1277 Paddocks catched
+[14:25:34] 72 Mounts catched
+[14:25:34] 3 Guild catched
+[14:25:34] 2 GuildMembers catched
+[14:25:34] 11 GatheringJob LevelInfos catched
+[14:25:34] 233 InteractiveSkills LevelInfos catched
+[14:25:34] 2210 Monster Templates catched
+[14:25:34] 11688 Monster Grades catched
+[14:25:34] 8021 Monster Drops catched
+[14:25:35] 128 Handlers Readed
+[14:25:35] 175 Messages Readed
+[14:25:35] WorldServer start in 5678 ms.
+[14:31:58] MySQL Database Connected
+[14:31:58] 16 Breeds catched
+[14:31:58] 256 Heads catched
+[14:31:58] 566 Effects catched
+[14:31:58] 4 SuperAreas catched
+[14:31:58] 48 Areas catched
+[14:31:59] 334 SubAreas catched
+[14:32:00] 11267 DofusMaps catched
+[14:32:00] 9761 StatedElements catched
+[14:32:00] 13349 InteractiveElements catched
+[14:32:00] 1485 HouseInformations catched
+[14:32:00] 556 InteractiveDoors catched
+[14:32:00] 3530 MapPositions uncatched
+[14:32:00] 14681 MapPositions catched
+[14:32:00] 42 MapZaaps catched
+[14:32:00] 79 MapSubways catched
+[14:32:00] 15612 SpellLevels catched 
+[14:32:01] 4972 Spells catched 
+[14:32:01] 4 SpellBombs catched 
+[14:32:01] 316 GuildEmblems catched 
+[14:32:01] 1179 LearnableSpells catched 
+[14:32:01] 10063 ItemTemplates catched 
+[14:32:01] 4355 Weapons catched 
+[14:32:01] 366 ItemSets catched 
+[14:32:01] 171 ItemTypes catched 
+[14:32:01] 114 ItemPets catched 
+[14:32:01] 2476 NpcTemplates catched 
+[14:32:01] 787 NpcSpawns catched 
+[14:32:01] 94 NpcItems catched 
+[14:32:01] 19801 NpcMessages catched 
+[14:32:01] 7 NpcReplies catched 
+[14:32:01] 353 Triggers catched
+[14:32:01] 1277 Paddocks catched
+[14:32:01] 72 Mounts catched
+[14:32:01] 3 Guild catched
+[14:32:01] 2 GuildMembers catched
+[14:32:01] 11 GatheringJob LevelInfos catched
+[14:32:02] 233 InteractiveSkills LevelInfos catched
+[14:32:02] 2210 Monster Templates catched
+[14:32:02] 11688 Monster Grades catched
+[14:32:02] 8021 Monster Drops catched
+[14:32:02] 128 Handlers Readed
+[14:32:03] 175 Messages Readed
+[14:32:03] WorldServer start in 5682 ms.
+[16:56:20] MySQL Database Connected
+[16:56:20] 16 Breeds catched
+[16:56:20] 256 Heads catched
+[16:56:20] 566 Effects catched
+[16:56:20] 4 SuperAreas catched
+[16:56:20] 48 Areas catched
+[16:56:21] 334 SubAreas catched
+[16:56:22] 11267 DofusMaps catched
+[16:56:22] 9761 StatedElements catched
+[16:56:22] 13349 InteractiveElements catched
+[16:56:22] 1485 HouseInformations catched
+[16:56:22] 556 InteractiveDoors catched
+[16:56:22] 3530 MapPositions uncatched
+[16:56:22] 14681 MapPositions catched
+[16:56:22] 42 MapZaaps catched
+[16:56:22] 79 MapSubways catched
+[16:56:22] 15612 SpellLevels catched 
+[16:56:22] 4972 Spells catched 
+[16:56:22] 4 SpellBombs catched 
+[16:56:22] 316 GuildEmblems catched 
+[16:56:22] 1179 LearnableSpells catched 
+[16:56:23] 10063 ItemTemplates catched 
+[16:56:23] 4355 Weapons catched 
+[16:56:23] 366 ItemSets catched 
+[16:56:23] 171 ItemTypes catched 
+[16:56:23] 114 ItemPets catched 
+[16:56:23] 2476 NpcTemplates catched 
+[16:56:23] 787 NpcSpawns catched 
+[16:56:23] 94 NpcItems catched 
+[16:56:23] 19801 NpcMessages catched 
+[16:56:23] 7 NpcReplies catched 
+[16:56:23] 353 Triggers catched
+[16:56:23] 1277 Paddocks catched
+[16:56:23] 72 Mounts catched
+[16:56:23] 3 Guild catched
+[16:56:23] 2 GuildMembers catched
+[16:56:23] 11 GatheringJob LevelInfos catched
+[16:56:23] 233 InteractiveSkills LevelInfos catched
+[16:56:23] 2210 Monster Templates catched
+[16:56:24] 11688 Monster Grades catched
+[16:56:24] 8021 Monster Drops catched
+[16:56:24] 128 Handlers Readed
+[16:56:25] 175 Messages Readed
+[16:56:25] WorldServer start in 5760 ms.
+[17:00:09] MySQL Database Connected
+[17:00:09] 16 Breeds catched
+[17:00:09] 256 Heads catched
+[17:00:09] 566 Effects catched
+[17:00:10] 4 SuperAreas catched
+[17:00:10] 48 Areas catched
+[17:00:11] 334 SubAreas catched
+[17:00:11] 11267 DofusMaps catched
+[17:00:11] 9761 StatedElements catched
+[17:00:12] 13349 InteractiveElements catched
+[17:00:12] 1485 HouseInformations catched
+[17:00:12] 556 InteractiveDoors catched
+[17:00:12] 3530 MapPositions uncatched
+[17:00:12] 14681 MapPositions catched
+[17:00:12] 42 MapZaaps catched
+[17:00:12] 79 MapSubways catched
+[17:00:12] 15612 SpellLevels catched 
+[17:00:12] 4972 Spells catched 
+[17:00:12] 4 SpellBombs catched 
+[17:00:12] 316 GuildEmblems catched 
+[17:00:12] 1179 LearnableSpells catched 
+[17:00:12] 10063 ItemTemplates catched 
+[17:00:12] 4355 Weapons catched 
+[17:00:12] 366 ItemSets catched 
+[17:00:12] 171 ItemTypes catched 
+[17:00:12] 114 ItemPets catched 
+[17:00:13] 2476 NpcTemplates catched 
+[17:00:13] 787 NpcSpawns catched 
+[17:00:13] 94 NpcItems catched 
+[17:00:13] 19801 NpcMessages catched 
+[17:00:13] 7 NpcReplies catched 
+[17:00:13] 353 Triggers catched
+[17:00:13] 1277 Paddocks catched
+[17:00:13] 72 Mounts catched
+[17:00:13] 3 Guild catched
+[17:00:13] 2 GuildMembers catched
+[17:00:13] 11 GatheringJob LevelInfos catched
+[17:00:13] 233 InteractiveSkills LevelInfos catched
+[17:00:13] 2210 Monster Templates catched
+[17:00:13] 11688 Monster Grades catched
+[17:00:13] 8021 Monster Drops catched
+[17:00:14] 128 Handlers Readed
+[17:00:14] 175 Messages Readed
+[17:00:14] WorldServer start in 5526 ms.
+[17:03:56] MySQL Database Connected
+[17:03:56] 16 Breeds catched
+[17:03:56] 256 Heads catched
+[17:03:56] 566 Effects catched
+[17:03:57] 4 SuperAreas catched
+[17:03:57] 48 Areas catched
+[17:03:58] 334 SubAreas catched
+[17:03:58] 11267 DofusMaps catched
+[17:03:58] 9761 StatedElements catched
+[17:03:59] 13349 InteractiveElements catched
+[17:03:59] 1485 HouseInformations catched
+[17:03:59] 556 InteractiveDoors catched
+[17:03:59] 3530 MapPositions uncatched
+[17:03:59] 14681 MapPositions catched
+[17:03:59] 42 MapZaaps catched
+[17:03:59] 79 MapSubways catched
+[17:03:59] 15612 SpellLevels catched 
+[17:03:59] 4972 Spells catched 
+[17:03:59] 4 SpellBombs catched 
+[17:03:59] 316 GuildEmblems catched 
+[17:03:59] 1179 LearnableSpells catched 
+[17:03:59] 10063 ItemTemplates catched 
+[17:03:59] 4355 Weapons catched 
+[17:03:59] 366 ItemSets catched 
+[17:03:59] 171 ItemTypes catched 
+[17:03:59] 114 ItemPets catched 
+[17:04:00] 2476 NpcTemplates catched 
+[17:04:00] 787 NpcSpawns catched 
+[17:04:00] 94 NpcItems catched 
+[17:04:00] 19801 NpcMessages catched 
+[17:04:00] 7 NpcReplies catched 
+[17:04:00] 353 Triggers catched
+[17:04:00] 1277 Paddocks catched
+[17:04:00] 72 Mounts catched
+[17:04:00] 3 Guild catched
+[17:04:00] 2 GuildMembers catched
+[17:04:00] 11 GatheringJob LevelInfos catched
+[17:04:00] 233 InteractiveSkills LevelInfos catched
+[17:04:00] 2210 Monster Templates catched
+[17:04:00] 11688 Monster Grades catched
+[17:04:00] 8021 Monster Drops catched
+[17:04:01] 128 Handlers Readed
+[17:04:01] 175 Messages Readed
+[17:04:01] WorldServer start in 5244 ms.
+[17:08:07] MySQL Database Connected
+[17:08:07] 16 Breeds catched
+[17:08:07] 256 Heads catched
+[17:08:07] 566 Effects catched
+[17:08:07] 4 SuperAreas catched
+[17:08:07] 48 Areas catched
+[17:08:08] 334 SubAreas catched
+[17:08:09] 11267 DofusMaps catched
+[17:08:09] 9761 StatedElements catched
+[17:08:09] 13349 InteractiveElements catched
+[17:08:09] 1485 HouseInformations catched
+[17:08:09] 556 InteractiveDoors catched
+[17:08:09] 3530 MapPositions uncatched
+[17:08:09] 14681 MapPositions catched
+[17:08:09] 42 MapZaaps catched
+[17:08:09] 79 MapSubways catched
+[17:08:10] 15612 SpellLevels catched 
+[17:08:10] 4972 Spells catched 
+[17:08:10] 4 SpellBombs catched 
+[17:08:10] 316 GuildEmblems catched 
+[17:08:10] 1179 LearnableSpells catched 
+[17:08:10] 10063 ItemTemplates catched 
+[17:08:10] 4355 Weapons catched 
+[17:08:10] 366 ItemSets catched 
+[17:08:10] 171 ItemTypes catched 
+[17:08:10] 114 ItemPets catched 
+[17:08:10] 2476 NpcTemplates catched 
+[17:08:10] 787 NpcSpawns catched 
+[17:08:10] 94 NpcItems catched 
+[17:08:10] 19801 NpcMessages catched 
+[17:08:10] 7 NpcReplies catched 
+[17:08:10] 353 Triggers catched
+[17:08:10] 1277 Paddocks catched
+[17:08:10] 72 Mounts catched
+[17:08:10] 3 Guild catched
+[17:08:10] 2 GuildMembers catched
+[17:08:10] 11 GatheringJob LevelInfos catched
+[17:08:11] 233 InteractiveSkills LevelInfos catched
+[17:08:11] 2210 Monster Templates catched
+[17:08:11] 11688 Monster Grades catched
+[17:08:11] 8021 Monster Drops catched
+[17:08:11] 128 Handlers Readed
+[17:08:12] 175 Messages Readed
+[17:08:12] WorldServer start in 5505 ms.
+[22:17:05] MySQL Database Connected
+[22:17:05] 16 Breeds catched
+[22:17:05] 256 Heads catched
+[22:17:05] 566 Effects catched
+[22:17:06] 4 SuperAreas catched
+[22:17:06] 48 Areas catched
+[22:17:07] 334 SubAreas catched
+[22:17:08] 11267 DofusMaps catched
+[22:17:08] 9761 StatedElements catched
+[22:17:08] 13349 InteractiveElements catched
+[22:17:08] 1485 HouseInformations catched
+[22:17:08] 556 InteractiveDoors catched
+[22:17:08] 3530 MapPositions uncatched
+[22:17:08] 14681 MapPositions catched
+[22:17:08] 42 MapZaaps catched
+[22:17:08] 79 MapSubways catched
+[22:17:08] 15612 SpellLevels catched 
+[22:17:08] 4972 Spells catched 
+[22:17:08] 4 SpellBombs catched 
+[22:17:08] 316 GuildEmblems catched 
+[22:17:08] 1179 LearnableSpells catched 
+[22:17:08] 10063 ItemTemplates catched 
+[22:17:08] 4355 Weapons catched 
+[22:17:08] 366 ItemSets catched 
+[22:17:08] 171 ItemTypes catched 
+[22:17:08] 114 ItemPets catched 
+[22:17:09] 2476 NpcTemplates catched 
+[22:17:09] 787 NpcSpawns catched 
+[22:17:09] 94 NpcItems catched 
+[22:17:09] 19801 NpcMessages catched 
+[22:17:09] 7 NpcReplies catched 
+[22:17:09] 353 Triggers catched
+[22:17:09] 1277 Paddocks catched
+[22:17:09] 72 Mounts catched
+[22:17:09] 3 Guild catched
+[22:17:09] 2 GuildMembers catched
+[22:17:09] 11 GatheringJob LevelInfos catched
+[22:17:09] 233 InteractiveSkills LevelInfos catched
+[22:17:09] 2210 Monster Templates catched
+[22:17:09] 11688 Monster Grades catched
+[22:17:09] 8021 Monster Drops catched
+[22:17:10] 128 Handlers Readed
+[22:17:11] 175 Messages Readed
+[22:17:11] WorldServer start in 5580 ms.

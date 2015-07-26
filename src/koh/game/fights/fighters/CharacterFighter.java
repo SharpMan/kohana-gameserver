@@ -1,5 +1,6 @@
 package koh.game.fights.fighters;
 
+import java.util.Date;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.dao.ExpDAO;
 import koh.game.entities.actors.Player;
@@ -16,8 +17,10 @@ import koh.protocol.client.enums.PlayerEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightVanishMessage;
+import koh.protocol.messages.game.basic.BasicTimeMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.character.stats.FighterStatsListMessage;
+import koh.protocol.messages.game.character.stats.LifePointsRegenBeginMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
 import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
@@ -133,6 +136,7 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public void LeaveFight() {
+        System.out.println("leava");
         super.LeaveFight();
         this.EndFight();
     }
@@ -158,20 +162,24 @@ public class CharacterFighter extends Fighter {
         }
 
         this.Fight.unregisterPlayer(Character);
-        this.Character.SetFight(null);
-        this.Character.SetFighter(null);
+
         if (this.Character.IsInWorld) {
             this.Character.Client.EndGameAction(GameActionTypeEnum.FIGHT);
             this.Character.Send(new GameContextDestroyMessage());
             this.Character.Send(new GameContextCreateMessage((byte) 1));
-            this.Character.RefreshStats();
+            //this.Character.Send(new LifePointsRegenBeginMessage());
+            this.Character.RefreshStats(false);
             if (!(this.Fight instanceof ChallengeFight) && this.Team.Id == this.Fight.GetLoosers().Id) {
                 this.Character.teleport(this.Character.SavedMap, this.Character.SavedCell);
             } else {
-                this.Character.CurrentMap.SpawnActor(this.Character);
                 this.Character.Send(new CurrentMapMessage(this.Character.CurrentMap.Id, "649ae451ca33ec53bbcbcc33becf15f4"));
+                //this.Character.Send(new BasicTimeMessage((double) (new Date().getTime()), 0));
+                this.Character.CurrentMap.SpawnActor(this.Character);
+
             }
         }
+        this.Character.SetFight(null);
+        this.Character.SetFighter(null);
     }
 
     @Override

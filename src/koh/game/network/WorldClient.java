@@ -264,9 +264,8 @@ public class WorldClient {
             if (showQueue) {
                 this.Send(new LoginQueueStatusMessage((short) 0, (short) 0));
             }
-            Date actDate = new Date();
             this.Send(new AuthenticationTicketAcceptedMessage());
-            this.Send(new BasicTimeMessage((double) actDate.getTime(), 0));
+            this.Send(new BasicTimeMessage((double) (new Date().getTime()), 0));
             this.Send(new ServerOptionalFeaturesMessage(new byte[]{1, 2}));
             this.Send(new AccountCapabilitiesMessage(getAccount().ID, false, (short) Integer.MAX_VALUE, (short) Integer.MAX_VALUE, this.getAccount().Right));
             this.Send(new TrustStatusMessage(true));

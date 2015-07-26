@@ -27,19 +27,19 @@ public class EffectActivableObject extends EffectBase {
                 if (CastInfos.Caster.Fight.HasObjectOnCell(FightObjectType.OBJECT_FIGHTER, CastInfos.CellId)) {
                     return -1;
                 }
-                obj = new FightGlyph(CastInfos, CastInfos.Duration, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), CastInfos.Effect.ZoneShape() == SpellShapeEnum.G ? GameActionMarkCellsTypeEnum.CELLS_SQUARE : CastInfos.Effect.ZoneShape() == SpellShapeEnum.Q ? GameActionMarkCellsTypeEnum.CELLS_CROSS : GameActionMarkCellsTypeEnum.CELLS_CIRCLE);
+                obj = new FightGlyph(CastInfos, CastInfos.Duration, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), GetMarkType(CastInfos.Effect.ZoneShape()));
                 break;
 
             case LAYING_TRAP_LEVEL:
                 if (!CastInfos.Caster.Fight.CanPutObject(CastInfos.CellId)) {
                     return -1;
                 }
-                obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), CastInfos.Effect.ZoneShape() == SpellShapeEnum.G ? GameActionMarkCellsTypeEnum.CELLS_SQUARE : CastInfos.Effect.ZoneShape() == SpellShapeEnum.Q ? GameActionMarkCellsTypeEnum.CELLS_CROSS : GameActionMarkCellsTypeEnum.CELLS_CIRCLE);
+                obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), GetMarkType(CastInfos.Effect.ZoneShape()));
                 break;
             case LAYING_PORTAIL:
-                if (!CastInfos.Caster.Fight.CanPutObject(CastInfos.CellId)) {
-                    return -1;
-                }
+                /*if (!CastInfos.Caster.Fight.CanPutObject(CastInfos.CellId)) {
+                 return -1;
+                 }*/
                 obj = new FightPortal(CastInfos.Caster.Fight, CastInfos.Caster, CastInfos, CastInfos.CellId);
                 break;
         }
@@ -48,6 +48,19 @@ public class EffectActivableObject extends EffectBase {
             CastInfos.Caster.Fight.AddActivableObject(CastInfos.Caster, obj);
         }
         return -1;
+    }
+
+    public static GameActionMarkCellsTypeEnum GetMarkType(SpellShapeEnum Shape) {
+        switch (Shape) {
+            case P:
+            case G:
+                return GameActionMarkCellsTypeEnum.CELLS_SQUARE;
+            case Q:
+                return GameActionMarkCellsTypeEnum.CELLS_CROSS;
+
+            default:
+                return GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
+        }
     }
 
     public static Color GetColor(int Spell) {

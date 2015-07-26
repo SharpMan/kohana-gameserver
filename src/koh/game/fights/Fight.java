@@ -71,11 +71,13 @@ import koh.protocol.messages.game.actions.fight.GameActionFightSpellCastMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
+import koh.protocol.messages.game.context.GameContextQuitMessage;
 import koh.protocol.messages.game.context.GameEntitiesDispositionMessage;
 import koh.protocol.messages.game.context.GameMapMovementMessage;
 import koh.protocol.messages.game.context.ShowCellMessage;
 import koh.protocol.messages.game.context.fight.GameFightEndMessage;
 import koh.protocol.messages.game.context.fight.GameFightHumanReadyStateMessage;
+import koh.protocol.messages.game.context.fight.GameFightJoinMessage;
 import koh.protocol.messages.game.context.fight.GameFightNewRoundMessage;
 import koh.protocol.messages.game.context.fight.GameFightOptionStateUpdateMessage;
 import koh.protocol.messages.game.context.fight.GameFightPlacementPossiblePositionsMessage;
@@ -145,7 +147,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     public FightTypeEnum FightType;
     protected Map<Short, FightCell> myCells = new HashMap<>();
     protected Map<FightTeam, Map<Short, FightCell>> myFightCells = new HashMap<>();
-    protected short AgeBonus = 0, lootShareLimitMalus = 0;
+    protected short AgeBonus = -1, lootShareLimitMalus = -1;
 
     protected Map<String, CancellableExecutorRunnable> myTimers = new HashMap<>();
     public Map<Fighter, CopyOnWriteArrayList<FightActivableObject>> m_activableObjects = Collections.synchronizedMap(new HashMap<>());
@@ -384,7 +386,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         if (!fakeLaunch) {
             Three<Integer, int[], Integer> Informations = null;
-            if (this.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
+            if (this.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL) && !Arrays.stream(Effects).anyMatch(Effect -> Effect.EffectType().equals(StatsEnum.DISABLE_PORTAL))) {
                 Informations = this.getTargetThroughPortal(Fighter, CellId, true);
                 CellId = Informations.first.shortValue();
                 DamagePercentBoosted = Informations.tree;
@@ -1369,6 +1371,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         this.sendToField(this.myResult);
 
+        this.CreationTime = 0;
         this.FightTime = 0;
         this.EndAllSequences();
         this.Fighters().forEach(x -> x.EndFight());

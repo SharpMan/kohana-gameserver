@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
+import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
@@ -158,6 +159,10 @@ public class EffectCast {
         this.SpellLevel = sl;
         this.Duration = Duration;
         this.ParentUID = ParentUID;
+    }
+    
+    public FightCell Cell(){
+        return this.Caster.Fight.GetCell(CellId);
     }
 
     public String toString() {

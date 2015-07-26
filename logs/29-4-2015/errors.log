@@ -1,0 +1,16 @@
+avr. 29, 2015 3:32:25 PM com.j256.ormlite.logger.Slf4jLoggingLog log
+GRAVE: WARNING: you seem to not be using the Xerial SQLite driver.  See ORMLite docs on SQLite: http://ormlite.com/docs/sqlite
+avr. 29, 2015 3:32:38 PM org.reflections.Reflections scan
+INFOS: Reflections took 176 ms to scan 1 urls, producing 1 keys and 95 values 
+avr. 29, 2015 3:32:39 PM org.reflections.Reflections scan
+INFOS: Reflections took 320 ms to scan 1 urls, producing 2 keys and 126 values 
+[15:32:42] Undefinied Stat id 285
+[15:32:42] Undefinied Stat id 281
+[15:32:42] Undefinied Stat id 288
+[15:32:42] Undefinied Stat id 283
+[15:32:42] Undefinied Stat id 970
+[15:32:42] Undefinied Stat id 974
+[15:32:42] Undefinied Stat id 973
+[15:32:42] Undefinied Stat id 971
+[15:32:42] Undefinied Stat id 972
+[15:32:42] Undefinied Stat id 110

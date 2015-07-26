@@ -39,6 +39,17 @@ public class EffectPush extends EffectBase {
                 case PullForward:
                     Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
                     break;
+                case BACK_CELL:
+                    Fighter p = CastInfos.Caster;
+                    CastInfos.Caster = Target;
+                    Target = p;
+                    CastInfos.Targets.remove(0);
+                    if (Pathfinder.InLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
+                        Direction = Pathfinder.GetDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());
+                    } else if (Pathfinder.InLine(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId())) {
+                        Direction = Pathfinder.GetDirection(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId());
+                    }
+                    break;
             }
             if (EffectPush.ApplyPush(CastInfos, Target, Direction, CastInfos.RandomJet(Target)) == -3) {
                 return -3;
@@ -99,8 +110,7 @@ public class EffectPush extends EffectBase {
             DamageCoef = 7;
         } else if (CastInfos.Caster.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
             DamageCoef = 4;
-        }
-        else {
+        } else {
             DamageCoef = 4 + EffectPush.RANDOM_PUSHDAMAGE.nextInt(3);
         }
 

@@ -1,0 +1,7 @@
+mars 03, 2015 11:37:45 PM org.reflections.Reflections scan
+INFOS: Reflections took 127 ms to scan 1 urls, producing 1 keys and 19 values 
+mars 03, 2015 11:37:45 PM org.reflections.Reflections scan
+INFOS: Reflections took 131 ms to scan 1 urls, producing 2 keys and 21 values 
+[23:39:08] [ERROR] Unknown Message Header Handler 890/127.0.0.1:45167
+[23:47:46] [ERROR] Unknown Message Header Handler 192/127.0.0.1:45167
+[23:59:08] [ERROR] Unknown Message Header Handler 182/127.0.0.1:45167

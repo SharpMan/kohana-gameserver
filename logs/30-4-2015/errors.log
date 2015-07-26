@@ -1,0 +1,6 @@
+avr. 30, 2015 1:17:18 PM com.j256.ormlite.logger.Slf4jLoggingLog log
+GRAVE: WARNING: you seem to not be using the Xerial SQLite driver.  See ORMLite docs on SQLite: http://ormlite.com/docs/sqlite
+avr. 30, 2015 1:17:29 PM org.reflections.Reflections scan
+INFOS: Reflections took 230 ms to scan 1 urls, producing 1 keys and 96 values 
+avr. 30, 2015 1:17:30 PM org.reflections.Reflections scan
+INFOS: Reflections took 334 ms to scan 1 urls, producing 2 keys and 126 values 

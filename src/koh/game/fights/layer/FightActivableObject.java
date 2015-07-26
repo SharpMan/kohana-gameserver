@@ -54,7 +54,7 @@ public abstract class FightActivableObject implements IFightObject {
     public byte Size;
     public GameActionMarkCellsTypeEnum Shape;
     public short ID;
-    
+
     protected MapPoint CachedMapPoints;
 
     public abstract void AppearForAll();
@@ -73,24 +73,28 @@ public abstract class FightActivableObject implements IFightObject {
         m_caster = caster;
         m_spellId = castInfos.SpellId;
         m_spell_level = castInfos.SpellLevel.grade;
-        try{ m_actionEffect = SpellDAO.Spells.get(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1]; } catch(NullPointerException | ArrayIndexOutOfBoundsException e) {}
+        try {
+            m_actionEffect = SpellDAO.Spells.get(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1];
+        } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+        }
         Cell = fight.GetCell(cell);
         ActivationType = activeType;
         Color = color;
         Targets = new ArrayList<>();
-        AffectedCells = (shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).GetCells(Cell.Id);
+        AffectedCells = new Zone(castInfos.Effect.ZoneShape(), size).GetCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).GetCells(Cell.Id)*/;
         Duration = duration;
         this.VisibileState = visibleState;
         Size = size;
         Shape = shap;
 
-        if(m_actionEffect != null)
-        for (EffectInstanceDice effect : m_actionEffect.effects) {
-            if (EffectCast.IsDamageEffect(effect.EffectType())) {
-                Priority--;
-            }
-            if (effect.EffectType() == StatsEnum.PullForward || effect.EffectType() == StatsEnum.Push_Back) {
-                Priority += 50;
+        if (m_actionEffect != null) {
+            for (EffectInstanceDice effect : m_actionEffect.effects) {
+                if (EffectCast.IsDamageEffect(effect.EffectType())) {
+                    Priority--;
+                }
+                if (effect.EffectType() == StatsEnum.PullForward || effect.EffectType() == StatsEnum.Push_Back) {
+                    Priority += 50;
+                }
             }
         }
 
@@ -126,9 +130,9 @@ public abstract class FightActivableObject implements IFightObject {
                 break;
         }
     }
-    
-    public void Enable(Fighter fighter){
-        
+
+    public void Enable(Fighter fighter) {
+
     }
 
     public int LoadEnnemyTargetsAndActive(Fighter target) {
@@ -142,13 +146,13 @@ public abstract class FightActivableObject implements IFightObject {
         return this.Activate(target);
     }
 
-    public MapPoint MapPoint(){
-        if(CachedMapPoints == null){
+    public MapPoint MapPoint() {
+        if (CachedMapPoints == null) {
             this.CachedMapPoints = MapPoint.fromCellId(this.CellId());
         }
         return this.CachedMapPoints;
     }
-    
+
     public synchronized int Activate(Fighter activator) {
         Activated = true;
         if (this.ObjectType() == FightObjectType.OBJECT_TRAP) {
@@ -158,6 +162,7 @@ public abstract class FightActivableObject implements IFightObject {
         m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(GameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.m_caster.ID, this.ID, activator.ID, this.m_spellId));
         activator.Fight.StartSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         for (EffectInstanceDice Effect : m_actionEffect.effects) {
+            System.out.println(Effect.toString());
             EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.spellId, Cell.Id, 100, Effect, m_caster, Targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
             CastInfos.IsTrap = this.ObjectType() == FightObjectType.OBJECT_TRAP;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {

@@ -40,11 +40,10 @@ public class BuffPoutch extends BuffEffect {
             return -1;
         }
 
-        if (CastInfos.EffectType == StatsEnum.Refoullage) {
+        if (/*CastInfos.EffectType == StatsEnum.Refoullage*/CastInfos.SpellId == 2809) {
             DamageValue.setValue(0);
             Target = DamageInfos.Caster;
         }
-        
 
         SpellLevel SpellLevel = SpellDAO.Spells.get(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();

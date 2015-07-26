@@ -1,0 +1,65 @@
+avr. 24, 2015 1:27:08 PM com.j256.ormlite.logger.Slf4jLoggingLog log
+GRAVE: WARNING: you seem to not be using the Xerial SQLite driver.  See ORMLite docs on SQLite: http://ormlite.com/docs/sqlite
+avr. 24, 2015 1:27:17 PM org.reflections.Reflections scan
+INFOS: Reflections took 173 ms to scan 1 urls, producing 1 keys and 87 values 
+avr. 24, 2015 1:27:17 PM org.reflections.Reflections scan
+INFOS: Reflections took 319 ms to scan 1 urls, producing 2 keys and 117 values 
+[13:27:21] Undefinied Stat id 285
+[13:27:21] Undefinied Stat id 281
+[13:27:21] Undefinied Stat id 288
+[13:27:21] Undefinied Stat id 283
+[13:27:21] Undefinied Stat id 970
+[13:27:21] Undefinied Stat id 974
+[13:27:21] Undefinied Stat id 973
+[13:27:21] Undefinied Stat id 971
+[13:27:21] Undefinied Stat id 972
+[13:27:21] Undefinied Stat id 110
+[14:26:58] (server->proxy->client)::Error:{java.nio.BufferUnderflowException (Hexdump: 00 09 AA 00 20 42 6C 37 6D 4C 38 6F 50 77 38 63 61 52 55 5A 68 6C 44 35 7A 75 55 6F 49 57 7A 44 72 53 38 58 6A 00 0A 2F 31 32 37 2E 30 2E 30 2E 31 00 00 00 01 00 0B 4D 65 6C 61 6E 63 68 6F 6C 69 61 00 13 4D 6F 6E 20 4D 65 69 6C 6C 65 75 72 20 74 65 73 74 20 3F 00 04 74 65 73 74 00 0A 2F 31 32 37 2E 30 2E 30 2E 31 0A 00 00 00 3F AC ED 00 05 73 72 01 00 12 6A 61 76 61 2E 73 71 6C 2E)}::cause.toString(){org.apache.mina.filter.codec.ProtocolDecoderException: java.nio.BufferUnderflowException (Hexdump: 00 09 AA 00 20 42 6C 37 6D 4C 38 6F 50 77 38 63 61 52 55 5A 68 6C 44 35 7A 75 55 6F 49 57 7A 44 72 53 38 58 6A 00 0A 2F 31 32 37 2E 30 2E 30 2E 31 00 00 00 01 00 0B 4D 65 6C 61 6E 63 68 6F 6C 69 61 00 13 4D 6F 6E 20 4D 65 69 6C 6C 65 75 72 20 74 65 73 74 20 3F 00 04 74 65 73 74 00 0A 2F 31 32 37 2E 30 2E 30 2E 31 0A 00 00 00 3F AC ED 00 05 73 72 01 00 12 6A 61 76 61 2E 73 71 6C 2E)}
+[14:27:28] Undefinied Stat id 285
+[14:27:28] Undefinied Stat id 281
+[14:27:28] Undefinied Stat id 288
+[14:27:28] Undefinied Stat id 283
+[14:27:28] Undefinied Stat id 970
+[14:27:28] Undefinied Stat id 974
+[14:27:28] Undefinied Stat id 973
+[14:27:28] Undefinied Stat id 971
+[14:27:28] Undefinied Stat id 972
+com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 4 479 239 milliseconds ago.  The last packet sent successfully to the server was 4 479 255 milliseconds ago.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:408)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:406)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1119)
+	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3318)
+	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:1940)
+	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2113)
+	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2693)
+	at com.mysql.jdbc.PreparedStatement.executeInternal(PreparedStatement.java:2102)
+	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2395)
+	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2313)
+	at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:2298)
+	at koh.game.dao.PlayerDAO.Update(PlayerDAO.java:208)
+	at koh.game.entities.actors.Player.Save(Player.java:400)
+	at koh.game.dao.PlayerDAO$1.run(PlayerDAO.java:55)
+	at java.util.TimerThread.mainLoop(Timer.java:555)
+	at java.util.TimerThread.run(Timer.java:505)
+Caused by: java.net.SocketException: Software caused connection abort: socket write error
+	at java.net.SocketOutputStream.socketWrite0(Native Method)
+	at java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:109)
+	at java.net.SocketOutputStream.write(SocketOutputStream.java:153)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at com.mysql.jdbc.MysqlIO.send(MysqlIO.java:3299)
+	... 12 more
+[21:47:26] Undefinied Stat id 285
+[21:47:26] Undefinied Stat id 281
+[21:47:26] Undefinied Stat id 288
+[21:47:26] Undefinied Stat id 283
+[21:47:26] Undefinied Stat id 970
+[21:47:26] Undefinied Stat id 974
+[21:47:26] Undefinied Stat id 973
+[21:47:26] Undefinied Stat id 971
+[21:47:26] Undefinied Stat id 972
