@@ -30,6 +30,15 @@ public class PlayerController {
             message
         }));
     }
+    
+    public static void SendServerErrorMessage(WorldClient c, String message) {
+        if (c == null) {
+            return;
+        }
+        c.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 0, new String[]{
+            message
+        }));
+    }
 
     public static void SendServerMessage(WorldClient c, String message, String Color) {
         SendServerMessage(c, "<font color=\"#" + Color + "\">" + message + "</font>");

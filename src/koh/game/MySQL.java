@@ -207,10 +207,10 @@ public class MySQL {
         Main.Logs().writeInfo(SpellDAO.FindBombs() + " SpellBombs catched ");
         Main.Logs().writeInfo(GuildEmblemDAO.FindAll() + " GuildEmblems catched ");
         Main.Logs().writeInfo(SpellDAO.FindLearnables() + " LearnableSpells catched ");
+         Main.Logs().writeInfo(ItemDAO.FindItemTypes() + " ItemTypes catched ");
         Main.Logs().writeInfo(ItemDAO.FindAll() + " ItemTemplates catched ");
         Main.Logs().writeInfo(ItemDAO.FindWeapons() + " Weapons catched ");
         Main.Logs().writeInfo(ItemDAO.FindItemSets() + " ItemSets catched ");
-        Main.Logs().writeInfo(ItemDAO.FindItemTypes() + " ItemTypes catched ");
         Main.Logs().writeInfo(ItemDAO.FindPets() + " ItemPets catched ");
         Main.Logs().writeInfo(NpcDAO.FindAll() + " NpcTemplates catched ");
         Main.Logs().writeInfo(NpcDAO.FindSpawns() + " NpcSpawns catched ");

@@ -49,7 +49,12 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         if (buf.remaining() < messageLength) {
             return false;
         }
+        if(getMessageId(header) < 0){
+            session.close();
+            return false;
+        }
 
+        
         Message message;
         
         

@@ -25,6 +25,8 @@ import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextCreateRequestMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
 import koh.protocol.messages.game.context.GameContextReadyMessage;
+import koh.protocol.messages.game.context.GameMapChangeOrientationMessage;
+import koh.protocol.messages.game.context.GameMapChangeOrientationRequestMessage;
 import koh.protocol.messages.game.context.GameMapMovementCancelMessage;
 import koh.protocol.messages.game.context.GameMapMovementConfirmMessage;
 import koh.protocol.messages.game.context.GameMapMovementMessage;
@@ -36,12 +38,22 @@ import koh.protocol.messages.game.context.roleplay.MapInformationsRequestMessage
 import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
 import koh.protocol.messages.game.inventory.items.ObjectDropMessage;
 import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
+import koh.protocol.types.game.context.ActorOrientation;
 
 /**
  *
  * @author Neo-Craft
  */
 public class ContextHandler {
+    
+    @HandlerAttribute(ID = GameMapChangeOrientationRequestMessage.M_ID)
+    public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client , GameMapChangeOrientationRequestMessage Message){
+        if(Client.Character.GetFight() == null){
+            Client.Character.Direction = Message.direction;
+            Client.Character.CurrentMap.sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.Character.ID,Client.Character.Direction)));
+            Main.Logs().writeDebug("New Direction for Actor "+Client.Character.ID+"~"+Message.direction);
+        }
+    }
 
     @HandlerAttribute(ID = ShowCellRequestMessage.M_ID)
     public static void HandleShowCellRequestMessage(WorldClient Client, ShowCellRequestMessage Message) {

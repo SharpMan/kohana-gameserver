@@ -36,7 +36,7 @@ public class WorldServer {
         this.acceptor.setHandler(new WorldHandler());
 
         //this.acceptor.getSessionConfig().setMaxReadBufferSize(2048); 
-        this.acceptor.getSessionConfig().setReadBufferSize(1024); // Debug
+        //this.acceptor.getSessionConfig().setReadBufferSize(1024); // Debug
         this.acceptor.getSessionConfig().setReaderIdleTime(Main.MIN_TIMEOUT * 60);
         this.acceptor.getSessionConfig().setTcpNoDelay(true);
         this.acceptor.getSessionConfig().setKeepAlive(true);

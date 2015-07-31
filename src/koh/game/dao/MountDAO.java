@@ -7,6 +7,7 @@ import java.util.HashMap;
 import koh.game.MySQL;
 import koh.game.utils.Settings;
 import koh.look.EntityLookParser;
+import koh.protocol.client.enums.ItemSuperTypeEnum;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import koh.utils.Couple;
 import org.apache.commons.lang3.ArrayUtils;
@@ -37,6 +38,8 @@ public class MountDAO {
                                 Stats.add(c);
                             }
                         }
+                        System.out.println("INSERT INTO npc_items VALUES(788," + 10 + ",'',0," + this.ScroolId + ",0);");
+                        
                     }
                 });
                 i++;

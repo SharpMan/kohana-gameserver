@@ -230,7 +230,7 @@ public class Player extends IGameActor implements Observer {
         }
         DofusMap NextMap = MapDAO.Cache.get(newMapID);
         if (NextMap == null) {
-            PlayerController.SendServerMessage(Client, "Nulled map");
+            PlayerController.SendServerMessage(Client, "Signal on the bugTracker nulled map -> "+newMapID);
             //Client.sendPacket(new ErrorMapNotFoundMessage());
             return;
         }

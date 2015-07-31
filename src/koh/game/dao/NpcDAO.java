@@ -194,6 +194,8 @@ public class NpcDAO {
                         this.gender = RS.getInt("gender");
                         this.look = RS.getString("look");
                         this.fastAnimsFun = RS.getBoolean("fast_anims_fun");
+                        this.OrderItemsByLevel = RS.getBoolean("order_items_level");
+                        this.OrderItemsByPrice = RS.getBoolean("order_items_price");
                     }
                 });
                 i++;

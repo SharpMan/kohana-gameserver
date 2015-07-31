@@ -40,7 +40,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.Poutch, new EffectPoutch());
             this.put(StatsEnum.DistributesDamagesOccasioned, new EffectDistributesDamagesOccasioned());
 
-            //this.put(StatsEnum.PUNITION, new Effec
+            this.put(StatsEnum.PUNITION, new EffectPunishment());
             this.put(StatsEnum.LAYING_GLYPH_RANKED, new EffectActivableObject());
             this.put(StatsEnum.LAYING_GLYPH_RANKED_2, new EffectActivableObject());
             this.put(StatsEnum.LAYING_GLYPH, new EffectActivableObject());

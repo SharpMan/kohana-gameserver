@@ -2,7 +2,9 @@ package koh.game.entities.actors.npc;
 
 import com.google.common.primitives.Ints;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.stream.Stream;
 import koh.look.EntityLookParser;
 import koh.protocol.messages.game.inventory.exchanges.ExchangeStartOkNpcShopMessage;
 import koh.protocol.types.game.data.items.ObjectItemToSellInNpcShop;
@@ -22,7 +24,7 @@ public class NpcTemplate {
     public int[] actions;
     public int gender;
     public String look;
-    public boolean fastAnimsFun;
+    public boolean fastAnimsFun, OrderItemsByPrice, OrderItemsByLevel;
     public Map<Integer, NpcItem> Items;
 
     public int[] GetReply(int id) {
@@ -45,12 +47,33 @@ public class NpcTemplate {
 
     private ObjectItemToSellInNpcShop[] ItemList = null;
 
+    public static <T> Comparator<T> Compose(
+            final Comparator<? super T> primary,
+            final Comparator<? super T> secondary
+    ) {
+        return (T a, T b) -> {
+            int result = primary.compare(a, b);
+            return result == 0 ? secondary.compare(a, b) : result;
+        };
+    }
+
     public ObjectItemToSellInNpcShop[] GetItems() {
         if (ItemList == null) {
             if (Items == null) {
                 ItemList = new ObjectItemToSellInNpcShop[0];
             } else {
-                ItemList = this.Items.values().stream().map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);
+                Stream<NpcItem> Objects = this.Items.values().stream();
+                if (this.Id == 816) {
+                    Objects = Objects.filter(Item -> Item.Template().level > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.Template().TypeId, e2.Template().TypeId)), ((e1, e2) -> Integer.compare(e1.Template().level, e2.Template().level))));
+                }
+                if (this.OrderItemsByPrice) {
+                    Objects = Objects.sorted((e1, e2) -> Float.compare(e1.Price(), e2.Price()));
+                }
+                if (this.OrderItemsByLevel) {
+                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.Template().level, e2.Template().level));
+                }
+
+                ItemList = Objects.map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);
             }
         }
         return ItemList;

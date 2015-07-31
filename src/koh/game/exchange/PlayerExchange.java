@@ -150,7 +150,7 @@ public class PlayerExchange extends Exchange {
             }
         } else {
 
-            if (Item.GetQuantity() < this.myItemsToTrade.get(Client).get(Item.ID) + Quantity || this.myItemsToTrade.get(Client).get(Item.ID) + Quantity < 0) {
+            if (Item.GetQuantity() < (this.myItemsToTrade.get(Client).get(Item.ID) + Quantity) || (this.myItemsToTrade.get(Client).get(Item.ID) + Quantity) < 0) {
                 return false;
             }
 
@@ -186,7 +186,7 @@ public class PlayerExchange extends Exchange {
 
         this.UnValidateAll();
 
-        if (Quantity > Client.Character.Kamas) {
+        if (Quantity > Client.Character.Kamas || Quantity < 0) {
             Quantity = Client.Character.Kamas;
         }
 

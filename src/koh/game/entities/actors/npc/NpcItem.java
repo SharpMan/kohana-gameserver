@@ -35,7 +35,7 @@ public class NpcItem {
 
     /*/int objectGID, ObjectEffect[] effects, int objectPrice, String buyCriterion*/
     public ObjectItemToSellInNpcShop toShop() {
-        return new ObjectItemToSellInNpcShop(this.Item, EffectHelper.toObjectEffects(this.Template().possibleEffects), (int) this.CustomPrice, this.BuyCriterion);
+        return new ObjectItemToSellInNpcShop(this.Item, EffectHelper.toObjectEffects(this.Template().possibleEffects), (int) Price(), this.BuyCriterion);
     }
 
     public NpcItem() {

@@ -37,6 +37,7 @@ import koh.protocol.messages.game.context.roleplay.objects.ObjectGroundListAdded
 import koh.protocol.messages.game.context.roleplay.objects.ObjectGroundRemovedMessage;
 import koh.protocol.messages.game.context.roleplay.objects.ObjectGroundRemovedMultipleMessage;
 import koh.protocol.messages.game.context.roleplay.paddock.PaddockPropertiesMessage;
+import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.UpdateMapPlayersAgressableStatusMessage;
 import koh.protocol.messages.game.pvp.UpdateSelfAgressableStatusMessage;
 import koh.protocol.types.game.context.MapCoordinates;
@@ -48,6 +49,7 @@ import koh.protocol.types.game.house.HouseInformations;
 import koh.protocol.types.game.interactive.InteractiveElement;
 import koh.protocol.types.game.interactive.InteractiveElementSkill;
 import koh.protocol.types.game.interactive.InteractiveElementWithAgeBonus;
+import koh.utils.Couple;
 import koh.utils.Enumerable;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -65,6 +67,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public int BottomNeighbourId;
     public int TopNeighbourId;
     public int LeftNeighbourId, RightNeighbourId, ShadowBonusOnEntities;
+    public NeighBourStruct[] newNeighbour;
     public boolean UseLowPassFilter, UseReverb;
     public int PresetId;
     private byte[] CompressedCells, CompressedLayers;
@@ -79,7 +82,6 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private int myNextActorId = -1;
     private Map<Integer, MapDoor> Doors;
     private FightController myFightController;
-
     /*After Initialize */
     public short[] BlueCells, RedCells;
     private DofusCell[] Cells;
@@ -93,6 +95,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         if (Actor instanceof Player) {
             if (((Player) Actor).Client != null) {
                 this.registerPlayer((Player) Actor);
+                this.onPlayerSpawned((Player) Actor);
             }
         }
         this.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) Actor.GetGameContextActorInformations(null)));
@@ -111,6 +114,12 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
          }*/
         this.Cells[Actor.Cell.Id].AddActor(Actor);
 
+    }
+
+    public void onPlayerSpawned(Player Actor) {
+        if (this.Id == 115083777) {
+            Actor.Send(new PopupWarningMessage((byte) 5, "MØ", "Pour consulter les vendeurs , parlez à Hal San !"));
+        }
     }
 
     public SubArea GetSubArea() {
@@ -387,6 +396,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public MapDoor getDoor(int id) {
+        if (this.Doors == null) {
+            return null;
+        }
         return this.Doors.get(id);
     }
 

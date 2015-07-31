@@ -18,7 +18,6 @@ import koh.game.entities.item.ItemSet;
 import koh.game.entities.item.ItemTemplate;
 import koh.game.entities.item.Weapon;
 import koh.game.entities.item.animal.MountInventoryItem;
-import koh.game.entities.spells.*;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.ItemSuperTypeEnum;

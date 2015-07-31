@@ -15,6 +15,8 @@ import koh.game.dao.PaddockDAO;
 import koh.game.dao.PlayerDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.environments.MapPosition;
+import koh.game.entities.environments.SubArea;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
@@ -57,6 +59,7 @@ import koh.protocol.types.game.look.EntityLook;
 import koh.protocol.types.game.look.SubEntity;
 import koh.protocol.types.game.mount.ItemDurability;
 import koh.protocol.types.game.paddock.PaddockItem;
+import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -244,16 +247,15 @@ public class ChatHandler {
 
                         }
 
-                        int[] SubAreas = MapDAO.GetSubAreaOfPos(X, Y);
+                        MapPosition[] SubAreas = MapDAO.GetSubAreaOfPos(X, Y);
                         if (SubAreas.length > 1 && subArea == -1) {
                             PlayerController.SendServerMessage(Client, "This position contains a lots of SubArea so try one of this ..");
-                            for (int s : SubAreas) {
-                                PlayerController.SendServerMessage(Client, "!go " + X + " " + Y + " " + s);
+                            for (MapPosition s : SubAreas) {
+                                PlayerController.SendServerMessage(Client, "!go " + X + " " + Y + " " + s.subAreaId +" (Or choose Mapid "+s.id);
                             }
-                            return;
                         } else {
                             if (subArea == -1) {
-                                subArea = SubAreas[0];
+                                subArea = SubAreas[0].subAreaId;
                             }
                             DofusMap Map = MapDAO.GetMapByPos(X, Y, subArea);
                             if (Map == null) {
@@ -290,7 +292,10 @@ public class ChatHandler {
                     Client.Character.ChangeAlignementSide(AlignmentSideEnum.ALIGNMENT_ANGEL);
                 } else if (message.Content.startsWith("!demon")) {
                     Client.Character.ChangeAlignementSide(AlignmentSideEnum.ALIGNMENT_EVIL);
-                } else if (message.Content.startsWith("!set")) {
+                }else if (message.Content.startsWith("!dit")) {
+                    Client.Send(new ChatServerMessage(CHANNEL_GLOBAL, message.Content, (int) Instant.now().getEpochSecond(), "az", -1, "Pnj de Merde", Client.getAccount().ID));
+                }
+                else if (message.Content.startsWith("!set")) {
                     //Client.Send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(), 5));
                     Client.Send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean()), Client.Character.ID));
 

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.D2oDao;
 import koh.game.network.WorldClient;
@@ -127,16 +128,18 @@ public class RolePlayHandler {
 
         //System.out.println(cell.MapChangeData + "cell" + cell.Id);
         if (Client.Character.CurrentMap.TopNeighbourId == Message.mapId) {
-            Client.Character.teleport(Message.mapId, Client.Character.Cell.Id + 532);
+            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[0].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[0].Cellid : (Client.Character.Cell.Id + 532));
         } else if (Client.Character.CurrentMap.BottomNeighbourId == Message.mapId) {
-            Client.Character.teleport(Message.mapId, Client.Character.Cell.Id - 532);
+            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[1].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[1].Cellid : (Client.Character.Cell.Id - 532));
         } else if (Client.Character.CurrentMap.LeftNeighbourId == Message.mapId) {
-            Client.Character.teleport(Message.mapId, Client.Character.Cell.Id + 13);
+            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[2].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[2].Cellid : (Client.Character.Cell.Id + 13));
         } else if (Client.Character.CurrentMap.RightNeighbourId == Message.mapId) {
-            Client.Character.teleport(Message.mapId, Client.Character.Cell.Id - 13);
+            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[3].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[3].Cellid : (Client.Character.Cell.Id - 13));
         } else {
+            // Client.Character.teleport(Message.mapId, -1);
+            Main.Logs().writeError("Client " + Client.Character.NickName + " teleport from " + Client.Character.CurrentMap.Id + " to " + Message.mapId);
             Client.Send(new BasicNoOperationMessage());
-            System.out.println("undefinied map");
+            //System.out.println("undefinied map");
         }
 
     }

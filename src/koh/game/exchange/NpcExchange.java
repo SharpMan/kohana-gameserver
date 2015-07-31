@@ -2,6 +2,7 @@ package koh.game.exchange;
 
 import com.google.common.primitives.Ints;
 import koh.game.actions.GameActionTypeEnum;
+import koh.game.controllers.PlayerController;
 import koh.game.dao.ItemDAO;
 import koh.game.entities.actors.Npc;
 import static koh.game.entities.actors.character.CharacterInventory.UnMergeableType;
@@ -58,6 +59,10 @@ public class NpcExchange extends Exchange {
             Client.Send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }
+        if((npcItem.Template().realWeight * Quantity) + Client.Character.InventoryCache.Weight() > Client.Character.InventoryCache.WeightTotal()){
+            PlayerController.SendServerErrorMessage(Client, "Erreur : Votre poids depasse les bornes...");
+            return false;
+        }
 
         if (Ints.contains(UnMergeableType, ItemDAO.Cache.get(TemplateId).TypeId)) {
             Quantity = 1;
@@ -66,7 +71,7 @@ public class NpcExchange extends Exchange {
         int amount1 = (int) ((double) npcItem.Price() * (double) Quantity);
 
         InventoryItem playerItem = null;
-
+        
         if (npcItem.ItemToken() != null) {
             playerItem = Client.Character.InventoryCache.GetItemInTemplate(npcItem.Token);
             if (playerItem == null || (double) playerItem.GetQuantity() < amount1) {

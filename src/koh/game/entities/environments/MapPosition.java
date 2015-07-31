@@ -6,6 +6,7 @@ package koh.game.entities.environments;
  */
 public class MapPosition {
 
+    public int id;
     public short posX, posY;
     public boolean outdoor;
     public int capabilities;

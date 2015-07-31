@@ -259,7 +259,7 @@ public class CharacterHandler {
                         Emotes = new byte[]{1, 8, 19};
                         Ornaments = Titles = new int[0];
                         this.MountInfo = new MountInformations(this);
-                        this.Scores.put(ScoreType.PVM_WIN, 0);
+                        this.Scores.put(ScoreType.PVP_WIN, 0);
                         this.Scores.put(ScoreType.PVP_LOOSE, 0);
                         this.Scores.put(ScoreType.ARENA_WIN, 0);
                         this.Scores.put(ScoreType.ARENA_LOOSE, 0);

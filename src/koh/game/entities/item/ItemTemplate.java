@@ -2,6 +2,7 @@ package koh.game.entities.item;
 
 import com.google.common.base.Strings;
 import java.util.Arrays;
+import koh.game.Main;
 import koh.game.conditions.ConditionExpression;
 import koh.game.dao.ItemDAO;
 import koh.game.entities.spells.EffectInstance;
@@ -14,7 +15,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @author Neo-Craft
  */
 public class ItemTemplate {
-
+    
     public int id;
     public String nameId;
     public int TypeId;
@@ -36,7 +37,7 @@ public class ItemTemplate {
     public int[] favoriteSubAreas;
     public int favoriteSubAreasBonus;
     private ConditionExpression m_criteriaExpression;
-
+    
     public ConditionExpression CriteriaExpression() {
         if (m_criteriaExpression == null) {
             if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
@@ -47,26 +48,27 @@ public class ItemTemplate {
         }
         return m_criteriaExpression;
     }
-
     
     public EffectInstance GetEffect(int uid) {
         return Arrays.stream(possibleEffects).filter(x -> x.effectId == uid).findFirst().orElse(null);
     }
     
-    public boolean isVisibleInTooltip(int Effect){
+    public boolean isVisibleInTooltip(int Effect) {
         return !Arrays.stream(this.possibleEffects).anyMatch(x -> x.effectId == Effect && !x.visibleInTooltip);
     }
-
+    
     public ItemSet ItemSet() {
         return this.itemSetId < 0 ? null : ItemDAO.Sets.get(this.itemSetId);
     }
-
-   
     
     public ItemSuperTypeEnum GetSuperType() {
-        return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(TypeId).SuperType);
+        try {
+            return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(TypeId).SuperType);
+        } catch (java.lang.NullPointerException e) {
+            return ItemSuperTypeEnum.SUPERTYPE_UNKNOWN_0;
+        }
     }
-
+    
     public static boolean CanPlaceInSlot(ItemSuperTypeEnum Type, CharacterInventoryPositionEnum Slot) {
         //TODO Living Object
         switch (Type) {
@@ -75,32 +77,32 @@ public class ItemTemplate {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_WEAPON:
             case SUPERTYPE_WEAPON_7:
                 if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_RING:
                 if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_RING_LEFT || Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_RING_RIGHT) {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_CAPE:
                 if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_CAPE) {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_HAT:
                 if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_HAT) {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_BOOTS:
                 if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_BOOTS) {
                     return true;
@@ -111,19 +113,19 @@ public class ItemTemplate {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_PET:
                 if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_SHIELD:
                 if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD) {
                     return true;
                 }
                 break;
-
+            
             case SUPERTYPE_DOFUS:
                 if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_1
                         || Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_2
@@ -137,9 +139,9 @@ public class ItemTemplate {
         }
         return false;
     }
-
+    
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
-
+    
 }

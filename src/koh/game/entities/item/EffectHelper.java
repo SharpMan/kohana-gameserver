@@ -8,6 +8,7 @@ import koh.game.Logs;
 import koh.game.Main;
 import koh.game.entities.spells.*;
 import koh.protocol.client.enums.EffectGenerationType;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
 import koh.utils.Couple;
@@ -25,6 +26,24 @@ public class EffectHelper {
     public static final int[] MonsterEffect = new int[]{185, 621, 1011, 905};
     public static final int[] LadderEffects = new int[]{717};
     public static final int[] LivingObjectEffect = new int[]{973, 971, 972, 974};
+    public static final int[] RelatedObjectsEffect = new int[]{981, 982/*, 983*/};
+    public static final int SpellEffectPerFight = 1175;
+    public static final int[] SpellItemsEffects = new int[]{
+        281, //Augmente la PO du sort #1 de #3
+        282, //Rend la portée du sort #1 modifiable
+        283, //+#3 Dommages sur le sort #1
+        284, //+#3 Soins sur le sort #1
+        285, //Réduit de #3 le coût en PA du sort #1
+        286, //Réduit de #3 le délai de relance du sort #1
+        287, //+#3 CC sur le sort #1
+        288, //Désactive le lancer en ligne du sort #1
+        289, //Désactive la ligne de vue du sort #1
+        290, //Augmente de #3 le nombre de lancer maximal par tour du sort #1
+        291, //Augmente de #3 le nombre de lancer maximal par cible du sort #1
+        292, //Fixe à #3 le délai de relance du sort #1
+        293, //Augmente les dégâts de base du sort #1 de #3
+        294, //Diminue la portée du sort #1 de #3
+    };
     public static final int[] unRandomablesEffects = new int[]{
         96,//Effect_DamageWater
         97,//Effect_DamageEarth
@@ -112,7 +131,7 @@ public class EffectHelper {
         int i = 0;
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
-                if (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId)) {
+                if (e.effectId == SpellEffectPerFight || ArrayUtils.contains(RelatedObjectsEffect, e.effectId) || ArrayUtils.contains(SpellItemsEffects, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
                     Effects[i] = e;
                     continue;
                 }
@@ -144,7 +163,7 @@ public class EffectHelper {
                 if ((int) num2 == 0) {
                     Effects[i] = (new EffectInstanceInteger(e, num1));
                 } else {
-                    Effects[i] = (new EffectInstanceInteger(e, (short) RandomValue((int) num2, (int) num1 + 1)));
+                    Effects[i] = (new EffectInstanceInteger(e, (short) RandomValue((int) num2, (int) num1 /*+ 1*/)));
                 }
             } else if (e != null) {
                 throw new Error("Effect not suport" + e.SerializationIdentifier());
@@ -159,7 +178,9 @@ public class EffectHelper {
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
                 Main.Logs().writeDebug(e.toString());
-                if (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId)) {
+                if(e.effectId == 984 || e.effectId == 800) //Truc familiers pas sur
+                    continue;
+                if (e.effectId == SpellEffectPerFight || ArrayUtils.contains(RelatedObjectsEffect, e.effectId) || ArrayUtils.contains(SpellItemsEffects, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
                     Effects.add(new ObjectEffectDice(e.effectId, ((EffectInstanceDice) e).diceNum, ((EffectInstanceDice) e).diceSide, ((EffectInstanceDice) e).value));
                     continue;
                 }
@@ -194,7 +215,7 @@ public class EffectHelper {
                 if ((int) num2 == 0) {
                     Effects.add(new ObjectEffectInteger(e.effectId, num1));
                 } else {
-                    Effects.add(new ObjectEffectInteger(e.effectId, (short) RandomValue((int) num2, (int) num1 + 1)));
+                    Effects.add(new ObjectEffectInteger(e.effectId, (short) RandomValue((int) num2, (int) num1)));
                 }
             } else {
                 throw new Error("Effect not suport" + e.toString());

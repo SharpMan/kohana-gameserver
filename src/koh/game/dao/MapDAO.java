@@ -31,7 +31,15 @@ public class MapDAO {
             while (RS.next()) {
                 //System.out.println(RS.getInt("id"));
                 Cache.put(RS.getInt("id"), new DofusMap(RS.getInt("id"), (byte) RS.getInt("version"), RS.getInt("relativeid"), (byte) RS.getInt("maptype"), RS.getInt("subareaid"), RS.getInt("bottomneighbourId"), RS.getInt("topneighbourid"), RS.getInt("leftneighbourId"), RS.getInt("rightneighbourId"), RS.getInt("shadowbonusonentities"), RS.getByte("uselowpassfilter") == 1, RS.getByte("usereverb") == 1, RS.getInt("presetid"), RS.getString("bluecells"), RS.getString("redcells"), RS.getBytes("cells"), RS.getBytes("layers")));
-
+                if (RS.getString("new_neighbour") != null) {
+                    Cache.get(RS.getInt("id")).newNeighbour = new NeighBourStruct[]
+                    {
+                        new NeighBourStruct(Integer.parseInt(RS.getString("new_neighbour").split(",")[0].split(":")[0]), Integer.parseInt(RS.getString("new_neighbour").split(",")[0].split(":")[1])),
+                        new NeighBourStruct(Integer.parseInt(RS.getString("new_neighbour").split(",")[1].split(":")[0]), Integer.parseInt(RS.getString("new_neighbour").split(",")[1].split(":")[1])),
+                        new NeighBourStruct(Integer.parseInt(RS.getString("new_neighbour").split(",")[2].split(":")[0]), Integer.parseInt(RS.getString("new_neighbour").split(",")[2].split(":")[1])),
+                        new NeighBourStruct(Integer.parseInt(RS.getString("new_neighbour").split(",")[3].split(":")[0]), Integer.parseInt(RS.getString("new_neighbour").split(",")[3].split(":")[1]))
+                     };
+                }
             }
             MySQL.closeResultSet(RS);
             return Cache.size();
@@ -226,8 +234,8 @@ public class MapDAO {
         }
     }
 
-    public static int[] GetSubAreaOfPos(int X, int Y) {
-        return Cache.values().stream().filter(x -> x.Position != null && x.Position.posX == X && x.Position.posY == Y).mapToInt(x -> x.Position.subAreaId).toArray();
+    public static MapPosition[] GetSubAreaOfPos(int X, int Y) {
+        return Cache.values().stream().filter(x -> x.Position != null && x.Position.posX == X && x.Position.posY == Y).map(x -> x.Position).toArray(MapPosition[]::new);
     }
 
     public static DofusMap GetMapByPos(int X, int Y, int subArea) {
@@ -247,6 +255,7 @@ public class MapDAO {
                 try {
                     Cache.get(RS.getInt("id")).Position = new MapPosition() {
                         {
+                            id = RS.getInt("id");
                             posX = (short) RS.getInt("posX");
                             posY = (short) RS.getInt("posY");
                             outdoor = RS.getBoolean("outdoor");

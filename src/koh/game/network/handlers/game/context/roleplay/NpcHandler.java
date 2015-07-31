@@ -3,6 +3,7 @@ package koh.game.network.handlers.game.context.roleplay;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+import koh.game.Main;
 import koh.game.actions.*;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.NpcDAO;
@@ -16,6 +17,7 @@ import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.context.roleplay.npc.NpcDialogReplyMessage;
 import koh.protocol.messages.game.context.roleplay.npc.NpcGenericActionRequestMessage;
 import koh.protocol.messages.game.inventory.exchanges.ExchangeStartOkNpcShopMessage;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  *
@@ -29,7 +31,7 @@ public class NpcHandler {
             Client.Send(new BasicNoOperationMessage());
             return;
         }
-        ((NpcDialog)Client.GetGameAction(GameActionTypeEnum.NPC_DAILOG)).Reply(Message.replyId);
+        ((NpcDialog) Client.GetGameAction(GameActionTypeEnum.NPC_DAILOG)).Reply(Message.replyId);
 
     }
 
@@ -48,6 +50,13 @@ public class NpcHandler {
             return;
         }
         final NpcActionTypeEnum Action = NpcActionTypeEnum.valueOf(Message.npcActionId);
+        if (Action == null) {
+            Main.Logs().writeError(String.format("Unknow Action %s by character %s", Byte.toString(Message.npcActionId), Client.Character.NickName));
+            return;
+        } else if (!ArrayUtils.contains(PNJ.Template().actions, Message.npcActionId)) {
+            PlayerController.SendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
+            return;
+        }
         switch (Action) {
             case ACTION_BUY_SELL:
                 if (Client.CanGameAction(GameActionTypeEnum.EXCHANGE)) {
