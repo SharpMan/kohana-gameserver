@@ -5,37 +5,33 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import javafx.scene.paint.Color;
-import koh.game.dao.SpellDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.environments.Pathfinder;
-import koh.game.entities.environments.cells.Cross;
+import koh.game.entities.environments.cells.CrossZone;
 import koh.game.entities.environments.cells.IZone;
 import koh.game.entities.environments.cells.Lozenge;
+import koh.game.entities.maps.pathfinding.LinkedCellsManager;
 import koh.game.entities.maps.pathfinding.MapPoint;
+import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight.FightLoopState;
-import koh.game.fights.effects.EffectActivableObject;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffPorter;
 import koh.game.fights.effects.buff.BuffSpellDommage;
-import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
 import koh.game.fights.layer.FightActivableObject;
-import koh.game.fights.layer.FightBomb;
 import koh.game.fights.layer.FightPortal;
 import koh.game.fights.types.AgressionFight;
-import koh.game.utils.Settings;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.GameActionTypeEnum;
 import koh.protocol.client.enums.SequenceTypeEnum;
+import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightActivateGlyphTrapMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightDeathMessage;
 import koh.protocol.messages.game.context.ShowCellMessage;
 import koh.protocol.types.game.context.EntityDispositionInformations;
@@ -366,21 +362,21 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         }
         IZone shape;
         if (spellLevel.castInDiagonal && spellLevel.castInLine) {
-            shape = new Cross((byte) spellLevel.minRange, (byte) num) {
+            shape = new CrossZone((byte) spellLevel.minRange, (byte) num) {
                 {
                     AllDirections = true;
                 }
             };
         } else if (spellLevel.castInLine) {
-            shape = new Cross((byte) spellLevel.minRange, (byte) num);
+            shape = new CrossZone((byte) spellLevel.minRange, (byte) num);
         } else if (spellLevel.castInDiagonal) {
-            shape = new Cross((byte) spellLevel.minRange, (byte) num) {
+            shape = new CrossZone((byte) spellLevel.minRange, (byte) num) {
                 {
                     Diagonal = true;
                 }
             };
         } else {
-            shape = new Lozenge((byte) spellLevel.minRange, (byte) num);
+            shape = new Lozenge((byte) spellLevel.minRange, (byte) num,this.Fight.Map);
         }
         return shape.GetCells(this.CellId());
     }
@@ -519,48 +515,168 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         switch (Effect) {
             case Damage_Earth:
             case Steal_Earth:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)));
                 break;
             case Damage_Earth_Per_Pm_Percent:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100));
                 break;
             case Damage_Neutral:
             case Steal_Neutral:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
                 break;
             case Damage_Neutral_Per_Pm_Percent:
-                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100)));
                 break;
             case Damage_Fire:
             case Steal_Fire:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus)));
                 break;
             case Damage_Fire_Per_Pm_Percent:
-                Jet.setValue((int) Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue((int) Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
                 break;
             case Damage_Air:
             case Steal_Air:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus)));
                 break;
             case Damage_Air_Per_Pm_Percent:
-                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
                 break;
             case Damage_Water:
             case Steal_Water:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Water_Damages_Bonus)));
                 break;
             case Damage_Water_Per_Pm_Percent:
-                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.Add_Damage_Bonus_Percent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Water_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
                 break;
         }
+
+    }
+
+    public static final byte EFFECTSHAPE_DEFAULT_AREA_SIZE = 1;
+
+    public static final byte EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE = 0;
+
+    public static final byte EFFECTSHAPE_DEFAULT_EFFICIENCY = 10;
+
+    public static final byte EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY = 4;
+
+    public double getPortalsSpellEfficiencyBonus(short param1, Fight Fight) {
+        boolean _loc3_ = false;
+        FightPortal[] _loc8_ = new FightPortal[0];
+        int _loc9_ = 0;
+        FightPortal _loc10_ = null;
+        FightPortal _loc11_ = null;
+        int _loc12_ = 0;
+        double _loc13_ = 0;
+        double _loc2_ = 1;
+
+        for (CopyOnWriteArrayList<FightActivableObject> Objects : Fight.m_activableObjects.values()) {
+            for (FightActivableObject Object : Objects) {
+                if (Object instanceof FightPortal && ((FightPortal) Object).Enabled) {
+                    _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
+                    if (Object.CellId() == param1) {
+                        _loc3_ = true;
+                    }
+                }
+            }
+        }
+
+        if (!_loc3_) {
+            return _loc2_;
+        }
+        final int[] _loc6_ = LinkedCellsManager.getLinks(MapPoint.fromCellId(param1), Arrays.stream(_loc8_).map(x -> x.MapPoint()).toArray(MapPoint[]::new));
+        int _loc7_ = _loc6_.length;
+        if (_loc7_ > 1) {
+            while (_loc9_ < _loc7_) {
+                _loc10_ = _loc8_[_loc9_];
+                _loc12_ = Math.max(_loc12_, _loc10_.damageValue);
+                if (_loc11_ != null) {
+                    _loc13_ = _loc13_ + MapPoint.fromCellId(_loc10_.CellId()).distanceToCell(MapPoint.fromCellId(_loc11_.CellId()));
+                }
+                _loc11_ = _loc10_;
+                _loc9_++;
+            }
+            _loc2_ = 1 + (_loc12_ + _loc8_.length * _loc13_) / 100;
+        }
+        return _loc2_;
+    }
+
+    public void CalculBonusDamages(EffectInstanceDice Effect, MutableInt Jet, short CastCell, short TargetCell, short TruedCell) {
+
+        Effect.parseZone();
+
+        double Bonus = this.Stats.GetTotal(StatsEnum.Add_Damage_Final_Percent);
+
+        Bonus += getShapeEfficiency(Effect.zoneShape, CastCell, TargetCell, Effect.zoneSize != -100000 ? Effect.zoneSize : EFFECTSHAPE_DEFAULT_AREA_SIZE, Effect.zoneMinSize != -100000 ? Effect.zoneMinSize : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, Effect.zoneEfficiencyPercent != -100000 ? Effect.zoneEfficiencyPercent : EFFECTSHAPE_DEFAULT_EFFICIENCY, Effect.zoneMaxEfficiency != -100000 ? Effect.zoneMaxEfficiency : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
+
+        Bonus *= getPortalsSpellEfficiencyBonus(TruedCell, this.Fight);
+
+        Jet.setValue((Jet.floatValue() * Bonus));
+    }
+
+    public static double getShapeEfficiency(int param1, int param2, int param3, int param4, int param5, int param6, int param7) {
+        if (SpellShapeEnum.valueOf(param1) == null) {
+            return getSimpleEfficiency(Pathfinder.getDistance(param2, param3), param4, param5, param6, param7);
+        }
+        int _loc8_ = 0;
+
+        switch (SpellShapeEnum.valueOf(param1)) {
+            case A:
+            case a:
+            case Z:
+            case I:
+            case O:
+            case semicolon:
+            case empty:
+            case P:
+                return DAMAGE_NOT_BOOSTED;
+            case B:
+            case V:
+            case G:
+            case W:
+                _loc8_ = Pathfinder.getSquareDistance(param2, param3);
+                break;
+            case minus:
+            case plus:
+            case U:
+                _loc8_ = Pathfinder.getDistance(param2, param3) / 2;
+                break;
+            default:
+                _loc8_ = Pathfinder.getDistance(param2, param3);
+        }
+        return getSimpleEfficiency(_loc8_, param4, param5, param6, param7);
+    }
+
+    private static final int DAMAGE_NOT_BOOSTED = 1, UNLIMITED_ZONE_SIZE = 50;
+
+    public static double getSimpleEfficiency(int param1, int param2, int param3, int param4, int param5) {
+        if (param4 == 0) {
+            return DAMAGE_NOT_BOOSTED;
+        }
+        if (param2 <= 0 || param2 >= UNLIMITED_ZONE_SIZE) {
+            return DAMAGE_NOT_BOOSTED;
+        }
+        if (param1 > param2) {
+            return DAMAGE_NOT_BOOSTED;
+        }
+        if (param4 <= 0) {
+            return DAMAGE_NOT_BOOSTED;
+        }
+        if (param3 != 0) {
+            if (param1 <= param3) {
+                return DAMAGE_NOT_BOOSTED;
+            }
+            return Math.max(0, DAMAGE_NOT_BOOSTED - 0.01 * Math.min(param1 - param3, param5) * param4);
+        }
+        return Math.max(0, DAMAGE_NOT_BOOSTED - 0.01 * Math.min(param1, param5) * param4);
     }
 
     public void CalculReduceDamages(StatsEnum Effect, MutableInt Damages) {

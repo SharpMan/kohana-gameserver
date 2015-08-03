@@ -2,6 +2,7 @@ package koh.game.entities.environments.cells;
 
 import java.util.ArrayList;
 import java.util.List;
+import koh.game.entities.environments.DofusMap;
 import koh.game.entities.maps.pathfinding.MapPoint;
 
 /**
@@ -16,19 +17,22 @@ public class Lozenge implements IZone {
 
     public byte Radius;
 
-    public Lozenge(byte minRadius, byte radius) {
+    public DofusMap Map;
+
+    public Lozenge(byte minRadius, byte radius,DofusMap Map) {
         this.MinRadius = minRadius;
         this.Radius = radius;
+        this.Map = Map;
     }
-    
-      @Override
+
+    @Override
     public void SetDirection(byte Direction) {
         this.Direction = Direction;
     }
 
     @Override
     public void SetRadius(byte Radius) {
-       this.Radius = Radius;
+        this.Radius = Radius;
     }
 
     @Override
@@ -40,32 +44,41 @@ public class Lozenge implements IZone {
     public Short[] GetCells(short centerCell) {
         MapPoint mapPoint = MapPoint.fromCellId(centerCell);
         ArrayList<Short> list = new ArrayList<>();
-        if ((int) this.Radius == 0) {
-            if ((int) this.MinRadius == 0) {
-                list.add(centerCell);
+        if (this.Radius() == 0) {
+            if (this.MinRadius() == 0) {
+                return new Short[]{centerCell};
             }
-            return list.stream().toArray(Short[]::new);
+            return new Short[0];
         } else {
-            int x = mapPoint.get_x() - (int) this.Radius;
-            int num1 = 0;
-            int num2 = 1;
-            for (; x <= mapPoint.get_x() + (int) this.Radius; ++x) {
-                for (int index = -num1; index <= num1; ++index) {
-                    if ((int) this.MinRadius == 0 || Math.abs(mapPoint.get_x() - x) + Math.abs(index) >= (int) this.MinRadius) {
-                        Lozenge.AddCellIfValid(x, index + mapPoint.get_y(), list);
+            int _loc8_ = 1;
+            int _loc9_ = 0;
+            int _loc6_ = 0;
+            int _loc7_ = 0;
+            int _loc4_ = mapPoint.get_x();
+            int _loc5_ = mapPoint.get_y();
+            _loc6_ = _loc4_ - this.Radius();
+            while (_loc6_ <= _loc4_ + this.Radius()) {
+                _loc7_ = -_loc9_;
+                while (_loc7_ <= _loc9_) {
+                    if (Math.abs(_loc4_ - _loc6_) + Math.abs(_loc7_) >= this.MinRadius()) {
+                        if (MapPoint.isInMap(_loc6_, _loc7_ + _loc5_)) {
+                            addCell(_loc6_, _loc7_ + _loc5_, list);
+                        }
                     }
+                    _loc7_++;
                 }
-                if (num1 == (int) this.Radius) {
-                    num2 = -num2;
+                if (_loc9_ == this.Radius()) {
+                    _loc8_ = -_loc8_;
                 }
-                num1 += num2;
+                _loc9_ = _loc9_ + _loc8_;
+                _loc6_++;
             }
             return list.stream().toArray(Short[]::new);
         }
     }
 
-    private static void AddCellIfValid(int x, int y, List<Short> container) {
-        if (!MapPoint.IsInMap(x, y)) {
+    private void addCell(int x, int y, List<Short> container) {
+        if (!this.Map.pointMov(x, y, true, -1, -1)) {
             return;
         }
         container.add(MapPoint.CoordToCellId(x, y));

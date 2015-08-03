@@ -21,6 +21,7 @@ import koh.inter.messages.PlayerCreatedMessage;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.AggressableStatusEnum;
 import koh.protocol.client.enums.CharacterCreationResultEnum;
+import koh.protocol.client.enums.CharacterDeletionErrorEnum;
 import koh.protocol.client.enums.PlayerEnum;
 import koh.protocol.client.enums.ShortcutBarEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -29,6 +30,8 @@ import koh.protocol.messages.game.approach.CharactersListRequestMessage;
 import koh.protocol.messages.game.approach.ServerSettingsMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.character.choice.*;
+import koh.protocol.messages.game.character.deletion.CharacterDeletionErrorMessage;
+import koh.protocol.messages.game.character.deletion.CharacterDeletionRequestMessage;
 import koh.protocol.messages.game.character.stats.CharacterStatsListMessage;
 import koh.protocol.messages.game.chat.EnabledChannelsMessage;
 import koh.protocol.messages.game.context.mount.MountRidingMessage;
@@ -87,7 +90,11 @@ public class CharacterHandler {
     @HandlerAttribute(ID = CharacterNameSuggestionRequestMessage.MESSAGE_ID)
     public static void HandleCharacterNameSuggestionRequestMessage(WorldClient Client, Message message) {
         Client.Send(new CharacterNameSuggestionSuccessMessage(PlayerController.GenerateName()));
-
+    }
+    
+    @HandlerAttribute(ID = 165) //Suppresion
+    public static void HandleCharacterDeletionRequestMessage(WorldClient Client , CharacterDeletionRequestMessage Message){
+        Client.Send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
     }
 
     @HandlerAttribute(ID = 152)

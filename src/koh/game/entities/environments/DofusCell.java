@@ -1,5 +1,6 @@
 package koh.game.entities.environments;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,14 @@ public class DofusCell {
 
     public void DelActor(IGameActor Actor) {
         this.myActors.remove(Actor.ID);
+    }
+    
+    public Collection<IGameActor> getActors(){
+        return this.myActors.values();
+    }
+    
+    public boolean hasActor(){
+        return !this.myActors.isEmpty();
     }
 
     public DofusCell(DofusMap map, short id, short Floor, byte LosMov, byte Speed, int MapChangeData, int MoveZone) {

@@ -16,6 +16,8 @@ import koh.protocol.messages.game.context.fight.FightOutcomeEnum;
 import koh.protocol.messages.game.context.fight.GameFightEndMessage;
 import koh.protocol.messages.game.context.fight.GameFightJoinMessage;
 import koh.protocol.messages.game.context.fight.GameFightLeaveMessage;
+import koh.protocol.messages.game.context.fight.GameFightRemoveTeamMemberMessage;
+import koh.protocol.messages.game.context.fight.GameFightUpdateTeamMessage;
 import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayAggressionMessage;
 import koh.protocol.types.game.context.fight.FightLoot;
 import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
@@ -48,6 +50,17 @@ public class AgressionFight extends Fight {
     public synchronized void LeaveFight(Fighter Fighter) {
         // Un persos quitte le combat
         switch (this.FightState) {
+            case STATE_PLACE:
+                if (Fighter == Fighter.Team.Leader) {
+                    break;
+                } else {
+                    this.Map.sendToField(new GameFightUpdateTeamMessage(this.FightId, Fighter.Team.GetFightTeamInformations()));
+
+                    this.sendToField(new GameFightRemoveTeamMemberMessage(this.FightId, Fighter.Team.Id, Fighter.ID));
+
+                    Fighter.LeaveFight();
+                }
+                break;
             case STATE_ACTIVE:
                 if (Fighter.TryDie(Fighter.ID, true) != -3) {
                     Fighter.Send(LeftEndMessage(Fighter));

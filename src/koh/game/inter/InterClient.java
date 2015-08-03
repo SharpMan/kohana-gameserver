@@ -25,7 +25,7 @@ public class InterClient {
     public InterClient() {
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PtEncoder(), new PtDecoder()));
         connector.setHandler(new InterHandler(this));
-        connector.getSessionConfig().setReadBufferSize(2048);
+        connector.getSessionConfig().setReadBufferSize(65536);
     }
 
     public void bind() {
@@ -38,7 +38,7 @@ public class InterClient {
         connector = new NioSocketConnector();
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PtEncoder(), new PtDecoder()));
         connector.setHandler(new InterHandler(this));
-        connector.getSessionConfig().setReadBufferSize(2048);
+        connector.getSessionConfig().setReadBufferSize(65536);
         System.out.println("Retry to connect to the InterServer ...");
         connector.connect(address);
     }

@@ -153,14 +153,13 @@ public abstract class EffectBase {
             this.put(StatsEnum.Sub_Vitality, new EffectStats());
             this.put(StatsEnum.Prospecting, new EffectStats());
             this.put(StatsEnum.AddDamageMagic, new EffectStats());
-            this.put(StatsEnum.Add_Damage_Bonus_Percent, new EffectStats());
+            this.put(StatsEnum.Add_Damage_Final_Percent, new EffectStats());
             this.put(StatsEnum.Add_Push_Damages_Bonus, new EffectStats());
             this.put(StatsEnum.Add_Push_Damages_Reduction, new EffectStats());
             this.put(StatsEnum.Add_Critical_Damages, new EffectStats());
             this.put(StatsEnum.Add_Critical_Damages_Reduction, new EffectStats());
             this.put(StatsEnum.Add_Push_Damages_Reduction, new EffectStats());
             this.put(StatsEnum.Add_Critical_Damages, new EffectStats());
-            this.put(StatsEnum.Add_Critical_Damages_Reduction, new EffectStats());
             this.put(StatsEnum.Sub_Prospecting, new EffectStats());
             this.put(StatsEnum.Sub_Damage, new EffectStats());
             this.put(StatsEnum.SubDamageBonusPercent, new EffectStats());
@@ -215,7 +214,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.Damage_Return, new EffectStats());
             this.put(StatsEnum.Sub_Critical_Hit, new EffectStats());
             this.put(StatsEnum.Add_Global_Damage_Reduction, new EffectStats());
-            this.put(StatsEnum.Add_Damage_Bonus_Percent, new EffectStats());
+            this.put(StatsEnum.Add_Damage_Final_Percent, new EffectStats());
             this.put(StatsEnum.SubDamageBonusPercent, new EffectStats());
             this.put(StatsEnum.AddDamagePercent, new EffectStats());
             this.put(StatsEnum.AddSummonLimit, new EffectStats());

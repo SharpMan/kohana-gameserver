@@ -251,7 +251,7 @@ public class ChatHandler {
                         if (SubAreas.length > 1 && subArea == -1) {
                             PlayerController.SendServerMessage(Client, "This position contains a lots of SubArea so try one of this ..");
                             for (MapPosition s : SubAreas) {
-                                PlayerController.SendServerMessage(Client, "!go " + X + " " + Y + " " + s.subAreaId +" (Or choose Mapid "+s.id);
+                                PlayerController.SendServerMessage(Client, "!go " + X + " " + Y + " " + s.subAreaId + " (Or choose Mapid " + s.id);
                             }
                         } else {
                             if (subArea == -1) {
@@ -279,6 +279,20 @@ public class ChatHandler {
                     Client.Character.RefreshEntitie();
                 } else if (message.Content.startsWith("!clearitems")) {
                     Client.Character.CurrentMap.ClearDroppedItems();
+                } else if (message.Content.startsWith("!setpdvper")) {
+                    int Level = Integer.parseInt(message.Content.split(" ")[1]);
+                    if (Client.Character.GetFight() != null || Level > 100) {
+                        return;
+                    }
+                    Client.Character.Life = (int) (((float) Client.Character.MaxLife() * 100) / Level);
+                    PlayerController.SendServerMessage(Client, "PdV Updated");
+                    Client.Character.RefreshStats();
+                } else if (message.Content.startsWith("!spellpoint")) {
+                    int Level = Integer.parseInt(message.Content.split(" ")[1]);
+                    Client.Character.SpellPoints = +Level;
+                    PlayerController.SendServerMessage(Client, "SpellPoints added");
+                    Client.Character.RefreshStats();
+                    return;
                 } else if (message.Content.startsWith("!level")) {
                     int Level = Integer.parseInt(message.Content.split(" ")[1]);
                     Player Target = message.Content.length() >= 2 ? Client.Character : PlayerDAO.GetCharacter(message.Content.split(" ")[2]);
@@ -292,10 +306,9 @@ public class ChatHandler {
                     Client.Character.ChangeAlignementSide(AlignmentSideEnum.ALIGNMENT_ANGEL);
                 } else if (message.Content.startsWith("!demon")) {
                     Client.Character.ChangeAlignementSide(AlignmentSideEnum.ALIGNMENT_EVIL);
-                }else if (message.Content.startsWith("!dit")) {
+                } else if (message.Content.startsWith("!dit")) {
                     Client.Send(new ChatServerMessage(CHANNEL_GLOBAL, message.Content, (int) Instant.now().getEpochSecond(), "az", -1, "Pnj de Merde", Client.getAccount().ID));
-                }
-                else if (message.Content.startsWith("!set")) {
+                } else if (message.Content.startsWith("!set")) {
                     //Client.Send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(), 5));
                     Client.Send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean()), Client.Character.ID));
 

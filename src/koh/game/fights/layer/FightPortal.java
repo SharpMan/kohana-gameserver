@@ -57,7 +57,7 @@ public class FightPortal extends FightActivableObject {
 
     @Override
     public void DisappearForAll() {
-        this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.ID, this.Cell.Id));
+        this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.ID, this.ID));
     }
 
     @Override

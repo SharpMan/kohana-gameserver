@@ -177,7 +177,7 @@ public class CharacterFighter extends Fighter {
                 this.Character.CurrentMap.SpawnActor(this.Character);
 
             }
-        }
+        }//elseSetstats mapid...
         this.Character.SetFight(null);
         this.Character.SetFighter(null);
     }

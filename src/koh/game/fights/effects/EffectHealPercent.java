@@ -12,7 +12,6 @@ import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMes
  */
 public class EffectHealPercent extends EffectBase {
 
-
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
@@ -43,8 +42,12 @@ public class EffectHealPercent extends EffectBase {
         Heal = Heal * (Target.Life() / 100);
 
         // Si le soin est superieur a sa vie actuelle
-        if (Target.Life() + Heal > Target.MaxLife()) {
+        if ((Target.Life() + Heal) > Target.MaxLife()) {
             Heal = Target.MaxLife() - Target.Life();
+        }
+
+        if (Heal < 0) {
+            Heal = 0;
         }
 
         // Affectation

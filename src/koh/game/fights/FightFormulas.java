@@ -2,6 +2,7 @@ package koh.game.fights;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
+import koh.game.Main;
 import koh.game.dao.ExpDAO;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
@@ -68,6 +69,9 @@ public class FightFormulas {
             malus = 1;
         }
         long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) * (1 + (Fighter.Stats.GetTotal(StatsEnum.Wisdom) * 0.01)));
+        if (xpWin < 0) {
+            Main.Logs().writeInfo("lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.Stats.GetTotal(StatsEnum.Wisdom) * 0.01)));
+        }
         return xpWin;
     }
 
@@ -110,6 +114,9 @@ public class FightFormulas {
     public static long MountXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
         if (Fighter == null) {
             return 0;
+        }
+        if (Fighter.Character.MountInfo == null) {
+            Main.Logs().writeError("MountInfo Null " + Fighter.Character.toString());
         }
         if (!Fighter.Character.MountInfo.isToogled) {
             return 0;

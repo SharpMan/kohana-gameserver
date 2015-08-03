@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.network.WorldClient;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  *
@@ -51,6 +52,10 @@ public abstract class GameAction {
 
     public void RegisterEnd(Method CallBack) {
         //this.myEndCallBacks.add(CallBack);
+    }
+    
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

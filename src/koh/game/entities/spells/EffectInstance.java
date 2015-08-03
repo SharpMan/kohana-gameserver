@@ -51,7 +51,7 @@ public class EffectInstance implements Serializable {
     public String triggers;
     public boolean visibleInTooltip, visibleInFightLog, visibleInBuffUi;
 
-    private int zoneShape, zoneSize, zoneMinSize, zoneEfficiencyPercent, zoneMaxEfficiency;
+    public int zoneShape = -100000, zoneSize = -100000, zoneMinSize = -100000, zoneEfficiencyPercent = -100000, zoneMaxEfficiency = -100000; //Integer.NULL NOTATION
     public boolean initialized;
 
     public byte ZoneSize() {
@@ -293,6 +293,9 @@ public class EffectInstance implements Serializable {
     }
 
     public void parseZone() {
+        if (this.initialized) {
+            return;
+        }
         String[] params;
         boolean hasMinSize;
         this.initialized = true;
@@ -300,44 +303,48 @@ public class EffectInstance implements Serializable {
             this.zoneShape = this.rawZone.charAt(0);
             params = this.rawZone.substring(1).split(",");
             hasMinSize = (((((((((this.ZoneShape() == SpellShapeEnum.C)) || ((this.ZoneShape() == SpellShapeEnum.X)))) || ((this.ZoneShape() == SpellShapeEnum.Q)))) || ((this.ZoneShape() == SpellShapeEnum.plus)))) || ((this.ZoneShape() == SpellShapeEnum.sharp)));
-            switch (params.length) {
-                case 1:
-                    this.zoneSize = Integer.parseInt(params[0]);
-                    break;
-                case 2:
-                    this.zoneSize = Integer.parseInt(params[0]);
-                    if (hasMinSize) {
-                        this.zoneMinSize = Integer.parseInt(params[1]);
-                    } else {
-                        this.zoneEfficiencyPercent = Integer.parseInt(params[1]);
-                    }
-                    ;
-                    break;
-                case 3:
-                    this.zoneSize = Integer.parseInt(params[0]);
-                    if (hasMinSize) {
+            if (this.rawZone.substring(1).contains(",")) {
+                switch (params.length) {
+                    case 1:
+                        this.zoneSize = Integer.parseInt(params[0]);
+                        break;
+                    case 2:
+                        this.zoneSize = Integer.parseInt(params[0]);
+                        if (hasMinSize) {
+                            this.zoneMinSize = Integer.parseInt(params[1]);
+                        } else {
+                            this.zoneEfficiencyPercent = Integer.parseInt(params[1]);
+                        }
+                        ;
+                        break;
+                    case 3:
+                        this.zoneSize = Integer.parseInt(params[0]);
+                        if (hasMinSize) {
+                            this.zoneMinSize = Integer.parseInt(params[1]);
+                            this.zoneEfficiencyPercent = Integer.parseInt(params[2]);
+                        } else {
+                            this.zoneEfficiencyPercent = Integer.parseInt(params[1]);
+                            this.zoneMaxEfficiency = Integer.parseInt(params[2]);
+                        }
+                        ;
+                        break;
+                    case 4:
+                        this.zoneSize = Integer.parseInt(params[0]);
                         this.zoneMinSize = Integer.parseInt(params[1]);
                         this.zoneEfficiencyPercent = Integer.parseInt(params[2]);
-                    } else {
-                        this.zoneEfficiencyPercent = Integer.parseInt(params[1]);
-                        this.zoneMaxEfficiency = Integer.parseInt(params[2]);
-                    }
-                    ;
-                    break;
-                case 4:
-                    this.zoneSize = Integer.parseInt(params[0]);
-                    this.zoneMinSize = Integer.parseInt(params[1]);
-                    this.zoneEfficiencyPercent = Integer.parseInt(params[2]);
-                    this.zoneMaxEfficiency = Integer.parseInt(params[3]);
-                    break;
-            };
+                        this.zoneMaxEfficiency = Integer.parseInt(params[3]);
+                        break;
+                };
+            }
         } else {
             Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
         };
-        /*if(this.zoneMinSize >=63)
-         this.zoneMinSize = 63;
-         if(this.zoneSize >=63)
-         this.zoneSize = 63;*/
+        if (this.zoneMinSize >= 63) {
+            this.zoneMinSize = 63;
+        }
+        if (this.zoneSize >= 63) {
+            this.zoneSize = 63;
+        }
     }
 
     public Effect Template() {

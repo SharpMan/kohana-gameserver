@@ -45,13 +45,13 @@ import koh.protocol.types.game.context.ActorOrientation;
  * @author Neo-Craft
  */
 public class ContextHandler {
-    
+
     @HandlerAttribute(ID = GameMapChangeOrientationRequestMessage.M_ID)
-    public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client , GameMapChangeOrientationRequestMessage Message){
-        if(Client.Character.GetFight() == null){
+    public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client, GameMapChangeOrientationRequestMessage Message) {
+        if (Client.Character.GetFight() == null) {
             Client.Character.Direction = Message.direction;
-            Client.Character.CurrentMap.sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.Character.ID,Client.Character.Direction)));
-            Main.Logs().writeDebug("New Direction for Actor "+Client.Character.ID+"~"+Message.direction);
+            Client.Character.CurrentMap.sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.Character.ID, Client.Character.Direction)));
+            Main.Logs().writeDebug("New Direction for Actor " + Client.Character.ID + "~" + Message.direction);
         }
     }
 
@@ -184,13 +184,18 @@ public class ContextHandler {
                     Client.Character.GetFight().EndTurn();
                     return;
                 }
+                GameMapMovement GameMovement = Client.Character.GetFight().TryMove(Client.Character.GetFighter(), Path);
 
-                /*GameMapMovement GameMovement = */
-                Client.Character.GetFight().TryMove(Client.Character.GetFighter(), Path).Execute();
-                /*if (GameMovement != null) {
-                 Client.AddGameAction(GameMovement);
-                 }*/
+                if (GameMovement != null) {
+                    GameMovement.Execute();
+                }
             }
+            return;
+        }
+        if (Client.Character.CurrentMap == null) {
+            Client.Send(new GameMapNoMovementMessage());
+            PlayerController.SendServerErrorMessage(Client, "Votre map est absente veuillez le signalez au staff ");
+            Main.Logs().writeError("Map Absente " + Client.Character.toString());
             return;
         }
         if (!Client.CanGameAction(GameActionTypeEnum.MAP_MOVEMENT)) {

@@ -184,10 +184,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         //var cellEntities:Array; Obstacle glyphe ect lol ?
         //var o:IObstacle;
         if (MapPoint.isInMap(x, y)) {
-            useNewSystem = /*dataMap.isUsingNewMovementSystem*/ false; //Todo repase fucking map ?
+            useNewSystem =  this.isUsingNewMovementSystem;
             cellId = MapPoint.fromCoords(x, y).get_cellId();
             cellData = this.Cells[cellId];
-            mov = cellData.Mov() /*&& (((!(this.isInFight)) || (!(cellData.nonWalkableDuringFight)))))*/;
+            mov = cellData.Mov() && !cellData.NonWalkableDuringFight()/*&& (((!(this.isInFight)) || (!(cellData.nonWalkableDuringFight)))))*/;
 
             if (((((((mov) && (useNewSystem))) && (!((previousCellId == -1))))) && (!((previousCellId == cellId))))) {
                 previousCellData = Cells[previousCellId];
@@ -196,26 +196,19 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
                     mov = false;
                 }
             }
-            /*if (!(bAllowTroughEntity))
-             {
-             cellEntities = EntitiesManager.getInstance().getEntitiesOnCell(cellId, IObstacle);
-             if (cellEntities.length)
-             {
-             for each (o in cellEntities)
-             {
-             if ((((endCellId == cellId)) && (o.canWalkTo())))
-             {
-             }
-             else
-             {
-             if (!(o.canWalkThrough()))
-             {
-             return (false);
-             };
-             };
-             };
-             };
-             };*/
+
+            if (!(bAllowTroughEntity)) {
+                if (this.getCell((short) cellId).hasActor()) {
+                    for (IGameActor o : this.getCell((short) cellId).getActors()) {
+                        if ((((endCellId == cellId)) /*&& (o.canWalkTo())*/)) {
+                        } else {
+                            /*if (!(o.canWalkThrough())) {
+                             return (false);
+                             };*/
+                        };
+                    };
+                };
+            };
         } else {
             mov = false;
         }
@@ -235,6 +228,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public int getCellSpeed(int cellId) {
         return this.Cells[(short) cellId].Speed;
     }
+    
+    private boolean isUsingNewMovementSystem = false;
 
     public synchronized void Init() {
         if (this.myInitialized) {
@@ -244,8 +239,15 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         //this.Cells = MapController.UnCompressCells(this, CompressedCells);
         IoBuffer buf = IoBuffer.wrap(CompressedCells);
         this.Cells = new DofusCell[buf.getInt()];
+        int _oldMvtSystem = -1;
         for (short i = 0; i < this.Cells.length; i++) {
             this.Cells[i] = new DofusCell(this, i, buf);
+            if(_oldMvtSystem == -1){
+                _oldMvtSystem = this.Cells[i].MoveZone;
+            }
+            if(this.Cells[i].MoveZone != _oldMvtSystem){
+               this.isUsingNewMovementSystem = true;
+            }
         }
         buf.clear();
         buf = IoBuffer.wrap(CompressedLayers);

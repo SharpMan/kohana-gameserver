@@ -42,7 +42,7 @@ public class MovementPath {
     }
 
     public short LastStep() {
-        return TransitCells.get(TransitCells.size() - 2);
+        return TransitCells.get(TransitCells.size() < 2 ? 0 : TransitCells.size() - 2);
     }
 
     public short EndCell() {

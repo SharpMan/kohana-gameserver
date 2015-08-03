@@ -3,12 +3,10 @@ package koh.game.network.handlers.character;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
+import koh.game.actions.GameActionTypeEnum;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.ItemLivingObject;
 import koh.game.entities.item.animal.PetsInventoryItem;
-import koh.game.entities.spells.EffectInstance;
-import koh.game.entities.spells.EffectInstanceDate;
-import koh.game.entities.spells.EffectInstanceInteger;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
@@ -16,7 +14,6 @@ import koh.protocol.client.enums.ObjectErrorEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.items.LivingObjectChangeSkinRequestMessage;
 import koh.protocol.messages.game.inventory.items.LivingObjectDissociateMessage;
@@ -39,6 +36,10 @@ public class InventoryHandler {
 
     @HandlerAttribute(ID = ObjectDeleteMessage.MESSAGE_ID)
     public static void HandleObjectDeleteMessage(WorldClient Client, ObjectDeleteMessage Message) {
+        if (Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.Send(new BasicNoOperationMessage());
+            return;
+        }
         InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(Message.objectUID);
         if (Item == null || Message.quantity <= 0) {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
@@ -57,14 +58,20 @@ public class InventoryHandler {
     }
 
     @HandlerAttribute(ID = ObjectSetPositionMessage.MESSAGE_ID)
-    public static void HandleObjectSetPositionMessage(WorldClient Client, ObjectSetPositionMessage Message) {
-        //Todo if Figght
+    public synchronized static void HandleObjectSetPositionMessage(WorldClient Client, ObjectSetPositionMessage Message) {
+        if (Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.Send(new BasicNoOperationMessage());
+            return;
+        }
         Client.Character.InventoryCache.MoveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
-
     }
 
     @HandlerAttribute(ID = LivingObjectMessageRequestMessage.MESSAGE_ID)
     public static void HandleLivingObjectMessageRequestMessage(WorldClient Client, LivingObjectMessageRequestMessage Message) {
+        if (Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.Send(new BasicNoOperationMessage());
+            return;
+        }
         InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(Message.livingObject);
         if (Item == null) {
             Client.Send(new BasicNoOperationMessage());
@@ -77,6 +84,10 @@ public class InventoryHandler {
 
     @HandlerAttribute(ID = LivingObjectChangeSkinRequestMessage.MESSAGE_ID)
     public static void HandleLivingObjectChangeSkinRequestMessage(WorldClient Client, LivingObjectChangeSkinRequestMessage Message) {
+        if (Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.Send(new BasicNoOperationMessage());
+            return;
+        }
         InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(Message.livingUID);
         if (Item == null) {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
@@ -91,13 +102,13 @@ public class InventoryHandler {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.Template().appearanceId != 0) {
+        if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.Apparrance() != 0) {
             Client.Character.InventoryCache.RemoveApparence(Item.Apparrance());
         }
         Item.RemoveEffect(972);
         Item.getEffects().add(((ObjectEffectInteger) obviSkin.Clone()).SetValue(Message.skinId));
         Client.Send(new ObjectModifiedMessage(Item.ObjectItem()));
-        if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.Template().appearanceId != 0) {
+        if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.Apparrance() != 0) {
             Client.Character.InventoryCache.AddApparence(Item.Apparrance());
             Client.Character.RefreshEntitie();
         }
@@ -107,6 +118,10 @@ public class InventoryHandler {
 
     @HandlerAttribute(ID = ObjectFeedMessage.MESSAGE_ID)
     public static void HandleObjectFeedMessage(WorldClient Client, ObjectFeedMessage Message) {
+        if (Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.Send(new BasicNoOperationMessage());
+            return;
+        }
         InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(Message.objectUID), Food = Client.Character.InventoryCache.ItemsCache.get(Message.foodUID);
         if (Item == null || Food == null || Food.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
@@ -148,9 +163,10 @@ public class InventoryHandler {
             }
             Item.RemoveEffect(974);
             Item.getEffects().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
-            //FIXME : if(state < 2) But useles...
-            Item.RemoveEffect(971);
-            Item.getEffects().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
+            if (state < 2) {
+                Item.RemoveEffect(971);
+                Item.getEffects().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
+            }
             Item.RemoveEffect(808);
             Calendar now = Calendar.getInstance();
             Item.getEffects().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
@@ -165,6 +181,10 @@ public class InventoryHandler {
 
     @HandlerAttribute(ID = LivingObjectDissociateMessage.MESSAGE_ID)
     public static void HandleLivingObjectDissociateMessage(WorldClient Client, LivingObjectDissociateMessage Message) {
+        if (Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.Send(new BasicNoOperationMessage());
+            return;
+        }
         InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(Message.livingUID);
         if (Item == null) {
             Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));

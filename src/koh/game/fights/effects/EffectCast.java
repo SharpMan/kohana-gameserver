@@ -49,7 +49,7 @@ public class EffectCast {
     }
 
     public int SpellId, FakeValue, DamageValue, ParentUID, targetKnownCellId;
-    public short CellId;
+    public short CellId,oldCell;
     public boolean IsReflect, IsPoison, IsCAC, IsTrap, IsReturnedDamages;
     public double Chance;
     public SpellLevel SpellLevel;

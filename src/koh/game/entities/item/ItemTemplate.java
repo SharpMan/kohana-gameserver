@@ -39,14 +39,20 @@ public class ItemTemplate {
     private ConditionExpression m_criteriaExpression;
     
     public ConditionExpression CriteriaExpression() {
-        if (m_criteriaExpression == null) {
-            if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
-                return null;
-            } else {
-                this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
+        try {
+            if (m_criteriaExpression == null) {
+                if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
+                    return null;
+                } else {
+                    this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
+                }
             }
+            return m_criteriaExpression;
+        } catch (Error e) {
+            Main.Logs().writeError(this.toString());
+            e.printStackTrace();
+            return null;
         }
-        return m_criteriaExpression;
     }
     
     public EffectInstance GetEffect(int uid) {

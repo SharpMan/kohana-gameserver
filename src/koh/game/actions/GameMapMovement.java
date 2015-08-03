@@ -1,8 +1,10 @@
 package koh.game.actions;
 
+import koh.game.Main;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.IWorldField;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  *
@@ -28,13 +30,18 @@ public class GameMapMovement extends GameAction {
 
     @Override
     public void Execute() {
-        synchronized (this.sync) {
-            if (!this.IsFinish) {
-                // mouvement stoppé ?
-                if (!this.myAborted) {
-                    this.myField.ActorMoved(null, this.Actor, (short) (keyMovements[keyMovements.length - 1] & 4095), (byte) (keyMovements[keyMovements.length - 1] >> 12 & 7));
+        try {
+            synchronized (this.sync) {
+                if (!this.IsFinish) {
+                    // mouvement stoppé ?
+                    if (!this.myAborted) {
+                        this.myField.ActorMoved(null, this.Actor, (short) (keyMovements[keyMovements.length - 1] & 4095), (byte) (keyMovements[keyMovements.length - 1] >> 12 & 7));
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Main.Logs().writeError(this.toString());
         }
         super.Execute();
     }
@@ -73,6 +80,10 @@ public class GameMapMovement extends GameAction {
     @Override
     public boolean CanSubAction(GameActionTypeEnum ActionType) {
         return false;
+    }
+
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

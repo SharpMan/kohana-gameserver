@@ -37,6 +37,12 @@ public class EffectActivableObject extends EffectBase {
                 obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), GetMarkType(CastInfos.Effect.ZoneShape()));
                 break;
             case LAYING_PORTAIL:
+                if (CastInfos.Cell().HasGameObject(FightObjectType.OBJECT_PORTAL)) {
+                    ((FightPortal) CastInfos.Cell().GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Remove();
+                } else if (CastInfos.Caster.Fight.m_activableObjects.get(CastInfos.Caster) != null
+                        && CastInfos.Caster.Fight.m_activableObjects.get(CastInfos.Caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
+                    CastInfos.Caster.Fight.m_activableObjects.get(CastInfos.Caster).stream().findFirst().get().Remove();
+                }
                 /*if (!CastInfos.Caster.Fight.CanPutObject(CastInfos.CellId)) {
                  return -1;
                  }*/

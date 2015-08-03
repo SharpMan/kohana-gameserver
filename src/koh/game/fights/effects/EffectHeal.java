@@ -1,5 +1,6 @@
 package koh.game.fights.effects;
 
+import koh.game.Main;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffHeal;
 import koh.protocol.client.enums.ActionIdEnum;
@@ -27,13 +28,16 @@ public class EffectHeal extends EffectBase {
         // Si le soin est superieur a sa vie actuelle
         if (Target.Life() + Heal.getValue() > Target.MaxLife()) {
             Heal.setValue(Target.MaxLife() - Target.Life());
+            if (Heal.getValue() < 0) {
+                Main.Logs().writeError("TargetMaxlife" + Target.MaxLife() + " TargettLife" + Target.Life());
+            }
         }
 
         // Affectation
         Target.setLife(Target.Life() + Heal.getValue());
 
         // Envoi du packet
-        Target.Fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.ID, Target.ID, Heal.getValue()));
+        Target.Fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.ID, Target.ID, Math.abs(Heal.getValue())));
 
         // Le soin entraine la fin du combat ?
         return Target.TryDie(Caster.ID);

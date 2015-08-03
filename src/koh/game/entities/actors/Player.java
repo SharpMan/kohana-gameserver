@@ -1,6 +1,7 @@
 package koh.game.entities.actors;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
@@ -66,6 +67,7 @@ import koh.protocol.types.game.context.roleplay.HumanOptionGuild;
 import koh.protocol.types.game.context.roleplay.HumanOptionOrnament;
 import koh.protocol.types.game.context.roleplay.HumanOptionTitle;
 import koh.protocol.types.game.look.EntityLook;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -181,7 +183,19 @@ public class Player extends IGameActor implements Observer {
     }
 
     @Override
+    public boolean CanBeSee(IGameActor Actor) {
+        if (this.Account == null) {
+            Main.Logs().writeError("NulledGameContext" + this.NickName + this.ID);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public GameContextActorInformations GetGameContextActorInformations(Player character) {
+        if (this.Account == null) {
+            Main.Logs().writeError("NulledGameContext" + this.NickName);
+        }
         return new GameRolePlayCharacterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.NickName, this.GetHumanInformations(), this.Account.ID, this.GetActorAlignmentInformations());
     }
 
@@ -230,7 +244,7 @@ public class Player extends IGameActor implements Observer {
         }
         DofusMap NextMap = MapDAO.Cache.get(newMapID);
         if (NextMap == null) {
-            PlayerController.SendServerMessage(Client, "Signal on the bugTracker nulled map -> "+newMapID);
+            PlayerController.SendServerMessage(Client, "Signal on the bugTracker nulled map -> " + newMapID);
             //Client.sendPacket(new ErrorMapNotFoundMessage());
             return;
         }
@@ -282,9 +296,11 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public void OnDisconnect() {
+    public synchronized void OnDisconnect() {
         try {
-            this.IsInWorld = false;
+            if (!this.IsInWorld) {
+                return;
+            }
             if (this.Guild != null) {
                 this.Guild.unregisterPlayer(this);
             }
@@ -296,13 +312,26 @@ public class Player extends IGameActor implements Observer {
                 CurrentMap.DestroyActor(this);
             }
             this.Client = null;
-            for (Player p : this.Account.Characters) {
-                PlayerDAO.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + Settings.GetIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
-                Main.Logs().writeError(p.NickName + " aded");
+            if (this.Account != null) {
+                if (this.Account.Characters == null) {
+                    Main.Logs().writeError("NulledAccountCharacters " + this.NickName);
+                    Main.Logs().writeError(this.toString());
+                }
+                for (Player p : this.Account.Characters) {
+                    if(PlayerDAO.myCharacterByTime.stream().anyMatch(x -> x.second.NickName.equalsIgnoreCase(p.NickName))){
+                        System.out.println(p.NickName + " already aded");
+                    }
+                    PlayerDAO.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + Settings.GetIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
+                    Main.Logs().writeInfo(p.NickName + " aded" + this.Account.Characters.size());
+                }
+            } else {
+                Main.Logs().writeError(NickName + " Nulled Account on disconnection");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            this.IsInWorld = false;
         }
     }
 
@@ -389,7 +418,13 @@ public class Player extends IGameActor implements Observer {
     }
 
     public int MaxLife() {
-        return this.Stats.GetTotal(StatsEnum.Vitality) + ((int) Level * 5) + D2oDao.getBreed(this.Breed).getHealPoint();
+        try {
+            return this.Stats.GetTotal(StatsEnum.Vitality) + ((int) Level * 5) + D2oDao.getBreed(this.Breed).getHealPoint();
+        } catch (NullPointerException e) {
+            Main.Logs().writeError(new Date().toString()+" Maxalife");
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Override
@@ -444,7 +479,8 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void setHonor(int Point, boolean Notice) {
-        this.Honor = Point;
+        this.Honor = Point < 0 ? 0 : Point;
+
         byte oldGrade = this.AlignmentGrade;
         if (Honor >= 17500) {
             this.AlignmentGrade = 10;
@@ -726,6 +762,10 @@ public class Player extends IGameActor implements Observer {
             this.finalize();
         } catch (Throwable tr) {
         }
+    }
+
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

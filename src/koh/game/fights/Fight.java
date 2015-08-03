@@ -59,7 +59,6 @@ import koh.protocol.client.enums.SequenceTypeEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.StatsEnum;
 import static koh.protocol.client.enums.StatsEnum.ADD_BASE_DAMAGE_SPELL;
-import static koh.protocol.client.enums.StatsEnum.AddDamagePercent;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightTackledMessage;
 import koh.protocol.messages.game.actions.SequenceEndMessage;
@@ -339,12 +338,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (this.FightState != FightState.STATE_ACTIVE) {
             return;
         }
+        short oldCell = CellId;
         if (SpellLevel.id == 10461 && Fighter instanceof CharacterFighter && ((CharacterFighter) Fighter).Character.InventoryCache.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
             this.LaunchWeapon(((CharacterFighter) Fighter), CellId);
             return;
         }
 
-        int DamagePercentBoosted = 0; //BadCode por Portla
         // La cible si elle existe
         Fighter TargetE = this.HasEnnemyInCell(CellId, Fighter.Team);
         if (friend && TargetE == null) {
@@ -389,8 +388,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (this.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL) && !Arrays.stream(Effects).anyMatch(Effect -> Effect.EffectType().equals(StatsEnum.DISABLE_PORTAL))) {
                 Informations = this.getTargetThroughPortal(Fighter, CellId, true);
                 CellId = Informations.first.shortValue();
-                DamagePercentBoosted = Informations.tree;
-                Fighter.Stats.AddBoost(AddDamagePercent, DamagePercentBoosted);
+                //this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"DamagePercentBoosted Suite au portails = " + DamagePercentBoosted}));
+
             }
             for (Player player : this.Observable$stream()) {
                 player.Send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), SpellLevel.spellId == 2763 ? true : (!Fighter.IsVisibleFor(player) || silentCast), SpellLevel.spellId, SpellLevel.grade, Informations == null ? new int[0] : Informations.second));
@@ -405,7 +404,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             Effect.parseZone();
             System.out.println(Effect.toString());
             Targets.put(Effect, new ArrayList<>());
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true))).GetCells(CellId)) {
+            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true),this.Map)).GetCells(CellId)) {
                 FightCell FightCell = this.GetCell(Cell);
                 if (FightCell != null && FightCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
 
@@ -476,6 +475,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
             EffectCast CastInfos = new EffectCast(Effect.EffectType(), SpellLevel.spellId, CellId, num1, Effect, Fighter, Targets.get(Effect), false, StatsEnum.NONE, 0, SpellLevel);
             CastInfos.targetKnownCellId = CellId;
+            CastInfos.oldCell = oldCell;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {
                 break;
             }
@@ -491,7 +491,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         if (!fakeLaunch) {
             this.EndSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
-            Fighter.Stats.AddBoost(AddDamagePercent, -DamagePercentBoosted);
         }
     }
 
@@ -537,7 +536,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         ArrayList<Fighter> Targets = new ArrayList<>(4);
 
-        for (short Cell : (new Zone(SpellShapeEnum.valueOf(Weapon.ItemType().zoneShape()), Weapon.ItemType().zoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true))).GetCells(CellId)) {
+        for (short Cell : (new Zone(SpellShapeEnum.valueOf(Weapon.ItemType().zoneShape()), Weapon.ItemType().zoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true),this.Map)).GetCells(CellId)) {
             FightCell FightCell = this.GetCell(Cell);
             if (FightCell != null) {
                 if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {

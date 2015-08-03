@@ -134,8 +134,8 @@ public class SpellDAO {
                         this.effects = new EffectInstanceDice[buf.getInt()];
                         for (int i = 0; i < this.effects.length; i++) {
                             this.effects[i] = new EffectInstanceDice(buf);
-                            /*if(this.spellId == 5325)
-                                System.out.println(this.effects[i]);*/
+                           /* if(this.effects[i].effectId == 165)
+                                System.out.println("hn"+this.spellId);*/
                         }
                         buf.clear();
 

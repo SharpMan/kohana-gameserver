@@ -120,6 +120,7 @@ public class GuildDAO {
     
     public static void Insert(GuildMember Item) {
         try {
+            guildsMembersDao.deleteById(Item.CharacterID);
             guildsMembersDao.create(Item);
         } catch (Exception e) {
             e.printStackTrace();

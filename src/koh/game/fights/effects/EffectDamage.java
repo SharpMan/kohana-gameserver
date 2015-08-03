@@ -67,6 +67,10 @@ public class EffectDamage extends EffectBase {
         }
         // Calcul jet
         Caster.CalculDamages(CastInfos.EffectType, DamageJet);
+        //Calcul Bonus Negatif Zone ect ...
+        if (CastInfos.Effect != null) {
+            Caster.CalculBonusDamages(CastInfos.Effect, DamageJet,CastInfos.CellId , Target.CellId(),CastInfos.oldCell); 
+        }
 
         // Calcul resistances
         Target.CalculReduceDamages(CastInfos.EffectType, DamageJet);

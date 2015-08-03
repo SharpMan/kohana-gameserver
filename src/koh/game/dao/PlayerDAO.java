@@ -3,8 +3,10 @@ package koh.game.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +57,7 @@ public class PlayerDAO {
                             DelCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
                             AccountInUnload.add(ref.second.Account.ID);
                             cleanMap(ref.second);
-                            Main.Logs().writeDebug("Player " + ref.second.NickName + " is going to be cleared");
+                            Main.Logs().writeInfo("Player " + ref.second.NickName + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
                             ref.second.Save(true);
                             MySQL.needCommit = true;
                         }
@@ -89,8 +91,8 @@ public class PlayerDAO {
                         throw new AccountOccupedException("Player id " + account.ID + " are unload handled ");
                     }
                     if (myCharacterById.containsKey(RS.getInt("ID"))) {
-                        cleanMap(p);
                         p = myCharacterById.get(RS.getInt("id"));
+                        cleanMap(p);
                         if (p.Account != null && p.Account.Data != null) {
                             account.Data = p.Account.Data;
                         }

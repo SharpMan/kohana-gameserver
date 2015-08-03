@@ -52,7 +52,7 @@ public class BuffPoutch extends BuffEffect {
         for (EffectInstanceDice Effect : SpellLevel.effects) {
             Effect.parseZone();
             ArrayList<Fighter> Targets = new ArrayList<>();
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true))).GetCells(Target.CellId())) {
+            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true),this.Caster.Fight.Map)).GetCells(Target.CellId())) {
                 FightCell FightCell = Target.Fight.GetCell(Cell);
                 if (FightCell != null) {
                     if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {

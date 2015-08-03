@@ -90,6 +90,8 @@ public abstract class Criterion extends ConditionExpression {
                 return (Criterion) new HasItemCriterion();
             case "PJ":
                 return (Criterion) new JobCriterion();
+            case "Pk":
+                return (Criterion) new PanoplieBonusCriterion();
             case "PK":
                 return (Criterion) new KamaCriterion();
             case "PL":
@@ -141,7 +143,7 @@ public abstract class Criterion extends ConditionExpression {
             case "PW":
                 return (Criterion) new WeightCriterion();
             default:
-                throw new Error(String.format("Criterion {0} doesn't not exist or not handled", name));
+                throw new Error(String.format("Criterion %s doesn't not exist or not handled", name));
         }
     }
 

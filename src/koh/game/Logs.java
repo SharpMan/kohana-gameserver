@@ -108,7 +108,7 @@ public class Logs {
     }
 
     public synchronized void writeError(String toAdd) {
-        if (Log_Errors == null) {
+        if (Log_Errors == null || toAdd.contains("java.io.IOException")) {  
             return;
         }
 

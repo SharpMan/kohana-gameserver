@@ -67,7 +67,7 @@ public class GenericStats {
             put(StatsEnum.Initiative, StatsEnum.Sub_Initiative);
             put(StatsEnum.Prospecting, StatsEnum.Sub_Prospecting);
             put(StatsEnum.AddDamageMagic, StatsEnum.Sub_Damage);
-            put(StatsEnum.Add_Damage_Bonus_Percent, StatsEnum.SubDamageBonusPercent);
+            put(StatsEnum.Add_Damage_Final_Percent, StatsEnum.SubDamageBonusPercent);
             put(StatsEnum.Add_Push_Damages_Bonus, StatsEnum.Sub_Push_Damages_Bonus);
             put(StatsEnum.Add_CriticalHit, StatsEnum.Sub_Critical_Hit);
 

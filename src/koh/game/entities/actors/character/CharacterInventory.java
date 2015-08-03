@@ -61,6 +61,10 @@ public class CharacterInventory {
         ItemDAO.InitInventoryCache(Player.ID, ItemsCache, "character_items");
     }
 
+    public int ItemSetCount() {
+        return (int) this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63 && x.Template().ItemSet() != null).map(x -> x.Template().ItemSet()).distinct().count();
+    }
+
     public void GeneralItemSetApply() {
         this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63 && x.Template().ItemSet() != null).map(x -> x.Template().ItemSet()).distinct().forEach(Set -> {
             {
@@ -182,7 +186,59 @@ public class CharacterInventory {
         }
     }
 
-    public synchronized void MoveItem(int Guid, CharacterInventoryPositionEnum Slot, int quantity) {
+    public void MoveLivingItem(int Guid, CharacterInventoryPositionEnum Slot, int quantity) {
+        InventoryItem Item = this.ItemsCache.get(Guid);
+        Slot = this.GetLivingObjectSlot(Item.TemplateId);
+        InventoryItem exItem = this.GetItemInSlot(Slot);
+        if (exItem == null) {
+            Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
+            return;
+        }
+        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972);
+        ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808), exchangeTime = (ObjectEffectDate) Item.GetEffect(983);
+        if (exItem.GetEffect(970) != null) {
+            PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet est déjà associé à un objet d'apparance.");
+            return;
+        }
+        if (obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
+            return;
+        }
+        if (exItem.GetEffect(983) != null || exItem.GetQuantity() != 1) {
+
+            PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet ne peut pas être associé." + exItem.GetEffect(983).toString());
+            return;
+        }
+        if (exItem.Apparrance() != 0) {
+            this.RemoveApparence(exItem.Apparrance());
+            //this.Player.GetEntityLook().skins.remove(this.Player.GetEntityLook().skins.indexOf(exItem.Apparrance()));
+        }
+
+        exItem.getEffects().add(new ObjectEffectInteger(970, Item.TemplateId));
+        exItem.getEffects().add(obviXp.Clone());
+        exItem.getEffects().add(obviTime.Clone());
+        exItem.getEffects().add(obviType.Clone());
+        exItem.getEffects().add(obviState.Clone());
+        exItem.getEffects().add(obviSkin.Clone());
+
+        if (exchangeTime != null) {
+            exItem.getEffects().add(exchangeTime.Clone());
+        }
+
+        if (Item.GetQuantity() == 1) {
+            RemoveItem(Item);
+        } else {
+            this.UpdateObjectquantity(Item, Item.GetQuantity() - 1);
+        }
+        if (exItem.Apparrance() != 0) {
+            this.AddApparence(exItem.Apparrance());
+        }
+
+        Player.Send(new ObjectModifiedMessage(exItem.ObjectItem()));
+        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
+        Player.RefreshEntitie();
+    }
+
+    public void MoveItem(int Guid, CharacterInventoryPositionEnum Slot, int quantity) {
         InventoryItem Item = this.ItemsCache.get(Guid);
         if (Item == null || Slot == null || Item.Slot() == Slot) {
             Player.Send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_UNEQUIP));
@@ -191,56 +247,10 @@ public class CharacterInventory {
         int count = this.CountItemSetEquiped(Item.Template().itemSetId);
         if (Slot != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             if (Item.Template().TypeId == 113) {
-                Slot = this.GetLivingObjectSlot(Item.TemplateId);
-                InventoryItem exItem = this.GetItemInSlot(Slot);
-                if (exItem == null) {
-                    Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
-                    return;
-                }
-                ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972);
-                ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808), exchangeTime = (ObjectEffectDate) Item.GetEffect(983);
-                if (exItem.GetEffect(970) != null) {
-                    PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet est déjà associé à un objet d'apparance.");
-                    return;
-                }
-                if (obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
-                    return;
-                }
-                if (exItem.GetEffect(983) != null || exItem.GetQuantity() != 1) {
-
-                    PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet ne peut pas être associé." + exItem.GetEffect(983).toString());
-                    return;
-                }
-                if (exItem.Apparrance() != 0) {
-                    this.RemoveApparence(exItem.Apparrance());
-                    //this.Player.GetEntityLook().skins.remove(this.Player.GetEntityLook().skins.indexOf(exItem.Apparrance()));
-                }
-
-                exItem.getEffects().add(new ObjectEffectInteger(970, Item.TemplateId));
-                exItem.getEffects().add(obviXp.Clone());
-                exItem.getEffects().add(obviTime.Clone());
-                exItem.getEffects().add(obviType.Clone());
-                exItem.getEffects().add(obviState.Clone());
-                exItem.getEffects().add(obviSkin.Clone());
-
-                if (exchangeTime != null) {
-                    exItem.getEffects().add(exchangeTime.Clone());
-                }
-
-                if (Item.GetQuantity() == 1) {
-                    RemoveItem(Item);
-                } else {
-                    this.UpdateObjectquantity(Item, Item.GetQuantity() - 1);
-                }
-                if (exItem.Apparrance() != 0) {
-                    this.AddApparence(exItem.Apparrance());
-                }
-
-                Player.Send(new ObjectModifiedMessage(exItem.ObjectItem()));
-                Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
-                Player.RefreshEntitie();
+                this.MoveLivingItem(Guid, Slot, quantity);
                 return;
             }
+
             if (!ItemTemplate.CanPlaceInSlot(Item.GetSuperType(), Slot)) {
                 Player.Send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_EQUIP_HERE));
                 return;
@@ -273,33 +283,38 @@ public class CharacterInventory {
                 this.UpdateObjectquantity(Item, Item.GetQuantity() - 1);
                 return;
             }
-            Player.Stats.Merge(Item.GetStats());
-            this.Player.Life += Item.GetStats().GetTotal(StatsEnum.Vitality);
-            Item.SetPosition(Slot);
-            Player.Send(new ObjectMovementMessage(Item.ID, (byte) Item.GetPosition()));
-            if (Item.Apparrance() != 0) {
-                if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) {
-                    if (this.Player.MountInfo.isToogled) {
-                        this.Player.MountInfo.OnGettingOff();
-                    }
-                    //TODO:  Clean Code + Clear old ArrayList from  memory
-                    if (Item.Template().TypeId == 121) { //Montelier
-                        this.Player.GetEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.Player.GetEntityLook().SkinsCopy(), this.Player.GetEntityLook().ColorsCopy(), this.Player.GetEntityLook().ScalesCopy(), this.Player.GetEntityLook().SubEntityCopy())));
-                        this.Player.GetEntityLook().bonesId = Item.Apparrance();
-                        this.Player.GetEntityLook().skins.clear();
-                        if (Item.TemplateId != ItemsEnum.Kramkram) {
-                            this.Player.GetEntityLook().indexedColors.clear();
+            if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+                Item.SetPosition(Slot);
+                Player.Send(new ObjectMovementMessage(Item.ID, (byte) Item.GetPosition()));
+            } else {
+                Player.Stats.Merge(Item.GetStats());
+                this.Player.Life += Item.GetStats().GetTotal(StatsEnum.Vitality);
+                Item.SetPosition(Slot);
+                Player.Send(new ObjectMovementMessage(Item.ID, (byte) Item.GetPosition()));
+                if (Item.Apparrance() != 0) {
+                    if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) {
+                        if (this.Player.MountInfo.isToogled) {
+                            this.Player.MountInfo.OnGettingOff();
                         }
-                        this.Player.GetEntityLook().scales.clear();
-                    } else {
-                        this.Player.GetEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET, 0, new EntityLook(Item.Apparrance(), new ArrayList<>(), new ArrayList<>(), new ArrayList<Short>() {
-                            {
-                                this.add((short) 80);
+                        //TODO:  Clean Code + Clear old ArrayList from  memory
+                        if (Item.Template().TypeId == 121) { //Montelier
+                            this.Player.GetEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.Player.GetEntityLook().SkinsCopy(), this.Player.GetEntityLook().ColorsCopy(), this.Player.GetEntityLook().ScalesCopy(), this.Player.GetEntityLook().SubEntityCopy())));
+                            this.Player.GetEntityLook().bonesId = Item.Apparrance();
+                            this.Player.GetEntityLook().skins.clear();
+                            if (Item.TemplateId != ItemsEnum.Kramkram) {
+                                this.Player.GetEntityLook().indexedColors.clear();
                             }
-                        }, new ArrayList<>())));
+                            this.Player.GetEntityLook().scales.clear();
+                        } else {
+                            this.Player.GetEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET, 0, new EntityLook(Item.Apparrance(), new ArrayList<>(), new ArrayList<>(), new ArrayList<Short>() {
+                                {
+                                    this.add((short) 80);
+                                }
+                            }, new ArrayList<>())));
+                        }
+                    } else {
+                        this.AddApparence(Item.Apparrance());
                     }
-                } else {
-                    this.AddApparence(Item.Apparrance());
                 }
             }
         } else {

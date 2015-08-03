@@ -35,8 +35,9 @@ public class WorldServer {
         this.acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new ProtocolEncoder(), new ProtocolDecoder()));
         this.acceptor.setHandler(new WorldHandler());
 
-        //this.acceptor.getSessionConfig().setMaxReadBufferSize(2048); 
-        //this.acceptor.getSessionConfig().setReadBufferSize(1024); // Debug
+        //this.acceptor.getSessionConfig().setMaxReadBufferSize(65536)); 
+        //System.out.println(this.acceptor.getSessionConfig().getMaxReadBufferSize());
+        this.acceptor.getSessionConfig().setReadBufferSize(65536); // Debug
         this.acceptor.getSessionConfig().setReaderIdleTime(Main.MIN_TIMEOUT * 60);
         this.acceptor.getSessionConfig().setTcpNoDelay(true);
         this.acceptor.getSessionConfig().setKeepAlive(true);

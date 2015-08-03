@@ -23,7 +23,7 @@ public class ItemType {
         if (this._zoneSize == Integer.MAX_VALUE) {
             this.parseZone();
         };
-        return (byte)(this._zoneSize);
+        return (byte) (this._zoneSize);
     }
 
     public int zoneShape() {
@@ -41,23 +41,30 @@ public class ItemType {
     }
 
     private void parseZone() {
-        String[] params;
-        if (!StringUtils.isNullOrEmpty(this.rawZone)) {
-            this._zoneShape = this.rawZone.charAt(0);
-            params = this.rawZone.substring(1).split(",");
-            if (params.length > 0) {
-                this._zoneSize = Integer.parseInt(params[0]);
+        try {
+            String[] params;
+            if (!StringUtils.isNullOrEmpty(this.rawZone)) {
+                this._zoneShape = this.rawZone.charAt(0);
+                if (!this.rawZone.contains(",")) {
+                    return;
+                }
+                params = this.rawZone.substring(1).split(",");
+                if (params.length > 0) {
+                    this._zoneSize = Integer.parseInt(params[0]);
+                } else {
+                    this._zoneSize = 0;
+                };
+                if (params.length > 1) {
+                    this._zoneMinSize = Integer.parseInt(params[1]);
+                } else {
+                    this._zoneMinSize = 0;
+                };
             } else {
-                this._zoneSize = 0;
+                Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
             };
-            if (params.length > 1) {
-                this._zoneMinSize = Integer.parseInt(params[1]);
-            } else {
-                this._zoneMinSize = 0;
-            };
-        } else {
-            Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
-        };
+        } catch (java.lang.NumberFormatException e) {
+            Main.Logs().writeError(String.format("Error with ItemType %s", this.SuperType));
+        }
     }
 
 }

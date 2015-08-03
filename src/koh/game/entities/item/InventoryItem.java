@@ -144,13 +144,13 @@ public class InventoryItem {
     public ItemTemplate Template() {
         return ItemDAO.Cache.get(TemplateId);
     }
-    
-     public ItemType ItemType(){
+
+    public ItemType ItemType() {
         return ItemDAO.SuperTypes.get(Template().TypeId);
     }
-    
+
     public Weapon WeaponTemplate() {
-        return (Weapon)ItemDAO.Cache.get(TemplateId);
+        return (Weapon) ItemDAO.Cache.get(TemplateId);
     }
 
     public CharacterInventoryPositionEnum Slot() {
@@ -244,6 +244,7 @@ public class InventoryItem {
                 return this.Template().CriteriaExpression().Eval(character);
             }
         } catch (Exception e) {
+            Main.Logs().writeError(String.format("Bugged Item %s Condition %s", this.Template().id, this.Template().criteria));
             e.printStackTrace();
             return false;
         }
@@ -273,6 +274,9 @@ public class InventoryItem {
     public GenericStats GetStats() {
         if (this.myStats == null) {
             this.ParseStats();
+            if (this.Template() instanceof Weapon) {
+                this.WeaponTemplate().Initialize();
+            }
         }
         return myStats;
     }

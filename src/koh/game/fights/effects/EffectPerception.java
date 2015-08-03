@@ -22,7 +22,7 @@ public class EffectPerception extends EffectBase {
     //TODO Cache AffectedCell in CastInfos et nettoyer ce code
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        for (short Cell : (new Zone(CastInfos.Effect.ZoneShape(), CastInfos.Effect.ZoneSize(), MapPoint.fromCellId(CastInfos.Caster.CellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true))).GetCells(CastInfos.CellId)) {
+        for (short Cell : (new Zone(CastInfos.Effect.ZoneShape(), CastInfos.Effect.ZoneSize(), MapPoint.fromCellId(CastInfos.Caster.CellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true),CastInfos.Caster.Fight.Map)).GetCells(CastInfos.CellId)) {
             FightCell fightCell = CastInfos.Caster.Fight.GetCell(Cell);
             if (fightCell != null) {
                 fightCell.GetObjects().stream().filter((fightObject) -> (fightObject.CellId() == Cell)).forEach((fightObject) -> {

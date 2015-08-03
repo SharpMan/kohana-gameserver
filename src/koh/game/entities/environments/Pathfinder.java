@@ -1,6 +1,7 @@
 package koh.game.entities.environments;
 
 import java.util.ArrayList;
+import koh.game.Main;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.fights.Fight;
 import koh.game.fights.FightTeam;
@@ -10,6 +11,7 @@ import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
+import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -20,6 +22,16 @@ public class Pathfinder {
     public static final double RUN_SPEED = 0.20;
     public static final double WALK_SPEED = 0.50;
     private static final byte[] FIGHT_DIRECTIONS = {1, 3, 5, 7};
+
+    public static int getDistance(int param1, int param2) {
+        return MapPoint.fromCellId(param1).distanceToCell(MapPoint.fromCellId(param2));
+    }
+
+    public static int getSquareDistance(int param1, int param2) {
+        MapPoint _loc3_ = MapPoint.fromCellId(param1);
+        MapPoint _loc4_ = MapPoint.fromCellId(param2);
+        return Math.max(Math.abs(_loc3_.get_x() - _loc4_.get_x()), Math.abs(_loc3_.get_y() - _loc4_.get_y()));
+    }
 
     public static double GetPathTime(int Len) {
         return ((Len >= 6 ? Pathfinder.RUN_SPEED : Pathfinder.WALK_SPEED) * 1000 * Len);
@@ -45,7 +57,7 @@ public class Pathfinder {
         do {
             TransitCell = DecodedPath.TransitCells.get(Index);
 
-            int Length = Pathfinder.IsValidLine(Fight, Fighter, FinalPath, TransitCell, DecodedPath.GetDirection(TransitCell), DecodedPath.TransitCells.get(Index + 1));
+            int Length = Pathfinder.IsValidLine(Fight, Fighter, FinalPath, TransitCell, DecodedPath.GetDirection(TransitCell), DecodedPath.TransitCells.get(DecodedPath.TransitCells.size() == 1 ? Index : Index + 1));
             if (Length == -1) {
                 return null;
             } else if (Length == -2) {
@@ -161,7 +173,7 @@ public class Pathfinder {
     public static short NextCell(short Cell, byte Direction, int Time) {
         try {
             short Cell2 = MapPoint.fromCellId(Cell).getNearestCellInDirection(Direction).get_cellId();
-            
+
             for (int i = 1; i < Time; i++) {
                 Cell2 = MapPoint.fromCellId(Cell2).getNearestCellInDirection(Direction).get_cellId();
             }
@@ -197,6 +209,10 @@ public class Pathfinder {
     }
 
     public static Short[] GetLineCellsBetween(Fight Fight, short BeginCell, byte Direction, int EndCell) {
+        return GetLineCellsBetween(Fight, BeginCell, Direction, EndCell, true);
+    }
+
+    public static Short[] GetLineCellsBetween(Fight Fight, short BeginCell, byte Direction, int EndCell, boolean WithoutFighter) {
         int Length = -1;
         Short ActualCell = BeginCell;
 
@@ -215,7 +231,7 @@ public class Pathfinder {
                 return null;
             }
 
-            if (Fight.GetFighterOnCell(ActualCell) != null) {
+            if (WithoutFighter && Fight.GetFighterOnCell(ActualCell) != null) {
                 return null;
             }
 

@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import koh.game.dao.PlayerDAO;
+import koh.game.fights.FightTypeEnum;
 import koh.game.network.WorldClient;
 import koh.protocol.messages.connection.LoginQueueStatusMessage;
 
@@ -24,8 +25,9 @@ public class Waiter implements Runnable {
 
     @Override
     public void run() {
-        if (PlayerDAO.AccountInUnload.contains(this.waitingList.getAccount().ID)) {
-            waitingList.Send(new LoginQueueStatusMessage((short) 1, (short) 50)); 
+        if (PlayerDAO.AccountInUnload.contains(this.waitingList.getAccount().ID)
+                || this.waitingList.getAccount().Characters.stream().anyMatch(Player -> Player.GetFighter() != null && Player.GetFight() != null && Player.GetFight().FightType == FightTypeEnum.FIGHT_TYPE_CHALLENGE)) {
+            waitingList.Send(new LoginQueueStatusMessage((short) 1, (short) 50));
             //Wait to comit....
             return;
         }

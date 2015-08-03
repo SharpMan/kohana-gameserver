@@ -45,8 +45,6 @@ public class BombFighter extends StaticFighter {
         super.setLife(this.Life());
     }
 
-    
-
     @Override
     public void CalculDamages(StatsEnum Effect, MutableInt Jet) {
         switch (Effect) {
@@ -88,7 +86,7 @@ public class BombFighter extends StaticFighter {
         }
         int TotalCombo = 0;
         ArrayList<BombFighter> Targets = new ArrayList<>(6);
-        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true))).GetCells(this.CellId())) {
+        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true),this.Fight.Map)).GetCells(this.CellId())) {
             FightCell FightCell = Fight.GetCell(aCell);
             if (FightCell != null) {
                 if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
@@ -155,7 +153,7 @@ public class BombFighter extends StaticFighter {
                 int Distance = Pathfinder.GoalDistance(null, CellId(), Friend.CellId());
                 Main.Logs().writeDebug("Distance = " + Distance);
                 if (Distance >= 2 && Distance <= 6) {
-                    Cells = Pathfinder.GetLineCellsBetween(Fight, this.CellId(), Pathfinder.GetDirection(null, this.CellId(), Friend.CellId()), Friend.CellId());
+                    Cells = Pathfinder.GetLineCellsBetween(Fight, this.CellId(), Pathfinder.GetDirection(null, this.CellId(), Friend.CellId()), Friend.CellId(), false);
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.CellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.CellId());
