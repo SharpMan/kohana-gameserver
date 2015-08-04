@@ -122,9 +122,9 @@ public abstract class EffectBase {
             this.put(StatsEnum.Sub_Dodge_PA_Probability, new EffectStats());
             this.put(StatsEnum.Sub_Dodge_PM_Probability, new EffectStats());
             this.put(StatsEnum.AddDamagePhysic, new EffectStats());
-            this.put(StatsEnum.SubPAEsquive_2, new EffectSubPAEsquive());
+            this.put(StatsEnum.SubPAEsquive_2_IF_HEALED, new EffectSubPaAfterHealed());
             this.put(StatsEnum.SubPAEsquive, new EffectSubPAEsquive());
-            this.put(StatsEnum.SubPMEsquive_2, new EffectSubPMEsquive());
+            this.put(StatsEnum.SubPMEsquive_2_IF_HEALED, new EffectSubPmAfterHealed());
             this.put(StatsEnum.SubPMEsquive, new EffectSubPMEsquive());
 
             //DommageSubis
@@ -248,18 +248,26 @@ public abstract class EffectBase {
             this.put(StatsEnum.Ends_Round, new EffectFinishTour());
             this.put(StatsEnum.CREATE_ILLUSION, new EffectCreateIllusion());
             this.put(StatsEnum.Refoullage, new EffectPoutch());
-            
+
             //Eliatrope
-            this.put(StatsEnum.LOST_PDV_PERCENT,new EffectLostPdvPercent());
+            this.put(StatsEnum.LOST_PDV_PERCENT, new EffectLostPdvPercent());
             this.put(StatsEnum.PORTAL_TELEPORTATION, new EffectPortalTeleportation());
             this.put(StatsEnum.ADD_SPELL_PO, new EffectSpellDommage());
             this.put(StatsEnum.BACK_CELL, new EffectPush());
             this.put(StatsEnum.DISABLE_PORTAL, new EffectDisablePortal());
-            
+
             //Zobal
             this.put(StatsEnum.ADVANCE_CELL, new EffectPush());
+
+            //Resistance% ALL
+            this.put(StatsEnum.ADD_ALL_RESITANCES_PERCENT, new EffectAddAllResist());
+            this.put(StatsEnum.SUB_ALl_RESISTANCES_PERCENT, new EffectSubAllResist());
         }
     };
+
+    public static EffectBase GetEffect(StatsEnum Effect) {
+        return EffectBase.Effects.get(Effect);
+    }
 
     public static int TryApplyEffect(EffectCast CastInfos) {
 

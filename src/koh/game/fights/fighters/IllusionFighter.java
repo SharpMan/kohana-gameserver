@@ -26,6 +26,7 @@ public class IllusionFighter extends StaticFighter {
         super.InitFighter(this.Stats, Fight.GetNextContextualId());
         this.entityLook = EntityLookParser.Copy(Summoner.GetEntityLook());
         super.setLife(Summoner.Life());
+        super.setLifeMax(Summoner.MaxLife());
     }
 
     @Override

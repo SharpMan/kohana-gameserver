@@ -233,7 +233,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int CurrentLife, CurrentLifeMax;
 
     public void setLife(int value) {
-        this.CurrentLife = value - (this.Stats.GetTotal(StatsEnum.Vitality) + +this.Stats.GetTotal(StatsEnum.Heal)) /*+ this.Stats.GetTotal(StatsEnum.AddVie)*/;
+        this.CurrentLife = value - (this.Stats.GetTotal(StatsEnum.Vitality) + this.Stats.GetTotal(StatsEnum.Heal)) /*+ this.Stats.GetTotal(StatsEnum.AddVie)*/;
     }
 
     public int Life() {
@@ -241,7 +241,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public void setLifeMax(int value) {
-        this.CurrentLifeMax = value - (this.Stats.GetTotal(StatsEnum.Vitality) + +this.Stats.GetTotal(StatsEnum.Heal));
+        this.CurrentLifeMax = value - (this.Stats.GetTotal(StatsEnum.Vitality) + this.Stats.GetTotal(StatsEnum.Heal));
     }
 
     public int MaxLife() {
@@ -376,7 +376,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 }
             };
         } else {
-            shape = new Lozenge((byte) spellLevel.minRange, (byte) num,this.Fight.Map);
+            shape = new Lozenge((byte) spellLevel.minRange, (byte) num, this.Fight.Map);
         }
         return shape.GetCells(this.CellId());
     }
@@ -610,7 +610,6 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public void CalculBonusDamages(EffectInstanceDice Effect, MutableInt Jet, short CastCell, short TargetCell, short TruedCell) {
-
 
         double Bonus = this.Stats.GetTotal(StatsEnum.Add_Damage_Final_Percent);
 

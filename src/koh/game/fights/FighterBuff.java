@@ -30,6 +30,7 @@ public class FighterBuff {
             this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_POST_JET, new ArrayList<>());
+            this.put(BuffActiveType.ACTIVE_HEAL_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_BEGINTURN, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ENDTURN, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ENDMOVE, new ArrayList<>());
@@ -155,6 +156,21 @@ public class FighterBuff {
         }
 
         this.BuffsAct.get(BuffActiveType.ACTIVE_ENDMOVE).removeIf(x -> x.DecrementType == BuffDecrementType.TYPE_ENDMOVE && x.Duration == 0);
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Lance un soin, activation des buffs d'attaque avant le calcul du jet avec les statistiques
+    /// </summary>
+    /// <param name="CastInfos"></param>
+    /// <param name="DamageValue"></param>
+    public int OnHealPostJet(EffectCast CastInfos, MutableInt DamageValue) {
+        for (BuffEffect Buff : BuffsAct.get(BuffActiveType.ACTIVE_HEAL_AFTER_JET)) {
+            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+                return -3;
+            }
+        }
 
         return -1;
     }

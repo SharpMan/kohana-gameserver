@@ -24,6 +24,10 @@ public class EffectHeal extends EffectBase {
         if (Calculate) {
             Caster.CalculHeal(Heal);
         }
+        
+        if (Target.Buffs.OnHealPostJet(CastInfos, Heal) == -3) {
+            return -3; // Fin du combat
+        }
 
         // Si le soin est superieur a sa vie actuelle
         if (Target.Life() + Heal.getValue() > Target.MaxLife()) {

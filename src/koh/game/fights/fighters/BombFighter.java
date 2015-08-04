@@ -35,7 +35,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
  * @author Neo-Craft
  */
 public class BombFighter extends StaticFighter {
-
+    
     public BombFighter(Fight Fight, Fighter Summoner, MonsterGrade Monster) {
         super(Fight, Summoner);
         this.Grade = Monster;
@@ -43,8 +43,9 @@ public class BombFighter extends StaticFighter {
         this.entityLook = EntityLookParser.Copy(this.Grade.Monster().GetEntityLook());
         super.AdjustStats();
         super.setLife(this.Life());
+        super.setLifeMax(this.MaxLife());
     }
-
+    
     @Override
     public void CalculDamages(StatsEnum Effect, MutableInt Jet) {
         switch (Effect) {
@@ -57,19 +58,19 @@ public class BombFighter extends StaticFighter {
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
                 break;
-
+            
             case Damage_Fire:
             case Steal_Fire:
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus)));
                 break;
-
+            
             case Damage_Air:
             case Steal_Air:
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus)));
                 break;
-
+            
             case Damage_Water:
             case Steal_Water:
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
@@ -77,16 +78,16 @@ public class BombFighter extends StaticFighter {
                 break;
         }
     }
-
+    
     public boolean Boosted = false;
-
+    
     public synchronized void SlefMurder(int Caster) {
         if (Boosted) {
             return;
         }
         int TotalCombo = 0;
         ArrayList<BombFighter> Targets = new ArrayList<>(6);
-        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true),this.Fight.Map)).GetCells(this.CellId())) {
+        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true), this.Fight.Map)).GetCells(this.CellId())) {
             FightCell FightCell = Fight.GetCell(aCell);
             if (FightCell != null) {
                 if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
@@ -114,7 +115,7 @@ public class BombFighter extends StaticFighter {
         }
         Targets.forEach(Bomb -> Bomb.TryDie(Caster, true));
     }
-
+    
     @Override
     public int TryDie(int CasterId, boolean force) {
         if (this.Life() <= 0 || force) {
@@ -126,16 +127,16 @@ public class BombFighter extends StaticFighter {
         }
         return super.TryDie(CasterId, force);
     }
-
+    
     public ArrayList<FightBomb> FightBombs;
-
+    
     public void addBomb(FightBomb Bomb) {
         if (FightBombs == null) {
             FightBombs = new ArrayList<>(4);
         }
         this.FightBombs.add(Bomb);
     }
-
+    
     @Override
     public int OnCellChanged() {
         if (this.myCell != null) {
@@ -162,51 +163,51 @@ public class BombFighter extends StaticFighter {
                     }
                 }
             }
-
+            
             return this.Buffs.EndMove();
         }
         return -1;
     }
-
+    
     @Override
     public int BeginTurn() {
         super.onBeginTurn();
         return super.BeginTurn();
     }
-
+    
     @Override
     public int Level() {
         return this.Grade.Level;
     }
-
+    
     @Override
     public short MapCell() {
         return 0;
     }
-
+    
     @Override
     public GameContextActorInformations GetGameContextActorInformations(Player character) {
         return new GameFightMonsterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Grade.monsterId, this.Grade.Grade);
     }
-
+    
     @Override
     public FightTeamMemberInformations GetFightTeamMemberInformations() {
         return new FightTeamMemberMonsterInformations(this.ID, this.Grade.monsterId, this.Grade.Grade);
     }
-
+    
     @Override
     public void Send(Message Packet) {
-
+        
     }
-
+    
     @Override
     public void JoinFight() {
-
+        
     }
-
+    
     @Override
     public EntityLook GetEntityLook() {
         return this.entityLook;
     }
-
+    
 }

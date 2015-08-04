@@ -59,8 +59,10 @@ public abstract class BuffEffect {
 
     public BuffEffect(EffectCast CastInfos, Fighter Target, BuffActiveType ActiveType, BuffDecrementType DecrementType) {
         this.CastInfos = CastInfos;
-        
-        this.Duration = (CastInfos.Duration == -1) ? -1 : (Target.Fight.CurrentFighter == Target /*&& CastInfos.Duration == 0*/ ? CastInfos.Duration + 1 : CastInfos.Duration) - CastInfos.Delay();
+
+        //this.Duration = (CastInfos.Duration == -1) ? -1 : (Target.Fight.CurrentFighter == Target /*&& CastInfos.Duration == 0*/ ? CastInfos.Duration + 1 : CastInfos.Duration) - CastInfos.Delay();
+        this.Duration = (CastInfos.Duration == -1) ? -1 : ((CastInfos.Duration) - CastInfos.Delay());
+
         this.Delay = CastInfos.Delay();
         this.Caster = CastInfos.Caster;
         this.Target = Target;

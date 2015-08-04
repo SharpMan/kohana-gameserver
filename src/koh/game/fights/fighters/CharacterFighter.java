@@ -56,6 +56,7 @@ public class CharacterFighter extends Fighter {
         this.Fight.registerPlayer(Character);
         super.InitFighter(this.Character.Stats, this.Character.ID);
         super.setLife(this.Character.Life);
+        super.setLifeMax(this.Character.MaxLife());
         if (super.Life() == 0) {
             super.setLife(1);
         }
@@ -192,10 +193,6 @@ public class CharacterFighter extends Fighter {
         this.Character.Send(Packet);
     }
 
-    @Override
-    public int MaxLife() {
-        return this.Character.MaxLife();
-    }
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
         return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) Character.Experience, (double) ExpDAO.PersoXpMin(Character.Level), (double) ExpDAO.PersoXpMax(Character.Level), Character.Kamas, Character.StatPoints, 0, Character.SpellPoints, Character.GetActorAlignmentExtendInformations(),
