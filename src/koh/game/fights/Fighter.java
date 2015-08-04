@@ -9,7 +9,7 @@ import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.environments.Pathfinder;
-import koh.game.entities.environments.cells.CrossZone;
+import koh.game.entities.environments.CrossZone;
 import koh.game.entities.environments.cells.IZone;
 import koh.game.entities.environments.cells.Lozenge;
 import koh.game.entities.maps.pathfinding.LinkedCellsManager;
@@ -611,11 +611,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public void CalculBonusDamages(EffectInstanceDice Effect, MutableInt Jet, short CastCell, short TargetCell, short TruedCell) {
 
-        Effect.parseZone();
 
         double Bonus = this.Stats.GetTotal(StatsEnum.Add_Damage_Final_Percent);
 
-        Bonus += getShapeEfficiency(Effect.zoneShape, CastCell, TargetCell, Effect.zoneSize != -100000 ? Effect.zoneSize : EFFECTSHAPE_DEFAULT_AREA_SIZE, Effect.zoneMinSize != -100000 ? Effect.zoneMinSize : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, Effect.zoneEfficiencyPercent != -100000 ? Effect.zoneEfficiencyPercent : EFFECTSHAPE_DEFAULT_EFFICIENCY, Effect.zoneMaxEfficiency != -100000 ? Effect.zoneMaxEfficiency : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
+        Bonus += getShapeEfficiency(Effect.zoneShape(), CastCell, TargetCell, Effect.ZoneSize() != -100000 ? Effect.ZoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, Effect.zoneMinSize() != -100000 ? Effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, Effect.zoneEfficiencyPercent() != -100000 ? Effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, Effect.zoneMaxEfficiency() != -100000 ? Effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
         Bonus *= getPortalsSpellEfficiencyBonus(TruedCell, this.Fight);
 

@@ -36,6 +36,13 @@ public class EffectPush extends EffectBase {
                         return -1;
                     }
                     break;
+                case ADVANCE_CELL:
+                    Fighter pp = CastInfos.Caster;
+                    CastInfos.Caster = Target;
+                    Target = pp;
+                    CastInfos.Targets.remove(0);
+                    Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
+                    break;
                 case PullForward:
                     Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
                     break;
@@ -118,7 +125,7 @@ public class EffectPush extends EffectBase {
         if (LevelCoef < 0.1) {
             LevelCoef = 0.1;
         }
-        double pushDmg = (CastInfos.Caster.Level() / 2 + (CastInfos.Caster.Stats.GetTotal(StatsEnum.Add_Push_Damages_Bonus) - Target.Stats.GetTotal(StatsEnum.Add_Push_Damages_Bonus)) + 32) * CastInfos.Effect.diceNum / (4 * Math.pow(2,CurrentLength));
+        double pushDmg = (CastInfos.Caster.Level() / 2 + (CastInfos.Caster.Stats.GetTotal(StatsEnum.Add_Push_Damages_Bonus) - Target.Stats.GetTotal(StatsEnum.Add_Push_Damages_Bonus)) + 32) * CastInfos.Effect.diceNum / (4 * Math.pow(2, CurrentLength));
         MutableInt DamageValue = new MutableInt(pushDmg);
         //MutableInt DamageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 

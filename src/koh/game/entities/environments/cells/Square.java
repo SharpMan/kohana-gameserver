@@ -1,5 +1,6 @@
 package koh.game.entities.environments.cells;
 
+import koh.game.entities.environments.DofusMap;
 
 /**
  *
@@ -7,8 +8,8 @@ package koh.game.entities.environments.cells;
  */
 public class Square extends ZRectangle {
 
-    public Square(byte minRadius, byte radius) {
-        super(minRadius, radius, radius);
+    public Square(byte minRadius, byte radius, DofusMap Map) {
+        super(minRadius, radius, radius, Map);
     }
 
     @Override

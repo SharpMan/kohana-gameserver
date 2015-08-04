@@ -401,7 +401,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         HashMap<EffectInstanceDice, ArrayList<Fighter>> Targets = new HashMap<>();
         for (EffectInstanceDice Effect : Effects) {
-            Effect.parseZone();
             System.out.println(Effect.toString());
             Targets.put(Effect, new ArrayList<>());
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true),this.Map)).GetCells(CellId)) {

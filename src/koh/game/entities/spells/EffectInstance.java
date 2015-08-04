@@ -51,10 +51,26 @@ public class EffectInstance implements Serializable {
     public String triggers;
     public boolean visibleInTooltip, visibleInFightLog, visibleInBuffUi;
 
-    public int zoneShape = -100000, zoneSize = -100000, zoneMinSize = -100000, zoneEfficiencyPercent = -100000, zoneMaxEfficiency = -100000; //Integer.NULL NOTATION
+    private int zoneShape = -100000, zoneSize = -100000, zoneMinSize = -100000, zoneEfficiencyPercent = -100000, zoneMaxEfficiency = -100000; //Integer.NULL NOTATION
     public boolean initialized;
 
+    public int zoneEfficiencyPercent() {
+        this.parseZone();
+        return this.zoneEfficiencyPercent;
+    }
+
+    public int zoneMaxEfficiency() {
+        this.parseZone();
+        return this.zoneMaxEfficiency;
+    }
+
+    public int zoneMinSize() {
+        this.parseZone();
+        return this.zoneMinSize;
+    }
+
     public byte ZoneSize() {
+        this.parseZone();
         return (byte) zoneSize;
     }
 
@@ -75,10 +91,13 @@ public class EffectInstance implements Serializable {
                 && (Caster.IsFriendlyWith(actor) && Caster != actor && ((Targets().HasFlag(SpellTargetType.ALLY_1) || Targets().HasFlag(SpellTargetType.ALLY_2) || (Targets().HasFlag(SpellTargetType.ALLY_3) || Targets().HasFlag(SpellTargetType.ALLY_4)) || Targets().HasFlag(SpellTargetType.ALLY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ALLY_SUMMONS) || Targets().HasFlag(SpellTargetType.ALLY_STATIC_SUMMONS)) && actor instanceof SummonedFighter) || Caster.IsEnnemyWith(actor) && ((Targets().HasFlag(SpellTargetType.ENNEMY_1) || Targets().HasFlag(SpellTargetType.ENNEMY_2) || (Targets().HasFlag(SpellTargetType.ENNEMY_3) || Targets().HasFlag(SpellTargetType.ENNEMY_4)) || Targets().HasFlag(SpellTargetType.ENNEMY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ENNEMY_SUMMONS) || Targets().HasFlag(SpellTargetType.ENNEMY_STATIC_SUMMONS)) && actor instanceof SummonedFighter));
     }
 
+    public int zoneShape() {
+        this.parseZone();
+        return zoneShape;
+    }
+
     public SpellShapeEnum ZoneShape() {
-        if (!this.initialized) {
-            this.parseZone();
-        }
+        this.parseZone();
         return SpellShapeEnum.valueOf(zoneShape);
     }
 
@@ -292,13 +311,14 @@ public class EffectInstance implements Serializable {
         return (verify);
     }
 
-    public void parseZone() {
+    private synchronized void parseZone() {
         if (this.initialized) {
             return;
         }
+        this.initialized = true;
         String[] params;
         boolean hasMinSize;
-        this.initialized = true;
+
         if (((this.rawZone != null) && (!this.rawZone.isEmpty()))) {
             this.zoneShape = this.rawZone.charAt(0);
             params = this.rawZone.substring(1).split(",");
@@ -335,6 +355,11 @@ public class EffectInstance implements Serializable {
                         this.zoneMaxEfficiency = Integer.parseInt(params[3]);
                         break;
                 };
+            } else {
+                try {
+                    this.zoneSize = Integer.parseInt(params[0]);
+                } catch (Exception e) {
+                }
             }
         } else {
             Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
@@ -345,6 +370,22 @@ public class EffectInstance implements Serializable {
         if (this.zoneSize >= 63) {
             this.zoneSize = 63;
         }
+        if (zoneShape == -100000) {
+            this.zoneShape = 0;
+        }
+        if (zoneSize == -100000) {
+            this.zoneSize = 0;
+        }
+        if (zoneMinSize == -100000) {
+            this.zoneMinSize = 0;
+        }
+        if (zoneEfficiencyPercent == -100000) {
+            this.zoneEfficiencyPercent = 0;
+        }
+        if (zoneMaxEfficiency == -100000) {
+            this.zoneMaxEfficiency = 0;
+        }
+        this.initialized = true;
     }
 
     public Effect Template() {

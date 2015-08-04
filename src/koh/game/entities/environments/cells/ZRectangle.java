@@ -2,7 +2,9 @@ package koh.game.entities.environments.cells;
 
 import java.util.ArrayList;
 import java.util.List;
+import koh.game.entities.environments.DofusMap;
 import koh.game.entities.maps.pathfinding.MapPoint;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  *
@@ -12,17 +14,19 @@ public class ZRectangle implements IZone {
 
     public byte Direction;
 
-    public byte Radius;
+    public byte Radius = 0;
 
     public byte _radius2;
     public byte _minRadius = 2;
 
     public boolean diagonalFree;
+    public DofusMap Map;
 
-    public ZRectangle(byte minRadius, byte nWidth, byte nHeight) {
+    public ZRectangle(byte minRadius, byte nWidth, byte nHeight,DofusMap Map) {
         this._minRadius = minRadius;
         this.Radius = nWidth;
         this._radius2 = ((nHeight != 0) ? nHeight : nWidth);
+        this.Map = Map;
     }
 
     @Override
@@ -49,16 +53,17 @@ public class ZRectangle implements IZone {
         int j;
         int x = origin.get_x();
         int y = origin.get_y();
-        if ((((this.Radius == 0)) || ((this._radius2 == 0)))) {
+        if ((((this.Radius() == 0)) || ((this._radius2 == 0)))) {
             if ((((this.MinRadius() == 0)) && (!(this.diagonalFree)))) {
                 list.add(centerCell);
             };
             return list.stream().toArray(Short[]::new);
         };
-        i = (x - this.Radius);
-        while (i <= (x + this.Radius)) {
+        i = (x - this.Radius());
+        while (i <= (x + this.Radius())) {
             j = (y - this._radius2);
             while (j <= (y + this._radius2)) {
+                System.out.println("sss");
                 if ((/*(!(this._minRadius != -1)) ||*/(((Math.abs((x - i)) + Math.abs((y - j))) >= this._minRadius)))) {
                     if (((!(this.diagonalFree)) || (!((Math.abs((x - i)) == Math.abs((y - j))))))) {
                         if (MapPoint.isInMap(i, j)) {
@@ -75,16 +80,24 @@ public class ZRectangle implements IZone {
 
     }
 
-    private static void AddCellIfValid(int x, int y, List<Short> container) {
-        if (!MapPoint.IsInMap(x, y)) {
+    private void AddCellIfValid(int x, int y, List<Short> container) {
+        if (!this.Map.pointMov(x, y, true, -1, -1)) {
             return;
         }
+        /*if (!MapPoint.IsInMap(x, y)) {
+            return;
+        }*/
         container.add(MapPoint.CoordToCellId(x, y));
     }
 
     @Override
     public byte MinRadius() {
         return _minRadius;
+    }
+    
+     @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override

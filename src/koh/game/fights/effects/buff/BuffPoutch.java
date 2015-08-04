@@ -50,7 +50,6 @@ public class BuffPoutch extends BuffEffect {
         double num2 = (double) Arrays.stream(SpellLevel.effects).mapToInt(x -> x.random).sum();
         boolean flag = false;
         for (EffectInstanceDice Effect : SpellLevel.effects) {
-            Effect.parseZone();
             ArrayList<Fighter> Targets = new ArrayList<>();
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true),this.Caster.Fight.Map)).GetCells(Target.CellId())) {
                 FightCell FightCell = Target.Fight.GetCell(Cell);

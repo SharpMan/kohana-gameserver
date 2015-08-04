@@ -1,6 +1,6 @@
 package koh.game.entities.environments.cells;
 
-import java.util.ArrayList;
+import koh.game.entities.environments.CrossZone;
 import koh.game.entities.environments.DofusMap;
 import koh.protocol.client.enums.DirectionsEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
@@ -18,16 +18,18 @@ public class Zone implements IZone {
     private DofusMap Map;
 
     public Zone(SpellShapeEnum shape, byte radius, DofusMap Map) {
+        this.Map = Map;
         this.SetRadius(radius);
         this.setShapeType(shape);
-        this.Map = Map;
     }
 
     public Zone(SpellShapeEnum shape, byte radius, byte direction, DofusMap Map) {
+        this.Map = Map;
         this.SetRadius(radius);
         this.SetDirection(direction);
         this.setShapeType(shape);
-        this.Map = Map;
+        
+        
     }
 
     public SpellShapeEnum ShapeType() {
@@ -83,22 +85,23 @@ public class Zone implements IZone {
     }
 
     private void InitializeShape() {
+
         switch (this.ShapeType()) {
             case slash:
                 this.m_shape = new Line(this.Radius());
                 break;
             case a:
             case A:
-                this.m_shape = new Lozenge((byte) 0, (byte) 63,this.Map);
+                this.m_shape = new Lozenge((byte) 0, (byte) 63, this.Map);
                 break;
             case C:
-                this.m_shape = new Lozenge((byte) 0, this.Radius(),this.Map);
+                this.m_shape = new Lozenge((byte) 0, this.Radius(), this.Map);
                 break;
             case D:
                 this.m_shape = new CrossZone((byte) 0, this.Radius());
                 break;
             case I:
-                this.m_shape = new Lozenge(this.Radius(), (byte) 63,this.Map);
+                this.m_shape = new Lozenge(this.Radius(), (byte) 63, this.Map);
                 break;
             case L:
                 this.m_shape = new Line(this.Radius());
@@ -107,7 +110,7 @@ public class Zone implements IZone {
                 this.m_shape = new CrossZone((byte) 1, this.Radius());
                 break;
             case G:
-                this.m_shape = new Square((byte) 0, this.Radius());
+                this.m_shape = new Square((byte) 0, this.Radius(), this.Map);
 
                 break;
             case P:
@@ -130,7 +133,7 @@ public class Zone implements IZone {
                 this.m_shape = new Cone((byte) 0, this.Radius());
                 break;
             case W:
-                this.m_shape = new Square((byte) 0, this.Radius()) {
+                this.m_shape = new Square((byte) 0, this.Radius(), this.Map) {
                     {
                         this.diagonalFree = true;
                     }
@@ -183,7 +186,6 @@ public class Zone implements IZone {
                 this.m_shape = new CrossZone((byte) 0, (byte) 0);
                 break;
         }
-
         this.m_shape.SetDirection(this.m_direction);
     }
 }

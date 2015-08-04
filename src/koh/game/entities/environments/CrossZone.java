@@ -1,7 +1,8 @@
-package koh.game.entities.environments.cells;
+package koh.game.entities.environments;
 
 import java.util.ArrayList;
 import java.util.List;
+import koh.game.entities.environments.cells.IZone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.protocol.client.enums.DirectionsEnum;
 

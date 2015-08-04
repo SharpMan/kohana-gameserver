@@ -255,6 +255,9 @@ public abstract class EffectBase {
             this.put(StatsEnum.ADD_SPELL_PO, new EffectSpellDommage());
             this.put(StatsEnum.BACK_CELL, new EffectPush());
             this.put(StatsEnum.DISABLE_PORTAL, new EffectDisablePortal());
+            
+            //Zobal
+            this.put(StatsEnum.ADVANCE_CELL, new EffectPush());
         }
     };
 
