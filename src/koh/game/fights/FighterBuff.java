@@ -71,6 +71,7 @@ public class FighterBuff {
         this.BuffsAct.get(Buff.ActiveType).add(Buff);
         this.BuffsDec.get(Buff.DecrementType).add(Buff);
         Buff.Target.Fight.sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.Effect.effectId*/Buff.CastInfos.EffectType.value(), Buff.Caster.ID, Buff.GetAbstractFightDispellableEffect()));
+        Main.Logs().writeDebug("Buff " + Buff.getClass().getName() + " added");
     }
 
     //Le -1 definie l'infini

@@ -10,8 +10,7 @@ import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.dialog.LeaveDialogMessage;
 import koh.utils.Enumerable;
-import messages.game.interactive.zaap.TeleportDestinationsListMessage;
-import org.apache.commons.lang.ArrayUtils;
+import koh.protocol.messages.game.interactive.zaap.TeleportDestinationsListMessage;
 
 /**
  *

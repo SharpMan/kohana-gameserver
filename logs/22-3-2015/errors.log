@@ -1,8 +1,0 @@
-java.lang.ClassCastException: [B cannot be cast to koh.protocol.types.game.context.roleplay.GameRolePlayGroupMonsterInformations
-	at koh.game.dao.MapDAO.FindTriggers(MapDAO.java:76)
-	at koh.game.MySQL.LoadCache(MySQL.java:196)
-	at koh.game.Main.main(Main.java:48)
-mars 22, 2015 11:14:29 PM org.reflections.Reflections scan
-INFOS: Reflections took 144 ms to scan 1 urls, producing 1 keys and 37 values 
-mars 22, 2015 11:14:29 PM org.reflections.Reflections scan
-INFOS: Reflections took 173 ms to scan 1 urls, producing 2 keys and 42 values 

@@ -95,6 +95,9 @@ public abstract class EffectBase {
             // Armure et bouclié feca
             this.put(StatsEnum.Damage_Armor_Reduction, new EffectArmor());
             this.put(StatsEnum.Damage_Reduction, new EffectArmor());
+            
+            //Chance Eca
+            this.put(StatsEnum.DamageBecomeHeal, new EffectDamageBecomeHeal());
 
             //Heal
             this.put(StatsEnum.PDV_PERCENT_REPORTED, new EffectHealPercent());

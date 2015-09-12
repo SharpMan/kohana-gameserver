@@ -1,5 +1,0 @@
-mars 11, 2015 10:10:30 PM org.reflections.Reflections scan
-INFOS: Reflections took 155 ms to scan 1 urls, producing 1 keys and 27 values 
-mars 11, 2015 10:10:31 PM org.reflections.Reflections scan
-INFOS: Reflections took 148 ms to scan 1 urls, producing 2 keys and 30 values 
-[22:12:51] An error occurred: Could not evaluate null: no value set for the variable.

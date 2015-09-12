@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Stack;
@@ -373,6 +374,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (Fight.RANDOM.nextInt(TauxCC) == 0) {
                 IsCc = true;
             }
+            Main.Logs().writeDebug("CC: "+IsCc+ " TauxCC "+TauxCC+" SpellLevel.criticalHitProbability "+SpellLevel.criticalHitProbability);
         }
         IsCc &= !Fighter.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
 
@@ -400,7 +402,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         HashMap<EffectInstanceDice, ArrayList<Fighter>> Targets = new HashMap<>();
-        for (EffectInstanceDice Effect : Effects) {
+        for (Iterator<EffectInstanceDice> EffectI = ((Arrays.stream(Effects).sorted((e2, e1) -> ( e1.EffectType() == StatsEnum.DISPELL_SPELL ? 0 : (e2.EffectType() == StatsEnum.DISPELL_SPELL ? -1 : 1))).iterator())); EffectI.hasNext();) {
+            final EffectInstanceDice Effect = EffectI.next();
             System.out.println(Effect.toString());
             Targets.put(Effect, new ArrayList<>());
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true),this.Map)).GetCells(CellId)) {
@@ -1534,7 +1537,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public GameFightTurnListMessage FightTurnListMessage() {
-        return new GameFightTurnListMessage(this.AliveFighters().filter(x -> !(x instanceof StaticFighter)).sorted((e1, e2) -> Integer.compare(e2.Initiative(false), e1.Initiative(false))).mapToInt(x -> x.ID).toArray(), this.DeadFighters().filter(x -> !(x instanceof StaticFighter)).mapToInt(x -> x.ID).toArray());
+        return new GameFightTurnListMessage(this.AliveFighters().filter(x -> !(x instanceof StaticFighter))
+                .sorted((e1, e2) -> Integer.compare(e2.Initiative(false), e1.Initiative(false)))
+                .mapToInt(x -> x.ID).toArray(), this.DeadFighters().filter(x -> !(x instanceof StaticFighter))
+                .mapToInt(x -> x.ID).toArray());
     }
 
     private synchronized FightCell GetFreeSpawnCell(FightTeam Team) {

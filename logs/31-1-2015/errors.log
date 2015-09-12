@@ -1,7 +1,0 @@
-janv. 31, 2015 10:58:57 PM org.reflections.Reflections scan
-INFOS: Reflections took 105 ms to scan 1 urls, producing 1 keys and 6 values 
-janv. 31, 2015 10:58:57 PM org.reflections.Reflections scan
-INFOS: Reflections took 63 ms to scan 1 urls, producing 2 keys and 7 values 
-[22:59:11] [ERROR] Unknown Message Header Handler 4001/127.0.0.1:20272
-[22:59:11] [ERROR] Unknown Message Header Handler 5676/127.0.0.1:20272
-[22:59:11] [ERROR] Unknown Message Header Handler 6355/127.0.0.1:20272

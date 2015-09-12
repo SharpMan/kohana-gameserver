@@ -8,7 +8,6 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.effects.buff.BuffPorteur;
-import koh.game.fights.fighters.StaticFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;

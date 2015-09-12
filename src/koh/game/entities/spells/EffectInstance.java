@@ -184,6 +184,7 @@ public class EffectInstance implements Serializable {
         if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
             return (false);
         };
+        System.out.println(pEffect.targetMask);
         boolean targetIsCaster = (pTargetId.ID == pCasterId.ID);
         boolean targetIsCarried = pTargetId.GetCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
@@ -252,6 +253,7 @@ public class EffectInstance implements Serializable {
                         } else {
                             verify = !pTargetId.HasState(maskState);
                         }
+                        System.out.println(verify);
                         break;
                     case 'E':
                         maskState = Integer.parseInt(exclusiveMaskParam);
@@ -262,13 +264,14 @@ public class EffectInstance implements Serializable {
                         }
                         break;
                     case 'f':
-                        verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
+                        verify = (((monsterInfo == null)) || (!((pEffect.targetMask.contains("f"+monsterInfo.creatureGenericId)))));
                         break;
                     case 'F':
-                        verify = ((monsterInfo != null) && ((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
-                        if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
+                        verify = ((monsterInfo != null) && ((pEffect.targetMask.contains("F"+monsterInfo.creatureGenericId))));
+                       
+                        /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
                             return true;
-                        }
+                        }*/
                         break;
                     case 'z':
                         break;

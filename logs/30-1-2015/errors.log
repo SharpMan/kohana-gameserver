@@ -1,6 +1,0 @@
-janv. 30, 2015 1:05:35 AM org.reflections.Reflections scan
-INFOS: Reflections took 86 ms to scan 1 urls, producing 1 keys and 5 values 
-janv. 30, 2015 1:05:35 AM org.reflections.Reflections scan
-INFOS: Reflections took 40 ms to scan 1 urls, producing 2 keys and 6 values 
-[01:05:38] (server->proxy->client)::Error:{null}::cause.toString(){java.lang.NullPointerException}
-[01:15:39] [ERROR] Unknown Message Header Handler 182/127.0.0.1:21037

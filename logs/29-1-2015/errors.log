@@ -1,6 +1,0 @@
-janv. 29, 2015 11:50:46 PM org.reflections.Reflections scan
-INFOS: Reflections took 89 ms to scan 1 urls, producing 1 keys and 3 values 
-janv. 29, 2015 11:50:46 PM org.reflections.Reflections scan
-INFOS: Reflections took 42 ms to scan 1 urls, producing 2 keys and 5 values 
-[23:50:49] (server->proxy->client)::Error:{null}::cause.toString(){java.lang.NullPointerException}
-[23:50:54] [ERROR] Unknown Message Header Handler 160/127.0.0.1:18579

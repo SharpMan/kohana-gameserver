@@ -10,9 +10,8 @@ import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.interactive.InteractiveUseEndedMessage;
 import koh.protocol.messages.game.interactive.InteractiveUseErrorMessage;
 import koh.protocol.messages.game.interactive.InteractiveUseRequestMessage;
-import koh.protocol.types.game.interactive.InteractiveElement;
 import koh.protocol.types.game.interactive.InteractiveElementSkill;
-import messages.game.interactive.zaap.TeleportRequestMessage;
+import koh.protocol.messages.game.interactive.zaap.TeleportRequestMessage;
 
 /**
  *
