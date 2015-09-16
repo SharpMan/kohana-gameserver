@@ -35,6 +35,7 @@ public class FighterBuff {
             this.put(BuffActiveType.ACTIVE_ENDTURN, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ENDMOVE, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_STATS, new ArrayList<>());
+            this.put(BuffActiveType.ACTIVE_ON_DIE, new ArrayList<>());
         }
     };
 
@@ -81,6 +82,7 @@ public class FighterBuff {
             EffectCast.second--;
             if (EffectCast.second <= 0) {
                 this.DelayedEffects.remove(EffectCast);
+                EffectCast.first.Targets.removeIf(Fighter -> !Fighter.IsAlive());
                 if (EffectBase.TryApplyEffect(EffectCast.first) == -3) {
                     return -3;
                 }

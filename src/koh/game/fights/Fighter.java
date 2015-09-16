@@ -1,10 +1,12 @@
 package koh.game.fights;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
@@ -70,6 +72,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public Fighter Summoner;
     public GameActionFightInvisibilityStateEnum VisibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
     public int[] previousPositions = new int[0];
+    public CopyOnWriteArrayList<Short> previousCellPos = new CopyOnWriteArrayList<>(), previousFirstCellPos = new CopyOnWriteArrayList<>();
     private final MapPoint MapPointCache = MapPoint.fromCellId(0);
     public byte wave = 0;
     public FighterSpell SpellsController;
@@ -98,8 +101,12 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             if (this.myCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
                 ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Enable(this, true);
             }
-            if (this.Fight.FightState == FightState.STATE_PLACE && ArrayUtils.contains(previousPositions, myCell.Id)) {
-                this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
+            if (this.Fight.FightState == FightState.STATE_PLACE) {
+                if (!ArrayUtils.contains(previousPositions, myCell.Id)) {
+                    this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
+                }
+            } else {
+                this.previousCellPos.add(this.myCell.Id);
             }
         }
         this.myCell = Cell;
@@ -204,6 +211,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (buffResult != -1) {
             return buffResult;
         }
+        this.previousFirstCellPos.add(this.myCell.Id);
         return myCell.BeginTurn(this);
     }
 
@@ -224,6 +232,14 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return buffResult;
         }
         return myCell.EndTurn(this);
+    }
+
+    public Stream<FightActivableObject> GetActivableObjects() {
+        try {
+            return this.Fight.m_activableObjects.get(this).stream();
+        } catch (Exception e) {
+            return Stream.empty();
+        }
     }
 
     public boolean Dead() {
@@ -535,8 +551,13 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus)));
                 break;
             case Damage_Fire_Per_Pm_Percent:
-                Jet.setValue((int) Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
+                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))) * ((((double) this.MP() / (double) this.MaxMP()))));
+                System.out.println((this.MP() / this.MaxMP()));
+                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))));
+                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((this.MP() / this.MaxMP()))));
                 break;
             case Damage_Air:
             case Steal_Air:

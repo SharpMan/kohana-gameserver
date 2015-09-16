@@ -3,9 +3,11 @@ package koh.game.fights.layer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Stream;
 import javafx.scene.paint.Color;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
+import koh.game.fights.FightCell;
 import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
@@ -30,6 +32,10 @@ public class FightBomb extends FightActivableObject {
 
     public HashMap<Short, Short> Cells = new HashMap<>();
     public BombFighter[] Owner = new BombFighter[2];
+    
+    public Stream<FightCell> FightCells(){
+        return this.Cells.keySet().stream().map(C -> this.m_fight.GetCell(C));
+    }
 
     public FightBomb(Fighter Caster, SpellLevel Spell, Color color, Short[] Cells, BombFighter[] Members) {
         m_fight = Caster.Fight;
@@ -59,6 +65,8 @@ public class FightBomb extends FightActivableObject {
         Cell = m_fight.GetCell(AffectedCells[0]);
         // On ajout l'objet a toutes les cells qu'il affecte
         for (short cellId : AffectedCells) {
+            if(!this.m_fight.GetCell(cellId).IsWalkable())
+                continue;
             this.Cells.put(cellId, (short) m_fight.NextTriggerUid.incrementAndGet());
             if (m_fight.GetCell(cellId) != null) {
                 m_fight.GetCell(cellId).AddObject(this);

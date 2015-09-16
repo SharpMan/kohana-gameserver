@@ -39,6 +39,7 @@ public class SpellDAO {
                         spellLevels = new SpellLevel[RS.getString("spell_levels").split(",").length];
                         for (int i = 0; i < RS.getString("spell_levels").split(",").length; i++) {
                             this.spellLevels[i] = LevelCache.get(Integer.parseInt(RS.getString("spell_levels").split(",")[i]));
+                           
                         }
                     }
                 });
@@ -134,8 +135,8 @@ public class SpellDAO {
                         this.effects = new EffectInstanceDice[buf.getInt()];
                         for (int i = 0; i < this.effects.length; i++) {
                             this.effects[i] = new EffectInstanceDice(buf);
-                           /* if(this.effects[i].effectId == 165)
-                                System.out.println("hn"+this.spellId);*/
+                            /* if(this.effects[i].effectId == 165)
+                             System.out.println("hn"+this.spellId);*/
                         }
                         buf.clear();
 
@@ -146,7 +147,7 @@ public class SpellDAO {
                         }
                         buf.clear();
                         buf = null;
-                        
+
                     }
                 });
                 i++;

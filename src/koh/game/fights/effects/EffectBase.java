@@ -19,6 +19,9 @@ public abstract class EffectBase {
             this.put(StatsEnum.Damage_Fire, new EffectDamage());
             this.put(StatsEnum.Damage_Water, new EffectDamage());
 
+            //Xelor
+            this.put(StatsEnum.TELEPORT_PREVIOUS_POSITION, new EffectTpPrevPos());
+            this.put(StatsEnum.TELEPORT_STARTING_TURN_CELL, new EffectTpFirstPos());
             //Téleportation
             this.put(StatsEnum.Teleport_4, new EffectTeleport());
             this.put(StatsEnum.Teleport, new EffectTeleport());
@@ -31,6 +34,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.Sacrifice, new EffectSacrifice());
 
             // Effet de push back/fear
+            this.put(StatsEnum.PUSH_X_CELL, new EffectPush());
             this.put(StatsEnum.Push_Back, new EffectPush());
             this.put(StatsEnum.PushFear, new EffectPushFear());
             this.put(StatsEnum.PullForward, new EffectPush());
@@ -50,6 +54,7 @@ public abstract class EffectBase {
 
             // 1 PA,PM Utilisé = X Pdv perdu
             this.put(StatsEnum.Lose_PV_By_Using_PA, new EffectDamagePerPA());
+            this.put(StatsEnum.PA_USED_LOST_X_PDV_2, new EffectDamagePerPA());
             this.put(StatsEnum.PA_USED_LOST_X_PDV, new EffectDamagePerPA());
             this.put(StatsEnum.PM_USED_LOST_X_PDV, new EffectDamagePerPM());
 
@@ -95,7 +100,7 @@ public abstract class EffectBase {
             // Armure et bouclié feca
             this.put(StatsEnum.Damage_Armor_Reduction, new EffectArmor());
             this.put(StatsEnum.Damage_Reduction, new EffectArmor());
-            
+
             //Chance Eca
             this.put(StatsEnum.DamageBecomeHeal, new EffectDamageBecomeHeal());
 

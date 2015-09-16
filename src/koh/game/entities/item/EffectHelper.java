@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+import koh.d2o.entities.Effect;
 import koh.game.Logs;
 import koh.game.Main;
+import static koh.game.dao.D2oDao.getEffect;
+import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.spells.*;
+import koh.game.fights.Fighter;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
 import koh.utils.Couple;
@@ -21,6 +26,12 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class EffectHelper {
 
+    public static final int NEUTRAL_ELEMENT = 0;
+    public static final int EARTH_ELEMENT = 1;
+    public static final int FIRE_ELEMENT = 2;
+    public static final int WATER_ELEMENT = 3;
+    public static final int AIR_ELEMENT = 4;
+    public static final int NONE_ELEMENT = 5;
     public static final int[] DateEffect = new int[]{805, 808, 983, 998}; //971
     public static final int DAMAGE_EFFECT_CATEGORY = 2;
     public static final int[] MonsterEffect = new int[]{185, 621, 1011, 905};
@@ -80,6 +91,87 @@ public class EffectHelper {
     public static int RandomValue(int i1, int i2) {
         Random rand = new Random();
         return rand.nextInt(i2 - i1 + 1) + i1;
+    }
+
+    public static boolean verifyEffectTrigger(Fighter pCasterId, Fighter pTargetId, EffectInstance[] pSpellEffects, EffectInstance pEffect, boolean pWeaponEffect, String pTriggers, int pSpellImpactCell) {
+
+        boolean verify = true;
+        boolean isTargetAlly = pCasterId.IsFriendlyWith(pTargetId);
+        int distance = Pathfinder.getDistance( pCasterId.CellId(), pTargetId.CellId());
+        
+        for (String trigger : pTriggers.split("\\|")) {
+            switch (trigger) {
+                case "I":
+                    verify = true;
+                    break;
+                case "D":
+                    verify = (pEffect.category() == DAMAGE_EFFECT_CATEGORY);
+                    break;
+                case "DA":
+                    verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == AIR_ELEMENT)));
+                    break;
+                case "DBA":
+                    verify = isTargetAlly;
+                    break;
+                case "DBE":
+                    verify = !(isTargetAlly);
+                    break;
+                case "DC":
+                    verify = pWeaponEffect;
+                    break;
+                case "DE":
+                    verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == EARTH_ELEMENT)));
+                    break;
+                case "DF":
+                    verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == FIRE_ELEMENT)));
+                    break;
+                case "DG":
+                    break;
+                case "DI":
+                    break;
+                case "DM":
+                    verify = (distance <= 1);
+                    break;
+                case "DN":
+                    verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == NEUTRAL_ELEMENT)));
+                    break;
+                case "DP":
+                    break;
+                case "DR":
+                    verify = (distance > 1);
+                    break;
+                case "Dr":
+                    break;
+                case "DS":
+                    verify = !(pWeaponEffect);
+                    break;
+                case "DTB":
+                    break;
+                case "DTE":
+                    break;
+                case "DW":
+                    verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == WATER_ELEMENT)));
+                    break;
+                case "MD":
+                    //verify = PushUtil.hasPushDamages(pCasterId, pTargetId, pSpellEffects, pEffect, pSpellImpactCell);
+                    verify = true;
+                    break;
+                case "MDM":
+                    break;
+                case "MDP":
+                    break;
+                case "A":
+                    verify = (pEffect.effectId == 101);
+                    break;
+                case "m":
+                    verify = (pEffect.effectId == 127);
+                    break;
+            };
+            if (verify) {
+                return (true);
+            };
+        };
+        return (false);
     }
 
     public static ObjectEffect[] toObjectEffects(EffectInstance[] effects) {
@@ -178,8 +270,10 @@ public class EffectHelper {
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
                 Main.Logs().writeDebug(e.toString());
-                if(e.effectId == 984 || e.effectId == 800) //Truc familiers pas sur
+                if (e.effectId == 984 || e.effectId == 800) //Truc familiers pas sur
+                {
                     continue;
+                }
                 if (e.effectId == SpellEffectPerFight || ArrayUtils.contains(RelatedObjectsEffect, e.effectId) || ArrayUtils.contains(SpellItemsEffects, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
                     Effects.add(new ObjectEffectDice(e.effectId, ((EffectInstanceDice) e).diceNum, ((EffectInstanceDice) e).diceSide, ((EffectInstanceDice) e).value));
                     continue;

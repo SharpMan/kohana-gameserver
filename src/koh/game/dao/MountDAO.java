@@ -38,8 +38,6 @@ public class MountDAO {
                                 Stats.add(c);
                             }
                         }
-                        System.out.println("INSERT INTO npc_items VALUES(788," + 10 + ",'',0," + this.ScroolId + ",0);");
-                        
                     }
                 });
                 i++;

@@ -1,5 +1,6 @@
 package koh.game.fights.fighters;
 
+import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.protocol.client.Message;
@@ -11,6 +12,8 @@ import koh.protocol.types.game.look.EntityLook;
  * @author Neo-Craft
  */
 public class MonsterFighter extends Fighter {
+    
+     public MonsterGrade Grade;
 
     public MonsterFighter(koh.game.fights.Fight Fight, Fighter Invocator) {
         super(Fight, Invocator);

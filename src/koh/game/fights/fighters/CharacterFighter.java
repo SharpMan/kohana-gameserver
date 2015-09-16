@@ -13,9 +13,12 @@ import koh.game.fights.types.ChallengeFight;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
+import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_MAKE_INVISIBLE;
+import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.PlayerEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
+import koh.protocol.messages.game.actions.fight.GameActionFightInvisibleDetectedMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightVanishMessage;
 import koh.protocol.messages.game.basic.BasicTimeMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
@@ -23,6 +26,7 @@ import koh.protocol.messages.game.character.stats.FighterStatsListMessage;
 import koh.protocol.messages.game.character.stats.LifePointsRegenBeginMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
+import koh.protocol.messages.game.context.fight.character.GameFightRefreshFighterMessage;
 import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
@@ -112,11 +116,16 @@ public class CharacterFighter extends Fighter {
             updated = true;
         }
         if (updated) {
-            this.Fight.observers.stream().filter(x -> !this.IsMyFriend(((Player) x))).forEach(o -> ((Player) o).Send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
-            this.fakeContextualId = -1000;
-            this.Buffs.Dispell(2763);
-            this.Send(this.FighterStatsListMessagePacket());
+            this.onCloneCleared();
         }
+    }
+
+    public void onCloneCleared() {
+        this.Fight.observers.stream().filter(x -> !this.IsMyFriend(((Player) x))).forEach(o -> ((Player) o).Send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
+        this.fakeContextualId = -1000;
+        this.Buffs.Dispell(2763);
+
+        this.Send(this.FighterStatsListMessagePacket());
     }
 
     @Override
@@ -192,7 +201,6 @@ public class CharacterFighter extends Fighter {
     public void Send(Message Packet) {
         this.Character.Send(Packet);
     }
-
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
         return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) Character.Experience, (double) ExpDAO.PersoXpMin(Character.Level), (double) ExpDAO.PersoXpMax(Character.Level), Character.Kamas, Character.StatPoints, 0, Character.SpellPoints, Character.GetActorAlignmentExtendInformations(),

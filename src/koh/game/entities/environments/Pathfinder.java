@@ -212,6 +212,36 @@ public class Pathfinder {
         return GetLineCellsBetween(Fight, BeginCell, Direction, EndCell, true);
     }
 
+    public static Short[] GetLineCellsBetweenBomb(Fight Fight, short BeginCell, byte Direction, int EndCell, boolean WithoutFighter) {
+        int Length = -1;
+        Short ActualCell = BeginCell;
+
+        if (!Pathfinder.InLine(Fight.Map, BeginCell, EndCell)) {
+            return null;
+        }
+
+        Length = (int) GoalDistanceEstimate(Fight.Map, BeginCell, EndCell) - 1;
+        Short[] Cells = new Short[Length];
+
+        for (int i = 0; i < Length; i++) {
+
+            ActualCell = (short) Pathfinder.NextCell(ActualCell, Direction);
+
+
+            if (WithoutFighter && Fight.GetFighterOnCell(ActualCell) != null) {
+                return null;
+            }
+
+            Cells[i] = ActualCell;
+
+            if (Pathfinder.IsStopCell(Fight, null, ActualCell, null)) {
+                return null;
+            }
+        }
+
+        return Cells;
+    }
+    
     public static Short[] GetLineCellsBetween(Fight Fight, short BeginCell, byte Direction, int EndCell, boolean WithoutFighter) {
         int Length = -1;
         Short ActualCell = BeginCell;

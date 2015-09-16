@@ -26,6 +26,7 @@ public class EffectPush extends EffectBase {
         byte Direction = 0;
         for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.States.HasState(FightStateEnum.Porté) && !target.States.HasState(FightStateEnum.Inébranlable) && !target.States.HasState(FightStateEnum.Enraciné) && !target.States.HasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (CastInfos.EffectType) {
+                case PUSH_X_CELL:
                 case Push_Back:
                     if (Pathfinder.InLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
                         Direction = Pathfinder.GetDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());

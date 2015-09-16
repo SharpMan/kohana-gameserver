@@ -162,7 +162,7 @@ public abstract class FightActivableObject implements IFightObject {
         m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(GameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.m_caster.ID, this.ID, activator.ID, this.m_spellId));
         activator.Fight.StartSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         for (EffectInstanceDice Effect : m_actionEffect.effects) {
-            System.out.println(Effect.toString());
+            //TODO : MASK
             EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.spellId, Cell.Id, 100, Effect, m_caster, Targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
             CastInfos.IsTrap = this.ObjectType() == FightObjectType.OBJECT_TRAP;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {

@@ -3,6 +3,7 @@ package koh.game.fights.effects.buff;
 import java.util.ArrayList;
 import java.util.Arrays;
 import koh.game.dao.SpellDAO;
+import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -40,9 +41,11 @@ public class BuffPoutch extends BuffEffect {
             return -1;
         }
 
-        if (/*CastInfos.EffectType == StatsEnum.Refoullage*/CastInfos.SpellId == 2809) {
-            DamageValue.setValue(0);
-            Target = DamageInfos.Caster;
+        if (CastInfos.SpellId == 2809) {
+            if(Pathfinder.GoalDistance(null, DamageInfos.Caster.CellId(), Target.CellId()) > 1){
+                return -1;
+            }
+            //Target = DamageInfos.Caster;
         }
 
         SpellLevel SpellLevel = SpellDAO.Spells.get(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
@@ -51,11 +54,14 @@ public class BuffPoutch extends BuffEffect {
         boolean flag = false;
         for (EffectInstanceDice Effect : SpellLevel.effects) {
             ArrayList<Fighter> Targets = new ArrayList<>();
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true),this.Caster.Fight.Map)).GetCells(Target.CellId())) {
+            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true), this.Caster.Fight.Map)).GetCells(Target.CellId())) {
                 FightCell FightCell = Target.Fight.GetCell(Cell);
                 if (FightCell != null) {
                     if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
                         for (Fighter Target2 : FightCell.GetObjectsAsFighter()) {
+                            if (CastInfos.SpellId == 2809 && Target2 == Target) {
+                                continue;
+                            }
                             if (Effect.IsValidTarget(this.Target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.Target, Target2, Effect)) {
                                 if (Effect.targetMask.equals("C") && this.Target.GetCarriedActor() == Target2.ID) {
                                     continue;

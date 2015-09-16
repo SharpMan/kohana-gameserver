@@ -31,7 +31,7 @@ public class IllusionFighter extends StaticFighter {
 
     @Override
     public int TryDie(int CasterId) {
-        if(Arrays.stream(new Exception().getStackTrace()).anyMatch(Method -> Method.getMethodName().equalsIgnoreCase("JoinFightTeam"))){ //Il viens de rejoindre la team rofl on le tue pas
+        if (Arrays.stream(new Exception().getStackTrace()).anyMatch(Method -> Method.getMethodName().equalsIgnoreCase("JoinFightTeam"))) { //Il viens de rejoindre la team rofl on le tue pas
             return -1;
         }
         this.setLife(0);
@@ -43,6 +43,10 @@ public class IllusionFighter extends StaticFighter {
         }
 
         myCell.RemoveObject(this);
+
+        if (!this.Team.GetAliveFighters().anyMatch(x -> x instanceof IllusionFighter && x.Summoner() == this.Summoner())) {
+            ((CharacterFighter) this.Summoner).onCloneCleared();
+        }
 
         if (this.Fight.TryEndFight()) {
             return -3;

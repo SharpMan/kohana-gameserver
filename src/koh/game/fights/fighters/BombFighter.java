@@ -15,6 +15,7 @@ import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectActivableObject;
+import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.layer.FightBomb;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
@@ -35,7 +36,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
  * @author Neo-Craft
  */
 public class BombFighter extends StaticFighter {
-    
+
     public BombFighter(Fight Fight, Fighter Summoner, MonsterGrade Monster) {
         super(Fight, Summoner);
         this.Grade = Monster;
@@ -45,7 +46,7 @@ public class BombFighter extends StaticFighter {
         super.setLife(this.Life());
         super.setLifeMax(this.MaxLife());
     }
-    
+
     @Override
     public void CalculDamages(StatsEnum Effect, MutableInt Jet) {
         switch (Effect) {
@@ -58,19 +59,19 @@ public class BombFighter extends StaticFighter {
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
                 break;
-            
+
             case Damage_Fire:
             case Steal_Fire:
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus)));
                 break;
-            
+
             case Damage_Air:
             case Steal_Air:
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
                         + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus)));
                 break;
-            
+
             case Damage_Water:
             case Steal_Water:
                 Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
@@ -78,9 +79,9 @@ public class BombFighter extends StaticFighter {
                 break;
         }
     }
-    
+
     public boolean Boosted = false;
-    
+
     public synchronized void SlefMurder(int Caster) {
         if (Boosted) {
             return;
@@ -95,7 +96,7 @@ public class BombFighter extends StaticFighter {
                         if (Target.ID == this.ID) {
                             continue;
                         }
-                        if (Target instanceof BombFighter && ((BombFighter) Target).Grade.monsterId == this.Grade.monsterId && ((BombFighter) Target).Summoner == this.Summoner && !((BombFighter) Target).Boosted) {
+                        if (Target instanceof BombFighter /*&& ((BombFighter) Target).Grade.monsterId == this.Grade.monsterId*/ && ((BombFighter) Target).Summoner == this.Summoner && !((BombFighter) Target).Boosted) {
                             Targets.add((BombFighter) Target);
                             TotalCombo += 40;
                         }
@@ -115,9 +116,20 @@ public class BombFighter extends StaticFighter {
         }
         Targets.forEach(Bomb -> Bomb.TryDie(Caster, true));
     }
-    
+
     @Override
     public int TryDie(int CasterId, boolean force) {
+        if (this.Life() <= 0 && !force) {
+            if (this.Buffs.GetAllBuffs().anyMatch(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE)) {
+                System.out.println("s");
+                return this.Buffs.GetAllBuffs().filter(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().ApplyEffect(null, null);
+            } else {
+                if (this.FightBombs != null) {
+                    this.FightBombs.forEach(Bomb -> Bomb.Remove());
+                }
+                return super.TryDie(CasterId, force);
+            }
+        }
         if (this.Life() <= 0 || force) {
             SlefMurder(CasterId);
             Fight.LaunchSpell(this, SpellDAO.Spells.get(SpellDAO.Bombs.get(this.Grade.monsterId).explodSpellId).SpellLevel(this.Grade.Grade), this.CellId(), true, true, false);
@@ -127,16 +139,16 @@ public class BombFighter extends StaticFighter {
         }
         return super.TryDie(CasterId, force);
     }
-    
+
     public ArrayList<FightBomb> FightBombs;
-    
+
     public void addBomb(FightBomb Bomb) {
         if (FightBombs == null) {
             FightBombs = new ArrayList<>(4);
         }
         this.FightBombs.add(Bomb);
     }
-    
+
     @Override
     public int OnCellChanged() {
         if (this.myCell != null) {
@@ -153,8 +165,8 @@ public class BombFighter extends StaticFighter {
             for (Fighter Friend : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.Summoner == this.Summoner && Pathfinder.InLine(null, this.CellId(), Fighter.CellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
                 int Distance = Pathfinder.GoalDistance(null, CellId(), Friend.CellId());
                 Main.Logs().writeDebug("Distance = " + Distance);
-                if (Distance >= 2 && Distance <= 6) {
-                    Cells = Pathfinder.GetLineCellsBetween(Fight, this.CellId(), Pathfinder.GetDirection(null, this.CellId(), Friend.CellId()), Friend.CellId(), false);
+                if (Distance >= 2 && Distance <= 7) {
+                    Cells = Pathfinder.GetLineCellsBetweenBomb(Fight, this.CellId(), Pathfinder.GetDirection(null, this.CellId(), Friend.CellId()), Friend.CellId(), false);
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.CellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.CellId());
@@ -163,51 +175,51 @@ public class BombFighter extends StaticFighter {
                     }
                 }
             }
-            
+
             return this.Buffs.EndMove();
         }
         return -1;
     }
-    
+
     @Override
     public int BeginTurn() {
         super.onBeginTurn();
         return super.BeginTurn();
     }
-    
+
     @Override
     public int Level() {
         return this.Grade.Level;
     }
-    
+
     @Override
     public short MapCell() {
         return 0;
     }
-    
+
     @Override
     public GameContextActorInformations GetGameContextActorInformations(Player character) {
         return new GameFightMonsterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Grade.monsterId, this.Grade.Grade);
     }
-    
+
     @Override
     public FightTeamMemberInformations GetFightTeamMemberInformations() {
         return new FightTeamMemberMonsterInformations(this.ID, this.Grade.monsterId, this.Grade.Grade);
     }
-    
+
     @Override
     public void Send(Message Packet) {
-        
+
     }
-    
+
     @Override
     public void JoinFight() {
-        
+
     }
-    
+
     @Override
     public EntityLook GetEntityLook() {
         return this.entityLook;
     }
-    
+
 }

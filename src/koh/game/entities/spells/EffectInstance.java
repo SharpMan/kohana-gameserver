@@ -12,6 +12,7 @@ import koh.d2o.entities.Effect;
 import koh.game.Main;
 import koh.game.dao.D2oDao;
 import koh.game.dao.MonsterDAO;
+import koh.game.entities.environments.Pathfinder;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;
@@ -82,6 +83,8 @@ public class EffectInstance implements Serializable {
     public StatsEnum EffectType() {
         return StatsEnum.valueOf(this.effectId);
     }
+
+    
 
     public boolean IsValidTarget(Fighter Caster, Fighter actor) {
         return Targets() == SpellTargetType.NONE
@@ -184,7 +187,6 @@ public class EffectInstance implements Serializable {
         if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
             return (false);
         };
-        System.out.println(pEffect.targetMask);
         boolean targetIsCaster = (pTargetId.ID == pCasterId.ID);
         boolean targetIsCarried = pTargetId.GetCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
@@ -253,7 +255,6 @@ public class EffectInstance implements Serializable {
                         } else {
                             verify = !pTargetId.HasState(maskState);
                         }
-                        System.out.println(verify);
                         break;
                     case 'E':
                         maskState = Integer.parseInt(exclusiveMaskParam);
@@ -264,14 +265,15 @@ public class EffectInstance implements Serializable {
                         }
                         break;
                     case 'f':
-                        verify = (((monsterInfo == null)) || (!((pEffect.targetMask.contains("f"+monsterInfo.creatureGenericId)))));
+                        verify = !((monsterInfo != null) && ((pEffect.targetMask.contains("f" + monsterInfo.creatureGenericId))));
+                       
                         break;
                     case 'F':
-                        verify = ((monsterInfo != null) && ((pEffect.targetMask.contains("F"+monsterInfo.creatureGenericId))));
+                        verify = ((monsterInfo != null) && ((pEffect.targetMask.contains("F" + monsterInfo.creatureGenericId))));
                        
                         /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
-                            return true;
-                        }*/
+                         return true;
+                         }*/
                         break;
                     case 'z':
                         break;

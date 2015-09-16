@@ -106,13 +106,17 @@ public class FightCell {
     public List<IFightObject> GetObjectsAsList(FightObjectType ObjectType) {
         return this.myFightObjects.stream().filter(x -> x.ObjectType() == ObjectType).collect(Collectors.toList());
     }
+    
+    public boolean hasFighter(){
+        return myFightObjects.stream().anyMatch(x -> x instanceof Fighter);
+    }
 
     public Fighter[] GetObjectsAsFighter() {
-        return this.myFightObjects.stream().filter(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER ||  x.ObjectType() == FightObjectType.OBJECT_STATIC).map(x -> (Fighter) x).toArray(Fighter[]::new);
+        return this.myFightObjects.stream().filter(x -> x instanceof Fighter).map(x -> (Fighter) x).toArray(Fighter[]::new);
     }
 
     public List<Fighter> GetObjectsAsFighterList() {
-        return this.myFightObjects.stream().filter(x -> x.ObjectType() == FightObjectType.OBJECT_FIGHTER ||  x.ObjectType() == FightObjectType.OBJECT_STATIC).map(x -> (Fighter) x).collect(Collectors.toList());
+        return this.myFightObjects.stream().filter(x -> x instanceof Fighter).map(x -> (Fighter) x).collect(Collectors.toList());
     }
     
     public List<Fighter> GetObjectsAsFighterList(Predicate<? super IFightObject> prdct) {
@@ -120,14 +124,14 @@ public class FightCell {
     }
 
     public Fighter HasEnnemy(FightTeam Team) {
-        if (!this.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+      if (!this.hasFighter()) {
             return null;
         }
         return (this.GetObjectsAsFighter()[0].Team.Id != Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not ID ...
     }
 
     public Fighter HasFriend(FightTeam Team) {
-        if (!this.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+        if (!this.hasFighter()) {
             return null;
         }
         return (this.GetObjectsAsFighter()[0].Team.Id == Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not ID ...

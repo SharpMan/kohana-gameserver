@@ -63,7 +63,7 @@ public class ZRectangle implements IZone {
         while (i <= (x + this.Radius())) {
             j = (y - this._radius2);
             while (j <= (y + this._radius2)) {
-                System.out.println("sss");
+               // System.out.println("sss");
                 if ((/*(!(this._minRadius != -1)) ||*/(((Math.abs((x - i)) + Math.abs((y - j))) >= this._minRadius)))) {
                     if (((!(this.diagonalFree)) || (!((Math.abs((x - i)) == Math.abs((y - j))))))) {
                         if (MapPoint.isInMap(i, j)) {

@@ -107,7 +107,8 @@ public class Zone implements IZone {
                 this.m_shape = new Line(this.Radius());
                 break;
             case O:
-                this.m_shape = new CrossZone((byte) 1, this.Radius());
+                //this.m_shape = new CrossZone((byte) 1, this.Radius());
+                this.m_shape =  new Lozenge(this.Radius(),this.Radius(),this.Map);
                 break;
             case G:
                 this.m_shape = new Square((byte) 0, this.Radius(), this.Map);
