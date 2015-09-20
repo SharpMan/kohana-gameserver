@@ -42,6 +42,7 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffEffect;
+import koh.game.fights.effects.buff.BuffEndTurn;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.fighters.*;
 import koh.game.fights.layer.FightPortal;
@@ -60,6 +61,7 @@ import koh.protocol.client.enums.SequenceTypeEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.StatsEnum;
 import static koh.protocol.client.enums.StatsEnum.ADD_BASE_DAMAGE_SPELL;
+import static koh.protocol.client.enums.StatsEnum.CAST_SPELL_ON_CRITICAL_HIT;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightTackledMessage;
 import koh.protocol.messages.game.actions.SequenceEndMessage;
@@ -375,6 +377,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             Main.Logs().writeDebug("CC: " + IsCc + " TauxCC " + TauxCC + " SpellLevel.criticalHitProbability " + SpellLevel.criticalHitProbability);
         }
         IsCc &= !Fighter.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
+        if (IsCc && Fighter.Stats.GetTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Tutu
+
+        }
 
         EffectInstanceDice[] Effects = IsCc ? SpellLevel.criticalEffect : SpellLevel.effects;
         if (Effects == null) {
@@ -412,15 +417,23 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 if (FightCell != null) {
                     if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
                         for (Fighter Target : FightCell.GetObjectsAsFighter()) {
-                           if (EffectHelper.verifyEffectTrigger(Fighter, Target, Effects, Effect, false, Effect.triggers, CellId) && Effect.IsValidTarget(Fighter, Target) && EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect)) {
+                            if (Effect.targetMask.equals("C") && (Effect.category() == 0)) {
+                                Targets.get(Effect).add(Fighter);
+                                break;
+                            }
+                            System.out.println(EffectHelper.verifyEffectTrigger(Fighter, Target, Effects, Effect, false, Effect.triggers, CellId));
+                            System.out.println(Effect.IsValidTarget(Fighter, Target));
+                            System.out.println(EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect));
+
+                            if (EffectHelper.verifyEffectTrigger(Fighter, Target, Effects, Effect, false, Effect.triggers, CellId) && Effect.IsValidTarget(Fighter, Target) && EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect)) {
                                 if (Effect.targetMask.equals("C") && Fighter.GetCarriedActor() == Target.ID) {
                                     continue;
                                 } else if (Effect.targetMask.equals("a,A") && Fighter.GetCarriedActor() != 0 & Fighter.ID == Target.ID) {
                                     continue;
                                 }
                                 /*if (Fighter instanceof BombFighter && Target.States.HasState(FightStateEnum.Kaboom)) {
-                                    continue;
-                                }*/
+                                 continue;
+                                 }*/
                                 if (!imTargeted && Target.ID == Fighter.ID) {
                                     continue;
                                 }
@@ -603,7 +616,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return false;
         }
         //TargetId == -1
-        return     (!Spell.needFreeCell || TargetId == -1) 
+        return (!Spell.needFreeCell || TargetId == -1)
                 && (!Spell.needTakenCell || TargetId != -1)
                 && !Arrays.stream(Spell.statesForbidden).anyMatch(x -> Fighter.HasState(x))
                 && !Arrays.stream(Spell.statesRequired).anyMatch(x -> !Fighter.HasState(x))
@@ -813,7 +826,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.myLoopTimeOut = System.currentTimeMillis() + this.GetTurnTime();
 
         // Status en attente de fin de tour
-        if (this.CurrentFighter instanceof CharacterFighter && ((CharacterFighter) CurrentFighter).Character.Client == null && this.CurrentFighter.Team.GetAliveFighters().count() > 1L) {
+        if ((this.CurrentFighter instanceof CharacterFighter && ((CharacterFighter) CurrentFighter).Character.Client == null && this.CurrentFighter.Team.GetAliveFighters().count() > 1L) || this.CurrentFighter.Buffs.GetAllBuffs().anyMatch(x-> x instanceof BuffEndTurn)) {
             this.FightLoopState = FightLoopState.STATE_END_TURN;
         } else {
             this.FightLoopState = FightLoopState.STATE_WAIT_TURN;
@@ -975,7 +988,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         Fighter.UsedMP += Path.MovementLength;
         this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, Fighter.ID, Fighter.ID, (short) -Path.MovementLength));
-    
+
         Fighter.SetCell(this.GetCell(Path.EndCell()));
         this.EndSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
         return GameMovement;

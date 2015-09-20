@@ -121,7 +121,6 @@ public class BombFighter extends StaticFighter {
     public int TryDie(int CasterId, boolean force) {
         if (this.Life() <= 0 && !force) {
             if (this.Buffs.GetAllBuffs().anyMatch(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE)) {
-                System.out.println("s");
                 return this.Buffs.GetAllBuffs().filter(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().ApplyEffect(null, null);
             } else {
                 if (this.FightBombs != null) {

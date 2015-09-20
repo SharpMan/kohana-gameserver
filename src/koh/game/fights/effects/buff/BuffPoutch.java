@@ -2,6 +2,7 @@ package koh.game.fights.effects.buff;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import koh.game.Main;
 import koh.game.dao.SpellDAO;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
@@ -53,6 +54,7 @@ public class BuffPoutch extends BuffEffect {
         double num2 = (double) Arrays.stream(SpellLevel.effects).mapToInt(x -> x.random).sum();
         boolean flag = false;
         for (EffectInstanceDice Effect : SpellLevel.effects) {
+            Main.Logs().writeDebug(Effect.toString());
             ArrayList<Fighter> Targets = new ArrayList<>();
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true), this.Caster.Fight.Map)).GetCells(Target.CellId())) {
                 FightCell FightCell = Target.Fight.GetCell(Cell);
@@ -62,7 +64,7 @@ public class BuffPoutch extends BuffEffect {
                             if (CastInfos.SpellId == 2809 && Target2 == Target) {
                                 continue;
                             }
-                            if (Effect.IsValidTarget(this.Target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.Target, Target2, Effect)) {
+                            if (Effect.IsValidTarget(this.Target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.Target, Target2, Effect,Target2.ID)) {
                                 if (Effect.targetMask.equals("C") && this.Target.GetCarriedActor() == Target2.ID) {
                                     continue;
                                 } else if (Effect.targetMask.equals("a,A") && this.Target.GetCarriedActor() != 0 & this.Target.ID == Target2.ID) {
@@ -74,6 +76,10 @@ public class BuffPoutch extends BuffEffect {
                         }
                     }
                 }
+            }
+            if(CastInfos.SpellId == 94){
+                Targets.clear();
+                Targets.add(DamageInfos.Caster);
             }
             if (Effect.random > 0) {
                 if (!flag) {

@@ -65,6 +65,11 @@ public class EffectDamage extends EffectBase {
                 return -3; // Fin du combat
             }
         }
+        if(!CastInfos.IsReflect && CastInfos.IsTrap){
+            if (Target.Buffs.OnAttackedPostJetTrap(CastInfos, DamageJet) == -3) {
+                return -3; // Fin du combat
+            }
+        }
         // Calcul jet
         Caster.CalculDamages(CastInfos.EffectType, DamageJet);
         //Calcul Bonus Negatif Zone ect ...

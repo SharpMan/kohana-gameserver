@@ -1,6 +1,7 @@
 package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
+import koh.game.fights.effects.buff.BuffLifeSteal;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -11,23 +12,40 @@ public class EffectLifeSteal extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            if (CastInfos.SpellId == 450 && Target.Team.Id != CastInfos.Caster.Team.Id) { //Folie
-                continue;
-            }
-            MutableInt DamageJet = new MutableInt(CastInfos.RandomJet(Target));
+        // Si > 0 alors c'est un buff
+        if (CastInfos.Duration > 0) {
+            // L'effet est un poison
+            CastInfos.IsPoison = true;
 
-            if (EffectDamage.ApplyDamages(CastInfos, Target, DamageJet) == -3) {
-                return -3;
-            }
+            // Ajout du buff
+            CastInfos.Targets.stream().forEach((Target) -> {
+                Target.Buffs.AddBuff(new BuffLifeSteal(CastInfos, Target));
+            });
+        } else {
+            for (Fighter Target : CastInfos.Targets) {
+                if (CastInfos.SpellId == 450 && Target.Team.Id != CastInfos.Caster.Team.Id) { //Folie
+                    continue;
+                }
 
-            MutableInt HealJet = new MutableInt(DamageJet.intValue() / 2);
-
-            if (EffectHeal.ApplyHeal(CastInfos, CastInfos.Caster, HealJet) == -3) {
-                return -3;
+                if (ApplyLifeSteal(CastInfos, Target, new MutableInt(CastInfos.RandomJet(Target))) == -3) {
+                    return -3;
+                }
             }
         }
 
+        return -1;
+    }
+
+    public static int ApplyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
+        if (EffectDamage.ApplyDamages(CastInfos, Target, DamageJet) == -3) {
+            return -3;
+        }
+
+        MutableInt HealJet = new MutableInt(DamageJet.intValue() / 2);
+
+        if (EffectHeal.ApplyHeal(CastInfos, CastInfos.Caster, HealJet) == -3) {
+            return -3;
+        }
         return -1;
     }
 

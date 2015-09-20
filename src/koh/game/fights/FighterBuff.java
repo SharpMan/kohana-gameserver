@@ -28,6 +28,7 @@ public class FighterBuff {
         {
             this.put(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET, new ArrayList<>());
+             this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET_TRAP, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_POST_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_HEAL_AFTER_JET, new ArrayList<>());
@@ -213,6 +214,19 @@ public class FighterBuff {
     /// <param name="DamageValue"></param>
     public int OnAttackedPostJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : BuffsAct.get(BuffActiveType.ACTIVE_ATTACKED_POST_JET)) {
+            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+                return -3;
+            }
+        }
+        return -1;
+    }
+    
+     /// Subit des dommages, activation des buffs de reduction, renvois, anihilation des dommages avant le calcul du jet
+    /// </summary>
+    /// <param name="CastInfos"></param>
+    /// <param name="DamageValue"></param>
+    public int OnAttackedPostJetTrap(EffectCast CastInfos, MutableInt DamageValue) {
+        for (BuffEffect Buff : BuffsAct.get(BuffActiveType.ACTIVE_ATTACKED_POST_JET_TRAP)) {
             if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }

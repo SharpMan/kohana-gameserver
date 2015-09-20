@@ -193,9 +193,7 @@ public class EffectInstance implements Serializable {
         GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.GetGameContextActorInformations(null);
         GameFightMonsterInformations monsterInfo = pTargetId.GetGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.GetGameContextActorInformations(null) : null;
         boolean isTargetAlly = pCasterId.IsFriendlyWith(pTargetId);
-        if ((((((pCasterId.ID == pCasterId.Fight.CurrentFighter.ID)) && ((pEffect.category() == 0)))) && (((pEffect.targetMask.equals("C")))))) {
-            return (true);
-        };
+        
         if (targetIsCaster) {
             if (pEffect.effectId == 90) {
                 return (true);

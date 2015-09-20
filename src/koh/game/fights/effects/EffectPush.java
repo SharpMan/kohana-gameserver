@@ -45,6 +45,9 @@ public class EffectPush extends EffectBase {
                     break;
                 case PullForward:
                     Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
+                    if(CastInfos.SpellId == 5382 || CastInfos.SpellId == 5475){
+                        Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.targetKnownCellId);
+                    }
                     break;
                 case BACK_CELL:
                     Fighter p = CastInfos.Caster;

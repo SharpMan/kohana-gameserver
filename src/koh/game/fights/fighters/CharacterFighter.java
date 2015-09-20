@@ -146,7 +146,6 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public void LeaveFight() {
-        System.out.println("leava");
         super.LeaveFight();
         this.EndFight();
     }

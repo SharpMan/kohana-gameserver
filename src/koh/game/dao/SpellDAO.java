@@ -11,6 +11,7 @@ import koh.d2o.entities.SpellBomb;
 import koh.game.MySQL;
 import koh.game.entities.spells.*;
 import koh.game.utils.Settings;
+import koh.protocol.client.enums.SpellTargetType;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -39,7 +40,7 @@ public class SpellDAO {
                         spellLevels = new SpellLevel[RS.getString("spell_levels").split(",").length];
                         for (int i = 0; i < RS.getString("spell_levels").split(",").length; i++) {
                             this.spellLevels[i] = LevelCache.get(Integer.parseInt(RS.getString("spell_levels").split(",")[i]));
-                           
+
                         }
                     }
                 });
@@ -135,6 +136,9 @@ public class SpellDAO {
                         this.effects = new EffectInstanceDice[buf.getInt()];
                         for (int i = 0; i < this.effects.length; i++) {
                             this.effects[i] = new EffectInstanceDice(buf);
+                            if (this.spellId == 126) {//To patch in DAO After
+                                this.effects[i].targetMask = "a";
+                            }
                             /* if(this.effects[i].effectId == 165)
                              System.out.println("hn"+this.spellId);*/
                         }

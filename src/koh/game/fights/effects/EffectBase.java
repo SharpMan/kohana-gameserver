@@ -22,6 +22,9 @@ public abstract class EffectBase {
             //Xelor
             this.put(StatsEnum.TELEPORT_PREVIOUS_POSITION, new EffectTpPrevPos());
             this.put(StatsEnum.TELEPORT_STARTING_TURN_CELL, new EffectTpFirstPos());
+            this.put(StatsEnum.TELEPORT_SYMETRIC, new EffectTeleportSymetric());
+            this.put(StatsEnum.TELEPORT_SYMETRIC_MYSELF, new EffectTeleportSymetricMySelf());
+
             //Téleportation
             this.put(StatsEnum.Teleport_4, new EffectTeleport());
             this.put(StatsEnum.Teleport, new EffectTeleport());
@@ -145,6 +148,10 @@ public abstract class EffectBase {
             this.put(StatsEnum.CHATIMENT, new EffectChatiment());
             this.put(StatsEnum.Erosion, new EffectErosion());
 
+            
+            //Corruption
+            this.put(StatsEnum.Skip_Turn, new EffectEndTurn());
+            
             //Caracteristiques Ajout/Reduction
             this.put(StatsEnum.Strength, new EffectStats());
             this.put(StatsEnum.Intelligence, new EffectStats());

@@ -31,7 +31,7 @@ public class BuffTpFirstPos extends BuffEffect {
         FightCell cell = Target.Fight.GetCell(Target.previousFirstCellPos.get(Target.previousFirstCellPos.size() - 1));
 
         if (cell != null) {
-            Target.Fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, Target.ID, CastInfos.CellId));
+            Target.Fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, Target.ID, cell.Id));
 
             return Target.SetCell(cell);
         }
