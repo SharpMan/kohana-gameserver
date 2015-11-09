@@ -69,6 +69,7 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         } catch (Exception e) {
             Main.Logs().writeError("[ERROR] Unknown Message Header Handler " + (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) + session.getRemoteAddress().toString());
             session.write(new BasicNoOperationMessage());
+            buf.skip(messageLength);
             return true;
         }
         message.deserialize(buf);
