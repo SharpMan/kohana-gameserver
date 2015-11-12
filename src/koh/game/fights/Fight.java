@@ -1089,6 +1089,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         // Si un timer pour le lancement du combat
         if (this.GetStartTimer() != -1) {
+            //FIXME remove Thread.sleep
             this.StartTimer(new CancellableExecutorRunnable(BackGroundWorker, (GetStartTimer() * 1000)) {
                 @Override
                 public void run() {
