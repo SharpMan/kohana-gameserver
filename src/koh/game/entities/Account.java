@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import koh.game.dao.mysql.AccountDataDAOImpl;
 import koh.protocol.types.game.choice.CharacterBaseInformations;
+import lombok.Getter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -19,6 +20,7 @@ public class Account {
 
     }
 
+    @Getter
     public int ID;
     public String NickName;
     public byte Right;

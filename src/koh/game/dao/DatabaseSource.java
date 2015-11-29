@@ -2,6 +2,7 @@ package koh.game.dao;
 
 import com.google.inject.Binder;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import koh.patterns.services.api.DependsOn;
@@ -26,8 +27,12 @@ import java.sql.Statement;
 public class DatabaseSource implements Service {
 
     @Override
+    public void inject(Injector injector){
+    }
+
+    @Override
     public void configure(Binder binder){
-        //binder.bind(AccountDAO.class).to(AccountDAOImpl.class).asEagerSingleton();
+        binder.requestStaticInjection(DAO.class);
     }
 
     @Inject private Settings settings;
