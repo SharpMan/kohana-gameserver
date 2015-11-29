@@ -1,6 +1,6 @@
 package koh.game.actions;
 
-import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;
@@ -31,7 +31,7 @@ public class TeleporterAction extends GameAction {
     public void Abort(Object[] Args) {
         try {
             int map = (int) Args[0];
-            if (MapDAO.GetSubWay(((Player) Actor).CurrentMap.GetSubArea().area.id, map) == null) {
+            if (MapDAOImpl.getSubWay(((Player) Actor).CurrentMap.GetSubArea().area.id, map) == null) {
                 return;
             }
             if (((Player) Actor).Kamas < GetCostTo(null)) {
@@ -39,7 +39,7 @@ public class TeleporterAction extends GameAction {
                 return;
             }
             ((Player) Actor).InventoryCache.SubstractKamas(GetCostTo(null));
-            ((Player) Actor).teleport(map, MapDAO.GetSubWay(((Player) Actor).CurrentMap.GetSubArea().area.id, map).Cell);
+            ((Player) Actor).teleport(map, MapDAOImpl.getSubWay(((Player) Actor).CurrentMap.GetSubArea().area.id, map).Cell);
 
             this.EndExecute();
         } catch (Exception e) {
@@ -54,17 +54,17 @@ public class TeleporterAction extends GameAction {
     }
 
     public int[] subAreaIds() {
-        if (!MapDAO.SubWays.containsKey(((Player) Actor).CurrentMap.GetSubArea().area.id)) {
+        if (!MapDAOImpl.subWays.containsKey(((Player) Actor).CurrentMap.GetSubArea().area.id)) {
             return Enumerable.DuplicatedKeyInt(39, ((Player) Actor).Mapid);
         }
-        return MapDAO.SubWays.get(((Player) Actor).CurrentMap.GetSubArea().area.id).stream().mapToInt(x -> x.SubArea).toArray();
+        return MapDAOImpl.subWays.get(((Player) Actor).CurrentMap.GetSubArea().area.id).stream().mapToInt(x -> x.SubArea).toArray();
     }
 
     public int[] mapIds() {
-        if (!MapDAO.SubWays.containsKey(((Player) Actor).CurrentMap.GetSubArea().area.id)) {
+        if (!MapDAOImpl.subWays.containsKey(((Player) Actor).CurrentMap.GetSubArea().area.id)) {
             return Enumerable.DuplicatedKeyInt(39, ((Player) Actor).Mapid);
         }
-        return MapDAO.SubWays.get(((Player) Actor).CurrentMap.GetSubArea().area.id).stream().mapToInt(x -> x.Mapid).toArray();
+        return MapDAOImpl.subWays.get(((Player) Actor).CurrentMap.GetSubArea().area.id).stream().mapToInt(x -> x.Mapid).toArray();
     }
 
     public int[] Costs() {

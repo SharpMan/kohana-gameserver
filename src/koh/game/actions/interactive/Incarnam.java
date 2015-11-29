@@ -26,7 +26,7 @@ public class Incarnam implements InteractiveAction {
             return;
         }
         Actor.teleport(80216068, 283);
-        // Actor.teleport(D2oDao.getBreed(Actor.Breed).spawnMaptype, 298);
+        // Actor.teleport(D2oDaoImpl.getBreed(Actor.Breed).spawnMaptype, 298);
     }
 
     @Override

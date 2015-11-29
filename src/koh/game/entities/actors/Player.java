@@ -7,12 +7,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.D2oDao;
-import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.D2oDaoImpl;
+import koh.game.dao.mysql.ExpDAOImpl;
 import static koh.game.dao.sqlite.GuildDAO.HasGuild;
-import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.dao.mysql.PlayerDAO;
-import koh.game.dao.mysql.SpellDAO;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.character.CharacterInventory;
@@ -240,7 +240,7 @@ public class Player extends IGameActor implements Observer {
             this.CurrentMap.sendToField(new TeleportOnSameMapMessage(ID, Cell.Id));
             return;
         }
-        DofusMap NextMap = MapDAO.Cache.get(newMapID);
+        DofusMap NextMap = MapDAOImpl.dofusMaps.get(newMapID);
         if (NextMap == null) {
             PlayerController.SendServerMessage(Client, "Signal on the bugTracker nulled map -> " + newMapID);
             //Client.sendPacket(new ErrorMapNotFoundMessage());
@@ -379,8 +379,8 @@ public class Player extends IGameActor implements Observer {
      double INITIATIVE_TOTAL = (TOTALCARAC + BONUSINI) * (PDVACTUEL / PDVMAX);
 
      int fact = 4;
-     int pvmax = this.MaxLife() - D2oDao.getBreed(this.Breed).getHealPoint();
-     int pv = Life - D2oDao.getBreed(this.Breed).getHealPoint();
+     int pvmax = this.MaxLife() - D2oDaoImpl.getBreed(this.Breed).getHealPoint();
+     int pv = Life - D2oDaoImpl.getBreed(this.Breed).getHealPoint();
      if (pv < 0) {
      pv = 1;
      }
@@ -417,7 +417,7 @@ public class Player extends IGameActor implements Observer {
 
     public int MaxLife() {
         try {
-            return this.Stats.GetTotal(StatsEnum.Vitality) + ((int) Level * 5) + D2oDao.getBreed(this.Breed).getHealPoint();
+            return this.Stats.GetTotal(StatsEnum.Vitality) + ((int) Level * 5) + D2oDaoImpl.getBreed(this.Breed).getHealPoint();
         } catch (NullPointerException e) {
             Main.Logs().writeError(new Date().toString()+" Maxalife");
             e.printStackTrace();
@@ -484,7 +484,7 @@ public class Player extends IGameActor implements Observer {
             this.AlignmentGrade = 10;
         } else {
             for (byte n = 1; n <= 10; n++) {
-                if (Honor < ExpDAO.GetFloorByLevel(n).PvP) {
+                if (Honor < ExpDAOImpl.getFloorByLevel(n).PvP) {
                     this.AlignmentGrade = (byte) (n - 1);
 
                     break;
@@ -525,7 +525,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public ActorExtendedAlignmentInformations GetActorAlignmentExtendInformations() {
-        return new ActorExtendedAlignmentInformations(this.AlignmentSide.value, this.AlignmentValue, this.PvPEnabled == AggressableStatusEnum.NON_AGGRESSABLE ? 0 : this.AlignmentGrade, this.CharacterPower(), this.Honor, ExpDAO.GetFloorByLevel(this.AlignmentGrade).PvP, ExpDAO.GetFloorByLevel(this.AlignmentGrade == 10 ? 10 : this.AlignmentGrade + 1).PvP, this.PvPEnabled);
+        return new ActorExtendedAlignmentInformations(this.AlignmentSide.value, this.AlignmentValue, this.PvPEnabled == AggressableStatusEnum.NON_AGGRESSABLE ? 0 : this.AlignmentGrade, this.CharacterPower(), this.Honor, ExpDAOImpl.getFloorByLevel(this.AlignmentGrade).PvP, ExpDAOImpl.getFloorByLevel(this.AlignmentGrade == 10 ? 10 : this.AlignmentGrade + 1).PvP, this.PvPEnabled);
     }
 
     public CharacterBaseInformations toBaseInformations() {
@@ -551,13 +551,13 @@ public class Player extends IGameActor implements Observer {
 
         this.Experience += Value;
 
-        if (this.Level != ExpDAO.maxLEVEL) {
+        if (this.Level != ExpDAOImpl.maxLEVEL) {
 
             ExpLevel Floor;
 
             Integer LastLevel = this.Level;
             do {
-                Floor = ExpDAO.GetFloorByLevel(this.Level + 1);
+                Floor = ExpDAOImpl.getFloorByLevel(this.Level + 1);
                 if (Floor.Player < this.Experience) {
                     this.Level++;
                     this.StatPoints += 5;
@@ -567,7 +567,7 @@ public class Player extends IGameActor implements Observer {
                         this.Stats.AddBase(StatsEnum.ActionPoints, 1);
                     }
                     // Apprend des nouveaux sorts
-                    for (LearnableSpell learnableSpell : SpellDAO.LearnableSpells.get((int) this.Breed)) {
+                    for (LearnableSpell learnableSpell : SpellDAOImpl.learnableSpells.get((int) this.Breed)) {
                         if ((int) learnableSpell.ObtainLevel > (int) Level && this.mySpells.HasSpell(learnableSpell.Spell)) {
                             this.mySpells.RemoveSpell(this, learnableSpell.Spell);
                         } else if ((int) learnableSpell.ObtainLevel <= (int) Level && !this.mySpells.HasSpell(learnableSpell.Spell)) {

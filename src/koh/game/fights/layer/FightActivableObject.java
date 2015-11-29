@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import koh.game.dao.mysql.SpellDAO;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -70,7 +70,7 @@ public abstract class FightActivableObject implements IFightObject {
         m_spellId = castInfos.SpellId;
         m_spell_level = castInfos.SpellLevel.grade;
         try {
-            m_actionEffect = SpellDAO.Spells.get(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1];
+            m_actionEffect = SpellDAOImpl.spells.get(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1];
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
         }
         Cell = fight.GetCell(cell);

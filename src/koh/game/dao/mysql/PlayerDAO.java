@@ -127,7 +127,7 @@ public class PlayerDAO {
                             Level = RS.getInt("level");
                             Account = account;
                             Mapid = RS.getInt("map");
-                            this.CurrentMap = MapDAO.Cache.get(Mapid);
+                            this.CurrentMap = MapDAOImpl.dofusMaps.get(Mapid);
 
                             if (CurrentMap != null) {
                                 CurrentMap.Init();

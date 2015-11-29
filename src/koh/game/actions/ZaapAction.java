@@ -1,6 +1,6 @@
 package koh.game.actions;
 
-import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;
@@ -25,23 +25,23 @@ public class ZaapAction extends GameAction {
 
     @Override
     public void Execute() {
-        //Stream<Entry<Integer, DofusZaap>> Zaaps = MapDAO.Zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id);
-        this.Actor.Send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), Costs(), Enumerable.DuplicatedKey(MapDAO.Zaaps.size() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) Actor).CurrentMap.Id));
+        //Stream<Entry<Integer, DofusZaap>> zaaps = MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id);
+        this.Actor.Send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), Costs(), Enumerable.DuplicatedKey(MapDAOImpl.zaaps.size() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) Actor).CurrentMap.Id));
     }
 
     @Override
     public void Abort(Object[] Args) {
         try {
             int map = (int) Args[0];
-            if (!MapDAO.Zaaps.containsKey(map)) {
+            if (!MapDAOImpl.zaaps.containsKey(map)) {
                 return;
             }
-            if (((Player) Actor).Kamas < GetCostTo(MapDAO.Zaaps.get(map).Map())) {
+            if (((Player) Actor).Kamas < GetCostTo(MapDAOImpl.zaaps.get(map).Map())) {
                 Actor.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
                 return;
             }
-            ((Player) Actor).InventoryCache.SubstractKamas(GetCostTo(MapDAO.Zaaps.get(map).Map()));
-            ((Player) Actor).teleport(map, MapDAO.Zaaps.get(map).Cell);
+            ((Player) Actor).InventoryCache.SubstractKamas(GetCostTo(MapDAOImpl.zaaps.get(map).Map()));
+            ((Player) Actor).teleport(map, MapDAOImpl.zaaps.get(map).Cell);
 
             this.EndExecute();
         } catch (Exception e) {
@@ -56,17 +56,17 @@ public class ZaapAction extends GameAction {
     }
 
     public int[] subAreaIds() {
-        return MapDAO.Zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).mapToInt(x -> x.getValue().Map().SubAreaId).toArray();
+        return MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).mapToInt(x -> x.getValue().Map().SubAreaId).toArray();
     }
 
     public int[] mapIds() {
-        return MapDAO.Zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).mapToInt(x -> x.getKey()).toArray();
+        return MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).mapToInt(x -> x.getKey()).toArray();
     }
 
     public int[] Costs() {
-        int[] Cost = new int[MapDAO.Zaaps.size() - 1];
+        int[] Cost = new int[MapDAOImpl.zaaps.size() - 1];
         int i = 0;
-        for (DofusMap zaap : MapDAO.Zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).map(x -> x.getValue().Map()).toArray(DofusMap[]::new)) {
+        for (DofusMap zaap : MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).map(x -> x.getValue().Map()).toArray(DofusMap[]::new)) {
             Cost[i] = GetCostTo(zaap);
             i++;
         }

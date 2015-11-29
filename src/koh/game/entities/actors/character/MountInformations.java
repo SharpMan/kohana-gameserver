@@ -1,7 +1,7 @@
 package koh.game.entities.actors.character;
 
 import koh.game.Main;
-import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.dao.sqlite.MountDAO;
 import koh.game.dao.sqlite.PetsDAO;
 import koh.game.entities.actors.Player;
@@ -101,7 +101,7 @@ public class MountInformations {
     public void addExperience(long amount) {
         this.Mount.experience += amount;
 
-        while (this.Mount.experience >= ExpDAO.GetFloorByLevel(this.Mount.level + 1).Mount && this.Mount.level < 100) {
+        while (this.Mount.experience >= ExpDAOImpl.getFloorByLevel(this.Mount.level + 1).Mount && this.Mount.level < 100) {
             levelUp();
         }
 
@@ -128,8 +128,8 @@ public class MountInformations {
             this.myStats = null;
             this.EnableStats(true);
         }
-        this.Mount.experienceForLevel = ExpDAO.GetFloorByLevel(this.Mount.level).Mount;
-        this.Mount.experienceForNextLevel = ExpDAO.GetFloorByLevel(this.Mount.level == 100 ? 100 : this.Mount.level + 1).Mount;
+        this.Mount.experienceForLevel = ExpDAOImpl.getFloorByLevel(this.Mount.level).Mount;
+        this.Mount.experienceForNextLevel = ExpDAOImpl.getFloorByLevel(this.Mount.level == 100 ? 100 : this.Mount.level + 1).Mount;
     }
 
     public byte[] Serialize() {

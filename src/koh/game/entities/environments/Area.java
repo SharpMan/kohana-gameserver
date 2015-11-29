@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import koh.concurrency.CancellableScheduledRunnable;
-import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.utils.Settings;
 import koh.protocol.messages.game.interactive.StatedMapUpdateMessage;
 import koh.protocol.types.game.interactive.StatedElement;
@@ -22,8 +22,8 @@ public class Area {
             @Override
             public void run() {
                 Arrays.stream(SubAreas).forEach(Sub -> Arrays.stream(Sub.mapIds)
-                        .forEach(Id -> MapDAO.Cache.get(Id).InteractiveElements.stream()
-                                .filter(Element -> MapDAO.Cache.get(Id).GetStatedElementById(Element.elementId) != null && MapDAO.Cache.get(Id).GetStatedElementById(Element.elementId).elementState == 0)
+                        .forEach(Id -> MapDAOImpl.dofusMaps.get(Id).InteractiveElements.stream()
+                                .filter(Element -> MapDAOImpl.dofusMaps.get(Id).GetStatedElementById(Element.elementId) != null && MapDAOImpl.dofusMaps.get(Id).GetStatedElementById(Element.elementId).elementState == 0)
                                 .forEach(Interactive -> {
                                     {
                                         if (Interactive.AgeBonus == -1) {
@@ -42,18 +42,18 @@ public class Area {
             public void run() {
                 Arrays.stream(SubAreas)
                         .forEach(Sub -> Arrays.stream(Sub.mapIds)
-                                .filter(Id -> MapDAO.Cache.get(Id).myInitialized)
+                                .filter(Id -> MapDAOImpl.dofusMaps.get(Id).myInitialized)
                                 .forEach(Id -> {
                                     {
                                         boolean Modified = false;
-                                        for (StatedElement Element : (Iterable<StatedElement>) Arrays.stream(MapDAO.Cache.get(Id).ElementsStated)
+                                        for (StatedElement Element : (Iterable<StatedElement>) Arrays.stream(MapDAOImpl.dofusMaps.get(Id).ElementsStated)
                                         .filter(Element -> Element.deadAt != -1 && Element.elementState > 0 && (System.currentTimeMillis() - Element.deadAt) > Settings.GetIntElement("Job.Spawn") * 60000)::iterator) {
                                             Element.deadAt = -1;
                                             Element.elementState = 0;
                                             Modified = true;
                                         }
                                         if (Modified) {
-                                            MapDAO.Cache.get(Id).sendToField(new StatedMapUpdateMessage(MapDAO.Cache.get(Id).ElementsStated));
+                                            MapDAOImpl.dofusMaps.get(Id).sendToField(new StatedMapUpdateMessage(MapDAOImpl.dofusMaps.get(Id).ElementsStated));
                                         }
 
                                     }

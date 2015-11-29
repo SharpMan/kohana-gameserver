@@ -3,7 +3,7 @@ package koh.game.fights.effects.buff;
 import java.util.ArrayList;
 import java.util.Arrays;
 import koh.game.Main;
-import koh.game.dao.mysql.SpellDAO;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
@@ -49,7 +49,7 @@ public class BuffPoutch extends BuffEffect {
             //Target = DamageInfos.Caster;
         }
 
-        SpellLevel SpellLevel = SpellDAO.Spells.get(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
+        SpellLevel SpellLevel = SpellDAOImpl.spells.get(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();
         double num2 = (double) Arrays.stream(SpellLevel.effects).mapToInt(x -> x.random).sum();
         boolean flag = false;

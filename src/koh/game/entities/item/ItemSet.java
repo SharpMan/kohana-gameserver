@@ -37,7 +37,7 @@ public class ItemSet {
     public EffectInstance[][] effects; //Dice
     private GenericStats[] myStats;
     
-    //TODO: Create Cache  ObjectEffect[] toObjectEffects
+    //TODO: Create dofusMaps  ObjectEffect[] toObjectEffects
 
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

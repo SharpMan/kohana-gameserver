@@ -19,7 +19,7 @@ import koh.protocol.messages.game.context.fight.character.GameFightRefreshFighte
  */
 public class EffectPerception extends EffectBase {
 
-    //TODO Cache AffectedCell in CastInfos et nettoyer ce code
+    //TODO dofusMaps AffectedCell in CastInfos et nettoyer ce code
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (short Cell : (new Zone(CastInfos.Effect.ZoneShape(), CastInfos.Effect.ZoneSize(), MapPoint.fromCellId(CastInfos.Caster.CellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true),CastInfos.Caster.Fight.Map)).GetCells(CastInfos.CellId)) {

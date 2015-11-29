@@ -3,8 +3,8 @@ package koh.game.entities.actors.character;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import koh.game.dao.mysql.ExpDAO;
-import koh.game.dao.mysql.JobDAO;
+import koh.game.dao.mysql.ExpDAOImpl;
+import koh.game.dao.mysql.JobDAOImpl;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.Player;
 import koh.game.entities.jobs.InteractiveSkill;
@@ -38,7 +38,7 @@ public class JobBook {
         Integer LastLevel = this.myJobs.get(parentJobId).jobLevel;
 
         do {
-            Floor = ExpDAO.GetFloorByLevel(this.myJobs.get(parentJobId).jobLevel + 1);
+            Floor = ExpDAOImpl.getFloorByLevel(this.myJobs.get(parentJobId).jobLevel + 1);
 
             if (Floor.Job < this.myJobs.get(parentJobId).XP) {
                 this.myJobs.get(parentJobId).jobLevel++;
@@ -46,10 +46,10 @@ public class JobBook {
         } while (Floor.Job < this.myJobs.get(parentJobId).XP && this.myJobs.get(parentJobId).jobLevel != 200);
 
         if (this.myJobs.get(parentJobId).jobLevel != LastLevel) {
-            Actor.Send(new JobLevelUpMessage((byte)this.myJobs.get(parentJobId).jobLevel,new JobDescription(parentJobId, JobDAO.Skills.values().stream().filter(Skill -> Skill.parentJobId == parentJobId && this.myJobs.get(parentJobId).jobLevel >= Skill.levelMin).map(Skill -> JobToSkill(Skill, this.myJobs.get(parentJobId))).toArray(SkillActionDescription[]::new))));
+            Actor.Send(new JobLevelUpMessage((byte)this.myJobs.get(parentJobId).jobLevel,new JobDescription(parentJobId, JobDAOImpl.Skills.values().stream().filter(Skill -> Skill.parentJobId == parentJobId && this.myJobs.get(parentJobId).jobLevel >= Skill.levelMin).map(Skill -> JobToSkill(Skill, this.myJobs.get(parentJobId))).toArray(SkillActionDescription[]::new))));
         }
 
-        Actor.Send(new JobExperienceUpdateMessage(new JobExperience(parentJobId, (byte) this.myJobs.get(parentJobId).jobLevel, this.myJobs.get(parentJobId).XP, ExpDAO.GetFloorByLevel(this.myJobs.get(parentJobId).jobLevel).Job, ExpDAO.GetFloorByLevel(this.myJobs.get(parentJobId).jobLevel + 1).Job)));
+        Actor.Send(new JobExperienceUpdateMessage(new JobExperience(parentJobId, (byte) this.myJobs.get(parentJobId).jobLevel, this.myJobs.get(parentJobId).XP, ExpDAOImpl.getFloorByLevel(this.myJobs.get(parentJobId).jobLevel).Job, ExpDAOImpl.getFloorByLevel(this.myJobs.get(parentJobId).jobLevel + 1).Job)));
     }
 
     public class JobInfo {
@@ -87,11 +87,11 @@ public class JobBook {
         }
 
         public JobGatheringInfos JobEntity(int StartLevel) {
-            return JobDAO.GatheringJobs.get(JobDAO.GatheringJobs.keySet().stream().filter(x -> StartLevel >= x).mapToInt(x -> x).max().getAsInt());
+            return JobDAOImpl.GatheringJobs.get(JobDAOImpl.GatheringJobs.keySet().stream().filter(x -> StartLevel >= x).mapToInt(x -> x).max().getAsInt());
         }
 
         public Couple<Integer, Integer> Quantity(int StartLevel) {
-            return JobDAO.GatheringJobs.get(JobDAO.GatheringJobs.keySet().stream().filter(x -> StartLevel >= x).mapToInt(x -> x).max().getAsInt()).LevelMinMax(this.jobLevel);
+            return JobDAOImpl.GatheringJobs.get(JobDAOImpl.GatheringJobs.keySet().stream().filter(x -> StartLevel >= x).mapToInt(x -> x).max().getAsInt()).LevelMinMax(this.jobLevel);
         }
 
         public byte Probability() {
@@ -132,11 +132,11 @@ public class JobBook {
     }
 
     public JobDescription[] GetDescriptions() {
-        return this.myJobs.values().stream().map(Job -> new JobDescription(Job.ID, JobDAO.Skills.values().stream().filter(Skill -> Skill.parentJobId == Job.ID && Job.jobLevel >= Skill.levelMin).map(Skill -> JobToSkill(Skill, Job)).toArray(SkillActionDescription[]::new))).toArray(JobDescription[]::new);
+        return this.myJobs.values().stream().map(Job -> new JobDescription(Job.ID, JobDAOImpl.Skills.values().stream().filter(Skill -> Skill.parentJobId == Job.ID && Job.jobLevel >= Skill.levelMin).map(Skill -> JobToSkill(Skill, Job)).toArray(SkillActionDescription[]::new))).toArray(JobDescription[]::new);
     }
 
     public JobExperience[] GetExperiences() {
-        return this.myJobs.values().stream().map(Job -> new JobExperience(Job.ID, (byte) Job.jobLevel, Job.XP, ExpDAO.GetFloorByLevel(Job.jobLevel).Job, ExpDAO.GetFloorByLevel(Job.jobLevel + 1).Job)).toArray(JobExperience[]::new);
+        return this.myJobs.values().stream().map(Job -> new JobExperience(Job.ID, (byte) Job.jobLevel, Job.XP, ExpDAOImpl.getFloorByLevel(Job.jobLevel).Job, ExpDAOImpl.getFloorByLevel(Job.jobLevel + 1).Job)).toArray(JobExperience[]::new);
     }
 
     public JobCrafterDirectorySettings[] GetSettings() {

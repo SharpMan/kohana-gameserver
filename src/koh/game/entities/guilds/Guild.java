@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import koh.game.Main;
-import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.dao.sqlite.GuildDAO;
 import koh.game.dao.mysql.PlayerDAO;
 import koh.game.entities.actors.Player;
@@ -52,7 +52,7 @@ public class Guild extends IWorldEventObserver {
     public void onFighterAddedExperience(GuildMember Member, long XP) {
         Member.AddExperience(XP);
         this.Entity.AddExperience(XP);
-        while (this.Entity.Experience() >= ExpDAO.GetFloorByLevel(this.Entity.Level + 1).Guild && this.Entity.Level < Settings.GetIntElement("Max.GuildLevel")) {
+        while (this.Entity.Experience() >= ExpDAOImpl.getFloorByLevel(this.Entity.Level + 1).Guild && this.Entity.Level < Settings.GetIntElement("Max.GuildLevel")) {
             this.Entity.Level++;
             this.Entity.Boost += 5;
             this.sendToField(new GuildLevelUpMessage(this.Entity.Level));
@@ -211,7 +211,7 @@ public class Guild extends IWorldEventObserver {
     }
 
     public GuildInformationsGeneralMessage toGeneralInfos() {
-        return new GuildInformationsGeneralMessage(true, false, (byte) this.Entity.Level, (long) ExpDAO.GetFloorByLevel(this.Entity.Level).Guild, this.Entity.Experience(), (long) ExpDAO.GetFloorByLevel(this.Entity.Level + 1).Guild, this.Entity.CreationDate, this.Members.size(), this.Characters.size());
+        return new GuildInformationsGeneralMessage(true, false, (byte) this.Entity.Level, (long) ExpDAOImpl.getFloorByLevel(this.Entity.Level).Guild, this.Entity.Experience(), (long) ExpDAOImpl.getFloorByLevel(this.Entity.Level + 1).Guild, this.Entity.CreationDate, this.Members.size(), this.Characters.size());
     }
 
     protected void UpdateMember(GuildMember member) {
@@ -250,7 +250,7 @@ public class Guild extends IWorldEventObserver {
 
     public GuildEmblem GetGuildEmblem() {
         if (EmblemeCache == null) {
-            //EmblemSymbols Template = GuildEmblemDAO.Cache.get(this.Entity.EmblemForegroundShape);
+            //EmblemSymbols Template = GuildEmblemDAO.dofusMaps.get(this.Entity.EmblemForegroundShape);
             this.EmblemeCache = new GuildEmblem(this.Entity.EmblemForegroundShape, this.Entity.EmblemForegroundColor, (byte) this.Entity.EmblemBackgroundShape, this.Entity.EmblemBackgroundColor);
         }
         return EmblemeCache;

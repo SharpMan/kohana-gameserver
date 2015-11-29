@@ -3,7 +3,7 @@ package koh.game.fights.types;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
-import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.entities.environments.DofusMap;
 import koh.game.fights.Fight;
 import koh.game.fights.FightFormulas;
@@ -62,9 +62,9 @@ public class ChallengeFight extends Fight {
                 {
                     this.experience = ((CharacterFighter) Fighter).Character.Experience;
                     this.showExperience = true;
-                    this.experienceLevelFloor = ExpDAO.PersoXpMin(Fighter.Level());
+                    this.experienceLevelFloor = ExpDAOImpl.persoXpMin(Fighter.Level());
                     this.showExperienceLevelFloor = true;
-                    this.experienceNextLevelFloor = ExpDAO.PersoXpMax(Fighter.Level());
+                    this.experienceNextLevelFloor = ExpDAOImpl.persoXpMax(Fighter.Level());
                     this.showExperienceNextLevelFloor = Fighter.Level() < 200;
                     this.experienceFightDelta = xpTotal.get().intValue();
                     this.showExperienceFightDelta = true;

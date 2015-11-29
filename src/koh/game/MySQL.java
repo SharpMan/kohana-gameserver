@@ -184,7 +184,7 @@ public class MySQL {
     }
 
     public static void LoadCache() {
-        D2oDao.Initialize();
+        D2oDaoImpl.loadAll();
         Main.Logs().writeInfo(d2oReader.Breeds.size() + " Breeds catched");
         Main.Logs().writeInfo(d2oReader.Heads.size() + " Heads catched");
         Main.Logs().writeInfo(d2oReader.Effects.size() + " Effects catched");
@@ -193,43 +193,43 @@ public class MySQL {
         PetsDAO.InitNextKey();
         GuildDAO.InitNextKey();
         ItemTemplateDAOImpl.InitializeNextIdentifiant();
-        ExpDAO.load_ExpLevels();
-        Main.Logs().writeInfo(AreaDAO.FindSuper() + " SuperAreas catched");
-        Main.Logs().writeInfo(AreaDAO.FindAll() + " Areas catched");
-        Main.Logs().writeInfo(AreaDAO.FindSubAreas() + " SubAreas catched");
-        Main.Logs().writeInfo(MapDAO.FindAll() + " DofusMaps catched");
-        Main.Logs().writeInfo(MapDAO.FindSatedElements() + " StatedElements catched");
-        Main.Logs().writeInfo(MapDAO.FindInteractiveElements() + " InteractiveElements catched");
-        Main.Logs().writeInfo(MapDAO.FindHouseInformations() + " HouseInformations catched");
-        Main.Logs().writeInfo(MapDAO.FindDoors() + " InteractiveDoors catched");
-        Main.Logs().writeInfo(MapDAO.FindMapPositions() + " MapPositions catched");
-        Main.Logs().writeInfo(MapDAO.FindZaaps() + " MapZaaps catched");
-        Main.Logs().writeInfo(MapDAO.FindSubways() + " MapSubways catched");
-        Main.Logs().writeInfo(SpellDAO.FindLevels() + " SpellLevels catched ");
-        Main.Logs().writeInfo(SpellDAO.FindAll() + " Spells catched ");
-        Main.Logs().writeInfo(SpellDAO.FindBombs() + " SpellBombs catched ");
+        ExpDAOImpl.load_ExpLevels();
+        Main.Logs().writeInfo(AreaDAOImpl.FindSuper() + " SuperAreas catched");
+        Main.Logs().writeInfo(AreaDAOImpl.FindAll() + " Areas catched");
+        Main.Logs().writeInfo(AreaDAOImpl.FindSubAreas() + " SubAreas catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindAll() + " DofusMaps catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadAllSatedElements() + " StatedElements catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindInteractiveElements() + " InteractiveElements catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadALlHouseInformations() + " HouseInformations catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadAllDoors() + " InteractiveDoors catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadALlPositions() + " MapPositions catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindZaaps() + " MapZaaps catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindSubways() + " MapSubways catched");
+        Main.Logs().writeInfo(SpellDAOImpl.FindLevels() + " SpellLevels catched ");
+        Main.Logs().writeInfo(SpellDAOImpl.FindAll() + " spells catched ");
+        Main.Logs().writeInfo(SpellDAOImpl.loadAllBombs() + " SpellBombs catched ");
         Main.Logs().writeInfo(GuildEmblemDAO.FindAll() + " GuildEmblems catched ");
-        Main.Logs().writeInfo(SpellDAO.FindLearnables() + " LearnableSpells catched ");
+        Main.Logs().writeInfo(SpellDAOImpl.loadLearnables() + " learnableSpells catched ");
          Main.Logs().writeInfo(ItemTemplateDAOImpl.FindItemTypes() + " ItemTypes catched ");
         Main.Logs().writeInfo(ItemTemplateDAOImpl.FindAll() + " ItemTemplates catched ");
         Main.Logs().writeInfo(ItemTemplateDAOImpl.FindWeapons() + " Weapons catched ");
         Main.Logs().writeInfo(ItemTemplateDAOImpl.FindItemSets() + " ItemSets catched ");
         Main.Logs().writeInfo(ItemTemplateDAOImpl.FindPets() + " ItemPets catched ");
-        Main.Logs().writeInfo(NpcDAO.FindAll() + " NpcTemplates catched ");
-        Main.Logs().writeInfo(NpcDAO.FindSpawns() + " NpcSpawns catched ");
-        Main.Logs().writeInfo(NpcDAO.FindItems() + " NpcItems catched ");
-        Main.Logs().writeInfo(NpcDAO.FindMessages() + " NpcMessages catched ");
-        Main.Logs().writeInfo(NpcDAO.FindReplies() + " NpcReplies catched ");
-        Main.Logs().writeInfo(MapDAO.FindTriggers() + " Triggers catched");
-        Main.Logs().writeInfo(PaddockDAO.FindAll() + " Paddocks catched");
+        Main.Logs().writeInfo(NpcDAOImpl.loadAll() + " NpcTemplates catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindSpawns() + " NpcSpawns catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindItems() + " NpcItems catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindMessages() + " NpcMessages catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindReplies() + " NpcReplies catched ");
+        Main.Logs().writeInfo(MapDAOImpl.FindTriggers() + " Triggers catched");
+        Main.Logs().writeInfo(PaddockDAOImpl.FindAll() + " Paddocks catched");
         Main.Logs().writeInfo(MountDAO.FindAll() + " Mounts catched");
         Main.Logs().writeInfo(GuildDAO.FindAll() + " Guild catched");
         Main.Logs().writeInfo(GuildDAO.FindMembers() + " GuildMembers catched");
-        Main.Logs().writeInfo(JobDAO.FindAllGatheringInfos() + " GatheringJob LevelInfos catched");
-        Main.Logs().writeInfo(JobDAO.FindAllSkills() + " InteractiveSkills LevelInfos catched");
-        Main.Logs().writeInfo(MonsterDAO.FindAll() + " Monster Templates catched");
-        Main.Logs().writeInfo(MonsterDAO.FindGrades() + " Monster Grades catched");
-        Main.Logs().writeInfo(MonsterDAO.FindDrops() + " Monster Drops catched");
+        Main.Logs().writeInfo(JobDAOImpl.loadAllGatheringInfos() + " GatheringJob LevelInfos catched");
+        Main.Logs().writeInfo(JobDAOImpl.loadAllSkills() + " InteractiveSkills LevelInfos catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindAll() + " Monster Templates catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindGrades() + " Monster Grades catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindDrops() + " Monster Drops catched");
     }
 
     public synchronized Savepoint commitDatabase(boolean createSavePoint) {

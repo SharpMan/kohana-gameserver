@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import koh.game.Main;
-import koh.game.dao.mysql.SpellDAO;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
@@ -131,7 +131,7 @@ public class BombFighter extends StaticFighter {
         }
         if (this.Life() <= 0 || force) {
             SlefMurder(CasterId);
-            Fight.LaunchSpell(this, SpellDAO.Spells.get(SpellDAO.Bombs.get(this.Grade.monsterId).explodSpellId).SpellLevel(this.Grade.Grade), this.CellId(), true, true, false);
+            Fight.LaunchSpell(this, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(this.Grade.monsterId).explodSpellId).SpellLevel(this.Grade.Grade), this.CellId(), true, true, false);
             if (this.FightBombs != null) {
                 this.FightBombs.forEach(Bomb -> Bomb.Remove());
             }
@@ -169,7 +169,7 @@ public class BombFighter extends StaticFighter {
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.CellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.CellId());
-                        FightBomb Bomb = new FightBomb(this.Summoner, SpellDAO.Spells.get(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId).SpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                        FightBomb Bomb = new FightBomb(this.Summoner, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId).SpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
                         Fight.AddActivableObject(this.Summoner, Bomb);
                     }
                 }

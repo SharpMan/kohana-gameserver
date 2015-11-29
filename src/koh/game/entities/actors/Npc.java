@@ -1,6 +1,6 @@
 package koh.game.entities.actors;
 
-import koh.game.dao.mysql.NpcDAO;
+import koh.game.dao.mysql.NpcDAOImpl;
 import koh.game.entities.actors.npc.NpcTemplate;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayNpcInformations;
@@ -22,7 +22,7 @@ public class Npc extends IGameActor {
 
     //Todo QuestTODO:
     public NpcTemplate Template() {
-        return NpcDAO.Cache.get(this.NpcId);
+        return NpcDAOImpl.templates.get(this.NpcId);
     }
 
     @Override

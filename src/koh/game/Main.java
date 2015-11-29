@@ -51,7 +51,7 @@ public class Main {
             MySQL.ConnectDatabase();
             MySQL.LoadCache();
             $Logs.writeInfo(Handler.Initialize() + " Handlers Readed");
-            $Logs.writeInfo(Handler.InitializeMessage() + " Messages Readed");
+            $Logs.writeInfo(Handler.InitializeMessage() + " messages Readed");
             $TransfererTimeOut = new TransfererTimeOut();
             $InterClient = new InterClient();
             $InterClient.bind();

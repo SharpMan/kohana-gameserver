@@ -14,6 +14,8 @@ import koh.game.utils.StringUtil;
 import koh.patterns.services.api.Service;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.utils.Enumerable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 import java.sql.PreparedStatement;
@@ -29,6 +31,9 @@ import static koh.game.entities.item.InventoryItem.DeserializeEffects;
  * @author Neo-Craft
  */
 public abstract class ItemTemplateDAO implements Service {
+
+    private static final Logger logger = LogManager.getLogger(ItemTemplateDAO.class);
+
 
     public abstract void initInventoryCache(int player, Map<Integer, InventoryItem> cache, String table);
     //public abstract void distinctItems();
@@ -61,7 +66,7 @@ public abstract class ItemTemplateDAO implements Service {
                 case -1431655766:
                     break;
                 default:
-                    System.out.println("class" + classID);
+                    logger.warn("Unknown effectInstance classId " + classID);
                     //throw new Error("Unknown classDI " + classID);
                     break;
             }

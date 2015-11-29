@@ -5,7 +5,7 @@ import java.util.Map;
 import koh.game.Main;
 import koh.game.actions.interactive.*;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.JobDAO;
+import koh.game.dao.mysql.JobDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.InteractiveActionEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
@@ -34,7 +34,7 @@ public class InteractiveElementAction extends GameAction {
     }
 
     static {
-        JobDAO.Skills.values().stream().filter(x -> x.gatheredRessourceItem != -1).forEach(Skill -> Handlers.put(InteractiveActionEnum.valueOf(Skill.ID), new Collect(Skill)));
+        JobDAOImpl.Skills.values().stream().filter(x -> x.gatheredRessourceItem != -1).forEach(Skill -> Handlers.put(InteractiveActionEnum.valueOf(Skill.ID), new Collect(Skill)));
     }
 
     public InteractiveElementSkill Skill;

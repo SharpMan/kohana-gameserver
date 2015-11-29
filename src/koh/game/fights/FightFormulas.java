@@ -3,7 +3,7 @@ package koh.game.fights;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import koh.game.Main;
-import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
@@ -76,7 +76,7 @@ public class FightFormulas {
     }
 
     private static long XpNeededAtLevel(int lvl) {
-        return (ExpDAO.PersoXpMax(lvl) - ExpDAO.PersoXpMin(lvl == 200 ? 199 : lvl));
+        return (ExpDAOImpl.persoXpMax(lvl) - ExpDAOImpl.persoXpMin(lvl == 200 ? 199 : lvl));
     }
 
     public static long GuildXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {

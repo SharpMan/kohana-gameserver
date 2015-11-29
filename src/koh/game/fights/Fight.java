@@ -20,7 +20,7 @@ import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.Main;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameMapMovement;
-import koh.game.dao.mysql.SpellDAO;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
@@ -918,7 +918,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     public void AffectSpellTo(Fighter Caster, Fighter Target, int Level, int... Spells) {
         SpellLevel Spell;
         for (int Spellid : Spells) {
-            Spell = SpellDAO.Spells.get(Spellid).SpellLevel(Level);
+            Spell = SpellDAOImpl.spells.get(Spellid).SpellLevel(Level);
             double num1 = Fight.RANDOM.nextDouble();
             double num2 = (double) Arrays.stream(Spell.effects).mapToInt(x -> x.random).sum();
             boolean flag = false;

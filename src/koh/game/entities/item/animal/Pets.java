@@ -48,7 +48,7 @@ public class Pets {
                     if (total != (int) (b.getStatsBoost(i) * (Hormone / b.Point))) {
                         System.out.println("ErreurEffect stat " + i + " Familier " + Id + " StatsNormalMax " + ((int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide) + " != " + b.getStatsBoost(i)  * (Hormone / b.Point));
                         int maySet = total / (Hormone / b.Point);
-                        System.out.println("Familier" + ItemDAO.Cache.get(Id).nameId + "ID " + Id + " Monster " + b.MonsterFamily + " you should put " + b.MonsterFamily + ";" + b.DeathNumber + ";" + b.Point + ";" + Enumerable.Join(b.Stats, ':') + ";" + maySet);
+                        System.out.println("Familier" + ItemDAO.dofusMaps.get(Id).nameId + "ID " + Id + " Monster " + b.MonsterFamily + " you should put " + b.MonsterFamily + ";" + b.DeathNumber + ";" + b.Point + ";" + Enumerable.Join(b.Stats, ':') + ";" + maySet);
                     }
                 }*/
 

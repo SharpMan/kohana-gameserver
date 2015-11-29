@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import koh.game.dao.mysql.SpellDAO;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.spells.LearnableSpell;
 import koh.game.entities.spells.SpellLevel;
@@ -48,11 +48,11 @@ public class SpellBook {
         }
 
         public SpellLevel SpellLevel() {
-            return SpellDAO.Spells.get(Id).spellLevels[Level -1];
+            return SpellDAOImpl.spells.get(Id).spellLevels[Level -1];
         }
 
         public SpellLevel SpellLevel(byte Level) {
-            return SpellDAO.Spells.get(Id).spellLevels[Level - 1];
+            return SpellDAOImpl.spells.get(Id).spellLevels[Level - 1];
         }
 
         public SpellItem GetSpellItem() {
@@ -105,7 +105,7 @@ public class SpellBook {
         SpellBook Book = new SpellBook();
         byte i = 0;
         Book.AddSpell(0, (byte) 1, i++, null);
-        for (LearnableSpell ls : SpellDAO.LearnableSpells.get(Class)) {
+        for (LearnableSpell ls : SpellDAOImpl.learnableSpells.get(Class)) {
             if (ls.ObtainLevel <= Level) {
                 Book.AddSpell(ls.Spell, (byte) 1, i++, null);
             }

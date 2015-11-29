@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.D2oDao;
+import koh.game.dao.mysql.D2oDaoImpl;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.StatsBoostEnum;
@@ -63,8 +63,8 @@ public class RolePlayHandler {
             return;
         }
         int oldbase = base;
-        List<List<Integer>> thresholds = D2oDao.getBreed(Client.Character.Breed).GetThresholds((int) Message.statId);
-        for (int thresholdIndex = D2oDao.getBreed(Client.Character.Breed).GetThresholdIndex((int) base, thresholds); (long) num1 >= (long) thresholds.get(thresholdIndex).get(1); thresholdIndex = D2oDao.getBreed(Client.Character.Breed).GetThresholdIndex((int) base, thresholds)) {
+        List<List<Integer>> thresholds = D2oDaoImpl.getBreed(Client.Character.Breed).GetThresholds((int) Message.statId);
+        for (int thresholdIndex = D2oDaoImpl.getBreed(Client.Character.Breed).GetThresholdIndex((int) base, thresholds); (long) num1 >= (long) thresholds.get(thresholdIndex).get(1); thresholdIndex = D2oDaoImpl.getBreed(Client.Character.Breed).GetThresholdIndex((int) base, thresholds)) {
             short num2;
             short num3;
             if (thresholdIndex < thresholds.size() - 1 && (double) num1 / (double) thresholds.get(thresholdIndex).get(1) > (double) ((long) thresholds.get(thresholdIndex + 1).get(0) - (long) base)) {

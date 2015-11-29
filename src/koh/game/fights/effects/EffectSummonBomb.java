@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
-import koh.game.dao.mysql.MonsterDAO;
-import koh.game.dao.mysql.SpellDAO;
+import koh.game.dao.mysql.MonsterDAOImpl;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
@@ -21,7 +21,7 @@ public class EffectSummonBomb extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         // Possibilité de spawn une creature sur la case ?
 
-        MonsterTemplate Monster = MonsterDAO.Cache.get(CastInfos.Effect.diceNum);
+        MonsterTemplate Monster = MonsterDAOImpl.Cache.get(CastInfos.Effect.diceNum);
         // Template de monstre existante
         if (Monster != null) {
             MonsterGrade MonsterLevel = Monster.GetLevelOrNear(CastInfos.Effect.diceSide);
@@ -43,8 +43,8 @@ public class EffectSummonBomb extends EffectBase {
                                                   }
                                               }}));
                 } else {
-                    //CastInfos.Caster.Fight.AffectSpellTo(CastInfos.Caster, CastInfos.Caster.Fight.GetCell(CastInfos.CellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAO.Bombs.get(CastInfos.Effect.diceNum).instantSpellId);
-                    CastInfos.Caster.Fight.LaunchSpell(CastInfos.Caster, SpellDAO.Spells.get(SpellDAO.Bombs.get(CastInfos.Effect.diceNum).instantSpellId).SpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
+                    //CastInfos.Caster.Fight.AffectSpellTo(CastInfos.Caster, CastInfos.Caster.Fight.GetCell(CastInfos.CellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId);
+                    CastInfos.Caster.Fight.LaunchSpell(CastInfos.Caster, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId).SpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
                 }
             }
         }

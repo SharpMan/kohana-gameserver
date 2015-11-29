@@ -12,9 +12,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 import koh.game.actions.InteractiveElementAction;
 import koh.game.controllers.MapController;
-import koh.game.dao.mysql.AreaDAO;
-import koh.game.dao.mysql.NpcDAO;
-import koh.game.dao.mysql.PaddockDAO;
+import koh.game.dao.mysql.AreaDAOImpl;
+import koh.game.dao.mysql.NpcDAOImpl;
+import koh.game.dao.mysql.PaddockDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
@@ -77,7 +77,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private int myNextActorId = -1;
     private Map<Integer, MapDoor> Doors;
     private FightController myFightController;
-    /*After Initialize */
+    /*After loadAll */
     public short[] BlueCells, RedCells;
     private DofusCell[] Cells;
     private Layer[] Layers;
@@ -121,11 +121,11 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         if (this.SubAreaId == 0) {
             return null;
         }
-        return AreaDAO.SubAreas.get(this.SubAreaId);
+        return AreaDAOImpl.SubAreas.get(this.SubAreaId);
     }
 
     public Area getArea() {
-        return GetSubArea() != null ? GetSubArea().area : AreaDAO.SubAreas.get(0).area;
+        return GetSubArea() != null ? GetSubArea().area : AreaDAOImpl.SubAreas.get(0).area;
     }
 
     public MapCoordinates Cordinates() {
@@ -259,8 +259,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.CompressedLayers = null;
         this.CompressedBlueCells = null;
         this.CompressedRedCells = null;
-        if (NpcDAO.Npcs.containsKey(this.Id)) {
-            for (Npc npc : NpcDAO.Npcs.get(this.Id)) {
+        if (NpcDAOImpl.npcs.containsKey(this.Id)) {
+            for (Npc npc : NpcDAOImpl.npcs.get(this.Id)) {
                 npc.ID = this.myNextActorId--;
                 npc.Cell = this.getCell(npc.CellID);
                 this.SpawnActor(npc);
@@ -459,10 +459,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     public void SendMapInfo(WorldClient Client) {
         this.myFightController.SendFightInfos(Client);
-        if (PaddockDAO.Cache.containsKey(Id)) {
-            Client.Send(new PaddockPropertiesMessage(PaddockDAO.Cache.get(Id).Informations()));
-            if (PaddockDAO.Cache.get(Id).Items != null) {
-                Client.Send(new GameDataPaddockObjectListAddMessage(PaddockDAO.Cache.get(Id).Items));
+        if (PaddockDAOImpl.paddocks.containsKey(Id)) {
+            Client.Send(new PaddockPropertiesMessage(PaddockDAOImpl.paddocks.get(Id).Informations()));
+            if (PaddockDAOImpl.paddocks.get(Id).Items != null) {
+                Client.Send(new GameDataPaddockObjectListAddMessage(PaddockDAOImpl.paddocks.get(Id).Items));
             }
         }
         Client.Send(GetAgressableActorsStatus(Client.Character));

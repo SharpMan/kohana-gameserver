@@ -2,7 +2,7 @@ package koh.game.entities.actors.npc;
 
 import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
-import koh.game.dao.mysql.NpcDAO;
+import koh.game.dao.mysql.NpcDAOImpl;
 import koh.game.entities.actors.Player;
 
 /**
@@ -56,7 +56,7 @@ public class NpcMessage {
         if (AreConditionFilled(req)) {
             return this;
         } else {
-            return NpcDAO.Messages.get(this.FalseQuestion).GetMessage(req);
+            return NpcDAOImpl.messages.get(this.FalseQuestion).GetMessage(req);
         }
     }
 

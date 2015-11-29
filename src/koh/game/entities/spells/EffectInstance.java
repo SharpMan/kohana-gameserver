@@ -9,8 +9,8 @@ import jregex.Pattern;
 import jregex.REFlags;
 import koh.d2o.entities.Effect;
 import koh.game.Main;
-import koh.game.dao.mysql.D2oDao;
-import koh.game.dao.mysql.MonsterDAO;
+import koh.game.dao.mysql.D2oDaoImpl;
+import koh.game.dao.mysql.MonsterDAOImpl;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;
@@ -167,10 +167,10 @@ public class EffectInstance implements Serializable {
     }
 
     public int category() {
-        if (D2oDao.getEffect(this.effectId) == null) {
+        if (D2oDaoImpl.getEffect(this.effectId) == null) {
             return -1;
         }
-        return D2oDao.getEffect(this.effectId).category;
+        return D2oDaoImpl.getEffect(this.effectId).category;
     }
 
     public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect, int pTriggeringSpellCasterId) {
@@ -205,7 +205,7 @@ public class EffectInstance implements Serializable {
             if (((((targetIsCarried) && (!((pEffect.ZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.ZoneShape() == SpellShapeEnum.a))))) {
                 return (true);
             };
-            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(MonsterDAO.Cache.get(monsterInfo.creatureGenericId).canPlay)))) {
+            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(MonsterDAOImpl.Cache.get(monsterInfo.creatureGenericId).canPlay)))) {
                 targetMaskPattern = ((isTargetAlly) ? "agsj" : "ASJ");
             } else {
                 if (targetInfos.stats.summoned) {
@@ -390,7 +390,7 @@ public class EffectInstance implements Serializable {
     }
 
     public Effect Template() {
-        return D2oDao.getEffect(this.effectId);
+        return D2oDaoImpl.getEffect(this.effectId);
     }
 
     public EffectInstance(IoBuffer buf) {

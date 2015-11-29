@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import koh.game.Main;
-import static koh.game.dao.mysql.D2oDao.getEffect;
+import static koh.game.dao.mysql.D2oDaoImpl.getEffect;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;

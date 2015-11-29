@@ -1,8 +1,8 @@
 package koh.game.entities.environments;
 
 import java.util.Arrays;
-import koh.game.dao.mysql.MapDAO;
-import koh.game.dao.mysql.PaddockDAO;
+import koh.game.dao.mysql.MapDAOImpl;
+import koh.game.dao.mysql.PaddockDAOImpl;
 import koh.protocol.messages.game.context.mount.GameDataPaddockObjectAddMessage;
 import koh.protocol.messages.game.context.mount.GameDataPaddockObjectRemoveMessage;
 import koh.protocol.types.game.context.roleplay.GuildInformations;
@@ -50,8 +50,8 @@ public class Paddock {
             this.Items = new PaddockItem[0];
         }
         this.Items = ArrayUtils.add(Items, Item);
-        PaddockDAO.Update(this, new String[]{"items"});
-        MapDAO.Cache.get(this.Map).sendToField(new GameDataPaddockObjectAddMessage(Item));
+        PaddockDAOImpl.update(this, new String[]{"items"});
+        MapDAOImpl.dofusMaps.get(this.Map).sendToField(new GameDataPaddockObjectAddMessage(Item));
 
     }
 
@@ -71,8 +71,8 @@ public class Paddock {
         }
 
         this.Items = ArrayUtils.removeElement(Items, GetItem(Cell));
-        PaddockDAO.Update(this, new String[]{"items"});
-        MapDAO.Cache.get(this.Map).sendToField(new GameDataPaddockObjectRemoveMessage(Cell));
+        PaddockDAOImpl.update(this, new String[]{"items"});
+        MapDAOImpl.dofusMaps.get(this.Map).sendToField(new GameDataPaddockObjectRemoveMessage(Cell));
 
     }
 

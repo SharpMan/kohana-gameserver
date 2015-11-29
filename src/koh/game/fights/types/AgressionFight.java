@@ -2,7 +2,7 @@ package koh.game.fights.types;
 
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
-import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.entities.environments.DofusMap;
 import koh.game.fights.AntiCheat;
 import koh.game.fights.Fight;
@@ -82,7 +82,7 @@ public class AgressionFight extends Fight {
             final short LossedHonor = (short) (FightFormulas.HonorPoint(Fighter, Winners.GetFighters(), Loosers.GetFighters(), true) / AntiCheat.DeviserBy(GetWinners().GetFighters(), Fighter, false));
             ((CharacterFighter) Fighter).Character.addHonor(LossedHonor, true);
             ((CharacterFighter) Fighter).Character.Dishonor += FightFormulas.CalculateEarnedDishonor(Fighter);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).Character.AlignmentGrade, ExpDAO.GetFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade).PvP, ExpDAO.GetFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) Fighter).Character.Honor, LossedHonor)}));
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).Character.AlignmentGrade, ExpDAOImpl.getFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade).PvP, ExpDAOImpl.getFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) Fighter).Character.Honor, LossedHonor)}));
         }
 
         for (Fighter Fighter : (Iterable<Fighter>) Winners.GetFighters()::iterator) {
@@ -90,7 +90,7 @@ public class AgressionFight extends Fight {
             final short LossedHonor = (short) (FightFormulas.HonorPoint(Fighter, Winners.GetFighters(), Loosers.GetFighters(), false) / AntiCheat.DeviserBy(GetEnnemyTeam(GetWinners()).GetFighters(), Fighter, true));
             ((CharacterFighter) Fighter).Character.addHonor(LossedHonor, true);
             ((CharacterFighter) Fighter).Character.Dishonor += FightFormulas.CalculateEarnedDishonor(Fighter);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).Character.AlignmentGrade, ExpDAO.GetFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade).PvP, ExpDAO.GetFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) Fighter).Character.Honor, LossedHonor)}));
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).Character.AlignmentGrade, ExpDAOImpl.getFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade).PvP, ExpDAOImpl.getFloorByLevel(((CharacterFighter) Fighter).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) Fighter).Character.Honor, LossedHonor)}));
         }
         super.EndFight();
     }
@@ -116,7 +116,7 @@ public class AgressionFight extends Fight {
         short LossedHonor = FightFormulas.HonorPoint(Leaver, this.GetEnnemyTeam(Leaver.Team).GetFighters().filter(x -> x.Summoner == null), Leaver.Team.GetFighters().filter(x -> x.Summoner == null), true, false);
         ((CharacterFighter) Leaver).Character.addHonor(LossedHonor, true);
         ((CharacterFighter) Leaver).Character.Dishonor += FightFormulas.CalculateEarnedDishonor(Leaver);
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.Summoner == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == Leaver.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.IsAlive(), (byte) x.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) x).Character.AlignmentGrade, ExpDAO.GetFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade).PvP, ExpDAO.GetFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) x).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) x).Character.Honor, x.ID == Leaver.ID ? LossedHonor : 0)})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.Summoner == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == Leaver.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.IsAlive(), (byte) x.Level(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) x).Character.AlignmentGrade, ExpDAOImpl.getFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade).PvP, ExpDAOImpl.getFloorByLevel(((CharacterFighter) x).Character.AlignmentGrade == 10 ? 10 : ((CharacterFighter) x).Character.AlignmentGrade + 1).PvP, ((CharacterFighter) x).Character.Honor, x.ID == Leaver.ID ? LossedHonor : 0)})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
 }

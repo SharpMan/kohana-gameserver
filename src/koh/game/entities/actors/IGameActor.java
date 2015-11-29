@@ -1,6 +1,6 @@
 package koh.game.entities.actors;
 
-import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.DofusMap;
 import koh.protocol.client.Message;
@@ -28,7 +28,7 @@ public abstract class IGameActor {
     public byte Direction = 1;
 
     public DofusMap getDofusMap() {
-        return MapDAO.Cache.get(this.Mapid);
+        return MapDAOImpl.dofusMaps.get(this.Mapid);
     }
 
     public GameContextActorInformations GetGameContextActorInformations(Player character) {

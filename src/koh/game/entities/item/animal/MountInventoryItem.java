@@ -2,7 +2,7 @@ package koh.game.entities.item.animal;
 
 import java.time.Instant;
 import java.util.List;
-import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.dao.sqlite.MountDAO;
 import koh.game.dao.sqlite.PetsDAO;
@@ -45,8 +45,8 @@ public class MountInventoryItem extends InventoryItem {
             this.Mount.energy = this.Mount.energyMax = this.Mount.loveMax = this.Mount.reproductionCountMax = this.Mount.reproductionCountMax = this.Mount.serenityMax = 10000;
             this.Mount.maxPods = 3000;
             this.Mount.experience = 0;
-            this.Mount.experienceForLevel = ExpDAO.GetFloorByLevel(1).Mount;
-            this.Mount.experienceForNextLevel = (double) ExpDAO.GetFloorByLevel(2).Mount;
+            this.Mount.experienceForLevel = ExpDAOImpl.getFloorByLevel(1).Mount;
+            this.Mount.experienceForNextLevel = (double) ExpDAOImpl.getFloorByLevel(2).Mount;
             this.Mount.id = (double) this.Entity.AnimalID;
             this.Mount.isRideable = true;
             this.Mount.level = 1;
@@ -68,7 +68,7 @@ public class MountInventoryItem extends InventoryItem {
     public void addExperience(long amount) {
         this.Mount.experience += amount;
 
-        while (this.Mount.experience >= ExpDAO.GetFloorByLevel(this.Mount.level + 1).Mount && this.Mount.level < 100) {
+        while (this.Mount.experience >= ExpDAOImpl.getFloorByLevel(this.Mount.level + 1).Mount && this.Mount.level < 100) {
             levelUp();
         }
         this.Save();

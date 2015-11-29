@@ -6,9 +6,9 @@ import koh.d2o.entities.Breed;
 import koh.d2o.entities.Head;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.D2oDao;
-import koh.game.dao.mysql.ExpDAO;
-import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.D2oDaoImpl;
+import koh.game.dao.mysql.ExpDAOImpl;
+import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.dao.mysql.PlayerDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.MountInformations;
@@ -169,7 +169,7 @@ public class CharacterHandler {
     }
 
     public static void SendCharacterStatsListMessage(WorldClient Client) {
-        Client.Send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) Client.Character.Experience, (double) ExpDAO.PersoXpMin(Client.Character.Level), (double) ExpDAO.PersoXpMax(Client.Character.Level), Client.Character.Kamas, Client.Character.StatPoints, 0, Client.Character.SpellPoints, Client.Character.GetActorAlignmentExtendInformations(),
+        Client.Send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) Client.Character.Experience, (double) ExpDAOImpl.persoXpMin(Client.Character.Level), (double) ExpDAOImpl.persoXpMax(Client.Character.Level), Client.Character.Kamas, Client.Character.StatPoints, 0, Client.Character.SpellPoints, Client.Character.GetActorAlignmentExtendInformations(),
                 Client.Character.Life, Client.Character.MaxLife(), Client.Character.Energy, PlayerEnum.MaxEnergy,
                 (short) Client.Character.Stats.GetTotal(StatsEnum.ActionPoints), (short) Client.Character.Stats.GetTotal(StatsEnum.MovementPoints),
                 new CharacterBaseCharacteristic(Client.Character.Initiative(true), 0, Client.Character.Stats.GetItem(StatsEnum.Initiative), 0, 0), Client.Character.Stats.GetEffect(StatsEnum.Prospecting), Client.Character.Stats.GetEffect(StatsEnum.ActionPoints),
@@ -205,12 +205,12 @@ public class CharacterHandler {
             } else if (PlayerDAO.DoesNameExist(((CharacterCreationRequestMessage) message).Name)) {
                 ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
             } else {
-                Breed breed = D2oDao.getBreed(((CharacterCreationRequestMessage) message).Breed);
+                Breed breed = D2oDaoImpl.getBreed(((CharacterCreationRequestMessage) message).Breed);
                 if (breed == null) {
                     ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NOT_ALLOWED.value()));
                     return;
                 }
-                Head head = D2oDao.getHead(((CharacterCreationRequestMessage) message).cosmeticId);
+                Head head = D2oDaoImpl.getHead(((CharacterCreationRequestMessage) message).cosmeticId);
                 if (head == null || head.breedtype != breed.id || head.gendertype == 1 != ((CharacterCreationRequestMessage) message).Sex) {
                     ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
                     return;
@@ -249,7 +249,7 @@ public class CharacterHandler {
                         Level = (byte) Settings.GetIntElement("Register.StartLevel");
                         SavedMap = Mapid = Settings.GetIntElement("Register.StartMap");
                         SavedCell = Settings.GetShortElement("Register.StartCell");
-                        CurrentMap = MapDAO.Cache.get(Settings.GetIntElement("Register.StartMap"));
+                        CurrentMap = MapDAOImpl.dofusMaps.get(Settings.GetIntElement("Register.StartMap"));
                         if (CurrentMap != null) {
                             CurrentMap.Init();
                         }
@@ -260,7 +260,7 @@ public class CharacterHandler {
                         StatPoints = (Settings.GetIntElement("Register.StartLevel") - 1) * 5;
                         SpellPoints = (Settings.GetIntElement("Register.StartLevel") - 1);
                         Life = breed.getHealPoint() + ((Level - 1) * 5);
-                        Experience = ExpDAO.PersoXpMin(Settings.GetIntElement("Register.StartLevel"));
+                        Experience = ExpDAOImpl.persoXpMin(Settings.GetIntElement("Register.StartLevel"));
                         Kamas = Settings.GetIntElement("Register.KamasStart");
                         Shortcuts = new ShortcutBook();
                         Emotes = new byte[]{1, 8, 19};

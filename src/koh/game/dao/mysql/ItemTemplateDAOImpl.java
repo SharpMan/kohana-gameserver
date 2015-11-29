@@ -36,10 +36,10 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
 
     private static final Logger logger = LogManager.getLogger(ItemTemplateDAO.class);
 
-    private final Map<Integer, ItemTemplate> itemTemplates = new ConcurrentHashMap<>(1000);
-    private final Map<Integer, ItemSet> itemSets = new ConcurrentHashMap<>(50);
-    private final Map<Integer, Pets> pets = new ConcurrentHashMap<>(50);
-    private final Map<Integer, ItemType> itemTypes = new ConcurrentHashMap<>(50);
+    private final Map<Integer, ItemTemplate> itemTemplates = new ConcurrentHashMap<>(11000);
+    private final Map<Integer, ItemSet> itemSets = new ConcurrentHashMap<>(377);
+    private final Map<Integer, Pets> pets = new ConcurrentHashMap<>(114);
+    private final Map<Integer, ItemType> itemTypes = new ConcurrentHashMap<>(171);
 
     private volatile int nextId;
     private volatile int nextStorageId;

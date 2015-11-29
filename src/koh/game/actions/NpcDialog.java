@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.NpcDAO;
+import koh.game.dao.mysql.NpcDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
@@ -32,7 +32,7 @@ public class NpcDialog extends GameAction {
     public void ChangeMessage(int id, int pos) {
         NpcMessage Message = null;
         try {
-            Message = NpcDAO.Messages.get(this.NPC.Template().getDialogMessage(id, pos)).GetMessage((Player) this.Actor);
+            Message = NpcDAOImpl.messages.get(this.NPC.Template().getDialogMessage(id, pos)).GetMessage((Player) this.Actor);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,7 +59,7 @@ public class NpcDialog extends GameAction {
     }
 
     public void Reply(int rep) {
-        NpcReply[] Stream = NpcDAO.Replies.stream().filter(x -> x.ReplyID == rep).toArray(NpcReply[]::new);
+        NpcReply[] Stream = NpcDAOImpl.replies.stream().filter(x -> x.ReplyID == rep).toArray(NpcReply[]::new);
         if (!Arrays.stream(Stream).anyMatch(x -> x instanceof TalkReply)) {
             this.GetClient().EndGameAction(GameActionTypeEnum.NPC_DAILOG);
         }

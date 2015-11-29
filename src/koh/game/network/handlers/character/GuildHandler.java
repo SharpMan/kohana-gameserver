@@ -6,9 +6,9 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameRequest;
 import koh.game.actions.requests.GuildJoinRequest;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.dao.sqlite.GuildDAO;
 import koh.game.dao.mysql.PlayerDAO;
-import koh.game.dao.mysql.SpellDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildEntity;
@@ -62,7 +62,7 @@ public class GuildHandler {
             }
 
             byte SpellLevel = Client.Character.Guild.SpellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)];
-            if (SpellLevel >= SpellDAO.Spells.get(Message.pellId).spellLevels.length) { //Action Asyn ^^
+            if (SpellLevel >= SpellDAOImpl.spells.get(Message.pellId).spellLevels.length) { //Action Asyn ^^
                 Client.Send(new BasicNoOperationMessage());
                 return;
             }

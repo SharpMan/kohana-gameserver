@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.ExpDAO;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
-import koh.game.dao.mysql.MapDAO;
-import koh.game.dao.mysql.PaddockDAO;
-import koh.game.dao.mysql.PlayerDAO;
+import koh.game.dao.mysql.*;
+import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.MapPosition;
@@ -198,11 +195,11 @@ public class ChatHandler {
                     break;//RemovePaddockItem
                 } else if (message.Content.startsWith("!remove_item")) {
                     try {
-                        if (!PaddockDAO.Cache.containsKey(Client.Character.CurrentMap.Id)) {
+                        if (!PaddockDAOImpl.paddocks.containsKey(Client.Character.CurrentMap.Id)) {
                             break;
                         }
                         int cellid = Integer.parseInt(message.Content.split(" ")[1]);
-                        PaddockDAO.Cache.get(Client.Character.CurrentMap.Id).RemovePaddockItem(cellid);
+                        PaddockDAOImpl.paddocks.get(Client.Character.CurrentMap.Id).RemovePaddockItem(cellid);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -214,14 +211,14 @@ public class ChatHandler {
                     break;
                 } else if (message.Content.startsWith("!item_paddock")) {
                     try {
-                        if (!PaddockDAO.Cache.containsKey(Client.Character.CurrentMap.Id)) {
+                        if (!PaddockDAOImpl.paddocks.containsKey(Client.Character.CurrentMap.Id)) {
                             break;
                         }
                         int cellid = Integer.parseInt(message.Content.split(" ")[1]);
                         int object = Integer.parseInt(message.Content.split(" ")[2]);
                         short durability = Short.parseShort(message.Content.split(" ")[3]);
                         short durabilityMax = Short.parseShort(message.Content.split(" ")[4]);
-                        PaddockDAO.Cache.get(Client.Character.CurrentMap.Id).AddPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
+                        PaddockDAOImpl.paddocks.get(Client.Character.CurrentMap.Id).AddPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -238,7 +235,7 @@ public class ChatHandler {
 
                         }
 
-                        MapPosition[] SubAreas = MapDAO.GetSubAreaOfPos(X, Y);
+                        MapPosition[] SubAreas = MapDAOImpl.getSubAreaOfPos(X, Y);
                         if (SubAreas.length > 1 && subArea == -1) {
                             PlayerController.SendServerMessage(Client, "This position contains a lots of SubArea so try one of this ..");
                             for (MapPosition s : SubAreas) {
@@ -248,7 +245,7 @@ public class ChatHandler {
                             if (subArea == -1) {
                                 subArea = SubAreas[0].subAreaId;
                             }
-                            DofusMap Map = MapDAO.GetMapByPos(X, Y, subArea);
+                            DofusMap Map = MapDAOImpl.findMapByPos(X, Y, subArea);
                             if (Map == null) {
                                 PlayerController.SendServerMessage(Client, "Map Inconnue");
                                 break;
@@ -291,7 +288,7 @@ public class ChatHandler {
                         PlayerController.SendServerMessage(Client, "Player " + message.Content.split(" ")[2] + " Offline");
                         return;
                     }
-                    Target.AddExperience((ExpDAO.PersoXpMin(Level) + 1) - Target.Experience);
+                    Target.AddExperience((ExpDAOImpl.persoXpMin(Level) + 1) - Target.Experience);
                     PlayerController.SendServerMessage(Client, "Level seted successfully");
                 } else if (message.Content.startsWith("!ange")) {
                     Client.Character.ChangeAlignementSide(AlignmentSideEnum.ALIGNMENT_ANGEL);
