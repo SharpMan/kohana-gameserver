@@ -3,27 +3,20 @@ package koh.game.dao.mysql;
 import com.google.inject.Inject;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.ItemTemplateDAO;
-import koh.game.entities.item.animal.Pets;
-import java.sql.PreparedStatement;
+import koh.game.entities.item.animal.PetTemplate;
+
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import koh.game.Logs;
 
 import static koh.game.MySQL.executeQuery;
 import koh.game.entities.item.*;
-import static koh.game.entities.item.InventoryItem.DeserializeEffects;
 import koh.game.entities.item.animal.*;
 import koh.game.entities.spells.*;
-import koh.game.utils.StringUtil;
 import koh.game.utils.sql.ConnectionResult;
-import koh.game.utils.sql.ConnectionStatement;
-import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.utils.Enumerable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +32,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
 
     private final Map<Integer, ItemTemplate> itemTemplates = new HashMap<>(11000);
     private final Map<Integer, ItemSet> itemSets = new HashMap<>(377);
-    private final Map<Integer, Pets> pets = new HashMap<>(114);
+    private final Map<Integer, PetTemplate> pets = new HashMap<>(114);
     private final Map<Integer, ItemType> itemTypes = new HashMap<>(171);
 
     @Inject
@@ -107,7 +100,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                pets.put(result.getInt("id"), new Pets() {
+                pets.put(result.getInt("id"), new PetTemplate() {
                     {
                         this.Id = result.getInt("id");
                         if (result.getString("food_items").isEmpty() || result.getString("food_items").equalsIgnoreCase("2239")) {
@@ -339,7 +332,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
     }
 
     @Override
-    public Pets getPets(int id) {
+    public PetTemplate getPetTemplate(int id) {
         return pets.get(id);
     }
 

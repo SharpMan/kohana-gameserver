@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author Neo-Craft
  */
-public class Pets {
+public class PetTemplate {
 
     public int Id;
     public FoodItem[] foodItems, foodTypes;

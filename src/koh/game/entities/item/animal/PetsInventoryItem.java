@@ -96,7 +96,7 @@ public class PetsInventoryItem extends InventoryItem {
         this.myInitialized = true;
     }
 
-    public Pets Animal() {
+    public PetTemplate Animal() {
         return ItemTemplateDAOImpl.Pets.get(this.TemplateId);
     }
 
