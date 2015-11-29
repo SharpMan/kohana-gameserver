@@ -42,7 +42,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
         query += " WHERE id = ?;";
 
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement(query)) {
-            PreparedStatement pStatement = MySQL.prepareQuery(query, MySQL.Connection());
+            PreparedStatement pStatement = conn.getStatement();
 
             data.ColumsToUpdate.add("id");
             for (String columnName : data.ColumsToUpdate) {
@@ -95,7 +95,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
     private static final String SAVE_ACCOUNT_DATA = "INSERT INTO `accounts_data` VALUES (?,?,?,?,?,?,?,?);";
 
     @Override
-    public AccountData findById(int id) {
+    public AccountData get(int id) {
 
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * FROM `accounts_data` where id = '" + id + "';")) {
             ResultSet result = conn.getResult();

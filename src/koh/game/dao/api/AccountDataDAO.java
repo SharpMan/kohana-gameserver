@@ -8,6 +8,6 @@ public abstract class AccountDataDAO implements Service {
 
     public abstract void save(AccountData data, Account account);
 
-    public abstract AccountData findById(int id);
+    public abstract AccountData get(int id);
 
 }

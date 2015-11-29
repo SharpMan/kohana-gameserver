@@ -17,17 +17,18 @@ import org.apache.logging.log4j.Logger;
  * @author Neo-Craft
  */
 public class JobDAOImpl extends JobDAO {
-    
-    private HashMap<Integer, JobGatheringInfos> gatheringJobs = new HashMap<>(11);
-    private HashMap<Integer, InteractiveSkill> skills = new HashMap<>(250);
 
-    private static final Logger logger = LogManager.getLogger(JobDAOImpl.class);
+    private static final Logger logger = LogManager.getLogger(JobDAO.class);
+
+    private final HashMap<Integer, JobGatheringInfos> gatheringJobs = new HashMap<>(11);
+    private final HashMap<Integer, InteractiveSkill> skills = new HashMap<>(250);
+
 
     @Inject
     private DatabaseSource dbSource;
     
-    public  int loadAllGatheringInfos() {
-            int i = 0;
+    private int loadAllGathering() {
+        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from job_gathering", 0)) {
             ResultSet result = conn.getResult();
             while (result.next()) {
@@ -59,7 +60,7 @@ public class JobDAOImpl extends JobDAO {
     }
     
     public int loadAllSkills() {
-            int i = 0;
+        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from maps_interactive_skills", 0)) {
             ResultSet result = conn.getResult();
 
@@ -95,7 +96,7 @@ public class JobDAOImpl extends JobDAO {
     @Override
     public void start() {
         logger.info("Loaded {} map interactive skills",this.loadAllSkills());
-        logger.info("Loaded {} gathering jobs",this.loadAllGatheringInfos());
+        logger.info("Loaded {} gathering jobs",this.loadAllGathering());
     }
 
     @Override

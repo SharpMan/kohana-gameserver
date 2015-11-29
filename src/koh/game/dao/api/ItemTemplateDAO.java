@@ -34,21 +34,6 @@ public abstract class ItemTemplateDAO implements Service {
 
     private static final Logger logger = LogManager.getLogger(ItemTemplateDAO.class);
 
-
-    public abstract void initInventoryCache(int player, Map<Integer, InventoryItem> cache, String table);
-    //public abstract void distinctItems();
-    //public abstract void initNextId();
-
-    public abstract boolean create(InventoryItem item, boolean clear, String table);
-    public abstract boolean save(InventoryItem item, boolean clear, String table);
-    public abstract boolean delete(InventoryItem item, String table);
-
-    //public abstract int loadAllItemTypes();
-    //public abstract int loadAllItemSets();
-    //public abstract int loadAllPets();
-    //public abstract int loadAll();
-    //public abstract int loadAllWeapons();
-
     public static EffectInstance[] readEffectInstance(IoBuffer buf) {
         EffectInstance[] possibleEffectstype = new EffectInstance[buf.getInt()];
         for (int i = 0; i < possibleEffectstype.length; ++i) {
@@ -73,5 +58,13 @@ public abstract class ItemTemplateDAO implements Service {
         }
         return possibleEffectstype;
     }
+
+    public abstract ItemTemplate getTemplate(int id);
+
+    public abstract ItemSet getSet(int id);
+
+    public abstract Pets getPets(int id);
+
+    public abstract ItemType getType(int id);
 
 }

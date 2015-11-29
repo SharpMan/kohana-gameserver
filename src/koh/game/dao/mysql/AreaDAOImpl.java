@@ -24,19 +24,19 @@ import org.apache.logging.log4j.Logger;
  */
 public class AreaDAOImpl extends AreaDAO {
 
-    private static HashMap<Integer, SuperArea> superAreas = new HashMap<>(5);
-    private static HashMap<Integer, Area> areas = new HashMap<>(56);
-    private static HashMap<Integer, SubArea> subAreas = new HashMap<>(855);
+    private static final Logger logger = LogManager.getLogger(AreaDAO.class);
 
-    private static final Logger logger = LogManager.getLogger(AreaDAOImpl.class);
+    private final HashMap<Integer, SuperArea> superAreas = new HashMap<>(5);
+    private final HashMap<Integer, Area> areas = new HashMap<>(56);
+    private final HashMap<Integer, SubArea> subAreas = new HashMap<>(855);
 
     @Inject
     private DatabaseSource dbSource;
 
     private int loadAll() {
-            int i = 0;
-            try (ConnectionResult conn = dbSource.executeQuery("SELECT * from areas", 0)) {
-                ResultSet result = conn.getResult();
+        int i = 0;
+        try (ConnectionResult conn = dbSource.executeQuery("SELECT * from areas", 0)) {
+            ResultSet result = conn.getResult();
 
             while (result.next()) {
                 areas.put(result.getInt("id"), new Area() {
@@ -51,18 +51,17 @@ public class AreaDAOImpl extends AreaDAO {
                     }
                 });
 
-                i++;
+                ++i;
             }
-            return i;
         } catch (Exception e) {
                 logger.error(e);
                 logger.warn(e.getMessage());
-            }
+        }
         return i;
     }
 
     private int loadAllSubAreas() {
-            int i = 0;
+        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from sub_area", 0)) {
             ResultSet result = conn.getResult();
 
@@ -87,7 +86,7 @@ public class AreaDAOImpl extends AreaDAO {
                     }
                 });
 
-                i++;
+                ++i;
             }
         } catch (Exception e) {
             logger.error(e);
@@ -97,7 +96,7 @@ public class AreaDAOImpl extends AreaDAO {
     }
 
     private int loadAllSuper() {
-            int i = 0;
+        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from super_areas", 0)) {
             ResultSet result = conn.getResult();
             while (result.next()) {
@@ -109,7 +108,7 @@ public class AreaDAOImpl extends AreaDAO {
                     }
                 });
 
-                i++;
+                ++i;
             }
         } catch (Exception e) {
             logger.error(e);
@@ -128,5 +127,20 @@ public class AreaDAOImpl extends AreaDAO {
     @Override
     public void stop() {
 
+    }
+
+    @Override
+    public SuperArea getSuperArea(int id) {
+        return superAreas.get(id);
+    }
+
+    @Override
+    public Area getArea(int id) {
+        return areas.get(id);
+    }
+
+    @Override
+    public SubArea getSubArea(int id) {
+        return subAreas.get(id);
     }
 }
