@@ -1,18 +1,9 @@
 package koh.game.dao.mysql;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.inject.Inject;
-import koh.game.MySQL;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.PaddockDAO;
 import koh.game.entities.environments.Paddock;
-import koh.game.utils.Settings;
 import koh.game.utils.StringUtil;
 import koh.game.utils.sql.ConnectionResult;
 import koh.protocol.client.BufUtils;
@@ -25,85 +16,85 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author Neo-Craft
  */
 public class PaddockDAOImpl extends PaddockDAO {
 
-    public static Map<Integer, Paddock> paddocks = new HashMap<>(1500);
-
     private static final Logger logger = LogManager.getLogger(PaddockDAOImpl.class);
-
+    public static Map<Integer, Paddock> paddocks = new HashMap<>(1500);
     @Inject
     private DatabaseSource dbSource;
 
     @Override
-    public boolean update(Paddock Item, String[] Columns) {
-        try {
-            int i = 1;
-            String Query = "UPDATE `paddocks_template` set ";
-            Query = Arrays.stream(Columns).map((s) -> s + " =?,").reduce(Query, String::concat);
-            Query = StringUtil.removeLastChar(Query);
-            Query += " WHERE id = ?;";
-
-            PreparedStatement p = MySQL.prepareQuery(Query, MySQL.Connection());
-
-            for (String s : Columns) {
-                setValue(p, s, i++, Item);
+    public boolean update(Paddock item, String[] columns) {
+        int i = 1;
+        String Query = "UPDATE `paddocks_template` set ";
+        Query = Arrays.stream(columns).map((s) -> s + " =?,").reduce(Query, String::concat);
+        Query = StringUtil.removeLastChar(Query);
+        Query += " WHERE id = ?;";
+        try (PreparedStatement p = (PreparedStatement) dbSource.prepareStatement(Query)) {
+            for (String s : columns) {
+                setValue(p, s, i++, item);
             }
-            setValue(p, "id", i++, Item);
-
+            setValue(p, "id", i++, item);
             p.execute();
-            MySQL.closePreparedStatement(p);
-            Columns = null;
-
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            //MySQL.closePreparedStatement(p);
+        } catch (Exception e) {
+            logger.error(e);
+            logger.warn(e.getMessage());
             return false;
         }
+        columns = null;
+        return true;
     }
 
-    private void setValue(PreparedStatement p, String Column, int Seq, Paddock Item) {
+
+    private void setValue(PreparedStatement p, String column, int seq, Paddock item) {
         try {
             IoBuffer buf;
-            switch (Column) {
+            switch (column) {
                 case "id":
-                    p.setInt(Seq, Item.Id);
+                    p.setInt(seq, item.Id);
                     break;
                 case "abandonned":
-                    p.setBoolean(Seq, Item.Abandonned);
+                    p.setBoolean(seq, item.Abandonned);
                     break;
                 case "loocked":
-                    p.setBoolean(Seq, Item.Loocked);
+                    p.setBoolean(seq, item.Loocked);
                     break;
                 case "mounts_informations":
-                    buf = SerializeMountsInformations(Item.MountInformations);
-                    p.setBytes(Seq, buf.array());
+                    buf = serializeMountsInformations(item.MountInformations);
+                    p.setBytes(seq, buf.array());
                     buf.clear();
                     break;
                 case "items":
-                    buf = SerializeItemsInformations(Item.Items);
-                    p.setBytes(Seq, buf.array());
+                    buf = serializeItemsInformations(item.Items);
+                    p.setBytes(seq, buf.array());
                     buf.clear();
                     break;
                 case "guild_informations":
-                    buf = SerializeGuildInformations(Item.guildInfo);
-                    p.setBytes(Seq, buf.array());
+                    buf = serializeGuildInformations(item.guildInfo);
+                    p.setBytes(seq, buf.array());
                     buf.clear();
                     break;
                 case "sell_informations":
-                    p.setString(Seq, Item.SelledId + "," + Item.OwnerName);
+                    p.setString(seq, item.SelledId + "," + item.OwnerName);
                     break;
                 case "price":
-                    p.setInt(Seq, Item.Price);
+                    p.setInt(seq, item.Price);
                     break;
                 case "max_outdoor_mount":
-                    p.setInt(Seq, Item.MaxOutDoorMount);
+                    p.setInt(seq, item.MaxOutDoorMount);
                     break;
                 case "max_items":
-                    p.setInt(Seq, Item.MaxItem);
+                    p.setInt(seq, item.MaxItem);
                     break;
 
             }
@@ -114,9 +105,8 @@ public class PaddockDAOImpl extends PaddockDAO {
     }
 
 
-
     private int loadAll() {
-            int i = 0;
+        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from paddocks_template", 0)) {
             ResultSet result = conn.getResult();
 

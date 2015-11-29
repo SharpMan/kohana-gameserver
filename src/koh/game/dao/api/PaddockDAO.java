@@ -13,10 +13,10 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public abstract class PaddockDAO implements Service {
 
-    public abstract boolean update(Paddock Item, String[] Columns);
+    public abstract boolean update(Paddock item, String[] columns);
 
-    public static IoBuffer SerializeGuildInformations(GuildInformations m) {
-        IoBuffer buff = IoBuffer.allocate(65535);
+    public static IoBuffer serializeGuildInformations(GuildInformations m) {
+        IoBuffer buff = IoBuffer.allocate(17 + m.guildName.length());
         buff.setAutoExpand(true);
         buff.putInt(m.guildId);
         BufUtils.writeUTF(buff, m.guildName);
@@ -28,8 +28,8 @@ public abstract class PaddockDAO implements Service {
         return buff;
     }
 
-    public static IoBuffer SerializeMountsInformations(MountInformationsForPaddock[] M) {
-        IoBuffer buff = IoBuffer.allocate(65535);
+    public static IoBuffer serializeMountsInformations(MountInformationsForPaddock[] M) {
+        IoBuffer buff = IoBuffer.allocate(1000);
         buff.setAutoExpand(true);
 
         buff.putInt(M.length);
@@ -43,12 +43,12 @@ public abstract class PaddockDAO implements Service {
         return buff;
     }
 
-    public static IoBuffer SerializeItemsInformations(PaddockItem[] Items) {
-        IoBuffer buff = IoBuffer.allocate(65535);
+    public static IoBuffer serializeItemsInformations(PaddockItem[] items) {
+        IoBuffer buff = IoBuffer.allocate(12 * items.length);
         buff.setAutoExpand(true);
 
-        buff.putInt(Items.length);
-        for (PaddockItem e : Items) {
+        buff.putInt(items.length);
+        for (PaddockItem e : items) {
             buff.putInt(e.cellId);
             buff.putInt(e.objectGID);
             buff.putShort(e.durability.durability);
