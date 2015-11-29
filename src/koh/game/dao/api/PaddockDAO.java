@@ -1,5 +1,6 @@
 package koh.game.dao.api;
 
+import koh.game.entities.environments.Paddock;
 import koh.patterns.services.api.Service;
 import koh.protocol.client.BufUtils;
 import koh.protocol.types.game.context.roleplay.GuildInformations;
@@ -11,6 +12,8 @@ import org.apache.mina.core.buffer.IoBuffer;
  * Created by Melancholia on 11/28/15.
  */
 public abstract class PaddockDAO implements Service {
+
+    public abstract boolean update(Paddock Item, String[] Columns);
 
     public static IoBuffer SerializeGuildInformations(GuildInformations m) {
         IoBuffer buff = IoBuffer.allocate(65535);
