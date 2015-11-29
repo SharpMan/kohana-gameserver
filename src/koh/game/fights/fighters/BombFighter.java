@@ -2,9 +2,9 @@ package koh.game.fights.fighters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+
 import koh.game.Main;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.mysql.SpellDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;

@@ -1,22 +1,18 @@
 package koh.game.network.handlers.character;
 
-import com.google.common.primitives.Bytes;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ExpDAO;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.MapDAO;
-import koh.game.dao.PaddockDAO;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.PaddockDAO;
+import koh.game.dao.mysql.PlayerDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.MapPosition;
-import koh.game.entities.environments.SubArea;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
@@ -25,7 +21,6 @@ import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.game.utils.Settings;
 import koh.look.EntityLookParser;
-import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_CHANGE_LOOK;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.ChatActivableChannelsEnum;
 import koh.protocol.messages.game.chat.ChatClientMultiMessage;
@@ -36,7 +31,6 @@ import koh.protocol.client.enums.ItemSuperTypeEnum;
 import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
-import koh.protocol.messages.game.actions.fight.GameActionFightChangeLookMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.chat.ChannelEnablingMessage;
 import koh.protocol.messages.game.chat.ChatClientMultiWithObjectMessage;
@@ -48,8 +42,6 @@ import koh.protocol.messages.game.chat.ChatServerCopyWithObjectMessage;
 import koh.protocol.messages.game.chat.ChatServerMessage;
 import koh.protocol.messages.game.chat.ChatServerWithObjectMessage;
 import koh.protocol.messages.game.chat.EnabledChannelsMessage;
-import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
-import koh.protocol.messages.game.context.mount.GameDataPaddockObjectAddMessage;
 import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.messages.game.tinsel.OrnamentGainedMessage;
 import koh.protocol.messages.messages.game.tinsel.TitleGainedMessage;
@@ -59,7 +51,6 @@ import koh.protocol.types.game.look.EntityLook;
 import koh.protocol.types.game.look.SubEntity;
 import koh.protocol.types.game.mount.ItemDurability;
 import koh.protocol.types.game.paddock.PaddockItem;
-import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -373,19 +364,19 @@ public class ChatHandler {
                                 Type = EffectGenerationType.Normal;
                                 break;
                         }
-                        if (ItemDAO.Cache.get(Id) == null) {
+                        if (ItemTemplateDAOImpl.Cache.get(Id) == null) {
                             PlayerController.SendServerMessage(Client, "Inexistant Item");
                             return;
                         }
-                        if (ItemDAO.Cache.get(Id).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
+                        if (ItemTemplateDAOImpl.Cache.get(Id).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
                             Qua = 1;
                         }
-                        InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, Id, 63, Client.Character.ID, Qua, EffectHelper.GenerateIntegerEffect(ItemDAO.Cache.get(Id).possibleEffects, Type, ItemDAO.Cache.get(Id) instanceof Weapon));
+                        InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, Id, 63, Client.Character.ID, Qua, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Id).possibleEffects, Type, ItemTemplateDAOImpl.Cache.get(Id) instanceof Weapon));
 
                         if (Client.Character.InventoryCache.Add(Item, true)) {
                             Item.NeedInsert = true;
                         }
-                        PlayerController.SendServerMessage(Client, String.format("%s  added to your inventory with %s stats", ItemDAO.Cache.get(Id).nameId, Type.toString()));
+                        PlayerController.SendServerMessage(Client, String.format("%s  added to your inventory with %s stats", ItemTemplateDAOImpl.Cache.get(Id).nameId, Type.toString()));
 
                     } catch (Exception e) {
                         e.printStackTrace();

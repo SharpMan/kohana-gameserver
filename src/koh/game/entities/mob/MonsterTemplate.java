@@ -1,9 +1,5 @@
 package koh.game.entities.mob;
 
-import java.util.Arrays;
-import koh.game.dao.SpellDAO;
-import koh.game.entities.spells.Spell;
-import koh.game.entities.spells.SpellLevel;
 import koh.look.EntityLookParser;
 import koh.protocol.types.game.look.EntityLook;
 

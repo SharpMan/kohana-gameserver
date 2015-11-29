@@ -1,6 +1,6 @@
 package koh.game.entities.environments;
 
-import koh.game.dao.MapDAO;
+import koh.game.dao.mysql.MapDAO;
 
 /**
  *

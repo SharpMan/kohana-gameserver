@@ -1,22 +1,20 @@
 package koh.game.network.handlers.character;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.regex.Pattern;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameRequest;
 import koh.game.actions.requests.GuildJoinRequest;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.GuildDAO;
-import koh.game.dao.PlayerDAO;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.sqlite.GuildDAO;
+import koh.game.dao.mysql.PlayerDAO;
+import koh.game.dao.mysql.SpellDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildEntity;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
-import koh.protocol.client.Message;
 import koh.protocol.client.enums.GuildInvitationStateEnum;
 import koh.protocol.client.enums.GuildRightsBitEnum;
 import koh.protocol.client.enums.SocialGroupCreationResultEnum;
@@ -31,7 +29,6 @@ import koh.protocol.messages.game.guild.GuildGetInformationsMessage;
 import koh.protocol.messages.game.guild.GuildHousesInformationMessage;
 import koh.protocol.messages.game.guild.GuildInformationsMembersMessage;
 import koh.protocol.messages.game.guild.GuildInformationsPaddocksMessage;
-import koh.protocol.messages.game.guild.GuildInfosUpgradeMessage;
 import koh.protocol.messages.game.guild.GuildInvitationAnswerMessage;
 import koh.protocol.messages.game.guild.GuildInvitationByNameMessage;
 import koh.protocol.messages.game.guild.GuildInvitationMessage;
@@ -42,7 +39,6 @@ import koh.protocol.messages.game.guild.GuildKickRequestMessage;
 import koh.protocol.messages.game.guild.GuildSpellUpgradeRequestMessage;
 import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *

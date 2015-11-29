@@ -3,14 +3,13 @@ package koh.game.entities.item;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import koh.game.Main;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.item.animal.MountInventoryItem;
 import koh.game.entities.item.animal.PetsInventoryItem;
-import koh.game.entities.spells.*;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -42,9 +41,9 @@ public class InventoryItem {
     private GenericStats myStats;
 
     public static InventoryItem Instance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
-        if (ItemDAO.Cache.get(TemplateId).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
+        if (ItemTemplateDAOImpl.Cache.get(TemplateId).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
             return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
-        } else if (ItemDAO.Cache.get(TemplateId).TypeId == 97) {
+        } else if (ItemTemplateDAOImpl.Cache.get(TemplateId).TypeId == 97) {
             return new MountInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
         } else {
             return new InventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects);
@@ -69,7 +68,7 @@ public class InventoryItem {
     }
 
     public ItemSuperTypeEnum GetSuperType() {
-        return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(Template().TypeId).SuperType);
+        return ItemSuperTypeEnum.valueOf(ItemTemplateDAOImpl.SuperTypes.get(Template().TypeId).SuperType);
     }
 
     public boolean isEquiped() {
@@ -142,15 +141,15 @@ public class InventoryItem {
     }
 
     public ItemTemplate Template() {
-        return ItemDAO.Cache.get(TemplateId);
+        return ItemTemplateDAOImpl.Cache.get(TemplateId);
     }
 
     public ItemType ItemType() {
-        return ItemDAO.SuperTypes.get(Template().TypeId);
+        return ItemTemplateDAOImpl.SuperTypes.get(Template().TypeId);
     }
 
     public Weapon WeaponTemplate() {
-        return (Weapon) ItemDAO.Cache.get(TemplateId);
+        return (Weapon) ItemTemplateDAOImpl.Cache.get(TemplateId);
     }
 
     public CharacterInventoryPositionEnum Slot() {
@@ -213,7 +212,7 @@ public class InventoryItem {
     public static List<ObjectEffect> DeserializeEffects(byte[] binary) {
         IoBuffer buf = IoBuffer.wrap(binary);
         int len = buf.getInt();
-        List<ObjectEffect> Effects = new ArrayList<>();
+        List<ObjectEffect> Effects = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             Effects.add(ObjectEffect.Instance(buf.getInt()));
             Effects.get(i).deserialize(buf);
@@ -251,7 +250,7 @@ public class InventoryItem {
     }
 
     public boolean isWeapon() {
-        return ItemDAO.Cache.get(TemplateId) instanceof Weapon;
+        return ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon;
     }
 
     private void ParseStats() {

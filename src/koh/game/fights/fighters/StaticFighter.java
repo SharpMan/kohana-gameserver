@@ -1,20 +1,9 @@
 package koh.game.fights.fighters;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import koh.game.dao.SpellDAO;
 import koh.game.entities.mob.MonsterGrade;
-import koh.game.entities.spells.EffectInstanceDice;
-import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
-import koh.game.fights.effects.EffectBase;
-import koh.game.fights.effects.EffectCast;
-import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
-import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
-import koh.utils.Couple;
 
 /**
  *

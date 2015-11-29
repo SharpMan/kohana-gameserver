@@ -1,12 +1,10 @@
 package koh.game.actions.interactive;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import koh.commons.CancellableExecutorRunnable;
+import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -63,7 +61,7 @@ public class Collect implements InteractiveAction {
 
         Actor.CurrentMap.sendToField(Player -> Player.Send(new InteractiveElementUpdatedMessage(Actor.CurrentMap.toInteractiveElement(Player, Element))));
         Actor.CurrentMap.sendToField(new StatedElementUpdatedMessage(Actor.CurrentMap.GetStatedElementById(Element)));
-        new CancellableExecutorRunnable(Actor.CurrentMap.getArea().BackGroundWorker, this.GetDuration() * 100) {
+        new CancellableScheduledRunnable(Actor.CurrentMap.getArea().BackGroundWorker, this.GetDuration() * 100) {
             @Override
             public void run() {
                 try {
@@ -91,7 +89,7 @@ public class Collect implements InteractiveAction {
         if (AgeBonus > 0) {
             bonusQuantity += (int) ((float) bonusQuantity * AgeBonus / 100);
         }
-        InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, Skill.gatheredRessourceItem, 63, Actor.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.GenerateIntegerEffect(ItemDAO.Cache.get(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
+        InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, Skill.gatheredRessourceItem, 63, Actor.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
         if (Actor.InventoryCache.Add(Item, true)) {
             Item.NeedInsert = true;
         }

@@ -3,7 +3,7 @@ package koh.game.fights;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import koh.game.Main;
-import koh.game.dao.ExpDAO;
+import koh.game.dao.mysql.ExpDAO;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;

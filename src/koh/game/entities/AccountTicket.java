@@ -3,7 +3,7 @@ package koh.game.entities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
-import koh.game.dao.AccountTicketDAO;
+import koh.game.dao.mysql.AccountTicketDAO;
 
 /**
  *

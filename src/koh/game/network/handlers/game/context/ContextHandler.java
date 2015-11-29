@@ -5,7 +5,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameFight;
 import koh.game.actions.GameMapMovement;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.character.CharacterInventory;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.MovementPath;
@@ -14,7 +14,6 @@ import koh.game.entities.item.InventoryItem;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
-import koh.game.network.handlers.game.approach.CharacterHandler;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ObjectErrorEnum;
@@ -32,10 +31,8 @@ import koh.protocol.messages.game.context.GameMapMovementConfirmMessage;
 import koh.protocol.messages.game.context.GameMapMovementMessage;
 import koh.protocol.messages.game.context.GameMapMovementRequestMessage;
 import koh.protocol.messages.game.context.GameMapNoMovementMessage;
-import koh.protocol.messages.game.context.ShowCellMessage;
 import koh.protocol.messages.game.context.ShowCellRequestMessage;
 import koh.protocol.messages.game.context.roleplay.MapInformationsRequestMessage;
-import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
 import koh.protocol.messages.game.inventory.items.ObjectDropMessage;
 import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
 import koh.protocol.types.game.context.ActorOrientation;
@@ -131,7 +128,7 @@ public class ContextHandler {
         int newQua = Item.GetQuantity() - Message.quantity;
         if (newQua <= 0) {
             Client.Character.InventoryCache.RemoveItemFromInventory(Item);
-            ItemDAO.Update(Item, false, "character_items");
+            ItemTemplateDAOImpl.Update(Item, false, "character_items");
         } else {
             Client.Character.InventoryCache.UpdateObjectquantity(Item, newQua);
             Item = CharacterInventory.TryCreateItem(Item.TemplateId, null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());

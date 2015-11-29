@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import koh.game.dao.AccountDataDAO;
+import koh.game.dao.mysql.AccountDataDAOImpl;
 import koh.protocol.types.game.choice.CharacterBaseInformations;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -65,7 +65,7 @@ public class Account {
     public void totalClear() {
         if (this.Data != null && Data.ColumsToUpdate != null) {
             if (Data.ColumsToUpdate != null) {
-                AccountDataDAO.Update(this.Data,this);
+                AccountDataDAOImpl.Update(this.Data,this);
             } else {
                 Data.totalClear(this);
             }

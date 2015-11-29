@@ -1,22 +1,18 @@
 package koh.game.entities.actors.character;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.mysql.SpellDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.spells.LearnableSpell;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.network.WorldClient;
-import static koh.protocol.MessageEnum.TextInformationMessage;
 import koh.protocol.client.enums.ShortcutBarEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
-import koh.protocol.messages.game.basic.BasicAckMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.roleplay.spell.SpellUpgradeFailureMessage;
 import koh.protocol.messages.game.context.roleplay.spell.SpellUpgradeSuccessMessage;

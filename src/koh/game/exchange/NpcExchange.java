@@ -3,7 +3,7 @@ package koh.game.exchange;
 import com.google.common.primitives.Ints;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.Npc;
 import static koh.game.entities.actors.character.CharacterInventory.UnMergeableType;
 import koh.game.entities.actors.npc.NpcItem;
@@ -14,7 +14,6 @@ import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.DialogTypeEnum;
 import koh.protocol.client.enums.ExchangeErrorEnum;
-import koh.protocol.client.enums.ItemSuperTypeEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.dialog.LeaveDialogMessage;
@@ -64,7 +63,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        if (Ints.contains(UnMergeableType, ItemDAO.Cache.get(TemplateId).TypeId)) {
+        if (Ints.contains(UnMergeableType, ItemTemplateDAOImpl.Cache.get(TemplateId).TypeId)) {
             Quantity = 1;
         }
 
@@ -90,7 +89,7 @@ public class NpcExchange extends Exchange {
             Client.Character.InventoryCache.SubstractKamas(amount1);
         }
 
-        InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, TemplateId, 63, Client.Character.ID, Quantity, EffectHelper.GenerateIntegerEffect(ItemDAO.Cache.get(TemplateId).possibleEffects, npcItem.GenType(), ItemDAO.Cache.get(TemplateId) instanceof Weapon));
+        InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, TemplateId, 63, Client.Character.ID, Quantity, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(TemplateId).possibleEffects, npcItem.GenType(), ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon));
         if (this.myClient.Character.InventoryCache.Add(Item, true)) {
             Item.NeedInsert = true;
         }

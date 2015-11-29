@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
-import koh.game.dao.MonsterDAO;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.mysql.MonsterDAO;
+import koh.game.dao.mysql.SpellDAO;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;

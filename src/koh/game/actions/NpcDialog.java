@@ -1,10 +1,10 @@
 package koh.game.actions;
 
 import java.util.Arrays;
-import java.util.stream.Stream;
+
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.NpcDAO;
+import koh.game.dao.mysql.NpcDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;

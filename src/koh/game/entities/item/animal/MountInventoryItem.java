@@ -2,10 +2,10 @@ package koh.game.entities.item.animal;
 
 import java.time.Instant;
 import java.util.List;
-import koh.game.dao.ExpDAO;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.MountDAO;
-import koh.game.dao.PetsDAO;
+import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.sqlite.MountDAO;
+import koh.game.dao.sqlite.PetsDAO;
 import koh.game.entities.item.InventoryItem;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
@@ -38,7 +38,7 @@ public class MountInventoryItem extends InventoryItem {
         }
         if (this.Entity == null) {
             this.Entity = new MountInventoryItemEntity();
-            this.Entity.AnimalID = ItemDAO.NextMountsID++;
+            this.Entity.AnimalID = ItemTemplateDAOImpl.NextMountsID++;
             this.Entity.lastEat = (System.currentTimeMillis() - (24 * 3600 * 1000)) + "";
             this.Mount = new MountClientData();
             this.Mount.ownerId = Owner;

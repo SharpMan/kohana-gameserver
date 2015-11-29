@@ -11,8 +11,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 import koh.d2o.d2oReader;
-import koh.game.dao.*;
-import static koh.game.dao.PlayerDAO.AccountInUnload;
+
+import static koh.game.dao.mysql.PlayerDAO.AccountInUnload;
+
+import koh.game.dao.mysql.*;
+import koh.game.dao.sqlite.*;
 import koh.game.utils.Settings;
 
 /**
@@ -186,10 +189,10 @@ public class MySQL {
         Main.Logs().writeInfo(d2oReader.Heads.size() + " Heads catched");
         Main.Logs().writeInfo(d2oReader.Effects.size() + " Effects catched");
         PlayerDAO.InitializeNextIdentifiant();
-        ItemDAO.DistinctItems();
+        ItemTemplateDAOImpl.DistinctItems();
         PetsDAO.InitNextKey();
         GuildDAO.InitNextKey();
-        ItemDAO.InitializeNextIdentifiant();
+        ItemTemplateDAOImpl.InitializeNextIdentifiant();
         ExpDAO.load_ExpLevels();
         Main.Logs().writeInfo(AreaDAO.FindSuper() + " SuperAreas catched");
         Main.Logs().writeInfo(AreaDAO.FindAll() + " Areas catched");
@@ -207,11 +210,11 @@ public class MySQL {
         Main.Logs().writeInfo(SpellDAO.FindBombs() + " SpellBombs catched ");
         Main.Logs().writeInfo(GuildEmblemDAO.FindAll() + " GuildEmblems catched ");
         Main.Logs().writeInfo(SpellDAO.FindLearnables() + " LearnableSpells catched ");
-         Main.Logs().writeInfo(ItemDAO.FindItemTypes() + " ItemTypes catched ");
-        Main.Logs().writeInfo(ItemDAO.FindAll() + " ItemTemplates catched ");
-        Main.Logs().writeInfo(ItemDAO.FindWeapons() + " Weapons catched ");
-        Main.Logs().writeInfo(ItemDAO.FindItemSets() + " ItemSets catched ");
-        Main.Logs().writeInfo(ItemDAO.FindPets() + " ItemPets catched ");
+         Main.Logs().writeInfo(ItemTemplateDAOImpl.FindItemTypes() + " ItemTypes catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindAll() + " ItemTemplates catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindWeapons() + " Weapons catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindItemSets() + " ItemSets catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindPets() + " ItemPets catched ");
         Main.Logs().writeInfo(NpcDAO.FindAll() + " NpcTemplates catched ");
         Main.Logs().writeInfo(NpcDAO.FindSpawns() + " NpcSpawns catched ");
         Main.Logs().writeInfo(NpcDAO.FindItems() + " NpcItems catched ");

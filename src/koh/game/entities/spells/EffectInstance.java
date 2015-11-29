@@ -1,18 +1,16 @@
 package koh.game.entities.spells;
 
 import com.mysql.jdbc.StringUtils;
-import java.io.IOException;
-import java.io.ObjectOutput;
+
 import java.io.Serializable;
 import java.util.regex.Matcher;
-import jregex.MatchIterator;
+
 import jregex.Pattern;
 import jregex.REFlags;
 import koh.d2o.entities.Effect;
 import koh.game.Main;
-import koh.game.dao.D2oDao;
-import koh.game.dao.MonsterDAO;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.dao.mysql.D2oDao;
+import koh.game.dao.mysql.MonsterDAO;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;

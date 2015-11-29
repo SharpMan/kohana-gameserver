@@ -1,6 +1,6 @@
 package koh.game.entities.actors;
 
-import koh.game.dao.NpcDAO;
+import koh.game.dao.mysql.NpcDAO;
 import koh.game.entities.actors.npc.NpcTemplate;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayNpcInformations;

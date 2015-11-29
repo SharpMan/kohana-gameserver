@@ -1,6 +1,6 @@
 package koh.game.entities.actors.npc;
 
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.ItemTemplate;
 import koh.protocol.client.enums.EffectGenerationType;
@@ -26,11 +26,11 @@ public class NpcItem {
     }
     
     public ItemTemplate ItemToken() {
-        return ItemDAO.Cache.get(Token);
+        return ItemTemplateDAOImpl.Cache.get(Token);
     }
 
     public ItemTemplate Template() {
-        return ItemDAO.Cache.get(Item);
+        return ItemTemplateDAOImpl.Cache.get(Item);
     }
 
     /*/int objectGID, ObjectEffect[] effects, int objectPrice, String buyCriterion*/

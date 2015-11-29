@@ -1,10 +1,9 @@
 package koh.game.actions.requests;
 
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.dao.GuildDAO;
+import koh.game.dao.sqlite.GuildDAO;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.network.WorldClient;
-import koh.protocol.client.Message;
 import koh.protocol.client.enums.GuildInvitationStateEnum;
 import koh.protocol.client.enums.GuildRightsBitEnum;
 import koh.protocol.messages.game.guild.GuildInvitationStateRecrutedMessage;

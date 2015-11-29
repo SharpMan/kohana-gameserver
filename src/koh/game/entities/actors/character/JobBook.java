@@ -3,17 +3,14 @@ package koh.game.entities.actors.character;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import koh.game.dao.ExpDAO;
-import koh.game.dao.JobDAO;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.mysql.JobDAO;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.Player;
 import koh.game.entities.jobs.InteractiveSkill;
 import koh.game.entities.jobs.JobGatheringInfos;
-import koh.game.entities.spells.LearnableSpell;
 import koh.protocol.client.BufUtils;
 import koh.protocol.client.enums.JobEnum;
-import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.roleplay.job.JobExperienceUpdateMessage;
 import koh.protocol.messages.game.context.roleplay.job.JobLevelUpMessage;
 import koh.protocol.types.game.context.roleplay.job.JobCrafterDirectorySettings;
@@ -23,7 +20,6 @@ import koh.protocol.types.game.interactive.skill.SkillActionDescription;
 import koh.protocol.types.game.interactive.skill.SkillActionDescriptionCollect;
 import koh.protocol.types.game.interactive.skill.SkillActionDescriptionCraft;
 import koh.utils.Couple;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**

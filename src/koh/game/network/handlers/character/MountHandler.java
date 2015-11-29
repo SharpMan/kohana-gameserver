@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.MountDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.sqlite.MountDAO;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.animal.MountInventoryItem;
 import koh.game.network.WorldClient;
@@ -124,7 +124,7 @@ public class MountHandler {
                         break;
                     }
 
-                    InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, MountDAO.Model(Client.Character.MountInfo.Mount.model).ScroolId, 63, Client.Character.ID, 1, new ArrayList<ObjectEffect>() {
+                    InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, MountDAO.Model(Client.Character.MountInfo.Mount.model).ScroolId, 63, Client.Character.ID, 1, new ArrayList<ObjectEffect>() {
                         {
                             add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
                             add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.Character.MountInfo.Mount.model, Client.Character.MountInfo.Entity.AnimalID));

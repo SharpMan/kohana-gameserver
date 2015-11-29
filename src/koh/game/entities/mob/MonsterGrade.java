@@ -1,6 +1,6 @@
 package koh.game.entities.mob;
 
-import koh.game.dao.MonsterDAO;
+import koh.game.dao.mysql.MonsterDAO;
 import koh.game.entities.actors.character.GenericStats;
 import koh.protocol.client.enums.StatsEnum;
 

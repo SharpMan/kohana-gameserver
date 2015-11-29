@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.PetsDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.sqlite.PetsDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
 import koh.protocol.client.enums.ItemsEnum;
@@ -69,7 +69,7 @@ public class PetsInventoryItem extends InventoryItem {
         }
         if (this.Entity == null) {
             this.Entity = new PetsInventoryItemEntity();
-            this.Entity.PetsID = ItemDAO.NextPetsID++;
+            this.Entity.PetsID = ItemTemplateDAOImpl.nextPetId++;
             this.Entity.lastEat = (System.currentTimeMillis() - (24 * 3600 * 1000)) + "";
             this.Entity.PointsUsed = 0;
             this.SerializeInformations();
@@ -97,19 +97,19 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public Pets Animal() {
-        return ItemDAO.Pets.get(this.TemplateId);
+        return ItemTemplateDAOImpl.Pets.get(this.TemplateId);
     }
 
     public boolean Eat(Player p, InventoryItem Food) {
         //Todo refresh stat
-        if (!ItemDAO.Pets.containsKey(this.TemplateId)) {
+        if (!ItemTemplateDAOImpl.Pets.containsKey(this.TemplateId)) {
             return false;
         } else if (Food.TemplateId == ItemsEnum.EneripsaPouder) {
             //TODO : Life
             return true;
         } else if (this.Entity.PointsUsed >= Animal().Hormone) {
             return false;
-        } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat))) < ItemDAO.Pets.get(this.TemplateId).minDurationBeforeMeal) {
+        } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat))) < ItemTemplateDAOImpl.Pets.get(this.TemplateId).minDurationBeforeMeal) {
             PlayerController.SendServerMessage(p.Client, "Veuillez patientez " + ((Animal().minDurationBeforeMeal) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat)))) + " heures pour le prochain repas");
             return false;
         }

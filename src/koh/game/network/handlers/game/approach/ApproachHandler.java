@@ -1,6 +1,6 @@
 package koh.game.network.handlers.game.approach;
 
-import koh.game.dao.AccountTicketDAO;
+import koh.game.dao.mysql.AccountTicketDAO;
 import koh.game.network.WorldClient;
 import koh.game.network.WorldServer;
 import koh.game.network.handlers.HandlerAttribute;

@@ -3,8 +3,8 @@ package koh.game.entities.environments;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import koh.commons.CancellableExecutorRunnable;
-import koh.game.dao.MapDAO;
+import koh.concurrency.CancellableScheduledRunnable;
+import koh.game.dao.mysql.MapDAO;
 import koh.game.utils.Settings;
 import koh.protocol.messages.game.interactive.StatedMapUpdateMessage;
 import koh.protocol.types.game.interactive.StatedElement;
@@ -18,7 +18,7 @@ public class Area {
     public final ScheduledExecutorService BackGroundWorker = Executors.newScheduledThreadPool(50);
 
     public Area() {
-        new CancellableExecutorRunnable(BackGroundWorker, ((Settings.GetIntElement("Job.AgeBonusTime") + this.id) * 60) * 1000, (Settings.GetIntElement("Job.AgeBonusTime") * 60) * 1000) {
+        new CancellableScheduledRunnable(BackGroundWorker, ((Settings.GetIntElement("Job.AgeBonusTime") + this.id) * 60) * 1000, (Settings.GetIntElement("Job.AgeBonusTime") * 60) * 1000) {
             @Override
             public void run() {
                 Arrays.stream(SubAreas).forEach(Sub -> Arrays.stream(Sub.mapIds)
@@ -37,7 +37,7 @@ public class Area {
                                 })));
             }
         };
-        new CancellableExecutorRunnable(BackGroundWorker, (Settings.GetIntElement("Job.Spawn") + this.id) * 60 * 1000, Settings.GetIntElement("Job.Spawn") * 60 * 1000) {
+        new CancellableScheduledRunnable(BackGroundWorker, (Settings.GetIntElement("Job.Spawn") + this.id) * 60 * 1000, Settings.GetIntElement("Job.Spawn") * 60 * 1000) {
             @Override
             public void run() {
                 Arrays.stream(SubAreas)

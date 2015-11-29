@@ -14,9 +14,9 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameParty;
 import koh.game.actions.requests.GameBaseRequest;
 import koh.game.actions.requests.PartyRequest;
-import koh.game.dao.AccountDataDAO;
-import koh.game.dao.AccountOccupedException;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.mysql.AccountDataDAOImpl;
+import koh.game.dao.mysql.AccountOccupedException;
+import koh.game.dao.mysql.PlayerDAO;
 import koh.game.entities.Account;
 import koh.game.entities.AccountTicket;
 import koh.game.entities.actors.Player;
@@ -25,8 +25,6 @@ import koh.game.entities.environments.DofusTrigger;
 import koh.game.entities.environments.IWorldEventObserver;
 import koh.game.exchange.Exchange;
 import koh.game.executors.Waiter;
-import koh.game.fights.Fight;
-import koh.game.fights.Fighter;
 import koh.game.network.handlers.Handler;
 import koh.protocol.client.Message;
 import static koh.protocol.client.enums.ChatActivableChannelsEnum.*;
@@ -259,7 +257,7 @@ public class WorldClient {
         try {
             PlayerDAO.FindAll(this.getAccount());
             if (this.getAccount().Data == null) {
-                this.getAccount().Data = AccountDataDAO.Find(this.getAccount().ID);
+                this.getAccount().Data = AccountDataDAOImpl.Find(this.getAccount().ID);
             }
             if (showQueue) {
                 this.Send(new LoginQueueStatusMessage((short) 0, (short) 0));

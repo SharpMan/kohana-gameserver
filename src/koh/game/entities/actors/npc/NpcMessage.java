@@ -2,7 +2,7 @@ package koh.game.entities.actors.npc;
 
 import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
-import koh.game.dao.NpcDAO;
+import koh.game.dao.mysql.NpcDAO;
 import koh.game.entities.actors.Player;
 
 /**

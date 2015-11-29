@@ -3,7 +3,7 @@ package koh.game.fights.types;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
-import koh.game.dao.ExpDAO;
+import koh.game.dao.mysql.ExpDAO;
 import koh.game.entities.environments.DofusMap;
 import koh.game.fights.Fight;
 import koh.game.fights.FightFormulas;

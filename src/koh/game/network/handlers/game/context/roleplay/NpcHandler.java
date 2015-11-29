@@ -1,14 +1,9 @@
 package koh.game.network.handlers.game.context.roleplay;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
 import koh.game.Main;
 import koh.game.actions.*;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.NpcDAO;
 import koh.game.entities.actors.Npc;
-import koh.game.entities.actors.npc.NpcReply;
 import koh.game.exchange.*;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;

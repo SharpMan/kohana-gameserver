@@ -3,9 +3,7 @@ package koh.game.entities.guilds;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import koh.game.dao.GuildDAO;
-import koh.protocol.client.enums.CharacterInventoryPositionEnum;
-import koh.protocol.client.enums.GuildRightsBitEnum;
+import koh.game.dao.sqlite.GuildDAO;
 
 /**
  *

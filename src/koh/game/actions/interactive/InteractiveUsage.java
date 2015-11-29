@@ -1,9 +1,7 @@
 package koh.game.actions.interactive;
 
-import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameGuildCreation;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.MapDAO;
 import koh.game.entities.actors.Player;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 

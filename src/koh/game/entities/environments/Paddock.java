@@ -1,12 +1,11 @@
 package koh.game.entities.environments;
 
 import java.util.Arrays;
-import koh.game.dao.MapDAO;
-import koh.game.dao.PaddockDAO;
+import koh.game.dao.mysql.MapDAO;
+import koh.game.dao.mysql.PaddockDAO;
 import koh.protocol.messages.game.context.mount.GameDataPaddockObjectAddMessage;
 import koh.protocol.messages.game.context.mount.GameDataPaddockObjectRemoveMessage;
 import koh.protocol.types.game.context.roleplay.GuildInformations;
-import koh.protocol.types.game.mount.ItemDurability;
 import koh.protocol.types.game.paddock.MountInformationsForPaddock;
 import koh.protocol.types.game.paddock.PaddockAbandonnedInformations;
 import koh.protocol.types.game.paddock.PaddockBuyableInformations;

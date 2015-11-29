@@ -22,7 +22,7 @@ public class Layer {
     public Layer(DofusMap map, IoBuffer buf) {
         this.Map = map;
         this.LayerId = buf.getInt();
-        this.Cells = BufUtils.ReadShortArray(buf);
+        this.Cells = BufUtils.readShortArray(buf);
     }
 
 }

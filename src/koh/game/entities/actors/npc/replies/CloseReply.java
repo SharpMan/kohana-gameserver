@@ -1,8 +1,6 @@
 package koh.game.entities.actors.npc.replies;
 
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.actions.NpcDialog;
-import koh.game.dao.NpcDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.npc.NpcReply;
 

@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import java.util.Arrays;
 import koh.game.Main;
 import koh.game.conditions.ConditionExpression;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.spells.EffectInstance;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
@@ -64,12 +64,12 @@ public class ItemTemplate {
     }
     
     public ItemSet ItemSet() {
-        return this.itemSetId < 0 ? null : ItemDAO.Sets.get(this.itemSetId);
+        return this.itemSetId < 0 ? null : ItemTemplateDAOImpl.Sets.get(this.itemSetId);
     }
     
     public ItemSuperTypeEnum GetSuperType() {
         try {
-            return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(TypeId).SuperType);
+            return ItemSuperTypeEnum.valueOf(ItemTemplateDAOImpl.SuperTypes.get(TypeId).SuperType);
         } catch (java.lang.NullPointerException e) {
             return ItemSuperTypeEnum.SUPERTYPE_UNKNOWN_0;
         }

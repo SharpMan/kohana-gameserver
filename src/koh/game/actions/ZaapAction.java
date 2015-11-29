@@ -1,6 +1,6 @@
 package koh.game.actions;
 
-import koh.game.dao.MapDAO;
+import koh.game.dao.mysql.MapDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;

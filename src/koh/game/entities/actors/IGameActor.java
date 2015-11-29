@@ -1,6 +1,6 @@
 package koh.game.entities.actors;
 
-import koh.game.dao.MapDAO;
+import koh.game.dao.mysql.MapDAO;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.DofusMap;
 import koh.protocol.client.Message;

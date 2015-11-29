@@ -2,11 +2,9 @@ package koh.game.entities.item.animal;
 
 import com.google.common.primitives.Ints;
 import java.util.Arrays;
-import koh.game.dao.ItemDAO;
+
 import koh.game.entities.item.ItemTemplate;
 import koh.game.entities.spells.EffectInstance;
-import koh.game.entities.spells.EffectInstanceDice;
-import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 

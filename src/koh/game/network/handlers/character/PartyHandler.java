@@ -4,7 +4,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameParty;
 import koh.game.actions.requests.PartyRequest;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.mysql.PlayerDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.Party;
 import koh.game.network.WorldClient;

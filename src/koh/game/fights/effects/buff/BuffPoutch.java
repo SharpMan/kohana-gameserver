@@ -3,7 +3,7 @@ package koh.game.fights.effects.buff;
 import java.util.ArrayList;
 import java.util.Arrays;
 import koh.game.Main;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.mysql.SpellDAO;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;

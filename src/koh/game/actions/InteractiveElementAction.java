@@ -5,7 +5,7 @@ import java.util.Map;
 import koh.game.Main;
 import koh.game.actions.interactive.*;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.JobDAO;
+import koh.game.dao.mysql.JobDAO;
 import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.InteractiveActionEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;

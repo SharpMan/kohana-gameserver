@@ -1,6 +1,5 @@
 package koh.game.entities.environments;
 
-import koh.game.dao.AreaDAO;
 import koh.protocol.messages.game.prism.PrismsListMessage;
 import koh.protocol.types.game.prism.PrismSubareaEmptyInfo;
 

@@ -43,9 +43,8 @@ public class WorldServer {
         acceptor.setReuseAddress(true);
         acceptor.setBacklog(100000);
 
-        this.acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new Dofus2ProtocolEncoder(
-                new CachedBufferAllocator(4, 0xFFFF)
-        ), new ProtocolDecoder()));
+        this.acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new Dofus2ProtocolEncoder(),
+                new ProtocolDecoder()));
         this.acceptor.setHandler(new WorldHandler());
 
         this.acceptor.getSessionConfig().setMaxReadBufferSize(MAX_READ_SIZE);

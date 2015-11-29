@@ -1,13 +1,8 @@
 package koh.game.exchange;
 
-import java.util.ArrayList;
-import java.util.List;
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.dao.ItemDAO;
-import koh.game.entities.actors.Npc;
-import koh.game.entities.item.EffectHelper;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.item.InventoryItem;
-import koh.game.entities.item.Weapon;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.DialogTypeEnum;
@@ -36,7 +31,7 @@ public class StorageExchange extends Exchange {
         InventoryItem NewItem = null;
         if (Add) {
             for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.Instance(ItemDAO.NextStorageID++, Item.TemplateId, 63, Client.getAccount().ID, Item.GetQuantity(), Item.Effects);
+                NewItem = InventoryItem.Instance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().ID, Item.GetQuantity(), Item.Effects);
                 if (Client.getAccount().Data.Add(Client.Character, NewItem, true)) {
                     NewItem.NeedInsert = true;
                 }
@@ -44,7 +39,7 @@ public class StorageExchange extends Exchange {
             }
         } else {
             for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.Instance(ItemDAO.NextID++, Item.TemplateId, 63, Client.Character.ID, Item.GetQuantity(), Item.Effects);
+                NewItem = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, Item.TemplateId, 63, Client.Character.ID, Item.GetQuantity(), Item.Effects);
                 if (Client.Character.InventoryCache.Add(NewItem, true)) {
                     NewItem.NeedInsert = true;
                 }
@@ -64,7 +59,7 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             Client.getAccount().Data.UpdateObjectquantity(Client.Character, BankItem, BankItem.GetQuantity() + Quantity);
-            InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, BankItem.TemplateId, 63, Client.Character.ID, -Quantity, BankItem.Effects);
+            InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, BankItem.TemplateId, 63, Client.Character.ID, -Quantity, BankItem.Effects);
             if (Client.Character.InventoryCache.Add(Item, true)) {
                 Item.NeedInsert = true;
             }
@@ -74,7 +69,7 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             Client.Character.InventoryCache.UpdateObjectquantity(Item, Item.GetQuantity() - Quantity);
-            InventoryItem NewItem = InventoryItem.Instance(ItemDAO.NextStorageID++, Item.TemplateId, 63, Client.getAccount().ID, Quantity, Item.Effects);
+            InventoryItem NewItem = InventoryItem.Instance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().ID, Quantity, Item.Effects);
             if (Client.getAccount().Data.Add(Client.Character, NewItem, true)) {
                 NewItem.NeedInsert = true;
             }

@@ -16,11 +16,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import koh.commons.CancellableExecutorRunnable;
+import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.Main;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameMapMovement;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.mysql.SpellDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
@@ -149,7 +149,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected Map<FightTeam, Map<Short, FightCell>> myFightCells = new HashMap<>();
     protected short AgeBonus = -1, lootShareLimitMalus = -1;
 
-    protected Map<String, CancellableExecutorRunnable> myTimers = new HashMap<>();
+    protected Map<String, CancellableScheduledRunnable> myTimers = new HashMap<>();
     public Map<Fighter, CopyOnWriteArrayList<FightActivableObject>> m_activableObjects = Collections.synchronizedMap(new HashMap<>());
     private final Object $mutex_lock = new Object();
     public FightWorker myWorker = new FightWorker(this);
@@ -708,7 +708,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.FightLoopState = FightLoopState.STATE_WAIT_START;
 
         // Lancement du gameLoop 10 ms d'interval.
-        this.StartTimer(new CancellableExecutorRunnable(BackGroundWorker, 10, 10) {
+        this.StartTimer(new CancellableScheduledRunnable(BackGroundWorker, 10, 10) {
             @Override
             public void run() {
                 GameLoop();
@@ -1090,7 +1090,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         // Si un timer pour le lancement du combat
         if (this.GetStartTimer() != -1) {
             //FIXME remove Thread.sleep
-            this.StartTimer(new CancellableExecutorRunnable(BackGroundWorker, (GetStartTimer() * 1000)) {
+            this.StartTimer(new CancellableScheduledRunnable(BackGroundWorker, (GetStartTimer() * 1000)) {
                 @Override
                 public void run() {
                     try {
@@ -1587,7 +1587,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public void StartTimer(CancellableExecutorRunnable CR, String Name) {
+    public void StartTimer(CancellableScheduledRunnable CR, String Name) {
         synchronized ($mutex_lock) {
             try {
                 this.myTimers.put(Name, CR);

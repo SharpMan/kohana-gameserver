@@ -1,10 +1,7 @@
 package koh.game.actions.interactive;
 
-import koh.game.controllers.PlayerController;
-import koh.game.dao.MapDAO;
 import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.TextInformationTypeEnum;
-import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 
 /**

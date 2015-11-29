@@ -1,7 +1,6 @@
 package koh.game.network.handlers.character;
 
-import java.time.Instant;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.mysql.PlayerDAO;
 import koh.game.entities.AccountData.FriendContact;
 import koh.game.entities.AccountData.IgnoredContact;
 import koh.game.entities.actors.Player;
@@ -33,8 +32,6 @@ import koh.protocol.messages.game.friend.IgnoredAddedMessage;
 import koh.protocol.messages.game.friend.IgnoredDeleteRequestMessage;
 import koh.protocol.messages.game.friend.IgnoredDeleteResultMessage;
 import koh.protocol.messages.game.friend.SpouseStatusMessage;
-import koh.protocol.types.game.friend.FriendInformations;
-import koh.protocol.types.game.friend.IgnoredInformations;
 import koh.protocol.types.game.context.roleplay.BasicGuildInformations;
 import koh.protocol.types.game.friend.FriendOnlineInformations;
 import koh.protocol.types.game.friend.IgnoredOnlineInformations;

@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
-import koh.d2o.entities.Effect;
-import koh.game.Logs;
+
 import koh.game.Main;
-import static koh.game.dao.D2oDao.getEffect;
+import static koh.game.dao.mysql.D2oDao.getEffect;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.EffectGenerationType;
-import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
 import koh.utils.Couple;

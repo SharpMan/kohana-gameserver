@@ -1,16 +1,15 @@
 package koh.game.entities.actors.character;
 
 import koh.game.Main;
-import koh.game.dao.ExpDAO;
-import koh.game.dao.MountDAO;
-import koh.game.dao.PetsDAO;
+import koh.game.dao.mysql.ExpDAO;
+import koh.game.dao.sqlite.MountDAO;
+import koh.game.dao.sqlite.PetsDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.animal.MountInventoryItemEntity;
 import koh.protocol.client.BufUtils;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
-import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import koh.protocol.types.game.look.EntityLook;
 import koh.protocol.types.game.look.SubEntity;

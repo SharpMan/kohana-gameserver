@@ -4,9 +4,8 @@ import java.net.InetSocketAddress;
 import koh.game.Main;
 import koh.game.utils.Settings;
 import koh.inter.InterMessage;
-import koh.inter.PtDecoder;
-import koh.inter.PtEncoder;
-import koh.protocol.client.Message;
+import koh.inter.IntercomDecoder;
+import koh.inter.IntercomEncoder;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -23,7 +22,7 @@ public class InterClient {
     private IoSession session;
 
     public InterClient() {
-        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PtEncoder(), new PtDecoder()));
+        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new IntercomEncoder(), new IntercomDecoder()));
         connector.setHandler(new InterHandler(this));
         connector.getSessionConfig().setReadBufferSize(65536);
     }
@@ -36,7 +35,7 @@ public class InterClient {
     public void RetryConnect(int port) {
         connector.dispose();
         connector = new NioSocketConnector();
-        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new PtEncoder(), new PtDecoder()));
+        connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new IntercomEncoder(), new IntercomDecoder()));
         connector.setHandler(new InterHandler(this));
         connector.getSessionConfig().setReadBufferSize(65536);
         System.out.println("Retry to connect to the InterServer ...");

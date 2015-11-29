@@ -1,7 +1,7 @@
 package koh.game.entities.item;
 
 import java.util.Arrays;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import static koh.game.entities.item.EffectHelper.unRandomablesEffects;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -26,7 +26,7 @@ public class Weapon extends ItemTemplate {
     }
 
     public ItemType ItemType() {
-        return ItemDAO.SuperTypes.get(TypeId);
+        return ItemTemplateDAOImpl.SuperTypes.get(TypeId);
     }
 
 }

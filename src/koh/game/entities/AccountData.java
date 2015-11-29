@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import koh.game.dao.AccountDataDAO;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.mysql.AccountDataDAOImpl;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.mysql.PlayerDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
 import koh.protocol.client.BufUtils;
@@ -46,7 +46,7 @@ public class AccountData {
     public List<String> ColumsToUpdate = null;
 
     public List<ObjectItem> toObjectsItem() {
-        return ItemsCache.values().stream().map(x -> x.ObjectItem()).collect(Collectors.toList());
+        return ItemsCache.values().stream().map(InventoryItem::ObjectItem).collect(Collectors.toList());
     }
 
     public void UpdateObjectquantity(Player Player, InventoryItem Item, int Quantity) {
@@ -63,7 +63,7 @@ public class AccountData {
         Item.ColumsToUpdate = null;
         this.RemoveFromDic(Item.ID);
         Player.Send(new StorageObjectRemoveMessage(Item.ID));
-        ItemDAO.Remove(Item, "storage_items");
+        ItemTemplateDAOImpl.Remove(Item, "storage_items");
     }
 
     public void SetBankKamas(int Price) {
@@ -110,7 +110,7 @@ public class AccountData {
                     if (RemoveItem != null) {
                         this.RemoveFromDic(RemoveItem.ID);
                         RemoveItem.NeedInsert = false;
-                        ItemDAO.Remove(RemoveItem, "storage_items");
+                        ItemTemplateDAOImpl.Remove(RemoveItem, "storage_items");
                         RemoveItem.ColumsToUpdate = null;
                     }
                     this.UpdateObjectquantity(Player, Item, Item.GetQuantity() + Quantity);
@@ -232,17 +232,17 @@ public class AccountData {
         synchronized (ItemsCache) {
             this.ItemsCache.values().parallelStream().forEach(Item -> {
                 if (Item.NeedRemove) {
-                    ItemDAO.Remove(Item, "storage_items");
+                    ItemTemplateDAOImpl.Remove(Item, "storage_items");
                 } else if (Item.NeedInsert) {
-                    ItemDAO.Insert(Item, Clear, "storage_items");
+                    ItemTemplateDAOImpl.Insert(Item, Clear, "storage_items");
                 } else if (Item.ColumsToUpdate != null && !Item.ColumsToUpdate.isEmpty()) {
-                    ItemDAO.Update(Item, Clear, "storage_items");
+                    ItemTemplateDAOImpl.Update(Item, Clear, "storage_items");
                 } else if (Clear) {
                     Item.totalClear();
                 }
             });
             if (!Clear && this.ColumsToUpdate != null) {
-                AccountDataDAO.Update(this, null);
+                AccountDataDAOImpl.Update(this, null);
             }
         }
     }

@@ -3,7 +3,7 @@ package koh.game.executors;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.mysql.PlayerDAO;
 import koh.game.fights.FightTypeEnum;
 import koh.game.network.WorldClient;
 import koh.protocol.messages.connection.LoginQueueStatusMessage;

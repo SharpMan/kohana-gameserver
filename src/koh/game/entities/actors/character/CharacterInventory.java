@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -58,7 +58,7 @@ public class CharacterInventory {
 
     public CharacterInventory(Player character) {
         this.Player = character;
-        ItemDAO.InitInventoryCache(Player.ID, ItemsCache, "character_items");
+        ItemTemplateDAOImpl.InitInventoryCache(Player.ID, ItemsCache, "character_items");
     }
 
     public int ItemSetCount() {
@@ -111,7 +111,7 @@ public class CharacterInventory {
                     if (RemoveItem != null) {
                         this.RemoveFromDic(RemoveItem.ID);
                         RemoveItem.NeedInsert = false;
-                        ItemDAO.Remove(RemoveItem, "character_items");
+                        ItemTemplateDAOImpl.Remove(RemoveItem, "character_items");
                         RemoveItem.ColumsToUpdate = null;
                         if (Send) {
                             Player.Send(new ObjectDeletedMessage(RemoveItem.ID));
@@ -418,16 +418,16 @@ public class CharacterInventory {
     }
 
     public static InventoryItem TryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
-        if (!ItemDAO.Cache.containsKey(templateId)) // Template inexistant
+        if (!ItemTemplateDAOImpl.Cache.containsKey(templateId)) // Template inexistant
         {
             return null;
         }
 
         // Recup template
-        ItemTemplate Template = ItemDAO.Cache.get(templateId);
+        ItemTemplate Template = ItemTemplateDAOImpl.Cache.get(templateId);
 
         // Creation
-        InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, templateId, position, Character != null ? Character.ID : -1, quantity, (Stats == null ? EffectHelper.GenerateIntegerEffect(Template.possibleEffects, EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
+        InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, templateId, position, Character != null ? Character.ID : -1, quantity, (Stats == null ? EffectHelper.GenerateIntegerEffect(Template.possibleEffects, EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
         Item.NeedInsert = true;
         Item.GetStats();
         if (Character != null) {
@@ -511,7 +511,7 @@ public class CharacterInventory {
         Item.NeedInsert = false;
         this.RemoveFromDic(Item.ID);
         Player.Send(new ObjectDeletedMessage(Item.ID));
-        ItemDAO.Remove(Item, "character_items");
+        ItemTemplateDAOImpl.Remove(Item, "character_items");
         Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
     }
 
@@ -629,11 +629,11 @@ public class CharacterInventory {
     public void Save(boolean Clear) {
         this.ItemsCache.values().parallelStream().forEach(Item -> {
             if (Item.NeedRemove) {
-                ItemDAO.Remove(Item, "character_items");
+                ItemTemplateDAOImpl.Remove(Item, "character_items");
             } else if (Item.NeedInsert) {
-                ItemDAO.Insert(Item, Clear, "character_items");
+                ItemTemplateDAOImpl.Insert(Item, Clear, "character_items");
             } else if (Item.ColumsToUpdate != null && !Item.ColumsToUpdate.isEmpty()) {
-                ItemDAO.Update(Item, Clear, "character_items");
+                ItemTemplateDAOImpl.Update(Item, Clear, "character_items");
             } else if (Clear) {
                 Item.totalClear();
             }
