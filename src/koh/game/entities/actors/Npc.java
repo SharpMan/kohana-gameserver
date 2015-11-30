@@ -14,34 +14,34 @@ import koh.protocol.types.game.look.EntityLook;
  */
 public class Npc extends IGameActor {
 
-    public int NpcId, Artwork;
-    public short CellID;
-    public boolean Sex;
-    public GameContextActorInformations ContextInformation;
-    public int[] QuestsToValid, QuestsToStart;
+    public int npcId, artwork;
+    public short cellID;
+    public boolean sex;
+    public GameContextActorInformations contextActorInformations;
+    public int[] questsToValid, questsToStart;
 
     //Todo QuestTODO:
-    public NpcTemplate Template() {
-        return NpcDAOImpl.templates.get(this.NpcId);
+    public NpcTemplate getTemplate() {
+        return NpcDAOImpl.templates.get(this.npcId);
     }
 
     @Override
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         if (entityLook == null) {
-            this.entityLook = this.Template().GetEntityLook();
+            this.entityLook = this.getTemplate().getEntityLook();
         }
         return entityLook;
     }
 
     @Override
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        if (ContextInformation == null) {
-            if (this.QuestsToStart.length > 0 || this.QuestsToValid.length > 0) {
-                this.ContextInformation = new GameRolePlayNpcWithQuestInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), (short) this.Template().Id, this.Sex, this.Artwork, new GameRolePlayNpcQuestFlag(this.QuestsToValid, this.QuestsToStart));
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        if (contextActorInformations == null) {
+            if (this.questsToStart.length > 0 || this.questsToValid.length > 0) {
+                this.contextActorInformations = new GameRolePlayNpcWithQuestInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), (short) this.getTemplate().id, this.sex, this.artwork, new GameRolePlayNpcQuestFlag(this.questsToValid, this.questsToStart));
             } else {
-                this.ContextInformation = new GameRolePlayNpcInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), (short) this.Template().Id, this.Sex, this.Artwork);
+                this.contextActorInformations = new GameRolePlayNpcInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), (short) this.getTemplate().id, this.sex, this.artwork);
             }
         }
-        return ContextInformation;
+        return contextActorInformations;
     }
 }

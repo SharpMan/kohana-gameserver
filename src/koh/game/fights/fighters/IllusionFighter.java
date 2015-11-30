@@ -22,9 +22,9 @@ public class IllusionFighter extends StaticFighter {
     public IllusionFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
         super(Fight, Summoner);
         this.Stats = new GenericStats();
-        this.Stats.Merge(Summoner.Stats);
+        this.Stats.merge(Summoner.Stats);
         super.InitFighter(this.Stats, Fight.GetNextContextualId());
-        this.entityLook = EntityLookParser.Copy(Summoner.GetEntityLook());
+        this.entityLook = EntityLookParser.Copy(Summoner.getEntityLook());
         super.setLife(Summoner.Life());
         super.setLifeMax(Summoner.MaxLife());
     }
@@ -68,17 +68,17 @@ public class IllusionFighter extends StaticFighter {
     }
 
     @Override
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.Summoner).Character.NickName, ((CharacterFighter) this.Summoner).Character.PlayerStatus(), (byte) this.Level(), ((CharacterFighter) this.Summoner).Character.GetActorAlignmentInformations(), ((CharacterFighter) this.Summoner).Character.Breed, ((CharacterFighter) this.Summoner).Character.Sexe());
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.Summoner).Character.nickName, ((CharacterFighter) this.Summoner).Character.getPlayerStatus(), (byte) this.Level(), ((CharacterFighter) this.Summoner).Character.getActorAlignmentInformations(), ((CharacterFighter) this.Summoner).Character.breed, ((CharacterFighter) this.Summoner).Character.hasSexe());
     }
 
     @Override
     public FightTeamMemberInformations GetFightTeamMemberInformations() {
-        return new FightTeamMemberCharacterInformations(this.ID, ((CharacterFighter) this.Summoner).Character.NickName, (byte) this.Level());
+        return new FightTeamMemberCharacterInformations(this.ID, ((CharacterFighter) this.Summoner).Character.nickName, (byte) this.Level());
     }
 
     @Override
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
 
     }
 
@@ -88,7 +88,7 @@ public class IllusionFighter extends StaticFighter {
     }
 
     @Override
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         return this.entityLook;
     }
 

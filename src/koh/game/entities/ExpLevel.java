@@ -7,7 +7,7 @@ package koh.game.entities;
 public class ExpLevel {
 
     public final int level;
-    public final long Player;
+    public final long player;
     public final long Job;
     public final long Mount;
     public final long Guild;
@@ -19,7 +19,7 @@ public class ExpLevel {
 
     public ExpLevel(int lvl, long a, long b, long c, long d, int e, int f, int g, long h, long i) {
         this.level = lvl;
-        this.Player = a;
+        this.player = a;
         this.Job = b;
         this.Mount = c;
         this.Guild = d;

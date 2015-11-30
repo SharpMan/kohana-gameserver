@@ -9,40 +9,40 @@ import koh.game.exchange.Exchange;
  */
 public class GameExchange extends GameAction {
 
-    public Exchange Exchange;
+    public Exchange exchange;
 
-    public GameExchange(IGameActor Actor, Exchange Exchange) {
-        super(GameActionTypeEnum.EXCHANGE, Actor);
-        this.Exchange = Exchange;
+    public GameExchange(IGameActor actor, Exchange exchange) {
+        super(GameActionTypeEnum.EXCHANGE, actor);
+        this.exchange = exchange;
     }
     
 
     @Override
-    public void EndExecute() {
-        if (!Exchange.ExchangeFinish()) {
-            Exchange.CloseExchange(true);
+    public void endExecute() {
+        if (!exchange.ExchangeFinish()) {
+            exchange.CloseExchange(true);
         }
 
         try {
-            super.EndExecute();
+            super.endExecute();
         } catch (Exception e) {
         }
     }
 
     @Override
-    public void Abort(Object[] Args) {
+    public void abort(Object[] Args) {
 
-        if (!Exchange.ExchangeFinish()) {
-            Exchange.CloseExchange();
+        if (!exchange.ExchangeFinish()) {
+            exchange.CloseExchange();
         }
         try {
-            super.EndExecute();
+            super.endExecute();
         } catch (Exception e) {
         }
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         return false;
     }
 

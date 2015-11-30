@@ -26,7 +26,7 @@ public class Weapon extends ItemTemplate {
     }
 
     public ItemType ItemType() {
-        return ItemTemplateDAOImpl.SuperTypes.get(TypeId);
+        return ItemTemplateDAOImpl.SuperTypes.get(typeId);
     }
 
 }

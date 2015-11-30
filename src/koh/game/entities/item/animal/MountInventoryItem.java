@@ -26,7 +26,7 @@ public class MountInventoryItem extends InventoryItem {
     public MountInventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects, boolean Create) {
         super(ID, TemplateId, Position, Owner, Quantity, Effects);
         if (!Create) {
-            this.Entity = PetsDAO.GetMount(((ObjectEffectMount) this.GetEffect(995)).mountId);
+            this.Entity = PetsDAO.getMount(((ObjectEffectMount) this.GetEffect(995)).mountId);
             if (this.Entity != null) {
                 this.Initialize();
             }
@@ -82,7 +82,7 @@ public class MountInventoryItem extends InventoryItem {
 
     public void Save() {
         this.SerializeInformations();
-        PetsDAO.Update(Entity);
+        PetsDAO.update(Entity);
     }
 
     public void SerializeInformations() {
@@ -108,7 +108,7 @@ public class MountInventoryItem extends InventoryItem {
 
     @Override
     public void totalClear() {
-        //this.Mount.clear();
+        //this.mount.clear();
         this.Mount = null;
         this.myInitialized = false;
         this.Entity.totalClear();

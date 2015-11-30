@@ -23,6 +23,6 @@ public class WeightCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.InventoryCache.Weight(), this.Weight);
+        return this.Compare((Comparable<Integer>) character.inventoryCache.getWeight(), this.Weight);
     }
 }

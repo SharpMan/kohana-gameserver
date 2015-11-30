@@ -105,12 +105,12 @@ public class PetsInventoryItem extends InventoryItem {
         if (!ItemTemplateDAOImpl.Pets.containsKey(this.TemplateId)) {
             return false;
         } else if (Food.TemplateId == ItemsEnum.EneripsaPouder) {
-            //TODO : Life
+            //TODO : life
             return true;
         } else if (this.Entity.PointsUsed >= Animal().Hormone) {
             return false;
         } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat))) < ItemTemplateDAOImpl.Pets.get(this.TemplateId).minDurationBeforeMeal) {
-            PlayerController.SendServerMessage(p.Client, "Veuillez patientez " + ((Animal().minDurationBeforeMeal) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat)))) + " heures pour le prochain repas");
+            PlayerController.sendServerMessage(p.client, "Veuillez patientez " + ((Animal().minDurationBeforeMeal) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat)))) + " heures pour le prochain repas");
             return false;
         }
 
@@ -125,23 +125,23 @@ public class PetsInventoryItem extends InventoryItem {
                 UpdateFood(Food.TemplateId);
                 this.UpdateDate();
                 this.CheckLastEffect();
-                p.Send(new ObjectModifiedMessage(this.ObjectItem()));
+                p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.Save();
                 return true;
             }
         }
         for (FoodItem i : Animal().foodTypes) {
-            if (Food.Template().TypeId == i.ItemID) {
-                if (!this.EatedFoodsType.containsKey(Food.Template().TypeId)) {
-                    this.EatedFoodsType.put(Food.Template().TypeId, 0);
+            if (Food.getTemplate().typeId == i.ItemID) {
+                if (!this.EatedFoodsType.containsKey(Food.getTemplate().typeId)) {
+                    this.EatedFoodsType.put(Food.getTemplate().typeId, 0);
                 }
-                this.EatedFoodsType.put(Food.Template().TypeId, this.EatedFoodsType.get(Food.Template().TypeId) + 1);
+                this.EatedFoodsType.put(Food.getTemplate().typeId, this.EatedFoodsType.get(Food.getTemplate().typeId) + 1);
                 this.Entity.PointsUsed += i.Point;
                 this.Boost(i.Stats, i.StatsPoints);
                 UpdateFood(Food.TemplateId);
                 this.UpdateDate();
                 this.CheckLastEffect();
-                p.Send(new ObjectModifiedMessage(this.ObjectItem()));
+                p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.Save();
                 return true;
             }
@@ -179,7 +179,7 @@ public class PetsInventoryItem extends InventoryItem {
 
     public void Save() {
         this.SerializeInformations();
-        PetsDAO.Update(Entity);
+        PetsDAO.update(Entity);
     }
 
     public void CheckLastEffect() {

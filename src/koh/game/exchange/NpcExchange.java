@@ -5,7 +5,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.Npc;
-import static koh.game.entities.actors.character.CharacterInventory.UnMergeableType;
+import static koh.game.entities.actors.character.CharacterInventory.unMergeableType;
 import koh.game.entities.actors.npc.NpcItem;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -52,49 +52,49 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        NpcItem npcItem = this.Npc.Template().Items.get(TemplateId);
+        NpcItem npcItem = this.Npc.getTemplate().Items.get(TemplateId);
 
         if (npcItem == null) {
-            Client.Send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
+            Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }
-        if((npcItem.Template().realWeight * Quantity) + Client.Character.InventoryCache.Weight() > Client.Character.InventoryCache.WeightTotal()){
+        if((npcItem.getTemplate().realWeight * Quantity) + Client.character.inventoryCache.getWeight() > Client.character.inventoryCache.getTotalWeight()){
             PlayerController.SendServerErrorMessage(Client, "Erreur : Votre poids depasse les bornes...");
             return false;
         }
 
-        if (Ints.contains(UnMergeableType, ItemTemplateDAOImpl.Cache.get(TemplateId).TypeId)) {
+        if (Ints.contains(unMergeableType, ItemTemplateDAOImpl.Cache.get(TemplateId).TypeId)) {
             Quantity = 1;
         }
 
-        int amount1 = (int) ((double) npcItem.Price() * (double) Quantity);
+        int amount1 = (int) ((double) npcItem.getPrice() * (double) Quantity);
 
         InventoryItem playerItem = null;
         
-        if (npcItem.ItemToken() != null) {
-            playerItem = Client.Character.InventoryCache.GetItemInTemplate(npcItem.Token);
-            if (playerItem == null || (double) playerItem.GetQuantity() < amount1) {
+        if (npcItem.getItemToken() != null) {
+            playerItem = Client.character.inventoryCache.getItemInTemplate(npcItem.token);
+            if (playerItem == null || (double) playerItem.getQuantity() < amount1) {
                 return false;
             }
-        } else if ((double) this.myClient.Character.Kamas < amount1) {
-            Client.Send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
+        } else if ((double) this.myClient.character.kamas < amount1) {
+            Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }
 
-        this.myClient.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 21, new String[]{Quantity + "", TemplateId + ""}));
+        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 21, new String[]{Quantity + "", TemplateId + ""}));
 
         if (playerItem != null) {
-            Client.Character.InventoryCache.UpdateObjectquantity(playerItem, playerItem.GetQuantity() - amount1);
+            Client.character.inventoryCache.updateObjectquantity(playerItem, playerItem.getQuantity() - amount1);
         } else {
-            Client.Character.InventoryCache.SubstractKamas(amount1);
+            Client.character.inventoryCache.substractKamas(amount1);
         }
 
-        InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, TemplateId, 63, Client.Character.ID, Quantity, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(TemplateId).possibleEffects, npcItem.GenType(), ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon));
-        if (this.myClient.Character.InventoryCache.Add(Item, true)) {
-            Item.NeedInsert = true;
+        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, TemplateId, 63, Client.character.ID, Quantity, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(TemplateId).possibleEffects, npcItem.genType(), ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon));
+        if (this.myClient.character.inventoryCache.add(Item, true)) {
+            Item.needInsert = true;
         }
 
-        Client.Send(new ExchangeBuyOkMessage());
+        Client.send(new ExchangeBuyOkMessage());
 
         return true;
     }
@@ -106,22 +106,22 @@ public class NpcExchange extends Exchange {
         }
 
         if (Item == null) {
-            Client.Send(new ExchangeErrorMessage(ExchangeErrorEnum.SELL_ERROR));
+            Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.SELL_ERROR));
             return false;
         }
 
-        NpcItem npcItem = this.Npc.Template().Items.get(Item.TemplateId);
+        NpcItem npcItem = this.Npc.getTemplate().Items.get(Item.TemplateId);
 
-        int Refund = npcItem == null ? (int) ((long) (int) Math.ceil((double) Item.Template().price / 10.0) * (long) Quantity) : (int) ((long) (int) Math.ceil((double) npcItem.Price() / 10.0) * (long) Quantity);
-        if (Quantity == Item.GetQuantity()) {
-            Client.Character.InventoryCache.RemoveItem(Item);
+        int Refund = npcItem == null ? (int) ((long) (int) Math.ceil((double) Item.getTemplate().price / 10.0) * (long) Quantity) : (int) ((long) (int) Math.ceil((double) npcItem.getPrice() / 10.0) * (long) Quantity);
+        if (Quantity == Item.getQuantity()) {
+            Client.character.inventoryCache.removeItem(Item);
         } else {
-            Client.Character.InventoryCache.UpdateObjectquantity(Item, Item.GetQuantity() - Quantity);
+            Client.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - Quantity);
         }
 
-        this.myClient.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{Quantity + "", Item.TemplateId + ""}));
+        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{Quantity + "", Item.TemplateId + ""}));
 
-        Client.Character.InventoryCache.AddKamas(Refund);
+        Client.character.inventoryCache.addKamas(Refund);
 
         return true;
     }
@@ -142,15 +142,15 @@ public class NpcExchange extends Exchange {
     public boolean CloseExchange(boolean Success) {
         this.Finish();
         this.myClient.myExchange = null;
-        this.myClient.Send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
-        this.myClient.EndGameAction(GameActionTypeEnum.EXCHANGE);
+        this.myClient.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
+        this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 
         return true;
     }
 
     @Override
     public void Send(Message Packet) {
-        this.myClient.Send(Packet);
+        this.myClient.send(Packet);
     }
 
     @Override

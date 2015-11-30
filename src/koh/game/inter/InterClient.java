@@ -42,7 +42,7 @@ public class InterClient {
         connector.connect(address);
     }
 
-    public void Send(InterMessage Packet) { //FIXME : Add message in queue when realm offline
+    public void Send(InterMessage Packet) { //FIXME : add message in queue when realm offline
         try {
             this.session.write(Packet);
         } catch (Exception e) {

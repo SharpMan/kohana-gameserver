@@ -52,30 +52,30 @@ public class BombFighter extends StaticFighter {
         switch (Effect) {
             case Damage_Earth:
             case Steal_Earth:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.Combo_Dammages)) / 100 + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Earth_Damages_Bonus)));
                 break;
             case Damage_Neutral:
             case Steal_Neutral:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.Combo_Dammages)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
                 break;
 
             case Damage_Fire:
             case Steal_Fire:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.Combo_Dammages)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus)));
                 break;
 
             case Damage_Air:
             case Steal_Air:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Agility) + this.Stats.getTotal(StatsEnum.Combo_Dammages)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Air_Damages_Bonus)));
                 break;
 
             case Damage_Water:
             case Steal_Water:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Water_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Chance) + this.Stats.getTotal(StatsEnum.Combo_Dammages)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Water_Damages_Bonus)));
                 break;
         }
     }
@@ -88,7 +88,7 @@ public class BombFighter extends StaticFighter {
         }
         int TotalCombo = 0;
         ArrayList<BombFighter> Targets = new ArrayList<>(6);
-        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true), this.Fight.Map)).GetCells(this.CellId())) {
+        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true), this.Fight.Map)).getCells(this.CellId())) {
             FightCell FightCell = Fight.GetCell(aCell);
             if (FightCell != null) {
                 if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
@@ -108,10 +108,10 @@ public class BombFighter extends StaticFighter {
             return;
         }
         Fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
-        Stats.AddBoost(StatsEnum.Combo_Dammages, TotalCombo);
+        Stats.addBoost(StatsEnum.Combo_Dammages, TotalCombo);
         this.Boosted = true;
         for (Fighter Bomb : Targets) {
-            Bomb.Stats.AddBoost(StatsEnum.Combo_Dammages, TotalCombo);
+            Bomb.Stats.addBoost(StatsEnum.Combo_Dammages, TotalCombo);
             Boosted = true;
         }
         Targets.forEach(Bomb -> Bomb.TryDie(Caster, true));
@@ -197,8 +197,8 @@ public class BombFighter extends StaticFighter {
     }
 
     @Override
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameFightMonsterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Grade.monsterId, this.Grade.Grade);
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameFightMonsterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Grade.monsterId, this.Grade.Grade);
     }
 
     @Override
@@ -207,7 +207,7 @@ public class BombFighter extends StaticFighter {
     }
 
     @Override
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
 
     }
 
@@ -217,7 +217,7 @@ public class BombFighter extends StaticFighter {
     }
 
     @Override
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         return this.entityLook;
     }
 

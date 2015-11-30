@@ -45,8 +45,8 @@ public class DofusTrigger {
     public void Apply(Player Actor) {
         switch (this.Type) {
             case 0:
-                /*if (!this.Criteria.isEmpty() && !ConditionParserOld.validConditions(Actor, Criteria)) { Dont need to check now
-                    PlayerController.SendServerMessage(Actor.Client, "Vous n'avez pas les condition suffisantes...");
+                /*if (!this.criteria.isEmpty() && !ConditionParserOld.validConditions(actor, criteria)) { Dont need to check now
+                    PlayerController.sendServerMessage(actor.client, "Vous n'avez pas les condition suffisantes...");
                     return;
                 }*/
                 Actor.teleport(NewMap, NewCell);

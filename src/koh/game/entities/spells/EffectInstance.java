@@ -188,8 +188,8 @@ public class EffectInstance implements Serializable {
         boolean targetIsCaster = (pTargetId.ID == pCasterId.ID);
         boolean targetIsCarried = pTargetId.GetCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
-        GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.GetGameContextActorInformations(null);
-        GameFightMonsterInformations monsterInfo = pTargetId.GetGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.GetGameContextActorInformations(null) : null;
+        GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
+        GameFightMonsterInformations monsterInfo = pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.getGameContextActorInformations(null) : null;
         boolean isTargetAlly = pCasterId.IsFriendlyWith(pTargetId);
         
         if (targetIsCaster) {
@@ -211,10 +211,10 @@ public class EffectInstance implements Serializable {
                 if (targetInfos.stats.summoned) {
                     targetMaskPattern = ((isTargetAlly) ? "agij" : "AIJ");
                 } else {
-                    if ((pTargetId.GetGameContextActorInformations(null) instanceof GameFightCompanionInformations)) {
+                    if ((pTargetId.getGameContextActorInformations(null) instanceof GameFightCompanionInformations)) {
                         targetMaskPattern = ((isTargetAlly) ? "agdl" : "ADL");
                     } else {
-                        if ((pTargetId.GetGameContextActorInformations(null) instanceof GameFightMonsterInformations)) {
+                        if ((pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations)) {
                             targetMaskPattern = ((isTargetAlly) ? "agm" : "AM");
                         } else {
                             targetMaskPattern = ((isTargetAlly) ? "gahl" : "AHL");

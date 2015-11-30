@@ -13,8 +13,8 @@ public class Square extends ZRectangle {
     }
 
     @Override
-    public int Surface() {
-        return (int) (Math.pow(((this.Radius() * 2) + 1), 2));
+    public int getSurface() {
+        return (int) (Math.pow(((this.getRadius() * 2) + 1), 2));
     }
 
 }

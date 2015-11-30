@@ -111,7 +111,7 @@ public class GuildDAO {
 
     public static void Insert(GuildEntity Item) {
         try {
-            //TableUtils.createTable(PetsDAO.connectionSource, GuildMember.class);
+            //TableUtils.createTable(PetsDAO.connectionSource, getGuildMember.class);
             guildsDao.create(Item);
         } catch (Exception e) {
             e.printStackTrace();

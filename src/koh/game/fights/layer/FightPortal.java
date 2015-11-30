@@ -144,8 +144,8 @@ public class FightPortal extends FightActivableObject {
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.ID, ID, false));
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.ID, lastPortal.ID, false));
 
-        //Portails = Arrays.stream(Portails).sorted((FightPortail b2, FightPortail b1) -> (int) (b2.ID) - b1.ID).toArray(FightPortail[]::new);
-        //Arrays.stream(Portails).forEach(Portail -> m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.ID, Portail.ID, false)));
+        //Portails = Arrays.stream(Portails).sorted((FightPortail b2, FightPortail b1) -> (int) (b2.id) - b1.id).toArray(FightPortail[]::new);
+        //Arrays.stream(Portails).forEach(Portail -> m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.id, Portail.id, false)));
         m_fight.AffectSpellTo(m_caster, activator, 1, 5426);
 
         m_fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, activator.ID, activator.ID, lastPortal.CellId()));

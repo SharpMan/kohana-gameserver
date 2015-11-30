@@ -20,69 +20,69 @@ public class GuildJoinRequest extends GameBaseRequest {
     }
 
     @Override
-    public boolean Accept() {
-        if (!super.Declin()) {
+    public boolean accept() {
+        if (!super.declin()) {
             return false;
         }
 
         try {
-            this.Requester.Send(new GuildInvitationStateRecruterMessage(this.Requested.Character.NickName, GuildInvitationStateEnum.GUILD_INVITATION_OK));
-            this.Requested.Send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_OK));
+            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_OK));
+            this.requested.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_OK));
 
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            if (this.Requester.Character.Guild != null) {
-                this.Requester.Character.Guild.addMember(new GuildMember(this.Requester.Character.Guild.Entity.GuildID) {
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            if (this.requester.character.guild != null) {
+                this.requester.character.guild.addMember(new GuildMember(this.requester.character.guild.Entity.GuildID) {
                     {
-                        this.AccountID = Requested.getAccount().ID;
-                        this.Breed = Requested.Character.Breed;
-                        this.CharacterID = Requested.Character.ID;
+                        this.AccountID = requested.getAccount().id;
+                        this.Breed = requested.character.breed;
+                        this.CharacterID = requested.character.ID;
                         this.LastConnection = System.currentTimeMillis() + "";
-                        this.Level = Requested.Character.Level;
-                        this.Name = Requested.Character.NickName;
+                        this.Level = requested.character.level;
+                        this.Name = requested.character.nickName;
                         this.Rank = 0;
                         this.Experience = "0";
                         this.Rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
-                        this.Sex = Requested.Character.Sexe == 1;
-                        this.achievementPoints = Requested.Character.achievementPoints;
-                        this.alignmentSide = Requested.Character.AlignmentSide.value;
+                        this.Sex = requested.character.sexe == 1;
+                        this.achievementPoints = requested.character.achievementPoints;
+                        this.alignmentSide = requested.character.alignmentSide.value;
                         GuildDAO.Insert(this);
                     }
-                }, this.Requested.Character);
-                this.Requester.Character.Guild.registerPlayer(Requested.Character);
+                }, this.requested.character);
+                this.requester.character.guild.registerPlayer(requested.character);
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.Requester.SetBaseRequest(null);
-            this.Requested.SetBaseRequest(null);
+            this.requester.setBaseRequest(null);
+            this.requested.setBaseRequest(null);
         }
         return true;
     }
 
     @Override
-    public boolean Declin() {
-        if (!super.Declin()) {
+    public boolean declin() {
+        if (!super.declin()) {
             return false;
         }
 
         try {
-            this.Requester.Send(new GuildInvitationStateRecruterMessage(this.Requested.Character.NickName, GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
-            this.Requested.Send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
+            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
+            this.requested.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
 
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.Requester.SetBaseRequest(null);
-            this.Requested.SetBaseRequest(null);
+            this.requester.setBaseRequest(null);
+            this.requested.setBaseRequest(null);
         }
         return true;
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum Action) {
+    public boolean canSubAction(GameActionTypeEnum action) {
         return false;
     }
 

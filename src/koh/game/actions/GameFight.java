@@ -11,27 +11,27 @@ import koh.game.fights.types.ChallengeFight;
  */
 public class GameFight extends GameAction {
 
-    public Fight Fight;
+    public Fight fight;
 
-    public GameFight(Fighter Fighter, Fight Fight) {
-        super(GameActionTypeEnum.FIGHT, Fighter);
-        this.Fight = Fight;
+    public GameFight(Fighter fighter, Fight fight) {
+        super(GameActionTypeEnum.FIGHT, fighter);
+        this.fight = fight;
     }
 
     @Override
-    public void Abort(Object[] Args) {
-        if (Fight instanceof ChallengeFight) {
-            this.Fight.LeaveFight((Fighter) Actor);
+    public void abort(Object[] Args) {
+        if (fight instanceof ChallengeFight) {
+            this.fight.LeaveFight((Fighter) actor);
         }
         else{
-            Fight.Disconnect((CharacterFighter) Actor);
+            fight.Disconnect((CharacterFighter) actor);
         }
         
-        super.Abort(Args);
+        super.abort(Args);
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         switch (ActionType) {
             case MAP_MOVEMENT:
                 return true;

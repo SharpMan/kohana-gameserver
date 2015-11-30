@@ -1,6 +1,5 @@
 package koh.game.entities.item;
 
-import java.util.List;
 import koh.game.Main;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.spells.EffectInstance;
@@ -59,7 +58,7 @@ public class ItemSet {
                         Main.Logs().writeError("Undefinied Stat id " + e.effectId);
                         continue;
                     }
-                    this.myStats[i].AddItem(Stat, ((EffectInstanceInteger) e).value);
+                    this.myStats[i].addItem(Stat, ((EffectInstanceInteger) e).value);
                 }
 
             }
@@ -68,7 +67,7 @@ public class ItemSet {
         Stat = null;
     }
 
-    public GenericStats GetStats(int round) {
+    public GenericStats getStats(int round) {
         try {
             if (this.myStats == null) {
                 this.ParseStats();

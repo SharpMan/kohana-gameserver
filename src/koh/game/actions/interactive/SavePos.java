@@ -11,30 +11,30 @@ import koh.protocol.messages.game.basic.TextInformationMessage;
 public class SavePos implements InteractiveAction {
 
     @Override
-    public boolean isEnabled(Player Actor) {
+    public boolean isEnabled(Player actor) {
         return true;
     }
 
     @Override
-    public int GetDuration() {
+    public int getDuration() {
         return 0;
     }
 
     @Override
-    public void Execute(Player Actor, int Element) {
-        Actor.SavedMap = Actor.CurrentMap.Id;
-        Actor.SavedCell = Actor.Cell.Id;
-        Actor.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 6, new String[0]));
+    public void execute(Player actor, int element) {
+        actor.savedMap = actor.currentMap.id;
+        actor.savedCell = actor.cell.id;
+        actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 6, new String[0]));
 
     }
 
     @Override
-    public void Leave(Player Actor, int Element) {
+    public void leave(Player player, int element) {
 
     }
 
     @Override
-    public void Abort(Player player, int Element) {
+    public void abort(Player player, int element) {
 
     }
 

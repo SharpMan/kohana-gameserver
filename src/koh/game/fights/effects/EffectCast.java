@@ -74,10 +74,10 @@ public class EffectCast {
         int num2 = this.Effect.diceNum <= (int) this.Effect.diceSide ? this.Effect.diceNum : this.Effect.diceSide;
 
         /*if (type == EffectGenerationType.MaxEffects) {
-         return  new EffectInteger(this.Id, this.Template.Operator != "-" ? num1 : num2, (EffectBase) this);
+         return  new EffectInteger(this.id, this.getTemplate.Operator != "-" ? num1 : num2, (EffectBase) this);
          }
          if (type == EffectGenerationType.MinEffects) {
-         return new EffectInteger(this.Id, this.Template.Operator != "-" ? num2 : num1, (EffectBase) this);
+         return new EffectInteger(this.id, this.getTemplate.Operator != "-" ? num2 : num1, (EffectBase) this);
          }*/
         if ((int) num2 == 0) {
             return (short) num1;

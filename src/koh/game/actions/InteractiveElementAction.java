@@ -5,12 +5,14 @@ import java.util.Map;
 import koh.game.Main;
 import koh.game.actions.interactive.*;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.JobDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.InteractiveActionEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.interactive.InteractiveUsedMessage;
 import koh.protocol.types.game.interactive.InteractiveElementSkill;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -18,7 +20,9 @@ import koh.protocol.types.game.interactive.InteractiveElementSkill;
  */
 public class InteractiveElementAction extends GameAction {
 
-    public static final Map<InteractiveActionEnum, InteractiveAction> Handlers = new HashMap<InteractiveActionEnum, InteractiveAction>() {
+    private static final Logger logger = LogManager.getLogger(InteractiveElementAction.class);
+
+    public static final Map<InteractiveActionEnum, InteractiveAction> HANDLERS = new HashMap<InteractiveActionEnum, InteractiveAction>() {
         {
             this.put(InteractiveActionEnum.ROAD_TO_INCARNAM, new Incarnam());
             this.put(InteractiveActionEnum.USE, new InteractiveUsage());
@@ -29,60 +33,60 @@ public class InteractiveElementAction extends GameAction {
         }
     };
 
-    public static boolean canDoAction(int SkillID, Player Actor) {
-        return Handlers.get(InteractiveActionEnum.valueOf(SkillID)) != null && Handlers.get(InteractiveActionEnum.valueOf(SkillID)).isEnabled(Actor);
+    public static boolean canDoAction(int skillID, Player actor) {
+        return HANDLERS.get(InteractiveActionEnum.valueOf(skillID)) != null && HANDLERS.get(InteractiveActionEnum.valueOf(skillID)).isEnabled(actor);
     }
 
     static {
-        JobDAOImpl.Skills.values().stream().filter(x -> x.gatheredRessourceItem != -1).forEach(Skill -> Handlers.put(InteractiveActionEnum.valueOf(Skill.ID), new Collect(Skill)));
+        DAO.getJobTemplates().consumeSkills((x -> x.gatheredRessourceItem != -1),(Skill -> HANDLERS.put(InteractiveActionEnum.valueOf(Skill.ID), new Collect(Skill))));
     }
 
-    public InteractiveElementSkill Skill;
+    public InteractiveElementSkill skill;
 
-    public InteractiveActionEnum Action;
-    public int ElementID;
+    public InteractiveActionEnum action;
+    public int elementID;
 
-    public InteractiveElementAction(Player Actor, InteractiveElementSkill Skill, int ElementID) {
-        super(GameActionTypeEnum.INTERACTIVE_ELEMENT, Actor);
-        this.Skill = Skill;
-        this.Action = InteractiveActionEnum.valueOf(Skill.skillId);
-        this.ElementID = ElementID;
-        Main.Logs().writeDebug(Skill.skillId + " used");
+    public InteractiveElementAction(Player actor, InteractiveElementSkill skill, int elementID) {
+        super(GameActionTypeEnum.INTERACTIVE_ELEMENT, actor);
+        this.skill = skill;
+        this.action = InteractiveActionEnum.valueOf(skill.skillId);
+        this.elementID = elementID;
+        Main.Logs().writeDebug(skill.skillId + " used");
     }
 
     @Override
-    public void Execute() {
-        if (Action == null || !Handlers.containsKey(Action)) {
-            Main.Logs().writeDebug(Action + " Id not implanted");
-            PlayerController.SendServerMessage(((Player) Actor).Client, "L'utilisation de cet object intéractif est indisponnible pour le moment ...");
-            Actor.Send(new BasicNoOperationMessage());
+    public void execute() {
+        if (action == null || !HANDLERS.containsKey(action)) {
+            logger.debug("Action {} id not implanted",action);
+            PlayerController.sendServerMessage(((Player) actor).client, "L'utilisation de cet object intéractif est indisponnible pour le moment ...");
+            actor.send(new BasicNoOperationMessage());
             return;
         }
-        ((Player) this.Actor).CurrentMap.sendToField(new InteractiveUsedMessage(Actor.ID, ElementID, Skill.skillId, Handlers.get(Action).GetDuration()));
-        Handlers.get(Action).Execute((Player) this.Actor, ElementID);
+        ((Player) this.actor).currentMap.sendToField(new InteractiveUsedMessage(actor.ID, elementID, skill.skillId, HANDLERS.get(action).getDuration()));
+        HANDLERS.get(action).execute((Player) this.actor, elementID);
 
-        super.Execute();
+        super.execute();
     }
 
     @Override
-    public void Abort(Object[] Args) {
-        if (this.Handlers.get(Action) != null) {
-            this.Handlers.get(Action).Abort((Player) this.Actor, ElementID);
+    public void abort(Object[] Args) {
+        if (this.HANDLERS.get(action) != null) {
+            this.HANDLERS.get(action).abort((Player) this.actor, elementID);
         }
-        super.Abort(Args);
+        super.abort(Args);
 
     }
 
     @Override
-    public void EndExecute() throws Exception {
-        if (this.Handlers.get(Action) != null) {
-            this.Handlers.get(Action).Leave((Player) this.Actor, ElementID);
+    public void endExecute() throws Exception {
+        if (this.HANDLERS.get(action) != null) {
+            this.HANDLERS.get(action).leave((Player) this.actor, elementID);
         }
-        super.EndExecute();
+        super.endExecute();
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         if (ActionType == GameActionTypeEnum.ZAAP) {
             return true;
         }

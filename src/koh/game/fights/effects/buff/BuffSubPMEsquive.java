@@ -36,7 +36,7 @@ public class BuffSubPMEsquive extends BuffEffect {
             BuffStats.ApplyEffect(LostPM, null);
             this.Target.Buffs.AddBuff(BuffStats);
             if (Target.ID == Target.Fight.CurrentFighter.ID) {
-                // Target.Fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_LOST, this.Caster.ID, Target.ID, (short) -CastInfos.DamageValue));
+                // Target.fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_LOST, this.Caster.id, Target.id, (short) -CastInfos.DamageValue));
             }
         }
 

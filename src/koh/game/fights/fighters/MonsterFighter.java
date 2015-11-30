@@ -20,7 +20,7 @@ public class MonsterFighter extends Fighter {
     }
 
     @Override
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -47,7 +47,7 @@ public class MonsterFighter extends Fighter {
     }
 
     @Override
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

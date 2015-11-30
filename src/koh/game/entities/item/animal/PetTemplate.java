@@ -21,7 +21,7 @@ public class PetTemplate {
     public EffectInstance[] possibleEffects, maxEffects;
 
     public boolean canEat(ItemTemplate Item) {
-        return Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.ItemID).toArray(), Item.id) || Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.ItemID).toArray(), Item.TypeId);
+        return Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.ItemID).toArray(), Item.id) || Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.ItemID).toArray(), Item.typeId);
     }
 
     public EffectInstance getEffect(int id) {
@@ -46,9 +46,9 @@ public class PetTemplate {
                     EffectInstanceDice a = (EffectInstanceDice) Arrays.stream(possibleEffects).filter(x -> x.effectId == i).findFirst().get();
                     int total = (int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide;
                     if (total != (int) (b.getStatsBoost(i) * (Hormone / b.Point))) {
-                        System.out.println("ErreurEffect stat " + i + " Familier " + Id + " StatsNormalMax " + ((int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide) + " != " + b.getStatsBoost(i)  * (Hormone / b.Point));
+                        System.out.println("ErreurEffect stat " + i + " Familier " + id + " StatsNormalMax " + ((int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide) + " != " + b.getStatsBoost(i)  * (Hormone / b.Point));
                         int maySet = total / (Hormone / b.Point);
-                        System.out.println("Familier" + ItemDAO.dofusMaps.get(Id).nameId + "ID " + Id + " Monster " + b.MonsterFamily + " you should put " + b.MonsterFamily + ";" + b.DeathNumber + ";" + b.Point + ";" + Enumerable.Join(b.Stats, ':') + ";" + maySet);
+                        System.out.println("Familier" + ItemDAO.dofusMaps.get(id).nameId + "id " + id + " Monster " + b.MonsterFamily + " you should put " + b.MonsterFamily + ";" + b.DeathNumber + ";" + b.Point + ";" + Enumerable.Join(b.stats, ':') + ";" + maySet);
                     }
                 }*/
 

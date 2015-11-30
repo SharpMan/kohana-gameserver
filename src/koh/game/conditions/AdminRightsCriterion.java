@@ -18,7 +18,7 @@ public class AdminRightsCriterion extends Criterion {
     @Override
     public void Build() {
         if (this.Literal.equalsIgnoreCase("G")) {
-            this.Role = 0; //Player
+            this.Role = 0; //player
         }
         int result;
         try {
@@ -31,7 +31,7 @@ public class AdminRightsCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Byte>) character.Account.Right, this.Role);
+        return this.Compare((Comparable<Byte>) character.account.right, this.Role);
     }
     
     @Override

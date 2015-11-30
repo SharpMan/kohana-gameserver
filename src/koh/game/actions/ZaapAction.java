@@ -1,9 +1,10 @@
 package koh.game.actions;
 
-import koh.game.dao.mysql.MapDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.environments.DofusZaap;
 import koh.game.entities.environments.MapPosition;
 import koh.protocol.client.enums.DialogTypeEnum;
 import koh.protocol.client.enums.TeleporterTypeEnum;
@@ -24,63 +25,64 @@ public class ZaapAction extends GameAction {
     }
 
     @Override
-    public void Execute() {
-        //Stream<Entry<Integer, DofusZaap>> zaaps = MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id);
-        this.Actor.Send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), Costs(), Enumerable.DuplicatedKey(MapDAOImpl.zaaps.size() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) Actor).CurrentMap.Id));
+    public void execute() {
+        //Stream<Entry<Integer, DofusZaap>> zaaps = MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().mapid != ((player) actor).currentMap.id);
+        this.actor.send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), costs(), Enumerable.DuplicatedKey(DAO.getMaps().getZaapsLength() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) actor).currentMap.id));
     }
 
     @Override
-    public void Abort(Object[] Args) {
+    public void abort(Object[] Args) {
         try {
             int map = (int) Args[0];
-            if (!MapDAOImpl.zaaps.containsKey(map)) {
+            DofusZaap zaap = DAO.getMaps().getZaap(map);
+            if (zaap == null) {
                 return;
             }
-            if (((Player) Actor).Kamas < GetCostTo(MapDAOImpl.zaaps.get(map).Map())) {
-                Actor.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
+            if (((Player) actor).kamas < getCostTo(zaap.Map())) {
+                actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
                 return;
             }
-            ((Player) Actor).InventoryCache.SubstractKamas(GetCostTo(MapDAOImpl.zaaps.get(map).Map()));
-            ((Player) Actor).teleport(map, MapDAOImpl.zaaps.get(map).Cell);
+            ((Player) actor).inventoryCache.substractKamas(getCostTo(zaap.Map()));
+            ((Player) actor).teleport(map, zaap.Cell);
 
-            this.EndExecute();
+            this.endExecute();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void EndExecute() throws Exception {
-        Actor.Send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_TELEPORTER));
-        super.EndExecute();
+    public void endExecute() throws Exception {
+        actor.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_TELEPORTER));
+        super.endExecute();
     }
 
     public int[] subAreaIds() {
-        return MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).mapToInt(x -> x.getValue().Map().SubAreaId).toArray();
+        return DAO.getMaps().getZaapsNot(((Player) actor).currentMap.id).mapToInt(x -> x.getValue().Map().subAreaId).toArray();
     }
 
     public int[] mapIds() {
-        return MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).mapToInt(x -> x.getKey()).toArray();
+        return DAO.getMaps().getZaapsNot(((Player) actor).currentMap.id).mapToInt(x -> x.getKey()).toArray();
     }
 
-    public int[] Costs() {
-        int[] Cost = new int[MapDAOImpl.zaaps.size() - 1];
+    public int[] costs() {
+        int[] Cost = new int[DAO.getMaps().getZaapsLength() - 1];
         int i = 0;
-        for (DofusMap zaap : MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().Mapid != ((Player) Actor).CurrentMap.Id).map(x -> x.getValue().Map()).toArray(DofusMap[]::new)) {
-            Cost[i] = GetCostTo(zaap);
+        for (DofusMap zaap : DAO.getMaps().getZaapsNot(((Player) actor).currentMap.id).map(x -> x.getValue().Map()).toArray(DofusMap[]::new)) {
+            Cost[i] = getCostTo(zaap);
             i++;
         }
         return Cost;
     }
 
-    public short GetCostTo(DofusMap map) {
-        MapPosition position1 = map.Position;
-        MapPosition position2 = ((Player) Actor).CurrentMap.Position;
+    public short getCostTo(DofusMap map) {
+        MapPosition position1 = map.position;
+        MapPosition position2 = ((Player) actor).currentMap.position;
         return (short) Math.floor(Math.sqrt((double) ((position2.posX - position1.posX) * (position2.posX - position1.posX) + (position2.posY - position1.posY) * (position2.posY - position1.posY))) * 10.0);
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         return false;
     }
 

@@ -49,7 +49,7 @@ public class ObjectPosition {
     }
 
     public boolean IsValid() {
-        return this.Cell.Id > 0 && (long) this.Cell.Id < 560L && this.Direction > DirectionsEnum.RIGHT && this.Direction < DirectionsEnum.RIGHT && this.Map != null;
+        return this.Cell.id > 0 && (long) this.Cell.id < 560L && this.Direction > DirectionsEnum.RIGHT && this.Direction < DirectionsEnum.RIGHT && this.Map != null;
     }
 
 }

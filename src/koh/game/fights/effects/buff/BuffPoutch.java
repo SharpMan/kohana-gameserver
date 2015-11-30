@@ -56,7 +56,7 @@ public class BuffPoutch extends BuffEffect {
         for (EffectInstanceDice Effect : SpellLevel.effects) {
             Main.Logs().writeDebug(Effect.toString());
             ArrayList<Fighter> Targets = new ArrayList<>();
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true), this.Caster.Fight.Map)).GetCells(Target.CellId())) {
+            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true), this.Caster.Fight.Map)).getCells(Target.CellId())) {
                 FightCell FightCell = Target.Fight.GetCell(Cell);
                 if (FightCell != null) {
                     if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
@@ -101,8 +101,8 @@ public class BuffPoutch extends BuffEffect {
         }
 
         /*int Apply = -1;
-         for (short Cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true))).GetCells(Target.CellId())) {
-         FightCell FightCell = this.Target.Fight.GetCell(Cell);
+         for (short cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true))).getCells(Target.CellId())) {
+         FightCell FightCell = this.Target.fight.GetCell(cell);
          if (FightCell != null) {
          if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
          for (Fighter Target : FightCell.GetObjectsAsFighter()) {

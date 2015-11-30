@@ -45,7 +45,7 @@ public class DatabaseSource implements Service {
             dataSource.close();
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://" + settings.getStringElement("Database.Host") + "/" + settings.getStringElement("Database.Name"));
+        config.setJdbcUrl("jdbc:mysql://" + settings.getStringElement("Database.Host") + "/" + settings.getStringElement("Database.name"));
         config.setUsername(settings.getStringElement("Database.User"));
         config.setPassword(settings.getStringElement("Database.Password"));
         config.addDataSourceProperty("cachePrepStmts", "true");

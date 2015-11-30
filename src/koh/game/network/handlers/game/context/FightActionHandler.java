@@ -17,28 +17,28 @@ public class FightActionHandler {
 
     @HandlerAttribute(ID = GameActionFightCastOnTargetRequestMessage.M_ID)
     public static void HandleGameActionFightCastOnTargetRequestMessage(WorldClient Client, GameActionFightCastOnTargetRequestMessage Message) {
-        if (!Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.Send(new BasicNoOperationMessage());
+        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.send(new BasicNoOperationMessage());
             return;
         }
-        SpellLevel Spell = Client.Character.mySpells.GetSpellLevel(Message.spellId);
-        Fighter Fighter = Client.Character.GetFight().GetFighter(Message.targetId);
+        SpellLevel Spell = Client.character.mySpells.getSpellLevel(Message.spellId);
+        Fighter Fighter = Client.character.getFight().GetFighter(Message.targetId);
         if (Spell != null && Fighter != null) {
-            Client.Character.GetFight().LaunchSpell(Client.Character.GetFighter(), Spell, Fighter.CellId(), false);
+            Client.character.getFight().LaunchSpell(Client.character.getFighter(), Spell, Fighter.CellId(), false);
         }
     }
 
     @HandlerAttribute(ID = GameActionFightCastRequestMessage.M_ID)
     public static void HandleGameActionFightCastRequestMessage(WorldClient Client, GameActionFightCastRequestMessage Message) {
-        if (!Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.Send(new BasicNoOperationMessage());
+        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            Client.send(new BasicNoOperationMessage());
             return;
         }
-        SpellLevel Spell = Client.Character.mySpells.GetSpellLevel(Message.spellId);
+        SpellLevel Spell = Client.character.mySpells.getSpellLevel(Message.spellId);
 
         // Sort existant ?
         if (Spell != null) {
-            Client.Character.GetFight().LaunchSpell(Client.Character.GetFighter(), Spell, Message.cellId, false);
+            Client.character.getFight().LaunchSpell(Client.character.getFighter(), Spell, Message.cellId, false);
         }
 
     }

@@ -26,21 +26,21 @@ public class BuffSubResistStats extends BuffEffect {
 
         this.Value1 = CastInfos.RandomJet(Target);
 
-        this.Target.Stats.AddBoost(StatsEnum.Sub_Earth_Resist_Percent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.Sub_Water_Element_Reduction, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.Sub_Fire_Element_Reduction, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.Sub_Neutral_Element_Reduction, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.Sub_Air_Element_Reduction, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.Sub_Earth_Resist_Percent, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.Sub_Water_Element_Reduction, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.Sub_Fire_Element_Reduction, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.Sub_Neutral_Element_Reduction, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.Sub_Air_Element_Reduction, this.Value1);
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int RemoveEffect() {
-        this.Target.Stats.GetEffect(StatsEnum.Sub_Earth_Resist_Percent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.Sub_Water_Element_Reduction).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.Sub_Fire_Element_Reduction).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.Sub_Neutral_Element_Reduction).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.Sub_Air_Element_Reduction).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.Sub_Earth_Resist_Percent).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.Sub_Water_Element_Reduction).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.Sub_Fire_Element_Reduction).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.Sub_Neutral_Element_Reduction).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.Sub_Air_Element_Reduction).additionnal -= this.Value1;
 
         return super.RemoveEffect();
     }

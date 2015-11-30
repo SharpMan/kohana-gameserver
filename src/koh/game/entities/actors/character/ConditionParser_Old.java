@@ -33,27 +33,27 @@ public class ConditionParser_Old {
         }*/
         req = req.replace("&", "&&").replace("=", "==").replace("|", "||").replace("!", "!=");
         try {
-            jep.addVariable("CI", perso.Stats.GetTotal(StatsEnum.Intelligence));
-            jep.addVariable("CV", perso.Stats.GetTotal(StatsEnum.Vitality));
-            jep.addVariable("CA", perso.Stats.GetTotal(StatsEnum.Agility));
-            jep.addVariable("CW", perso.Stats.GetTotal(StatsEnum.Wisdom));
-            jep.addVariable("CC", perso.Stats.GetTotal(StatsEnum.Chance));
-            jep.addVariable("CS", perso.Stats.GetTotal(StatsEnum.Strength));
+            jep.addVariable("CI", perso.stats.getTotal(StatsEnum.Intelligence));
+            jep.addVariable("CV", perso.stats.getTotal(StatsEnum.Vitality));
+            jep.addVariable("CA", perso.stats.getTotal(StatsEnum.Agility));
+            jep.addVariable("CW", perso.stats.getTotal(StatsEnum.Wisdom));
+            jep.addVariable("CC", perso.stats.getTotal(StatsEnum.Chance));
+            jep.addVariable("CS", perso.stats.getTotal(StatsEnum.Strength));
 
-            jep.addVariable("Ci", perso.Stats.GetBase(StatsEnum.Intelligence));
-            jep.addVariable("Cs", perso.Stats.GetBase(StatsEnum.Strength));
-            jep.addVariable("Cv", perso.Stats.GetBase(StatsEnum.Vitality));
-            jep.addVariable("Ca", perso.Stats.GetBase(StatsEnum.Agility));
-            jep.addVariable("Cw", perso.Stats.GetBase(StatsEnum.Wisdom));
-            jep.addVariable("Cc", perso.Stats.GetBase(StatsEnum.Chance));
+            jep.addVariable("Ci", perso.stats.getBase(StatsEnum.Intelligence));
+            jep.addVariable("Cs", perso.stats.getBase(StatsEnum.Strength));
+            jep.addVariable("Cv", perso.stats.getBase(StatsEnum.Vitality));
+            jep.addVariable("Ca", perso.stats.getBase(StatsEnum.Agility));
+            jep.addVariable("Cw", perso.stats.getBase(StatsEnum.Wisdom));
+            jep.addVariable("Cc", perso.stats.getBase(StatsEnum.Chance));
 
-            jep.addVariable("Ps", perso.AlignmentSide);
-            jep.addVariable("Pa", perso.AlignmentValue);
-            jep.addVariable("PP", perso.AlignmentGrade);
-            jep.addVariable("PL", perso.Level);
-            jep.addVariable("PK", perso.Kamas);
-            jep.addVariable("PG", perso.Breed);
-            jep.addVariable("PS", perso.Sexe);
+            jep.addVariable("Ps", perso.alignmentSide);
+            jep.addVariable("Pa", perso.alignmentValue);
+            jep.addVariable("PP", perso.alignmentGrade);
+            jep.addVariable("PL", perso.level);
+            jep.addVariable("PK", perso.kamas);
+            jep.addVariable("PG", perso.breed);
+            jep.addVariable("PS", perso.sexe);
             jep.addVariable("PZ", Boolean.valueOf(true));
 
             jep.addVariable("MiS", perso.ID);
@@ -84,7 +84,7 @@ public class ConditionParser_Old {
                 Main.Logs().writeError("False .. Condition " + cond);
                 continue;
             }
-            if (perso != null && perso.InventoryCache.HasItemId(Integer.parseInt(cur.split("[=]")[1]))) {
+            if (perso != null && perso.inventoryCache.hasItemId(Integer.parseInt(cur.split("[=]")[1]))) {
                 value.add(Integer.valueOf(Integer.parseInt(cur.split("[=]")[1])));
             } else {
                 value.add(Integer.valueOf(-1));

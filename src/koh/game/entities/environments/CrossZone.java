@@ -29,22 +29,22 @@ public class CrossZone implements IZone {
     }
 
     @Override
-    public void SetDirection(byte Direction) {
+    public void setDirection(byte Direction) {
         this.Direction = Direction;
     }
 
     @Override
-    public void SetRadius(byte Radius) {
+    public void setRadius(byte Radius) {
         this.Radius = Radius;
     }
 
     @Override
-    public int Surface() {
+    public int getSurface() {
         return ((int) this.Radius * 4 + 1);
     }
 
     @Override
-    public Short[] GetCells(short centerCell) {
+    public Short[] getCells(short centerCell) {
         ArrayList<Short> list1 = new ArrayList<>();
         if ((int) this.MinRadius == 0) {
             list1.add(centerCell);
@@ -117,17 +117,17 @@ public class CrossZone implements IZone {
     }
 
     @Override
-    public byte MinRadius() {
+    public byte getMinRadius() {
         return MinRadius;
     }
 
     @Override
-    public byte Direction() {
+    public byte getDirection() {
         return Direction;
     }
 
     @Override
-    public byte Radius() {
+    public byte getRadius() {
         return Radius;
     }
 

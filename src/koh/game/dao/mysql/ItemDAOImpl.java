@@ -80,7 +80,7 @@ public class ItemDAOImpl extends ItemDAO {
             ResultSet result = conn.getResult();
             while (result.next()) {
                 List<ObjectEffect> effects = DeserializeEffects(result.getBytes("effects"));
-                cache.put(result.getInt("id"), InventoryItem.Instance(
+                cache.put(result.getInt("id"), InventoryItem.getInstance(
                         result.getInt("id"),
                         result.getInt("template"),
                         result.getInt("position"),
@@ -101,14 +101,14 @@ public class ItemDAOImpl extends ItemDAO {
             PreparedStatement pStatement = conn.getStatement();
 
             pStatement.setInt(1, item.ID);
-            pStatement.setInt(2, item.GetOwner());
+            pStatement.setInt(2, item.getOwner());
             pStatement.setInt(3, item.TemplateId);
-            pStatement.setInt(4, item.GetPosition());
-            pStatement.setInt(5, item.GetQuantity());
+            pStatement.setInt(4, item.getPosition());
+            pStatement.setInt(5, item.getQuantity());
             pStatement.setBytes(6, item.SerializeEffectInstanceDice().array());
 
-            item.NeedInsert = false;
-            item.ColumsToUpdate = null;
+            item.needInsert = false;
+            item.columsToUpdate = null;
 
             pStatement.execute();
 
@@ -125,26 +125,26 @@ public class ItemDAOImpl extends ItemDAO {
     public boolean save(InventoryItem item, boolean clear, String table) {
         int i = 1;
         String query = "UPDATE `" + table + "` set ";
-        query = item.ColumsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);
+        query = item.columsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);
         query = StringUtil.removeLastChar(query);
         query += " WHERE id = ?;";
 
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement(query)) {
             PreparedStatement pStatement = conn.getStatement();
 
-            item.ColumsToUpdate.add("id");
-            for (String columnName : item.ColumsToUpdate) {
+            item.columsToUpdate.add("id");
+            for (String columnName : item.columsToUpdate) {
                 setValue(pStatement, columnName, i++, item);
             }
 
-            item.ColumsToUpdate.clear();
-            item.ColumsToUpdate = null;
+            item.columsToUpdate.clear();
+            item.columsToUpdate = null;
 
             pStatement.execute();
 
             //TODO better Dispose/totalClear pattern
-            /*if (Clear) {
-                Item.totalClear();
+            /*if (clear) {
+                item.totalClear();
             }*/
 
             return true;
@@ -162,17 +162,17 @@ public class ItemDAOImpl extends ItemDAO {
                     p.setInt(Seq, Item.ID);
                     break;
                 case "owner":
-                    p.setInt(Seq, Item.GetOwner());
+                    p.setInt(Seq, Item.getOwner());
                     break;
                 case "stack":
-                    p.setInt(Seq, Item.GetQuantity());
+                    p.setInt(Seq, Item.getQuantity());
                     break;
                 case "position":
-                    p.setInt(Seq, Item.GetPosition());
+                    p.setInt(Seq, Item.getPosition());
                     break;
                 case "effects":
                     p.setBytes(Seq, Item.SerializeEffectInstanceDice().array());
-                    //p.setBlob(Seq, new SerialBlob(Item.SerializeEffectInstanceDice()));
+                    //p.setBlob(Seq, new SerialBlob(item.SerializeEffectInstanceDice()));
                     break;
 
             }

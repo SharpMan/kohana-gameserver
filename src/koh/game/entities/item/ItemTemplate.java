@@ -18,7 +18,7 @@ public class ItemTemplate {
     
     public int id;
     public String nameId;
-    public int TypeId;
+    public int typeId;
     public int iconId, level, realWeight;
     public boolean cursed;
     public int useAnimationId;
@@ -63,19 +63,19 @@ public class ItemTemplate {
         return !Arrays.stream(this.possibleEffects).anyMatch(x -> x.effectId == Effect && !x.visibleInTooltip);
     }
     
-    public ItemSet ItemSet() {
+    public ItemSet getItemSet() {
         return this.itemSetId < 0 ? null : ItemTemplateDAOImpl.Sets.get(this.itemSetId);
     }
     
     public ItemSuperTypeEnum GetSuperType() {
         try {
-            return ItemSuperTypeEnum.valueOf(ItemTemplateDAOImpl.SuperTypes.get(TypeId).SuperType);
+            return ItemSuperTypeEnum.valueOf(ItemTemplateDAOImpl.SuperTypes.get(typeId).SuperType);
         } catch (java.lang.NullPointerException e) {
             return ItemSuperTypeEnum.SUPERTYPE_UNKNOWN_0;
         }
     }
     
-    public static boolean CanPlaceInSlot(ItemSuperTypeEnum Type, CharacterInventoryPositionEnum Slot) {
+    public static boolean canPlaceInSlot(ItemSuperTypeEnum Type, CharacterInventoryPositionEnum Slot) {
         //TODO Living Object
         switch (Type) {
             case SUPERTYPE_AMULET:

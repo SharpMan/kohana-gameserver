@@ -23,7 +23,7 @@ public class StorageExchange extends Exchange {
     public StorageExchange(WorldClient Client) {
         this.myClient = Client;
         this.Send(new ExchangeStartedWithStorageMessage(ExchangeTypeEnum.STORAGE, 2147483647));
-        this.Send(new StorageInventoryContentMessage(Client.getAccount().Data.toObjectsItem(), Client.getAccount().Data.Kamas));
+        this.Send(new StorageInventoryContentMessage(Client.getAccount().accountData.toObjectsItem(), Client.getAccount().accountData.kamas));
     }
 
     @Override
@@ -31,19 +31,19 @@ public class StorageExchange extends Exchange {
         InventoryItem NewItem = null;
         if (Add) {
             for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.Instance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().ID, Item.GetQuantity(), Item.Effects);
-                if (Client.getAccount().Data.Add(Client.Character, NewItem, true)) {
-                    NewItem.NeedInsert = true;
+                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().id, Item.getQuantity(), Item.Effects);
+                if (Client.getAccount().accountData.add(Client.character, NewItem, true)) {
+                    NewItem.needInsert = true;
                 }
-                Client.Character.InventoryCache.UpdateObjectquantity(Item, 0);
+                Client.character.inventoryCache.updateObjectquantity(Item, 0);
             }
         } else {
             for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, Item.TemplateId, 63, Client.Character.ID, Item.GetQuantity(), Item.Effects);
-                if (Client.Character.InventoryCache.Add(NewItem, true)) {
-                    NewItem.NeedInsert = true;
+                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Item.TemplateId, 63, Client.character.ID, Item.getQuantity(), Item.Effects);
+                if (Client.character.inventoryCache.add(NewItem, true)) {
+                    NewItem.needInsert = true;
                 }
-                Client.getAccount().Data.UpdateObjectquantity(Client.Character, Item, 0);
+                Client.getAccount().accountData.updateObjectquantity(Client.character, Item, 0);
             }
         }
         return true;
@@ -54,24 +54,24 @@ public class StorageExchange extends Exchange {
         if (Quantity == 0) {
             return false;
         } else if (Quantity <= 0) { //Remove from Bank
-            InventoryItem BankItem = Client.getAccount().Data.ItemsCache.get(ItemID);
+            InventoryItem BankItem = Client.getAccount().accountData.itemscache.get(ItemID);
             if (BankItem == null) {
                 return false;
             }
-            Client.getAccount().Data.UpdateObjectquantity(Client.Character, BankItem, BankItem.GetQuantity() + Quantity);
-            InventoryItem Item = InventoryItem.Instance(ItemTemplateDAOImpl.nextId++, BankItem.TemplateId, 63, Client.Character.ID, -Quantity, BankItem.Effects);
-            if (Client.Character.InventoryCache.Add(Item, true)) {
-                Item.NeedInsert = true;
+            Client.getAccount().accountData.updateObjectquantity(Client.character, BankItem, BankItem.getQuantity() + Quantity);
+            InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, BankItem.TemplateId, 63, Client.character.ID, -Quantity, BankItem.Effects);
+            if (Client.character.inventoryCache.add(Item, true)) {
+                Item.needInsert = true;
             }
-        } else { //Add In bank
-            InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(ItemID);
+        } else { //add In bank
+            InventoryItem Item = Client.character.inventoryCache.itemsCache.get(ItemID);
             if (Item == null) {
                 return false;
             }
-            Client.Character.InventoryCache.UpdateObjectquantity(Item, Item.GetQuantity() - Quantity);
-            InventoryItem NewItem = InventoryItem.Instance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().ID, Quantity, Item.Effects);
-            if (Client.getAccount().Data.Add(Client.Character, NewItem, true)) {
-                NewItem.NeedInsert = true;
+            Client.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - Quantity);
+            InventoryItem NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().id, Quantity, Item.Effects);
+            if (Client.getAccount().accountData.add(Client.character, NewItem, true)) {
+                NewItem.needInsert = true;
             }
         }
         return true;
@@ -82,19 +82,19 @@ public class StorageExchange extends Exchange {
         if (Quantity == 0) {
             return false;
         } else if (Quantity < 0) {
-            if (Client.getAccount().Data.Kamas + Quantity < 0) {
+            if (Client.getAccount().accountData.kamas + Quantity < 0) {
                 return false;
             }
-            Client.getAccount().Data.SetBankKamas(Client.getAccount().Data.Kamas + Quantity);
-            Client.Send(new StorageKamasUpdateMessage(Client.getAccount().Data.Kamas));
-            Client.Character.InventoryCache.SubstractKamas(Quantity, false);
+            Client.getAccount().accountData.setBankKamas(Client.getAccount().accountData.kamas + Quantity);
+            Client.send(new StorageKamasUpdateMessage(Client.getAccount().accountData.kamas));
+            Client.character.inventoryCache.substractKamas(Quantity, false);
         } else {
-            if (Client.Character.Kamas - Quantity < 0) {
+            if (Client.character.kamas - Quantity < 0) {
                 return false;
             }
-            Client.getAccount().Data.SetBankKamas(Client.getAccount().Data.Kamas + Quantity);
-            Client.Send(new StorageKamasUpdateMessage(Client.getAccount().Data.Kamas));
-            Client.Character.InventoryCache.SubstractKamas(Quantity, false);
+            Client.getAccount().accountData.setBankKamas(Client.getAccount().accountData.kamas + Quantity);
+            Client.send(new StorageKamasUpdateMessage(Client.getAccount().accountData.kamas));
+            Client.character.inventoryCache.substractKamas(Quantity, false);
         }
         return true;
     }
@@ -125,20 +125,20 @@ public class StorageExchange extends Exchange {
     public boolean CloseExchange(boolean Success) {
         this.Finish();
         this.myClient.myExchange = null;
-        this.myClient.Send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
-        this.myClient.EndGameAction(GameActionTypeEnum.EXCHANGE);
+        this.myClient.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
+        this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 
         return true;
     }
 
     @Override
     public void Send(Message Packet) {
-        this.myClient.Send(Packet);
+        this.myClient.send(Packet);
     }
 
     @Override
     public boolean TransfertAllToInv(WorldClient Client, InventoryItem[] Items) {
-        return Client.myExchange.MoveItems(Client, Client.getAccount().Data.ItemsCache.values().toArray(new InventoryItem[Client.getAccount().Data.ItemsCache.size()]), false);
+        return Client.myExchange.MoveItems(Client, Client.getAccount().accountData.itemscache.values().toArray(new InventoryItem[Client.getAccount().accountData.itemscache.size()]), false);
     }
 
 }

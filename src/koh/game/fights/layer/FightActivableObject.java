@@ -77,7 +77,7 @@ public abstract class FightActivableObject implements IFightObject {
         ActivationType = activeType;
         Color = color;
         Targets = new ArrayList<>();
-        AffectedCells = new Zone(castInfos.Effect.ZoneShape(), size,fight.Map).GetCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).GetCells(Cell.Id)*/;
+        AffectedCells = new Zone(castInfos.Effect.ZoneShape(), size,fight.Map).getCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).getCells(cell.id)*/;
         Duration = duration;
         this.VisibileState = visibleState;
         Size = size;

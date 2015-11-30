@@ -9,14 +9,14 @@ import koh.game.entities.actors.Player;
 public interface InteractiveAction {
     
 
-    public boolean isEnabled(Player Actor);
+    public boolean isEnabled(Player actor);
 
-    public void Execute(Player Actor, int Element);
+    public void execute(Player actor, int element);
 
-    public int GetDuration();
+    public int getDuration();
     
-    public void Leave(Player Actor, int Element);
+    public void leave(Player player, int element);
 
-    public void Abort(Player player, int Element);
+    public void abort(Player player, int element);
 
 }

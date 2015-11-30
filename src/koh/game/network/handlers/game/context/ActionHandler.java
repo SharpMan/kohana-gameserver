@@ -12,11 +12,11 @@ public class ActionHandler {
 
     @HandlerAttribute(ID = 957)
     public static void HandleGameActionAcknowledgementMessage(WorldClient Client, GameActionAcknowledgementMessage Message) {
-        if (Client.Character.GetFight() == null || Client.Character.GetFighter() != Client.Character.GetFight().CurrentFighter) {
+        if (Client.character.getFight() == null || Client.character.getFighter() != Client.character.getFight().CurrentFighter) {
             return;
         }
-        Client.Character.GetFight().AcknowledgeAction();
-        Client.SequenceMessage();
+        Client.character.getFight().AcknowledgeAction();
+        Client.sequenceMessage();
 
     }
 }

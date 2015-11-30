@@ -26,21 +26,21 @@ public class BuffAddResistStats extends BuffEffect {
 
         this.Value1 = CastInfos.RandomJet(Target);
 
-        this.Target.Stats.AddBoost(StatsEnum.WaterElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.FireElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.AirElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.EarthElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.NeutralElementResistPercent, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.WaterElementResistPercent, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.FireElementResistPercent, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.AirElementResistPercent, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.EarthElementResistPercent, this.Value1);
+        this.Target.Stats.addBoost(StatsEnum.NeutralElementResistPercent, this.Value1);
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int RemoveEffect() {
-        this.Target.Stats.GetEffect(StatsEnum.WaterElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.FireElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.AirElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.EarthElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.NeutralElementResistPercent).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.WaterElementResistPercent).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.FireElementResistPercent).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.AirElementResistPercent).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.EarthElementResistPercent).additionnal -= this.Value1;
+        this.Target.Stats.getEffect(StatsEnum.NeutralElementResistPercent).additionnal -= this.Value1;
 
         return super.RemoveEffect();
     }

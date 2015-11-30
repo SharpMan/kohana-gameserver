@@ -341,7 +341,7 @@ public class MapPoint {
             init();
         }
         if (CELLPOS[this._nCellId] == null) {
-            Main.Logs().writeError((("Cell identifier out of bounds (" + this._nCellId) + ")."));
+            Main.Logs().writeError((("cell identifier out of bounds (" + this._nCellId) + ")."));
         }
         Point p = CELLPOS[this._nCellId];
         this._nX = p.x;

@@ -14,7 +14,7 @@ public class PrismHandler {
 
     @HandlerAttribute(ID = PrismsListRegisterMessage.MESSAGE_ID)
     public static void HandlePrismsListRegisterMessage(WorldClient Client, Message message) {
-        Client.Send(SubArea.PrismMessage());
+        Client.send(SubArea.PrismMessage());
 
     }
 

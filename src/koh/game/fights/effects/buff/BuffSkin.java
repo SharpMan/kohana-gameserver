@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
-import koh.game.fights.effects.EffectSkin;
+
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_CHANGE_LOOK;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightChangeLookMessage;
@@ -33,8 +33,8 @@ public class BuffSkin extends BuffEffect {
      */
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        this.oldBonesID = Target.GetEntityLook().bonesId;
-        this.oldScales = Target.GetEntityLook().scales;
+        this.oldBonesID = Target.getEntityLook().bonesId;
+        this.oldScales = Target.getEntityLook().scales;
         switch (this.CastInfos.SpellId) {
             case 2879: //Masque pleutre
                 this.Target.entityLook.bonesId = 1576;
@@ -68,7 +68,7 @@ public class BuffSkin extends BuffEffect {
         }
 
         //this.Target.entityLook.bonesId = (short) Math.abs((this.CastInfos.Effect.value * 44) / 666);
-        this.Caster.Fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.GetEntityLook()));
+        this.Caster.Fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.getEntityLook()));
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
 
@@ -82,7 +82,7 @@ public class BuffSkin extends BuffEffect {
         if (this.skinToRemove != 0) {
             this.Target.entityLook.skins.remove(this.Target.entityLook.skins.indexOf(this.skinToRemove));
         }
-        this.Caster.Fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.GetEntityLook()));
+        this.Caster.Fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.getEntityLook()));
         return super.RemoveEffect();
     }
 

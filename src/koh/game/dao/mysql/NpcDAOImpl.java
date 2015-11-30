@@ -56,8 +56,8 @@ public class NpcDAOImpl extends NpcDAO {
                     default:
                         continue;
                 }
-                npcReply.ReplyID = result.getInt("reply_id");
-                npcReply.Criteria = result.getString("criteria");
+                npcReply.replyID = result.getInt("reply_id");
+                npcReply.criteria = result.getString("criteria");
                 if (result.getString("parameter0") != null) {
                     params.add(result.getString("parameter0"));
                 }
@@ -76,7 +76,7 @@ public class NpcDAOImpl extends NpcDAO {
                 if (result.getString("additional_parameters") != null) {
                     params.addAll(Arrays.asList(result.getString("additional_parameters").split("\\|")));
                 }
-                npcReply.Parameters = params.toArray(new String[params.size()]);
+                npcReply.parameters = params.toArray(new String[params.size()]);
                 params.clear();
                 replies.add(npcReply);
 
@@ -102,14 +102,14 @@ public class NpcDAOImpl extends NpcDAO {
                 }
                 npcs.get(result.getInt("map")).add(new Npc() {
                     {
-                        this.Mapid = result.getInt("map");
-                        this.CellID = result.getShort("cell");
-                        this.Direction = result.getByte("direction");
-                        this.Sex = result.getBoolean("sex");
-                        this.NpcId = result.getInt("id");
-                        this.Artwork = result.getInt("artwork");
-                        this.QuestsToStart = Enumerable.StringToIntArray(result.getString("quests_to_start"));
-                        this.QuestsToValid = Enumerable.StringToIntArray(result.getString("quests_to_valid"));
+                        this.mapid = result.getInt("map");
+                        this.cellID = result.getShort("cell");
+                        this.direction = result.getByte("direction");
+                        this.sex = result.getBoolean("sex");
+                        this.npcId = result.getInt("id");
+                        this.artwork = result.getInt("artwork");
+                        this.questsToStart = Enumerable.StringToIntArray(result.getString("quests_to_start"));
+                        this.questsToValid = Enumerable.StringToIntArray(result.getString("quests_to_valid"));
                     }
                 });
                 i++;
@@ -132,11 +132,11 @@ public class NpcDAOImpl extends NpcDAO {
                 }
                 templates.get(result.getInt("npc_shop_id")).Items.put(result.getInt("item_id"), new NpcItem() {
                     {
-                        this.CustomPrice = result.getFloat("custom_price");
-                        this.BuyCriterion = result.getString("buy_criterion");
-                        this.MaximiseStats = result.getBoolean("max_stats");
-                        this.Item = result.getInt("item_id");
-                        this.Token = result.getInt("token_id");
+                        this.customPrice = result.getFloat("custom_price");
+                        this.buyCriterion = result.getString("buy_criterion");
+                        this.maximiseStats = result.getBoolean("max_stats");
+                        this.item = result.getInt("item_id");
+                        this.token = result.getInt("token_id");
                     }
                 });
                 i++;
@@ -157,16 +157,16 @@ public class NpcDAOImpl extends NpcDAO {
             while (result.next()) {
                 messages.put(result.getInt("id"), new NpcMessage() {
                     {
-                        this.Id = result.getInt("id");
-                        this.MessageId = result.getInt("message_id");
-                        this.Parameters = result.getString("parameters").split("\\|");
-                        this.Criteria = result.getString("criteria");
-                        this.FalseQuestion = result.getInt("if_false");
+                        this.id = result.getInt("id");
+                        this.messageId = result.getInt("message_id");
+                        this.parameters = result.getString("parameters").split("\\|");
+                        this.criteria = result.getString("criteria");
+                        this.falseQuestion = result.getInt("if_false");
                         if (result.getString("replies") != null) {
                             if (result.getString("replies").isEmpty()) {
-                                this.Replies = new int[0];
+                                this.replies = new int[0];
                             } else {
-                                this.Replies = Enumerable.StringToIntArray(result.getString("replies"));
+                                this.replies = Enumerable.StringToIntArray(result.getString("replies"));
                             }
                         }
                     }
@@ -188,7 +188,7 @@ public class NpcDAOImpl extends NpcDAO {
             while (result.next()) {
                 templates.put(result.getInt("id"), new NpcTemplate() {
                     {
-                        this.Id = result.getInt("id");
+                        this.id = result.getInt("id");
                         this.dialogMessages = Enumerable.StringToMultiArray(result.getString("dialog_messages"));
                         this.dialogReplies = Enumerable.StringToMultiArray(result.getString("dialog_replies"));
                         this.actions = Enumerable.StringToIntArray(result.getString("actions"));

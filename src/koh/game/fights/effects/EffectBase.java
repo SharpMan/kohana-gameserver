@@ -104,7 +104,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.Damage_Armor_Reduction, new EffectArmor());
             this.put(StatsEnum.Damage_Reduction, new EffectArmor());
 
-            //Chance Eca
+            //chance Eca
             this.put(StatsEnum.DamageBecomeHeal, new EffectDamageBecomeHeal());
 
             //Heal

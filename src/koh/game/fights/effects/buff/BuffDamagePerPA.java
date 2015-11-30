@@ -29,14 +29,14 @@ public class BuffDamagePerPA extends BuffEffect {
 
         int inte = 0;
         if (CastInfos.EffectType == StatsEnum.PA_USED_LOST_X_PDV) {
-            inte += CastInfos.Caster.Stats.GetTotal(StatsEnum.Agility);
+            inte += CastInfos.Caster.Stats.getTotal(StatsEnum.Agility);
         } else /*if (CastInfos.EffectType == StatsEnum.Lose_PV_By_Using_PA)*/ {
-            inte += CastInfos.Caster.Stats.GetTotal(StatsEnum.Intelligence);
+            inte += CastInfos.Caster.Stats.getTotal(StatsEnum.Intelligence);
         }
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = CastInfos.Caster.Stats.GetTotal(StatsEnum.AddDamagePercent);
+        int pdom = CastInfos.Caster.Stats.getTotal(StatsEnum.AddDamagePercent);
         if (pdom < 0) {
             pdom = 0;
         }

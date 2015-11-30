@@ -13,11 +13,11 @@ import koh.game.entities.actors.npc.NpcReply;
 public class TalkReply extends NpcReply {
 
     @Override
-    public boolean Execute(Player p) {
-        if (!super.Execute(p)) {
+    public boolean execute(Player p) {
+        if (!super.execute(p)) {
             return false;
         }
-        ((NpcDialog) p.Client.GetGameAction(GameActionTypeEnum.NPC_DAILOG)).ChangeMessage(NpcDAOImpl.messages.get(Integer.parseInt(this.Parameters[0])));
+        ((NpcDialog) p.client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).changeMessage(NpcDAOImpl.messages.get(Integer.parseInt(this.parameters[0])));
         return true;
     }
 

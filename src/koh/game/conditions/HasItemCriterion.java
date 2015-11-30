@@ -28,10 +28,10 @@ public class HasItemCriterion extends Criterion {
     @Override
     public boolean Eval(Player character) {
         if (this.Operator == ComparaisonOperatorEnum.EQUALS) {
-            return character.InventoryCache.HasItemId(this.Item);
+            return character.inventoryCache.hasItemId(this.Item);
         }
         else if (this.Operator == ComparaisonOperatorEnum.INEQUALS) {
-            return !character.InventoryCache.HasItemId(this.Item);
+            return !character.inventoryCache.hasItemId(this.Item);
         } else {
             return true;
         }

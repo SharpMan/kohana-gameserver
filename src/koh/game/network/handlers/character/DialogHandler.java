@@ -16,26 +16,26 @@ public class DialogHandler {
     @HandlerAttribute(ID = LeaveDialogRequestMessage.MESSAGE_ID)
     public static void HandleLeaveDialogRequestMessage(WorldClient Client, LeaveDialogRequestMessage Message) {
         try {
-            if (Client.IsGameAction(GameActionTypeEnum.EXCHANGE)) {
+            if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
                 if (!Client.myExchange.CloseExchange()) {
-                    Client.EndGameAction(GameActionTypeEnum.EXCHANGE);
+                    Client.endGameAction(GameActionTypeEnum.EXCHANGE);
                 }
-            } else if (Client.IsGameAction(GameActionTypeEnum.CREATE_GUILD)) {
-                Client.EndGameAction(GameActionTypeEnum.CREATE_GUILD);
-                Client.Send(new BasicNoOperationMessage());
-            } else if (Client.IsGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-                if (!(Client.GetBaseRequest() instanceof ExchangeRequest)) {
-                    Client.Send(new BasicNoOperationMessage());
+            } else if (Client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {
+                Client.endGameAction(GameActionTypeEnum.CREATE_GUILD);
+                Client.send(new BasicNoOperationMessage());
+            } else if (Client.isGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+                if (!(Client.getBaseRequest() instanceof ExchangeRequest)) {
+                    Client.send(new BasicNoOperationMessage());
                 }
-                if (!Client.GetBaseRequest().Declin()) {
-                    Client.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
+                if (!Client.getBaseRequest().declin()) {
+                    Client.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
                 }
-            } else if (Client.IsGameAction(GameActionTypeEnum.ZAAP)) {
-                Client.EndGameAction(GameActionTypeEnum.ZAAP);
-            } else if (Client.IsGameAction(GameActionTypeEnum.NPC_DAILOG)) {
-                Client.EndGameAction(GameActionTypeEnum.NPC_DAILOG);
+            } else if (Client.isGameAction(GameActionTypeEnum.ZAAP)) {
+                Client.endGameAction(GameActionTypeEnum.ZAAP);
+            } else if (Client.isGameAction(GameActionTypeEnum.NPC_DAILOG)) {
+                Client.endGameAction(GameActionTypeEnum.NPC_DAILOG);
             } else {
-                Client.Send(new BasicNoOperationMessage());
+                Client.send(new BasicNoOperationMessage());
             }
         } catch (Exception ex) {
             ex.printStackTrace();

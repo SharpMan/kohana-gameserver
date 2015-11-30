@@ -55,7 +55,7 @@ public class WorldHandler extends IoHandlerAdapter {
     @Override
     public void messageSent(IoSession session, Object arg1) throws Exception {
         Message message = (Message) arg1;
-        Main.Logs().writeDebug(new StringBuilder("[DEBUG] Client send >> ").append(session.getRemoteAddress()).append(" ").append(message.getClass().getSimpleName()).toString());
+        Main.Logs().writeDebug(new StringBuilder("[DEBUG] client send >> ").append(session.getRemoteAddress()).append(" ").append(message.getClass().getSimpleName()).toString());
 
     }
 

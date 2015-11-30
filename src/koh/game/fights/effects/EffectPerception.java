@@ -22,7 +22,7 @@ public class EffectPerception extends EffectBase {
     //TODO dofusMaps AffectedCell in CastInfos et nettoyer ce code
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        for (short Cell : (new Zone(CastInfos.Effect.ZoneShape(), CastInfos.Effect.ZoneSize(), MapPoint.fromCellId(CastInfos.Caster.CellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true),CastInfos.Caster.Fight.Map)).GetCells(CastInfos.CellId)) {
+        for (short Cell : (new Zone(CastInfos.Effect.ZoneShape(), CastInfos.Effect.ZoneSize(), MapPoint.fromCellId(CastInfos.Caster.CellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true),CastInfos.Caster.Fight.Map)).getCells(CastInfos.CellId)) {
             FightCell fightCell = CastInfos.Caster.Fight.GetCell(Cell);
             if (fightCell != null) {
                 fightCell.GetObjects().stream().filter((fightObject) -> (fightObject.CellId() == Cell)).forEach((fightObject) -> {
@@ -39,8 +39,8 @@ public class EffectPerception extends EffectBase {
                             } else if (fighter.VisibleState == GameActionFightInvisibilityStateEnum.INVISIBLE) {
                                 fighter.VisibleState = GameActionFightInvisibilityStateEnum.DETECTED;
                                 CastInfos.Caster.Fight.sendToField(new GameActionFightInvisibleDetectedMessage(ACTION_CHARACTER_MAKE_INVISIBLE, CastInfos.Caster.ID, fighter.ID, fighter.CellId()));
-                                //CastInfos.Caster.Fight.sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, CastInfos.Caster.ID, fighter.ID, fighter.VisibleState.value));
-                                CastInfos.Caster.Fight.sendToField(new GameFightRefreshFighterMessage(fighter.GetGameContextActorInformations(null)));
+                                //CastInfos.Caster.fight.sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, CastInfos.Caster.id, fighter.id, fighter.VisibleState.value));
+                                CastInfos.Caster.Fight.sendToField(new GameFightRefreshFighterMessage(fighter.getGameContextActorInformations(null)));
                             }
                             /*if(fighter.StateManager.HasState(FighterStateEnum.STATE_STEALTH))
                              {

@@ -9,7 +9,6 @@ import koh.game.network.codec.ProtocolDecoder;
 import koh.game.utils.Settings;
 import koh.protocol.client.Message;
 import koh.protocol.client.codec.Dofus2ProtocolEncoder;
-import org.apache.mina.core.buffer.CachedBufferAllocator;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -70,7 +69,7 @@ public class WorldServer {
 
     public void SendPacket(Message message) {
         acceptor.getManagedSessions().values().stream().filter((session) -> (session.getAttribute("session") instanceof WorldClient) /*&& ((RealmClient) session.getAttribute("session")).ClientState == State.ON_GAMESERVER_LIST*/).forEach((session) -> {
-            ((WorldClient) session.getAttribute("session")).Send(message);
+            ((WorldClient) session.getAttribute("session")).send(message);
         });
     }
 
@@ -86,7 +85,7 @@ public class WorldServer {
         for (IoSession session : acceptor.getManagedSessions().values()) {
             if (session.getAttribute("session") instanceof WorldClient) {
                 WorldClient client = (WorldClient) session.getAttribute("session");
-                if (client.getAccount() != null && client.getAccount().ID == guid) {
+                if (client.getAccount() != null && client.getAccount().id == guid) {
                     return client;
                 }
             }

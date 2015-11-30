@@ -23,22 +23,27 @@ public class D2oDaoImpl extends D2oDAO {
         d2oStates = new d2oReader("data/SpellStates.d2o");
     }
 
+    @Override
     public SpellState getState(FightStateEnum state) {
         return d2oReader.SpellStates.get(state.value);
     }
 
+    @Override
     public SpellState getState(int state) {
         return d2oReader.SpellStates.get(state);
     }
 
-    public Effect getEffect(int effectid) {
-        return d2oReader.Effects.get(effectid);
+    @Override
+    public Effect getEffect(int effectId) {
+        return d2oReader.Effects.get(effectId);
     }
 
+    @Override
     public Head getHead(int head) {
         return d2oReader.Heads.get(head);
     }
 
+    @Override
     public Breed getBreed(int breedId) {
         return d2oReader.Breeds.get(breedId - 1);
     }

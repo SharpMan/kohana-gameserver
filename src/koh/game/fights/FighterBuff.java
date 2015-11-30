@@ -99,7 +99,7 @@ public class FighterBuff {
          }
          this.BuffsAct.get(Buff.ActiveType).add(Buff);
          this.BuffsDec.get(Buff.DecrementType).add(Buff);
-         Buff.Target.Fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.CastInfos.EffectType.value(), Buff.Caster.ID, Buff.GetAbstractFightDispellableEffect()));
+         Buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.CastInfos.EffectType.value(), Buff.Caster.id, Buff.GetAbstractFightDispellableEffect()));
 
          }
          }*/

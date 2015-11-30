@@ -4,7 +4,6 @@ import javafx.scene.paint.Color;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
 import koh.game.fights.FightTeam;
-import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.protocol.client.enums.ActionIdEnum;
@@ -37,7 +36,7 @@ public class FightTrap extends FightActivableObject {
         this.m_fight.sendToField(new FieldNotification(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, GetHiddenGameActionMark())) {
             @Override
             public boolean can(Player perso) {
-                return !(perso.Client != null && perso.GetFighter() != null && perso.GetFighter().Team.Id == dispatcher.Id);
+                return !(perso.client != null && perso.getFighter() != null && perso.getFighter().Team.Id == dispatcher.Id);
             }
         });
         dispatcher.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, GetGameActionMark()));

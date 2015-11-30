@@ -39,23 +39,13 @@ class InterHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void messageReceived(IoSession is, Object o) throws Exception {
-        if (o instanceof PlayerComingMessage) {
-            AccountTicketDAO.addWaitingCompte(new Account() {
-                {
-                    ID = ((PlayerComingMessage) o).accountId;
-                    NickName = ((PlayerComingMessage) o).nickname;
-                    Right = ((PlayerComingMessage) o).rights;
-                    SecretQuestion = ((PlayerComingMessage) o).secretQuestion;
-                    SecretAnswer = ((PlayerComingMessage) o).secretAnswer;
-                    LastIP = ((PlayerComingMessage) o).lastAddress;
-                    last_login = ((PlayerComingMessage) o).lastLogin;
-                }
-            }, ((PlayerComingMessage) o).authenticationAddress, ((PlayerComingMessage) o).authenticationTicket);
+    public void messageReceived(IoSession is, Object object) throws Exception {
+        if (object instanceof PlayerComingMessage) {
+            AccountTicketDAO.addWaitingCompte(new Account((PlayerComingMessage) object), ((PlayerComingMessage) object).authenticationAddress, ((PlayerComingMessage) object).authenticationTicket);
         }
-        if (o instanceof ExpulseAccountMessage) {
+        if (object instanceof ExpulseAccountMessage) {
             try {
-                Main.WorldServer().getClient(((ExpulseAccountMessage) o).accountId).close();
+                Main.WorldServer().getClient(((ExpulseAccountMessage) object).accountId).close();
             } catch (NullPointerException e) {
             }
         }

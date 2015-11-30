@@ -1,15 +1,13 @@
 package koh.game.entities.actors.npc;
 
 import com.google.common.primitives.Ints;
-import java.util.ArrayList;
+
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
 import koh.look.EntityLookParser;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeStartOkNpcShopMessage;
 import koh.protocol.types.game.data.items.ObjectItemToSellInNpcShop;
 import koh.protocol.types.game.look.EntityLook;
-import koh.utils.Couple;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -18,8 +16,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class NpcTemplate {
 
-    public int Id;
-    public String Name;
+    public int id;
+    public String name;
     public int[][] dialogMessages, dialogReplies;
     public int[] actions;
     public int gender;
@@ -27,7 +25,7 @@ public class NpcTemplate {
     public boolean fastAnimsFun, OrderItemsByPrice, OrderItemsByLevel;
     public Map<Integer, NpcItem> Items;
 
-    public int[] GetReply(int id) {
+    public int[] getReply(int id) {
         try {
             return this.dialogReplies[id];
         } catch (Exception e) {
@@ -35,7 +33,7 @@ public class NpcTemplate {
         }
     }
 
-    public int GetMessageOffset(int Message) {
+    public int getMessageOffset(int Message) {
         for (int i = 0; i < this.dialogMessages.length; i++) {
             if (Ints.contains(this.dialogMessages[i], Message)) {
                 //return Ints.indexOf(i, Message);
@@ -45,7 +43,7 @@ public class NpcTemplate {
         return -1;
     }
 
-    private ObjectItemToSellInNpcShop[] ItemList = null;
+    private ObjectItemToSellInNpcShop[] itemList = null;
 
     public static <T> Comparator<T> Compose(
             final Comparator<? super T> primary,
@@ -57,26 +55,26 @@ public class NpcTemplate {
         };
     }
 
-    public ObjectItemToSellInNpcShop[] GetItems() {
-        if (ItemList == null) {
+    public ObjectItemToSellInNpcShop[] getItems() {
+        if (itemList == null) {
             if (Items == null) {
-                ItemList = new ObjectItemToSellInNpcShop[0];
+                itemList = new ObjectItemToSellInNpcShop[0];
             } else {
                 Stream<NpcItem> Objects = this.Items.values().stream();
-                if (this.Id == 816) {
-                    Objects = Objects.filter(Item -> Item.Template().level > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.Template().TypeId, e2.Template().TypeId)), ((e1, e2) -> Integer.compare(e1.Template().level, e2.Template().level))));
+                if (this.id == 816) {
+                    Objects = Objects.filter(Item -> Item.getTemplate().level > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().typeId, e2.getTemplate().typeId)), ((e1, e2) -> Integer.compare(e1.getTemplate().level, e2.getTemplate().level))));
                 }
                 if (this.OrderItemsByPrice) {
-                    Objects = Objects.sorted((e1, e2) -> Float.compare(e1.Price(), e2.Price()));
+                    Objects = Objects.sorted((e1, e2) -> Float.compare(e1.getPrice(), e2.getPrice()));
                 }
                 if (this.OrderItemsByLevel) {
-                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.Template().level, e2.Template().level));
+                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().level, e2.getTemplate().level));
                 }
 
-                ItemList = Objects.map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);
+                itemList = Objects.map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);
             }
         }
-        return ItemList;
+        return itemList;
     }
 
     public int getDialogMessage(int id, int pos) {
@@ -92,15 +90,15 @@ public class NpcTemplate {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    public int CommonTokenId() {
+    public int getCommonTokenId() {
         if (Items == null) {
             return 0;
         }
-        return this.Items.values().stream().findFirst().get().Token;
+        return this.Items.values().stream().findFirst().get().token;
 
     }
 
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         return EntityLookParser.fromString(this.look);
     }
 

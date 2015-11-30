@@ -12,7 +12,7 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 import koh.d2o.d2oReader;
 
-import static koh.game.dao.mysql.PlayerDAO.AccountInUnload;
+import static koh.game.dao.mysql.PlayerDAOImpl.AccountInUnload;
 
 import koh.game.dao.mysql.*;
 import koh.game.dao.sqlite.*;
@@ -59,7 +59,7 @@ public class MySQL {
         try {
             myLocker.lock();
             try {
-                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.Name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
+                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(1000)) || (!Connection.isValid(1000))) {
                     Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
@@ -114,7 +114,7 @@ public class MySQL {
                     } catch (Exception e) {
                     }
                 }
-                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.Name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
+                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(60000))) {
                     Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
@@ -188,7 +188,7 @@ public class MySQL {
         Main.Logs().writeInfo(d2oReader.Breeds.size() + " Breeds catched");
         Main.Logs().writeInfo(d2oReader.Heads.size() + " Heads catched");
         Main.Logs().writeInfo(d2oReader.Effects.size() + " Effects catched");
-        PlayerDAO.InitializeNextIdentifiant();
+        PlayerDAOImpl.InitializeNextIdentifiant();
         ItemTemplateDAOImpl.DistinctItems();
         PetsDAO.InitNextKey();
         GuildDAO.InitNextKey();
@@ -196,10 +196,10 @@ public class MySQL {
         ExpDAOImpl.load_ExpLevels();
         Main.Logs().writeInfo(AreaDAOImpl.FindSuper() + " SuperAreas catched");
         Main.Logs().writeInfo(AreaDAOImpl.FindAll() + " Areas catched");
-        Main.Logs().writeInfo(AreaDAOImpl.FindSubAreas() + " SubAreas catched");
+        Main.Logs().writeInfo(AreaDAOImpl.FindSubAreas() + " subAreas catched");
         Main.Logs().writeInfo(MapDAOImpl.FindAll() + " DofusMaps catched");
         Main.Logs().writeInfo(MapDAOImpl.loadAllSatedElements() + " StatedElements catched");
-        Main.Logs().writeInfo(MapDAOImpl.FindInteractiveElements() + " InteractiveElements catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindInteractiveElements() + " interactiveElements catched");
         Main.Logs().writeInfo(MapDAOImpl.loadALlHouseInformations() + " HouseInformations catched");
         Main.Logs().writeInfo(MapDAOImpl.loadAllDoors() + " InteractiveDoors catched");
         Main.Logs().writeInfo(MapDAOImpl.loadALlPositions() + " MapPositions catched");
@@ -208,7 +208,7 @@ public class MySQL {
         Main.Logs().writeInfo(SpellDAOImpl.FindLevels() + " SpellLevels catched ");
         Main.Logs().writeInfo(SpellDAOImpl.FindAll() + " spells catched ");
         Main.Logs().writeInfo(SpellDAOImpl.loadAllBombs() + " SpellBombs catched ");
-        Main.Logs().writeInfo(GuildEmblemDAO.FindAll() + " GuildEmblems catched ");
+        Main.Logs().writeInfo(GuildEmblemDAOImpl.FindAll() + " GuildEmblems catched ");
         Main.Logs().writeInfo(SpellDAOImpl.loadLearnables() + " learnableSpells catched ");
          Main.Logs().writeInfo(ItemTemplateDAOImpl.FindItemTypes() + " ItemTypes catched ");
         Main.Logs().writeInfo(ItemTemplateDAOImpl.FindAll() + " ItemTemplates catched ");
@@ -223,7 +223,7 @@ public class MySQL {
         Main.Logs().writeInfo(MapDAOImpl.FindTriggers() + " Triggers catched");
         Main.Logs().writeInfo(PaddockDAOImpl.FindAll() + " Paddocks catched");
         Main.Logs().writeInfo(MountDAO.FindAll() + " Mounts catched");
-        Main.Logs().writeInfo(GuildDAO.FindAll() + " Guild catched");
+        Main.Logs().writeInfo(GuildDAO.FindAll() + " guild catched");
         Main.Logs().writeInfo(GuildDAO.FindMembers() + " GuildMembers catched");
         Main.Logs().writeInfo(JobDAOImpl.loadAllGatheringInfos() + " GatheringJob LevelInfos catched");
         Main.Logs().writeInfo(JobDAOImpl.loadAllSkills() + " InteractiveSkills LevelInfos catched");

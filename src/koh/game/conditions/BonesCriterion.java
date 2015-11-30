@@ -28,7 +28,7 @@ public class BonesCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Short>) character.GetEntityLook().bonesId, this.BonesId);
+        return this.Compare((Comparable<Short>) character.getEntityLook().bonesId, this.BonesId);
     }
 
     @Override

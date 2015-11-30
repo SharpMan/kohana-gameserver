@@ -180,7 +180,7 @@ public class SpellDAOImpl extends SpellDAO {
                     {
                         ID = result.getInt("id");
                         Spell = result.getInt("spell");
-                        ObtainLevel = result.getInt("obtain_level");
+                        obtainLevel = result.getInt("obtain_level");
                         BreedID = result.getInt("breed_id");
                     }
                 });
@@ -191,6 +191,17 @@ public class SpellDAOImpl extends SpellDAO {
             logger.warn(e.getMessage());
         }
         return i;
+    }
+
+    @Override
+    public Spell findSpell(int id)
+    {
+        return this.spells.get(id);
+    }
+
+    @Override
+    public ArrayList<LearnableSpell> findLearnableSpell(int id) {
+        return this.learnableSpells.get(id);
     }
 
     @Override
@@ -205,4 +216,6 @@ public class SpellDAOImpl extends SpellDAO {
     public void stop() {
 
     }
+
+
 }

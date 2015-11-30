@@ -27,9 +27,9 @@ public class EmoteCriterion extends Criterion {
         //FIXME : See if another operator exist for this
         switch (this.Operator) {
             case INEQUALS:
-                return !Bytes.contains(character.Emotes, Emote);
+                return !Bytes.contains(character.emotes, Emote);
             case EQUALS:
-                return Bytes.contains(character.Emotes, Emote);
+                return Bytes.contains(character.emotes, Emote);
         }
         return true;
     }

@@ -22,7 +22,7 @@ public class EffectSummonBomb extends EffectBase {
         // Possibilité de spawn une creature sur la case ?
 
         MonsterTemplate Monster = MonsterDAOImpl.Cache.get(CastInfos.Effect.diceNum);
-        // Template de monstre existante
+        // getTemplate de monstre existante
         if (Monster != null) {
             MonsterGrade MonsterLevel = Monster.GetLevelOrNear(CastInfos.Effect.diceSide);
             if (MonsterLevel != null) {
@@ -30,7 +30,7 @@ public class EffectSummonBomb extends EffectBase {
                     BombFighter Bomb = new BombFighter(CastInfos.Caster.Fight, CastInfos.Caster, MonsterLevel);
                     Bomb.JoinFight();
                     Bomb.Fight.JoinFightTeam(Bomb, CastInfos.Caster.Team, false, CastInfos.CellId, true);
-                    CastInfos.Caster.Fight.sendToField(new GameActionFightSummonMessage(1008, CastInfos.Caster.ID, (GameFightFighterInformations) Bomb.GetGameContextActorInformations(null)));
+                    CastInfos.Caster.Fight.sendToField(new GameActionFightSummonMessage(1008, CastInfos.Caster.ID, (GameFightFighterInformations) Bomb.getGameContextActorInformations(null)));
                     CastInfos.Caster.Fight.myWorker.SummonFighter(Bomb);
                     CastInfos.Caster.GetActivableObjects().filter(Object -> Object instanceof FightBomb)
                             .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).Owner,Bomb))
@@ -43,7 +43,7 @@ public class EffectSummonBomb extends EffectBase {
                                                   }
                                               }}));
                 } else {
-                    //CastInfos.Caster.Fight.AffectSpellTo(CastInfos.Caster, CastInfos.Caster.Fight.GetCell(CastInfos.CellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId);
+                    //CastInfos.Caster.fight.AffectSpellTo(CastInfos.Caster, CastInfos.Caster.fight.GetCell(CastInfos.CellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId);
                     CastInfos.Caster.Fight.LaunchSpell(CastInfos.Caster, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId).SpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
                 }
             }

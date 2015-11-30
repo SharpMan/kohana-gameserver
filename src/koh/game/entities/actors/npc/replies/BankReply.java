@@ -13,13 +13,13 @@ import koh.game.exchange.StorageExchange;
 public class BankReply extends NpcReply {
 
     @Override
-    public boolean Execute(Player player) {
-        if (!super.Execute(player)) {
+    public boolean execute(Player player) {
+        if (!super.execute(player)) {
             return false;
         }
-        if (player.Client.CanGameAction(GameActionTypeEnum.EXCHANGE)) {
-            player.Client.myExchange = new StorageExchange(player.Client);
-            player.Client.AddGameAction(new GameExchange(player, player.Client.myExchange));
+        if (player.client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
+            player.client.myExchange = new StorageExchange(player.client);
+            player.client.addGameAction(new GameExchange(player, player.client.myExchange));
         }
         return true;
     }

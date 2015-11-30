@@ -31,8 +31,8 @@ public class InventoryItem {
     private int Owner;
     private int Quantity;
     public List<ObjectEffect> Effects; //FIXME : Think if we should migrate to Array or not , trought newArray = ArraysUtils.add(T[] Array,T Element);
-    public boolean NeedInsert, NeedRemove;
-    public List<String> ColumsToUpdate = null;
+    public boolean needInsert, NeedRemove;
+    public List<String> columsToUpdate = null;
 
     public InventoryItem() {
 
@@ -40,7 +40,7 @@ public class InventoryItem {
 
     private GenericStats myStats;
 
-    public static InventoryItem Instance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
+    public static InventoryItem getInstance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
         if (ItemTemplateDAOImpl.Cache.get(TemplateId).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
             return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
         } else if (ItemTemplateDAOImpl.Cache.get(TemplateId).TypeId == 97) {
@@ -59,16 +59,16 @@ public class InventoryItem {
         this.Effects = Effects;
     }
 
-    public ObjectItem ObjectItem(int WithQuantity) {
-        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.Template().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, WithQuantity);
+    public ObjectItem getObjectItem(int WithQuantity) {
+        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, WithQuantity);
     }
 
-    public ObjectItem ObjectItem() {
-        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.Template().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.Quantity);
+    public ObjectItem getObjectItem() {
+        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.Quantity);
     }
 
-    public ItemSuperTypeEnum GetSuperType() {
-        return ItemSuperTypeEnum.valueOf(ItemTemplateDAOImpl.SuperTypes.get(Template().TypeId).SuperType);
+    public ItemSuperTypeEnum getSuperType() {
+        return ItemSuperTypeEnum.valueOf(ItemTemplateDAOImpl.SuperTypes.get(getTemplate().typeId).SuperType);
     }
 
     public boolean isEquiped() {
@@ -76,36 +76,36 @@ public class InventoryItem {
     }
 
     public boolean IsLinked() { //928 = Lié 983 = Non echangeable
-        return this.hasEffect(982) || this.hasEffect(983) || this.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_QUEST || this.IsTokenItem();
+        return this.hasEffect(982) || this.hasEffect(983) || this.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_QUEST || this.IsTokenItem();
     }
 
     public boolean isLivingObject() {
-        return this.Template().TypeId == 113 || (this.GetEffect(970) != null && this.GetEffect(971) != null);
+        return this.getTemplate().typeId == 113 || (this.GetEffect(970) != null && this.GetEffect(971) != null);
     }
 
-    public short Apparrance() {
+    public short getApparrance() {
         ObjectEffectInteger effect = (ObjectEffectInteger) this.GetEffect(972);
         if (effect == null) {
-            return this.Template().appearanceId;
+            return this.getTemplate().appearanceId;
         } else {
             ObjectEffectInteger type = (ObjectEffectInteger) this.GetEffect(970);
             if (type == null) {
-                return this.Template().appearanceId;
+                return this.getTemplate().appearanceId;
             }
             return (short) ItemLivingObject.GetObviAppearanceBySkinId(effect.value, type.value);
         }
     }
 
-    public int GetPosition() {
+    public int getPosition() {
         return Position;
     }
 
-    public void SetPosition(int i) {
+    public void setPosition(int i) {
         this.Position = i;
         this.NotifiedColumn("position");
     }
 
-    public int GetQuantity() {
+    public int getQuantity() {
         return Quantity;
     }
 
@@ -114,21 +114,21 @@ public class InventoryItem {
         this.NotifiedColumn("stack");
     }
 
-    public int GetOwner() {
+    public int getOwner() {
         return Owner;
     }
 
-    public void SetOwner(int i) {
+    public void setOwner(int i) {
         this.Owner = i;
         this.NotifiedColumn("owner");
     }
 
     public void NotifiedColumn(String C) {
-        if (this.ColumsToUpdate == null) {
-            this.ColumsToUpdate = new ArrayList<>();
+        if (this.columsToUpdate == null) {
+            this.columsToUpdate = new ArrayList<>();
         }
-        if (!this.ColumsToUpdate.contains(C)) {
-            this.ColumsToUpdate.add(C);
+        if (!this.columsToUpdate.contains(C)) {
+            this.columsToUpdate.add(C);
         }
     }
 
@@ -140,19 +140,19 @@ public class InventoryItem {
         return this.Effects.stream().filter(x -> x.actionId == id).findFirst().orElse(null);
     }
 
-    public ItemTemplate Template() {
+    public ItemTemplate getTemplate() {
         return ItemTemplateDAOImpl.Cache.get(TemplateId);
     }
 
     public ItemType ItemType() {
-        return ItemTemplateDAOImpl.SuperTypes.get(Template().TypeId);
+        return ItemTemplateDAOImpl.SuperTypes.get(getTemplate().typeId);
     }
 
     public Weapon WeaponTemplate() {
         return (Weapon) ItemTemplateDAOImpl.Cache.get(TemplateId);
     }
 
-    public CharacterInventoryPositionEnum Slot() {
+    public CharacterInventoryPositionEnum getSlot() {
         return CharacterInventoryPositionEnum.valueOf((byte) this.Position);
     }
 
@@ -187,10 +187,10 @@ public class InventoryItem {
     }
 
     public int Weight() {
-        return this.Template().realWeight * this.Quantity;
+        return this.getTemplate().realWeight * this.Quantity;
     }
 
-    public void SetPosition(CharacterInventoryPositionEnum Slot) {
+    public void setPosition(CharacterInventoryPositionEnum Slot) {
         this.Position = Slot.value();
         this.NotifiedColumn("position");
     }
@@ -235,15 +235,15 @@ public class InventoryItem {
         return buff;
     }
 
-    public boolean AreConditionFilled(Player character) {
+    public boolean areConditionFilled(Player character) {
         try {
-            if (this.Template().CriteriaExpression() == null) {
+            if (this.getTemplate().CriteriaExpression() == null) {
                 return true;
             } else {
-                return this.Template().CriteriaExpression().Eval(character);
+                return this.getTemplate().CriteriaExpression().Eval(character);
             }
         } catch (Exception e) {
-            Main.Logs().writeError(String.format("Bugged Item %s Condition %s", this.Template().id, this.Template().criteria));
+            Main.Logs().writeError(String.format("Bugged item %s Condition %s", this.getTemplate().id, this.getTemplate().criteria));
             e.printStackTrace();
             return false;
         }
@@ -264,16 +264,16 @@ public class InventoryItem {
                     Main.Logs().writeError("Undefinied Stat id " + e.actionId);
                     continue;
                 }
-                this.myStats.AddItem(Stat, ((ObjectEffectInteger) e).value);
+                this.myStats.addItem(Stat, ((ObjectEffectInteger) e).value);
             }
         }
         Stat = null;
     }
 
-    public GenericStats GetStats() {
+    public GenericStats getStats() {
         if (this.myStats == null) {
             this.ParseStats();
-            if (this.Template() instanceof Weapon) {
+            if (this.getTemplate() instanceof Weapon) {
                 this.WeaponTemplate().Initialize();
             }
         }
@@ -292,10 +292,10 @@ public class InventoryItem {
              }*/
             Effects.clear();
             Effects = null;
-            NeedInsert = false;
+            needInsert = false;
             NeedRemove = false;
-            ColumsToUpdate.clear();
-            ColumsToUpdate = null;
+            columsToUpdate.clear();
+            columsToUpdate = null;
             if (this.myStats == null) {
                 myStats.totalClear();
                 myStats = null;

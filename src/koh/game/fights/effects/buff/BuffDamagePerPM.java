@@ -27,12 +27,12 @@ public class BuffDamagePerPM extends BuffEffect {
         DamageValue.setValue(val * nbr);
         //Poison Paralysant
 
-        int inte = CastInfos.Caster.Stats.GetTotal(StatsEnum.Intelligence);
+        int inte = CastInfos.Caster.Stats.getTotal(StatsEnum.Intelligence);
         
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = CastInfos.Caster.Stats.GetTotal(StatsEnum.AddDamagePercent);
+        int pdom = CastInfos.Caster.Stats.getTotal(StatsEnum.AddDamagePercent);
         if (pdom < 0) {
             pdom = 0;
         }

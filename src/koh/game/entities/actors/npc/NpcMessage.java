@@ -11,40 +11,40 @@ import koh.game.entities.actors.Player;
  */
 public class NpcMessage {
 
-    public int Id, MessageId;
-    public String[] Parameters;
-    public String Criteria;
-    public int FalseQuestion;
-    public int[] Replies;
+    public int id, messageId;
+    public String[] parameters;
+    public String criteria;
+    public int falseQuestion;
+    public int[] replies;
 
     private ConditionExpression m_criteriaExpression;
 
-    public ConditionExpression CriteriaExpression() {
+    public ConditionExpression getCriteriaExpression() {
         if (m_criteriaExpression == null) {
-            if (Strings.isNullOrEmpty(Criteria) || this.Criteria.equalsIgnoreCase("null")) {
+            if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                 return null;
             } else {
-                this.m_criteriaExpression = ConditionExpression.Parse(this.Criteria);
+                this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
             }
         }
         return m_criteriaExpression;
     }
 
-    public String[] GetParameters(Player req) {
-        for (int i = 0; i < Parameters.length; i++) {
-            if (Parameters[i].contains("BK")) {
-                Parameters[i] = String.valueOf(req.Account.Data.ItemsCache.size()); //TODO : Kamas Bank
+    public String[] getParameters(Player req) {
+        for (int i = 0; i < parameters.length; i++) {
+            if (parameters[i].contains("BK")) {
+                parameters[i] = String.valueOf(req.account.accountData.itemscache.size()); //TODO : kamas Bank
             }
         }
-        return Parameters;
+        return parameters;
     }
 
-    public boolean AreConditionFilled(Player character) {
+    public boolean areConditionFilled(Player character) {
         try {
-            if (this.CriteriaExpression() == null) {
+            if (this.getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.CriteriaExpression().Eval(character);
+                return this.getCriteriaExpression().Eval(character);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,11 +52,11 @@ public class NpcMessage {
         }
     }
 
-    public NpcMessage GetMessage(Player req) {
-        if (AreConditionFilled(req)) {
+    public NpcMessage getMessage(Player req) {
+        if (areConditionFilled(req)) {
             return this;
         } else {
-            return NpcDAOImpl.messages.get(this.FalseQuestion).GetMessage(req);
+            return NpcDAOImpl.messages.get(this.falseQuestion).getMessage(req);
         }
     }
 

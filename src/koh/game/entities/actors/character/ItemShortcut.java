@@ -12,27 +12,27 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class ItemShortcut extends PlayerShortcut {
 
-    public int ItemID;
+    public int itemID;
 
-    public ItemShortcut(byte Pos, int Template) {
-        super(Pos, ShortcutType.ShortcutItem);
-        this.ItemID = Template;
+    public ItemShortcut(byte pos, int template) {
+        super(pos, ShortcutType.ShortcutItem);
+        this.itemID = template;
     }
 
     @Override
     public Shortcut toShortcut(Player p) {
-        return new ShortcutObjectItem(Position, p.InventoryCache.ItemsCache.get(this.ItemID).TemplateId, ItemID);
+        return new ShortcutObjectItem(position, p.inventoryCache.itemsCache.get(this.itemID).TemplateId, itemID);
     }
 
     public ItemShortcut(IoBuffer buf) {
         super(buf.get(), ShortcutType.ShortcutItem);
-        this.ItemID = buf.getInt();
+        this.itemID = buf.getInt();
     }
 
     @Override
-    public void Serialize(IoBuffer buf) {
-        super.Serialize(buf);
-        buf.putInt(ItemID);
+    public void serialize(IoBuffer buf) {
+        super.serialize(buf);
+        buf.putInt(itemID);
     }
 
 }

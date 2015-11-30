@@ -26,8 +26,8 @@ public class AccountTicketDAO {
 
     public static void delWaitingCompte(AccountTicket ticket) {
         synchronized (_waitings) {
-            if (accountGuid.containsKey(ticket.valid().ID)) {
-                accountGuid.remove(ticket.valid().ID);
+            if (accountGuid.containsKey(ticket.valid().id)) {
+                accountGuid.remove(ticket.valid().id);
             }
             if (_waitings.containsKey(ticket.getKey())) {
                 _waitings.remove(ticket.getKey());
@@ -37,18 +37,18 @@ public class AccountTicketDAO {
 
     public static AccountTicket addWaitingCompte(Account _compte, String ip, String ticket) {
 
-        if (accountGuid.containsKey(_compte.ID)) {
+        if (accountGuid.containsKey(_compte.id)) {
             try {
                 // ActualCharacted accountGuid.get(_compte.get_GUID()).valid().getGameThread().closeSocket(false);
             } catch (Exception e) {
             } finally {
-                accountGuid.remove(_compte.ID);
+                accountGuid.remove(_compte.id);
             }
             return null;
         }
         synchronized (_waitings) {
             AccountTicket t = new AccountTicket(_compte, ip, ticket);
-            accountGuid.put(_compte.ID, t);
+            accountGuid.put(_compte.id, t);
             _waitings.put(ticket, t);
             return t;
         }

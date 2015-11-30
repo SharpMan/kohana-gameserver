@@ -21,7 +21,7 @@ public class ApproachHandler {
     
     @HandlerAttribute(ID = StartupActionsExecuteMessage.M_ID)
     public static void HandleStartupActionsExecuteMessage(WorldClient Client , StartupActionsExecuteMessage Message){
-        Client.Send(new StartupActionsListMessage(new StartupActionAddObject[0]));//Client.Send(Message);
+        Client.send(new StartupActionsListMessage(new StartupActionAddObject[0]));//client.send(Message);
     }
 
     @HandlerAttribute(ID = AuthenticationTicketMessage.MESSAGE_ID)
@@ -32,11 +32,11 @@ public class ApproachHandler {
         if (Client.tempTicket != null && Client.tempTicket.isCorrect(Client.getIP(), ((AuthenticationTicketMessage) message).Ticket)) {
             WorldServer.Loader.addClient(Client);
             if (WorldServer.Loader.getPosition(Client) != 1) {
-                Client.Send(new LoginQueueStatusMessage((short) WorldServer.Loader.getPosition(Client), (short) WorldServer.Loader.getTotal()));
+                Client.send(new LoginQueueStatusMessage((short) WorldServer.Loader.getPosition(Client), (short) WorldServer.Loader.getTotal()));
                 Client.showQueue = true;
             }
         } else {
-            Client.Send(new AuthenticationTicketRefusedMessage());
+            Client.send(new AuthenticationTicketRefusedMessage());
             //Diconnected After 1s
         }
         
@@ -45,8 +45,8 @@ public class ApproachHandler {
     
     @HandlerAttribute(ID = ClientKeyMessage.MESSAGE_ID)
     public static void HandleClientKeyMessage(WorldClient Client, Message message) {
-        Client.ClientKey = (((ClientKeyMessage) message).key);
-       //Client.sendPacket(new CharacterLoadingCompleteMessage());
+        Client.clientKey = (((ClientKeyMessage) message).key);
+       //client.sendPacket(new CharacterLoadingCompleteMessage());
         
         
         

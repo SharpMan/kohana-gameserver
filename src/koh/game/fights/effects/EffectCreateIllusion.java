@@ -58,16 +58,16 @@ public class EffectCreateIllusion extends EffectBase {
             if (Cell != null && Cell.CanWalk()) {
                 IllusionFighter Clone = new IllusionFighter(CastInfos.Caster.Fight, CastInfos.Caster);
                 Clone.Fight.JoinFightTeam(Clone, CastInfos.Caster.Team, false, Cell.Id, true);
-                CastInfos.Caster.Fight.sendToField(new GameActionFightSummonMessage(1097, CastInfos.Caster.ID, (GameFightFighterInformations) Clone.GetGameContextActorInformations(null)));
+                CastInfos.Caster.Fight.sendToField(new GameActionFightSummonMessage(1097, CastInfos.Caster.ID, (GameFightFighterInformations) Clone.getGameContextActorInformations(null)));
                 CastInfos.Caster.Fight.myWorker.SummonFighter(Clone);
             }
         }
         CastInfos.Caster.Fight.observers.stream().forEach((o) -> {
             if (CastInfos.Caster.IsMyFriend((Player) o)) {
-                ((Player) o).Send(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, CastInfos.Caster.ID, CastInfos.CellId));
+                ((Player) o).send(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, CastInfos.Caster.ID, CastInfos.CellId));
             } else {
-                ((Player) o).Send(new GameFightShowFighterMessage(CastInfos.Caster.GetGameContextActorInformations((Player) o)));
-                ((Player) o).Send(new GameActionFightSummonMessage(1097, CastInfos.Caster.ID, (GameFightFighterInformations) CastInfos.Caster.GetGameContextActorInformations((Player) o)));
+                ((Player) o).send(new GameFightShowFighterMessage(CastInfos.Caster.getGameContextActorInformations((Player) o)));
+                ((Player) o).send(new GameActionFightSummonMessage(1097, CastInfos.Caster.ID, (GameFightFighterInformations) CastInfos.Caster.getGameContextActorInformations((Player) o)));
             }
         });
 

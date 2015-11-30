@@ -21,7 +21,7 @@ public class SubArea {
 
     
     public static PrismsListMessage PrismMessage(){
-        return new PrismsListMessage(/*AreaDAOImpl.SubAreas.values().stream().map(x -> new PrismSubareaEmptyInfo(x.Id,1191)).toArray(PrismSubareaEmptyInfo[]::new)*/new PrismSubareaEmptyInfo[0]);
+        return new PrismsListMessage(/*AreaDAOImpl.subAreas.values().stream().map(x -> new PrismSubareaEmptyInfo(x.id,1191)).toArray(PrismSubareaEmptyInfo[]::new)*/new PrismSubareaEmptyInfo[0]);
     }
     
 }

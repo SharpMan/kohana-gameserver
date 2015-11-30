@@ -38,7 +38,7 @@ public class PushUtil {
      {
      return (false);
      };
-     GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.GetGameContextActorInformations(null);
+     GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
      if (((targetInfos) && (isPushableEntity(pTargetId))))
      {
      origin = ((!(hasMinSize(pEffect.ZoneShape()))) ? pCasterId.CellId() : pSpellImpactCell);

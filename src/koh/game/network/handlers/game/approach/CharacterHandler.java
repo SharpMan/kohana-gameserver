@@ -6,10 +6,9 @@ import koh.d2o.entities.Breed;
 import koh.d2o.entities.Head;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.D2oDaoImpl;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.ExpDAOImpl;
-import koh.game.dao.mysql.MapDAOImpl;
-import koh.game.dao.mysql.PlayerDAO;
+import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.MountInformations;
 import koh.game.entities.actors.character.ScoreType;
@@ -57,6 +56,8 @@ import koh.protocol.types.game.character.SetCharacterRestrictionsMessage;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
 import koh.protocol.types.game.character.characteristic.CharacterSpellModification;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -64,9 +65,11 @@ import koh.protocol.types.game.character.characteristic.CharacterSpellModificati
  */
 public class CharacterHandler {
 
+    private static final Logger logger = LogManager.getLogger(CharacterHandler.class);
+
     @HandlerAttribute(ID = 6072)
     public static void HandleCharacterSelectedForceReadyMessage(WorldClient Client, CharacterSelectedForceReadyMessage Message) {
-        Player inFight = Client.getAccount().GetPlayerInFight();
+        Player inFight = Client.getAccount().getPlayerInFight();
         if (inFight != null) {
             CharacterSelectionMessage(Client, inFight.ID);
         }
@@ -75,26 +78,26 @@ public class CharacterHandler {
 
     @HandlerAttribute(ID = SetEnablePVPRequestMessage.M_ID)
     public static void HandleSetEnablePVPRequestMessage(WorldClient Client, SetEnablePVPRequestMessage Message) {
-        Client.Character.setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
+        Client.character.setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
     }
 
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)
     public static void HandleAuthenticationTicketMessage(WorldClient Client, Message message) {
-        Player inFight = Client.getAccount().GetPlayerInFight();
-        Client.Send(new CharactersListMessage(false, Client.getAccount().ToBaseInformations()));
+        Player inFight = Client.getAccount().getPlayerInFight();
+        Client.send(new CharactersListMessage(false, Client.getAccount().toBaseInformations()));
         if (inFight != null) {
-            Client.Send(new CharacterSelectedForceMessage(inFight.ID));
+            Client.send(new CharacterSelectedForceMessage(inFight.ID));
         }
     }
 
     @HandlerAttribute(ID = CharacterNameSuggestionRequestMessage.MESSAGE_ID)
     public static void HandleCharacterNameSuggestionRequestMessage(WorldClient Client, Message message) {
-        Client.Send(new CharacterNameSuggestionSuccessMessage(PlayerController.GenerateName()));
+        Client.send(new CharacterNameSuggestionSuccessMessage(PlayerController.GenerateName()));
     }
     
     @HandlerAttribute(ID = 165) //Suppresion
     public static void HandleCharacterDeletionRequestMessage(WorldClient Client , CharacterDeletionRequestMessage Message){
-        Client.Send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
+        Client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
     }
 
     @HandlerAttribute(ID = 152)
@@ -107,59 +110,59 @@ public class CharacterHandler {
 
             Player Character = Client.getAccount().getPlayer(id);
             if (Character == null) {
-                Client.Send(new CharacterSelectedErrorMessage());
+                Client.send(new CharacterSelectedErrorMessage());
             } else {
-                Client.Character = Character;
-                Character.Client = Client;
-                Character.Initialize();
+                Client.character = Character;
+                Character.client = Client;
+                Character.initialize();
                 Client.getAccount().currentCharacter = Character;
-                Client.SequenceMessage();
-                //Client.Send(new ComicReadingBeginMessage(79));
-                Client.Send(new EnabledChannelsMessage(Character.EnnabledChannels, Character.DisabledChannels));
-                Client.Send(new NotificationListMessage(new int[]{2147483647}));
-                Client.Send(new CharacterSelectedSuccessMessage(Character.toBaseInformations(), false));
-                Client.Send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
-                Client.Send(new InventoryContentMessage(Character.InventoryCache.toObjectsItem(), Character.Kamas));
-                Client.Send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Character.Shortcuts.toShortcuts(Character)));
-                Client.Send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, Character.mySpells.toShortcuts()));
-                Client.Send(new EmoteListMessage(Character.Emotes));
-                Client.Send(new JobDescriptionMessage(Character.myJobs.GetDescriptions()));
-                Client.Send(new JobExperienceMultiUpdateMessage(Character.myJobs.GetExperiences()));
-                Client.Send(new JobCrafterDirectorySettingsMessage(Character.myJobs.GetSettings()));
+                Client.sequenceMessage();
+                //client.send(new ComicReadingBeginMessage(79));
+                Client.send(new EnabledChannelsMessage(Character.ennabledChannels, Character.DisabledChannels));
+                Client.send(new NotificationListMessage(new int[]{2147483647}));
+                Client.send(new CharacterSelectedSuccessMessage(Character.toBaseInformations(), false));
+                Client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
+                Client.send(new InventoryContentMessage(Character.inventoryCache.toObjectsItem(), Character.kamas));
+                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Character.shortcuts.toShortcuts(Character)));
+                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, Character.mySpells.toShortcuts()));
+                Client.send(new EmoteListMessage(Character.emotes));
+                Client.send(new JobDescriptionMessage(Character.myJobs.getDescriptions()));
+                Client.send(new JobExperienceMultiUpdateMessage(Character.myJobs.getExperiences()));
+                Client.send(new JobCrafterDirectorySettingsMessage(Character.myJobs.getSettings()));
 
-                Client.Send(new SpellListMessage(true, Character.mySpells.toSpellItems()));
-                Client.Send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false), Character.ID));
-                Client.Send(new InventoryWeightMessage(Character.InventoryCache.Weight(), Character.InventoryCache.WeightTotal()));
+                Client.send(new SpellListMessage(true, Character.mySpells.toSpellItems()));
+                Client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false), Character.ID));
+                Client.send(new InventoryWeightMessage(Character.inventoryCache.getWeight(), Character.inventoryCache.getTotalWeight()));
                 //GuilMember =! null
-                Client.Send(new FriendWarnOnConnectionStateMessage(Client.getAccount().Data.friend_warn_on_login));
-                Client.Send(new FriendWarnOnLevelGainStateMessage(Client.getAccount().Data.friend_warn_on_level_gain));
-                Client.Send(new GuildMemberWarnOnConnectionStateMessage(Client.getAccount().Data.guild_warn_on_login));
-                Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 89, new String[0]));
+                Client.send(new FriendWarnOnConnectionStateMessage(Client.getAccount().accountData.friend_warn_on_login));
+                Client.send(new FriendWarnOnLevelGainStateMessage(Client.getAccount().accountData.friend_warn_on_level_gain));
+                Client.send(new GuildMemberWarnOnConnectionStateMessage(Client.getAccount().accountData.guild_warn_on_login));
+                Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 89, new String[0]));
 
-                Client.Send(new ServerSettingsMessage("fr", (byte) 1, (byte) 0));
+                Client.send(new ServerSettingsMessage("fr", (byte) 1, (byte) 0));
 
-                //System.out.println(String.valueOf(Client.getAccount().last_login.getYear() +" "+String.valueOf(Client.getAccount().last_login.getMonth())+" "+String.valueOf(Client.getAccount().last_login.getDay()))+" "+String.valueOf(Client.getAccount().last_login.getHours()));
+                //System.out.println(String.valueOf(client.getAccount().last_login.getYear() +" "+String.valueOf(client.getAccount().last_login.getMonth())+" "+String.valueOf(client.getAccount().last_login.getDay()))+" "+String.valueOf(client.getAccount().last_login.getHours()));
                 try {
-                    Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 152, new String[]{
+                    Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 152, new String[]{
                         String.valueOf(Client.getAccount().last_login.getYear() - 100 + 2000),
                         String.valueOf(Client.getAccount().last_login.getDay()),
                         String.valueOf(Client.getAccount().last_login.getDate()),
                         String.valueOf(Client.getAccount().last_login.getHours()),
-                        String.valueOf(Client.getAccount().last_login.getMinutes()), Client.getAccount().LastIP}));
+                        String.valueOf(Client.getAccount().last_login.getMinutes()), Client.getAccount().lastIP}));
 
                 } catch (Exception e) {
                 }
-                Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 153, new String[]{Client.getIP()}));
+                Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 153, new String[]{Client.getIP()}));
 
-                //Client.Send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
-                Client.Send(new CharacterCapabilitiesMessage(4095));
-                if (Client.Character.MountInfo.Mount != null) {
-                    Client.Send(new MountSetMessage(Client.Character.MountInfo.Mount));
-                    Client.Send(new MountXpRatioMessage(Client.Character.MountInfo.Ratio));
-                    Client.Send(new MountRidingMessage(true));
+                //client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
+                Client.send(new CharacterCapabilitiesMessage(4095));
+                if (Client.character.mountInfo.mount != null) {
+                    Client.send(new MountSetMessage(Client.character.mountInfo.mount));
+                    Client.send(new MountXpRatioMessage(Client.character.mountInfo.ratio));
+                    Client.send(new MountRidingMessage(true));
                 }
                 Client.getAccount().last_login = new Timestamp(System.currentTimeMillis());
-                Client.getAccount().LastIP = Client.getIP();
+                Client.getAccount().lastIP = Client.getIP();
                 //Todo : LastCharacter? + UPdate
 
             }
@@ -168,127 +171,126 @@ public class CharacterHandler {
         }
     }
 
-    public static void SendCharacterStatsListMessage(WorldClient Client) {
-        Client.Send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) Client.Character.Experience, (double) ExpDAOImpl.persoXpMin(Client.Character.Level), (double) ExpDAOImpl.persoXpMax(Client.Character.Level), Client.Character.Kamas, Client.Character.StatPoints, 0, Client.Character.SpellPoints, Client.Character.GetActorAlignmentExtendInformations(),
-                Client.Character.Life, Client.Character.MaxLife(), Client.Character.Energy, PlayerEnum.MaxEnergy,
-                (short) Client.Character.Stats.GetTotal(StatsEnum.ActionPoints), (short) Client.Character.Stats.GetTotal(StatsEnum.MovementPoints),
-                new CharacterBaseCharacteristic(Client.Character.Initiative(true), 0, Client.Character.Stats.GetItem(StatsEnum.Initiative), 0, 0), Client.Character.Stats.GetEffect(StatsEnum.Prospecting), Client.Character.Stats.GetEffect(StatsEnum.ActionPoints),
-                Client.Character.Stats.GetEffect(StatsEnum.MovementPoints), Client.Character.Stats.GetEffect(StatsEnum.Strength), Client.Character.Stats.GetEffect(StatsEnum.Vitality),
-                Client.Character.Stats.GetEffect(StatsEnum.Wisdom), Client.Character.Stats.GetEffect(StatsEnum.Chance), Client.Character.Stats.GetEffect(StatsEnum.Agility),
-                Client.Character.Stats.GetEffect(StatsEnum.Intelligence), Client.Character.Stats.GetEffect(StatsEnum.Add_Range), Client.Character.Stats.GetEffect(StatsEnum.AddSummonLimit),
-                Client.Character.Stats.GetEffect(StatsEnum.DamageReflection), Client.Character.Stats.GetEffect(StatsEnum.Add_CriticalHit), (short) Client.Character.InventoryCache.WeaponCriticalHit(),
-                Client.Character.Stats.GetEffect(StatsEnum.CriticalMiss), Client.Character.Stats.GetEffect(StatsEnum.Add_Heal_Bonus), Client.Character.Stats.GetEffect(StatsEnum.AllDamagesBonus),
-                Client.Character.Stats.GetEffect(StatsEnum.WeaponDamagesBonusPercent), Client.Character.Stats.GetEffect(StatsEnum.AddDamagePercent), Client.Character.Stats.GetEffect(StatsEnum.TrapBonus),
-                Client.Character.Stats.GetEffect(StatsEnum.Trap_Damage_Percent), Client.Character.Stats.GetEffect(StatsEnum.GlyphBonusPercent), Client.Character.Stats.GetEffect(StatsEnum.PermanentDamagePercent), Client.Character.Stats.GetEffect(StatsEnum.Add_TackleBlock),
-                Client.Character.Stats.GetEffect(StatsEnum.Add_TackleEvade), Client.Character.Stats.GetEffect(StatsEnum.Add_RETRAIT_PA), Client.Character.Stats.GetEffect(StatsEnum.Add_RETRAIT_PM), Client.Character.Stats.GetEffect(StatsEnum.Add_Push_Damages_Bonus),
-                Client.Character.Stats.GetEffect(StatsEnum.Add_Critical_Damages), Client.Character.Stats.GetEffect(StatsEnum.Add_Neutral_Damages_Bonus), Client.Character.Stats.GetEffect(StatsEnum.Add_Earth_Damages_Bonus),
-                Client.Character.Stats.GetEffect(StatsEnum.Add_Water_Damages_Bonus), Client.Character.Stats.GetEffect(StatsEnum.Add_Air_Damages_Bonus), Client.Character.Stats.GetEffect(StatsEnum.Add_Fire_Damages_Bonus),
-                Client.Character.Stats.GetEffect(StatsEnum.DodgePALostProbability), Client.Character.Stats.GetEffect(StatsEnum.DodgePMLostProbability), Client.Character.Stats.GetEffect(StatsEnum.NeutralElementResistPercent),
-                Client.Character.Stats.GetEffect(StatsEnum.EarthElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.WaterElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.AirElementResistPercent),
-                Client.Character.Stats.GetEffect(StatsEnum.FireElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.NeutralElementReduction), Client.Character.Stats.GetEffect(StatsEnum.EarthElementReduction),
-                Client.Character.Stats.GetEffect(StatsEnum.WaterElementReduction), Client.Character.Stats.GetEffect(StatsEnum.AirElementReduction), Client.Character.Stats.GetEffect(StatsEnum.FireElementReduction),
-                Client.Character.Stats.GetEffect(StatsEnum.Add_Push_Damages_Reduction), Client.Character.Stats.GetEffect(StatsEnum.Add_Critical_Damages_Reduction), Client.Character.Stats.GetEffect(StatsEnum.PvpNeutralElementResistPercent),
-                Client.Character.Stats.GetEffect(StatsEnum.PvpEarthElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.PvpWaterElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.PvpAirElementResistPercent),
-                Client.Character.Stats.GetEffect(StatsEnum.PvpFireElementResistPercent), Client.Character.Stats.GetEffect(StatsEnum.PvpNeutralElementReduction), Client.Character.Stats.GetEffect(StatsEnum.PvpEarthElementReduction),
-                Client.Character.Stats.GetEffect(StatsEnum.PvpWaterElementReduction), Client.Character.Stats.GetEffect(StatsEnum.PvpAirElementReduction), Client.Character.Stats.GetEffect(StatsEnum.PvpFireElementReduction),
+    public static void SendCharacterStatsListMessage(WorldClient client) {
+        client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.character.experience, (double) ExpDAOImpl.persoXpMin(client.character.level), (double) ExpDAOImpl.persoXpMax(client.character.level), client.character.kamas, client.character.statPoints, 0, client.character.spellPoints, client.character.getActorAlignmentExtendInformations(),
+                client.character.life, client.character.getMaxLife(), client.character.energy, PlayerEnum.MaxEnergy,
+                (short) client.character.stats.getTotal(StatsEnum.ActionPoints), (short) client.character.stats.getTotal(StatsEnum.MovementPoints),
+                new CharacterBaseCharacteristic(client.character.getInitiative(true), 0, client.character.stats.getItem(StatsEnum.Initiative), 0, 0), client.character.stats.getEffect(StatsEnum.Prospecting), client.character.stats.getEffect(StatsEnum.ActionPoints),
+                client.character.stats.getEffect(StatsEnum.MovementPoints), client.character.stats.getEffect(StatsEnum.Strength), client.character.stats.getEffect(StatsEnum.Vitality),
+                client.character.stats.getEffect(StatsEnum.Wisdom), client.character.stats.getEffect(StatsEnum.Chance), client.character.stats.getEffect(StatsEnum.Agility),
+                client.character.stats.getEffect(StatsEnum.Intelligence), client.character.stats.getEffect(StatsEnum.Add_Range), client.character.stats.getEffect(StatsEnum.AddSummonLimit),
+                client.character.stats.getEffect(StatsEnum.DamageReflection), client.character.stats.getEffect(StatsEnum.Add_CriticalHit), (short) client.character.inventoryCache.weaponCriticalHit(),
+                client.character.stats.getEffect(StatsEnum.CriticalMiss), client.character.stats.getEffect(StatsEnum.Add_Heal_Bonus), client.character.stats.getEffect(StatsEnum.AllDamagesBonus),
+                client.character.stats.getEffect(StatsEnum.WeaponDamagesBonusPercent), client.character.stats.getEffect(StatsEnum.AddDamagePercent), client.character.stats.getEffect(StatsEnum.TrapBonus),
+                client.character.stats.getEffect(StatsEnum.Trap_Damage_Percent), client.character.stats.getEffect(StatsEnum.GlyphBonusPercent), client.character.stats.getEffect(StatsEnum.PermanentDamagePercent), client.character.stats.getEffect(StatsEnum.Add_TackleBlock),
+                client.character.stats.getEffect(StatsEnum.Add_TackleEvade), client.character.stats.getEffect(StatsEnum.Add_RETRAIT_PA), client.character.stats.getEffect(StatsEnum.Add_RETRAIT_PM), client.character.stats.getEffect(StatsEnum.Add_Push_Damages_Bonus),
+                client.character.stats.getEffect(StatsEnum.Add_Critical_Damages), client.character.stats.getEffect(StatsEnum.Add_Neutral_Damages_Bonus), client.character.stats.getEffect(StatsEnum.Add_Earth_Damages_Bonus),
+                client.character.stats.getEffect(StatsEnum.Add_Water_Damages_Bonus), client.character.stats.getEffect(StatsEnum.Add_Air_Damages_Bonus), client.character.stats.getEffect(StatsEnum.Add_Fire_Damages_Bonus),
+                client.character.stats.getEffect(StatsEnum.DodgePALostProbability), client.character.stats.getEffect(StatsEnum.DodgePMLostProbability), client.character.stats.getEffect(StatsEnum.NeutralElementResistPercent),
+                client.character.stats.getEffect(StatsEnum.EarthElementResistPercent), client.character.stats.getEffect(StatsEnum.WaterElementResistPercent), client.character.stats.getEffect(StatsEnum.AirElementResistPercent),
+                client.character.stats.getEffect(StatsEnum.FireElementResistPercent), client.character.stats.getEffect(StatsEnum.NeutralElementReduction), client.character.stats.getEffect(StatsEnum.EarthElementReduction),
+                client.character.stats.getEffect(StatsEnum.WaterElementReduction), client.character.stats.getEffect(StatsEnum.AirElementReduction), client.character.stats.getEffect(StatsEnum.FireElementReduction),
+                client.character.stats.getEffect(StatsEnum.Add_Push_Damages_Reduction), client.character.stats.getEffect(StatsEnum.Add_Critical_Damages_Reduction), client.character.stats.getEffect(StatsEnum.PvpNeutralElementResistPercent),
+                client.character.stats.getEffect(StatsEnum.PvpEarthElementResistPercent), client.character.stats.getEffect(StatsEnum.PvpWaterElementResistPercent), client.character.stats.getEffect(StatsEnum.PvpAirElementResistPercent),
+                client.character.stats.getEffect(StatsEnum.PvpFireElementResistPercent), client.character.stats.getEffect(StatsEnum.PvpNeutralElementReduction), client.character.stats.getEffect(StatsEnum.PvpEarthElementReduction),
+                client.character.stats.getEffect(StatsEnum.PvpWaterElementReduction), client.character.stats.getEffect(StatsEnum.PvpAirElementReduction), client.character.stats.getEffect(StatsEnum.PvpFireElementReduction),
                 new CharacterSpellModification[0], (short) 0)));
     }
 
     @HandlerAttribute(ID = CharacterCreationRequestMessage.MESSAGE_ID)
-    public static void HandleCharacterCreationRequestMessage(WorldClient ClientO, Message message) {
+    public static void HandleCharacterCreationRequestMessage(WorldClient client, CharacterCreationRequestMessage message) {
         try {
-            if (ClientO.getAccount().Characters.size() >= PlayerDAO.MaxCharacterSlot) {
-                ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_TOO_MANY_CHARACTERS.value()));
+            if (client.getAccount().characters.size() >= PlayerDAOImpl.MaxCharacterSlot) {
+                client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_TOO_MANY_CHARACTERS.value()));
             } else if (!PlayerController.isValidName(((CharacterCreationRequestMessage) message).Name)) {
-                ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
+                client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
 
-            } else if (PlayerDAO.DoesNameExist(((CharacterCreationRequestMessage) message).Name)) {
-                ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
+            } else if (DAO.getPlayers().containsName(((CharacterCreationRequestMessage) message).Name)) {
+                client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
             } else {
-                Breed breed = D2oDaoImpl.getBreed(((CharacterCreationRequestMessage) message).Breed);
-                if (breed == null) {
-                    ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NOT_ALLOWED.value()));
+                Breed breedTemplate = DAO.getD2oTemplates().getBreed(((CharacterCreationRequestMessage) message).Breed);
+                if (breedTemplate == null) {
+                    client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NOT_ALLOWED.value()));
                     return;
                 }
-                Head head = D2oDaoImpl.getHead(((CharacterCreationRequestMessage) message).cosmeticId);
-                if (head == null || head.breedtype != breed.id || head.gendertype == 1 != ((CharacterCreationRequestMessage) message).Sex) {
-                    ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
+                Head head = DAO.getD2oTemplates().getHead(((CharacterCreationRequestMessage) message).cosmeticId);
+                if (head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != ((CharacterCreationRequestMessage) message).Sex) {
+                    client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
                     return;
                 }
                 Player Character = new Player() {
                     {
-                        ID = PlayerDAO.NextID++;
-                        NickName = ((CharacterCreationRequestMessage) message).Name;
-                        Owner = ClientO.getAccount().ID;
-                        Breed = (byte) ((CharacterCreationRequestMessage) message).Breed;
-                        Sexe = ((CharacterCreationRequestMessage) message).Sex ? 1 : 0;
-                        Skins = new ArrayList<Short>() {
+                        nickName = message.Name;
+                        owner = client.getAccount().id;
+                        breed = (byte) message.Breed;
+                        sexe =  message.Sex ? 1 : 0;
+                        skins = new ArrayList<Short>() {
                             {
-                                add(Sexe == 1 ? breed.getFemaleLook() : breed.getMaleLook());
+                                add(sexe == 1 ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook());
                                 add(Short.parseShort(head.skinstype));
                             }
                         };
-                        Scales = new ArrayList<Short>() {
+                        scales = new ArrayList<Short>() {
                             {
-                                add(Sexe == 1 ? breed.getFemaleSize() : breed.getMaleSize());
+                                add(sexe == 1 ? breedTemplate.getFemaleSize() : breedTemplate.getMaleSize());
 
                             }
                         };
-                        IndexedColors = new ArrayList<Integer>(5) {
+                        indexedColors = new ArrayList<Integer>(5) {
                             {
                                 for (byte i = 0; i < 5; i++) {
-                                    if (((CharacterCreationRequestMessage) message).Colors.get(i) == -1) {
-                                        add(breed.getColors(Sexe).get(i) | (i + 1) * 0x1000000);
+                                    if (message.Colors.get(i) == -1) {
+                                        add(breedTemplate.getColors(sexe).get(i) | (i + 1) * 0x1000000);
                                     } else {
-                                        add(((CharacterCreationRequestMessage) message).Colors.get(i) | (i + 1) * 0x1000000);
+                                        add(message.Colors.get(i) | (i + 1) * 0x1000000);
                                     }
                                 }
                             }
                         };
-                        Account = ClientO.getAccount();
-                        Level = (byte) Settings.GetIntElement("Register.StartLevel");
-                        SavedMap = Mapid = Settings.GetIntElement("Register.StartMap");
-                        SavedCell = Settings.GetShortElement("Register.StartCell");
-                        CurrentMap = MapDAOImpl.dofusMaps.get(Settings.GetIntElement("Register.StartMap"));
-                        if (CurrentMap != null) {
-                            CurrentMap.Init();
+                        account = client.getAccount();
+                        level = (byte) Settings.GetIntElement("Register.StartLevel");
+                        savedMap = mapid = Settings.GetIntElement("Register.StartMap");
+                        savedCell = Settings.GetShortElement("Register.StartCell");
+                        currentMap = DAO.getMaps().getMap(Settings.GetIntElement("Register.StartMap"));
+                        if (currentMap != null) {
+                            currentMap.Init();
                         }
-                        Cell = CurrentMap.getCell(Settings.GetShortElement("Register.StartCell"));
+                        cell = currentMap.getCell(Settings.GetShortElement("Register.StartCell"));
                         for (String s : Settings.GetStringElement("Register.Channels").split(",")) {
-                            EnnabledChannels.add(Byte.parseByte(s));
+                            ennabledChannels.add(Byte.parseByte(s));
                         }
-                        StatPoints = (Settings.GetIntElement("Register.StartLevel") - 1) * 5;
-                        SpellPoints = (Settings.GetIntElement("Register.StartLevel") - 1);
-                        Life = breed.getHealPoint() + ((Level - 1) * 5);
-                        Experience = ExpDAOImpl.persoXpMin(Settings.GetIntElement("Register.StartLevel"));
-                        Kamas = Settings.GetIntElement("Register.KamasStart");
-                        Shortcuts = new ShortcutBook();
-                        Emotes = new byte[]{1, 8, 19};
-                        Ornaments = Titles = new int[0];
-                        this.MountInfo = new MountInformations(this);
-                        this.Scores.put(ScoreType.PVP_WIN, 0);
-                        this.Scores.put(ScoreType.PVP_LOOSE, 0);
-                        this.Scores.put(ScoreType.ARENA_WIN, 0);
-                        this.Scores.put(ScoreType.ARENA_LOOSE, 0);
-                        this.Scores.put(ScoreType.PVM_WIN, 0);
-                        this.Scores.put(ScoreType.PVM_LOOSE, 0);
-                        this.Scores.put(ScoreType.PVP_TOURNAMENT, 0);
+                        statPoints = (Settings.GetIntElement("Register.StartLevel") - 1) * 5;
+                        spellPoints = (Settings.GetIntElement("Register.StartLevel") - 1);
+                        life = breedTemplate.getHealPoint() + ((level - 1) * 5);
+                        experience = DAO.getExps().getPlayerMinExp(Settings.GetIntElement("Register.StartLevel"));
+                        kamas = Settings.GetIntElement("Register.KamasStart");
+                        shortcuts = new ShortcutBook();
+                        emotes = new byte[]{1, 8, 19};
+                        ornaments = titles = new int[0];
+                        this.mountInfo = new MountInformations(this);
+                        this.scores.put(ScoreType.PVP_WIN, 0);
+                        this.scores.put(ScoreType.PVP_LOOSE, 0);
+                        this.scores.put(ScoreType.ARENA_WIN, 0);
+                        this.scores.put(ScoreType.ARENA_LOOSE, 0);
+                        this.scores.put(ScoreType.PVM_WIN, 0);
+                        this.scores.put(ScoreType.PVM_LOOSE, 0);
+                        this.scores.put(ScoreType.PVP_TOURNAMENT, 0);
                     }
                 };
-
-                Character.Initialize();
-                if (!PlayerDAO.Insert(Character)) {
-                    ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
+                if (!DAO.getPlayers().add(Character)) {
+                    client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
                     return;
                 }
-                ClientO.getAccount().Characters.add(0, Character);
-                Main.InterClient().Send(new PlayerCreatedMessage(ClientO.getAccount().Characters.size(), ClientO.getAccount().ID));
-                ClientO.Send(new CharacterCreationResultMessage(CharacterCreationResultEnum.OK.value()));
-                ClientO.Send(new CharactersListMessage(false, ClientO.getAccount().ToBaseInformations()));
+                Character.initialize();
+
+                client.getAccount().characters.add(0, Character);
+                Main.InterClient().Send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
+                client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.OK.value()));
+                client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
         }
     }
 

@@ -11,12 +11,12 @@ import koh.game.entities.actors.npc.NpcReply;
 public class CloseReply extends NpcReply {
 
     @Override
-    public boolean Execute(Player p) {
-        if (!super.Execute(p)) {
+    public boolean execute(Player p) {
+        if (!super.execute(p)) {
             return false;
         }
         try {
-            p.Client.EndGameAction(GameActionTypeEnum.NPC_DAILOG);
+            p.client.endGameAction(GameActionTypeEnum.NPC_DAILOG);
         } catch (Exception e) {
         }
         return true;

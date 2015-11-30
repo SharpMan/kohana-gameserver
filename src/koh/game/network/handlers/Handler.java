@@ -38,7 +38,7 @@ public class Handler {
     }
 
     public static Method getMethodByMessage(Integer id) {
-        //if (Handlers.containsKey(id)) {
+        //if (HANDLERS.containsKey(id)) {
            return Handlers.get(id);
         /*}
         return null;*/

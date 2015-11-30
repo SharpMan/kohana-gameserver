@@ -11,31 +11,31 @@ public class GameRequest extends GameAction {
 
     public GameBaseRequest Request;
 
-    public GameRequest(IGameActor Actor, GameBaseRequest Request) {
-        super(GameActionTypeEnum.BASIC_REQUEST, Actor);
-        this.Request = Request;
+    public GameRequest(IGameActor actor, GameBaseRequest request) {
+        super(GameActionTypeEnum.BASIC_REQUEST, actor);
+        this.Request = request;
     }
 
     @Override
-    public void EndExecute() {
+    public void endExecute() {
         try {
-            super.EndExecute();
+            super.endExecute();
         } catch (Exception e) {
         }
     }
 
     @Override
-    public void Abort(Object[] Args) {
-        this.Request.Declin();
+    public void abort(Object[] Args) {
+        this.Request.declin();
         try {
-            super.Abort(Args);
+            super.abort(Args);
         } catch (Exception e) {
         }
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
-        return this.Request.CanSubAction(ActionType);
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
+        return this.Request.canSubAction(ActionType);
         //return true;
     }
 

@@ -1,6 +1,6 @@
 package koh.game.entities.actors;
 
-import koh.game.dao.mysql.MapDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.DofusMap;
 import koh.protocol.client.Message;
@@ -17,38 +17,38 @@ public abstract class IGameActor {
 
     public int ID;
 
-    public volatile DofusCell Cell;
+    public volatile DofusCell cell;
 
-    public int Mapid;
+    public int mapid;
 
     public EntityLook entityLook;
 
-    public abstract EntityLook GetEntityLook();
+    public abstract EntityLook getEntityLook();
 
-    public byte Direction = 1;
+    public byte direction = 1;
 
     public DofusMap getDofusMap() {
-        return MapDAOImpl.dofusMaps.get(this.Mapid);
+        return DAO.getMaps().getMap(this.mapid);
     }
 
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameRolePlayActorInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character));
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameRolePlayActorInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character));
     }
 
-    public boolean CanBeSee(IGameActor Actor) {
-        //Todo: Player Invisibile ?
+    public boolean canBeSee(IGameActor Actor) {
+        //Todo: player Invisibile ?
         return true;
     }
 
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
         if (this instanceof Player) {
-            ((Player) this).Send(Packet);
+            ((Player) this).send(Packet);
         }
     }
 
-    public EntityDispositionInformations GetEntityDispositionInformations(Player character) {
-        return new EntityDispositionInformations(this.Cell.Id, Direction);
+    public EntityDispositionInformations getEntityDispositionInformations(Player character) {
+        return new EntityDispositionInformations(this.cell.id, direction);
     }
 
-    //public DirectionsEnum Direction;
+    //public DirectionsEnum direction;
 }

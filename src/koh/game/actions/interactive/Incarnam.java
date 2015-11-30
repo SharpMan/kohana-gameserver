@@ -10,32 +10,32 @@ import koh.protocol.messages.connection.BasicNoOperationMessage;
 public class Incarnam implements InteractiveAction {
 
     @Override
-    public boolean isEnabled(Player Actor) {
+    public boolean isEnabled(Player actor) {
         return true;
     }
 
     @Override
-    public int GetDuration() {
+    public int getDuration() {
         return 0;
     }
 
     @Override
-    public void Execute(Player Actor, int Element) {
-        if (!this.isEnabled(Actor)) {
-            Actor.Send(new BasicNoOperationMessage());
+    public void execute(Player actor, int element) {
+        if (!this.isEnabled(actor)) {
+            actor.send(new BasicNoOperationMessage());
             return;
         }
-        Actor.teleport(80216068, 283);
-        // Actor.teleport(D2oDaoImpl.getBreed(Actor.Breed).spawnMaptype, 298);
+        actor.teleport(80216068, 283);
+        // actor.teleport(D2oDaoImpl.getBreed(actor.breed).spawnMaptype, 298);
     }
 
     @Override
-    public void Leave(Player Actor, int Element) {
+    public void leave(Player player, int element) {
 
     }
 
     @Override
-    public void Abort(Player player, int Element) {
+    public void abort(Player player, int element) {
 
     }
 

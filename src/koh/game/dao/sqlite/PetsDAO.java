@@ -103,7 +103,7 @@ public class PetsDAO {
         }
     }
 
-    public static void Update(PetsInventoryItemEntity Item) {
+    public static void update(PetsInventoryItemEntity Item) {
         try {
             doOpenConnectionSource();
             accountDao.update(Item);
@@ -131,7 +131,7 @@ public class PetsDAO {
         }
     }
 
-    public static void Update(MountInventoryItemEntity Item) {
+    public static void update(MountInventoryItemEntity Item) {
         try {
             doOpenConnectionSource();
             mountsDao.update(Item);
@@ -140,7 +140,7 @@ public class PetsDAO {
         }
     }
 
-    public static MountInventoryItemEntity GetMount(int id) {
+    public static MountInventoryItemEntity getMount(int id) {
         try {
             doOpenConnectionSource();
             return mountsDao.queryForId(id);

@@ -44,11 +44,11 @@ public abstract class Exchange {
     public abstract void Send(Message Packet);
 
     public static InventoryItem[] CharactersItems(Player Character) {
-        return Character.InventoryCache.ItemsCache.values().stream().filter(x -> !x.IsLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
+        return Character.inventoryCache.itemsCache.values().stream().filter(x -> !x.IsLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
     }
 
     public static InventoryItem[] CharactersItems(Player Character, int[] ids) {
-        return Character.InventoryCache.ItemsCache.entrySet().stream().filter(x -> ArrayUtils.contains(ids, x.getKey()) && !x.getValue().IsLinked() && !x.getValue().isEquiped()).map(x -> x.getValue()).toArray(InventoryItem[]::new);
+        return Character.inventoryCache.itemsCache.entrySet().stream().filter(x -> ArrayUtils.contains(ids, x.getKey()) && !x.getValue().IsLinked() && !x.getValue().isEquiped()).map(x -> x.getValue()).toArray(InventoryItem[]::new);
     }
 
 }

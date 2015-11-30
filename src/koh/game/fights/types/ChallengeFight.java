@@ -34,8 +34,8 @@ public class ChallengeFight extends Fight {
         Fighter AttFighter = new CharacterFighter(this, Attacker);
         Fighter DefFighter = new CharacterFighter(this, Defender);
 
-        Attacker.AddGameAction(new GameFight(AttFighter, this));
-        Defender.AddGameAction(new GameFight(DefFighter, this));
+        Attacker.addGameAction(new GameFight(AttFighter, this));
+        Defender.addGameAction(new GameFight(DefFighter, this));
 
         super.InitFight(AttFighter, DefFighter);
 
@@ -57,10 +57,10 @@ public class ChallengeFight extends Fight {
             AtomicReference<Long> xpTotal = new AtomicReference<>();
             xpTotal.set(FightFormulas.XPDefie(Fighter, Winners.GetFighters(), Loosers.GetFighters()));
             long GuildXp = FightFormulas.GuildXpEarned((CharacterFighter) Fighter, xpTotal), MountXp = FightFormulas.MountXpEarned((CharacterFighter) Fighter, xpTotal);
-            ((CharacterFighter) Fighter).Character.AddExperience(xpTotal.get(), false);
+            ((CharacterFighter) Fighter).Character.addExperience(xpTotal.get(), false);
             this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
-                    this.experience = ((CharacterFighter) Fighter).Character.Experience;
+                    this.experience = ((CharacterFighter) Fighter).Character.experience;
                     this.showExperience = true;
                     this.experienceLevelFloor = ExpDAOImpl.persoXpMin(Fighter.Level());
                     this.showExperienceLevelFloor = true;
@@ -108,12 +108,12 @@ public class ChallengeFight extends Fight {
 
                     Fighter.LeaveFight();
 
-                    //Fighter.Send(new GameLeaveMessage());
+                    //Fighter.send(new GameLeaveMessage());
                 }
                 break;
             case STATE_ACTIVE:
                 if (Fighter.TryDie(Fighter.ID, true) != -3) {
-                    Fighter.Send(LeftEndMessage(Fighter));
+                    Fighter.send(LeftEndMessage(Fighter));
                     this.sendToField(new GameFightLeaveMessage(Fighter.ID));
                     Fighter.LeaveFight();
                 }
@@ -134,7 +134,7 @@ public class ChallengeFight extends Fight {
     @Override
     protected void SendGameFightJoinMessage(Fighter fighter) {
         //boolean canBeCancelled, boolean canSayReady, boolean isFightStarted, short timeMaxBeforeFightStart, byte fightType
-        fighter.Send(new GameFightJoinMessage(true, !IsStarted(), this.IsStarted(), (short) 0, this.FightType.value));
+        fighter.send(new GameFightJoinMessage(true, !IsStarted(), this.IsStarted(), (short) 0, this.FightType.value));
     }
 
 }

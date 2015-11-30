@@ -24,6 +24,6 @@ public class ServerCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return Settings.GetIntElement("World.ID") == this.Server;
+        return Settings.GetIntElement("World.id") == this.Server;
     }
 }

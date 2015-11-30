@@ -37,48 +37,48 @@ public class InteractiveUsage implements InteractiveAction {
     }
 
     @Override
-    public boolean isEnabled(Player Actor) {
+    public boolean isEnabled(Player actor) {
         return true;
     }
 
     @Override
-    public int GetDuration() {
+    public int getDuration() {
         return 0;
     }
 
     @Override
-    public void Execute(Player Actor, int Element) {
-        if (!this.isEnabled(Actor)) {
-            Actor.Send(new BasicNoOperationMessage());
+    public void execute(Player actor, int element) {
+        if (!this.isEnabled(actor)) {
+            actor.send(new BasicNoOperationMessage());
             return;
         }
-        if (Actor.CurrentMap.getDoor(Element) == null) {
-            PlayerController.SendServerMessage(Actor.Client, "Door not implanted yet ..." + Element);
+        if (actor.currentMap.getDoor(element) == null) {
+            PlayerController.sendServerMessage(actor.client, "Door not implanted yet ..." + element);
             return;
         }
-        switch (ActionType.valueOf(Actor.CurrentMap.getDoor(Element).Type)) {
+        switch (ActionType.valueOf(actor.currentMap.getDoor(element).Type)) {
             case TELEPORT:
-                Actor.teleport(Integer.parseInt(Actor.CurrentMap.getDoor(Element).Parameters.split(",")[0]), Integer.parseInt(Actor.CurrentMap.getDoor(Element).Parameters.split(",")[1]));
+                actor.teleport(Integer.parseInt(actor.currentMap.getDoor(element).Parameters.split(",")[0]), Integer.parseInt(actor.currentMap.getDoor(element).Parameters.split(",")[1]));
                 break;
             case CREATE_GUILDE:
-                //if (Actor.Client.CanGameAction(GameActionTypeEnum.CREATE_GUILD)) {
-                Actor.Client.AddGameAction(new GameGuildCreation(Actor));
+                //if (actor.client.canGameAction(GameActionTypeEnum.CREATE_GUILD)) {
+                actor.client.addGameAction(new GameGuildCreation(actor));
                 //}
                 break;
             default:
-                PlayerController.SendServerMessage(Actor.Client, "Door not parametered ...");
+                PlayerController.sendServerMessage(actor.client, "Door not parametered ...");
                 return;
         }
 
     }
 
     @Override
-    public void Leave(Player Actor, int Element) {
+    public void leave(Player player, int element) {
 
     }
 
     @Override
-    public void Abort(Player player, int Element) {
+    public void abort(Player player, int element) {
 
     }
 

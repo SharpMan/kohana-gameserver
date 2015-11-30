@@ -1,7 +1,5 @@
 package koh.game.fights.effects.buff;
 
-import java.util.ArrayList;
-import java.util.List;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_CHANGE_LOOK;
@@ -21,14 +19,14 @@ public class BuffExpandSize extends BuffEffect {
 
     public BuffExpandSize(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
-        this.OldScale = Target.GetEntityLook().scales.get(0);
+        this.OldScale = Target.getEntityLook().scales.get(0);
     }
 
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.Target.entityLook.scales.clear();
         this.Target.entityLook.scales.add((short) (OldScale + (((double) this.OldScale * CastInfos.Effect.diceNum) / 100)));
-        this.Caster.Fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.GetEntityLook()));
+        this.Caster.Fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.getEntityLook()));
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
 

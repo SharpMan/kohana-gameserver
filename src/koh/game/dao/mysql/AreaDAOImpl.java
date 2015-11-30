@@ -1,17 +1,14 @@
 package koh.game.dao.mysql;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import com.google.inject.Inject;
-import koh.game.MySQL;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.AreaDAO;
 import koh.game.entities.environments.Area;
 import koh.game.entities.environments.SubArea;
 import koh.game.entities.environments.SuperArea;
-import koh.game.utils.Settings;
 import koh.game.utils.sql.ConnectionResult;
 import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
@@ -82,7 +79,7 @@ public class AreaDAOImpl extends AreaDAO {
                         this.entranceMapIds = Enumerable.StringToIntArray(result.getString("entrance_map_ids"));
                         this.exitMapIds = Enumerable.StringToIntArray(result.getString("exit_map_ids"));
                         this.capturable = result.getBoolean("capturable");
-                        areas.get(result.getInt("area_id")).SubAreas = ArrayUtils.add(areas.get(result.getInt("area_id")).SubAreas, this);
+                        areas.get(result.getInt("area_id")).subAreas = ArrayUtils.add(areas.get(result.getInt("area_id")).subAreas, this);
                     }
                 });
 

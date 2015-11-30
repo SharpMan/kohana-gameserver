@@ -7,7 +7,6 @@ import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_ADD_SPELL_
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSpellCooldownVariationMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
-import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -28,7 +27,7 @@ public class BuffSpellCoolDown extends BuffEffect {
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         //FighterSpell.SpellinitialCooldown CurrentCooldown = this.Target.SpellsController.myinitialCooldown.get(Spell);
-        this.Target.Send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, Value));
+        this.Target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, Value));
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
 
@@ -36,7 +35,7 @@ public class BuffSpellCoolDown extends BuffEffect {
     public int RemoveEffect() {
         FighterSpell.SpellinitialCooldown CurrentCooldown = this.Target.SpellsController.myinitialCooldown.get(Spell);
         if (CurrentCooldown != null) {
-            this.Target.Send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, CurrentCooldown.initialCooldown + 1));
+            this.Target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, CurrentCooldown.initialCooldown + 1));
         }
         return super.RemoveEffect();
     }

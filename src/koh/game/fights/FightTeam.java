@@ -79,11 +79,11 @@ public class FightTeam {
             return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
         }
         if (this.IsToggle(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)) {
-            if (!(((CharacterFighter) this.Leader).Character.Client.GetParty() != null && ((CharacterFighter) this.Leader).Character.Client.GetParty().containsPlayer(Character))) {
+            if (!(((CharacterFighter) this.Leader).Character.client.getParty() != null && ((CharacterFighter) this.Leader).Character.client.getParty().containsPlayer(Character))) {
                 return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
             }
         }
-        return this.AlignmentSide != AlignmentSideEnum.ALIGNMENT_WITHOUT && Character.AlignmentSide != this.AlignmentSide ? FighterRefusedReasonEnum.WRONG_ALIGNMENT : FighterRefusedReasonEnum.FIGHTER_ACCEPTED;
+        return this.AlignmentSide != AlignmentSideEnum.ALIGNMENT_WITHOUT && Character.alignmentSide != this.AlignmentSide ? FighterRefusedReasonEnum.WRONG_ALIGNMENT : FighterRefusedReasonEnum.FIGHTER_ACCEPTED;
     }
 
     public byte TeamType() {
@@ -154,7 +154,7 @@ public class FightTeam {
         this.Fight.sendToField(new FieldNotification(Message) {
             @Override
             public boolean can(Player perso) {
-                return perso.Client != null && perso.GetFighter() != null && perso.GetFighter().Team.Id == Id;
+                return perso.client != null && perso.getFighter() != null && perso.getFighter().Team.Id == Id;
             }
         });
     }

@@ -21,7 +21,7 @@ public class BreedCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Byte>) this.Breed, character.Breed);
+        return this.Compare((Comparable<Byte>) this.Breed, character.breed);
     }
 
     @Override

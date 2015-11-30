@@ -8,7 +8,7 @@ import koh.game.actions.requests.GuildJoinRequest;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.dao.sqlite.GuildDAO;
-import koh.game.dao.mysql.PlayerDAO;
+import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildEntity;
@@ -55,205 +55,205 @@ public class GuildHandler {
 
     @HandlerAttribute(ID = GuildSpellUpgradeRequestMessage.M_ID)
     public static void HandleGuildSpellUpgradeRequestMessage(WorldClient Client, GuildSpellUpgradeRequestMessage Message) {
-        if (Client.Character.Guild != null && Client.Character.GuildMember().manageGuildBoosts()) {
-            if (Client.Character.Guild.Entity.Boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)) {
-                Client.Send(new BasicNoOperationMessage());
+        if (Client.character.guild != null && Client.character.getGuildMember().manageGuildBoosts()) {
+            if (Client.character.guild.Entity.Boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)) {
+                Client.send(new BasicNoOperationMessage());
                 return;
             }
 
-            byte SpellLevel = Client.Character.Guild.SpellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)];
-            if (SpellLevel >= SpellDAOImpl.spells.get(Message.pellId).spellLevels.length) { //Action Asyn ^^
-                Client.Send(new BasicNoOperationMessage());
+            byte SpellLevel = Client.character.guild.SpellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)];
+            if (SpellLevel >= SpellDAOImpl.spells.get(Message.pellId).spellLevels.length) { //action Asyn ^^
+                Client.send(new BasicNoOperationMessage());
                 return;
             }
-            Client.Character.Guild.SpellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)]++;
-            Client.Character.Guild.Entity.Boost -= 5;
-            Client.Character.Guild.sendToField(Client.Character.Guild.toGuildInfosUpgradeMessage());
+            Client.character.guild.SpellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)]++;
+            Client.character.guild.Entity.Boost -= 5;
+            Client.character.guild.sendToField(Client.character.guild.toGuildInfosUpgradeMessage());
 
-            Client.Character.Guild.Entity.Spells = Enumerable.Join(Client.Character.Guild.SpellLevel, ',');
-            GuildDAO.Update(Client.Character.Guild.Entity);
+            Client.character.guild.Entity.Spells = Enumerable.Join(Client.character.guild.SpellLevel, ',');
+            GuildDAO.Update(Client.character.guild.Entity);
         } else {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
         }
     }
 
     @HandlerAttribute(ID = GuildCharacsUpgradeRequestMessage.ID)
     public static void HandleGuildCharacsUpgradeRequestMessage(WorldClient Client, GuildCharacsUpgradeRequestMessage Message) {
-        if (Client.Character.Guild != null && Client.Character.GuildMember().manageGuildBoosts()) {
-            if (Client.Character.Guild.Entity.Boost <= 0) {
-                Client.Send(new BasicNoOperationMessage());
+        if (Client.character.guild != null && Client.character.getGuildMember().manageGuildBoosts()) {
+            if (Client.character.guild.Entity.Boost <= 0) {
+                Client.send(new BasicNoOperationMessage());
                 return;
             }
 
             switch (Message.charaTypeTarget) {
                 case 0:
-                    if (Client.Character.Guild.Entity.Pods >= 5000) {
+                    if (Client.character.guild.Entity.Pods >= 5000) {
                         return;
                     }
-                    Client.Character.Guild.Entity.Pods += 20;
-                    if (Client.Character.Guild.Entity.Pods >= 5000) {
-                        Client.Character.Guild.Entity.Pods = 5000;
+                    Client.character.guild.Entity.Pods += 20;
+                    if (Client.character.guild.Entity.Pods >= 5000) {
+                        Client.character.guild.Entity.Pods = 5000;
                     }
                     break;
                 case 1:
-                    if (Client.Character.Guild.Entity.Prospecting >= 500) {
+                    if (Client.character.guild.Entity.Prospecting >= 500) {
                         return;
                     }
-                    Client.Character.Guild.Entity.Prospecting++;
-                    if (Client.Character.Guild.Entity.Prospecting >= 500) {
-                        Client.Character.Guild.Entity.Prospecting = 500;
+                    Client.character.guild.Entity.Prospecting++;
+                    if (Client.character.guild.Entity.Prospecting >= 500) {
+                        Client.character.guild.Entity.Prospecting = 500;
                     }
                     break;
                 case 2:
-                    if (Client.Character.Guild.Entity.Wisdom >= 400) {
+                    if (Client.character.guild.Entity.Wisdom >= 400) {
                         return;
                     }
-                    Client.Character.Guild.Entity.Wisdom++;
-                    if (Client.Character.Guild.Entity.Wisdom >= 400) {
-                        Client.Character.Guild.Entity.Wisdom = 400;
+                    Client.character.guild.Entity.Wisdom++;
+                    if (Client.character.guild.Entity.Wisdom >= 400) {
+                        Client.character.guild.Entity.Wisdom = 400;
                     }
                     break;
                 case 3:
-                    if (Client.Character.Guild.Entity.MaxTaxCollectors >= 500 || Client.Character.Guild.Entity.Boost <= 10) {
-                        Client.Send(new BasicNoOperationMessage());
+                    if (Client.character.guild.Entity.MaxTaxCollectors >= 500 || Client.character.guild.Entity.Boost <= 10) {
+                        Client.send(new BasicNoOperationMessage());
                         return;
                     }
-                    Client.Character.Guild.Entity.Boost -= 9;
-                    Client.Character.Guild.Entity.MaxTaxCollectors++;
-                    if (Client.Character.Guild.Entity.MaxTaxCollectors >= 50) {
-                        Client.Character.Guild.Entity.MaxTaxCollectors = 50;
+                    Client.character.guild.Entity.Boost -= 9;
+                    Client.character.guild.Entity.MaxTaxCollectors++;
+                    if (Client.character.guild.Entity.MaxTaxCollectors >= 50) {
+                        Client.character.guild.Entity.MaxTaxCollectors = 50;
                     }
                     break;
             }
-            Client.Character.Guild.Entity.Boost--;
-            Client.Character.Guild.sendToField(Client.Character.Guild.toGuildInfosUpgradeMessage());
-            GuildDAO.Update(Client.Character.Guild.Entity);
+            Client.character.guild.Entity.Boost--;
+            Client.character.guild.sendToField(Client.character.guild.toGuildInfosUpgradeMessage());
+            GuildDAO.Update(Client.character.guild.Entity);
         } else {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
         }
     }
 
     @HandlerAttribute(ID = GuildInvitationAnswerMessage.M_ID)
     public static void HandleGuildInvitationAnswerMessage(WorldClient Client, GuildInvitationAnswerMessage Message) {
-        if (!Client.IsGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-            Client.Send(new BasicNoOperationMessage());
+        if (!Client.isGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+            Client.send(new BasicNoOperationMessage());
         }
-        GuildJoinRequest guildInvitationRequest = (GuildJoinRequest) Client.GetBaseRequest();
-        if (Client == guildInvitationRequest.Requester && !Message.accept) {
-            guildInvitationRequest.Declin();
-        } else if (Client == guildInvitationRequest.Requested) {
+        GuildJoinRequest guildInvitationRequest = (GuildJoinRequest) Client.getBaseRequest();
+        if (Client == guildInvitationRequest.requester && !Message.accept) {
+            guildInvitationRequest.declin();
+        } else if (Client == guildInvitationRequest.requested) {
             if (Message.accept) {
-                guildInvitationRequest.Accept();
+                guildInvitationRequest.accept();
             } else {
-                guildInvitationRequest.Declin();
+                guildInvitationRequest.declin();
             }
         } else {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
         }
     }
 
     @HandlerAttribute(ID = 6115)
     public static void HandleGuildInvitationByNameMessage(WorldClient Client, GuildInvitationByNameMessage Message) {
-        if (Client.Character.Guild != null) {
-            if (!Client.Character.GuildMember().inviteNewMembers()) {
-                Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
+        if (Client.character.guild != null) {
+            if (!Client.character.getGuildMember().inviteNewMembers()) {
+                Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
             } else {
-                Player character = PlayerDAO.GetCharacter(Message.name);
-                if (character == null || character.Client == null) {
-                    Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
+                Player character = PlayerDAOImpl.getCharacter(Message.name);
+                if (character == null || character.client == null) {
+                    Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
                 } else {
-                    if (character.Guild != null) {
-                        Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 206, new String[0]));
+                    if (character.guild != null) {
+                        Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 206, new String[0]));
                     } else {
-                        if (!character.Client.CanGameAction(GameActionTypeEnum.BASIC_REQUEST) || !Client.CanGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-                            Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 209, new String[0]));
-                        } else if (!Client.Character.Guild.canAddMember()) {
-                            Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 55, new String[]{String.valueOf(50)}));
+                        if (!character.client.canGameAction(GameActionTypeEnum.BASIC_REQUEST) || !Client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+                            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 209, new String[0]));
+                        } else if (!Client.character.guild.canAddMember()) {
+                            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 55, new String[]{String.valueOf(50)}));
                         } else {
 
-                            GuildJoinRequest Request = new GuildJoinRequest(Client, character.Client);
-                            GameRequest RequestAction = new GameRequest(Client.Character, Request);
+                            GuildJoinRequest Request = new GuildJoinRequest(Client, character.client);
+                            GameRequest RequestAction = new GameRequest(Client.character, Request);
 
-                            Client.AddGameAction(RequestAction);
-                            character.Client.AddGameAction(RequestAction);
+                            Client.addGameAction(RequestAction);
+                            character.client.addGameAction(RequestAction);
 
-                            Client.SetBaseRequest(Request);
-                            character.Client.SetBaseRequest(Request);
+                            Client.setBaseRequest(Request);
+                            character.client.setBaseRequest(Request);
 
-                            Client.Send(new GuildInvitationStateRecruterMessage(character.NickName, GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.Send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.Send(new GuildInvitedMessage(Client.Character.ID, Client.Character.NickName, Client.Character.Guild.GetBasicGuildInformations()));
+                            Client.send(new GuildInvitationStateRecruterMessage(character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_SENT));
+                            character.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_SENT));
+                            character.send(new GuildInvitedMessage(Client.character.ID, Client.character.nickName, Client.character.guild.GetBasicGuildInformations()));
                         }
                     }
                 }
             }
         } else {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
         }
     }
 
     @HandlerAttribute(ID = 5551)
     public static void HandleGuildInvitationMessage(WorldClient Client, GuildInvitationMessage Message) {
-        if (Client.Character.Guild != null) {
-            if (!Client.Character.GuildMember().inviteNewMembers()) {
-                Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
+        if (Client.character.guild != null) {
+            if (!Client.character.getGuildMember().inviteNewMembers()) {
+                Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
             } else {
-                Player character = PlayerDAO.GetCharacter(Message.targetId);
-                if (character == null || character.Client == null) {
-                    Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
+                Player character = PlayerDAOImpl.getCharacter(Message.targetId);
+                if (character == null || character.client == null) {
+                    Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
                 } else {
-                    if (character.Guild != null) {
-                        Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 206, new String[0]));
+                    if (character.guild != null) {
+                        Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 206, new String[0]));
                     } else {
-                        if (!character.Client.CanGameAction(GameActionTypeEnum.BASIC_REQUEST) || !Client.CanGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-                            Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 209, new String[0]));
-                        } else if (!Client.Character.Guild.canAddMember()) {
-                            Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 55, new String[]{String.valueOf(50)}));
+                        if (!character.client.canGameAction(GameActionTypeEnum.BASIC_REQUEST) || !Client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+                            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 209, new String[0]));
+                        } else if (!Client.character.guild.canAddMember()) {
+                            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 55, new String[]{String.valueOf(50)}));
                         } else {
 
-                            GuildJoinRequest Request = new GuildJoinRequest(Client, character.Client);
-                            GameRequest RequestAction = new GameRequest(Client.Character, Request);
+                            GuildJoinRequest Request = new GuildJoinRequest(Client, character.client);
+                            GameRequest RequestAction = new GameRequest(Client.character, Request);
 
-                            Client.AddGameAction(RequestAction);
-                            character.Client.AddGameAction(RequestAction);
+                            Client.addGameAction(RequestAction);
+                            character.client.addGameAction(RequestAction);
 
-                            Client.SetBaseRequest(Request);
-                            character.Client.SetBaseRequest(Request);
+                            Client.setBaseRequest(Request);
+                            character.client.setBaseRequest(Request);
 
-                            Client.Send(new GuildInvitationStateRecruterMessage(character.NickName, GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.Send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.Send(new GuildInvitedMessage(Client.Character.ID, Client.Character.NickName, Client.Character.Guild.GetBasicGuildInformations()));
+                            Client.send(new GuildInvitationStateRecruterMessage(character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_SENT));
+                            character.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_SENT));
+                            character.send(new GuildInvitedMessage(Client.character.ID, Client.character.nickName, Client.character.guild.GetBasicGuildInformations()));
                         }
                     }
                 }
             }
         } else {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
         }
     }
 
     @HandlerAttribute(ID = 5549)
     public static void HandleGuildChangeMemberParametersMessage(WorldClient Client, GuildChangeMemberParametersMessage Message) {
-        if (Client.Character.Guild != null) {
-            GuildMember guildMember = Client.Character.Guild.Members.get(Message.memberId);
+        if (Client.character.guild != null) {
+            GuildMember guildMember = Client.character.guild.Members.get(Message.memberId);
             if (guildMember != null) {
-                Client.Character.Guild.ChangeParameters(Client.Character, guildMember, Message.rank, Message.experienceGivenPercent, Message.rights);
+                Client.character.guild.ChangeParameters(Client.character, guildMember, Message.rank, Message.experienceGivenPercent, Message.rights);
             }
 
         } else {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
         }
     }
 
     @HandlerAttribute(ID = GuildKickRequestMessage.M_ID)
     public static void HandleGuildKickRequestMessage(WorldClient Client, GuildKickRequestMessage Message) {
-        if (Client.Character.Guild != null) {
-            GuildMember guildMember = Client.Character.Guild.Members.get(Message.kickedId);
+        if (Client.character.guild != null) {
+            GuildMember guildMember = Client.character.guild.Members.get(Message.kickedId);
             if (guildMember != null) {
-                Client.Character.Guild.KickMember(Client.Character, guildMember);
+                Client.character.guild.KickMember(Client.character, guildMember);
             }
         } else {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
         }
     }
 
@@ -261,22 +261,22 @@ public class GuildHandler {
     public static void HandleGuildGetInformationsMessage(WorldClient Client, GuildGetInformationsMessage Message) {
         switch (Message.infoType) {
             case 1:
-                Client.Send(Client.Character.Guild.toGeneralInfos());
+                Client.send(Client.character.guild.toGeneralInfos());
                 break;
             case 2:
-                Client.Send(new GuildInformationsMembersMessage(Client.Character.Guild.allGuildMembers()));
+                Client.send(new GuildInformationsMembersMessage(Client.character.guild.allGuildMembers()));
                 break;
             case 3:
-                Client.Send(Client.Character.Guild.toGuildInfosUpgradeMessage());
+                Client.send(Client.character.guild.toGuildInfosUpgradeMessage());
                 break;
             case 4:
-                Client.Send(new GuildInformationsPaddocksMessage((byte) 5, Client.Character.Guild.toPaddockContentInformations()));
+                Client.send(new GuildInformationsPaddocksMessage((byte) 5, Client.character.guild.toPaddockContentInformations()));
                 break;
             case 5:
-                Client.Send(new GuildHousesInformationMessage(Client.Character.Guild.toHouseInformationsForGuild()));
+                Client.send(new GuildHousesInformationMessage(Client.character.guild.toHouseInformationsForGuild()));
                 break;
             case 6:
-                Client.Send(Client.Character.Guild.toTaxCollectorListMessage());
+                Client.send(Client.character.guild.toTaxCollectorListMessage());
                 break;
 
         }
@@ -284,17 +284,17 @@ public class GuildHandler {
 
     @HandlerAttribute(ID = 5546)
     public static void HandleGuildCreationValidMessage(WorldClient Client, GuildCreationValidMessage Message) {
-        if (Client.Character.Guild != null) {
-            Client.Send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_ALREADY_IN_GROUP));
-        } else if (!Client.Character.InventoryCache.HasItemId(1575)) {
-            Client.Send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_REQUIREMENT_UNMET));
-            PlayerController.SendServerMessage(Client, "La crétion d'une guilde nécessite une guildalogemme qui est commerciable en <b>Boutique</b>");
+        if (Client.character.guild != null) {
+            Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_ALREADY_IN_GROUP));
+        } else if (!Client.character.inventoryCache.hasItemId(1575)) {
+            Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_REQUIREMENT_UNMET));
+            PlayerController.sendServerMessage(Client, "La crétion d'une guilde nécessite une guildalogemme qui est commerciable en <b>Boutique</b>");
         } else if (GuildDAO.EmblemExist(Message.guildEmblem)) {
-            Client.Send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_EMBLEM_ALREADY_EXISTS));
-        } else if (!Client.IsGameAction(GameActionTypeEnum.CREATE_GUILD)) {
-            Client.Send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_CANCEL));
+            Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_EMBLEM_ALREADY_EXISTS));
+        } else if (!Client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {
+            Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_CANCEL));
         } else if (GuildDAO.NameExist(Message.guildName) || !isValidName(Message.guildName) || Message.guildName.length() < 4 || Message.guildName.length() > 16) {
-            Client.Send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_NAME_INVALID));
+            Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_NAME_INVALID));
         } else {
             new Guild(new GuildEntity() {
                 {
@@ -318,32 +318,32 @@ public class GuildHandler {
                 {
                     this.addMember(new GuildMember(this.Entity.GuildID) {
                         {
-                            this.AccountID = Client.getAccount().ID;
-                            this.Breed = Client.Character.Breed;
-                            this.CharacterID = Client.Character.ID;
+                            this.AccountID = Client.getAccount().id;
+                            this.Breed = Client.character.breed;
+                            this.CharacterID = Client.character.ID;
                             this.LastConnection = System.currentTimeMillis() + "";
-                            this.Level = Client.Character.Level;
-                            this.Name = Client.Character.NickName;
+                            this.Level = Client.character.level;
+                            this.Name = Client.character.nickName;
                             this.Rank = 1;
                             this.Experience = "0";
                             this.Rights = GuildRightsBitEnum.GUILD_RIGHT_BOSS;
-                            this.Sex = Client.Character.Sexe == 1;
-                            this.achievementPoints = Client.Character.achievementPoints;
-                            this.alignmentSide = Client.Character.AlignmentSide.value;
+                            this.Sex = Client.character.sexe == 1;
+                            this.achievementPoints = Client.character.achievementPoints;
+                            this.alignmentSide = Client.character.alignmentSide.value;
                             GuildDAO.Insert(this);
                         }
-                    }, Client.Character);
-                    this.registerPlayer(Client.Character);
-                    this.SetBoss(this.Members.get(Client.Character.ID));
+                    }, Client.character);
+                    this.registerPlayer(Client.character);
+                    this.SetBoss(this.Members.get(Client.character.ID));
                 }
             };
 
-            Client.Send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_OK));
+            Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_OK));
 
-            Client.Character.InventoryCache.UpdateObjectquantity(Client.Character.InventoryCache.GetItemInTemplate(1575), Client.Character.InventoryCache.GetItemInTemplate(1575).GetQuantity() - 1);
-            Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{1 + "", 1575 + ""}));
+            Client.character.inventoryCache.updateObjectquantity(Client.character.inventoryCache.getItemInTemplate(1575), Client.character.inventoryCache.getItemInTemplate(1575).getQuantity() - 1);
+            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{1 + "", 1575 + ""}));
 
-            Client.EndGameAction(GameActionTypeEnum.CREATE_GUILD);
+            Client.endGameAction(GameActionTypeEnum.CREATE_GUILD);
         }
 
     }

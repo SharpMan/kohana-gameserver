@@ -58,7 +58,7 @@ public class Algo {
             if (toDir == null) {
                 continue;
             }
-            FightCell randomCell = fight.GetCell(fight.Map.GetRandomAdjacentFreeCell(toDir.Id).Id);
+            FightCell randomCell = fight.GetCell(fight.Map.getRandomAdjacentFreeCell(toDir.Id).id);
             if (randomCell != null) {
                 if (!team1.contains(randomCell) && randomCell.IsWalkable()) {
                     team1.add(randomCell);
@@ -87,7 +87,7 @@ public class Algo {
             if (toDir == null) {
                 continue;
             }
-            FightCell randomCell = fight.GetCell(fight.Map.GetRandomAdjacentFreeCell(toDir.Id).Id);
+            FightCell randomCell = fight.GetCell(fight.Map.getRandomAdjacentFreeCell(toDir.Id).id);
             if (randomCell != null) {
                 if (!team1.contains(randomCell) && !team2.contains(randomCell) && randomCell.IsWalkable()) {
                     team2.add(randomCell);

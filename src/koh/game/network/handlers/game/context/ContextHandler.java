@@ -45,56 +45,56 @@ public class ContextHandler {
 
     @HandlerAttribute(ID = GameMapChangeOrientationRequestMessage.M_ID)
     public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client, GameMapChangeOrientationRequestMessage Message) {
-        if (Client.Character.GetFight() == null) {
-            Client.Character.Direction = Message.direction;
-            Client.Character.CurrentMap.sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.Character.ID, Client.Character.Direction)));
-            Main.Logs().writeDebug("New Direction for Actor " + Client.Character.ID + "~" + Message.direction);
+        if (Client.character.getFight() == null) {
+            Client.character.direction = Message.direction;
+            Client.character.currentMap.sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.character.ID, Client.character.direction)));
+            Main.Logs().writeDebug("New direction for actor " + Client.character.ID + "~" + Message.direction);
         }
     }
 
     @HandlerAttribute(ID = ShowCellRequestMessage.M_ID)
     public static void HandleShowCellRequestMessage(WorldClient Client, ShowCellRequestMessage Message) {
-        if (Client.Character.GetFighter() != null) {
-            Client.Character.GetFighter().ShowCell(Message.cellId, true);
+        if (Client.character.getFighter() != null) {
+            Client.character.getFighter().ShowCell(Message.cellId, true);
         }
         //Spectator
     }
 
     @HandlerAttribute(ID = GameContextReadyMessage.M_ID)
     public static void HandleGameContextReadyMessage(WorldClient Client, GameContextReadyMessage Message) {
-        if (Client.Character.GetFighter() != null) {
-            Client.AddGameAction(new GameFight(Client.Character.GetFighter(), Client.Character.GetFight()));
-            Client.Send(Client.Character.CurrentMap.GetMapComplementaryInformationsDataMessage(Client.Character));
-            Client.Character.GetFight().onReconnect((CharacterFighter) Client.Character.GetFighter());
+        if (Client.character.getFighter() != null) {
+            Client.addGameAction(new GameFight(Client.character.getFighter(), Client.character.getFight()));
+            Client.send(Client.character.currentMap.getMapComplementaryInformationsDataMessage(Client.character));
+            Client.character.getFight().onReconnect((CharacterFighter) Client.character.getFighter());
         }
     }
 
     @HandlerAttribute(ID = GameContextCreateRequestMessage.MESSAGE_ID)
     public static void HandleGameContextCreateRequestMessage(WorldClient Client, Message message) {
-        if (Client.Character.IsInWorld) {
-            PlayerController.SendServerMessage(Client, "You are already Logged !");
+        if (Client.character.isInWorld) {
+            PlayerController.sendServerMessage(Client, "You are already Logged !");
         } else {
-            Client.SequenceMessage(new GameContextDestroyMessage());
+            Client.sequenceMessage(new GameContextDestroyMessage());
 
-            Client.Send(new GameContextCreateMessage((byte) (Client.Character.GetFighter() == null ? 1 : 2)));
-            Client.Character.RefreshStats(false);
-            Client.Character.onLogged();
+            Client.send(new GameContextCreateMessage((byte) (Client.character.getFighter() == null ? 1 : 2)));
+            Client.character.refreshStats(false);
+            Client.character.onLogged();
         }
     }
 
     @HandlerAttribute(ID = ObjectDropMessage.MESSAGE_ID)
     public static void HandleObjectDropMessage(WorldClient Client, ObjectDropMessage Message) {
-        InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(Message.objectUID);
-        if (Item == null || Item.GetQuantity() < Message.quantity) {
-            Client.Send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
+        InventoryItem Item = Client.character.inventoryCache.itemsCache.get(Message.objectUID);
+        if (Item == null || Item.getQuantity() < Message.quantity) {
+            Client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
             return;
         } else if (Item.GetEffect(983) != null) {
-            Client.Send(new ObjectErrorMessage(ObjectErrorEnum.NOT_TRADABLE));
+            Client.send(new ObjectErrorMessage(ObjectErrorEnum.NOT_TRADABLE));
             return;
         }
-        if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            Client.Character.InventoryCache.UnEquipItem(Item);
-            Client.Character.RefreshStats();
+        if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+            Client.character.inventoryCache.unEquipItem(Item);
+            Client.character.refreshStats();
         }
 
         short cellID = -1;
@@ -102,62 +102,62 @@ public class ContextHandler {
         {
             switch (a) {
                 case 0:
-                    cellID = (short) (Client.Character.Cell.Id - 14);
+                    cellID = (short) (Client.character.cell.id - 14);
                     break;
                 case 1:
-                    cellID = (short) (Client.Character.Cell.Id - 14 + 1);
+                    cellID = (short) (Client.character.cell.id - 14 + 1);
                     break;
                 case 2:
-                    cellID = (short) (Client.Character.Cell.Id + 14 - 1);
+                    cellID = (short) (Client.character.cell.id + 14 - 1);
                     break;
                 case 3:
-                    cellID = (short) (Client.Character.Cell.Id + 14);
+                    cellID = (short) (Client.character.cell.id + 14);
                     break;
             }
-            DofusCell curcell = Client.Character.CurrentMap.getCell(cellID);
-            if (curcell.NonWalkableDuringRP() || Client.Character.CurrentMap.CellIsOccuped(cellID) || Client.Character.CurrentMap.HasActorOnCell(cellID)) {
+            DofusCell curcell = Client.character.currentMap.getCell(cellID);
+            if (curcell.nonWalkableDuringRP() || Client.character.currentMap.cellIsOccuped(cellID) || Client.character.currentMap.hasActorOnCell(cellID)) {
                 cellID = -1;
                 continue;
             }
             break;
         }
         if (cellID == -1 || Message.quantity <= 0) {
-            Client.Send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP_NO_PLACE));
+            Client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP_NO_PLACE));
             return;
         }
-        int newQua = Item.GetQuantity() - Message.quantity;
+        int newQua = Item.getQuantity() - Message.quantity;
         if (newQua <= 0) {
-            Client.Character.InventoryCache.RemoveItemFromInventory(Item);
+            Client.character.inventoryCache.removeItemFromInventory(Item);
             ItemTemplateDAOImpl.Update(Item, false, "character_items");
         } else {
-            Client.Character.InventoryCache.UpdateObjectquantity(Item, newQua);
-            Item = CharacterInventory.TryCreateItem(Item.TemplateId, null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
+            Client.character.inventoryCache.updateObjectquantity(Item, newQua);
+            Item = CharacterInventory.tryCreateItem(Item.TemplateId, null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
         }
 
-        Client.Character.CurrentMap.AddItem(cellID, Item);
-        Client.Send(new BasicNoOperationMessage());
+        Client.character.currentMap.addItem(cellID, Item);
+        Client.send(new BasicNoOperationMessage());
     }
 
     @HandlerAttribute(ID = MapInformationsRequestMessage.MESSAGE_ID)
     public static void HandleMapInformationsRequestMessage(WorldClient Client, Message message) {
-        //Client.SequenceMessage();
-        Client.Send(Client.Character.CurrentMap.GetMapComplementaryInformationsDataMessage(Client.Character));
-        Client.Character.CurrentMap.SendMapInfo(Client);
+        //client.sequenceMessage();
+        Client.send(Client.character.currentMap.getMapComplementaryInformationsDataMessage(Client.character));
+        Client.character.currentMap.sendMapInfo(Client);
 
     }
 
     @HandlerAttribute(ID = GameMapMovementCancelMessage.MESSAGE_ID)
     public static void HandleGameMapMovementCancelMessage(WorldClient Client, GameMapMovementCancelMessage Message) {
-        Client.AbortGameAction(GameActionTypeEnum.MAP_MOVEMENT, new Object[]{Message.cellId});
-        Client.EndGameAction(GameActionTypeEnum.MAP_MOVEMENT);
+        Client.abortGameAction(GameActionTypeEnum.MAP_MOVEMENT, new Object[]{Message.cellId});
+        Client.endGameAction(GameActionTypeEnum.MAP_MOVEMENT);
     }
 
     @HandlerAttribute(ID = GameMapMovementConfirmMessage.MESSAGE_ID)
     public static void HandleGameMapMovementConfirmMessage(WorldClient Client, GameMapMovementConfirmMessage message) {
         try {
-            Client.EndGameAction(GameActionTypeEnum.MAP_MOVEMENT);
-            Client.Send(new BasicNoOperationMessage());
-            Client.Character.CurrentMap.OnMouvementConfirmed(Client.Character);
+            Client.endGameAction(GameActionTypeEnum.MAP_MOVEMENT);
+            Client.send(new BasicNoOperationMessage());
+            Client.character.currentMap.onMouvementConfirmed(Client.character);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -169,39 +169,39 @@ public class ContextHandler {
 
         if (Message.keyMovements.length <= 0) {
             Main.Logs().writeError("Empty Path" + Client.getIP());
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.IsGameAction(GameActionTypeEnum.FIGHT)) {
-            MovementPath Path = Pathfinder.IsValidPath(Client.Character.GetFight(), Client.Character.GetFighter(), Client.Character.GetFighter().CellId(), Client.Character.GetFighter().Direction, Message.keyMovements);
+        if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            MovementPath Path = Pathfinder.IsValidPath(Client.character.getFight(), Client.character.getFighter(), Client.character.getFighter().CellId(), Client.character.getFighter().direction, Message.keyMovements);
             if (Path != null) {
-                if (Client.Character.GetFighter().Dead()) {
-                    Client.Send(new BasicNoOperationMessage());
-                    Client.Character.GetFight().EndTurn();
+                if (Client.character.getFighter().Dead()) {
+                    Client.send(new BasicNoOperationMessage());
+                    Client.character.getFight().EndTurn();
                     return;
                 }
-                GameMapMovement GameMovement = Client.Character.GetFight().TryMove(Client.Character.GetFighter(), Path);
+                GameMapMovement GameMovement = Client.character.getFight().TryMove(Client.character.getFighter(), Path);
 
                 if (GameMovement != null) {
-                    GameMovement.Execute();
+                    GameMovement.execute();
                 }
             }
             return;
         }
-        if (Client.Character.CurrentMap == null) {
-            Client.Send(new GameMapNoMovementMessage());
+        if (Client.character.currentMap == null) {
+            Client.send(new GameMapNoMovementMessage());
             PlayerController.SendServerErrorMessage(Client, "Votre map est absente veuillez le signalez au staff ");
-            Main.Logs().writeError("Map Absente " + Client.Character.toString());
+            Main.Logs().writeError("map Absente " + Client.character.toString());
             return;
         }
-        if (!Client.CanGameAction(GameActionTypeEnum.MAP_MOVEMENT)) {
-            Client.Send(new GameMapNoMovementMessage());
-            Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 12, new String[0]));
+        if (!Client.canGameAction(GameActionTypeEnum.MAP_MOVEMENT)) {
+            Client.send(new GameMapNoMovementMessage());
+            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 12, new String[0]));
             return;
         }
-        Client.AddGameAction(new GameMapMovement(Client.Character.CurrentMap, Client.Character, Message.keyMovements));
-        Client.Character.CurrentMap.sendToField(new GameMapMovementMessage(Message.keyMovements, Client.Character.ID));
+        Client.addGameAction(new GameMapMovement(Client.character.currentMap, Client.character, Message.keyMovements));
+        Client.character.currentMap.sendToField(new GameMapMovementMessage(Message.keyMovements, Client.character.ID));
     }
 
 }

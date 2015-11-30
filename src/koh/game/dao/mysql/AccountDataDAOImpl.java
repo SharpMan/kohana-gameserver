@@ -6,7 +6,7 @@ import java.sql.Statement;
 import java.util.List;
 
 import com.google.inject.Inject;
-import koh.game.MySQL;
+
 import static koh.game.MySQL.executeQuery;
 import static koh.game.entities.item.InventoryItem.DeserializeEffects;
 
@@ -37,20 +37,20 @@ public class AccountDataDAOImpl extends AccountDataDAO {
     public void save(AccountData data, Account account) {
         int i = 1;
         String query = "UPDATE `accounts_data` set ";
-        query = data.ColumsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);
+        query = data.columsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);
         query = StringUtil.removeLastChar(query);
         query += " WHERE id = ?;";
 
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement(query)) {
             PreparedStatement pStatement = conn.getStatement();
 
-            data.ColumsToUpdate.add("id");
-            for (String columnName : data.ColumsToUpdate) {
+            data.columsToUpdate.add("id");
+            for (String columnName : data.columsToUpdate) {
                 setValue(pStatement, columnName, i++, data);
             }
 
             pStatement.execute();
-            data.ColumsToUpdate.clear();
+            data.columsToUpdate.clear();
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
@@ -61,16 +61,16 @@ public class AccountDataDAOImpl extends AccountDataDAO {
         try {
             switch (Column) {
                 case "id":
-                    p.setInt(Seq, Item.Id);
+                    p.setInt(Seq, Item.id);
                     break;
                 case "kamas":
-                    p.setLong(Seq, Item.Kamas);
+                    p.setLong(Seq, Item.kamas);
                     break;
                 case "friends":
-                    p.setBytes(Seq, Item.SerializeFriends());
+                    p.setBytes(Seq, Item.serializeFriends());
                     break;
                 case "ignored":
-                    p.setBytes(Seq, Item.SerializeIgnored());
+                    p.setBytes(Seq, Item.serializeIgnored());
                     break;
                 case "spouse":
                     p.setBytes(Seq, null);
@@ -103,20 +103,20 @@ public class AccountDataDAOImpl extends AccountDataDAO {
             if(result.first()) {
                 return new AccountData() {
                     {
-                        Id = result.getInt("id");
-                        Kamas = (int) result.getLong("kamas");
-                        Friends = AccountData.FriendContact.Deserialize(result.getBytes("friends"));
-                        Ignored = AccountData.IgnoredContact.Deserialize(result.getBytes("ignored"));
-                        Spouse = null;
+                        id = result.getInt("id");
+                        kamas = (int) result.getLong("kamas");
+                        friends = AccountData.FriendContact.deserialize(result.getBytes("friends"));
+                        ignored = AccountData.IgnoredContact.deserialize(result.getBytes("ignored"));
+                        spouse = null;
                         friend_warn_on_login = result.getBoolean("friend_warn_on_login");
                         friend_warn_on_level_gain = result.getBoolean("friend_warn_on_level_gain");
                         guild_warn_on_login = result.getBoolean("guild_warn_on_login");
 
                         try (Statement statement = conn.getConnection().createStatement()) {
-                            ResultSet result = statement.executeQuery("SELECT * from storage_items where owner =" + Id + ";");
+                            ResultSet result = statement.executeQuery("SELECT * from storage_items where owner =" + id + ";");
                             while (result.next()) {
                                 List<ObjectEffect> effects = DeserializeEffects(result.getBytes("effects"));
-                                ItemsCache.put(result.getInt("id"), InventoryItem.Instance(
+                                itemscache.put(result.getInt("id"), InventoryItem.getInstance(
                                         result.getInt("id"),
                                         result.getInt("template"),
                                         result.getInt("position"),
@@ -134,19 +134,19 @@ public class AccountDataDAOImpl extends AccountDataDAO {
             } else {
                 return new AccountData() {
                     {
-                        Id = id;
-                        Kamas = 0;
-                        Friends = new FriendContact[0];
-                        Ignored = new IgnoredContact[0];
+                        id = id;
+                        kamas = 0;
+                        friends = new FriendContact[0];
+                        ignored = new IgnoredContact[0];
                         friend_warn_on_login = true;
                         friend_warn_on_level_gain = true;
                         guild_warn_on_login = true;
 
                         try(PreparedStatement pStatement = conn.getConnection().prepareStatement(SAVE_ACCOUNT_DATA)) {
-                            pStatement.setInt(1, Id);
+                            pStatement.setInt(1, id);
                             pStatement.setLong(2, 0);
-                            pStatement.setBytes(3, this.SerializeFriends());
-                            pStatement.setBytes(4, this.SerializeIgnored());
+                            pStatement.setBytes(3, this.serializeFriends());
+                            pStatement.setBytes(4, this.serializeIgnored());
                             pStatement.setBytes(5, null);
                             pStatement.setBoolean(6, friend_warn_on_login);
                             pStatement.setBoolean(7, friend_warn_on_level_gain);

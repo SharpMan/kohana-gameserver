@@ -16,14 +16,14 @@ public class StatusHandler {
     @HandlerAttribute(ID = PlayerStatusUpdateRequestMessage.MESSAGE_ID)
     public static void HandlePlayerStatusUpdateRequestMessage(WorldClient Client, PlayerStatusUpdateRequestMessage Message) {
         if (PlayerStatusEnum.valueOf(Message.status.statusId) == null) {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.Character.Status = PlayerStatusEnum.valueOf(Message.status.statusId);
-        if (Client.Character.GetFight() != null) {
-            Client.Character.GetFight().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().ID, Client.Character.ID, Message.status));
+        Client.character.status = PlayerStatusEnum.valueOf(Message.status.statusId);
+        if (Client.character.getFight() != null) {
+            Client.character.getFight().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.ID, Message.status));
         } else {
-            Client.Character.CurrentMap.sendToField(new PlayerStatusUpdateMessage(Client.getAccount().ID, Client.Character.ID, Message.status));
+            Client.character.currentMap.sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.ID, Message.status));
         }
     }
 

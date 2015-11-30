@@ -22,7 +22,7 @@ public class MountDAO {
     public static int FindAll() {
         try {
             int i = 0;
-            ResultSet RS = MySQL.executeQuery("SELECT * from mount_templates", Settings.GetStringElement("Database.Name"), 0);
+            ResultSet RS = MySQL.executeQuery("SELECT * from mount_templates", Settings.GetStringElement("Database.name"), 0);
 
             while (RS.next()) {
                 Cache.put(RS.getInt("scroll_id"), new MountTemplate() {

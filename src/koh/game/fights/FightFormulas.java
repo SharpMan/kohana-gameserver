@@ -45,8 +45,8 @@ public class FightFormulas {
         double num2 = (double) Lossers.mapToInt(x -> x.Level()).sum();
         double num3 = Math.floor(Math.sqrt((double) Fighter.Level()) * 10.0 * (num2 / num1));
         if (isLosser) {
-            if (num3 > ((CharacterFighter) Fighter).Character.Honor) {
-                num3 = -(short) ((CharacterFighter) Fighter).Character.Honor;
+            if (num3 > ((CharacterFighter) Fighter).Character.honor) {
+                num3 = -(short) ((CharacterFighter) Fighter).Character.honor;
             } else {
                 num3 = -num3;
             }
@@ -68,9 +68,9 @@ public class FightFormulas {
         if (rapport >= 1.0F) {
             malus = 1;
         }
-        long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) * (1 + (Fighter.Stats.GetTotal(StatsEnum.Wisdom) * 0.01)));
+        long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) * (1 + (Fighter.Stats.getTotal(StatsEnum.Wisdom) * 0.01)));
         if (xpWin < 0) {
-            Main.Logs().writeInfo("lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.Stats.GetTotal(StatsEnum.Wisdom) * 0.01)));
+            Main.Logs().writeInfo("lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.Stats.getTotal(StatsEnum.Wisdom) * 0.01)));
         }
         return xpWin;
     }
@@ -83,13 +83,13 @@ public class FightFormulas {
         if (Fighter.Character == null) {
             return 0;
         }
-        if (Fighter.Character.Guild == null) {
+        if (Fighter.Character.guild == null) {
             return 0;
         }
 
-        GuildMember gm = Fighter.Character.GuildMember();
+        GuildMember gm = Fighter.Character.getGuildMember();
 
-        double xp = (double) xpWin.get(), Lvl = Fighter.Level(), LvlGuild = Fighter.Character.Guild.Entity.Level, pXpGive = (double) gm.experienceGivenPercent / 100;
+        double xp = (double) xpWin.get(), Lvl = Fighter.Level(), LvlGuild = Fighter.Character.guild.Entity.Level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
         double maxP = xp * pXpGive * 0.10;	//Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
         double diff = Math.abs(Lvl - LvlGuild);	//Calcul l'écart entre le niveau du personnage et le niveau de la guilde
@@ -106,7 +106,7 @@ public class FightFormulas {
         }
         xpWin.set((long) (xp - xp * pXpGive));
 
-        Fighter.Character.Guild.onFighterAddedExperience(gm, (long) Math.round(toGuild));
+        Fighter.Character.guild.onFighterAddedExperience(gm, (long) Math.round(toGuild));
 
         return (long) Math.round(toGuild);
     }
@@ -115,18 +115,18 @@ public class FightFormulas {
         if (Fighter == null) {
             return 0;
         }
-        if (Fighter.Character.MountInfo == null) {
-            Main.Logs().writeError("MountInfo Null " + Fighter.Character.toString());
+        if (Fighter.Character.mountInfo == null) {
+            Main.Logs().writeError("mountInfo Null " + Fighter.Character.toString());
         }
-        if (!Fighter.Character.MountInfo.isToogled) {
+        if (!Fighter.Character.mountInfo.isToogled) {
             return 0;
         }
 
-        int diff = Math.abs(Fighter.Level() - Fighter.Character.MountInfo.Mount.level);
+        int diff = Math.abs(Fighter.Level() - Fighter.Character.mountInfo.mount.level);
 
         double coeff = 0;
         double xp = (double) xpWin.get();
-        double pToMount = (double) Fighter.Character.MountInfo.Ratio / 100 + 0.2;
+        double pToMount = (double) Fighter.Character.mountInfo.ratio / 100 + 0.2;
 
         if (diff >= 0 && diff <= 9) {
             coeff = 0.1;
@@ -150,10 +150,10 @@ public class FightFormulas {
             xpWin.set((long) (xp - (xp * (pToMount - 0.2))));
         }
 
-        Fighter.Character.MountInfo.addExperience((long) Math.round(xp * pToMount * coeff));
+        Fighter.Character.mountInfo.addExperience((long) Math.round(xp * pToMount * coeff));
 
         if (xp > 0) {
-            Fighter.Character.Send(new MountSetMessage(Fighter.Character.MountInfo.Mount));
+            Fighter.Character.send(new MountSetMessage(Fighter.Character.mountInfo.mount));
         }
 
         return (long) Math.round(xp * pToMount * coeff);
@@ -170,7 +170,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeWinner += ((CharacterFighter) fighter).Character.AlignmentGrade;
+                    TotalGradeWinner += ((CharacterFighter) fighter).Character.alignmentGrade;
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
@@ -182,7 +182,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeLooser += ((CharacterFighter) fighter).Character.AlignmentGrade;
+                    TotalGradeLooser += ((CharacterFighter) fighter).Character.alignmentGrade;
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
@@ -210,7 +210,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeWinner += ((CharacterFighter) fighter).Character.AlignmentGrade;
+                    TotalGradeWinner += ((CharacterFighter) fighter).Character.alignmentGrade;
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
@@ -222,7 +222,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeLooser += ((CharacterFighter) fighter).Character.AlignmentGrade;
+                    TotalGradeLooser += ((CharacterFighter) fighter).Character.alignmentGrade;
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/

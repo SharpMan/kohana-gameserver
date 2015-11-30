@@ -23,6 +23,6 @@ public class SexCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.Sexe, this.Sex);
+        return this.Compare((Comparable<Integer>) character.sexe, this.Sex);
     }
 }

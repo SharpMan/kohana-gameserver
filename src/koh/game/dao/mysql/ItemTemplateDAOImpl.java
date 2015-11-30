@@ -174,7 +174,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                     {
                         id = result.getInt("id");
                         this.nameId = result.getString("name");
-                        this.TypeId = result.getInt("type_id");
+                        this.typeId = result.getInt("type_id");
                         this.iconId = result.getInt("icon_id");
                         this.level = result.getInt("level");
                         this.realWeight = result.getInt("real_weight");
@@ -247,7 +247,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                     {
                         id = result.getInt("id");
                         this.nameId = result.getString("name");
-                        this.TypeId = result.getInt("type_id");
+                        this.typeId = result.getInt("type_id");
                         this.iconId = result.getInt("icon_id");
                         this.level = result.getInt("level");
                         this.realWeight = result.getInt("real_weight");

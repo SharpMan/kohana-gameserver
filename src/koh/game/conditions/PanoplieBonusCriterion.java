@@ -28,6 +28,6 @@ public class PanoplieBonusCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.InventoryCache.ItemSetCount(), this.PanoplieCount);
+        return this.Compare((Comparable<Integer>) character.inventoryCache.getItemSetCount(), this.PanoplieCount);
     }
 }

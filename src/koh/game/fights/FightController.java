@@ -43,7 +43,7 @@ public class FightController {
         this.myFights.stream().filter((Fight) -> (Fight.FightState == FightState.STATE_PLACE)).forEach((Fight) -> {
             Fight.SendFightFlagInfos(Client);
         });
-        Client.Send(new MapFightCountMessage(this.myFights.size()));
+        Client.send(new MapFightCountMessage(this.myFights.size()));
     }
 
     public void AddFight(Fight Fight) {

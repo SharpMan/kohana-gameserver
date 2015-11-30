@@ -9,11 +9,11 @@ import koh.utils.Couple;
  */
 public class JobGatheringInfos {
 
-    public HashMap<Integer, Couple<Integer, Integer>> GatheringByLevel = new HashMap<>(); //@Param1 =Level , @Param2 = <Min,Max>
+    public HashMap<Integer, Couple<Integer, Integer>> gatheringByLevel = new HashMap<>(); //@Param1 =level , @Param2 = <Min,Max>
     public int bonusMin, bonusMax, xpEarned;
 
-    public Couple<Integer, Integer> LevelMinMax(int currentLevel) {
-        return this.GatheringByLevel.get(this.GatheringByLevel.keySet().stream().filter(x -> currentLevel >= x).mapToInt(x -> x).max().getAsInt());
+    public Couple<Integer, Integer> levelMinMax(int currentLevel) {
+        return this.gatheringByLevel.get(this.gatheringByLevel.keySet().stream().filter(x -> currentLevel >= x).mapToInt(x -> x).max().getAsInt());
     }
 
     public Couple<Integer, Integer> toCouple(String content) {

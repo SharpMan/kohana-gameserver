@@ -10,30 +10,30 @@ import koh.game.entities.actors.Player;
  */
 public class NpcReply {
 
-    public String Type;
-    public int ReplyID;
-    public String Criteria;
-    public String[] Parameters;
+    public String type;
+    public int replyID;
+    public String criteria;
+    public String[] parameters;
 
     private ConditionExpression m_criteriaExpression;
 
-    public ConditionExpression CriteriaExpression() {
+    public ConditionExpression getCriteriaExpression() {
         if (m_criteriaExpression == null) {
-            if (Strings.isNullOrEmpty(Criteria) || this.Criteria.equalsIgnoreCase("null")) {
+            if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                 return null;
             } else {
-                this.m_criteriaExpression = ConditionExpression.Parse(this.Criteria);
+                this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
             }
         }
         return m_criteriaExpression;
     }
 
-    public boolean AreConditionFilled(Player character) {
+    public boolean areConditionFilled(Player character) {
         try {
-            if (this.CriteriaExpression() == null) {
+            if (this.getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.CriteriaExpression().Eval(character);
+                return this.getCriteriaExpression().Eval(character);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,8 +41,8 @@ public class NpcReply {
         }
     }
 
-    public boolean Execute(Player p) {
-        return AreConditionFilled(p);
+    public boolean execute(Player p) {
+        return areConditionFilled(p);
     }
 
 }

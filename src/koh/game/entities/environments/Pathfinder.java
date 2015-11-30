@@ -1,7 +1,7 @@
 package koh.game.entities.environments;
 
 import java.util.ArrayList;
-import koh.game.Main;
+
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.fights.Fight;
 import koh.game.fights.FightTeam;
@@ -11,7 +11,6 @@ import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -87,13 +86,13 @@ public class Pathfinder {
 
             ActualCell = (short) Pathfinder.NextCell(ActualCell, Direction);
 
-            if (!Fight.Map.getCell(ActualCell).Walakable()) {
+            if (!Fight.Map.getCell(ActualCell).walakable()) {
                 return -2;
             }
 
             if (Fight.GetFighterOnCell(ActualCell) != null) {
                 if (i == 0) {
-                    Fighter.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 276));
+                    Fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 276));
                 }
                 return -2;
             }
@@ -113,7 +112,7 @@ public class Pathfinder {
     public static boolean IsStopCell(Fight Fight, FightTeam Team, short CellId, Fighter Fighter) {
         // Un piege etc ?
         if (Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_TRAP) || Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_BOMB) || Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-            //Fight.GetCell(CellId).GetObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
+            //fight.GetCell(CellId).GetObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
             return true;
         }
         if (Team != null) {
@@ -257,7 +256,7 @@ public class Pathfinder {
 
             ActualCell = (short) Pathfinder.NextCell(ActualCell, Direction);
 
-            if (!Fight.Map.getCell(ActualCell).Walakable()) {
+            if (!Fight.Map.getCell(ActualCell).walakable()) {
                 return null;
             }
 

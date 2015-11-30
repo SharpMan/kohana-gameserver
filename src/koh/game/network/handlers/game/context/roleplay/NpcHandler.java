@@ -22,51 +22,51 @@ public class NpcHandler {
 
     @HandlerAttribute(ID = NpcDialogReplyMessage.MESSAGE_ID)
     public static void HandleNpcDialogReplyMessage(WorldClient Client, NpcDialogReplyMessage Message) {
-        if (!Client.IsGameAction(GameActionTypeEnum.NPC_DAILOG)) {
-            Client.Send(new BasicNoOperationMessage());
+        if (!Client.isGameAction(GameActionTypeEnum.NPC_DAILOG)) {
+            Client.send(new BasicNoOperationMessage());
             return;
         }
-        ((NpcDialog) Client.GetGameAction(GameActionTypeEnum.NPC_DAILOG)).Reply(Message.replyId);
+        ((NpcDialog) Client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).reply(Message.replyId);
 
     }
 
     /*LeaveDialogRequestMessage*/
     @HandlerAttribute(ID = NpcGenericActionRequestMessage.MESSAGE_ID)
     public static void HandleNpcGenericActionRequestMessage(WorldClient Client, NpcGenericActionRequestMessage Message) {
-        Npc PNJ = Client.Character.CurrentMap.GetNpc(Message.npcId);
+        Npc PNJ = Client.character.currentMap.getNpc(Message.npcId);
         if (PNJ == null) {
-            Client.Send(new BasicNoOperationMessage());
+            Client.send(new BasicNoOperationMessage());
             throw new Error("Le pnj " + Message.npcId + " est absent");
         }
         // ExchangeStartedBidBuyerMessage
         //ExchangeTypesExchangerDescriptionForUserMessage
-        if (Client.IsGameAction(GameActionTypeEnum.EXCHANGE)) {
-            PlayerController.SendServerMessage(Client, "You're always in a exchange...");
+        if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
+            PlayerController.sendServerMessage(Client, "You're always in a exchange...");
             return;
         }
         final NpcActionTypeEnum Action = NpcActionTypeEnum.valueOf(Message.npcActionId);
         if (Action == null) {
-            Main.Logs().writeError(String.format("Unknow Action %s by character %s", Byte.toString(Message.npcActionId), Client.Character.NickName));
+            Main.Logs().writeError(String.format("Unknow action %s by character %s", Byte.toString(Message.npcActionId), Client.character.nickName));
             return;
-        } else if (!ArrayUtils.contains(PNJ.Template().actions, Message.npcActionId)) {
-            PlayerController.SendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
+        } else if (!ArrayUtils.contains(PNJ.getTemplate().actions, Message.npcActionId)) {
+            PlayerController.sendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
             return;
         }
         switch (Action) {
             case ACTION_BUY_SELL:
-                if (Client.CanGameAction(GameActionTypeEnum.EXCHANGE)) {
+                if (Client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
                     Client.myExchange = new NpcExchange(Client, PNJ);
-                    Client.AddGameAction(new GameExchange(Client.Character, Client.myExchange));
-                    Client.Send(new ExchangeStartOkNpcShopMessage(PNJ.ID, PNJ.Template().CommonTokenId(), PNJ.Template().GetItems()));
+                    Client.addGameAction(new GameExchange(Client.character, Client.myExchange));
+                    Client.send(new ExchangeStartOkNpcShopMessage(PNJ.ID, PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems()));
                 }
                 break;
             case ACTION_TALK:
-                if (Client.CanGameAction(GameActionTypeEnum.NPC_DAILOG)) {
-                    Client.AddGameAction(new NpcDialog(PNJ, Client.Character));
+                if (Client.canGameAction(GameActionTypeEnum.NPC_DAILOG)) {
+                    Client.addGameAction(new NpcDialog(PNJ, Client.character));
                 }
                 break;
             default:
-                PlayerController.SendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
+                PlayerController.sendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
                 return;
         }
 

@@ -8,7 +8,7 @@ public class LearnableSpell {
     
     public int ID;
     public int Spell;
-    public int ObtainLevel;
+    public int obtainLevel;
     public int BreedID;
     
 }

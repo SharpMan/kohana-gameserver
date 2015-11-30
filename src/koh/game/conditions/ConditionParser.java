@@ -67,7 +67,7 @@ public class ConditionParser {
                 BoolOperatorEnum operator = BoolOperator.TryGetOperator(this.Str.charAt(length));
                 if (operator != null) {
                     if (length + 1 >= this.Str.length()) {
-                        throw new Error(String.format("Cannot parse {0} :  Right Expression of bool operator index {1} is empty", this.Str, length));
+                        throw new Error(String.format("Cannot parse {0} :  right Expression of bool operator index {1} is empty", this.Str, length));
                     }
                     String s1 = this.Str.substring(0, length);
                     if (Strings.isNullOrEmpty(s1)) {
@@ -76,7 +76,7 @@ public class ConditionParser {
                     ConditionExpression left = new ConditionParser(s1).Parse();
                     String s2 = this.Str.toString().substring(length + 1, (length + 1)+this.Str.length() - (length + 1));
                     if (Strings.isNullOrEmpty(s2)) {
-                        throw new Error(String.format("Cannot parse {0} : Right Expression of bool operator index {1} is empty", this.Str, length));
+                        throw new Error(String.format("Cannot parse {0} : right Expression of bool operator index {1} is empty", this.Str, length));
                     }
                     ConditionExpression right = new ConditionParser(s2).Parse();
                     return (ConditionExpression) new BoolOperator(left, right, operator);
@@ -140,7 +140,7 @@ public class ConditionParser {
                 ComparaisonOperatorEnum operator = Criterion.TryGetOperator(this.Str.charAt(length));
                 if (operator != null) {
                     if (length + 1 >= this.Str.length()) {
-                        throw new Error(String.format("Cannot parse {0} :  Right Expression of comparaison operator index {1} is empty", this.Str, length));
+                        throw new Error(String.format("Cannot parse {0} :  right Expression of comparaison operator index {1} is empty", this.Str, length));
                     }
                     String name = this.Str.toString().substring(0, length);
                     if (Strings.isNullOrEmpty(name)) {
@@ -150,7 +150,7 @@ public class ConditionParser {
                     String str = this.Str.toString().substring(length + 1, (length + 1)+this.Str.length() - (length + 1));
                     
                     if (Strings.isNullOrEmpty(str)) {
-                        throw new Error(String.format("Cannot parse {0} : Right Expression of comparaison operator index {1} is empty", this.Str, length));
+                        throw new Error(String.format("Cannot parse {0} : right Expression of comparaison operator index {1} is empty", this.Str, length));
                     }
                     criterionByName.Literal = str;
                     criterionByName.Operator = operator;

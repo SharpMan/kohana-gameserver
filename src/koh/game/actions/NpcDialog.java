@@ -29,71 +29,71 @@ public class NpcDialog extends GameAction {
         this.NPC = Pnj;
     }
 
-    public void ChangeMessage(int id, int pos) {
+    public void changeMessage(int id, int pos) {
         NpcMessage Message = null;
         try {
-            Message = NpcDAOImpl.messages.get(this.NPC.Template().getDialogMessage(id, pos)).GetMessage((Player) this.Actor);
+            Message = NpcDAOImpl.messages.get(this.NPC.getTemplate().getDialogMessage(id, pos)).getMessage((Player) this.actor);
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (Message == null) {
-            PlayerController.SendServerMessage(this.GetClient(), "Discours de Pnj Introuvable ...");
+            PlayerController.sendServerMessage(this.getClient(), "Discours de Pnj Introuvable ...");
             try {
-                this.GetClient().EndGameAction(this.ActionType);
+                this.getClient().endGameAction(this.actionType);
             } catch (Exception e) {
             }
             return;
         }
-        Actor.Send(new NpcDialogQuestionMessage(Message.Id, Message.GetParameters((Player) this.Actor), Message.Replies != null ? Message.Replies : this.NPC.Template().GetReply(id)));
+        actor.send(new NpcDialogQuestionMessage(Message.id, Message.getParameters((Player) this.actor), Message.replies != null ? Message.replies : this.NPC.getTemplate().getReply(id)));
     }
 
-    public void ChangeMessage(NpcMessage Message) {
+    public void changeMessage(NpcMessage Message) {
         if (Message == null) {
             try {
-                this.GetClient().EndGameAction(this.ActionType);
+                this.getClient().endGameAction(this.actionType);
             } catch (Exception e) {
             }
             return;
         }
-        Actor.Send(new NpcDialogQuestionMessage(Message.Id, Message.Parameters, Message.Replies != null ? Message.Replies : this.NPC.Template().GetReply(this.NPC.Template().GetMessageOffset(Message.Id))));
+        actor.send(new NpcDialogQuestionMessage(Message.id, Message.parameters, Message.replies != null ? Message.replies : this.NPC.getTemplate().getReply(this.NPC.getTemplate().getMessageOffset(Message.id))));
     }
 
-    public void Reply(int rep) {
-        NpcReply[] Stream = NpcDAOImpl.replies.stream().filter(x -> x.ReplyID == rep).toArray(NpcReply[]::new);
+    public void reply(int rep) {
+        NpcReply[] Stream = NpcDAOImpl.replies.stream().filter(x -> x.replyID == rep).toArray(NpcReply[]::new);
         if (!Arrays.stream(Stream).anyMatch(x -> x instanceof TalkReply)) {
-            this.GetClient().EndGameAction(GameActionTypeEnum.NPC_DAILOG);
+            this.getClient().endGameAction(GameActionTypeEnum.NPC_DAILOG);
         }
         for (NpcReply x : Stream) {
-            x.Execute(((Player) Actor));
+            x.execute(((Player) actor));
         }
         if (Stream.length == 0) {
             Main.Logs().writeDebug("Undefinied reponse " + rep);
-            PlayerController.SendServerMessage(((Player) Actor).Client, "Ce discours n'est pas encore parametré...");
+            PlayerController.sendServerMessage(((Player) actor).client, "Ce discours n'est pas encore parametré...");
         }
 
     }
 
     @Override
-    public void Execute() {
-        this.Actor.Send(new NpcDialogCreationMessage(NPC.Cell.Map.Id, NPC.ID));
-        this.ChangeMessage(0, 0);
-        super.Execute();
+    public void execute() {
+        this.actor.send(new NpcDialogCreationMessage(NPC.cell.map.id, NPC.ID));
+        this.changeMessage(0, 0);
+        super.execute();
     }
 
     @Override
-    public void Abort(Object[] Args) {
-        super.Abort(Args);
+    public void abort(Object[] Args) {
+        super.abort(Args);
 
     }
 
     @Override
-    public void EndExecute() throws Exception {
-        Actor.Send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_DIALOG));
-        super.EndExecute();
+    public void endExecute() throws Exception {
+        actor.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_DIALOG));
+        super.endExecute();
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         return false;
     }
 

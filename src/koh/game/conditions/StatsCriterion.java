@@ -62,12 +62,12 @@ public class StatsCriterion extends Criterion {
     public boolean Eval(Player character) {
 
         if (this.Field != null) {
-            return this.Compare((Comparable<Integer>) (this.Base ? character.Stats.GetBase(Field) : character.Stats.GetTotal(Field)), this.Comparand);
+            return this.Compare((Comparable<Integer>) (this.Base ? character.stats.getBase(Field) : character.stats.getTotal(Field)), this.Comparand);
         }
-        //return this.Compare<Integer>((Comparable<Integer>) (this.Base ? character.Stats.GetBase(Field) : character.Stats.GetTotal(Field)), this.Comparand);
+        //return this.Compare<Integer>((Comparable<Integer>) (this.Base ? character.stats.getBase(Field) : character.stats.getTotal(Field)), this.Comparand);
         switch (this.Identifier) {
             case "Ce":
-                return this.Compare((Comparable<Integer>) character.Energy, this.Comparand);
+                return this.Compare((Comparable<Integer>) character.energy, this.Comparand);
             case "CE":
                 //return this.Compare((Comparable<Integer>) character.EnergyMax, (Short) this.Comparand);
                 return true;

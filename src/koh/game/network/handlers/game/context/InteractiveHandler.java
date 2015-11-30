@@ -21,26 +21,26 @@ public class InteractiveHandler {
 
     @HandlerAttribute(ID = InteractiveUseRequestMessage.MESSAGE_ID)
     public static void HandleInteractiveUseRequestMessage(WorldClient Client, InteractiveUseRequestMessage Message) {
-        if (!Client.CanGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT)) {
-            Client.Send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
+        if (!Client.canGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT)) {
+            Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
-        InteractiveElementStruct Element = Client.Character.CurrentMap.GetInteractiveElementStruct(Message.elemId);
+        InteractiveElementStruct Element = Client.character.currentMap.getInteractiveElementStruct(Message.elemId);
         if (Element == null) {
-            Client.Send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
+            Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
         InteractiveElementSkill Skill = Element.GetSkill(Message.skillInstanceUid);
         if (Skill == null) {
-            Client.Send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
+            Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
 
-        Client.AddGameAction(new InteractiveElementAction(Client.Character, Skill, Message.elemId));
+        Client.addGameAction(new InteractiveElementAction(Client.character, Skill, Message.elemId));
 
         try {
-            if (InteractiveElementAction.Handlers.get(InteractiveActionEnum.valueOf(Skill.skillId)) != null && InteractiveElementAction.Handlers.get(InteractiveActionEnum.valueOf(Skill.skillId)).GetDuration() == 0) {
-                Client.EndGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
+            if (InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(Skill.skillId)) != null && InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(Skill.skillId)).getDuration() == 0) {
+                Client.endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -50,7 +50,7 @@ public class InteractiveHandler {
     @HandlerAttribute(ID = InteractiveUseEndedMessage.MESSAGE_ID)
     public static void HandleInteractiveUseEndedMessage(WorldClient Client, InteractiveUseEndedMessage Message) {
         try {
-            Client.EndGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
+            Client.endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -59,12 +59,12 @@ public class InteractiveHandler {
 
     @HandlerAttribute(ID = TeleportRequestMessage.MESSAGE_ID)
     public static void HandleTeleportRequestMessage(WorldClient Client, TeleportRequestMessage Message) {
-        if (!Client.IsGameAction(GameActionTypeEnum.ZAAP)) {
-            Client.Send(new BasicNoOperationMessage());
+        if (!Client.isGameAction(GameActionTypeEnum.ZAAP)) {
+            Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.AbortGameAction(GameActionTypeEnum.ZAAP, new Object[]{Message.mapId});
-        Client.DelGameAction(GameActionTypeEnum.ZAAP);
+        Client.abortGameAction(GameActionTypeEnum.ZAAP, new Object[]{Message.mapId});
+        Client.delGameAction(GameActionTypeEnum.ZAAP);
     }
 
 }

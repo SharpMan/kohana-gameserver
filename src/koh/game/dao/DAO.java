@@ -2,7 +2,7 @@ package koh.game.dao;
 
 import com.google.inject.Inject;
 import koh.game.dao.api.*;
-import koh.game.dao.mysql.PlayerDAO;
+import koh.game.dao.mysql.PlayerDAOImpl;
 import lombok.Getter;
 
 public class DAO {
@@ -23,7 +23,7 @@ public class DAO {
     private static MonsterDAO monsters;
 
     @Inject @Getter
-    private static PlayerDAO players;
+    private static PlayerDAOImpl players;
 
     @Inject @Getter
     private static PaddockDAO paddocks;
@@ -36,5 +36,14 @@ public class DAO {
 
     @Inject @Getter
     private static ItemTemplateDAO itemTemplates;
+
+    @Inject @Getter
+    private static MapDAO maps;
+
+    @Inject @Getter
+    private static SpellDAO spells;
+
+    @Inject @Getter
+    private static D2oDAO d2oTemplates;
 
 }

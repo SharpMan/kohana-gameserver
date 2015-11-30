@@ -75,7 +75,7 @@ public class ExpDAOImpl extends ExpDAO {
         if (level < 1)
             level = 1;
 
-        return ExpLevels.get(level).Player;
+        return ExpLevels.get(level).player;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ExpDAOImpl extends ExpDAO {
         if (level <= 1)
             level = 1;
 
-        return ExpLevels.get(++level).Player;
+        return ExpLevels.get(++level).player;
     }
 
     @Override

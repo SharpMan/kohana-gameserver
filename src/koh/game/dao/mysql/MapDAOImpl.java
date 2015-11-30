@@ -3,6 +3,7 @@ package koh.game.dao.mysql;
 import com.google.inject.Inject;
 import koh.game.Main;
 import koh.game.MySQL;
+import koh.game.dao.DAO;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.MapDAO;
 import koh.game.entities.environments.*;
@@ -17,6 +18,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Neo-Craft
@@ -53,6 +55,28 @@ public class MapDAOImpl extends MapDAO {
         return dofusMaps.size();
     }
 
+    @Override
+    public DofusZaap getZaap(int id){
+        return this.zaaps.get(id);
+    }
+
+    @Override
+    public int getZaapsLength()
+    {
+        return this.zaaps.size();
+    }
+
+    @Override
+    public Stream<Map.Entry<Integer,DofusZaap>> getZaapsNot(int id){
+        return zaaps.entrySet().stream().filter(zaap -> zaap.getValue().Mapid != id);
+    }
+
+    @Override
+    public ArrayList<DofusZaap> getSubway(int id){
+        return subWays.get(id);
+    }
+
+    @Override
     public DofusZaap findSubWay(int sub, int mapid) {
         return subWays.get(sub).stream().filter(x -> x.Mapid == mapid).findFirst().orElse(null);
     }
@@ -64,11 +88,11 @@ public class MapDAOImpl extends MapDAO {
 
             while (result.next()) {
                 try {
-                    if (subWays.get(AreaDAOImpl.SubAreas.get(result.getInt("subarea")).area.id) == null) {
-                        subWays.put(AreaDAOImpl.SubAreas.get(result.getInt("subarea")).area.id, new ArrayList<>());
+                    if (subWays.get(DAO.getAreas().getSubArea(result.getInt("subarea")).area.id) == null) {
+                        subWays.put(DAO.getAreas().getSubArea(result.getInt("subarea")).area.id, new ArrayList<>());
                     }
 
-                    subWays.get(AreaDAOImpl.SubAreas.get(result.getInt("subarea")).area.id).add(new DofusZaap() {
+                    subWays.get(DAO.getAreas().getSubArea(result.getInt("subarea")).area.id).add(new DofusZaap() {
                         {
                             this.Mapid = result.getInt("mapid");
                             this.Cell = result.getShort("cell");
@@ -128,7 +152,7 @@ public class MapDAOImpl extends MapDAO {
                         }
                     };
                 } catch (Exception e) {
-                    logger.warn("Map {} trigger null", result.getInt("map"));
+                    logger.warn("map {} trigger null", result.getInt("map"));
                 }
                 i++;
             }
@@ -156,7 +180,7 @@ public class MapDAOImpl extends MapDAO {
                         }
                     });
                 } catch (Exception e) {
-                    Main.Logs().writeError("Map " + result.getInt("map") + " Door nulled");
+                    Main.Logs().writeError("map " + result.getInt("map") + " Door nulled");
                 }
                 i++;
             }
@@ -174,7 +198,7 @@ public class MapDAOImpl extends MapDAO {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                dofusMaps.get(result.getInt("map")).Houses.add(new HouseInformations() {
+                dofusMaps.get(result.getInt("map")).houses.add(new HouseInformations() {
                     {
                         this.doorsOnMap = new int[result.getString("doors_on_map").split(",").length];
                         for (int i = 0; i < result.getString("doors_on_map").split(",").length; i++) {
@@ -202,9 +226,9 @@ public class MapDAOImpl extends MapDAO {
             ResultSet result = conn.getResult();
             while (result.next()) {
                 try {
-                    dofusMaps.get(result.getInt("map")).ElementsStated = ArrayUtils.add(dofusMaps.get(result.getInt("map")).ElementsStated, new StatedElement(result.getInt("element_id"), result.getShort("element_cell"), 0));
+                    dofusMaps.get(result.getInt("map")).elementsStated = ArrayUtils.add(dofusMaps.get(result.getInt("map")).elementsStated, new StatedElement(result.getInt("element_id"), result.getShort("element_cell"), 0));
                 } catch (Exception e) {
-                    Main.Logs().writeError("Map " + result.getInt("map") + " stated nulled");
+                    Main.Logs().writeError("map " + result.getInt("map") + " stated nulled");
                 }
                 i++;
             }
@@ -216,17 +240,17 @@ public class MapDAOImpl extends MapDAO {
     }
 
     public DofusMap findMapByPos(int X, int Y) {
-        return dofusMaps.values().stream().filter(x -> x.Position != null && x.Position.posX == X && x.Position.posY == Y)
+        return dofusMaps.values().stream().filter(x -> x.position != null && x.position.posX == X && x.position.posY == Y)
                 .findFirst().orElse(null);
     }
 
     public MapPosition[] getSubAreaOfPos(int X, int Y) {
-        return dofusMaps.values().stream().filter(x -> x.Position != null && x.Position.posX == X && x.Position.posY == Y).map(x -> x.Position).toArray(MapPosition[]::new);
+        return dofusMaps.values().stream().filter(x -> x.position != null && x.position.posX == X && x.position.posY == Y).map(x -> x.position).toArray(MapPosition[]::new);
     }
 
     public DofusMap findMapByPos(int X, int Y, int subArea) {
         return dofusMaps.values().stream()
-                .filter(x -> x.Position != null && x.Position.posX == X && x.Position.posY == Y && x.Position.subAreaId == subArea).
+                .filter(x -> x.position != null && x.position.posX == X && x.position.posY == Y && x.position.subAreaId == subArea).
                         findFirst().orElse(null);
 
     }
@@ -239,7 +263,7 @@ public class MapDAOImpl extends MapDAO {
 
             while (result.next()) {
                 try {
-                    dofusMaps.get(result.getInt("id")).Position = new MapPosition() {
+                    dofusMaps.get(result.getInt("id")).position = new MapPosition() {
                         {
                             id = result.getInt("id");
                             posX = (short) result.getInt("posX");
@@ -275,9 +299,9 @@ public class MapDAOImpl extends MapDAO {
 
             while (result.next()) {
                 try {
-                    dofusMaps.get(result.getInt("map")).InteractiveElements.add(new InteractiveElementStruct(result.getInt("element_id"), result.getInt("element_type_id"), result.getString("enabled_skills"), result.getString("disabled_skills"), result.getShort("age_bonus")));
+                    dofusMaps.get(result.getInt("map")).interactiveElements.add(new InteractiveElementStruct(result.getInt("element_id"), result.getInt("element_type_id"), result.getString("enabled_skills"), result.getString("disabled_skills"), result.getShort("age_bonus")));
                 } catch (Exception e) {
-                    logger.error("Map {} element nulled", result.getInt("map"));
+                    logger.error("map {} element nulled", result.getInt("map"));
                 }
 
                 i++;
@@ -288,6 +312,11 @@ public class MapDAOImpl extends MapDAO {
         }
         return i;
 
+    }
+
+    @Override
+    public DofusMap getMap(int id) {
+        return this.dofusMaps.get(id);
     }
 
     @Override

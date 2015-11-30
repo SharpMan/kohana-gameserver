@@ -1,7 +1,7 @@
 package koh.game.fights;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
+
 import koh.game.entities.actors.Player;
 import koh.game.fights.effects.buff.BuffEffect;
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_MAKE_INVISIBLE;
@@ -46,7 +46,7 @@ public class FighterState {
             case Invisibility:
                 myFighter.VisibleState = GameActionFightInvisibilityStateEnum.INVISIBLE;
                 for (Player o : this.myFighter.Fight.Observable$stream()) {
-                    o.Send(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.Caster.ID, myFighter.ID, myFighter.GetVisibleStateFor(o)));
+                    o.send(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.Caster.ID, myFighter.ID, myFighter.GetVisibleStateFor(o)));
                 }
                 this.myStates.put(FightStateEnum.Invisible, Buff);
                 return;
@@ -56,7 +56,7 @@ public class FighterState {
                 return;
 
             default:
-                // Buff.Target.Fight.SendToFight(new GameActionMessage((int)EffectEnum.AddState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.CastInfos.Value3 + ",1"));
+                // Buff.Target.fight.SendToFight(new GameActionMessage((int)EffectEnum.AddState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.CastInfos.Value3 + ",1"));
                 break;
         }
 
@@ -68,7 +68,7 @@ public class FighterState {
             case Invisibility:
                 this.myFighter.VisibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
                 this.myFighter.Fight.sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.Caster.ID, myFighter.ID, myFighter.GetVisibleStateFor(null)));
-                this.myFighter.Fight.sendToField(new GameFightRefreshFighterMessage(myFighter.GetGameContextActorInformations(null)));
+                this.myFighter.Fight.sendToField(new GameFightRefreshFighterMessage(myFighter.getGameContextActorInformations(null)));
                 this.myStates.remove(FightStateEnum.Invisible);
                 return;
             case REFLECT_SPELL:
@@ -76,7 +76,7 @@ public class FighterState {
                 return;
 
             default:
-                // Buff.Target.Fight.SendToFight(new GameActionMessage((int) EffectEnum.AddState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.CastInfos.Value3 + ",0"));
+                // Buff.Target.fight.SendToFight(new GameActionMessage((int) EffectEnum.AddState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.CastInfos.Value3 + ",0"));
                 break;
         }
 

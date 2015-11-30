@@ -1,7 +1,6 @@
 package koh.game.fights;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -138,7 +137,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     protected void InitFighter(GenericStats StatsToMerge, int ID) {
         this.Stats = new GenericStats();
-        this.Stats.Merge(StatsToMerge);
+        this.Stats.merge(StatsToMerge);
 
         this.ID = ID;
     }
@@ -249,19 +248,19 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int CurrentLife, CurrentLifeMax;
 
     public void setLife(int value) {
-        this.CurrentLife = value - (this.Stats.GetTotal(StatsEnum.Vitality) + this.Stats.GetTotal(StatsEnum.Heal)) /*+ this.Stats.GetTotal(StatsEnum.AddVie)*/;
+        this.CurrentLife = value - (this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal)) /*+ this.stats.getTotal(StatsEnum.AddVie)*/;
     }
 
     public int Life() {
-        return this.CurrentLife + (this.Stats.GetTotal(StatsEnum.Vitality) + this.Stats.GetTotal(StatsEnum.Heal));
+        return this.CurrentLife + (this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal));
     }
 
     public void setLifeMax(int value) {
-        this.CurrentLifeMax = value - (this.Stats.GetTotal(StatsEnum.Vitality) + this.Stats.GetTotal(StatsEnum.Heal));
+        this.CurrentLifeMax = value - (this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal));
     }
 
     public int MaxLife() {
-        return this.CurrentLifeMax + this.Stats.GetTotal(StatsEnum.Vitality) + this.Stats.GetTotal(StatsEnum.Heal);
+        return this.CurrentLifeMax + this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal);
     }
 
     public int LifePercentage() {
@@ -294,20 +293,20 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int MaxAP() {
-        return this.Stats.GetTotal(StatsEnum.ActionPoints);
+        return this.Stats.getTotal(StatsEnum.ActionPoints);
     }
 
     public int MaxMP() {
-        return this.Stats.GetTotal(StatsEnum.MovementPoints);
+        return this.Stats.getTotal(StatsEnum.MovementPoints);
     }
 
     public int AP() {
-        return this.Stats.GetTotal(StatsEnum.ActionPoints, this instanceof CharacterFighter) - this.UsedAP;
+        return this.Stats.getTotal(StatsEnum.ActionPoints, this instanceof CharacterFighter) - this.UsedAP;
 
     }
 
     public int MP() {
-        return this.Stats.GetTotal(StatsEnum.MovementPoints, this instanceof CharacterFighter) - this.UsedMP;
+        return this.Stats.getTotal(StatsEnum.MovementPoints, this instanceof CharacterFighter) - this.UsedMP;
 
     }
 
@@ -316,27 +315,27 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     @Override
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameFightFighterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions);
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameFightFighterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions);
     }
 
-    /*public EntityDispositionInformations GetEntityDispositionInformations(Player character) {
-     return new FightEntityDispositionInformations(character != null ? (this.IsVisibleFor(character) ? this.CellId() : -1) : this.CellId(), this.Direction, GetCarriedActor());
+    /*public EntityDispositionInformations getEntityDispositionInformations(player character) {
+     return new FightEntityDispositionInformations(character != null ? (this.IsVisibleFor(character) ? this.CellId() : -1) : this.CellId(), this.direction, GetCarriedActor());
      }*/
     public int APCancelling() {
-        return (int) Math.floor((double) this.Stats.GetTotal(StatsEnum.Wisdom) / 4) + this.Stats.GetTotal(StatsEnum.Add_RETRAIT_PA);
+        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.Add_RETRAIT_PA);
     }
 
     public int MPCancelling() {
-        return (int) Math.floor((double) this.Stats.GetTotal(StatsEnum.Wisdom) / 4) + this.Stats.GetTotal(StatsEnum.Add_RETRAIT_PM);
+        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.Add_RETRAIT_PM);
     }
 
     public int APDodge() {
-        return (int) Math.floor((double) this.Stats.GetTotal(StatsEnum.Wisdom) / 4) + this.Stats.GetTotal(StatsEnum.DodgePALostProbability);
+        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.DodgePALostProbability);
     }
 
     public int MPDodge() {
-        return (int) Math.floor((double) this.Stats.GetTotal(StatsEnum.Wisdom) / 4) + this.Stats.GetTotal(StatsEnum.DodgePMLostProbability);
+        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.DodgePMLostProbability);
     }
 
     public int GetTackledMP() { //Sould be implements in Summoner,Monster return 0
@@ -370,7 +369,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         }
 
         if (spellLevel.rangeCanBeBoosted) {
-            int val1 = num + this.Stats.GetTotal(StatsEnum.Add_Range);
+            int val1 = num + this.Stats.getTotal(StatsEnum.Add_Range);
             if (val1 < spellLevel.minRange) {
                 val1 = spellLevel.minRange;
             }
@@ -394,7 +393,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         } else {
             shape = new Lozenge((byte) spellLevel.minRange, (byte) num, this.Fight.Map);
         }
-        return shape.GetCells(this.CellId());
+        return shape.getCells(this.CellId());
     }
 
     public boolean HasState(int stateId) {
@@ -428,16 +427,16 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     private double GetTacklePercent(Fighter tackler) {
-        if (tackler.Stats.GetTotal(StatsEnum.Add_TackleBlock) == -2) {
+        if (tackler.Stats.getTotal(StatsEnum.Add_TackleBlock) == -2) {
             return 0.0;
         } else {
-            return (double) (this.Stats.GetTotal(StatsEnum.Add_TackleEvade) + 2) / (2.0 * (double) (tackler.Stats.GetTotal(StatsEnum.Add_TackleBlock) + 2));
+            return (double) (this.Stats.getTotal(StatsEnum.Add_TackleEvade) + 2) / (2.0 * (double) (tackler.Stats.getTotal(StatsEnum.Add_TackleBlock) + 2));
         }
     }
 
     @Override
-    public EntityDispositionInformations GetEntityDispositionInformations(Player character) {
-        return new FightEntityDispositionInformations(character != null ? (this.IsVisibleFor(character) ? this.CellId() : -1) : this.CellId(), this.Direction, GetCarriedActor());
+    public EntityDispositionInformations getEntityDispositionInformations(Player character) {
+        return new FightEntityDispositionInformations(character != null ? (this.IsVisibleFor(character) ? this.CellId() : -1) : this.CellId(), this.direction, GetCarriedActor());
     }
 
     public int GetCarriedActor() {
@@ -460,44 +459,44 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public byte GetVisibleStateFor(Player Character) {
         if (this.Team.GetAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.Summoner.ID == this.ID)) {
             return GameActionFightInvisibilityStateEnum.VISIBLE.value;
-        } else if (Character == null || Character.Client == null || Character.GetFighter() == null || Character.GetFight() != this.Fight) {
+        } else if (Character == null || Character.client == null || Character.getFighter() == null || Character.getFight() != this.Fight) {
             return this.VisibleState.value;
         } else {
-            return !Character.GetFighter().IsFriendlyWith(this) || this.VisibleState == GameActionFightInvisibilityStateEnum.VISIBLE ? this.VisibleState.value : GameActionFightInvisibilityStateEnum.DETECTED.value;
+            return !Character.getFighter().IsFriendlyWith(this) || this.VisibleState == GameActionFightInvisibilityStateEnum.VISIBLE ? this.VisibleState.value : GameActionFightInvisibilityStateEnum.DETECTED.value;
         }
     }
 
     public boolean IsMyFriend(Player Character) {
-        if (Character == null || Character.Client == null || Character.GetFighter() == null || Character.GetFight() != this.Fight) {
+        if (Character == null || Character.client == null || Character.getFighter() == null || Character.getFight() != this.Fight) {
             return false;
         }
-        return Character.GetFighter().IsFriendlyWith(this);
+        return Character.getFighter().IsFriendlyWith(this);
     }
 
-    public int Initiative(boolean Base) { //FIXME : Considerate Stats ?
-        return (int) Math.floor((double) (this.MaxLife() / 4 + this.Stats.GetTotal(StatsEnum.Initiative)) * (double) (this.Life() / this.MaxLife()));
+    public int Initiative(boolean Base) { //FIXME : Considerate stats ?
+        return (int) Math.floor((double) (this.MaxLife() / 4 + this.Stats.getTotal(StatsEnum.Initiative)) * (double) (this.Life() / this.MaxLife()));
     }
 
     public GameFightMinimalStats GetGameFightMinimalStats(Player character) {
         if (this.Fight.FightState == FightState.STATE_PLACE) {
-            return new GameFightMinimalStatsPreparation(this.Life(), this.MaxLife(), (int) this.Stats.GetBase(StatsEnum.Vitality), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.GetTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character), this.Initiative(false));
+            return new GameFightMinimalStatsPreparation(this.Life(), this.MaxLife(), (int) this.Stats.getBase(StatsEnum.Vitality), this.Stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.getTotal(StatsEnum.NeutralElementResistPercent), this.Stats.getTotal(StatsEnum.EarthElementResistPercent), this.Stats.getTotal(StatsEnum.WaterElementResistPercent), this.Stats.getTotal(StatsEnum.AirElementResistPercent), this.Stats.getTotal(StatsEnum.FireElementResistPercent), this.Stats.getTotal(StatsEnum.NeutralElementReduction), this.Stats.getTotal(StatsEnum.EarthElementReduction), this.Stats.getTotal(StatsEnum.WaterElementReduction), this.Stats.getTotal(StatsEnum.AirElementReduction), this.Stats.getTotal(StatsEnum.FireElementReduction), this.Stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.getTotal(StatsEnum.DodgePALostProbability), this.Stats.getTotal(StatsEnum.DodgePMLostProbability), this.Stats.getTotal(StatsEnum.Add_TackleBlock), this.Stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character), this.Initiative(false));
         }
-        return new GameFightMinimalStats(this.Life(), this.MaxLife(), (int) this.Stats.GetBase(StatsEnum.Vitality), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.GetTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
+        return new GameFightMinimalStats(this.Life(), this.MaxLife(), (int) this.Stats.getBase(StatsEnum.Vitality), this.Stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.getTotal(StatsEnum.NeutralElementResistPercent), this.Stats.getTotal(StatsEnum.EarthElementResistPercent), this.Stats.getTotal(StatsEnum.WaterElementResistPercent), this.Stats.getTotal(StatsEnum.AirElementResistPercent), this.Stats.getTotal(StatsEnum.FireElementResistPercent), this.Stats.getTotal(StatsEnum.NeutralElementReduction), this.Stats.getTotal(StatsEnum.EarthElementReduction), this.Stats.getTotal(StatsEnum.WaterElementReduction), this.Stats.getTotal(StatsEnum.AirElementReduction), this.Stats.getTotal(StatsEnum.FireElementReduction), this.Stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.getTotal(StatsEnum.DodgePALostProbability), this.Stats.getTotal(StatsEnum.DodgePMLostProbability), this.Stats.getTotal(StatsEnum.Add_TackleBlock), this.Stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
     }
 
     public IdentifiedEntityDispositionInformations GetIdentifiedEntityDispositionInformations() {
-        return new IdentifiedEntityDispositionInformations(this.CellId(), this.Direction, this.ID);
+        return new IdentifiedEntityDispositionInformations(this.CellId(), this.direction, this.ID);
     }
 
     public abstract FightTeamMemberInformations GetFightTeamMemberInformations();
 
     @Override
-    public abstract void Send(Message Packet);
+    public abstract void send(Message Packet);
 
     public abstract void JoinFight();
 
     @Override
-    public abstract EntityLook GetEntityLook();
+    public abstract EntityLook getEntityLook();
 
     @Override
     public FightObjectType ObjectType() {
@@ -531,51 +530,51 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         switch (Effect) {
             case Damage_Earth:
             case Steal_Earth:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Earth_Damages_Bonus)));
                 break;
             case Damage_Earth_Per_Pm_Percent:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Earth_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100));
                 break;
             case Damage_Neutral:
             case Steal_Neutral:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
                 break;
             case Damage_Neutral_Per_Pm_Percent:
-                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100)));
+                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Neutral_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100)));
                 break;
             case Damage_Fire:
             case Steal_Fire:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus)));
                 break;
             case Damage_Fire_Per_Pm_Percent:
-                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))) * ((((double) this.MP() / (double) this.MaxMP()))));
+                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * ((((double) this.MP() / (double) this.MaxMP()))));
                 System.out.println((this.MP() / this.MaxMP()));
-                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))));
-                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((this.MP() / this.MaxMP()))));
+                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))));
+                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((this.MP() / this.MaxMP()))));
                 break;
             case Damage_Air:
             case Steal_Air:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Agility) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Air_Damages_Bonus)));
                 break;
             case Damage_Air_Per_Pm_Percent:
-                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
+                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Agility) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Air_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
                 break;
             case Damage_Water:
             case Steal_Water:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Water_Damages_Bonus)));
+                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Chance) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Water_Damages_Bonus)));
                 break;
             case Damage_Water_Per_Pm_Percent:
-                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.AddDamagePercent) + this.Stats.GetTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Water_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
+                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Chance) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Water_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
                 break;
         }
 
@@ -632,7 +631,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public void CalculBonusDamages(EffectInstanceDice Effect, MutableInt Jet, short CastCell, short TargetCell, short TruedCell) {
 
-        double Bonus = this.Stats.GetTotal(StatsEnum.Add_Damage_Final_Percent);
+        double Bonus = this.Stats.getTotal(StatsEnum.Add_Damage_Final_Percent);
 
         Bonus += getShapeEfficiency(Effect.zoneShape(), CastCell, TargetCell, Effect.ZoneSize() != -100000 ? Effect.ZoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, Effect.zoneMinSize() != -100000 ? Effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, Effect.zoneEfficiencyPercent() != -100000 ? Effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, Effect.zoneMaxEfficiency() != -100000 ? Effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
@@ -702,32 +701,32 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         switch (Effect) {
             case Damage_Neutral:
             case Steal_Neutral:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent) - (Fight instanceof AgressionFight ? Stats.GetTotal(StatsEnum.PvpNeutralElementResistPercent) : 0)) / 100
-                        - this.Stats.GetTotal(StatsEnum.NeutralElementReduction) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpNeutralElementReduction) : 0) - this.Stats.GetTotal(StatsEnum.Add_Magic_Reduction));
+                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.NeutralElementResistPercent) - (Fight instanceof AgressionFight ? Stats.getTotal(StatsEnum.PvpNeutralElementResistPercent) : 0)) / 100
+                        - this.Stats.getTotal(StatsEnum.NeutralElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpNeutralElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Earth:
             case Steal_Earth:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.GetTotal(StatsEnum.EarthElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpEarthElementResistPercent) : 0)) / 100
-                        - this.Stats.GetTotal(StatsEnum.EarthElementReduction) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpEarthElementReduction) : 0) - this.Stats.GetTotal(StatsEnum.Add_Magic_Reduction));
+                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.EarthElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpEarthElementResistPercent) : 0)) / 100
+                        - this.Stats.getTotal(StatsEnum.EarthElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpEarthElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Fire:
             case Steal_Fire:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.GetTotal(StatsEnum.FireElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpFireElementResistPercent) : 0)) / 100
-                        - this.Stats.GetTotal(StatsEnum.FireElementReduction) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpFireElementReduction) : 0) - this.Stats.GetTotal(StatsEnum.Add_Magic_Reduction));
+                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.FireElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpFireElementResistPercent) : 0)) / 100
+                        - this.Stats.getTotal(StatsEnum.FireElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpFireElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Air:
             case Steal_Air:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.GetTotal(StatsEnum.AirElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpAirElementResistPercent) : 0)) / 100
-                        - this.Stats.GetTotal(StatsEnum.AirElementReduction) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpAirElementReduction) : 0) - this.Stats.GetTotal(StatsEnum.Add_Magic_Reduction));
+                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.AirElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpAirElementResistPercent) : 0)) / 100
+                        - this.Stats.getTotal(StatsEnum.AirElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpAirElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Water:
             case Steal_Water:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.GetTotal(StatsEnum.WaterElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpWaterElementResistPercent) : 0)) / 100
-                        - this.Stats.GetTotal(StatsEnum.WaterElementReduction) - (Fight instanceof AgressionFight ? this.Stats.GetTotal(StatsEnum.PvpWaterElementReduction) : 0) - this.Stats.GetTotal(StatsEnum.Add_Magic_Reduction));
+                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.WaterElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpWaterElementResistPercent) : 0)) / 100
+                        - this.Stats.getTotal(StatsEnum.WaterElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpWaterElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
         }
     }
@@ -798,19 +797,19 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public void CalculHeal(MutableInt Heal) {
-        Heal.setValue(Math.floor(Heal.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence)) / 100 + this.Stats.GetTotal(StatsEnum.Add_Heal_Bonus)));
+        Heal.setValue(Math.floor(Heal.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence)) / 100 + this.Stats.getTotal(StatsEnum.Add_Heal_Bonus)));
     }
 
     public int CalculArmor(StatsEnum DamageEffect) {
         /*switch (DamageEffect) {
          default:
-         return this.Stats.GetTotal(StatsEnum.AddArmor);
+         return this.stats.getTotal(StatsEnum.AddArmor);
          }*/
-        return this.Stats.GetTotal(StatsEnum.AddArmor);
+        return this.Stats.getTotal(StatsEnum.AddArmor);
     }
 
     public int ReflectDamage() {
-        return ((1 + (this.Stats.GetTotal(StatsEnum.Wisdom) / 100)) * this.Stats.GetTotal(StatsEnum.Damage_Return)) + this.Stats.GetTotal(StatsEnum.DamageReflection);
+        return ((1 + (this.Stats.getTotal(StatsEnum.Wisdom) / 100)) * this.Stats.getTotal(StatsEnum.Damage_Return)) + this.Stats.getTotal(StatsEnum.DamageReflection);
     }
 
     @Override

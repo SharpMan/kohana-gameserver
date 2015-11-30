@@ -23,7 +23,7 @@ public class KamaCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.Kamas, this.Kamas);
+        return this.Compare((Comparable<Integer>) character.kamas, this.Kamas);
     }
 
 }

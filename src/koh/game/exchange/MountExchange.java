@@ -22,7 +22,7 @@ public class MountExchange extends Exchange {
         this.myClient = Client;
         this.Send(new ExchangeMountsStableAddMessage(new MountClientData[0]));
         this.Send(new ExchangeStartOkMountWithOutPaddockMessage(new MountClientData[0]));
-        //this.Send(new BasicStatMessage(CLICK_ON_BUTTON));
+        //this.send(new BasicStatMessage(CLICK_ON_BUTTON));
     }
 
     @Override
@@ -72,14 +72,14 @@ public class MountExchange extends Exchange {
         this.Finish();
         this.myClient.myExchange = null;
         this.Send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, Success));
-        this.myClient.EndGameAction(GameActionTypeEnum.EXCHANGE);
+        this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 
         return true;
     }
 
     @Override
     public void Send(Message Packet) {
-        this.myClient.Send(Packet);
+        this.myClient.send(Packet);
     }
 
 }

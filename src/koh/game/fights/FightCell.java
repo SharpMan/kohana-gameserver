@@ -127,14 +127,14 @@ public class FightCell {
       if (!this.hasFighter()) {
             return null;
         }
-        return (this.GetObjectsAsFighter()[0].Team.Id != Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not ID ...
+        return (this.GetObjectsAsFighter()[0].Team.Id != Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not id ...
     }
 
     public Fighter HasFriend(FightTeam Team) {
         if (!this.hasFighter()) {
             return null;
         }
-        return (this.GetObjectsAsFighter()[0].Team.Id == Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not ID ...
+        return (this.GetObjectsAsFighter()[0].Team.Id == Team.Id && !this.GetObjectsAsFighter()[0].Dead) ? this.GetObjectsAsFighter()[0] : null; //Class not id ...
     }
 
     public synchronized int AddObject(IFightObject fightObject) {
