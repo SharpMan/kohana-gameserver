@@ -25,7 +25,7 @@ public class BuffChatiment extends BuffEffect {
         int MaxValue = this.CastInfos.Effect.diceSide;
         int Duration = this.CastInfos.Effect.value;
 
-        if (this.Target.Fight.CurrentFighter.ID == this.CastInfos.FakeValue) {
+        if (this.Target.fight.currentFighter.ID == this.CastInfos.FakeValue) {
             if (this.CastInfos.DamageValue < MaxValue) {
                 if (this.CastInfos.DamageValue + BuffValue.getValue() > MaxValue) {
                     BuffValue.setValue(MaxValue - this.CastInfos.DamageValue);
@@ -35,7 +35,7 @@ public class BuffChatiment extends BuffEffect {
             }
         } else {
             this.CastInfos.DamageValue = 0;
-            this.CastInfos.FakeValue = (int) this.Target.Fight.CurrentFighter.ID;
+            this.CastInfos.FakeValue = (int) this.Target.fight.currentFighter.ID;
 
             if (this.CastInfos.DamageValue + BuffValue.getValue() > MaxValue) {
                 BuffValue.setValue(MaxValue);
@@ -46,7 +46,7 @@ public class BuffChatiment extends BuffEffect {
             BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.CastInfos.Effect.diceNum), this.CastInfos.SpellId, this.CastInfos.CellId, 0, null, CastInfos.Caster, null, false, this.CastInfos.EffectType, BuffValue.getValue(), null, Duration, this.GetId()), this.Target);
 
             BuffStats.ApplyEffect(BuffValue, DamageInfos);
-            this.Target.Buffs.AddBuff(BuffStats);
+            this.Target.buff.addBuff(BuffStats);
         }
 
         return super.ApplyEffect(DamageValue, DamageInfos);

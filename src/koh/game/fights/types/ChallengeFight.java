@@ -37,35 +37,35 @@ public class ChallengeFight extends Fight {
         Attacker.addGameAction(new GameFight(AttFighter, this));
         Defender.addGameAction(new GameFight(DefFighter, this));
 
-        super.InitFight(AttFighter, DefFighter);
+        super.initFight(AttFighter, DefFighter);
 
     }
 
     @Override
-    public void EndFight(FightTeam Winners, FightTeam Loosers) {
+    public void endFight(FightTeam Winners, FightTeam Loosers) {
 
-        if(this.FightTime == -1){
+        if(this.fightTime == -1){
             this.myResult = new GameFightEndMessage(0, this.AgeBonus, this.lootShareLimitMalus);
-            super.EndFight();
+            super.endFight();
             return;
         }
         
-        this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.FightTime, this.AgeBonus, this.lootShareLimitMalus);
+        this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.AgeBonus, this.lootShareLimitMalus);
         
-         for (Fighter Fighter : (Iterable<Fighter>) Winners.GetFighters()::iterator) {
-            super.AddNamedParty(Fighter, FightOutcomeEnum.RESULT_VICTORY);
+         for (Fighter Fighter : (Iterable<Fighter>) Winners.getFighters()::iterator) {
+            super.addNamedParty(Fighter, FightOutcomeEnum.RESULT_VICTORY);
             AtomicReference<Long> xpTotal = new AtomicReference<>();
-            xpTotal.set(FightFormulas.XPDefie(Fighter, Winners.GetFighters(), Loosers.GetFighters()));
-            long GuildXp = FightFormulas.GuildXpEarned((CharacterFighter) Fighter, xpTotal), MountXp = FightFormulas.MountXpEarned((CharacterFighter) Fighter, xpTotal);
+            xpTotal.set(FightFormulas.XPDefie(Fighter, Winners.getFighters(), Loosers.getFighters()));
+            long GuildXp = FightFormulas.guildXpEarned((CharacterFighter) Fighter, xpTotal), MountXp = FightFormulas.mountXpEarned((CharacterFighter) Fighter, xpTotal);
             ((CharacterFighter) Fighter).Character.addExperience(xpTotal.get(), false);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultExperienceData[]{new FightResultExperienceData() {
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
                     this.experience = ((CharacterFighter) Fighter).Character.experience;
                     this.showExperience = true;
-                    this.experienceLevelFloor = ExpDAOImpl.persoXpMin(Fighter.Level());
+                    this.experienceLevelFloor = ExpDAOImpl.persoXpMin(Fighter.getLevel());
                     this.showExperienceLevelFloor = true;
-                    this.experienceNextLevelFloor = ExpDAOImpl.persoXpMax(Fighter.Level());
-                    this.showExperienceNextLevelFloor = Fighter.Level() < 200;
+                    this.experienceNextLevelFloor = ExpDAOImpl.persoXpMax(Fighter.getLevel());
+                    this.showExperienceNextLevelFloor = Fighter.getLevel() < 200;
                     this.experienceFightDelta = xpTotal.get().intValue();
                     this.showExperienceFightDelta = true;
                     this.experienceForGuild = (int) GuildXp;
@@ -77,64 +77,64 @@ public class ChallengeFight extends Fight {
             }}));
         }
 
-        for (Fighter Fighter : (Iterable<Fighter>) Loosers.GetFighters()::iterator) {
-            super.AddNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.IsAlive(), (byte) Fighter.Level(), new FightResultExperienceData[0]));
+        for (Fighter Fighter : (Iterable<Fighter>) Loosers.getFighters()::iterator) {
+            super.addNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultExperienceData[0]));
         }
 
        
 
-        super.EndFight();
+        super.endFight();
     }
 
     @Override
-    public GameFightEndMessage LeftEndMessage(Fighter f) {
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.FightTime), this.AgeBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.Summoner == null).map(x -> new FightResultPlayerListEntry(x.Team.Id == f.Team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, FightTime== -1 ? true : x.IsAlive(), (byte) x.Level(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+    public GameFightEndMessage leftEndMessage(Fighter f) {
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.AgeBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.summoner == null).map(x -> new FightResultPlayerListEntry(x.team.Id == f.team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, fightTime == -1 ? true : x.isAlive(), (byte) x.getLevel(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
     @Override
-    public synchronized void LeaveFight(Fighter Fighter) {
+    public synchronized void leaveFight(Fighter Fighter) {
         // Un persos quitte le combat
-        switch (this.FightState) {
+        switch (this.fightState) {
             case STATE_PLACE:
-                if (Fighter == Fighter.Team.Leader) {
-                    Fighter.Team.GetFighters().forEach(TeamFighter -> TeamFighter.setLife(0));
-                    Fighter.Left = true;
-                    this.EndFight(this.GetEnnemyTeam(Fighter.Team), Fighter.Team);
+                if (Fighter == Fighter.team.Leader) {
+                    Fighter.team.getFighters().forEach(TeamFighter -> TeamFighter.setLife(0));
+                    Fighter.left = true;
+                    this.endFight(this.getEnnemyTeam(Fighter.team), Fighter.team);
                 } else {
-                    this.Map.sendToField(new GameFightUpdateTeamMessage(this.FightId, Fighter.Team.GetFightTeamInformations()));
+                    this.map.sendToField(new GameFightUpdateTeamMessage(this.fightId, Fighter.team.getFightTeamInformations()));
 
-                    this.sendToField(new GameFightRemoveTeamMemberMessage(this.FightId, Fighter.Team.Id, Fighter.ID));
+                    this.sendToField(new GameFightRemoveTeamMemberMessage(this.fightId, Fighter.team.Id, Fighter.ID));
 
-                    Fighter.LeaveFight();
+                    Fighter.leaveFight();
 
                     //Fighter.send(new GameLeaveMessage());
                 }
                 break;
             case STATE_ACTIVE:
-                if (Fighter.TryDie(Fighter.ID, true) != -3) {
-                    Fighter.send(LeftEndMessage(Fighter));
+                if (Fighter.tryDie(Fighter.ID, true) != -3) {
+                    Fighter.send(leftEndMessage(Fighter));
                     this.sendToField(new GameFightLeaveMessage(Fighter.ID));
-                    Fighter.LeaveFight();
+                    Fighter.leaveFight();
                 }
                 break;
         }
     }
 
     @Override
-    public int GetStartTimer() {
+    public int getStartTimer() {
         return -1;
     }
 
     @Override
-    public int GetTurnTime() {
+    public int getTurnTime() {
         return 30000;
     }
 
     @Override
-    protected void SendGameFightJoinMessage(Fighter fighter) {
+    protected void sendGameFightJoinMessage(Fighter fighter) {
         //boolean canBeCancelled, boolean canSayReady, boolean isFightStarted, short timeMaxBeforeFightStart, byte fightType
-        fighter.send(new GameFightJoinMessage(true, !IsStarted(), this.IsStarted(), (short) 0, this.FightType.value));
+        fighter.send(new GameFightJoinMessage(true, !isStarted(), this.isStarted(), (short) 0, this.fightType.value));
     }
 
 }

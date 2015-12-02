@@ -20,7 +20,7 @@ public class GameExchange extends GameAction {
     @Override
     public void endExecute() {
         if (!exchange.ExchangeFinish()) {
-            exchange.CloseExchange(true);
+            exchange.closeExchange(true);
         }
 
         try {
@@ -33,7 +33,7 @@ public class GameExchange extends GameAction {
     public void abort(Object[] Args) {
 
         if (!exchange.ExchangeFinish()) {
-            exchange.CloseExchange();
+            exchange.closeExchange();
         }
         try {
             super.endExecute();

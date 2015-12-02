@@ -20,7 +20,7 @@ public class EffectEnableBomb extends EffectBase {
         for (Fighter Target : CastInfos.Targets) {
             if (Target instanceof BombFighter) {
                 if (CastInfos.Duration > 0) {
-                    Target.Buffs.AddBuff(new BuffEnableBomb(CastInfos, Target));
+                    Target.buff.addBuff(new BuffEnableBomb(CastInfos, Target));
                     continue;
                 }
                 if (Explose(Target, CastInfos) == -3) {
@@ -34,33 +34,33 @@ public class EffectEnableBomb extends EffectBase {
     public static int Explose(Fighter Target, EffectCast CastInfos) {
         BombFighter[] FutureExplosedBombs = new BombFighter[0];
         if (((BombFighter) Target).FightBombs != null) {
-            int TotalCombo = Target.Stats.getBoost(StatsEnum.Combo_Dammages);
+            int TotalCombo = Target.stats.getBoost(StatsEnum.Combo_Dammages);
             for (FightBomb Bomb : ((BombFighter) Target).FightBombs) {
                 FutureExplosedBombs = (BombFighter[]) ArrayUtils.add(FutureExplosedBombs, (BombFighter) ((Bomb.Owner[0].ID == Target.ID) ? Bomb.Owner[1] : Bomb.Owner[0]));
-                TotalCombo += (Bomb.Owner[0].ID == Target.ID) ? Bomb.Owner[1].Stats.getBoost(StatsEnum.Combo_Dammages) : Bomb.Owner[0].Stats.getBoost(StatsEnum.Combo_Dammages);
+                TotalCombo += (Bomb.Owner[0].ID == Target.ID) ? Bomb.Owner[1].stats.getBoost(StatsEnum.Combo_Dammages) : Bomb.Owner[0].stats.getBoost(StatsEnum.Combo_Dammages);
             }
             for (BombFighter Bomb : FutureExplosedBombs) {
                 if (Bomb.FightBombs != null) {
                     for (FightBomb Bomb2 : Bomb.FightBombs) {
                         if (Bomb2.Owner[0].ID != Target.ID && !ArrayUtils.contains(FutureExplosedBombs, Bomb2.Owner[0])) {
                             FutureExplosedBombs = (BombFighter[]) ArrayUtils.add(FutureExplosedBombs, Bomb2.Owner[0]);
-                            TotalCombo += Bomb2.Owner[0].Stats.getBoost(StatsEnum.Combo_Dammages);
+                            TotalCombo += Bomb2.Owner[0].stats.getBoost(StatsEnum.Combo_Dammages);
                         }
                         if (Bomb2.Owner[1].ID != Target.ID && !ArrayUtils.contains(FutureExplosedBombs, Bomb2.Owner[1])) {
                             FutureExplosedBombs = (BombFighter[]) ArrayUtils.add(FutureExplosedBombs, Bomb2.Owner[1]);
-                            TotalCombo += Bomb2.Owner[1].Stats.getBoost(StatsEnum.Combo_Dammages);
+                            TotalCombo += Bomb2.Owner[1].stats.getBoost(StatsEnum.Combo_Dammages);
                         }
                     }
                 }
             }
-            CastInfos.Caster.Fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
-            Target.Stats.getEffect(StatsEnum.Combo_Dammages).additionnal = TotalCombo;
+            CastInfos.Caster.fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
+            Target.stats.getEffect(StatsEnum.Combo_Dammages).additionnal = TotalCombo;
             for (BombFighter Bomb : FutureExplosedBombs) {
-                Bomb.Stats.getEffect(StatsEnum.Combo_Dammages).additionnal = TotalCombo;
-                Bomb.TryDie(CastInfos.Caster.ID, true);
+                Bomb.stats.getEffect(StatsEnum.Combo_Dammages).additionnal = TotalCombo;
+                Bomb.tryDie(CastInfos.Caster.ID, true);
             }
         }
-        return Target.TryDie(CastInfos.Caster.ID, true);
+        return Target.tryDie(CastInfos.Caster.ID, true);
     }
 
 }

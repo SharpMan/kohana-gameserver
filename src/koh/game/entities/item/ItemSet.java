@@ -42,7 +42,7 @@ public class ItemSet {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    private void ParseStats() {
+    private void parseStats() {
         StatsEnum Stat;
         this.myStats = new GenericStats[this.effects.length];
         for (int i = 0; i < this.effects.length; i++) {
@@ -70,7 +70,7 @@ public class ItemSet {
     public GenericStats getStats(int round) {
         try {
             if (this.myStats == null) {
-                this.ParseStats();
+                this.parseStats();
             }
             return myStats[round - 1];
         } catch (Exception e) {

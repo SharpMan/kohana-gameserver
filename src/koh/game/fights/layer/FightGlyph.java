@@ -19,7 +19,7 @@ import koh.protocol.types.game.actions.fight.GameActionMark;
 public class FightGlyph extends FightActivableObject {
 
     public FightGlyph(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum Shape) {
-        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.Caster.Fight, castInfos.Caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
+        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.Caster.fight, castInfos.Caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
     }
 
     @Override
@@ -49,26 +49,26 @@ public class FightGlyph extends FightActivableObject {
 
     @Override
     public GameActionMark GetGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.Team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.CellId(), this.GetGameActionMarkedCell(), true);
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.getCellId(), this.GetGameActionMarkedCell(), true);
     }
 
     @Override
-    public FightObjectType ObjectType() {
+    public FightObjectType getObjectType() {
         return FightObjectType.OBJECT_GLYPHE;
     }
 
     @Override
-    public boolean CanWalk() {
+    public boolean canWalk() {
         return true;
     }
 
     @Override
-    public boolean CanStack() {
+    public boolean canStack() {
         return true;
     }
 
     @Override
-    public boolean CanGoThrough() {
+    public boolean canGoThrough() {
        return true;
     }
 

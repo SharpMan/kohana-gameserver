@@ -12,7 +12,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 public class EffectInstanceMount extends EffectInstance {
 
     @Override
-    public byte SerializationIdentifier() {
+    public byte serializationIdentifier() {
         return 9;
     }
 

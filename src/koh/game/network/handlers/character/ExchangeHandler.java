@@ -40,13 +40,13 @@ public class ExchangeHandler {
         if (!Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
             Client.send(new BasicNoOperationMessage());
         }
-        Client.myExchange.Validate(Client);
+        Client.myExchange.validate(Client);
     }
 
     @HandlerAttribute(ID = ExchangeObjectTransfertListFromInvMessage.M_ID)
     public static void HandleExchangeObjectTransfertListFromInvMessage(WorldClient Client, ExchangeObjectTransfertListFromInvMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            if (!Client.myExchange.MoveItems(Client, Exchange.CharactersItems(Client.character, Message.ids), true)) {
+            if (!Client.myExchange.moveItems(Client, Exchange.getCharactersItems(Client.character, Message.ids), true)) {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
@@ -57,7 +57,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = ExchangeObjectTransfertExistingFromInvMessage.M_ID)
     public static void HandleExchangeObjectTransfertExistingFromInvMessage(WorldClient Client, ExchangeObjectTransfertExistingFromInvMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            if (!Client.myExchange.MoveItems(Client, Exchange.CharactersItems(Client.character), true)) {
+            if (!Client.myExchange.moveItems(Client, Exchange.getCharactersItems(Client.character), true)) {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
@@ -68,7 +68,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = 6184)
     public static void HandleExchangeObjectTransfertAllFromInvMessage(WorldClient Client, ExchangeObjectTransfertAllFromInvMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            if (!Client.myExchange.MoveItems(Client, Exchange.CharactersItems(Client.character), true)) {
+            if (!Client.myExchange.moveItems(Client, Exchange.getCharactersItems(Client.character), true)) {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
@@ -79,7 +79,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = 6039) //TODO : Take just IDS
     public static void HandleExchangeObjectTransfertListToInvMessage(WorldClient Client, ExchangeObjectTransfertListToInvMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            if (!Client.myExchange.TransfertAllToInv(Client, null)) {
+            if (!Client.myExchange.transfertAllToInv(Client, null)) {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
@@ -90,7 +90,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = ExchangeObjectTransfertExistingToInvMessage.M_ID)
     public static void HandleExchangeObjectTransfertExistingToInvMessage(WorldClient Client, ExchangeObjectTransfertExistingToInvMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            if (!Client.myExchange.TransfertAllToInv(Client, null)) {
+            if (!Client.myExchange.transfertAllToInv(Client, null)) {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
@@ -101,7 +101,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = ExchangeObjectTransfertAllToInvMessage.M_ID) //False
     public static void HandleExchangeObjectTransfertAllToInvMessage(WorldClient Client, ExchangeObjectTransfertAllToInvMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            if (!Client.myExchange.TransfertAllToInv(Client, null)) {
+            if (!Client.myExchange.transfertAllToInv(Client, null)) {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
@@ -112,7 +112,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = 5520)
     public static void HandleExchangeObjectMoveKamaMessage(WorldClient Client, ExchangeObjectMoveKamaMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            Client.myExchange.MoveKamas(Client, SecureParser.Integer(Message.quantity));
+            Client.myExchange.moveKamas(Client, SecureParser.Integer(Message.quantity));
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -121,7 +121,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = ExchangeObjectMoveMessage.M_ID)
     public static void HandleExchangeObjectMoveMessage(WorldClient Client, ExchangeObjectMoveMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            if (!Client.myExchange.MoveItem(Client, Message.objectUID, Message.quantity)) {
+            if (!Client.myExchange.moveItem(Client, Message.objectUID, Message.quantity)) {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
@@ -225,7 +225,7 @@ public class ExchangeHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.myExchange.BuyItem(Client, Message.objectToBuyId, SecureParser.ItemQuantity(Message.quantity));
+        Client.myExchange.buyItem(Client, Message.objectToBuyId, SecureParser.ItemQuantity(Message.quantity));
     }
 
     @HandlerAttribute(ID = ExchangeSellMessage.M_ID)
@@ -234,7 +234,7 @@ public class ExchangeHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.myExchange.SellItem(Client, Client.character.inventoryCache.itemsCache.get(Message.objectToSellId), SecureParser.ItemQuantity(Message.quantity));
+        Client.myExchange.sellItem(Client, Client.character.inventoryCache.itemsCache.get(Message.objectToSellId), SecureParser.ItemQuantity(Message.quantity));
     }
 
 }

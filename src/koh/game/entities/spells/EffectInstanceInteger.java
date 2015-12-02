@@ -15,7 +15,7 @@ public class EffectInstanceInteger extends EffectInstance {
     public static final int classID = 2;
 
     @Override
-    public byte SerializationIdentifier() {
+    public byte serializationIdentifier() {
         return 2;
     }
 

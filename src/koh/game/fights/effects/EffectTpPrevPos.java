@@ -18,12 +18,12 @@ public class EffectTpPrevPos extends EffectBase {
             if (Target.previousCellPos.isEmpty()) {
                 continue;
             }
-            FightCell cell = Target.Fight.GetCell(Target.previousCellPos.get(Target.previousCellPos.size() - 1));
+            FightCell cell = Target.fight.getCell(Target.previousCellPos.get(Target.previousCellPos.size() - 1));
 
             if (cell != null) {
-                Target.Fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, Target.ID, cell.Id));
+                Target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, Target.ID, cell.Id));
 
-                toReturn = Target.SetCell(cell);
+                toReturn = Target.setCell(cell);
             }
             if (toReturn != -1) {
                 break;

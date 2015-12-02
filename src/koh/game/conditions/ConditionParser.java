@@ -71,7 +71,7 @@ public class ConditionParser {
                     }
                     String s1 = this.Str.substring(0, length);
                     if (Strings.isNullOrEmpty(s1)) {
-                        throw new Error(String.format("Cannot parse {0} : Left Expression of bool operator index {1} is empty", this.Str, length));
+                        throw new Error(String.format("Cannot parse {0} : left Expression of bool operator index {1} is empty", this.Str, length));
                     }
                     ConditionExpression left = new ConditionParser(s1).Parse();
                     String s2 = this.Str.toString().substring(length + 1, (length + 1)+this.Str.length() - (length + 1));
@@ -144,7 +144,7 @@ public class ConditionParser {
                     }
                     String name = this.Str.toString().substring(0, length);
                     if (Strings.isNullOrEmpty(name)) {
-                        throw new Error(String.format("Cannot parse {0} : Left Expression of comparaison operator index {1} is empty", this.Str, length));
+                        throw new Error(String.format("Cannot parse {0} : left Expression of comparaison operator index {1} is empty", this.Str, length));
                     }
                     Criterion criterionByName = Criterion.CreateCriterionByName(name);
                     String str = this.Str.toString().substring(length + 1, (length + 1)+this.Str.length() - (length + 1));

@@ -7,8 +7,8 @@ package koh.game.entities.spells;
 public class LearnableSpell {
     
     public int ID;
-    public int Spell;
+    public int spell;
     public int obtainLevel;
-    public int BreedID;
+    public int breedID;
     
 }

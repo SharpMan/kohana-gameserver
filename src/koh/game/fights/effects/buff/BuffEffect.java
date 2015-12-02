@@ -4,7 +4,6 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -35,7 +34,7 @@ public abstract class BuffEffect {
 
     public int GetId() {
         if (this.Uid == -1) {
-            Uid = Target.NextBuffUid.incrementAndGet();
+            Uid = Target.nextBuffUid.incrementAndGet();
         }
         return this.Uid;
     }
@@ -60,10 +59,10 @@ public abstract class BuffEffect {
     public BuffEffect(EffectCast CastInfos, Fighter Target, BuffActiveType ActiveType, BuffDecrementType DecrementType) {
         this.CastInfos = CastInfos;
 
-        //this.Duration = (CastInfos.Duration == -1) ? -1 : (Target.fight.CurrentFighter == Target /*&& CastInfos.Duration == 0*/ ? CastInfos.Duration + 1 : CastInfos.Duration) - CastInfos.Delay();
+        //this.Duration = (CastInfos.Duration == -1) ? -1 : (Target.fight.currentFighter == Target /*&& CastInfos.Duration == 0*/ ? CastInfos.Duration + 1 : CastInfos.Duration) - CastInfos.Delay();
         this.Duration = (CastInfos.Duration == -1) ? -1 : (DecrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.Duration : (CastInfos.Duration) - CastInfos.Delay());
         
-        //System.out.println(Target.fight.CurrentFighter == Target);
+        //System.out.println(Target.fight.currentFighter == Target);
         if (DecrementType == BuffDecrementType.TYPE_ENDTURN && Target.ID == CastInfos.Caster.ID) {
             this.Duration++;
         }
@@ -76,7 +75,7 @@ public abstract class BuffEffect {
     }
 
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        return this.Target.TryDie(this.Caster.ID);
+        return this.Target.tryDie(this.Caster.ID);
     }
 
     public abstract AbstractFightDispellableEffect GetAbstractFightDispellableEffect();
@@ -86,11 +85,11 @@ public abstract class BuffEffect {
     /// </summary>
     /// <returns></returns>
     public int RemoveEffect() {
-        return this.Target.TryDie(this.Caster.ID);
+        return this.Target.tryDie(this.Caster.ID);
     }
 
     /// <summary>
-    /// Decrement le buff
+    /// decrement le buff
     /// </summary>
     public int DecrementDuration() {
         this.Duration--;

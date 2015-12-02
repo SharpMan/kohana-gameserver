@@ -6,7 +6,7 @@ package koh.game.entities.item;
  */
 public class ItemLivingObject {
     
-     public static int GetObviAppearanceBySkinId(int skin, int type) {
+     public static int getObviAppearanceBySkinId(int skin, int type) {
         switch (type) {
             case 9233:
                 return 1115 + skin;
@@ -24,7 +24,7 @@ public class ItemLivingObject {
         return 0;
     }
 
-    public static int GetLevelByObviXp(int xp) {
+    public static int getLevelByObviXp(int xp) {
         if (xp < 10) {
             return 1;
         } else if (xp < 21) {

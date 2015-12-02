@@ -81,7 +81,7 @@ public class Lozenge implements IZone {
         if (!this.Map.pointMov(x, y, true, -1, -1)) {
             return;
         }
-        container.add(MapPoint.CoordToCellId(x, y));
+        container.add(MapPoint.coordToCellId(x, y));
     }
 
     @Override

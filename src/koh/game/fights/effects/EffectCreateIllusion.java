@@ -25,23 +25,23 @@ public class EffectCreateIllusion extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        int DistanceCharacterFromHidedPlace = Pathfinder.getGoalDistance(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
-        byte IgnoredDirection = Pathfinder.getDirection(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
-        short StartCell = CastInfos.Caster.CellId();
+        int DistanceCharacterFromHidedPlace = Pathfinder.getGoalDistance(CastInfos.Caster.fight.map, CastInfos.Caster.getCellId(), CastInfos.CellId);
+        byte IgnoredDirection = Pathfinder.getDirection(CastInfos.Caster.fight.map, CastInfos.Caster.getCellId(), CastInfos.CellId);
+        short StartCell = CastInfos.Caster.getCellId();
 
         BuffState Buff = new BuffState(new EffectCast(StatsEnum.Invisibility, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.Caster, null), CastInfos.Caster);
         Buff.Duration = 1;
         Buff.DecrementType = BuffDecrementType.TYPE_BEGINTURN;
-        CastInfos.Caster.Buffs.AddBuff(Buff);
+        CastInfos.Caster.buff.addBuff(Buff);
         if (Buff.ApplyEffect(null, null) == -3) {
             return -3;
         }
         Buff.Duration = -1;
 
-        FightCell cell = CastInfos.Caster.Fight.GetCell(CastInfos.CellId);
+        FightCell cell = CastInfos.Caster.fight.getCell(CastInfos.CellId);
         if (cell != null) {
-            int Result = CastInfos.Caster.SetCell(cell);
-            ((CharacterFighter) CastInfos.Caster).fakeContextualId = CastInfos.Caster.Fight.GetNextContextualId();
+            int Result = CastInfos.Caster.setCell(cell);
+            ((CharacterFighter) CastInfos.Caster).fakeContextualId = CastInfos.Caster.fight.getNextContextualId();
 
             if (Result != -1) {
                 return Result;
@@ -54,16 +54,16 @@ public class EffectCreateIllusion extends EffectBase {
             if (IgnoredDirection == Direction) {
                 continue;
             }
-            FightCell Cell = CastInfos.Caster.Fight.GetCell(Pathfinder.nextCell(StartCell, Direction, DistanceCharacterFromHidedPlace));
+            FightCell Cell = CastInfos.Caster.fight.getCell(Pathfinder.nextCell(StartCell, Direction, DistanceCharacterFromHidedPlace));
             if (Cell != null && Cell.CanWalk()) {
-                IllusionFighter Clone = new IllusionFighter(CastInfos.Caster.Fight, CastInfos.Caster);
-                Clone.Fight.JoinFightTeam(Clone, CastInfos.Caster.Team, false, Cell.Id, true);
-                CastInfos.Caster.Fight.sendToField(new GameActionFightSummonMessage(1097, CastInfos.Caster.ID, (GameFightFighterInformations) Clone.getGameContextActorInformations(null)));
-                CastInfos.Caster.Fight.myWorker.SummonFighter(Clone);
+                IllusionFighter Clone = new IllusionFighter(CastInfos.Caster.fight, CastInfos.Caster);
+                Clone.fight.joinFightTeam(Clone, CastInfos.Caster.team, false, Cell.Id, true);
+                CastInfos.Caster.fight.sendToField(new GameActionFightSummonMessage(1097, CastInfos.Caster.ID, (GameFightFighterInformations) Clone.getGameContextActorInformations(null)));
+                CastInfos.Caster.fight.myWorker.summonFighter(Clone);
             }
         }
-        CastInfos.Caster.Fight.observers.stream().forEach((o) -> {
-            if (CastInfos.Caster.IsMyFriend((Player) o)) {
+        CastInfos.Caster.fight.observers.stream().forEach((o) -> {
+            if (CastInfos.Caster.isMyFriend((Player) o)) {
                 ((Player) o).send(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, CastInfos.Caster.ID, CastInfos.CellId));
             } else {
                 ((Player) o).send(new GameFightShowFighterMessage(CastInfos.Caster.getGameContextActorInformations((Player) o)));

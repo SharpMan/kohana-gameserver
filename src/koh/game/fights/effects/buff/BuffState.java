@@ -4,9 +4,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.FightStateEnum;
-import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
-import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostStateEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -22,13 +20,13 @@ public class BuffState extends BuffEffect {
 
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        this.Target.States.AddState(this);
+        this.Target.states.addState(this);
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int RemoveEffect() {
-        this.Target.States.DelState(this);
+        this.Target.states.delState(this);
 
         return super.RemoveEffect();
     }

@@ -101,7 +101,7 @@ public class MountInformations {
     public void addExperience(long amount) {
         this.mount.experience += amount;
 
-        while (this.mount.experience >= DAO.getExps().getLevel(this.mount.level + 1).Mount && this.mount.level < 100) {
+        while (this.mount.experience >= DAO.getExps().getLevel(this.mount.level + 1).mount && this.mount.level < 100) {
             levelUp();
         }
 
@@ -128,8 +128,8 @@ public class MountInformations {
             this.myStats = null;
             this.enableStats(true);
         }
-        this.mount.experienceForLevel = DAO.getExps().getLevel(this.mount.level).Mount;
-        this.mount.experienceForNextLevel = DAO.getExps().getLevel(this.mount.level == 100 ? 100 : this.mount.level + 1).Mount;
+        this.mount.experienceForLevel = DAO.getExps().getLevel(this.mount.level).mount;
+        this.mount.experienceForNextLevel = DAO.getExps().getLevel(this.mount.level == 100 ? 100 : this.mount.level + 1).mount;
     }
 
     public byte[] serialize() {

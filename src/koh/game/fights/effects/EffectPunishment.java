@@ -28,7 +28,7 @@ public class EffectPunishment extends EffectBase {
 
             // Ajout du buff
             CastInfos.Targets.stream().forEach((Target) -> {
-                Target.Buffs.AddBuff(new BuffDamagePerAttackantLife(CastInfos, Target));
+                Target.buff.addBuff(new BuffDamagePerAttackantLife(CastInfos, Target));
             });
         } else // Dommage direct
         {
@@ -47,47 +47,47 @@ public class EffectPunishment extends EffectBase {
 
     public static int ApplyDamages(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
 
-        if (Target.States.HasState(FightStateEnum.STATE_REFLECT_SPELL) && !CastInfos.IsPoison && ((BuffReflectSpell) Target.States.GetBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).ReflectLevel >= CastInfos.SpellLevel.grade) {
-            Target.Fight.sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, Target.ID, CastInfos.Caster.ID));
+        if (Target.states.hasState(FightStateEnum.STATE_REFLECT_SPELL) && !CastInfos.IsPoison && ((BuffReflectSpell) Target.states.getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).ReflectLevel >= CastInfos.SpellLevel.grade) {
+            Target.fight.sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, Target.ID, CastInfos.Caster.ID));
             Target = CastInfos.Caster;
         }
         Fighter Caster = CastInfos.Caster;
         // Perd l'invisibilité s'il inflige des dommages direct
         if (!CastInfos.IsPoison && !CastInfos.IsTrap && !CastInfos.IsReflect) {
-            Caster.States.RemoveState(FightStateEnum.Invisible);
+            Caster.states.removeState(FightStateEnum.Invisible);
         }
 
         // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat
         if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
-            if (Caster.Buffs.OnAttackPostJet(CastInfos, DamageJet) == -3) {
+            if (Caster.buff.onAttackPostJet(CastInfos, DamageJet) == -3) {
                 return -3; // Fin du combat
             }
-            if (Target.Buffs.OnAttackedPostJet(CastInfos, DamageJet) == -3) {
+            if (Target.buff.onAttackedPostJet(CastInfos, DamageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
         double num1 = 0.0;
-        double num2 = (double) CastInfos.Caster.Life() / (double) CastInfos.Caster.MaxLife();
+        double num2 = (double) CastInfos.Caster.getLife() / (double) CastInfos.Caster.getMaxLife();
         if (num2 <= 0.5) {
             num1 = 2.0 * num2;
         } else if (num2 > 0.5) {
             num1 = 1.0 + (num2 - 0.5) * -2.0;
         }
-        DamageJet.setValue((double) CastInfos.Caster.Life() * num1 * (double) CastInfos.RandomJet(Target) / 100.0);
+        DamageJet.setValue((double) CastInfos.Caster.getLife() * num1 * (double) CastInfos.RandomJet(Target) / 100.0);
 
         // Calcul resistances
-        Target.CalculReduceDamages(Damage_Neutral, DamageJet);
+        Target.calculReduceDamages(Damage_Neutral, DamageJet);
         // Reduction des dommages grace a l'armure
         if (DamageJet.intValue() > 0) {
             // Si ce n'est pas des dommages direct on ne reduit pas
             if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
                 // Calcul de l'armure par rapport a l'effet
-                int Armor = Target.CalculArmor(Damage_Neutral);
+                int Armor = Target.calculArmor(Damage_Neutral);
                 // Si il reduit un minimum
                 if (Armor != 0) {
                     // XX Reduit les dommages de X
 
-                    Target.Fight.sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, Target.ID, Target.ID, Armor));
+                    Target.fight.sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, Target.ID, Target.ID, Armor));
 
                     // On reduit
                     DamageJet.setValue(DamageJet.intValue() - Armor);
@@ -101,10 +101,10 @@ public class EffectPunishment extends EffectBase {
         }
         // Application des buffs apres le calcul totaux et l'armure
         if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
-            if (Caster.Buffs.OnAttackAfterJet(CastInfos, DamageJet) == -3) {
+            if (Caster.buff.onAttackAfterJet(CastInfos, DamageJet) == -3) {
                 return -3; // Fin du combat
             }
-            if (Target.Buffs.OnAttackedAfterJet(CastInfos, DamageJet) == -3) {
+            if (Target.buff.onattackedafterjet(CastInfos, DamageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
@@ -113,11 +113,11 @@ public class EffectPunishment extends EffectBase {
         if (DamageJet.getValue() > 0) {
             // Si c'est pas un poison ou un renvoi on applique le renvoie
             if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
-                MutableInt ReflectDamage = new MutableInt(Target.ReflectDamage());
+                MutableInt ReflectDamage = new MutableInt(Target.getReflectedDamage());
 
                 // Si du renvoi
                 if (ReflectDamage.intValue() > 0 && Target.ID != Caster.ID) {
-                    Target.Fight.sendToField(new GameActionFightReflectDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_REFLECTOR, Target.ID, Caster.ID));
+                    Target.fight.sendToField(new GameActionFightReflectDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_REFLECTOR, Target.ID, Caster.ID));
 
                     // Trop de renvois
                     if (ReflectDamage.getValue() > DamageJet.getValue()) {
@@ -143,18 +143,18 @@ public class EffectPunishment extends EffectBase {
         }
 
         // Dommages superieur a la vie de la cible
-        if (DamageJet.getValue() > Target.Life()) {
-            DamageJet.setValue(Target.Life());
+        if (DamageJet.getValue() > Target.getLife()) {
+            DamageJet.setValue(Target.getLife());
         }
 
         // Deduit la vie
-        Target.setLife(Target.Life() - DamageJet.intValue());
+        Target.setLife(Target.getLife() - DamageJet.intValue());
 
         // Enois du packet combat subit des dommages
         if (DamageJet.intValue() != 0) {
-            Target.Fight.sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.ID, Target.ID, DamageJet.intValue(), 0));
+            Target.fight.sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.ID, Target.ID, DamageJet.intValue(), 0));
         }
-        return Target.TryDie(Caster.ID);
+        return Target.tryDie(Caster.ID);
     }
 
 }

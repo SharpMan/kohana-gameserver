@@ -22,27 +22,27 @@ public class EffectPerception extends EffectBase {
     //TODO dofusMaps AffectedCell in CastInfos et nettoyer ce code
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        for (short Cell : (new Zone(CastInfos.Effect.ZoneShape(), CastInfos.Effect.ZoneSize(), MapPoint.fromCellId(CastInfos.Caster.CellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true),CastInfos.Caster.Fight.Map)).getCells(CastInfos.CellId)) {
-            FightCell fightCell = CastInfos.Caster.Fight.GetCell(Cell);
+        for (short Cell : (new Zone(CastInfos.Effect.ZoneShape(), CastInfos.Effect.ZoneSize(), MapPoint.fromCellId(CastInfos.Caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true),CastInfos.Caster.fight.map)).getCells(CastInfos.CellId)) {
+            FightCell fightCell = CastInfos.Caster.fight.getCell(Cell);
             if (fightCell != null) {
-                fightCell.GetObjects().stream().filter((fightObject) -> (fightObject.CellId() == Cell)).forEach((fightObject) -> {
-                    if (fightObject.ObjectType() == FightObjectType.OBJECT_TRAP && ((FightTrap) fightObject).VisibileState == GameActionFightInvisibilityStateEnum.INVISIBLE && ((FightTrap) fightObject).m_caster.IsEnnemyWith(CastInfos.Caster)) {
+                fightCell.GetObjects().stream().filter((fightObject) -> (fightObject.getCellId() == Cell)).forEach((fightObject) -> {
+                    if (fightObject.getObjectType() == FightObjectType.OBJECT_TRAP && ((FightTrap) fightObject).VisibileState == GameActionFightInvisibilityStateEnum.INVISIBLE && ((FightTrap) fightObject).m_caster.isEnnemyWith(CastInfos.Caster)) {
                         ((FightTrap) fightObject).VisibileState = GameActionFightInvisibilityStateEnum.DETECTED;
                         ((FightTrap) fightObject).AppearForAll();
                     } else if (fightObject instanceof IllusionFighter) {
-                        ((IllusionFighter) fightObject).TryDie(CastInfos.Caster.ID);
-                    } else if (fightObject.ObjectType() == FightObjectType.OBJECT_FIGHTER) {
+                        ((IllusionFighter) fightObject).tryDie(CastInfos.Caster.ID);
+                    } else if (fightObject.getObjectType() == FightObjectType.OBJECT_FIGHTER) {
                         Fighter fighter = (Fighter) fightObject;
-                        if (fighter.IsEnnemyWith(CastInfos.Caster)) {
-                            if (fighter instanceof CharacterFighter && fighter.Team.GetAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.Summoner == fighter)) {
+                        if (fighter.isEnnemyWith(CastInfos.Caster)) {
+                            if (fighter instanceof CharacterFighter && fighter.team.getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner == fighter)) {
                                 ((CharacterFighter) fighter).CleanClone();
-                            } else if (fighter.VisibleState == GameActionFightInvisibilityStateEnum.INVISIBLE) {
-                                fighter.VisibleState = GameActionFightInvisibilityStateEnum.DETECTED;
-                                CastInfos.Caster.Fight.sendToField(new GameActionFightInvisibleDetectedMessage(ACTION_CHARACTER_MAKE_INVISIBLE, CastInfos.Caster.ID, fighter.ID, fighter.CellId()));
-                                //CastInfos.Caster.fight.sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, CastInfos.Caster.id, fighter.id, fighter.VisibleState.value));
-                                CastInfos.Caster.Fight.sendToField(new GameFightRefreshFighterMessage(fighter.getGameContextActorInformations(null)));
+                            } else if (fighter.visibleState == GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                                fighter.visibleState = GameActionFightInvisibilityStateEnum.DETECTED;
+                                CastInfos.Caster.fight.sendToField(new GameActionFightInvisibleDetectedMessage(ACTION_CHARACTER_MAKE_INVISIBLE, CastInfos.Caster.ID, fighter.ID, fighter.getCellId()));
+                                //CastInfos.Caster.fight.sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, CastInfos.Caster.id, fighter.id, fighter.visibleState.value));
+                                CastInfos.Caster.fight.sendToField(new GameFightRefreshFighterMessage(fighter.getGameContextActorInformations(null)));
                             }
-                            /*if(fighter.StateManager.HasState(FighterStateEnum.STATE_STEALTH))
+                            /*if(fighter.StateManager.hasState(FighterStateEnum.STATE_STEALTH))
                              {
                              fighter.BuffManager.RemoveStealth();
                              }*/

@@ -53,31 +53,31 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public abstract class Fighter extends IGameActor implements IFightObject {
 
-    public Fighter(Fight Fight, Fighter Summoner) {
-        this.Fight = Fight;
-        this.Buffs = new FighterBuff();
-        this.SpellsController = new FighterSpell(Buffs);
-        this.States = new FighterState(this);
-        this.Summoner = Summoner;
+    public Fighter(Fight fight, Fighter summoner) {
+        this.fight = fight;
+        this.buff = new FighterBuff();
+        this.spellsController = new FighterSpell(buff);
+        this.states = new FighterState(this);
+        this.summoner = summoner;
     }
 
-    private static Random Random = new Random();
-    public boolean Dead, Left;
-    public FightTeam Team;
-    public Fight Fight;
+    private static final Random RANDOM = new Random();
+    public boolean dead, left;
+    public FightTeam team;
+    public Fight fight;
     public FightCell myCell;
-    public int UsedAP, UsedMP, TurnRunning = 19;
-    public GenericStats Stats;
-    public Fighter Summoner;
-    public GameActionFightInvisibilityStateEnum VisibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
+    public int usedAP, usedMP, turnRunning = 19;
+    public GenericStats stats;
+    public Fighter summoner;
+    public GameActionFightInvisibilityStateEnum visibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
     public int[] previousPositions = new int[0];
     public CopyOnWriteArrayList<Short> previousCellPos = new CopyOnWriteArrayList<>(), previousFirstCellPos = new CopyOnWriteArrayList<>();
-    private final MapPoint MapPointCache = MapPoint.fromCellId(0);
+    private final MapPoint mapPointCache = MapPoint.fromCellId(0);
     public byte wave = 0;
-    public FighterSpell SpellsController;
-    public FighterBuff Buffs;
-    public FighterState States;
-    public AtomicInteger NextBuffUid = new AtomicInteger();
+    public FighterSpell spellsController;
+    public FighterBuff buff;
+    public FighterState states;
+    public AtomicInteger nextBuffUid = new AtomicInteger();
 
     /**
      * Virtual Method
@@ -86,21 +86,21 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     }
 
-    public MapPoint MapPoint() {
-        return MapPointCache;
+    public MapPoint getMapPoint() {
+        return mapPointCache;
     }
 
-    public int SetCell(FightCell Cell) {
-        return this.SetCell(Cell, true);
+    public int setCell(FightCell cell) {
+        return this.setCell(cell, true);
     }
 
-    public int SetCell(FightCell Cell, boolean RunEvent) {
+    public int setCell(FightCell cell, boolean runEvent) {
         if (this.myCell != null) {
             this.myCell.RemoveObject(this); // On vire le fighter de la cell:
             if (this.myCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
                 ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Enable(this, true);
             }
-            if (this.Fight.FightState == FightState.STATE_PLACE) {
+            if (this.fight.fightState == FightState.STATE_PLACE) {
                 if (!ArrayUtils.contains(previousPositions, myCell.Id)) {
                     this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
                 }
@@ -108,105 +108,105 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 this.previousCellPos.add(this.myCell.Id);
             }
         }
-        this.myCell = Cell;
+        this.myCell = cell;
 
         if (this.myCell != null) {
-            this.MapPointCache.set_cellId(myCell.Id);
-            int AddResult = this.myCell.AddObject(this, RunEvent);
+            this.mapPointCache.set_cellId(myCell.Id);
+            int AddResult = this.myCell.AddObject(this, runEvent);
 
             if (AddResult == -3 || AddResult == -2) {
                 return AddResult;
             }
         }
 
-        if (RunEvent) {
-            int Result = OnCellChanged();
+        if (runEvent) {
+            int Result = onCellChanged();
             if (Result != -1) {
                 return Result;
             }
         }
-        return this.TryDie(this.ID);
+        return this.tryDie(this.ID);
     }
 
-    public int OnCellChanged() {
+    public int onCellChanged() {
         if (this.myCell != null) {
-            return this.Buffs.EndMove();
+            return this.buff.endMove();
         }
         return -1;
     }
 
-    protected void InitFighter(GenericStats StatsToMerge, int ID) {
-        this.Stats = new GenericStats();
-        this.Stats.merge(StatsToMerge);
+    protected void initFighter(GenericStats StatsToMerge, int ID) {
+        this.stats = new GenericStats();
+        this.stats.merge(StatsToMerge);
 
         this.ID = ID;
     }
 
     /*public int GetFighterOutcome() {
-     if(this.Left)
+     if(this.left)
      return FightOutcomeEnum.RESULT_LOST;
-     boolean flag1 = !this.Team.HasFighterAlive();
-     boolean flag2 = !this.Team.HasFighterAlive();
+     boolean flag1 = !this.team.hasFighterAlive();
+     boolean flag2 = !this.team.hasFighterAlive();
      if (!flag1 && flag2) {
      return FightOutcomeEnum.RESULT_VICTORY;
      }
      return flag1 && !flag2 ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_DRAW;
      }*/
-    public void LeaveFight() {
-        if (this.Fight.FightState == FightState.STATE_PLACE) {
+    public void leaveFight() {
+        if (this.fight.fightState == FightState.STATE_PLACE) {
             // On le vire de l'equipe
-            Team.FighterLeave(this);
+            team.fighterLeave(this);
         }
 
-        this.Left = true;
+        this.left = true;
 
         // On le vire de la cell
         myCell.RemoveObject(this);
     }
 
-    public int TryDie(int CasterId) {
-        return TryDie(CasterId, false);
+    public int tryDie(int casterId) {
+        return tryDie(casterId, false);
     }
 
-    public int TryDie(int CasterId, boolean force) {
+    public int tryDie(int casterId, boolean force) {
         if (force) {
             this.setLife(0);
         }
-        if (this.Life() <= 0) {
-            this.Fight.StartSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH);
+        if (this.getLife() <= 0) {
+            this.fight.startSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH);
             //SendGameFightLeaveMessage
-            this.Fight.sendToField(new GameActionFightDeathMessage(GameActionTypeEnum.FIGHT_KILLFIGHTER.value, CasterId, this.ID));
+            this.fight.sendToField(new GameActionFightDeathMessage(GameActionTypeEnum.FIGHT_KILLFIGHTER.value, casterId, this.ID));
 
-            this.Team.GetAliveFighters().filter(x -> x.Summoner != null && x.Summoner.ID == this.ID).forEach(Fighter -> Fighter.TryDie(this.ID, true));
+            this.team.getAliveFighters().filter(x -> x.summoner != null && x.summoner.ID == this.ID).forEach(Fighter -> Fighter.tryDie(this.ID, true));
 
-            if (this.Fight.m_activableObjects.containsKey(this)) {
-                this.Fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
+            if (this.fight.m_activableObjects.containsKey(this)) {
+                this.fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
 
             }
 
             myCell.RemoveObject(this);
 
-            this.Fight.EndSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH, false);
+            this.fight.endSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH, false);
 
-            if (this.Fight.TryEndFight()) {
+            if (this.fight.tryEndFight()) {
                 return -3;
             }
-            if (this.Fight.CurrentFighter == this) {
-                this.Fight.FightLoopState = FightLoopState.STATE_END_TURN;
+            if (this.fight.currentFighter == this) {
+                this.fight.fightLoopState = FightLoopState.STATE_END_TURN;
             }
             return -2;
         }
         return -1;
     }
 
-    public int BeginTurn() {
-        if (this.Fight.m_activableObjects.containsKey(this)) {
-            this.Fight.m_activableObjects.get(this).stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
+    public int beginTurn() {
+        if (this.fight.m_activableObjects.containsKey(this)) {
+            this.fight.m_activableObjects.get(this).stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
                 ((FightPortal) Object).ForceEnable(this);
             });
         }
 
-        int buffResult = this.Buffs.BeginTurn();
+        int buffResult = this.buff.beginTurn();
         if (buffResult != -1) {
             return buffResult;
         }
@@ -214,140 +214,140 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return myCell.BeginTurn(this);
     }
 
-    public void MiddleTurn() {
-        this.UsedAP = 0;
-        this.UsedMP = 0;
+    public void middleTurn() {
+        this.usedAP = 0;
+        this.usedMP = 0;
     }
 
-    public int EndTurn() {
-        this.Fight.m_activableObjects.values().stream().forEach((Objects) -> {
+    public int endTurn() {
+        this.fight.m_activableObjects.values().stream().forEach((Objects) -> {
             Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
                 ((FightPortal) Object).Enable(this);
             });
         });
-        this.SpellsController.EndTurn();
-        int buffResult = this.Buffs.EndTurn();
+        this.spellsController.endTurn();
+        int buffResult = this.buff.endTurn();
         if (buffResult != -1) {
             return buffResult;
         }
         return myCell.EndTurn(this);
     }
 
-    public Stream<FightActivableObject> GetActivableObjects() {
+    public Stream<FightActivableObject> getActivableObjects() {
         try {
-            return this.Fight.m_activableObjects.get(this).stream();
+            return this.fight.m_activableObjects.get(this).stream();
         } catch (Exception e) {
             return Stream.empty();
         }
     }
 
-    public boolean Dead() {
-        return this.Life() <= 0;
+    public boolean isDead() {
+        return this.getLife() <= 0;
     }
 
-    public int CurrentLife, CurrentLifeMax;
+    public int currentLife, currentLifeMax;
 
     public void setLife(int value) {
-        this.CurrentLife = value - (this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal)) /*+ this.stats.getTotal(StatsEnum.AddVie)*/;
+        this.currentLife = value - (this.stats.getTotal(StatsEnum.Vitality) + this.stats.getTotal(StatsEnum.Heal)) /*+ this.stats.getTotal(StatsEnum.AddVie)*/;
     }
 
-    public int Life() {
-        return this.CurrentLife + (this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal));
+    public int getLife() {
+        return this.currentLife + (this.stats.getTotal(StatsEnum.Vitality) + this.stats.getTotal(StatsEnum.Heal));
     }
 
     public void setLifeMax(int value) {
-        this.CurrentLifeMax = value - (this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal));
+        this.currentLifeMax = value - (this.stats.getTotal(StatsEnum.Vitality) + this.stats.getTotal(StatsEnum.Heal));
     }
 
-    public int MaxLife() {
-        return this.CurrentLifeMax + this.Stats.getTotal(StatsEnum.Vitality) + this.Stats.getTotal(StatsEnum.Heal);
+    public int getMaxLife() {
+        return this.currentLifeMax + this.stats.getTotal(StatsEnum.Vitality) + this.stats.getTotal(StatsEnum.Heal);
     }
 
-    public int LifePercentage() {
-        double percentage = ((double) Life() / (double) this.MaxLife());
+    public int getLifePercentage() {
+        double percentage = ((double) getLife() / (double) this.getMaxLife());
         return (int) (percentage * 100);
     }
 
-    public void ShowCell(int Cell, boolean team) {
+    public void showCell(int Cell, boolean team) {
         if (team) {
-            this.Team.sendToField(new ShowCellMessage(this.ID, Cell));
+            this.team.sendToField(new ShowCellMessage(this.ID, Cell));
         } else {
-            this.Fight.sendToField(new ShowCellMessage(this.ID, Cell));
+            this.fight.sendToField(new ShowCellMessage(this.ID, Cell));
         }
     }
 
-    public short NextCell;
-    public byte NextDir;
+    public short nextCell;
+    public byte nextDir;
 
-    public abstract int Level();
+    public abstract int getLevel();
 
-    public abstract short MapCell();
+    public abstract short getMapCell();
 
-    public boolean TurnReady = true;
+    public boolean turnReady = true;
 
-    public boolean CanBeginTurn() {
-        if (this.Dead()) {
+    public boolean canBeginTurn() {
+        if (this.isDead()) {
             return false; // Mort    
         }
         return true;
     }
 
-    public int MaxAP() {
-        return this.Stats.getTotal(StatsEnum.ActionPoints);
+    public int getMaxAP() {
+        return this.stats.getTotal(StatsEnum.ActionPoints);
     }
 
-    public int MaxMP() {
-        return this.Stats.getTotal(StatsEnum.MovementPoints);
+    public int getMaxMP() {
+        return this.stats.getTotal(StatsEnum.MovementPoints);
     }
 
-    public int AP() {
-        return this.Stats.getTotal(StatsEnum.ActionPoints, this instanceof CharacterFighter) - this.UsedAP;
-
-    }
-
-    public int MP() {
-        return this.Stats.getTotal(StatsEnum.MovementPoints, this instanceof CharacterFighter) - this.UsedMP;
+    public int getAP() {
+        return this.stats.getTotal(StatsEnum.ActionPoints, this instanceof CharacterFighter) - this.usedAP;
 
     }
 
-    public boolean IsAlive() {
-        return this.Life() > 0 && !this.Left && !this.Dead;
+    public int getMP() {
+        return this.stats.getTotal(StatsEnum.MovementPoints, this instanceof CharacterFighter) - this.usedMP;
+
+    }
+
+    public boolean isAlive() {
+        return this.getLife() > 0 && !this.left && !this.dead;
     }
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightFighterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions);
+        return new GameFightFighterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions);
     }
 
     /*public EntityDispositionInformations getEntityDispositionInformations(player character) {
-     return new FightEntityDispositionInformations(character != null ? (this.IsVisibleFor(character) ? this.CellId() : -1) : this.CellId(), this.direction, GetCarriedActor());
+     return new FightEntityDispositionInformations(character != null ? (this.isVisibleFor(character) ? this.getCellId() : -1) : this.getCellId(), this.direction, getCarriedActor());
      }*/
-    public int APCancelling() {
-        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.Add_RETRAIT_PA);
+    public int getAPCancelling() {
+        return (int) Math.floor((double) this.stats.getTotal(StatsEnum.Wisdom) / 4) + this.stats.getTotal(StatsEnum.Add_RETRAIT_PA);
     }
 
-    public int MPCancelling() {
-        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.Add_RETRAIT_PM);
+    public int getMPCancelling() {
+        return (int) Math.floor((double) this.stats.getTotal(StatsEnum.Wisdom) / 4) + this.stats.getTotal(StatsEnum.Add_RETRAIT_PM);
     }
 
-    public int APDodge() {
-        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.DodgePALostProbability);
+    public int getAPDodge() {
+        return (int) Math.floor((double) this.stats.getTotal(StatsEnum.Wisdom) / 4) + this.stats.getTotal(StatsEnum.DodgePALostProbability);
     }
 
-    public int MPDodge() {
-        return (int) Math.floor((double) this.Stats.getTotal(StatsEnum.Wisdom) / 4) + this.Stats.getTotal(StatsEnum.DodgePMLostProbability);
+    public int getMPDodge() {
+        return (int) Math.floor((double) this.stats.getTotal(StatsEnum.Wisdom) / 4) + this.stats.getTotal(StatsEnum.DodgePMLostProbability);
     }
 
-    public int GetTackledMP() { //Sould be implements in Summoner,Monster return 0
-        if (this.VisibleState != GameActionFightInvisibilityStateEnum.VISIBLE) {
+    public int getTackledMP() { //Sould be implements in summoner,Monster return 0
+        if (this.visibleState != GameActionFightInvisibilityStateEnum.VISIBLE) {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfinder.GetEnnemyNear(Fight, Team, this.CellId(), true)) {
+        for (Fighter Tackler : Pathfinder.GetEnnemyNear(fight, team, this.getCellId(), true)) {
             if (num1 == 0.0) {
-                num1 = this.GetTacklePercent(Tackler);
+                num1 = this.getTacklePercent(Tackler);
             } else {
-                num1 *= this.GetTacklePercent(Tackler);
+                num1 *= this.getTacklePercent(Tackler);
             }
         }
         if (num1 == 0.0) {
@@ -359,17 +359,17 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         } else if (num2 > 1.0) {
             num2 = 1.0;
         }
-        return (int) Math.ceil((double) this.MP() * num2);
+        return (int) Math.ceil((double) this.getMP() * num2);
     }
 
-    public Short[] GetCastZone(SpellLevel spellLevel) {
+    public Short[] getCastZone(SpellLevel spellLevel) {
         int num = spellLevel.range;
-        for (BuffEffect Buff : (Iterable<BuffEffect>) this.Buffs.GetAllBuffs().filter(Buff -> Buff instanceof BuffSpellDommage)::iterator) {
+        for (BuffEffect Buff : (Iterable<BuffEffect>) this.buff.getAllBuffs().filter(buff -> buff instanceof BuffSpellDommage)::iterator) {
             num += Buff.CastInfos.Effect.value;
         }
 
         if (spellLevel.rangeCanBeBoosted) {
-            int val1 = num + this.Stats.getTotal(StatsEnum.Add_Range);
+            int val1 = num + this.stats.getTotal(StatsEnum.Add_Range);
             if (val1 < spellLevel.minRange) {
                 val1 = spellLevel.minRange;
             }
@@ -391,26 +391,26 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 }
             };
         } else {
-            shape = new Lozenge((byte) spellLevel.minRange, (byte) num, this.Fight.Map);
+            shape = new Lozenge((byte) spellLevel.minRange, (byte) num, this.fight.map);
         }
-        return shape.getCells(this.CellId());
+        return shape.getCells(this.getCellId());
     }
 
-    public boolean HasState(int stateId) {
-        return this.States.HasState(FightStateEnum.valueOf(stateId));
+    public boolean hasState(int stateId) {
+        return this.states.hasState(FightStateEnum.valueOf(stateId));
     }
 
-    public int GetTackledAP() {
-        if (this.VisibleState != GameActionFightInvisibilityStateEnum.VISIBLE) {
+    public int getTackledAP() {
+        if (this.visibleState != GameActionFightInvisibilityStateEnum.VISIBLE) {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfinder.GetEnnemyNear(Fight, Team, this.CellId())) {
+        for (Fighter Tackler : Pathfinder.GetEnnemyNear(fight, team, this.getCellId())) {
             {
                 if (num1 == 0.0) {
-                    num1 = this.GetTacklePercent(Tackler);
+                    num1 = this.getTacklePercent(Tackler);
                 } else {
-                    num1 *= this.GetTacklePercent(Tackler);
+                    num1 *= this.getTacklePercent(Tackler);
                 }
             }
         }
@@ -423,72 +423,72 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         } else if (num2 > 1.0) {
             num2 = 1.0;
         }
-        return (int) Math.ceil((double) this.AP() * num2);
+        return (int) Math.ceil((double) this.getAP() * num2);
     }
 
-    private double GetTacklePercent(Fighter tackler) {
-        if (tackler.Stats.getTotal(StatsEnum.Add_TackleBlock) == -2) {
+    private double getTacklePercent(Fighter tackler) {
+        if (tackler.stats.getTotal(StatsEnum.Add_TackleBlock) == -2) {
             return 0.0;
         } else {
-            return (double) (this.Stats.getTotal(StatsEnum.Add_TackleEvade) + 2) / (2.0 * (double) (tackler.Stats.getTotal(StatsEnum.Add_TackleBlock) + 2));
+            return (double) (this.stats.getTotal(StatsEnum.Add_TackleEvade) + 2) / (2.0 * (double) (tackler.stats.getTotal(StatsEnum.Add_TackleBlock) + 2));
         }
     }
 
     @Override
     public EntityDispositionInformations getEntityDispositionInformations(Player character) {
-        return new FightEntityDispositionInformations(character != null ? (this.IsVisibleFor(character) ? this.CellId() : -1) : this.CellId(), this.direction, GetCarriedActor());
+        return new FightEntityDispositionInformations(character != null ? (this.isVisibleFor(character) ? this.getCellId() : -1) : this.getCellId(), this.direction, getCarriedActor());
     }
 
-    public int GetCarriedActor() {
-        Optional<BuffEffect> Option = this.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).findFirst();
+    public int getCarriedActor() {
+        Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).findFirst();
         return Option.isPresent() ? Option.get().Caster.ID : 0;
     }
 
-    public boolean IsVisibleFor(Player character) {
-        return this.GetVisibleStateFor(character) != GameActionFightInvisibilityStateEnum.INVISIBLE.value;
+    public boolean isVisibleFor(Player character) {
+        return this.getVisibleStateFor(character) != GameActionFightInvisibilityStateEnum.INVISIBLE.value;
     }
 
     public int shieldPoints() {
         return 0;
     }
 
-    public int Summoner() {
-        return this.Summoner == null ? 0 : this.Summoner.ID;
+    public int getSummonerID() {
+        return this.summoner == null ? 0 : this.summoner.ID;
     }
 
-    public byte GetVisibleStateFor(Player Character) {
-        if (this.Team.GetAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.Summoner.ID == this.ID)) {
+    public byte getVisibleStateFor(Player character) {
+        if (this.team.getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner.ID == this.ID)) {
             return GameActionFightInvisibilityStateEnum.VISIBLE.value;
-        } else if (Character == null || Character.client == null || Character.getFighter() == null || Character.getFight() != this.Fight) {
-            return this.VisibleState.value;
+        } else if (character == null || character.client == null || character.getFighter() == null || character.getFight() != this.fight) {
+            return this.visibleState.value;
         } else {
-            return !Character.getFighter().IsFriendlyWith(this) || this.VisibleState == GameActionFightInvisibilityStateEnum.VISIBLE ? this.VisibleState.value : GameActionFightInvisibilityStateEnum.DETECTED.value;
+            return !character.getFighter().isFriendlyWith(this) || this.visibleState == GameActionFightInvisibilityStateEnum.VISIBLE ? this.visibleState.value : GameActionFightInvisibilityStateEnum.DETECTED.value;
         }
     }
 
-    public boolean IsMyFriend(Player Character) {
-        if (Character == null || Character.client == null || Character.getFighter() == null || Character.getFight() != this.Fight) {
+    public boolean isMyFriend(Player character) {
+        if (character == null || character.client == null || character.getFighter() == null || character.getFight() != this.fight) {
             return false;
         }
-        return Character.getFighter().IsFriendlyWith(this);
+        return character.getFighter().isFriendlyWith(this);
     }
 
-    public int Initiative(boolean Base) { //FIXME : Considerate stats ?
-        return (int) Math.floor((double) (this.MaxLife() / 4 + this.Stats.getTotal(StatsEnum.Initiative)) * (double) (this.Life() / this.MaxLife()));
+    public int getInitiative(boolean Base) { //FIXME : Considerate stats ?
+        return (int) Math.floor((double) (this.getMaxLife() / 4 + this.stats.getTotal(StatsEnum.Initiative)) * (double) (this.getLife() / this.getMaxLife()));
     }
 
-    public GameFightMinimalStats GetGameFightMinimalStats(Player character) {
-        if (this.Fight.FightState == FightState.STATE_PLACE) {
-            return new GameFightMinimalStatsPreparation(this.Life(), this.MaxLife(), (int) this.Stats.getBase(StatsEnum.Vitality), this.Stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.getTotal(StatsEnum.NeutralElementResistPercent), this.Stats.getTotal(StatsEnum.EarthElementResistPercent), this.Stats.getTotal(StatsEnum.WaterElementResistPercent), this.Stats.getTotal(StatsEnum.AirElementResistPercent), this.Stats.getTotal(StatsEnum.FireElementResistPercent), this.Stats.getTotal(StatsEnum.NeutralElementReduction), this.Stats.getTotal(StatsEnum.EarthElementReduction), this.Stats.getTotal(StatsEnum.WaterElementReduction), this.Stats.getTotal(StatsEnum.AirElementReduction), this.Stats.getTotal(StatsEnum.FireElementReduction), this.Stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.getTotal(StatsEnum.DodgePALostProbability), this.Stats.getTotal(StatsEnum.DodgePMLostProbability), this.Stats.getTotal(StatsEnum.Add_TackleBlock), this.Stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character), this.Initiative(false));
+    public GameFightMinimalStats getGameFightMinimalStats(Player character) {
+        if (this.fight.fightState == FightState.STATE_PLACE) {
+            return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.Vitality), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
         }
-        return new GameFightMinimalStats(this.Life(), this.MaxLife(), (int) this.Stats.getBase(StatsEnum.Vitality), this.Stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.getTotal(StatsEnum.NeutralElementResistPercent), this.Stats.getTotal(StatsEnum.EarthElementResistPercent), this.Stats.getTotal(StatsEnum.WaterElementResistPercent), this.Stats.getTotal(StatsEnum.AirElementResistPercent), this.Stats.getTotal(StatsEnum.FireElementResistPercent), this.Stats.getTotal(StatsEnum.NeutralElementReduction), this.Stats.getTotal(StatsEnum.EarthElementReduction), this.Stats.getTotal(StatsEnum.WaterElementReduction), this.Stats.getTotal(StatsEnum.AirElementReduction), this.Stats.getTotal(StatsEnum.FireElementReduction), this.Stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.getTotal(StatsEnum.DodgePALostProbability), this.Stats.getTotal(StatsEnum.DodgePMLostProbability), this.Stats.getTotal(StatsEnum.Add_TackleBlock), this.Stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
+        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.Vitality), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
     }
 
     public IdentifiedEntityDispositionInformations GetIdentifiedEntityDispositionInformations() {
-        return new IdentifiedEntityDispositionInformations(this.CellId(), this.direction, this.ID);
+        return new IdentifiedEntityDispositionInformations(this.getCellId(), this.direction, this.ID);
     }
 
-    public abstract FightTeamMemberInformations GetFightTeamMemberInformations();
+    public abstract FightTeamMemberInformations getFightTeamMemberInformations();
 
     @Override
     public abstract void send(Message Packet);
@@ -499,82 +499,82 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public abstract EntityLook getEntityLook();
 
     @Override
-    public FightObjectType ObjectType() {
+    public FightObjectType getObjectType() {
         return FightObjectType.OBJECT_FIGHTER;
     }
 
     @Override
-    public short CellId() {
+    public short getCellId() {
         return this.myCell.Id;
     }
 
     @Override
-    public boolean CanWalk() {
+    public boolean canWalk() {
         return false;
     }
 
     @Override
-    public boolean CanStack() {
+    public boolean canStack() {
         return false;
     }
 
-    public boolean IsFriendlyWith(Fighter actor) {
-        return actor.Team.Id == this.Team.Id;
+    public boolean isFriendlyWith(Fighter actor) {
+        return actor.team.Id == this.team.Id;
     }
 
-    public boolean IsEnnemyWith(Fighter actor) {
-        return !this.IsFriendlyWith(actor);
+    public boolean isEnnemyWith(Fighter actor) {
+        return !this.isFriendlyWith(actor);
     }
 
-    public void CalculDamages(StatsEnum Effect, MutableInt Jet) {
-        switch (Effect) {
+    public void computeDamages(StatsEnum effect, MutableInt jet) {
+        switch (effect) {
             case Damage_Earth:
             case Steal_Earth:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Earth_Damages_Bonus)));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Strength) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Earth_Damages_Bonus)));
                 break;
             case Damage_Earth_Per_Pm_Percent:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Earth_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Strength) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Earth_Damages_Bonus)) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
             case Damage_Neutral:
             case Steal_Neutral:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Strength) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
                 break;
             case Damage_Neutral_Per_Pm_Percent:
-                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Strength) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamagePhysic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Neutral_Damages_Bonus)) * (((double) (this.MP() / this.MaxMP())) * 100)));
+                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Strength) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Neutral_Damages_Bonus)) * (((double) (this.getMP() / this.getMaxMP())) * 100)));
                 break;
             case Damage_Fire:
             case Steal_Fire:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus)));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus)));
                 break;
             case Damage_Fire_Per_Pm_Percent:
-                Jet.setValue(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * ((((double) this.MP() / (double) this.MaxMP()))));
-                System.out.println((this.MP() / this.MaxMP()));
-                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))));
-                System.out.println(Math.floor((Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((this.MP() / this.MaxMP()))));
+                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * ((((double) this.getMP() / (double) this.getMaxMP()))));
+                System.out.println((this.getMP() / this.getMaxMP()));
+                System.out.println(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))));
+                System.out.println(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((this.getMP() / this.getMaxMP()))));
                 break;
             case Damage_Air:
             case Steal_Air:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Agility) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Air_Damages_Bonus)));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Agility) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Air_Damages_Bonus)));
                 break;
             case Damage_Air_Per_Pm_Percent:
-                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Agility) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Air_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
+                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Agility) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Air_Damages_Bonus))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
             case Damage_Water:
             case Steal_Water:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Chance) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Water_Damages_Bonus)));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Chance) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Water_Damages_Bonus)));
                 break;
             case Damage_Water_Per_Pm_Percent:
-                Jet.setValue(((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Chance) + this.Stats.getTotal(StatsEnum.AddDamagePercent) + this.Stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.Stats.getTotal(StatsEnum.AddDamageMagic) + this.Stats.getTotal(StatsEnum.AllDamagesBonus) + this.Stats.getTotal(StatsEnum.Add_Water_Damages_Bonus))) * (((double) (this.MP() / this.MaxMP())) * 100));
+                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Chance) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Water_Damages_Bonus))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
         }
 
@@ -602,7 +602,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             for (FightActivableObject Object : Objects) {
                 if (Object instanceof FightPortal && ((FightPortal) Object).Enabled) {
                     _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
-                    if (Object.CellId() == param1) {
+                    if (Object.getCellId() == param1) {
                         _loc3_ = true;
                     }
                 }
@@ -619,7 +619,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 _loc10_ = _loc8_[_loc9_];
                 _loc12_ = Math.max(_loc12_, _loc10_.damageValue);
                 if (_loc11_ != null) {
-                    _loc13_ = _loc13_ + MapPoint.fromCellId(_loc10_.CellId()).distanceToCell(MapPoint.fromCellId(_loc11_.CellId()));
+                    _loc13_ = _loc13_ + MapPoint.fromCellId(_loc10_.getCellId()).distanceToCell(MapPoint.fromCellId(_loc11_.getCellId()));
                 }
                 _loc11_ = _loc10_;
                 _loc9_++;
@@ -629,15 +629,15 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return _loc2_;
     }
 
-    public void CalculBonusDamages(EffectInstanceDice Effect, MutableInt Jet, short CastCell, short TargetCell, short TruedCell) {
+    public void calculBonusDamages(EffectInstanceDice effect, MutableInt jet, short castCell, short targetCell, short truedCell) {
 
-        double Bonus = this.Stats.getTotal(StatsEnum.Add_Damage_Final_Percent);
+        double bonus = this.stats.getTotal(StatsEnum.Add_Damage_Final_Percent);
 
-        Bonus += getShapeEfficiency(Effect.zoneShape(), CastCell, TargetCell, Effect.ZoneSize() != -100000 ? Effect.ZoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, Effect.zoneMinSize() != -100000 ? Effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, Effect.zoneEfficiencyPercent() != -100000 ? Effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, Effect.zoneMaxEfficiency() != -100000 ? Effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
+        bonus += getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.ZoneSize() != -100000 ? effect.ZoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
-        Bonus *= getPortalsSpellEfficiencyBonus(TruedCell, this.Fight);
+        bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
 
-        Jet.setValue((Jet.floatValue() * Bonus));
+        jet.setValue((jet.floatValue() * bonus));
     }
 
     public static double getShapeEfficiency(int param1, int param2, int param3, int param4, int param5, int param6, int param7) {
@@ -697,36 +697,36 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return Math.max(0, DAMAGE_NOT_BOOSTED - 0.01 * Math.min(param1, param5) * param4);
     }
 
-    public void CalculReduceDamages(StatsEnum Effect, MutableInt Damages) {
-        switch (Effect) {
+    public void calculReduceDamages(StatsEnum effect, MutableInt damages) {
+        switch (effect) {
             case Damage_Neutral:
             case Steal_Neutral:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.NeutralElementResistPercent) - (Fight instanceof AgressionFight ? Stats.getTotal(StatsEnum.PvpNeutralElementResistPercent) : 0)) / 100
-                        - this.Stats.getTotal(StatsEnum.NeutralElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpNeutralElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.NeutralElementResistPercent) - (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PvpNeutralElementResistPercent) : 0)) / 100
+                        - this.stats.getTotal(StatsEnum.NeutralElementReduction) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpNeutralElementReduction) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Earth:
             case Steal_Earth:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.EarthElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpEarthElementResistPercent) : 0)) / 100
-                        - this.Stats.getTotal(StatsEnum.EarthElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpEarthElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.EarthElementResistPercent) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpEarthElementResistPercent) : 0)) / 100
+                        - this.stats.getTotal(StatsEnum.EarthElementReduction) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpEarthElementReduction) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Fire:
             case Steal_Fire:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.FireElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpFireElementResistPercent) : 0)) / 100
-                        - this.Stats.getTotal(StatsEnum.FireElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpFireElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.FireElementResistPercent) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpFireElementResistPercent) : 0)) / 100
+                        - this.stats.getTotal(StatsEnum.FireElementReduction) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpFireElementReduction) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Air:
             case Steal_Air:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.AirElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpAirElementResistPercent) : 0)) / 100
-                        - this.Stats.getTotal(StatsEnum.AirElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpAirElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.AirElementResistPercent) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpAirElementResistPercent) : 0)) / 100
+                        - this.stats.getTotal(StatsEnum.AirElementReduction) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpAirElementReduction) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
 
             case Damage_Water:
             case Steal_Water:
-                Damages.setValue(Damages.intValue() * (100 - this.Stats.getTotal(StatsEnum.WaterElementResistPercent) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpWaterElementResistPercent) : 0)) / 100
-                        - this.Stats.getTotal(StatsEnum.WaterElementReduction) - (Fight instanceof AgressionFight ? this.Stats.getTotal(StatsEnum.PvpWaterElementReduction) : 0) - this.Stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.WaterElementResistPercent) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpWaterElementResistPercent) : 0)) / 100
+                        - this.stats.getTotal(StatsEnum.WaterElementReduction) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PvpWaterElementReduction) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
                 break;
         }
     }
@@ -736,23 +736,23 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     /// </summary>
     /// <param name="Caster"></param> TODO: Supprimer les appel variable inutile qui occupent de la mémoire et referencer direct les var
     /// <param name="LostPoint"></param>
-    /// <param name="MP"></param>
+    /// <param name="getMP"></param>
     /// <returns></returns>
-    public int CalculDodgeAPMP(Fighter Caster, int LostPoint, boolean MP, boolean isBuff) {
-        int RealLostPoint = 0;
+    public int calculDodgeAPMP(Fighter caster, int lostPoint, boolean MP, boolean isBuff) {
+        int realLostPoint = 0;
 
         if (!MP) {
-            int DodgeAPCaster = Caster.APCancelling() + 1;
-            int DodgeAPTarget = this.APDodge() + 1;
+            int dodgeAPCaster = caster.getAPCancelling() + 1;
+            int dodgeAPTarget = this.getAPDodge() + 1;
 
-            for (int i = 0; i < LostPoint; i++) {
-                int ActualAP = (isBuff && this.ID == this.Fight.CurrentFighter.ID ? this.MaxAP() : this.AP()) - RealLostPoint;
-                int realAP = AP();
+            for (int i = 0; i < lostPoint; i++) {
+                int ActualAP = (isBuff && this.ID == this.fight.currentFighter.ID ? this.getMaxAP() : this.getAP()) - realLostPoint;
+                int realAP = getAP();
                 if (realAP == 0) {
                     realAP = 1;
                 }
                 double PercentLastAP = ActualAP / realAP;
-                double Chance = 0.5 * (DodgeAPCaster / DodgeAPTarget) * PercentLastAP;
+                double Chance = 0.5 * (dodgeAPCaster / dodgeAPTarget) * PercentLastAP;
                 int PercentChance = (int) (Chance * 100);
 
                 if (PercentChance > 100) {
@@ -762,22 +762,22 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                     PercentChance = 10;
                 }
 
-                if (Random.nextInt(99) < PercentChance) {
-                    RealLostPoint++;
+                if (RANDOM.nextInt(99) < PercentChance) {
+                    realLostPoint++;
                 }
             }
         } else {
-            int DodgeMPCaster = Caster.MPCancelling() + 1;
-            int DodgeMPTarget = this.MPDodge() + 1;
+            int dodgeMPCaster = caster.getMPCancelling() + 1;
+            int dodgeMPTarget = this.getMPDodge() + 1;
 
-            for (int i = 0; i < LostPoint; i++) {
-                int ActualMP = (isBuff && this.ID == this.Fight.CurrentFighter.ID ? this.MaxMP() : this.MP()) - RealLostPoint;
-                int realMP = MP();
+            for (int i = 0; i < lostPoint; i++) {
+                int ActualMP = (isBuff && this.ID == this.fight.currentFighter.ID ? this.getMaxMP() : this.getMP()) - realLostPoint;
+                int realMP = getMP();
                 if (realMP == 0) {
                     realMP = 1;
                 }
                 double PercentLastMP = ActualMP / realMP;
-                double Chance = 0.5 * (DodgeMPCaster / DodgeMPTarget) * PercentLastMP;
+                double Chance = 0.5 * (dodgeMPCaster / dodgeMPTarget) * PercentLastMP;
                 int PercentChance = (int) (Chance * 100);
 
                 if (PercentChance > 100) {
@@ -787,38 +787,38 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                     PercentChance = 10;
                 }
 
-                if (Random.nextInt(99) < PercentChance) {
-                    RealLostPoint++;
+                if (RANDOM.nextInt(99) < PercentChance) {
+                    realLostPoint++;
                 }
             }
         }
 
-        return RealLostPoint;
+        return realLostPoint;
     }
 
-    public void CalculHeal(MutableInt Heal) {
-        Heal.setValue(Math.floor(Heal.doubleValue() * (100 + this.Stats.getTotal(StatsEnum.Intelligence)) / 100 + this.Stats.getTotal(StatsEnum.Add_Heal_Bonus)));
+    public void calculheal(MutableInt heal) {
+        heal.setValue(Math.floor(heal.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence)) / 100 + this.stats.getTotal(StatsEnum.Add_Heal_Bonus)));
     }
 
-    public int CalculArmor(StatsEnum DamageEffect) {
+    public int calculArmor(StatsEnum DamageEffect) {
         /*switch (DamageEffect) {
          default:
          return this.stats.getTotal(StatsEnum.AddArmor);
          }*/
-        return this.Stats.getTotal(StatsEnum.AddArmor);
+        return this.stats.getTotal(StatsEnum.AddArmor);
     }
 
-    public int ReflectDamage() {
-        return ((1 + (this.Stats.getTotal(StatsEnum.Wisdom) / 100)) * this.Stats.getTotal(StatsEnum.Damage_Return)) + this.Stats.getTotal(StatsEnum.DamageReflection);
+    public int getReflectedDamage() {
+        return ((1 + (this.stats.getTotal(StatsEnum.Wisdom) / 100)) * this.stats.getTotal(StatsEnum.Damage_Return)) + this.stats.getTotal(StatsEnum.DamageReflection);
     }
 
     @Override
-    public Integer Priority() {
+    public Integer getPriority() {
         return 0;
     }
 
     @Override
-    public boolean CanGoThrough() {
+    public boolean canGoThrough() {
         return false;
     }
 

@@ -19,13 +19,13 @@ public class EffectLifeDamage extends EffectBase {
 
             // Ajout du buff
             for (Fighter Target : CastInfos.Targets) {
-                Target.Buffs.AddBuff(new BuffLifeDamage(CastInfos, Target));
+                Target.buff.addBuff(new BuffLifeDamage(CastInfos, Target));
             }
         } else // Dommage direct
         {
             for (Fighter Target : CastInfos.Targets) {
                 int effectBase = CastInfos.RandomJet(Target);
-                MutableInt DamageValue = new MutableInt((Target.CurrentLife / 100) * effectBase);
+                MutableInt DamageValue = new MutableInt((Target.currentLife / 100) * effectBase);
                 //DamageValue = (-DamageValue);
                 if (EffectDamage.ApplyDamages(CastInfos, Target, DamageValue) == -3) {
                     return -3;

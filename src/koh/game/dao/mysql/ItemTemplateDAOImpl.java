@@ -46,7 +46,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             while (result.next()) {
                 itemTypes.put(result.getInt("id"), new ItemType() {
                     {
-                        SuperType = result.getInt("super_type_id");
+                        superType = result.getInt("super_type_id");
                         plural = result.getBoolean("plural");
                         gender = result.getInt("gender");
                         rawZone = result.getString("raw_zone");

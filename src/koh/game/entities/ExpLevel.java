@@ -8,25 +8,25 @@ public class ExpLevel {
 
     public final int level;
     public final long player;
-    public final long Job;
-    public final long Mount;
-    public final long Guild;
-    public final int GuildMembers;
-    public final int LivingObject;
+    public final long job;
+    public final long mount;
+    public final long guild;
+    public final int guildMembers;
+    public final int livingObject;
     public final int PvP;
-    public final long Tourmentors;
-    public final long Bandits;
+    public final long tourmentors;
+    public final long bandits;
 
     public ExpLevel(int lvl, long a, long b, long c, long d, int e, int f, int g, long h, long i) {
         this.level = lvl;
         this.player = a;
-        this.Job = b;
-        this.Mount = c;
-        this.Guild = d;
-        this.GuildMembers = e;
-        this.LivingObject = f;
+        this.job = b;
+        this.mount = c;
+        this.guild = d;
+        this.guildMembers = e;
+        this.livingObject = f;
         this.PvP = g;
-        this.Tourmentors = h;
-        this.Bandits = i;
+        this.tourmentors = h;
+        this.bandits = i;
     }
 }

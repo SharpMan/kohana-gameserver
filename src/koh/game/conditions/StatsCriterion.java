@@ -20,7 +20,7 @@ public class StatsCriterion extends Criterion {
             put("CI", StatsEnum.Intelligence);
             put("CW", StatsEnum.Wisdom);
             put("CV", StatsEnum.Vitality);
-            put("CL", StatsEnum.Vitality); //TODO: CurrentLife
+            put("CL", StatsEnum.Vitality); //TODO: currentLife
             put("CM", StatsEnum.MovementPoints);
             put("CP", StatsEnum.ActionPoints);
             put("Ct", StatsEnum.Add_TackleEvade);

@@ -301,7 +301,7 @@ public class WorldClient {
         this.showQueue = false;
         if (this.character != null) {
             Main.Logs().writeDebug("player " + this.character.nickName + " disconnected");
-            ChatChannel.UnRegister(this);
+            ChatChannel.unRegister(this);
             this.character.onDisconnect();
             this.character = null;
         }

@@ -23,17 +23,17 @@ public class BuffErosionPercent extends BuffEffect {
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.Jet = this.CastInfos.RandomJet(Target);
         float pdamage = Jet / 100.00f;
-        if (this.Target.MaxLife() - (int) (this.Target.MaxLife() * pdamage) > 0) {
-            Added = (int) (this.Target.MaxLife() * pdamage);
+        if (this.Target.getMaxLife() - (int) (this.Target.getMaxLife() * pdamage) > 0) {
+            Added = (int) (this.Target.getMaxLife() * pdamage);
         }
-        this.Target.setLifeMax(this.Target.MaxLife() - Added);
+        this.Target.setLifeMax(this.Target.getMaxLife() - Added);
 
         return super.ApplyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int RemoveEffect() {
-        this.Target.setLifeMax(this.Target.MaxLife() + Added);
+        this.Target.setLifeMax(this.Target.getMaxLife() + Added);
         return super.RemoveEffect();
     }
 

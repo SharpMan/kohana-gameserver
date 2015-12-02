@@ -13,12 +13,12 @@ public class EffectLancer extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        if (CastInfos.Caster.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffPorteur)) {
-            Fighter Target = CastInfos.Caster.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).findFirst().get().Target;
+        if (CastInfos.Caster.buff.getAllBuffs().anyMatch(x -> x instanceof BuffPorteur)) {
+            Fighter Target = CastInfos.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).findFirst().get().Target;
             if (Target != null) {
-                Target.Fight.sendToField(new GameActionFightThrowCharacterMessage(ACTION_THROW_CARRIED_CHARACTER, CastInfos.Caster.ID, Target.ID, CastInfos.CellId));
+                Target.fight.sendToField(new GameActionFightThrowCharacterMessage(ACTION_THROW_CARRIED_CHARACTER, CastInfos.Caster.ID, Target.ID, CastInfos.CellId));
 
-                return Target.SetCell(Target.Fight.GetCell(CastInfos.CellId));
+                return Target.setCell(Target.fight.getCell(CastInfos.CellId));
             }
         }
 

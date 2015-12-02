@@ -18,32 +18,32 @@ public abstract class StaticFighter extends Fighter {
     }
     
     public void AdjustStats() {
-        this.Stats.addBase(StatsEnum.Vitality, (short) ((double) this.Stats.getEffect(StatsEnum.Vitality).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.addBase(StatsEnum.Intelligence, (short) ((double) this.Stats.getEffect(StatsEnum.Intelligence).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.addBase(StatsEnum.Chance, (short) ((double) this.Stats.getEffect(StatsEnum.Chance).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.addBase(StatsEnum.Strength, (short) ((double) this.Stats.getEffect(StatsEnum.Strength).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.addBase(StatsEnum.Agility, (short) ((double) this.Stats.getEffect(StatsEnum.Agility).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.addBase(StatsEnum.Wisdom, (short) ((double) this.Stats.getEffect(StatsEnum.Wisdom).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+        this.stats.addBase(StatsEnum.Vitality, (short) ((double) this.stats.getEffect(StatsEnum.Vitality).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.Intelligence, (short) ((double) this.stats.getEffect(StatsEnum.Intelligence).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.Chance, (short) ((double) this.stats.getEffect(StatsEnum.Chance).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.Strength, (short) ((double) this.stats.getEffect(StatsEnum.Strength).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.Agility, (short) ((double) this.stats.getEffect(StatsEnum.Agility).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.Wisdom, (short) ((double) this.stats.getEffect(StatsEnum.Wisdom).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
     }
 
     @Override
-    public int MaxAP() {
+    public int getMaxAP() {
         return 0;
     }
 
     @Override
-    public int MaxMP() {
+    public int getMaxMP() {
         return 0;
     }
 
     @Override
-    public int AP() {
+    public int getAP() {
         return 0;
 
     }
 
     @Override
-    public int MP() {
+    public int getMP() {
         return 0;
     }
 
@@ -51,18 +51,18 @@ public abstract class StaticFighter extends Fighter {
 
     public void onBeginTurn() {
         if (firstTurn) {
-            this.Fight.AffectSpellTo(this, this, this.Grade.Grade, this.Grade.Monster().spells);
+            this.fight.affectSpellTo(this, this, this.Grade.Grade, this.Grade.Monster().spells);
             this.firstTurn = false;
         }
     }
 
     @Override
     public int compareTo(IFightObject obj) {
-        return Priority().compareTo(obj.Priority());
+        return getPriority().compareTo(obj.getPriority());
     }
 
     @Override
-    public FightObjectType ObjectType() {
+    public FightObjectType getObjectType() {
         return FightObjectType.OBJECT_STATIC;
     }
 

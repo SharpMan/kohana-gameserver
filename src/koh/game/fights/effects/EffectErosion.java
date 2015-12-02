@@ -12,7 +12,7 @@ public class EffectErosion extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffErosion(CastInfos, Target));
+            Target.buff.addBuff(new BuffErosion(CastInfos, Target));
         }
 
         return -1;

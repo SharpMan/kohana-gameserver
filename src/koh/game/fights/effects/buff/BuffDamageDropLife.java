@@ -25,8 +25,8 @@ public class BuffDamageDropLife extends BuffEffect {
 
         // return EffectDamage.ApplyDamages(this.CastInfos, this.Target, ref Damage);
         int effectBase = DamageJet.getValue();
-        //var DamageValuea = (Target.CurrentLife / 100) * effectBase;
-        MutableInt DamageValue = new MutableInt((CastInfos.Caster.CurrentLife / 100) * effectBase);
+        //var DamageValuea = (Target.currentLife / 100) * effectBase;
+        MutableInt DamageValue = new MutableInt((CastInfos.Caster.currentLife / 100) * effectBase);
         if (EffectDamage.ApplyDamages(CastInfos, CastInfos.Caster, DamageValue) == -3) {
             EffectHeal.ApplyHeal(CastInfos, Target, DamageValue);
             return -3;

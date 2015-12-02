@@ -9,8 +9,7 @@ import jregex.Pattern;
 import jregex.REFlags;
 import koh.d2o.entities.Effect;
 import koh.game.Main;
-import koh.game.dao.mysql.D2oDaoImpl;
-import koh.game.dao.mysql.MonsterDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;
@@ -38,7 +37,7 @@ public class EffectInstance implements Serializable {
 
     public static final int classID = 1;
 
-    public byte SerializationIdentifier() {
+    public byte serializationIdentifier() {
         return 1;
     }
 
@@ -84,12 +83,12 @@ public class EffectInstance implements Serializable {
 
     
 
-    public boolean IsValidTarget(Fighter Caster, Fighter actor) {
+    public boolean isValidTarget(Fighter Caster, Fighter actor) {
         return Targets() == SpellTargetType.NONE
                 || Targets() == SpellTargetType.ALL
                 || Caster == actor && Targets().HasFlag(SpellTargetType.SELF)
                 || (!Targets().HasFlag(SpellTargetType.ONLY_SELF) || actor == Caster)
-                && (Caster.IsFriendlyWith(actor) && Caster != actor && ((Targets().HasFlag(SpellTargetType.ALLY_1) || Targets().HasFlag(SpellTargetType.ALLY_2) || (Targets().HasFlag(SpellTargetType.ALLY_3) || Targets().HasFlag(SpellTargetType.ALLY_4)) || Targets().HasFlag(SpellTargetType.ALLY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ALLY_SUMMONS) || Targets().HasFlag(SpellTargetType.ALLY_STATIC_SUMMONS)) && actor instanceof SummonedFighter) || Caster.IsEnnemyWith(actor) && ((Targets().HasFlag(SpellTargetType.ENNEMY_1) || Targets().HasFlag(SpellTargetType.ENNEMY_2) || (Targets().HasFlag(SpellTargetType.ENNEMY_3) || Targets().HasFlag(SpellTargetType.ENNEMY_4)) || Targets().HasFlag(SpellTargetType.ENNEMY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ENNEMY_SUMMONS) || Targets().HasFlag(SpellTargetType.ENNEMY_STATIC_SUMMONS)) && actor instanceof SummonedFighter));
+                && (Caster.isFriendlyWith(actor) && Caster != actor && ((Targets().HasFlag(SpellTargetType.ALLY_1) || Targets().HasFlag(SpellTargetType.ALLY_2) || (Targets().HasFlag(SpellTargetType.ALLY_3) || Targets().HasFlag(SpellTargetType.ALLY_4)) || Targets().HasFlag(SpellTargetType.ALLY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ALLY_SUMMONS) || Targets().HasFlag(SpellTargetType.ALLY_STATIC_SUMMONS)) && actor instanceof SummonedFighter) || Caster.isEnnemyWith(actor) && ((Targets().HasFlag(SpellTargetType.ENNEMY_1) || Targets().HasFlag(SpellTargetType.ENNEMY_2) || (Targets().HasFlag(SpellTargetType.ENNEMY_3) || Targets().HasFlag(SpellTargetType.ENNEMY_4)) || Targets().HasFlag(SpellTargetType.ENNEMY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ENNEMY_SUMMONS) || Targets().HasFlag(SpellTargetType.ENNEMY_STATIC_SUMMONS)) && actor instanceof SummonedFighter));
     }
 
     public int zoneShape() {
@@ -167,10 +166,10 @@ public class EffectInstance implements Serializable {
     }
 
     public int category() {
-        if (D2oDaoImpl.getEffect(this.effectId) == null) {
+        if (DAO.getD2oTemplates().getEffect(this.effectId) == null) {
             return -1;
         }
-        return D2oDaoImpl.getEffect(this.effectId).category;
+        return DAO.getD2oTemplates().getEffect(this.effectId).category;
     }
 
     public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect, int pTriggeringSpellCasterId) {
@@ -186,11 +185,11 @@ public class EffectInstance implements Serializable {
             return (false);
         };
         boolean targetIsCaster = (pTargetId.ID == pCasterId.ID);
-        boolean targetIsCarried = pTargetId.GetCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
+        boolean targetIsCarried = pTargetId.getCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
         GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
         GameFightMonsterInformations monsterInfo = pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.getGameContextActorInformations(null) : null;
-        boolean isTargetAlly = pCasterId.IsFriendlyWith(pTargetId);
+        boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
         
         if (targetIsCaster) {
             if (pEffect.effectId == 90) {
@@ -205,7 +204,7 @@ public class EffectInstance implements Serializable {
             if (((((targetIsCarried) && (!((pEffect.ZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.ZoneShape() == SpellShapeEnum.a))))) {
                 return (true);
             };
-            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(MonsterDAOImpl.Cache.get(monsterInfo.creatureGenericId).canPlay)))) {
+            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(DAO.getMonsters().find(monsterInfo.creatureGenericId).canPlay)))) {
                 targetMaskPattern = ((isTargetAlly) ? "agsj" : "ASJ");
             } else {
                 if (targetInfos.stats.summoned) {
@@ -247,17 +246,17 @@ public class EffectInstance implements Serializable {
                     case 'e':
                         maskState = Integer.parseInt(exclusiveMaskParam);
                         if (exclusiveMaskCasterOnly) {
-                            verify = !pCasterId.HasState(maskState);
+                            verify = !pCasterId.hasState(maskState);
                         } else {
-                            verify = !pTargetId.HasState(maskState);
+                            verify = !pTargetId.hasState(maskState);
                         }
                         break;
                     case 'E':
                         maskState = Integer.parseInt(exclusiveMaskParam);
                         if (exclusiveMaskCasterOnly) {
-                            verify = pCasterId.HasState(maskState);
+                            verify = pCasterId.hasState(maskState);
                         } else {
-                            verify = pTargetId.HasState(maskState);
+                            verify = pTargetId.hasState(maskState);
                         }
                         break;
                     case 'f':
@@ -389,8 +388,8 @@ public class EffectInstance implements Serializable {
         this.initialized = true;
     }
 
-    public Effect Template() {
-        return D2oDaoImpl.getEffect(this.effectId);
+    public Effect getTemplate() {
+        return DAO.getD2oTemplates().getEffect(this.effectId);
     }
 
     public EffectInstance(IoBuffer buf) {

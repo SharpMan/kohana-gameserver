@@ -27,7 +27,7 @@ public class EffectStats extends EffectBase {
                 return -3;
             }
 
-            Target.Buffs.AddBuff(BuffStats);
+            Target.buff.addBuff(BuffStats);
         }
 
         return -1;

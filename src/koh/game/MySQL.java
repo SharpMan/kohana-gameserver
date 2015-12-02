@@ -224,7 +224,7 @@ public class MySQL {
         Main.Logs().writeInfo(PaddockDAOImpl.FindAll() + " Paddocks catched");
         Main.Logs().writeInfo(MountDAOImpl.FindAll() + " Mounts catched");
         Main.Logs().writeInfo(GuildDAO.FindAll() + " guild catched");
-        Main.Logs().writeInfo(GuildDAO.FindMembers() + " GuildMembers catched");
+        Main.Logs().writeInfo(GuildDAO.FindMembers() + " guildMembers catched");
         Main.Logs().writeInfo(JobDAOImpl.loadAllGatheringInfos() + " GatheringJob LevelInfos catched");
         Main.Logs().writeInfo(JobDAOImpl.loadAllSkills() + " InteractiveSkills LevelInfos catched");
         Main.Logs().writeInfo(MonsterDAOImpl.FindAll() + " Monster Templates catched");

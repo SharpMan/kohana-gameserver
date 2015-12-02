@@ -24,19 +24,19 @@ public class BuffSubPAEsquive extends BuffEffect {
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt LostAP = new MutableInt(CastInfos.RandomJet(Target));
-        LostAP.setValue(LostAP.getValue() > Target.AP() ? Target.AP() : LostAP.getValue());
-        CastInfos.DamageValue = Target.CalculDodgeAPMP(CastInfos.Caster, LostAP.intValue(), false,CastInfos.Duration > 0);
+        LostAP.setValue(LostAP.getValue() > Target.getAP() ? Target.getAP() : LostAP.getValue());
+        CastInfos.DamageValue = Target.calculDodgeAPMP(CastInfos.Caster, LostAP.intValue(), false,CastInfos.Duration > 0);
 
         if (CastInfos.DamageValue != LostAP.intValue()) {
-            Target.Fight.sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, Caster.ID, Target.ID, LostAP.getValue() - CastInfos.DamageValue));
+            Target.fight.sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, Caster.ID, Target.ID, LostAP.getValue() - CastInfos.DamageValue));
         }
 
         if (CastInfos.DamageValue > 0) {
             BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PA, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.Caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, Duration, 0), this.Target);
             BuffStats.ApplyEffect(LostAP, null);
-            this.Target.Buffs.AddBuff(BuffStats);
-            if (Target.ID == Target.Fight.CurrentFighter.ID) {
-                Target.Fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, this.Caster.ID, Target.ID, (short) CastInfos.DamageValue));
+            this.Target.buff.addBuff(BuffStats);
+            if (Target.ID == Target.fight.currentFighter.ID) {
+                Target.fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, this.Caster.ID, Target.ID, (short) CastInfos.DamageValue));
             }
         }
 

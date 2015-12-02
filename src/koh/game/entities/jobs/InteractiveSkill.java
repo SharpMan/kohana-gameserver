@@ -7,7 +7,7 @@ package koh.game.entities.jobs;
 public class InteractiveSkill {
 
     public int ID;
-    public String Type;
+    public String type;
     public byte parentJobId;
     public boolean isForgemagus;
     public int[] modifiableItemTypeId;

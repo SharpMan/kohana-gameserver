@@ -20,65 +20,65 @@ public class MountExchange extends Exchange {
 
     public MountExchange(WorldClient Client) {
         this.myClient = Client;
-        this.Send(new ExchangeMountsStableAddMessage(new MountClientData[0]));
-        this.Send(new ExchangeStartOkMountWithOutPaddockMessage(new MountClientData[0]));
+        this.send(new ExchangeMountsStableAddMessage(new MountClientData[0]));
+        this.send(new ExchangeStartOkMountWithOutPaddockMessage(new MountClientData[0]));
         //this.send(new BasicStatMessage(CLICK_ON_BUTTON));
     }
 
     @Override
-    public boolean TransfertAllToInv(WorldClient Client, InventoryItem[] Items) {
+    public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
         return false;
     }
 
     @Override
-    public boolean MoveItems(WorldClient Client, InventoryItem[] Items, boolean Add) {
+    public boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add) {
         return false;
     }
 
     @Override
-    public boolean MoveItem(WorldClient Client, int ItemID, int Quantity) {
+    public boolean moveItem(WorldClient Client, int itemID, int quantity) {
         return false;
     }
 
     @Override
-    public boolean MoveKamas(WorldClient Client, int Quantity) {
+    public boolean moveKamas(WorldClient Client, int quantity) {
        return false;
     }
 
     @Override
-    public boolean BuyItem(WorldClient Client, int TemplateId, int Quantity) {
+    public boolean buyItem(WorldClient Client, int templateId, int quantity) {
         return false;
     }
 
     @Override
-    public boolean SellItem(WorldClient Client, InventoryItem Item, int Quantity) {
+    public boolean sellItem(WorldClient Client, InventoryItem item, int quantity) {
         return false;
     }
 
     @Override
-    public boolean Validate(WorldClient Client) {
+    public boolean validate(WorldClient Client) {
         return false;
     }
 
     @Override
-    public boolean Finish() {
+    public boolean finish() {
         this.myEnd = true;
 
         return true;
     }
 
     @Override
-    public boolean CloseExchange(boolean Success) {
-        this.Finish();
+    public boolean closeExchange(boolean Success) {
+        this.finish();
         this.myClient.myExchange = null;
-        this.Send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, Success));
+        this.send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, Success));
         this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 
         return true;
     }
 
     @Override
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
         this.myClient.send(Packet);
     }
 

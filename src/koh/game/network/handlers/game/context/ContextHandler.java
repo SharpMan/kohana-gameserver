@@ -55,7 +55,7 @@ public class ContextHandler {
     @HandlerAttribute(ID = ShowCellRequestMessage.M_ID)
     public static void HandleShowCellRequestMessage(WorldClient Client, ShowCellRequestMessage Message) {
         if (Client.character.getFighter() != null) {
-            Client.character.getFighter().ShowCell(Message.cellId, true);
+            Client.character.getFighter().showCell(Message.cellId, true);
         }
         //Spectator
     }
@@ -174,14 +174,14 @@ public class ContextHandler {
         }
 
         if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            MovementPath Path = Pathfinder.isValidPath(Client.character.getFight(), Client.character.getFighter(), Client.character.getFighter().CellId(), Client.character.getFighter().direction, Message.keyMovements);
+            MovementPath Path = Pathfinder.isValidPath(Client.character.getFight(), Client.character.getFighter(), Client.character.getFighter().getCellId(), Client.character.getFighter().direction, Message.keyMovements);
             if (Path != null) {
-                if (Client.character.getFighter().Dead()) {
+                if (Client.character.getFighter().isDead()) {
                     Client.send(new BasicNoOperationMessage());
-                    Client.character.getFight().EndTurn();
+                    Client.character.getFight().endTurn();
                     return;
                 }
-                GameMapMovement GameMovement = Client.character.getFight().TryMove(Client.character.getFighter(), Path);
+                GameMapMovement GameMovement = Client.character.getFight().tryMove(Client.character.getFighter(), Path);
 
                 if (GameMovement != null) {
                     GameMovement.execute();

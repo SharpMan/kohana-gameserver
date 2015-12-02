@@ -1,6 +1,8 @@
 package koh.game.entities.item;
 
 import java.util.Arrays;
+
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import static koh.game.entities.item.EffectHelper.unRandomablesEffects;
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,17 +18,17 @@ public class Weapon extends ItemTemplate {
     public int apCost;
     public boolean castInLine, castTestLos;
 
-    public boolean Initialized = false;
+    public boolean initialized = false;
 
-    public void Initialize() {
-        if(this.Initialized)
+    public void initialize() {
+        if(this.initialized)
             return;
-        Arrays.stream(this.possibleEffects).filter(e -> ArrayUtils.contains(unRandomablesEffects, e.effectId)).forEach(Effect -> Effect.rawZone = this.ItemType().rawZone);
-        this.Initialized = true;
+        Arrays.stream(this.possibleEffects).filter(e -> ArrayUtils.contains(unRandomablesEffects, e.effectId)).forEach(Effect -> Effect.rawZone = this.getItemType().rawZone);
+        this.initialized = true;
     }
 
-    public ItemType ItemType() {
-        return ItemTemplateDAOImpl.SuperTypes.get(typeId);
+    public ItemType getItemType() {
+        return DAO.getItemTemplates().getType(typeId);
     }
 
 }

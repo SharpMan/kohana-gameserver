@@ -13,7 +13,7 @@ public class EffectIncreaseSpellJet extends EffectBase {
         if (CastInfos.Caster == null) {
             return -1;
         }
-        CastInfos.Caster.Buffs.AddBuff(new BuffIncreaseSpellJet(CastInfos, CastInfos.Caster));
+        CastInfos.Caster.buff.addBuff(new BuffIncreaseSpellJet(CastInfos, CastInfos.Caster));
 
         return -1;
     }

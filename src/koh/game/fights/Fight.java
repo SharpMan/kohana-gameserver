@@ -1,6 +1,8 @@
 package koh.game.fights;
 
 import java.time.Instant;
+
+import koh.game.dao.DAO;
 import koh.game.fights.layer.FightActivableObject;
 import koh.game.fights.layer.FightGlyph;
 import java.util.ArrayList;
@@ -20,7 +22,6 @@ import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.Main;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameMapMovement;
-import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
@@ -138,13 +139,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         STATE_WAIT_START, STATE_WAIT_TURN, STATE_WAIT_ACTION, STATE_WAIT_READY, STATE_WAIT_END, STATE_WAIT_AI, STATE_END_TURN, STATE_END_FIGHT,
     }
 
-    public short FightId;
-    public FightState FightState;
-    public FightLoopState FightLoopState;
-    public DofusMap Map;
-    public Fighter CurrentFighter;
-    public long FightTime, CreationTime;
-    public FightTypeEnum FightType;
+    public short fightId;
+    public FightState fightState;
+    public FightLoopState fightLoopState;
+    public DofusMap map;
+    public Fighter currentFighter;
+    public long fightTime, creationTime;
+    public FightTypeEnum fightType;
     protected Map<Short, FightCell> myCells = new HashMap<>();
     protected Map<FightTeam, Map<Short, FightCell>> myFightCells = new HashMap<>();
     protected short AgeBonus = -1, lootShareLimitMalus = -1;
@@ -160,69 +161,69 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public Fight(FightTypeEnum Type, DofusMap Map) {
-        this.FightState = FightState.STATE_PLACE;
-        this.FightTime = -1;
-        this.CreationTime = Instant.now().getEpochSecond();
-        this.FightType = Type;
-        this.Map = Map;
-        this.FightId = this.Map.nextFightId();
-        this.InitCells();
+        this.fightState = fightState.STATE_PLACE;
+        this.fightTime = -1;
+        this.creationTime = Instant.now().getEpochSecond();
+        this.fightType = Type;
+        this.map = Map;
+        this.fightId = this.map.nextFightId();
+        this.initCells();
     }
 
-    public FighterRefusedReasonEnum CanJoin(FightTeam Team, Player Character) {
-        if (Team.CanJoin(Character) != FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
-            return Team.CanJoin(Character);
-        } else if (this.GetFreeSpawnCell(Team) == null) {
+    public FighterRefusedReasonEnum canJoin(FightTeam Team, Player Character) {
+        if (Team.canJoin(Character) != FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
+            return Team.canJoin(Character);
+        } else if (this.getFreeSpawnCell(Team) == null) {
             return FighterRefusedReasonEnum.TEAM_FULL;
         } else {
             return FighterRefusedReasonEnum.FIGHTER_ACCEPTED;
         }
     }
 
-    public boolean CanJoinSpectator() {
-        return this.FightState == FightState.STATE_ACTIVE && !this.myTeam1.IsToggle(FightOptionsEnum.FIGHT_OPTION_SET_SECRET) && !this.myTeam2.IsToggle(FightOptionsEnum.FIGHT_OPTION_SET_SECRET);
+    public boolean canJoinSpectator() {
+        return this.fightState == fightState.STATE_ACTIVE && !this.myTeam1.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_SECRET) && !this.myTeam2.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_SECRET);
     }
 
-    public FightTeam GetEnnemyTeam(FightTeam Team) {
+    public FightTeam getEnnemyTeam(FightTeam Team) {
         return (Team == this.myTeam1 ? this.myTeam2 : this.myTeam1);
     }
 
-    public FightTeam GetTeam(int LeaderId) {
+    public FightTeam getTeam(int LeaderId) {
         return (this.myTeam1.LeaderId == LeaderId ? this.myTeam1 : this.myTeam2);
     }
 
-    public abstract void LeaveFight(Fighter Fighter);
+    public abstract void leaveFight(Fighter Fighter);
 
-    public abstract void EndFight(FightTeam Winners, FightTeam Loosers);
+    public abstract void endFight(FightTeam Winners, FightTeam Loosers);
 
-    public abstract int GetStartTimer();
+    public abstract int getStartTimer();
 
-    public abstract int GetTurnTime();
+    public abstract int getTurnTime();
 
-    public boolean HasFinished = false;
+    public boolean hasFinished = false;
 
-    private void InitCells() {
+    private void initCells() {
         // Ajout des cells
-        for (DofusCell Cell : this.Map.getCells()) {
+        for (DofusCell Cell : this.map.getCells()) {
             this.myCells.put(Cell.id, new FightCell(Cell.id, Cell.mov(), Cell.los()));
         }
         this.myFightCells.put(myTeam1, new HashMap<>());
         this.myFightCells.put(myTeam2, new HashMap<>());
 
-        if (Fight.MAP_FIGHTCELLS.containsKey(this.Map.id)) {
+        if (Fight.MAP_FIGHTCELLS.containsKey(this.map.id)) {
             // Ajout
             synchronized (Fight.MAP_FIGHTCELLS) {
-                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.Map.id).get(0)) {
+                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.id).get(0)) {
                     this.myFightCells.get(this.myTeam1).put(Cell, this.myCells.get(Cell));
                 }
-                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.Map.id).get(1)) {
+                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.id).get(1)) {
                     this.myFightCells.get(this.myTeam2).put(Cell, this.myCells.get(Cell));
                 }
             }
             return;
         }
 
-        for (Short CellValue : this.Map.redCells) {
+        for (Short CellValue : this.map.redCells) {
             FightCell Cell = this.myCells.get(CellValue);
             if (Cell == null || !Cell.CanWalk()) {
                 continue;
@@ -230,7 +231,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.myFightCells.get(this.myTeam1).put(CellValue, Cell);
         }
 
-        for (Short CellValue : this.Map.blueCells) {
+        for (Short CellValue : this.map.blueCells) {
             FightCell Cell = this.myCells.get(CellValue);
             if (Cell == null || !Cell.CanWalk()) {
                 continue;
@@ -238,10 +239,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.myFightCells.get(this.myTeam2).put(CellValue, Cell);
         }
 
-        if (this.Map.blueCells.length == 0 || this.Map.redCells.length == 0) {
+        if (this.map.blueCells.length == 0 || this.map.redCells.length == 0) {
             this.myFightCells.get(this.myTeam1).clear();
             this.myFightCells.get(this.myTeam2).clear();
-            Couple<ArrayList<FightCell>, ArrayList<FightCell>> startCells = Algo.GenRandomFightPlaces(this);
+            Couple<ArrayList<FightCell>, ArrayList<FightCell>> startCells = Algo.genRandomFightPlaces(this);
             for (FightCell Cell : startCells.first) {
                 this.myFightCells.get(this.myTeam1).put(Cell.Id, Cell);
             }
@@ -249,30 +250,30 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 this.myFightCells.get(this.myTeam2).put(Cell.Id, Cell);
             }
             synchronized (Fight.MAP_FIGHTCELLS) {
-                Fight.MAP_FIGHTCELLS.put(this.Map.id, new HashMap<>());
-                Fight.MAP_FIGHTCELLS.get(this.Map.id).put(0, this.myFightCells.get(this.myTeam1).keySet().toArray(new Short[this.myFightCells.get(this.myTeam1).size()]));
-                Fight.MAP_FIGHTCELLS.get(this.Map.id).put(1, this.myFightCells.get(this.myTeam2).keySet().toArray(new Short[this.myFightCells.get(this.myTeam2).size()]));
+                Fight.MAP_FIGHTCELLS.put(this.map.id, new HashMap<>());
+                Fight.MAP_FIGHTCELLS.get(this.map.id).put(0, this.myFightCells.get(this.myTeam1).keySet().toArray(new Short[this.myFightCells.get(this.myTeam1).size()]));
+                Fight.MAP_FIGHTCELLS.get(this.map.id).put(1, this.myFightCells.get(this.myTeam2).keySet().toArray(new Short[this.myFightCells.get(this.myTeam2).size()]));
             }
         }
 
     }
 
-    public static final StatsEnum[] EffectNotSilenced = new StatsEnum[]{
+    public static final StatsEnum[] EFFECT_NOT_SILENCED = new StatsEnum[]{
         StatsEnum.Damage_Neutral, StatsEnum.Damage_Earth, StatsEnum.Damage_Air, StatsEnum.Damage_Fire, StatsEnum.Damage_Water,
         StatsEnum.Steal_Neutral, StatsEnum.Steal_Earth, StatsEnum.Steal_Air, StatsEnum.Steal_Fire, StatsEnum.Steal_Water, StatsEnum.Steal_PV_Fix,
         StatsEnum.DamageLifeNeutre, StatsEnum.DamageLifeEau, StatsEnum.DamageLifeTerre, StatsEnum.DamageLifeAir, StatsEnum.DamageLifeFeu, StatsEnum.DamageDropLife
     };
 
-    public void Disconnect(CharacterFighter Fighter) {
-        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 182, new String[]{Fighter.Character.nickName, Integer.toString(Fighter.TurnRunning)}));
-        if (this.CurrentFighter.ID == Fighter.ID) {
-            this.FightLoopState = FightLoopState.STATE_END_TURN;
+    public void disconnect(CharacterFighter Fighter) {
+        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 182, new String[]{Fighter.Character.nickName, Integer.toString(Fighter.turnRunning)}));
+        if (this.currentFighter.ID == Fighter.ID) {
+            this.fightLoopState = fightLoopState.STATE_END_TURN;
         }
-        Fighter.TurnReady = true;
+        Fighter.turnReady = true;
     }
 
-    public void LaunchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend) {
-        LaunchSpell(Fighter, SpellLevel, CellId, friend, false, true);
+    public void launchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend) {
+        launchSpell(Fighter, SpellLevel, CellId, friend, false, true);
     }
     //TODO ActionIdConverter.ACTION_FIGHT_DISABLE_PORTAL
 
@@ -289,7 +290,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             for (FightActivableObject Object : Objects) {
                 if (Object instanceof FightPortal && ((FightPortal) Object).Enabled) {
                     Portails = ArrayUtils.add(Portails, (FightPortal) Object);
-                    if (Object.CellId() == param1) {
+                    if (Object.getCellId() == param1) {
                         _loc3_ = Object.MapPoint();
                     }
                 }
@@ -301,9 +302,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (_loc3_ == null) {
             return new Three<>(param1, new int[0], 0);
         }
-        final int[] _loc10_ = LinkedCellsManager.getLinks(_loc3_, Arrays.stream(Portails)/*.filter(x -> x.m_caster.Team == Fighter.Team)*/.map(x -> x.MapPoint()).toArray(MapPoint[]::new));
+        final int[] _loc10_ = LinkedCellsManager.getLinks(_loc3_, Arrays.stream(Portails)/*.filter(x -> x.m_caster.team == Fighter.team)*/.map(x -> x.MapPoint()).toArray(MapPoint[]::new));
         MapPoint _loc11_ = MapPoint.fromCellId(_loc10_[/*_loc10_.length == 0 ? 0 :*/_loc10_.length - 1]);
-        MapPoint _loc12_ = MapPoint.fromCellId(Fighter.CellId());
+        MapPoint _loc12_ = MapPoint.fromCellId(Fighter.getCellId());
         if (_loc12_ == null) {
             return new Three<>(param1, new int[0], 0);
         }
@@ -322,82 +323,82 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
          }
          }
          for (int i : _loc10_) {
-         damagetoReturn += Arrays.stream(Portails).filter(y -> y.CellId() == i).findFirst().get().damageValue;
+         damagetoReturn += Arrays.stream(Portails).filter(y -> y.getCellId() == i).findFirst().get().damageValue;
          }*/
         int[] PortailIds = new int[_loc10_.length];
         FightPortal Portal;
         for (int i = 0; i < _loc10_.length; i++) {
             final int ID = _loc10_[i];
-            Portal = Arrays.stream(Portails).filter(y -> y.CellId() == ID).findFirst().get();
+            Portal = Arrays.stream(Portails).filter(y -> y.getCellId() == ID).findFirst().get();
             damagetoReturn += Portal.damageValue;
             PortailIds[i] = Portal.ID;
         }
         return new Three<>((int) _loc16_.get_cellId(), PortailIds, damagetoReturn);
     }
 
-    public void LaunchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend, boolean fakeLaunch, boolean imTargeted) {
-        if (this.FightState != FightState.STATE_ACTIVE) {
+    public void launchSpell(Fighter fighter, SpellLevel spellLevel, short cellId, boolean friend, boolean fakeLaunch, boolean imTargeted) {
+        if (this.fightState != fightState.STATE_ACTIVE) {
             return;
         }
-        short oldCell = CellId;
-        if (SpellLevel.id == 10461 && Fighter instanceof CharacterFighter && ((CharacterFighter) Fighter).Character.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
-            this.LaunchWeapon(((CharacterFighter) Fighter), CellId);
+        short oldCell = cellId;
+        if (spellLevel.id == 10461 && fighter instanceof CharacterFighter && ((CharacterFighter) fighter).Character.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
+            this.launchWeapon(((CharacterFighter) fighter), cellId);
             return;
         }
 
         // La cible si elle existe
-        Fighter TargetE = this.HasEnnemyInCell(CellId, Fighter.Team);
+        Fighter TargetE = this.hasEnnemyInCell(cellId, fighter.team);
         if (friend && TargetE == null) { //FIXME: relook this line
-            TargetE = this.HasFriendInCell(CellId, Fighter.Team);
+            TargetE = this.hasFriendInCell(cellId, fighter.team);
         }
 
         int TargetId = TargetE == null ? -1 : TargetE.ID;
         // Peut lancer le sort ?
-        if (!fakeLaunch && !this.CanLaunchSpell(Fighter, SpellLevel, Fighter.CellId(), CellId, TargetId)) {
-            Fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
-            this.EndSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
+        if (!fakeLaunch && !this.canLaunchSpell(fighter, spellLevel, fighter.getCellId(), cellId, TargetId)) {
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
+            this.endSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
             return;
         }
         if (!fakeLaunch) {
-            this.StartSequence(SequenceTypeEnum.SEQUENCE_SPELL);
+            this.startSequence(SequenceTypeEnum.SEQUENCE_SPELL);
 
-            Fighter.UsedAP += SpellLevel.ApCost;
-            Fighter.SpellsController.Actualise(SpellLevel, TargetId);
+            fighter.usedAP += spellLevel.ApCost;
+            fighter.spellsController.actualize(spellLevel, TargetId);
         }
 
         boolean IsCc = false;
-        if (SpellLevel.criticalHitProbability != 0 && SpellLevel.criticalEffect.length > 0) {
-            int TauxCC = SpellLevel.criticalHitProbability - Fighter.Stats.getTotal(StatsEnum.Add_CriticalHit);
+        if (spellLevel.criticalHitProbability != 0 && spellLevel.criticalEffect.length > 0) {
+            int TauxCC = spellLevel.criticalHitProbability - fighter.stats.getTotal(StatsEnum.Add_CriticalHit);
             if (TauxCC < 2) {
                 TauxCC = 2;
             }
             if (Fight.RANDOM.nextInt(TauxCC) == 0) {
                 IsCc = true;
             }
-            Main.Logs().writeDebug("CC: " + IsCc + " TauxCC " + TauxCC + " getSpellLevel.criticalHitProbability " + SpellLevel.criticalHitProbability);
+            Main.Logs().writeDebug("CC: " + IsCc + " TauxCC " + TauxCC + " getSpellLevel.criticalHitProbability " + spellLevel.criticalHitProbability);
         }
-        IsCc &= !Fighter.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
-        if (IsCc && Fighter.Stats.getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Tutu
+        IsCc &= !fighter.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
+        if (IsCc && fighter.stats.getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Tutu
 
         }
 
-        EffectInstanceDice[] Effects = IsCc ? SpellLevel.criticalEffect : SpellLevel.effects;
+        EffectInstanceDice[] Effects = IsCc ? spellLevel.criticalEffect : spellLevel.effects;
         if (Effects == null) {
-            Effects = SpellLevel.criticalEffect;
+            Effects = spellLevel.criticalEffect;
         }
 
-        boolean silentCast = Arrays.stream(Effects).allMatch(x -> !ArrayUtils.contains(EffectNotSilenced, x.EffectType()));
+        boolean silentCast = Arrays.stream(Effects).allMatch(x -> !ArrayUtils.contains(EFFECT_NOT_SILENCED, x.EffectType()));
 
         if (!fakeLaunch) {
             Three<Integer, int[], Integer> Informations = null;
-            if (this.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL) && !Arrays.stream(Effects).anyMatch(Effect -> Effect.EffectType().equals(StatsEnum.DISABLE_PORTAL))) {
-                Informations = this.getTargetThroughPortal(Fighter, CellId, true);
-                CellId = Informations.first.shortValue();
+            if (this.getCell(cellId).HasGameObject(FightObjectType.OBJECT_PORTAL) && !Arrays.stream(Effects).anyMatch(Effect -> Effect.EffectType().equals(StatsEnum.DISABLE_PORTAL))) {
+                Informations = this.getTargetThroughPortal(fighter, cellId, true);
+                cellId = Informations.first.shortValue();
                 //this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"DamagePercentBoosted Suite au portails = " + DamagePercentBoosted}));
 
             }
             for (Player player : this.Observable$stream()) {
-                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), SpellLevel.spellId == 2763 ? true : (!Fighter.IsVisibleFor(player) || silentCast), SpellLevel.spellId, SpellLevel.grade, Informations == null ? new int[0] : Informations.second));
+                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.ID, TargetId, cellId, (byte) (IsCc ? 2 : 1), spellLevel.spellId == 2763 ? true : (!fighter.isVisibleFor(player) || silentCast), spellLevel.spellId, spellLevel.grade, Informations == null ? new int[0] : Informations.second));
             }
             if (Informations != null) {
                 Informations.Clear();
@@ -409,8 +410,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             final EffectInstanceDice Effect = EffectI.next();
             System.out.println(Effect.toString());
             Targets.put(Effect, new ArrayList<>());
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true), this.Map)).getCells(CellId)) {
-                FightCell FightCell = this.GetCell(Cell);
+            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map)).getCells(cellId)) {
+                FightCell FightCell = this.getCell(Cell);
                 if (FightCell != null && FightCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
 
                 }
@@ -418,23 +419,23 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
                         for (Fighter Target : FightCell.GetObjectsAsFighter()) {
                             if (Effect.targetMask.equals("C") && (Effect.category() == 0)) {
-                                Targets.get(Effect).add(Fighter);
+                                Targets.get(Effect).add(fighter);
                                 break;
                             }
-                            System.out.println(EffectHelper.verifyEffectTrigger(Fighter, Target, Effects, Effect, false, Effect.triggers, CellId));
-                            System.out.println(Effect.IsValidTarget(Fighter, Target));
-                            System.out.println(EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect));
+                            System.out.println(EffectHelper.verifyEffectTrigger(fighter, Target, Effects, Effect, false, Effect.triggers, cellId));
+                            System.out.println(Effect.isValidTarget(fighter, Target));
+                            System.out.println(EffectInstanceDice.verifySpellEffectMask(fighter, Target, Effect));
 
-                            if (EffectHelper.verifyEffectTrigger(Fighter, Target, Effects, Effect, false, Effect.triggers, CellId) && Effect.IsValidTarget(Fighter, Target) && EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect)) {
-                                if (Effect.targetMask.equals("C") && Fighter.GetCarriedActor() == Target.ID) {
+                            if (EffectHelper.verifyEffectTrigger(fighter, Target, Effects, Effect, false, Effect.triggers, cellId) && Effect.isValidTarget(fighter, Target) && EffectInstanceDice.verifySpellEffectMask(fighter, Target, Effect)) {
+                                if (Effect.targetMask.equals("C") && fighter.getCarriedActor() == Target.ID) {
                                     continue;
-                                } else if (Effect.targetMask.equals("a,A") && Fighter.GetCarriedActor() != 0 & Fighter.ID == Target.ID) {
+                                } else if (Effect.targetMask.equals("a,A") && fighter.getCarriedActor() != 0 & fighter.ID == Target.ID) {
                                     continue;
                                 }
-                                /*if (Fighter instanceof BombFighter && Target.States.HasState(FightStateEnum.Kaboom)) {
+                                /*if (Fighter instanceof BombFighter && Target.states.hasState(FightStateEnum.Kaboom)) {
                                  continue;
                                  }*/
-                                if (!imTargeted && Target.ID == Fighter.ID) {
+                                if (!imTargeted && Target.ID == fighter.ID) {
                                     continue;
                                 }
                                 /*if(Effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect)){
@@ -465,20 +466,20 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
             }
             // Actualisation des morts
-            Targets.get(Effect).removeIf(F -> F.Dead());
+            Targets.get(Effect).removeIf(F -> F.isDead());
             if (Effect.EffectType() == ADD_BASE_DAMAGE_SPELL) {
                 Targets.get(Effect).clear();
-                Targets.get(Effect).add(Fighter);
+                Targets.get(Effect).add(fighter);
             }
             if (Effect.delay > 0) {
                 //TODO: Set ParentBoost UID
-                Fighter.Buffs.DelayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), SpellLevel.spellId, CellId, num1, Effect, Fighter, Targets.get(Effect), false, StatsEnum.NONE, 0, SpellLevel), Effect.delay));
+                fighter.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), spellLevel.spellId, cellId, num1, Effect, fighter, Targets.get(Effect), false, StatsEnum.NONE, 0, spellLevel), Effect.delay));
                 Targets.get(Effect).stream().forEach((Target) -> {
-                    this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, Fighter.ID, new FightTriggeredEffect(Target.NextBuffUid.incrementAndGet(), Target.ID, (short) Effect.duration, FightDispellableEnum.DISPELLABLE, SpellLevel.spellId, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
+                    this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, fighter.ID, new FightTriggeredEffect(Target.nextBuffUid.incrementAndGet(), Target.ID, (short) Effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.spellId, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
                 });
 
                 /*for (Fighter Target : Targets.get(Effect)) {
-                 Target.Buffs.DelayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), getSpellLevel.spellId, CellId, num1, Effect, Fighter, new ArrayList<Fighter>() {
+                 Target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), getSpellLevel.spellId, getCellId, num1, Effect, Fighter, new ArrayList<Fighter>() {
                  {
                  add(Target);
                  }
@@ -486,8 +487,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                  }*/
                 continue;
             }
-            EffectCast CastInfos = new EffectCast(Effect.EffectType(), SpellLevel.spellId, CellId, num1, Effect, Fighter, Targets.get(Effect), false, StatsEnum.NONE, 0, SpellLevel);
-            CastInfos.targetKnownCellId = CellId;
+            EffectCast CastInfos = new EffectCast(Effect.EffectType(), spellLevel.spellId, cellId, num1, Effect, fighter, Targets.get(Effect), false, StatsEnum.NONE, 0, spellLevel);
+            CastInfos.targetKnownCellId = cellId;
             CastInfos.oldCell = oldCell;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {
                 break;
@@ -495,49 +496,49 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         if (!fakeLaunch) {
-            this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, Fighter.ID, Fighter.ID, (short) -SpellLevel.ApCost));
+            this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, fighter.ID, fighter.ID, (short) -spellLevel.ApCost));
         }
 
-        if (!fakeLaunch && Fighter.VisibleState == GameActionFightInvisibilityStateEnum.INVISIBLE && silentCast && SpellLevel.spellId != 2763) {
-            this.sendToField(new ShowCellMessage(Fighter.ID, Fighter.CellId()));
+        if (!fakeLaunch && fighter.visibleState == GameActionFightInvisibilityStateEnum.INVISIBLE && silentCast && spellLevel.spellId != 2763) {
+            this.sendToField(new ShowCellMessage(fighter.ID, fighter.getCellId()));
         }
 
         if (!fakeLaunch) {
-            this.EndSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
+            this.endSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
         }
     }
 
-    public void LaunchWeapon(CharacterFighter Fighter, short CellId) {
+    public void launchWeapon(CharacterFighter fighter, short cellId) {
         // Combat encore en cour ?
-        if (this.FightState != FightState.STATE_ACTIVE) {
+        if (this.fightState != fightState.STATE_ACTIVE) {
             return;
         }
-        if (Fighter != this.CurrentFighter) {
+        if (fighter != this.currentFighter) {
             return;
         }
-        InventoryItem Weapon = Fighter.Character.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
+        InventoryItem Weapon = fighter.Character.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
         if (Weapon.getTemplate().typeId == 83) { //Pière d'Ame
             return;
         }
         // La cible si elle existe
-        Fighter TargetE = this.HasEnnemyInCell(CellId, Fighter.Team);
+        Fighter TargetE = this.hasEnnemyInCell(cellId, fighter.team);
         if (TargetE == null) {
-            TargetE = this.HasFriendInCell(CellId, Fighter.Team);
+            TargetE = this.hasFriendInCell(cellId, fighter.team);
         }
         int TargetId = TargetE == null ? -1 : TargetE.ID;
 
-        if (!(Pathfinder.getGoalDistance(Map, CellId, Fighter.CellId()) <= Weapon.WeaponTemplate().range && Pathfinder.getGoalDistance(Map, CellId, Fighter.CellId()) >= Weapon.WeaponTemplate().minRange && Fighter.AP() >= Weapon.WeaponTemplate().apCost)) {
-            Fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
+        if (!(Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) <= Weapon.getWeaponTemplate().range && Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) >= Weapon.getWeaponTemplate().minRange && fighter.getAP() >= Weapon.getWeaponTemplate().apCost)) {
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             return;
         }
 
-        this.StartSequence(SequenceTypeEnum.SEQUENCE_WEAPON);
+        this.startSequence(SequenceTypeEnum.SEQUENCE_WEAPON);
 
-        Fighter.UsedAP += Weapon.WeaponTemplate().apCost;
+        fighter.usedAP += Weapon.getWeaponTemplate().apCost;
 
         boolean IsCc = false;
 
-        int TauxCC = Weapon.WeaponTemplate().criticalHitProbability - Fighter.Stats.getTotal(StatsEnum.Add_CriticalHit);
+        int TauxCC = Weapon.getWeaponTemplate().criticalHitProbability - fighter.stats.getTotal(StatsEnum.Add_CriticalHit);
         if (TauxCC < 2) {
             TauxCC = 2;
         }
@@ -545,12 +546,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             IsCc = true;
         }
 
-        IsCc &= !Fighter.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
+        IsCc &= !fighter.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
 
         ArrayList<Fighter> Targets = new ArrayList<>(4);
 
-        for (short Cell : (new Zone(SpellShapeEnum.valueOf(Weapon.ItemType().zoneShape()), Weapon.ItemType().zoneSize(), MapPoint.fromCellId(Fighter.CellId()).advancedOrientationTo(MapPoint.fromCellId(CellId), true), this.Map)).getCells(CellId)) {
-            FightCell FightCell = this.GetCell(Cell);
+        for (short Cell : (new Zone(SpellShapeEnum.valueOf(Weapon.getItemType().zoneShape()), Weapon.getItemType().zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map)).getCells(cellId)) {
+            FightCell FightCell = this.getCell(Cell);
             if (FightCell != null) {
                 if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
                     Targets.addAll(FightCell.GetObjectsAsFighterList());
@@ -558,20 +559,20 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         }
 
-        Targets.removeIf(F -> F.Dead());
-        Targets.remove(Fighter);
+        Targets.removeIf(F -> F.isDead());
+        Targets.remove(fighter);
         ObjectEffectDice[] Effects = Weapon.getEffects().stream().filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId)).map(x -> (ObjectEffectDice) x).toArray(ObjectEffectDice[]::new);
 
         double num1 = Fight.RANDOM.nextDouble();
 
-        double num2 = (double) Arrays.stream(Effects).mapToInt(Effect -> ((EffectInstanceDice) Weapon.getTemplate().GetEffect(Effect.actionId)).random).sum();
+        double num2 = (double) Arrays.stream(Effects).mapToInt(Effect -> ((EffectInstanceDice) Weapon.getTemplate().getEffect(Effect.actionId)).random).sum();
         boolean flag = false;
 
-        this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, Fighter.ID, TargetId, CellId, (byte) (IsCc ? 2 : 1), false, Weapon.getTemplate().id));
+        this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.ID, TargetId, cellId, (byte) (IsCc ? 2 : 1), false, Weapon.getTemplate().id));
 
         EffectInstanceDice EffectFather;
         for (ObjectEffectDice Effect : Effects) {
-            EffectFather = (EffectInstanceDice) Weapon.getTemplate().GetEffect(Effect.actionId);
+            EffectFather = (EffectInstanceDice) Weapon.getTemplate().getEffect(Effect.actionId);
             if (EffectFather.random > 0) {
                 if (!flag) {
                     if (num1 > (double) EffectFather.random / num2) {
@@ -584,56 +585,56 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     continue;
                 }
             }
-            EffectCast CastInfos = new EffectCast(StatsEnum.valueOf(Effect.actionId), 0, CellId, num1, EffectFather, Fighter, Targets, true, StatsEnum.NONE, 0, null);
-            CastInfos.targetKnownCellId = CellId;
+            EffectCast CastInfos = new EffectCast(StatsEnum.valueOf(Effect.actionId), 0, cellId, num1, EffectFather, fighter, Targets, true, StatsEnum.NONE, 0, null);
+            CastInfos.targetKnownCellId = cellId;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {
                 break;
             }
         }
 
-        this.sendToField(new GameActionFightPointsVariationMessage(!IsCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, Fighter.ID, Fighter.ID, (short) Weapon.WeaponTemplate().apCost));
-        this.EndSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
+        this.sendToField(new GameActionFightPointsVariationMessage(!IsCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, fighter.ID, fighter.ID, (short) Weapon.getWeaponTemplate().apCost));
+        this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
     }
 
-    public boolean CanLaunchSpell(Fighter Fighter, SpellLevel Spell, short CurrentCell, short CellId, int TargetId) {
+    public boolean canLaunchSpell(Fighter fighter, SpellLevel spell, short currentCell, short cellId, int targetId) {
         // Fake caster
-        if (Fighter != this.CurrentFighter) {
+        if (fighter != this.currentFighter) {
             return false;
         }
 
         // Fake cellId
-        if (!this.myCells.containsKey(CellId)) {
+        if (!this.myCells.containsKey(cellId)) {
             return false;
         }
 
         // PA manquant ?
-        if (Fighter.AP() < Spell.ApCost) {
+        if (fighter.getAP() < spell.ApCost) {
             return false;
         }
 
         //Todo check po PO
-        if (!this.Map.getCell(CellId).walakable() || this.Map.getCell(CellId).nonWalkableDuringFight()) {
+        if (!this.map.getCell(cellId).walakable() || this.map.getCell(cellId).nonWalkableDuringFight()) {
             return false;
         }
-        //TargetId == -1
-        return (!Spell.needFreeCell || TargetId == -1)
-                && (!Spell.needTakenCell || TargetId != -1)
-                && !Arrays.stream(Spell.statesForbidden).anyMatch(x -> Fighter.HasState(x))
-                && !Arrays.stream(Spell.statesRequired).anyMatch(x -> !Fighter.HasState(x))
-                && ArrayUtils.contains(Fighter.GetCastZone(Spell), CellId)
-                && Fighter.SpellsController.CanLaunchSpell(Spell, TargetId);
+        //targetId == -1
+        return (!spell.needFreeCell || targetId == -1)
+                && (!spell.needTakenCell || targetId != -1)
+                && !Arrays.stream(spell.statesForbidden).anyMatch(x -> fighter.hasState(x))
+                && !Arrays.stream(spell.statesRequired).anyMatch(x -> !fighter.hasState(x))
+                && ArrayUtils.contains(fighter.getCastZone(spell), cellId)
+                && fighter.spellsController.canLaunchSpell(spell, targetId);
 
     }
 
-    public void ToggleLock(Fighter Fighter, FightOptionsEnum Type) {
-        boolean Value = Fighter.Team.IsToggle(Type) == false;
-        Fighter.Team.Toggle(Type, Value);
-        if (this.FightState == FightState.STATE_PLACE) {
-            this.Map.sendToField(new GameFightOptionStateUpdateMessage(this.FightId, Fighter.Team.Id, Type.value, Value));
+    public void toggleLock(Fighter fighter, FightOptionsEnum type) {
+        boolean Value = fighter.team.isToggled(type) == false;
+        fighter.team.toggle(type, Value);
+        if (this.fightState == fightState.STATE_PLACE) {
+            this.map.sendToField(new GameFightOptionStateUpdateMessage(this.fightId, fighter.team.Id, type.value, Value));
         }
 
         Message Message = null;
-        switch (Type) {
+        switch (type) {
             case FIGHT_OPTION_SET_CLOSED:
                 if (Value) {
                     Message = new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 95);
@@ -663,7 +664,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     Message = new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 40);
 
                     // on kick les spectateurs
-                    this.KickSpectators();
+                    this.kickSpectators();
                 } else {
                     Message = new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 39);
                 }
@@ -672,110 +673,110 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.sendToField(Message);
     }
 
-    public void KickSpectators() {
+    public void kickSpectators() {
 
     }
 
-    public synchronized void StartFight() {
+    public synchronized void startFight() {
         // Si combat deja lancé
-        if (this.FightState != FightState.STATE_PLACE) {
+        if (this.fightState != fightState.STATE_PLACE) {
             return;
         }
 
-        this.Map.sendToField(new GameRolePlayRemoveChallengeMessage(this.FightId));
+        this.map.sendToField(new GameRolePlayRemoveChallengeMessage(this.fightId));
 
         // Preparation du lancement
-        this.FightState = FightState.STATE_INIT;
+        this.fightState = fightState.STATE_INIT;
 
         //TODO : CHALLENGE
         // Arret du timer
-        this.StopTimer("StartTimer");
-        this.FightTime = System.currentTimeMillis();
+        this.stopTimer("startTimer");
+        this.fightTime = System.currentTimeMillis();
 
         // Init des tours
-        this.myWorker.InitTurns();
+        this.myWorker.initTurns();
 
         this.sendToField(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
         this.sendToField(new GameFightStartMessage(new Idol[0]));
         // Liste des tours
-        //this.sendToField(new GameFightTurnListMessage(this.myWorker.Fighters().stream().filter(x -> x.IsAlive()).mapToInt(x -> x.id).toArray(), this.myWorker.Fighters().stream().filter(x -> !x.IsAlive()).mapToInt(x -> x.id).toArray()));
-        this.sendToField(FightTurnListMessage());
+        //this.sendToField(new GameFightTurnListMessage(this.myWorker.fighters().stream().filter(x -> x.isAlive()).mapToInt(x -> x.id).toArray(), this.myWorker.fighters().stream().filter(x -> !x.isAlive()).mapToInt(x -> x.id).toArray()));
+        this.sendToField(getFightTurnListMessage());
         this.sendToField(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations(null)).toArray(GameFightFighterInformations[]::new)));
 
         // reset du ready
-        this.SetAllUnReady();
+        this.setAllUnReady();
         // En attente de lancement
-        this.FightLoopState = FightLoopState.STATE_WAIT_START;
+        this.fightLoopState = fightLoopState.STATE_WAIT_START;
 
         // Lancement du gameLoop 10 ms d'interval.
-        this.StartTimer(new CancellableScheduledRunnable(BackGroundWorker, 10, 10) {
+        this.startTimer(new CancellableScheduledRunnable(BackGroundWorker, 10, 10) {
             @Override
             public void run() {
-                GameLoop();
+                gameLoop();
             }
-        }, "GameLoop");
+        }, "gameLoop");
     }
 
-    private void GameLoop() {
+    private void gameLoop() {
         try {
             // Switch sur le status et verify fin de tour
-            switch (this.FightLoopState) {
+            switch (this.fightLoopState) {
                 case STATE_WAIT_START: // En attente de lancement
-                    this.FightState = FightState.STATE_ACTIVE;
-                    this.FightLoopState = FightLoopState.STATE_WAIT_READY;
-                    this.BeginTurn();
+                    this.fightState = fightState.STATE_ACTIVE;
+                    this.fightLoopState = fightLoopState.STATE_WAIT_READY;
+                    this.beginTurn();
                     break;
 
                 case STATE_WAIT_TURN: // Fin du tour par force a cause du timeout
                     if (this.myLoopTimeOut < System.currentTimeMillis()) {
-                        if (this.IsActionsFinish() || this.myLoopActionTimeOut < System.currentTimeMillis()) {
-                            this.EndTurn(); // Fin du tour
+                        if (this.isActionsFinish() || this.myLoopActionTimeOut < System.currentTimeMillis()) {
+                            this.endTurn(); // Fin du tour
                         }
                     }
                     break;
 
                 case STATE_END_TURN: // Fin du tour par le joueur
-                    if (this.IsActionsFinish() || this.myLoopActionTimeOut < System.currentTimeMillis()) {
-                        this.EndTurn(); // Fin du tour
+                    if (this.isActionsFinish() || this.myLoopActionTimeOut < System.currentTimeMillis()) {
+                        this.endTurn(); // Fin du tour
                     }
                     break;
 
                 case STATE_WAIT_READY: // En attente des joueurs x ...
-                    if (this.IsAllTurnReady()) {
-                        this.MiddleTurn();
-                        this.BeginTurn();
+                    if (this.isAllTurnReady()) {
+                        this.middleTurn();
+                        this.beginTurn();
                     } else if (this.myLoopTimeOut + 5000 < System.currentTimeMillis()) {
-                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.AliveFighters().filter(x -> !x.TurnReady && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).Character.nickName).toArray(String[]::new), ", ")}));
-                        this.MiddleTurn();
-                        this.BeginTurn();
+                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.turnReady && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).Character.nickName).toArray(String[]::new), ", ")}));
+                        this.middleTurn();
+                        this.beginTurn();
                     }
                     break;
 
                 case STATE_WAIT_AI: // Artificial intelligence
-                     /*if (this.CurrentFighter istanceof VirtualFighter)
+                     /*if (this.currentFighter istanceof VirtualFighter)
                      {
                      // Lancement de l'IA pour 30 secondes maximum
-                     (this.CurrentFighter as VirtualFighter).Mind.runAI();
-                     //new AIProcessor(this, this.CurrentFighter).applyIA(Environment.TickCount + 30000); 
+                     (this.currentFighter as VirtualFighter).Mind.runAI();
+                     //new AIProcessor(this, this.currentFighter).applyIA(Environment.TickCount + 30000);
                      }
                      else*/
-                    if (this.CurrentFighter.ObjectType() == FightObjectType.OBJECT_STATIC) {
+                    if (this.currentFighter.getObjectType() == FightObjectType.OBJECT_STATIC) {
                         this.myLoopActionTimeOut = System.currentTimeMillis() + 750;
                     }
                     // Fin de tour
-                    if (this.FightLoopState != FightLoopState.STATE_WAIT_END) {
-                        this.FightLoopState = FightLoopState.STATE_END_TURN;
+                    if (this.fightLoopState != fightLoopState.STATE_WAIT_END) {
+                        this.fightLoopState = fightLoopState.STATE_END_TURN;
                     }
                     break;
 
                 case STATE_WAIT_END: // Fin du combat
-                    if (!HasFinished || this.IsActionsFinish() || this.myLoopActionTimeOut < System.currentTimeMillis()) {
-                        this.EndTurn(true);
+                    if (!hasFinished || this.isActionsFinish() || this.myLoopActionTimeOut < System.currentTimeMillis()) {
+                        this.endTurn(true);
                         //System.Threading.Thread.Sleep(500);
-                        this.myTeam1.EndFight();
-                        this.myTeam2.EndFight();
-                        this.EndFight(this.GetWinners(), this.GetEnnemyTeam(this.GetWinners()));
-                        HasFinished = true;
+                        this.myTeam1.endFight();
+                        this.myTeam2.endFight();
+                        this.endFight(this.getWinners(), this.getEnnemyTeam(this.getWinners()));
+                        hasFinished = true;
                     }
                     break;
             }
@@ -789,20 +790,20 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     /// Veifie si toute les actions son terminé
     /// </summary>
     /// <returns></returns>
-    public boolean IsActionsFinish() {
+    public boolean isActionsFinish() {
         return this.myActions.isEmpty();
     }
 
-    public synchronized void BeginTurn() {
+    public synchronized void beginTurn() {
         // Mise a jour du combattant
-        this.CurrentFighter = this.myWorker.GetNextFighter();
+        this.currentFighter = this.myWorker.getNextFighter();
 
-        this.StartSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
+        this.startSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
 
         // Activation des buffs et fightObjects
-        int BeginTurnIndice = this.CurrentFighter.BeginTurn();
+        int BeginTurnIndice = this.currentFighter.beginTurn();
 
-        this.EndSequence(SequenceTypeEnum.SEQUENCE_TURN_END, false);
+        this.endSequence(SequenceTypeEnum.SEQUENCE_TURN_END, false);
 
         // Mort du joueur ou fin de combat
         if (BeginTurnIndice == -3 || BeginTurnIndice == -2) {
@@ -810,119 +811,119 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         // Envois debut du tour
-        this.sendToField(new GameFightTurnStartMessage(this.CurrentFighter.ID, this.GetTurnTime() / 100));
+        this.sendToField(new GameFightTurnStartMessage(this.currentFighter.ID, this.getTurnTime() / 100));
 
-        if (this.CurrentFighter instanceof CharacterFighter) {
-            this.CurrentFighter.send(((CharacterFighter) this.CurrentFighter).FighterStatsListMessagePacket());
+        if (this.currentFighter instanceof CharacterFighter) {
+            this.currentFighter.send(((CharacterFighter) this.currentFighter).FighterStatsListMessagePacket());
         }
 
         this.observers.stream().forEach((o) -> {
             ((Player) o).send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations((Player) o)).toArray(GameFightFighterInformations[]::new)));
         });
 
-        this.CurrentFighter.send(new GameFightTurnStartPlayingMessage());
+        this.currentFighter.send(new GameFightTurnStartPlayingMessage());
 
         // Timeout du tour
-        this.myLoopTimeOut = System.currentTimeMillis() + this.GetTurnTime();
+        this.myLoopTimeOut = System.currentTimeMillis() + this.getTurnTime();
 
         // status en attente de fin de tour
-        if ((this.CurrentFighter instanceof CharacterFighter && ((CharacterFighter) CurrentFighter).Character.client == null && this.CurrentFighter.Team.GetAliveFighters().count() > 1L) || this.CurrentFighter.Buffs.GetAllBuffs().anyMatch(x-> x instanceof BuffEndTurn)) {
-            this.FightLoopState = FightLoopState.STATE_END_TURN;
+        if ((this.currentFighter instanceof CharacterFighter && ((CharacterFighter) currentFighter).Character.client == null && this.currentFighter.team.getAliveFighters().count() > 1L) || this.currentFighter.buff.getAllBuffs().anyMatch(x-> x instanceof BuffEndTurn)) {
+            this.fightLoopState = fightLoopState.STATE_END_TURN;
         } else {
-            this.FightLoopState = FightLoopState.STATE_WAIT_TURN;
+            this.fightLoopState = fightLoopState.STATE_WAIT_TURN;
         }
 
             //Chalenge
-            /*if (this instanceof MonsterFight && this.CurrentFighter instanceof CharacterFighter)
+            /*if (this instanceof MonsterFight && this.currentFighter instanceof CharacterFighter)
          {
          foreach (var Challenge in Challanges)
          {
-         Challenge.BeginTurn(this.CurrentFighter);
+         Challenge.beginTurn(this.currentFighter);
          }
          }*/
         // Monstre passe le tour
-        if (/*this.CurrentFighter instanceof VirtualFighter*/this.CurrentFighter instanceof StaticFighter) {
-            this.FightLoopState = FightLoopState.STATE_WAIT_AI;
+        if (/*this.currentFighter instanceof VirtualFighter*/this.currentFighter instanceof StaticFighter) {
+            this.fightLoopState = fightLoopState.STATE_WAIT_AI;
         }
     }
 
-    public void EndTurn() {
-        EndTurn(false);
+    public void endTurn() {
+        endTurn(false);
     }
 
-    public void EndTurn(boolean Finish) {
-        this.StartSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
+    public void endTurn(boolean finish) {
+        this.startSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
         // Fin du tour, activation des buffs, pieges etc
-        if (this.CurrentFighter.EndTurn() == -3) {
+        if (this.currentFighter.endTurn() == -3) {
             return;
-        } else if (m_activableObjects.containsKey(CurrentFighter)) {
-            m_activableObjects.get(CurrentFighter).stream().filter(x -> x instanceof FightGlyph).forEach(y -> y.DecrementDuration());
-            m_activableObjects.get(CurrentFighter).removeIf(fightObject -> fightObject.ObjectType() == FightObjectType.OBJECT_GLYPHE && fightObject.Duration <= 0);
+        } else if (m_activableObjects.containsKey(currentFighter)) {
+            m_activableObjects.get(currentFighter).stream().filter(x -> x instanceof FightGlyph).forEach(y -> y.DecrementDuration());
+            m_activableObjects.get(currentFighter).removeIf(fightObject -> fightObject.getObjectType() == FightObjectType.OBJECT_GLYPHE && fightObject.Duration <= 0);
         }
-        this.EndSequence(SequenceTypeEnum.SEQUENCE_TURN_END, false);
+        this.endSequence(SequenceTypeEnum.SEQUENCE_TURN_END, false);
         // Combat fini a la fin de son tour
 
-        /* if (this instanceof MonsterFight && this.CurrentFighter  instanceof CharacterFighter)
+        /* if (this instanceof MonsterFight && this.currentFighter  instanceof CharacterFighter)
          {
-         this.Challanges.ForEach(x => x.EndTurn(this.CurrentFighter));
+         this.Challanges.ForEach(x => x.endTurn(this.currentFighter));
          }*/
         // Tout le monde doit se synchro
-        this.SetAllUnReady();
-        if (!Finish) // En attente des joueurs
+        this.setAllUnReady();
+        if (!finish) // En attente des joueurs
         {
-            this.FightLoopState = FightLoopState.STATE_WAIT_READY;
+            this.fightLoopState = fightLoopState.STATE_WAIT_READY;
         }
 
         if (this.IsSequencing) {
-            this.EndSequence(this.Sequence, true);
+            this.endSequence(this.sequence, true);
         }
-        if (this.WaitAcknowledgment) {
-            this.AcknowledgeAction();
+        if (this.waitAcknowledgment) {
+            this.acknowledgeAction();
         }
 
         // Tour fini
-        this.sendToField(new GameFightTurnEndMessage(this.CurrentFighter.ID));
-        if (!Finish) {
-            this.sendToField(new GameFightTurnReadyRequestMessage(this.CurrentFighter.ID));
+        this.sendToField(new GameFightTurnEndMessage(this.currentFighter.ID));
+        if (!finish) {
+            this.sendToField(new GameFightTurnReadyRequestMessage(this.currentFighter.ID));
         }
     }
 
-    public void MiddleTurn() {
-        this.CurrentFighter.MiddleTurn();
+    public void middleTurn() {
+        this.currentFighter.middleTurn();
 
     }
 
-    protected void OnTackled(Fighter Fighter, MovementPath path) {
-        ArrayList<Fighter> tacklers = Pathfinder.getEnnemyNearToTakle(this, Fighter.Team, Fighter.CellId());
+    protected void onTackled(Fighter fighter, MovementPath path) {
+        ArrayList<Fighter> tacklers = Pathfinder.getEnnemyNearToTakle(this, fighter.team, fighter.getCellId());
 
-        int tackledMp = Fighter.GetTackledMP();
-        int tackledAp = Fighter.GetTackledAP();
-        if (Fighter.MP() - tackledMp < 0) {
-            Main.Logs().writeError(String.format("Cannot apply tackle : mp tackled ({0}) > available mp ({1})", tackledMp, Fighter.MP()));
+        int tackledMp = fighter.getTackledMP();
+        int tackledAp = fighter.getTackledAP();
+        if (fighter.getMP() - tackledMp < 0) {
+            Main.Logs().writeError(String.format("Cannot apply tackle : mp tackled ({0}) > available mp ({1})", tackledMp, fighter.getMP()));
         } else {
-            this.sendToField(new GameActionFightTackledMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_TACKLED, Fighter.ID, tacklers.stream().mapToInt(x -> x.ID).toArray()));
+            this.sendToField(new GameActionFightTackledMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_TACKLED, fighter.ID, tacklers.stream().mapToInt(x -> x.ID).toArray()));
 
-            Fighter.UsedAP += tackledAp;
-            Fighter.UsedMP += tackledMp;
+            fighter.usedAP += tackledAp;
+            fighter.usedMP += tackledMp;
 
-            this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, Fighter.ID, Fighter.ID, (short) -tackledAp));
-            this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, Fighter.ID, Fighter.ID, (short) -tackledMp));
+            this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, fighter.ID, fighter.ID, (short) -tackledAp));
+            this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.ID, fighter.ID, (short) -tackledMp));
 
-            if (path.movementLength <= Fighter.MP()) {
+            if (path.movementLength <= fighter.getMP()) {
                 return;
             }
-            path.cutPath(Fighter.MP() + 1);
+            path.cutPath(fighter.getMP() + 1);
         }
     }
 
-    public void AffectSpellTo(Fighter Caster, Fighter Target, int Level, int... Spells) {
-        SpellLevel Spell;
-        for (int Spellid : Spells) {
-            Spell = SpellDAOImpl.spells.get(Spellid).SpellLevel(Level);
+    public void affectSpellTo(Fighter caster, Fighter target, int level, int... spells) {
+        SpellLevel spell;
+        for (int Spellid : spells) {
+            spell =  DAO.getSpells().findSpell(Spellid).SpellLevel(level);
             double num1 = Fight.RANDOM.nextDouble();
-            double num2 = (double) Arrays.stream(Spell.effects).mapToInt(x -> x.random).sum();
+            double num2 = (double) Arrays.stream(spell.effects).mapToInt(x -> x.random).sum();
             boolean flag = false;
-            for (EffectInstanceDice Effect : Spell.effects) {
+            for (EffectInstanceDice Effect : spell.effects) {
                 if (Effect.random > 0) {
                     if (!flag) {
                         if (num1 > (double) Effect.random / num2) {
@@ -935,18 +936,18 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         continue;
                     }
                 }
-                ArrayList<Fighter> target = new ArrayList<Fighter>() {
+                ArrayList<Fighter> targets = new ArrayList<Fighter>() {
                     {
-                        add(Target);
+                        add(target);
                     }
                 };
                 if (Effect.delay > 0) {
-                    Target.Buffs.DelayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), Spellid, Target.CellId(), num1, Effect, Caster, target, false, StatsEnum.NONE, 0, Spell), Effect.delay));
-                    this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, Caster.ID, new FightTriggeredEffect(Target.NextBuffUid.incrementAndGet(), Target.ID, (short) Effect.duration, FightDispellableEnum.DISPELLABLE, Spellid, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
+                    target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), Spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell), Effect.delay));
+                    this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, caster.ID, new FightTriggeredEffect(target.nextBuffUid.incrementAndGet(), target.ID, (short) Effect.duration, FightDispellableEnum.DISPELLABLE, Spellid, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
                     continue;
                 }
-                EffectCast CastInfos = new EffectCast(Effect.EffectType(), Spellid, Target.CellId(), num1, Effect, Caster, target, false, StatsEnum.NONE, 0, Spell);
-                CastInfos.targetKnownCellId = Target.CellId();
+                EffectCast CastInfos = new EffectCast(Effect.EffectType(), Spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell);
+                CastInfos.targetKnownCellId = target.getCellId();
                 if (EffectBase.TryApplyEffect(CastInfos) == -3) {
                     break;
                 }
@@ -954,347 +955,347 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public synchronized GameMapMovement TryMove(Fighter Fighter, MovementPath Path) {
+    public synchronized GameMapMovement tryMove(Fighter fighter, MovementPath path) {
         // Pas a lui de jouer
-        if (Fighter != this.CurrentFighter) {
+        if (fighter != this.currentFighter) {
             return null;
         }
 
         // Pas assez de point de mouvement
-        if (Path.movementLength > Fighter.MP() || Path.movementLength == -1) {
-            System.out.println(Path.movementLength > Fighter.MP());
-            System.out.println(Path.movementLength + " " + Fighter.MP());
+        if (path.movementLength > fighter.getMP() || path.movementLength == -1) {
+            System.out.println(path.movementLength > fighter.getMP());
+            System.out.println(path.movementLength + " " + fighter.getMP());
             return null;
         }
 
-        this.StartSequence(SequenceTypeEnum.SEQUENCE_MOVE);
+        this.startSequence(SequenceTypeEnum.SEQUENCE_MOVE);
 
-        if ((Fighter.GetTackledMP() > 0 || Fighter.GetTackledAP() > 0) && !this.CurrentFighter.States.HasState(FightStateEnum.Enraciné)) {
-            this.OnTackled(Fighter, Path);
-            if (Path.transitCells.isEmpty() || Path.movementLength == 0) {
-                this.EndSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
+        if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.states.hasState(FightStateEnum.Enraciné)) {
+            this.onTackled(fighter, path);
+            if (path.transitCells.isEmpty() || path.movementLength == 0) {
+                this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
                 return null;
             }
 
         }
-        GameMapMovement GameMovement = new GameMapMovement(this, Fighter, Path.serializePath());
+        GameMapMovement GameMovement = new GameMapMovement(this, fighter, path.serializePath());
 
-        this.sendToField(new FieldNotification(new GameMapMovementMessage(Path.serializePath(), Fighter.ID)) {
+        this.sendToField(new FieldNotification(new GameMapMovementMessage(path.serializePath(), fighter.ID)) {
             @Override
             public boolean can(Player perso) {
-                return Fighter.IsVisibleFor(perso);
+                return fighter.isVisibleFor(perso);
             }
         });
 
-        Fighter.UsedMP += Path.movementLength;
-        this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, Fighter.ID, Fighter.ID, (short) -Path.movementLength));
+        fighter.usedMP += path.movementLength;
+        this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.ID, fighter.ID, (short) -path.movementLength));
 
-        Fighter.SetCell(this.GetCell(Path.getEndCell()));
-        this.EndSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
+        fighter.setCell(this.getCell(path.getEndCell()));
+        this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
         return GameMovement;
 
     }
 
-    public byte FindPlacementDirection(Fighter fighter) {
-        if (this.FightState != FightState.STATE_PLACE) {
+    public byte findPlacementDirection(Fighter fighter) {
+        if (this.fightState != fightState.STATE_PLACE) {
             throw new Error("State != Placement, cannot give placement direction");
         }
-        FightTeam fightTeam = fighter.Team == this.myTeam1 ? this.myTeam2 : this.myTeam1;
+        FightTeam fightTeam = fighter.team == this.myTeam1 ? this.myTeam2 : this.myTeam1;
         Couple<Short, Integer> bestPos = null; //@Param1 = cellid,@Param2 = Distance
-        for (Fighter fightActor : (Iterable<Fighter>) fightTeam.GetFighters()::iterator) {
-            MapPoint point = fightActor.MapPoint();
+        for (Fighter fightActor : (Iterable<Fighter>) fightTeam.getFighters()::iterator) {
+            MapPoint point = fightActor.getMapPoint();
             if (bestPos == null) {
-                bestPos = new Couple<>(fightActor.CellId(), fighter.MapPoint().distanceToCell(point));
-            } else if (fighter.MapPoint().distanceToCell(point) < bestPos.second) {
-                bestPos = new Couple<>(fightActor.CellId(), fighter.MapPoint().distanceToCell(point));
+                bestPos = new Couple<>(fightActor.getCellId(), fighter.getMapPoint().distanceToCell(point));
+            } else if (fighter.getMapPoint().distanceToCell(point) < bestPos.second) {
+                bestPos = new Couple<>(fightActor.getCellId(), fighter.getMapPoint().distanceToCell(point));
             }
         }
         if (bestPos == null) {
             return fighter.direction;
         } else {
-            return fighter.MapPoint().advancedOrientationTo(MapPoint.fromCellId(bestPos.first), false);
+            return fighter.getMapPoint().advancedOrientationTo(MapPoint.fromCellId(bestPos.first), false);
         }
     }
 
-    public void SwapPosition(Fighter Fighter, Fighter FighterTarget) {
-        FightCell Cell = Fighter.myCell;
-        FightCell Cell2 = FighterTarget.myCell;
-        Fighter.SetCell(Cell2);
-        FighterTarget.SetCell(Cell);
-        this.Fighters().forEach(x -> x.direction = this.FindPlacementDirection(x));
-        this.sendToField(new GameFightPlacementSwapPositionsMessage(new IdentifiedEntityDispositionInformations[]{Fighter.GetIdentifiedEntityDispositionInformations(), FighterTarget.GetIdentifiedEntityDispositionInformations()}));
+    public void swapPosition(Fighter fighter, Fighter fighterTarget) {
+        FightCell cell = fighter.myCell;
+        FightCell cell2 = fighterTarget.myCell;
+        fighter.setCell(cell2);
+        fighterTarget.setCell(cell);
+        this.Fighters().forEach(x -> x.direction = this.findPlacementDirection(x));
+        this.sendToField(new GameFightPlacementSwapPositionsMessage(new IdentifiedEntityDispositionInformations[]{fighter.GetIdentifiedEntityDispositionInformations(), fighterTarget.GetIdentifiedEntityDispositionInformations()}));
     }
 
-    public void SetFighterReady(Fighter Fighter) {
+    public void SetFighterReady(Fighter fighter) {
         // Si combat deja commencé on arrete
-        if (this.FightState != FightState.STATE_PLACE) {
+        if (this.fightState != fightState.STATE_PLACE) {
             return;
         }
 
-        Fighter.TurnReady = Fighter.TurnReady == false;
+        fighter.turnReady = fighter.turnReady == false;
 
-        this.sendToField(new GameFightHumanReadyStateMessage(Fighter.ID, Fighter.TurnReady));
+        this.sendToField(new GameFightHumanReadyStateMessage(fighter.ID, fighter.turnReady));
 
         // Debut du combat si tout le monde ready
-        if (this.IsAllTurnReady() && this.FightType != FightTypeEnum.FIGHT_TYPE_PvT) {
-            this.StartFight();
+        if (this.isAllTurnReady() && this.fightType != FightTypeEnum.FIGHT_TYPE_PvT) {
+            this.startFight();
         }
     }
 
-    private boolean IsAllTurnReady() {
-        return this.AliveFighters().allMatch(Fighter -> Fighter.TurnReady);
+    private boolean isAllTurnReady() {
+        return this.getAliveFighters().allMatch(Fighter -> Fighter.turnReady);
     }
 
-    private void SetAllUnReady() {
-        this.Fighters().filter(x -> x instanceof CharacterFighter && ((CharacterFighter) x).Character.client != null).forEach(x -> x.TurnReady = false);
-        /*foreach (var Fighter in this.Fighters.Where(Fighter => Fighter is DoubleFighter))
-         Fighter.TurnReady = true;*/
+    private void setAllUnReady() {
+        this.Fighters().filter(x -> x instanceof CharacterFighter && ((CharacterFighter) x).Character.client != null).forEach(x -> x.turnReady = false);
+        /*foreach (var Fighter in this.fighters.Where(Fighter => Fighter is DoubleFighter))
+         Fighter.turnReady = true;*/
     }
 
-    public void SetFighterPlace(Fighter Fighter, short CellId) {
+    public void setFighterPlace(Fighter fighter, short cellId) {
         // Deja pret ?
-        if (Fighter.TurnReady) {
+        if (fighter.turnReady) {
             return;
         }
 
-        FightCell Cell = this.myFightCells.get(Fighter.Team).get(CellId);
+        FightCell Cell = this.myFightCells.get(fighter.team).get(cellId);
 
         // Existante ?
         if (Cell != null) {
             // Aucun persos dessus ?
             if (Cell.CanWalk()) {
                 // Affectation
-                Fighter.SetCell(Cell);
-                this.Fighters().forEach(x -> x.direction = this.FindPlacementDirection(x));
+                fighter.setCell(Cell);
+                this.Fighters().forEach(x -> x.direction = this.findPlacementDirection(x));
                 this.sendToField(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
             }
         }
     }
 
-    protected void InitFight(Fighter Attacker, Fighter Defender) {
+    protected void initFight(Fighter attacker, Fighter defender) {
         // Les leaders d'equipes
-        this.myTeam1.SetLeader(Attacker);
-        this.myTeam2.SetLeader(Defender);
+        this.myTeam1.setLeader(attacker);
+        this.myTeam2.setLeader(defender);
 
         // On despawn avant la vue du flag de combat
-        Attacker.JoinFight();
-        Defender.JoinFight();
+        attacker.JoinFight();
+        defender.JoinFight();
 
         // Flags de combat
-        this.SendFightFlagInfos();
+        this.sendFightFlagInfos();
 
         // Rejoins les combats
-        this.JoinFightTeam(Attacker, this.myTeam1, true, (short) -1, true);
-        this.JoinFightTeam(Defender, this.myTeam2, true, (short) - 1, true);
+        this.joinFightTeam(attacker, this.myTeam1, true, (short) -1, true);
+        this.joinFightTeam(defender, this.myTeam2, true, (short) - 1, true);
 
         // Si un timer pour le lancement du combat
-        if (this.GetStartTimer() != -1) {
+        if (this.getStartTimer() != -1) {
             //FIXME remove Thread.sleep
-            this.StartTimer(new CancellableScheduledRunnable(BackGroundWorker, (GetStartTimer() * 1000)) {
+            this.startTimer(new CancellableScheduledRunnable(BackGroundWorker, (getStartTimer() * 1000)) {
                 @Override
                 public void run() {
                     try {
-                        Thread.sleep(GetStartTimer() * 1000);
+                        Thread.sleep(getStartTimer() * 1000);
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                    StartFight();
+                    startFight();
                 }
-            }, "StartTimer");
+            }, "startTimer");
         }
     }
 
-    public void SendFightFlagInfos(WorldClient Client) {
-        if (this.FightState != FightState.STATE_PLACE) {
+    public void sendFightFlagInfos(WorldClient client) {
+        if (this.fightState != fightState.STATE_PLACE) {
             return;
         }
-        if (this.myTeam1.BladePosition == -1) {
-            if (this.myTeam1.Leader.MapCell() != this.myTeam2.Leader.MapCell()) {
-                this.myTeam1.BladePosition = this.myTeam1.Leader.MapCell();
-                this.myTeam2.BladePosition = this.myTeam2.Leader.MapCell();
+        if (this.myTeam1.bladePosition == -1) {
+            if (this.myTeam1.Leader.getMapCell() != this.myTeam2.Leader.getMapCell()) {
+                this.myTeam1.bladePosition = this.myTeam1.Leader.getMapCell();
+                this.myTeam2.bladePosition = this.myTeam2.Leader.getMapCell();
             } else {
-                this.myTeam1.BladePosition = this.Map.getRandomAdjacentFreeCell(this.myTeam2.Leader.MapCell()).id;
-                this.myTeam2.BladePosition = this.myTeam2.Leader.MapCell();
+                this.myTeam1.bladePosition = this.map.getRandomAdjacentFreeCell(this.myTeam2.Leader.getMapCell()).id;
+                this.myTeam2.bladePosition = this.myTeam2.Leader.getMapCell();
             }
         }
-        if (Client == null) {
-            this.Map.sendToField(new GameRolePlayShowChallengeMessage(GetFightCommonInformations()));
+        if (client == null) {
+            this.map.sendToField(new GameRolePlayShowChallengeMessage(getFightCommonInformations()));
         } else {
-            Client.send(new GameRolePlayShowChallengeMessage(GetFightCommonInformations()));
+            client.send(new GameRolePlayShowChallengeMessage(getFightCommonInformations()));
         }
     }
 
-    public void SendFightFlagInfos() {
-        this.SendFightFlagInfos(null);
+    public void sendFightFlagInfos() {
+        this.sendFightFlagInfos(null);
     }
 
-    public void OnTeamOptionsChanged(FightTeam team, FightOptionsEnum option) {
-        this.sendToField(new GameFightOptionStateUpdateMessage(this.FightId, team.Id, option.value, team.IsToggle(option)));
-        if (this.FightState == FightState.STATE_PLACE) {
-            this.Map.sendToField(new GameFightOptionStateUpdateMessage(this.FightId, team.Id, option.value, team.IsToggle(option)));
+    public void onTeamOptionsChanged(FightTeam team, FightOptionsEnum option) {
+        this.sendToField(new GameFightOptionStateUpdateMessage(this.fightId, team.Id, option.value, team.isToggled(option)));
+        if (this.fightState == fightState.STATE_PLACE) {
+            this.map.sendToField(new GameFightOptionStateUpdateMessage(this.fightId, team.Id, option.value, team.isToggled(option)));
         }
     }
 
     //int fightId, byte fightType, FightTeamInformations[] fightTeams, int[] fightTeamsPositions, FightOptionsInformations[] fightTeamsOption
-    public FightCommonInformations GetFightCommonInformations() {
-        return new FightCommonInformations(this.FightId, this.FightType.value, new FightTeamInformations[]{this.myTeam1.GetFightTeamInformations(), this.myTeam2.GetFightTeamInformations()}, new int[]{this.myTeam1.BladePosition, this.myTeam2.BladePosition}, new FightOptionsInformations[]{this.myTeam1.GetFightOptionsInformations(), this.myTeam2.GetFightOptionsInformations()});
+    public FightCommonInformations getFightCommonInformations() {
+        return new FightCommonInformations(this.fightId, this.fightType.value, new FightTeamInformations[]{this.myTeam1.getFightTeamInformations(), this.myTeam2.getFightTeamInformations()}, new int[]{this.myTeam1.bladePosition, this.myTeam2.bladePosition}, new FightOptionsInformations[]{this.myTeam1.getFightOptionsInformations(), this.myTeam2.getFightOptionsInformations()});
     }
 
-    public void JoinFightTeam(Fighter Fighter, FightTeam Team, boolean Leader, short cell, boolean sendInfos) {
-        if (!Leader) {
-            Fighter.JoinFight();
+    public void joinFightTeam(Fighter fighter, FightTeam team, boolean leader, short cell, boolean sendInfos) {
+        if (!leader) {
+            fighter.JoinFight();
         }
 
         // Ajout a la team
-        Team.FighterJoin(Fighter);
+        team.fighterJoin(fighter);
 
         // On envois l'ajout du joueur a la team sur la map BLADE
-        if (this.FightState == FightState.STATE_PLACE) {
-            this.Map.sendToField(new GameFightUpdateTeamMessage(this.FightId, Team.GetFightTeamInformations()));
+        if (this.fightState == fightState.STATE_PLACE) {
+            this.map.sendToField(new GameFightUpdateTeamMessage(this.fightId, team.getFightTeamInformations()));
         }
 
         // cell de combat
         if (cell == -1) {
-            Fighter.SetCell(this.GetFreeSpawnCell(Team));
+            fighter.setCell(this.getFreeSpawnCell(team));
         } else {
-            Fighter.SetCell(this.GetCell(cell));
+            fighter.setCell(this.getCell(cell));
         }
 
-        if (Fighter instanceof CharacterFighter) {
-            this.SendPlacementInformation((CharacterFighter) Fighter, true);
+        if (fighter instanceof CharacterFighter) {
+            this.sendPlacementInformation((CharacterFighter) fighter, true);
         }
 
         if (sendInfos) {
-            this.sendToField(new FieldNotification(new GameFightShowFighterMessage(Fighter.getGameContextActorInformations(null))) {
+            this.sendToField(new FieldNotification(new GameFightShowFighterMessage(fighter.getGameContextActorInformations(null))) {
                 @Override
                 public boolean can(Player perso) {
-                    return perso.ID != Fighter.ID;
+                    return perso.ID != fighter.ID;
                 }
             });
         }
 
-        // this.sendToField(this.FightTurnListMessage());
+        // this.sendToField(this.getFightTurnListMessage());
     }
 
-    public void SendPlacementInformation(CharacterFighter Fighter, boolean Update) {
-        if (Update) {
-            Fighter.send(new GameContextDestroyMessage());
-            Fighter.send(new GameContextCreateMessage((byte) 2));
+    public void sendPlacementInformation(CharacterFighter fighter, boolean update) {
+        if (update) {
+            fighter.send(new GameContextDestroyMessage());
+            fighter.send(new GameContextCreateMessage((byte) 2));
         }
-        Fighter.send(new GameFightStartingMessage(FightType.value, GetTeam1().LeaderId, GetTeam2().LeaderId));
+        fighter.send(new GameFightStartingMessage(fightType.value, getTeam1().LeaderId, getTeam2().LeaderId));
         //TODO FriendUpdateMessage OnContexteChanged
 
-        this.SendGameFightJoinMessage(Fighter);
-        Fighter.send(new GameFightPlacementPossiblePositionsMessage(this.myFightCells.get(myTeam1).keySet().stream().mapToInt(x -> x.intValue()).toArray(), this.myFightCells.get(myTeam2).keySet().stream().mapToInt(x -> x.intValue()).toArray(), Fighter.Team.Id));
+        this.sendGameFightJoinMessage(fighter);
+        fighter.send(new GameFightPlacementPossiblePositionsMessage(this.myFightCells.get(myTeam1).keySet().stream().mapToInt(x -> x.intValue()).toArray(), this.myFightCells.get(myTeam2).keySet().stream().mapToInt(x -> x.intValue()).toArray(), fighter.team.Id));
 
-        if (!Update) {
-            CharacterHandler.SendCharacterStatsListMessage(Fighter.Character.client);
+        if (!update) {
+            CharacterHandler.SendCharacterStatsListMessage(fighter.Character.client);
         }
         this.Fighters().forEach((Actor) -> {
-            Fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(null)));
+            fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(null)));
         });
 
-        Fighter.send(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
-        Fighter.send(new GameFightUpdateTeamMessage(this.FightId, this.GetTeam1().GetFightTeamInformations()));
-        Fighter.send(new GameFightUpdateTeamMessage(this.FightId, this.GetTeam2().GetFightTeamInformations()));
-        if (Update) {
-            this.sendToField(new FieldNotification(new GameFightUpdateTeamMessage(this.FightId, Fighter.Team.GetFightTeamInformations())) {
+        fighter.send(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
+        fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam1().getFightTeamInformations()));
+        fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam2().getFightTeamInformations()));
+        if (update) {
+            this.sendToField(new FieldNotification(new GameFightUpdateTeamMessage(this.fightId, fighter.team.getFightTeamInformations())) {
                 @Override
                 public boolean can(Player Actor) {
-                    return Actor.ID != Fighter.ID;
+                    return Actor.ID != fighter.ID;
                 }
             });
         }
-        this.Fighters().forEach(x -> Fighter.send(new GameFightHumanReadyStateMessage(x.ID, x.TurnReady)));
+        this.Fighters().forEach(x -> fighter.send(new GameFightHumanReadyStateMessage(x.ID, x.turnReady)));
     }
 
-    public void onReconnect(CharacterFighter Fighter) {
-        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 184, new String[]{Fighter.Character.nickName}));
+    public void onReconnect(CharacterFighter fighter) {
+        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 184, new String[]{fighter.Character.nickName}));
 
-        if (this.FightState == FightState.STATE_PLACE) {
-            this.SendPlacementInformation(Fighter, false);
+        if (this.fightState == fightState.STATE_PLACE) {
+            this.sendPlacementInformation(fighter, false);
         } else {
-            Fighter.send(new GameFightStartingMessage(FightType.value, GetTeam1().LeaderId, GetTeam2().LeaderId));
-            this.SendGameFightJoinMessage(Fighter);
+            fighter.send(new GameFightStartingMessage(fightType.value, getTeam1().LeaderId, getTeam2().LeaderId));
+            this.sendGameFightJoinMessage(fighter);
             this.Fighters().forEach((Actor) -> {
-                Fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(Fighter.Character)));
+                fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(fighter.Character)));
             });
-            Fighter.send(new GameEntitiesDispositionMessage(this.AliveFighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
-            Fighter.send(new GameFightResumeMessage(GetFightDispellableEffectExtendedInformations(), GetAllGameActionMark(), this.myWorker.FightTurn, (int) (System.currentTimeMillis() - this.FightTime), Idols(), Fighter.SpellsController.myinitialCooldown.entrySet().stream().map(x -> new GameFightSpellCooldown(x.getKey(), x.getValue().initialCooldown)).toArray(GameFightSpellCooldown[]::new), (byte) Fighter.Team.GetAliveFighters().filter(x -> x.Summoner() == Fighter.ID && !(x instanceof BombFighter)).count(), (byte) Fighter.Team.GetAliveFighters().filter(x -> x.Summoner() == Fighter.ID && (x instanceof BombFighter)).count()));
-            Fighter.send(FightTurnListMessage());
-            Fighter.send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations(Fighter.Character)).toArray(GameFightFighterInformations[]::new)));
+            fighter.send(new GameEntitiesDispositionMessage(this.getAliveFighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
+            fighter.send(new GameFightResumeMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.myWorker.fightTurn, (int) (System.currentTimeMillis() - this.fightTime), getIdols(), fighter.spellsController.myinitialCooldown.entrySet().stream().map(x -> new GameFightSpellCooldown(x.getKey(), x.getValue().initialCooldown)).toArray(GameFightSpellCooldown[]::new), (byte) fighter.team.getAliveFighters().filter(x -> x.getSummonerID() == fighter.ID && !(x instanceof BombFighter)).count(), (byte) fighter.team.getAliveFighters().filter(x -> x.getSummonerID() == fighter.ID && (x instanceof BombFighter)).count()));
+            fighter.send(getFightTurnListMessage());
+            fighter.send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations(fighter.Character)).toArray(GameFightFighterInformations[]::new)));
 
             /*/213.248.126.93 ChallengeInfoMessage Second8 paket
              /213.248.126.93 ChallengeResultMessage Second9 paket*/
-            CharacterHandler.SendCharacterStatsListMessage(Fighter.Character.client);
-            if (this.CurrentFighter.ID == Fighter.ID) {
-                Fighter.send(((CharacterFighter) this.CurrentFighter).FighterStatsListMessagePacket());
+            CharacterHandler.SendCharacterStatsListMessage(fighter.Character.client);
+            if (this.currentFighter.ID == fighter.ID) {
+                fighter.send(((CharacterFighter) this.currentFighter).FighterStatsListMessagePacket());
             }
-            /*Fighter.send(new GameFightUpdateTeamMessage(this.FightId, this.GetTeam1().GetFightTeamInformations()));
-             Fighter.send(new GameFightUpdateTeamMessage(this.FightId, this.GetTeam2().GetFightTeamInformations()));*/
+            /*Fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam1().getFightTeamInformations()));
+             Fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam2().getFightTeamInformations()));*/
 
-            Fighter.send(new GameFightNewRoundMessage(this.myWorker.Round));
+            fighter.send(new GameFightNewRoundMessage(this.myWorker.round));
 
-            Fighter.send(new GameFightTurnResumeMessage(this.CurrentFighter.ID, this.GetTurnTime() / 100, (int) (this.myLoopTimeOut - System.currentTimeMillis()) / 100));
+            fighter.send(new GameFightTurnResumeMessage(this.currentFighter.ID, this.getTurnTime() / 100, (int) (this.myLoopTimeOut - System.currentTimeMillis()) / 100));
         }
     }
 
-    public GameActionMark[] GetAllGameActionMark() {
-        GameActionMark[] GameActionMarks = new GameActionMark[0];
+    public GameActionMark[] getAllGameActionMark() {
+        GameActionMark[] gameActionMarks = new GameActionMark[0];
         for (CopyOnWriteArrayList<FightActivableObject> objs : this.m_activableObjects.values()) {
             for (FightActivableObject Object : objs) {
-                GameActionMarks = ArrayUtils.add(GameActionMarks, Object.GetHiddenGameActionMark());
+                gameActionMarks = ArrayUtils.add(gameActionMarks, Object.GetHiddenGameActionMark());
             }
         }
-        return GameActionMarks;
+        return gameActionMarks;
     }
 
-    public FightDispellableEffectExtendedInformations[] GetFightDispellableEffectExtendedInformations() {
+    public FightDispellableEffectExtendedInformations[] getFightDispellableEffectExtendedInformations() {
         FightDispellableEffectExtendedInformations[] FightDispellableEffectExtendedInformations = new FightDispellableEffectExtendedInformations[0];
 
-        for (Stream<BuffEffect> Buffs : (Iterable<Stream<BuffEffect>>) this.AliveFighters().map(x -> x.Buffs.GetAllBuffs())::iterator) {
+        for (Stream<BuffEffect> Buffs : (Iterable<Stream<BuffEffect>>) this.getAliveFighters().map(x -> x.buff.getAllBuffs())::iterator) {
             for (BuffEffect Buff : (Iterable<BuffEffect>) Buffs::iterator) {
                 FightDispellableEffectExtendedInformations = ArrayUtils.add(FightDispellableEffectExtendedInformations, new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.Caster.ID, Buff.GetAbstractFightDispellableEffect()));
             }
         }
-        /*return Stream.of(this.AliveFighters()
-         .map(x -> x.Buffs.GetAllBuffs()
+        /*return Stream.of(this.getAliveFighters()
+         .map(x -> x.buff.getAllBuffs()
          .map(Buff -> (new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.Caster.id, Buff.GetAbstractFightDispellableEffect())))
          )).toArray(FightDispellableEffectExtendedInformations[]::new);*/
         return FightDispellableEffectExtendedInformations;
     }
 
-    public byte SummonCount() {
+    public byte summonCount() {
         return 0;
     }
 
-    public byte BombCount() {
+    public byte bombCount() {
         return 0;
     }
 
-    public Idol[] Idols() {
+    public Idol[] getIdols() {
         return new Idol[0];
     }
 
-    protected abstract void SendGameFightJoinMessage(Fighter fighter);
+    protected abstract void sendGameFightJoinMessage(Fighter fighter);
 
-    public boolean OnlyOneTeam() {
-        boolean Team1 = this.myTeam1.GetFighters().anyMatch(Player -> !Player.Dead && (!Player.Left));
-        boolean Team2 = this.myTeam2.GetFighters().anyMatch(Player -> !Player.Dead && (!Player.Left));
-        /*for (Fighter player : Fighters()) {
-         if ((player.Team.id == 0) && (!player.Dead) && (!player.Left)) {
+    public boolean onlyOneTeam() {
+        boolean Team1 = this.myTeam1.getFighters().anyMatch(Player -> !Player.dead && (!Player.left));
+        boolean Team2 = this.myTeam2.getFighters().anyMatch(Player -> !Player.dead && (!Player.left));
+        /*for (Fighter player : fighters()) {
+         if ((player.team.id == 0) && (!player.dead) && (!player.left)) {
          Team1 = true;
          }
-         if ((player.Team.id == 1) && (!player.Dead) && (!player.Left)) {
+         if ((player.team.id == 1) && (!player.dead) && (!player.left)) {
          Team2 = true;
          }
          }*/
         return !(Team1 && Team2);
     }
 
-    public synchronized boolean TryEndFight() {
-        if (this.GetWinners() != null) {
-            this.FightLoopState = FightLoopState.STATE_WAIT_END;
+    public synchronized boolean tryEndFight() {
+        if (this.getWinners() != null) {
+            this.fightLoopState = fightLoopState.STATE_WAIT_END;
             return true;
         }
         return false;
@@ -1303,33 +1304,33 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private SequenceTypeEnum m_lastSequenceAction;
     private int m_sequenceLevel;
     public boolean IsSequencing;
-    public boolean WaitAcknowledgment;
-    public SequenceTypeEnum Sequence;
+    public boolean waitAcknowledgment;
+    public SequenceTypeEnum sequence;
     private Stack<SequenceTypeEnum> m_sequences = new Stack<>();
     private AtomicInteger contextualIdProvider = new AtomicInteger(-2);
 
-    public boolean StartSequence(SequenceTypeEnum sequenceType) {
+    public boolean startSequence(SequenceTypeEnum sequenceType) {
         this.m_lastSequenceAction = sequenceType;
         ++this.m_sequenceLevel;
         if (this.IsSequencing) {
             return false;
         }
         this.IsSequencing = true;
-        this.Sequence = sequenceType;
+        this.sequence = sequenceType;
         this.m_sequences.push(sequenceType);
-        this.sendToField(new SequenceStartMessage(sequenceType.value, this.CurrentFighter.ID)); //TODO not Spectator?
+        this.sendToField(new SequenceStartMessage(sequenceType.value, this.currentFighter.ID)); //TODO not Spectator?
         return true;
     }
 
-    public int GetNextContextualId() {
+    public int getNextContextualId() {
         int id = contextualIdProvider.decrementAndGet();
-        while (AnyFighterMatchId(id)) {
+        while (anyFighterMatchId(id)) {
             id = contextualIdProvider.decrementAndGet();
         }
         return id;
     }
 
-    public boolean AnyFighterMatchId(final int id) {
+    public boolean anyFighterMatchId(final int id) {
         return this.Fighters().anyMatch(Fighter -> Fighter.ID == id);
     }
 
@@ -1337,11 +1338,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         return this.m_sequences.contains(sequenceType);
     }
 
-    public boolean EndSequence(SequenceTypeEnum sequenceType) {
-        return EndSequence(sequenceType, false);
+    public boolean endSequence(SequenceTypeEnum sequenceType) {
+        return endSequence(sequenceType, false);
     }
 
-    public boolean EndSequence(SequenceTypeEnum sequenceType, boolean force) {
+    public boolean endSequence(SequenceTypeEnum sequenceType, boolean force) {
         if (!this.IsSequencing) {
             return false;
         }
@@ -1350,56 +1351,56 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return false;
         }
         this.IsSequencing = false;
-        this.WaitAcknowledgment = true;
+        this.waitAcknowledgment = true;
         SequenceTypeEnum sequenceTypeEnum = this.m_sequences.pop();
         if (sequenceTypeEnum != sequenceType) {
-            Main.Logs().writeDebug(String.format("Popped Sequence different ({0} != {1})", sequenceTypeEnum.value, sequenceType.value));
+            Main.Logs().writeDebug(String.format("Popped sequence different ({0} != {1})", sequenceTypeEnum.value, sequenceType.value));
         }
-        this.sendToField(new SequenceEndMessage(this.m_lastSequenceAction.value, this.CurrentFighter.ID, sequenceType.value));
+        this.sendToField(new SequenceEndMessage(this.m_lastSequenceAction.value, this.currentFighter.ID, sequenceType.value));
         return true;
     }
 
-    public void EndAllSequences() {
+    public void endAllSequences() {
         this.m_sequenceLevel = 0;
         this.IsSequencing = false;
-        this.WaitAcknowledgment = false;
+        this.waitAcknowledgment = false;
         while (this.m_sequences.size() > 0) {
-            this.sendToField(new SequenceEndMessage(this.m_lastSequenceAction.value, this.CurrentFighter.ID, this.m_sequences.pop().value));
+            this.sendToField(new SequenceEndMessage(this.m_lastSequenceAction.value, this.currentFighter.ID, this.m_sequences.pop().value));
         }
     }
 
-    public void AcknowledgeAction() {
-        this.WaitAcknowledgment = false;
+    public void acknowledgeAction() {
+        this.waitAcknowledgment = false;
     }
 
-    protected synchronized void EndFight() {
-        switch (this.FightState) {
+    protected synchronized void endFight() {
+        switch (this.fightState) {
             case STATE_PLACE:
-                this.Map.sendToField(new GameRolePlayRemoveChallengeMessage(this.FightId));
+                this.map.sendToField(new GameRolePlayRemoveChallengeMessage(this.fightId));
                 break;
             case STATE_FINISH:
                 return;
         }
 
-        this.StopTimer("GameLoop");
+        this.stopTimer("gameLoop");
 
         this.sendToField(this.myResult);
 
-        this.CreationTime = 0;
-        this.FightTime = 0;
-        this.EndAllSequences();
+        this.creationTime = 0;
+        this.fightTime = 0;
+        this.endAllSequences();
         this.Fighters().forEach(x -> x.EndFight());
 
-        this.KickSpectators(true);
+        this.kickSpectators(true);
 
         this.myCells.values().stream().forEach((c) -> {
             c.Clear();
         });
         this.myCells.clear();
         this.myTimers.clear();
-        this.myWorker.Dispose();
-        this.myTeam1.Dispose();
-        this.myTeam2.Dispose();
+        this.myWorker.dispose();
+        this.myTeam1.dispose();
+        this.myTeam2.dispose();
 
         this.myFightCells = null;
         this.myCells = null;
@@ -1415,9 +1416,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.contextualIdProvider = null;
 
         //this.Glyphes = null;
-        this.Map.removeFight(this);
-        this.FightState = FightState.STATE_FINISH;
-        this.FightLoopState = FightLoopState.STATE_END_FIGHT;
+        this.map.removeFight(this);
+        this.fightState = fightState.STATE_FINISH;
+        this.fightLoopState = fightLoopState.STATE_END_FIGHT;
         if (myTimers != null) {
             try {
                 myTimers.values().stream().forEach((CR) -> {
@@ -1432,95 +1433,96 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     }
 
-    public abstract GameFightEndMessage LeftEndMessage(Fighter fighter);
+    public abstract GameFightEndMessage leftEndMessage(Fighter fighter);
 
-    protected boolean IsStarted() {
-        return this.FightState != FightState.STATE_INIT && this.FightState != FightState.STATE_PLACE;
+    protected boolean isStarted() {
+        return this.fightState != fightState.STATE_INIT && this.fightState != fightState.STATE_PLACE;
     }
 
-    private void KickSpectators(boolean End) {
+    private void kickSpectators(boolean End) {
 
     }
 
-    public Fighter GetFighterOnCell(int cellId) {
-        return this.AliveFighters().filter(Fighter -> Fighter.CellId() == cellId).findFirst().orElse(null);
+    public Fighter getFighterOnCell(int cellId) {
+        return this.getAliveFighters().filter(Fighter -> Fighter.getCellId() == cellId).findFirst().orElse(null);
     }
 
-    public FightTeam GetWinners() {
-        if (!this.myTeam1.HasFighterAlive()) {
+    public FightTeam getWinners() {
+        if (!this.myTeam1.hasFighterAlive()) {
             return this.myTeam2;
-        } else if (!this.myTeam2.HasFighterAlive()) {
+        } else if (!this.myTeam2.hasFighterAlive()) {
             return this.myTeam1;
         }
 
         return null;
     }
 
-    public FightTeam GetLoosers() {
-        return this.GetEnnemyTeam(this.GetWinners());
+    public FightTeam getLoosers() {
+        return this.getEnnemyTeam(this.getWinners());
     }
 
     /// <summary>
     ///  Init des tours
     /// </summary>
     /*public void RemakeTurns() {
-     this.myWorker.RemakeTurns(this.Fighters());
+     this.myWorker.RemakeTurns(this.fighters());
      }*/
-    public synchronized void AddNamedParty(Fighter Fighter, int Outcome) {
+    public synchronized void addNamedParty(Fighter Fighter, int Outcome) {
         if (Fighter instanceof CharacterFighter) {
             if (((CharacterFighter) Fighter).Character.client != null && ((CharacterFighter) Fighter).Character.client.getParty() != null && !((CharacterFighter) Fighter).Character.client.getParty().partyName.isEmpty() && !Arrays.stream(this.myResult.namedPartyTeamsOutcomes).anyMatch(x -> x.team.partyName.equalsIgnoreCase(((CharacterFighter) Fighter).Character.client.getParty().partyName))) {
-                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(Fighter.Team.Id, ((CharacterFighter) Fighter).Character.client.getParty().partyName), Outcome));
+                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(Fighter.team.Id, ((CharacterFighter) Fighter).Character.client.getParty().partyName), Outcome));
             }
         }
     }
 
-    public void AddActivableObject(Fighter caster, FightActivableObject obj) {
+    public void addActivableObject(Fighter caster, FightActivableObject obj) {
         if (!m_activableObjects.containsKey(caster)) {
             m_activableObjects.put(caster, new CopyOnWriteArrayList<>());
         }
         m_activableObjects.get(caster).add(obj);
     }
 
+    //Dont rename vulnerble
     public Stream<Fighter> Fighters() {
-        return Stream.concat(this.myTeam1.GetFighters(), this.myTeam2.GetFighters());
+        return Stream.concat(this.myTeam1.getFighters(), this.myTeam2.getFighters());
     }
 
-    public Stream<Fighter> AliveFighters() {
-        return Stream.concat(this.myTeam1.GetAliveFighters(), this.myTeam2.GetAliveFighters());
+    public Stream<Fighter> getAliveFighters() {
+        return Stream.concat(this.myTeam1.getAliveFighters(), this.myTeam2.getAliveFighters());
     }
 
-    public Stream<Fighter> DeadFighters() {
-        //Need Performance Test return Stream.of(this.myTeam1.GetDeadFighters(), this.myTeam2.GetDeadFighters()).flatMap(x -> x);
-        return Stream.concat(this.myTeam1.GetDeadFighters(), this.myTeam2.GetDeadFighters());
+    public Stream<Fighter> getDeadFighters() {
+        //Need Performance Test return Stream.of(this.myTeam1.getDeadFighters(), this.myTeam2.getDeadFighters()).flatMap(x -> x);
+        return Stream.concat(this.myTeam1.getDeadFighters(), this.myTeam2.getDeadFighters());
     }
 
-    public FightTeam GetTeam1() { //red
+    public FightTeam getTeam1() { //red
         return myTeam1;
     }
 
-    public FightTeam GetTeam2() {
+    public FightTeam getTeam2() {
         return myTeam2;
     }
 
-    public Fighter GetFighter(int FighterId) {
+    public Fighter getFighter(int FighterId) {
         return this.Fighters().filter(x -> x.ID == FighterId).findFirst().orElse(null);
     }
 
-    public boolean HasObjectOnCell(FightObjectType type, short cell) {
+    public boolean hasObjectOnCell(FightObjectType type, short cell) {
         if (!this.myCells.containsKey(cell)) {
             return false;
         }
         return this.myCells.get(cell).HasObject(type);
     }
 
-    public boolean CanPutObject(short cellId) {
+    public boolean canPutObject(short cellId) {
         if (!this.myCells.containsKey(cellId)) {
             return false;
         }
         return this.myCells.get(cellId).CanPutObject();
     }
 
-    public boolean IsCellWalkable(short CellId) {
+    public boolean isCellWalkable(short CellId) {
         if (!this.myCells.containsKey(CellId)) {
             return false;
         }
@@ -1528,35 +1530,35 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         return this.myCells.get(CellId).CanWalk();
     }
 
-    public FightCell GetCell(short CellId) {
+    public FightCell getCell(short CellId) {
         if (this.myCells.containsKey(CellId)) {
             return this.myCells.get(CellId);
         }
         return null;
     }
 
-    public Fighter HasEnnemyInCell(short CellId, FightTeam Team) {
+    public Fighter hasEnnemyInCell(short CellId, FightTeam Team) {
         if (CellId == -1) {
             return null;
         }
         return this.myCells.get(CellId).HasEnnemy(Team);
     }
 
-    public Fighter HasFriendInCell(short CellId, FightTeam Team) {
+    public Fighter hasFriendInCell(short CellId, FightTeam Team) {
         if (CellId == -1) {
             return null;
         }
         return this.myCells.get(CellId).HasFriend(Team);
     }
 
-    public GameFightTurnListMessage FightTurnListMessage() {
-        return new GameFightTurnListMessage(this.AliveFighters().filter(x -> !(x instanceof StaticFighter))
-                .sorted((e1, e2) -> Integer.compare(e2.Initiative(false), e1.Initiative(false)))
-                .mapToInt(x -> x.ID).toArray(), this.DeadFighters().filter(x -> !(x instanceof StaticFighter))
+    public GameFightTurnListMessage getFightTurnListMessage() {
+        return new GameFightTurnListMessage(this.getAliveFighters().filter(x -> !(x instanceof StaticFighter))
+                .sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false)))
+                .mapToInt(x -> x.ID).toArray(), this.getDeadFighters().filter(x -> !(x instanceof StaticFighter))
                 .mapToInt(x -> x.ID).toArray());
     }
 
-    private synchronized FightCell GetFreeSpawnCell(FightTeam Team) {
+    private synchronized FightCell getFreeSpawnCell(FightTeam Team) {
         for (FightCell Cell : this.myFightCells.get(Team).values()) {
             if (Cell.CanWalk()) {
                 return Cell;
@@ -1569,12 +1571,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     @Override
-    public void ActorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection) {
-        //((Fighter) actor).SetCell(myCells.get(newCell));
+    public void actorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection) {
+        //((Fighter) actor).setCell(myCells.get(newCell));
         Actor.direction = newDirection;
     }
 
-    public void StopTimer(String Name) {
+    public void stopTimer(String Name) {
         synchronized ($mutex_lock) {
             try {
                 if (this.myTimers.containsKey(Name)) {
@@ -1587,7 +1589,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public void StartTimer(CancellableScheduledRunnable CR, String Name) {
+    public void startTimer(CancellableScheduledRunnable CR, String Name) {
         synchronized ($mutex_lock) {
             try {
                 this.myTimers.put(Name, CR);
@@ -1597,11 +1599,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public int GetPlacementTimeLeft() {
-        if (this.IsStarted()) {
+    public int getPlacementTimeLeft() {
+        if (this.isStarted()) {
             return 0;
         }
-        double num = (double) (this.GetStartTimer() - (Instant.now().getEpochSecond() - this.CreationTime)) * 10;
+        double num = (double) (this.getStartTimer() - (Instant.now().getEpochSecond() - this.creationTime)) * 10;
         if (num < 0.0) {
             num = 0.0;
         }

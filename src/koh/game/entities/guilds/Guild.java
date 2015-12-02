@@ -52,7 +52,7 @@ public class Guild extends IWorldEventObserver {
     public void onFighterAddedExperience(GuildMember member, long XP) {
         member.addExperience(XP);
         this.entity.addExperience(XP);
-        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).Guild && this.entity.level < Settings.GetIntElement("Max.GuildLevel")) {
+        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).guild && this.entity.level < Settings.GetIntElement("Max.GuildLevel")) {
             this.entity.level++;
             this.entity.boost += 5;
             this.sendToField(new GuildLevelUpMessage(this.entity.level));

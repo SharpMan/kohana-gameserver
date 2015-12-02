@@ -20,7 +20,7 @@ public class EffectSubPAEsquive extends EffectBase {
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
                 Buff.ApplyEffect(DamageValue, null);
-                Target.Buffs.AddBuff(Buff);
+                Target.buff.addBuff(Buff);
             }
         } else {
             for (Fighter Target : CastInfos.Targets) {
@@ -29,7 +29,7 @@ public class EffectSubPAEsquive extends EffectBase {
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
                 Buff.ApplyEffect(DamageValue, null);
 
-                Target.Buffs.AddBuff(Buff);
+                Target.buff.addBuff(Buff);
             }
         }
 

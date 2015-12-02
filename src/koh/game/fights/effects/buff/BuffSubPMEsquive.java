@@ -6,7 +6,6 @@ import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightDodgePointLossMessage;
-import koh.protocol.messages.game.actions.fight.GameActionFightPointsVariationMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -24,18 +23,18 @@ public class BuffSubPMEsquive extends BuffEffect {
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt LostPM = new MutableInt(CastInfos.RandomJet(Target));
-        LostPM.setValue(LostPM.getValue() > Target.AP() ? Target.AP() : LostPM.getValue());
-        CastInfos.DamageValue = Target.CalculDodgeAPMP(CastInfos.Caster, LostPM.intValue(), true, CastInfos.Duration > 0);
+        LostPM.setValue(LostPM.getValue() > Target.getAP() ? Target.getAP() : LostPM.getValue());
+        CastInfos.DamageValue = Target.calculDodgeAPMP(CastInfos.Caster, LostPM.intValue(), true, CastInfos.Duration > 0);
 
         if (CastInfos.DamageValue != LostPM.intValue()) {
-            Target.Fight.sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PM, Caster.ID, Target.ID, LostPM.getValue() - CastInfos.DamageValue));
+            Target.fight.sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PM, Caster.ID, Target.ID, LostPM.getValue() - CastInfos.DamageValue));
         }
 
         if (CastInfos.DamageValue > 0) {
             BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PM, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.Caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, Duration, 0), this.Target);
             BuffStats.ApplyEffect(LostPM, null);
-            this.Target.Buffs.AddBuff(BuffStats);
-            if (Target.ID == Target.Fight.CurrentFighter.ID) {
+            this.Target.buff.addBuff(BuffStats);
+            if (Target.ID == Target.fight.currentFighter.ID) {
                 // Target.fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_LOST, this.Caster.id, Target.id, (short) -CastInfos.DamageValue));
             }
         }

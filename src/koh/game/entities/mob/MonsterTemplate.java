@@ -26,7 +26,7 @@ public class MonsterTemplate {
 
     private EntityLook myEntityLook;
 
-    public MonsterGrade GetLevelOrNear(int Level) {
+    public MonsterGrade getLevelOrNear(int Level) {
         int Near = 10000;
         MonsterGrade objNear = null;
         for (MonsterGrade objLevel : grades) {
@@ -44,7 +44,7 @@ public class MonsterTemplate {
     }
 
 
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         if (myEntityLook == null) {
             myEntityLook = EntityLookParser.fromString(this.look);
         }

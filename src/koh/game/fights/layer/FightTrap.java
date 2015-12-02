@@ -23,7 +23,7 @@ import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
 public class FightTrap extends FightActivableObject {
 
     public FightTrap(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum shap) {
-        super(BuffActiveType.ACTIVE_ENDMOVE, castInfos.Caster.Fight, castInfos.Caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.INVISIBLE, size, shap);
+        super(BuffActiveType.ACTIVE_ENDMOVE, castInfos.Caster.fight, castInfos.Caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.INVISIBLE, size, shap);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class FightTrap extends FightActivableObject {
         this.m_fight.sendToField(new FieldNotification(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, GetHiddenGameActionMark())) {
             @Override
             public boolean can(Player perso) {
-                return !(perso.client != null && perso.getFighter() != null && perso.getFighter().Team.Id == dispatcher.Id);
+                return !(perso.client != null && perso.getFighter() != null && perso.getFighter().team.Id == dispatcher.Id);
             }
         });
         dispatcher.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, GetGameActionMark()));
@@ -54,31 +54,31 @@ public class FightTrap extends FightActivableObject {
 
     @Override
     public GameActionMark GetHiddenGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.Team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.VisibileState == VISIBLE ? this.CellId() : (short) -1, new GameActionMarkedCell[0], true);
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.VisibileState == VISIBLE ? this.getCellId() : (short) -1, new GameActionMarkedCell[0], true);
     }
 
     @Override
     public GameActionMark GetGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.Team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.CellId(), this.GetGameActionMarkedCell(), true);
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.getCellId(), this.GetGameActionMarkedCell(), true);
     }
 
     @Override
-    public FightObjectType ObjectType() {
+    public FightObjectType getObjectType() {
         return FightObjectType.OBJECT_TRAP;
     }
 
     @Override
-    public boolean CanWalk() {
+    public boolean canWalk() {
         return true;
     }
 
     @Override
-    public boolean CanStack() {
+    public boolean canStack() {
         return false;
     }
 
     @Override
-    public boolean CanGoThrough() {
+    public boolean canGoThrough() {
         return true;
     }
 

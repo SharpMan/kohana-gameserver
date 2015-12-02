@@ -95,7 +95,7 @@ public class Collect implements InteractiveAction {
         }
         player.myJobs.getJob(Skill.parentJobId).gatheringItems += bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered;
         player.send(bonusQuantity > 0 ? new ObtainedItemWithBonusMessage(Skill.gatheredRessourceItem, quantityGathered, bonusQuantity) : new ObtainedItemMessage(Skill.gatheredRessourceItem, quantityGathered));
-        player.myJobs.addExperience(player, Skill.parentJobId, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).xpEarned * Settings.GetIntElement("Job.Rate"));
+        player.myJobs.addExperience(player, Skill.parentJobId, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).xpEarned * Settings.GetIntElement("job.Rate"));
         player.currentMap.getStatedElementById(element).elementState = 1;
         player.currentMap.getStatedElementById(element).deadAt = System.currentTimeMillis();
         player.currentMap.getInteractiveElementStruct(element).ageBonus = -1;

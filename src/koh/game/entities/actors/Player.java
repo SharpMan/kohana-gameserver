@@ -96,8 +96,8 @@ public class Player extends IGameActor implements Observer {
     public PlayerStatusEnum status = PlayerStatusEnum.PLAYER_STATUS_AVAILABLE;
     public HashMap<ScoreType, Integer> scores = new HashMap<>(7);
     //GenericStats
-    /*public int AP;
-     public int MP;*/
+    /*public int getAP;
+     public int getMP;*/
     public int vitality;
     public int wisdom;
     public int strength;
@@ -276,7 +276,7 @@ public class Player extends IGameActor implements Observer {
                 }
                 client.send(new CurrentMapMessage(currentMap.id, "649ae451ca33ec53bbcbcc33becf15f4")); //kdpelrkdpaielcmspekdprcvkdparkdb
                 client.send(new CharacterLoadingCompleteMessage());
-                ChatChannel.Register(client);
+                ChatChannel.register(client);
                 PlayerController.sendServerMessage(client, Settings.GetStringElement("World.onLogged"), Settings.GetStringElement("World.onLoggedColor"));
                 // client.send(new BasicNoOperationMessage());
                 client.send(new AlignmentRankUpdateMessage(this.alignmentGrade, false));
@@ -343,9 +343,9 @@ public class Player extends IGameActor implements Observer {
             if (client.getParty() != null) {
                 client.getParty().updateMember(this);
             }
-            if (Logged && getFighter() != null && getFight().FightState == FightState.STATE_PLACE) {
-                getFighter().Stats.reset();
-                getFighter().Stats.merge(this.stats);
+            if (Logged && getFighter() != null && getFight().fightState == FightState.STATE_PLACE) {
+                getFighter().stats.reset();
+                getFighter().stats.merge(this.stats);
                 client.send(((CharacterFighter) getFighter()).FighterStatsListMessagePacket());
             } else {
                 CharacterHandler.SendCharacterStatsListMessage(this.client);
@@ -560,10 +560,10 @@ public class Player extends IGameActor implements Observer {
                     }
                     // Apprend des nouveaux sorts
                     for (LearnableSpell learnableSpell : DAO.getSpells().findLearnableSpell(this.breed)) {
-                        if ((int) learnableSpell.obtainLevel > (int) level && this.mySpells.hasSpell(learnableSpell.Spell)) {
-                            this.mySpells.removeSpell(this, learnableSpell.Spell);
-                        } else if ((int) learnableSpell.obtainLevel <= (int) level && !this.mySpells.hasSpell(learnableSpell.Spell)) {
-                            this.mySpells.addSpell(learnableSpell.Spell, (byte) 1, this.mySpells.getFreeSlot(), this.client);
+                        if ((int) learnableSpell.obtainLevel > (int) level && this.mySpells.hasSpell(learnableSpell.spell)) {
+                            this.mySpells.removeSpell(this, learnableSpell.spell);
+                        } else if ((int) learnableSpell.obtainLevel <= (int) level && !this.mySpells.hasSpell(learnableSpell.spell)) {
+                            this.mySpells.addSpell(learnableSpell.spell, (byte) 1, this.mySpells.getFreeSlot(), this.client);
                         }
                     }
 

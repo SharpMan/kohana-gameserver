@@ -22,9 +22,9 @@ public class FightActionHandler {
             return;
         }
         SpellLevel Spell = Client.character.mySpells.getSpellLevel(Message.spellId);
-        Fighter Fighter = Client.character.getFight().GetFighter(Message.targetId);
+        Fighter Fighter = Client.character.getFight().getFighter(Message.targetId);
         if (Spell != null && Fighter != null) {
-            Client.character.getFight().LaunchSpell(Client.character.getFighter(), Spell, Fighter.CellId(), false);
+            Client.character.getFight().launchSpell(Client.character.getFighter(), Spell, Fighter.getCellId(), false);
         }
     }
 
@@ -38,7 +38,7 @@ public class FightActionHandler {
 
         // Sort existant ?
         if (Spell != null) {
-            Client.character.getFight().LaunchSpell(Client.character.getFighter(), Spell, Message.cellId, false);
+            Client.character.getFight().launchSpell(Client.character.getFighter(), Spell, Message.cellId, false);
         }
 
     }

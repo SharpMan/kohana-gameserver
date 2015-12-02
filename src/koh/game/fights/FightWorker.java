@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 import koh.game.Main;
 import koh.protocol.messages.game.context.fight.GameFightNewRoundMessage;
 
@@ -14,33 +14,33 @@ import koh.protocol.messages.game.context.fight.GameFightNewRoundMessage;
  */
 public class FightWorker {
 
-    private Fight Fight;
+    private Fight fight;
 
     private List<Fighter> myFightersTurn = Collections.synchronizedList(new ArrayList<>());
     private Fighter myCurrentFighter;
-    public int Round = 0, FightTurn;
+    public int round = 0, fightTurn;
 
-    public List<Fighter> Fighters() {
+    public List<Fighter> fighters() {
         return this.myFightersTurn;
     }
 
     public FightWorker(Fight Fight) {
-        this.Fight = Fight;
+        this.fight = Fight;
     }
 
-    public void SummonFighter(Fighter fighter) {
-        int index = myFightersTurn.indexOf(fighter.Summoner) + 1;
+    public void summonFighter(Fighter fighter) {
+        int index = myFightersTurn.indexOf(fighter.summoner) + 1;
         if (index == 0) {
             index = myFightersTurn.size();
         }
         myFightersTurn.add(index, fighter);
     }
 
-    public void InitTurns() {
+    public void initTurns() {
         this.myFightersTurn.clear();
 
-        List<Fighter> Team1 = Fight.Fighters().filter(x -> x.Team.Id == 0).sorted((e1, e2) -> Integer.compare(e2.Initiative(false), e1.Initiative(false))).collect(Collectors.toList());
-        List<Fighter> Team2 = Fight.Fighters().filter(x -> x.Team.Id == 1).sorted((e1, e2) -> Integer.compare(e2.Initiative(false), e1.Initiative(false))).collect(Collectors.toList());
+        List<Fighter> Team1 = fight.Fighters().filter(x -> x.team.Id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
+        List<Fighter> Team2 = fight.Fighters().filter(x -> x.team.Id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
 
         for (Fighter Fighter : Team1) {
             int FIndex = Team1.indexOf(Fighter);
@@ -48,7 +48,7 @@ public class FightWorker {
             if (Team2.size() - 1 >= FIndex) {
                 Fighter OppositeFighter = Team2.get(FIndex);
 
-                if (OppositeFighter.Initiative(false) > Fighter.Initiative(false)) {
+                if (OppositeFighter.getInitiative(false) > Fighter.getInitiative(false)) {
                     myFightersTurn.add(OppositeFighter);
                     myFightersTurn.add(Fighter);
                 } else {
@@ -67,34 +67,34 @@ public class FightWorker {
         }
     }
 
-    public Fighter GetNextFighter() {
+    public Fighter getNextFighter() {
         try {
-            this.FightTurn++;
+            this.fightTurn++;
             do {
                 if (this.myCurrentFighter == null || this.myCurrentFighter == this.myFightersTurn.get(myFightersTurn.size() - 1)) //this.myFightersTurn.LastOrDefault()
                 {
-                    Round++;
-                    this.Fight.sendToField(new GameFightNewRoundMessage(Round));
+                    round++;
+                    this.fight.sendToField(new GameFightNewRoundMessage(round));
                     this.myCurrentFighter = this.myFightersTurn.get(0);
                 } else {
                     this.myCurrentFighter = this.myFightersTurn.get(this.myFightersTurn.indexOf(this.myCurrentFighter) + 1);
                 }
-            } while (!this.myCurrentFighter.CanBeginTurn());
+            } while (!this.myCurrentFighter.canBeginTurn());
 
             return this.myCurrentFighter;
         } catch (IndexOutOfBoundsException e) {
             return null;
         } catch (Exception e1) {
-            Main.Logs().writeError("FightWorker::GetNextFighter() -> " + e1.getMessage());
+            Main.Logs().writeError("FightWorker::getNextFighter() -> " + e1.getMessage());
             e1.printStackTrace();
             return null;
         }
     }
 
-    public void Dispose() {
+    public void dispose() {
         this.myFightersTurn.clear();
-        this.Round = 0;
-        this.Fight = null;
+        this.round = 0;
+        this.fight = null;
         this.myCurrentFighter = null;
         try {
             this.myFightersTurn = null;

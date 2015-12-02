@@ -22,14 +22,14 @@ public class BuffDodge extends BuffEffect {
 
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (Target.CellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(Target.Fight.Map, DamageInfos.Caster.CellId(), Target.CellId()) > 1) {
+        if (Target.getCellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(Target.fight.map, DamageInfos.Caster.getCellId(), Target.getCellId()) > 1) {
             return -1;
         }
         
         DamageValue.setValue(0);
 
         EffectCast SubInfos = new EffectCast(StatsEnum.Push_Back, 0, (short) 0, 0, null, DamageInfos.Caster, null, false, StatsEnum.NONE, 0, null);
-        byte Direction = Pathfinder.getDirection(Target.Fight.Map, DamageInfos.Caster.CellId(), Target.CellId());
+        byte Direction = Pathfinder.getDirection(Target.fight.map, DamageInfos.Caster.getCellId(), Target.getCellId());
 
         // Application du push
         return EffectPush.ApplyPush(SubInfos, this.Target, Direction, 1);

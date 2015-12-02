@@ -48,7 +48,7 @@ public class Pathfinder {
     }
 
     public static MovementPath isValidPath(Fight fight, Fighter fighter, short currentCell, byte currentDirection, short[] encodedPath) {
-        MovementPath DecodedPath = Pathfinder.DecodePath(fight.Map, currentCell, currentDirection, encodedPath);
+        MovementPath DecodedPath = Pathfinder.DecodePath(fight.map, currentCell, currentDirection, encodedPath);
         MovementPath FinalPath = new MovementPath();
 
         int Index = 0;
@@ -74,11 +74,11 @@ public class Pathfinder {
         int length = -1;
         Short ActualCell = beginCell;
 
-        if (!Pathfinder.inLine(fight.Map, beginCell, endCell)) {
+        if (!Pathfinder.inLine(fight.map, beginCell, endCell)) {
             return length;
         }
 
-        length = (int) getGoalDistanceEstimate(fight.Map, beginCell, endCell);
+        length = (int) getGoalDistanceEstimate(fight.map, beginCell, endCell);
 
         path.addCell(ActualCell, direction);
 
@@ -86,11 +86,11 @@ public class Pathfinder {
 
             ActualCell = (short) Pathfinder.nextCell(ActualCell, direction);
 
-            if (!fight.Map.getCell(ActualCell).walakable()) {
+            if (!fight.map.getCell(ActualCell).walakable()) {
                 return -2;
             }
 
-            if (fight.GetFighterOnCell(ActualCell) != null) {
+            if (fight.getFighterOnCell(ActualCell) != null) {
                 if (i == 0) {
                     fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 276));
                 }
@@ -101,7 +101,7 @@ public class Pathfinder {
 
             path.movementLength++;
 
-            if (Pathfinder.isStopCell(fighter.Fight, fighter.Team, ActualCell, fighter)) {
+            if (Pathfinder.isStopCell(fighter.fight, fighter.team, ActualCell, fighter)) {
                 return -2;
             }
         }
@@ -111,8 +111,8 @@ public class Pathfinder {
 
     public static boolean isStopCell(Fight fight, FightTeam team, short cellId, Fighter fighter) {
         // Un piege etc ?
-        if (fight.GetCell(cellId).HasGameObject(FightObjectType.OBJECT_TRAP) || fight.GetCell(cellId).HasGameObject(FightObjectType.OBJECT_BOMB) || fight.GetCell(cellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-            //fight.GetCell(CellId).GetObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
+        if (fight.getCell(cellId).HasGameObject(FightObjectType.OBJECT_TRAP) || fight.getCell(cellId).HasGameObject(FightObjectType.OBJECT_BOMB) || fight.getCell(cellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
+            //fight.getCell(getCellId).GetObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
             return true;
         }
         if (team != null) {
@@ -130,9 +130,9 @@ public class Pathfinder {
         ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
-            Fighter Ennemy = fight.HasEnnemyInCell((short) Pathfinder.nextCell(cellId, Direction), team);
+            Fighter Ennemy = fight.hasEnnemyInCell((short) Pathfinder.nextCell(cellId, Direction), team);
             if (Ennemy != null) {
-                if (!Ennemy.Dead && !(notVisible && Ennemy.VisibleState != GameActionFightInvisibilityStateEnum.INVISIBLE)) {
+                if (!Ennemy.dead && !(notVisible && Ennemy.visibleState != GameActionFightInvisibilityStateEnum.INVISIBLE)) {
                     ennemies.add(Ennemy);
                 }
             }
@@ -145,9 +145,9 @@ public class Pathfinder {
         ArrayList<Fighter> Ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
-            Fighter Ennemy = Fight.HasEnnemyInCell((short) Pathfinder.nextCell(CellId, Direction), Team);
+            Fighter Ennemy = Fight.hasEnnemyInCell((short) Pathfinder.nextCell(CellId, Direction), Team);
             if (Ennemy != null) {
-                if (!Ennemy.Dead() && !Ennemy.States.HasState(FightStateEnum.Enraciné) && Ennemy.VisibleState != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                if (!Ennemy.isDead() && !Ennemy.states.hasState(FightStateEnum.Enraciné) && Ennemy.visibleState != GameActionFightInvisibilityStateEnum.INVISIBLE) {
                     Ennemies.add(Ennemy);
                 }
             }
@@ -188,7 +188,7 @@ public class Pathfinder {
 
     public static boolean inLine(DofusMap map, int beginCell, int endCell) {
         try {
-            return MapPoint.GetX(beginCell) == MapPoint.GetX(endCell) || MapPoint.GetY(beginCell) == MapPoint.GetY(endCell);
+            return MapPoint.getx(beginCell) == MapPoint.getx(endCell) || MapPoint.GetY(beginCell) == MapPoint.GetY(endCell);
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
@@ -197,14 +197,14 @@ public class Pathfinder {
 
     public static double getGoalDistanceEstimate(DofusMap map, int BeginCell, int EndCell) {
         //return MapPoint.fromCellId(beginCell).distanceToCell(MapPoint.fromCellId(getEndCell));
-        int loc7 = MapPoint.GetX(BeginCell) - MapPoint.GetX(EndCell);
+        int loc7 = MapPoint.getx(BeginCell) - MapPoint.getx(EndCell);
         int loc8 = MapPoint.GetY(BeginCell) - MapPoint.GetY(EndCell);
 
         return Math.sqrt(Math.pow(loc7, 2) + Math.pow(loc8, 2));
     }
 
     public static int getGoalDistance(DofusMap map, int beginCell, int endCell) { //To not use
-        return (int) (Math.abs(MapPoint.GetX(endCell) - MapPoint.GetX(beginCell)) + Math.abs(MapPoint.GetY(endCell) - MapPoint.GetY(beginCell)));
+        return (int) (Math.abs(MapPoint.getx(endCell) - MapPoint.getx(beginCell)) + Math.abs(MapPoint.GetY(endCell) - MapPoint.GetY(beginCell)));
     }
 
     public static Short[] getLineCellsBetween(Fight fight, short beginCell, byte direction, int endCell) {
@@ -215,11 +215,11 @@ public class Pathfinder {
         int length = -1;
         Short actualCell = beginCell;
 
-        if (!Pathfinder.inLine(fight.Map, beginCell, endCell)) {
+        if (!Pathfinder.inLine(fight.map, beginCell, endCell)) {
             return null;
         }
 
-        length = (int) getGoalDistanceEstimate(fight.Map, beginCell, endCell) - 1;
+        length = (int) getGoalDistanceEstimate(fight.map, beginCell, endCell) - 1;
         Short[] cells = new Short[length];
 
         for (int i = 0; i < length; i++) {
@@ -227,7 +227,7 @@ public class Pathfinder {
             actualCell = (short) Pathfinder.nextCell(actualCell, direction);
 
 
-            if (withoutFighter && fight.GetFighterOnCell(actualCell) != null) {
+            if (withoutFighter && fight.getFighterOnCell(actualCell) != null) {
                 return null;
             }
 
@@ -245,22 +245,22 @@ public class Pathfinder {
         int length = -1;
         Short actualCell = beginCell;
 
-        if (!Pathfinder.inLine(fight.Map, beginCell, endCell)) {
+        if (!Pathfinder.inLine(fight.map, beginCell, endCell)) {
             return null;
         }
 
-        length = (int) getGoalDistanceEstimate(fight.Map, beginCell, endCell) - 1;
+        length = (int) getGoalDistanceEstimate(fight.map, beginCell, endCell) - 1;
         Short[] Cells = new Short[length];
 
         for (int i = 0; i < length; i++) {
 
             actualCell = (short) Pathfinder.nextCell(actualCell, direction);
 
-            if (!fight.Map.getCell(actualCell).walakable()) {
+            if (!fight.map.getCell(actualCell).walakable()) {
                 return null;
             }
 
-            if (withoutFighter && fight.GetFighterOnCell(actualCell) != null) {
+            if (withoutFighter && fight.getFighterOnCell(actualCell) != null) {
                 return null;
             }
 

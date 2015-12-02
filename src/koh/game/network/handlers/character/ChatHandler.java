@@ -120,7 +120,7 @@ public class ChatHandler {
         switch (Message.channel) {
             case CHANNEL_TEAM:
                 if (Client.character.getFighter() != null) {
-                    Client.character.getFighter().Team.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.character.ID, Client.character.nickName, Client.getAccount().id, Message.objects));
+                    Client.character.getFighter().team.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.character.ID, Client.character.nickName, Client.getAccount().id, Message.objects));
                 }
                 break;
             case CHANNEL_GLOBAL:
@@ -131,7 +131,7 @@ public class ChatHandler {
                 }
                 break;
             case CHANNEL_ADMIN:
-                ChatChannel.Channels.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id, Message.objects));
+                ChatChannel.CHANNELS.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id, Message.objects));
 
                 break;
             case CHANNEL_GUILD:
@@ -156,7 +156,7 @@ public class ChatHandler {
                     Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((Client.lastChannelMessage.get(Message.channel) + 60000L - System.currentTimeMillis()) / 1000) + ""}));
                     return;
                 }
-                ChatChannel.Channels.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id, Message.objects));
+                ChatChannel.CHANNELS.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id, Message.objects));
                 Client.lastChannelMessage.put(Message.channel, System.currentTimeMillis());
                 break;
             default:
@@ -170,7 +170,7 @@ public class ChatHandler {
         switch (message.channel) {
             case CHANNEL_TEAM:
                 if (Client.character.getFighter() != null) {
-                    Client.character.getFighter().Team.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.character.ID, Client.character.nickName, Client.getAccount().id));
+                    Client.character.getFighter().team.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.character.ID, Client.character.nickName, Client.getAccount().id));
                 }
                 break;
             case CHANNEL_GLOBAL:
@@ -251,7 +251,7 @@ public class ChatHandler {
                                 break;
                             }
 
-                            Client.character.teleport(Map.id, Map.getAnyCellWalakable().id); //Todo Random walakable cell
+                            Client.character.teleport(Map.id, Map.getAnyCellWalakable().id); //Todo random walakable cell
                         }
 
                     } catch (Exception e) {
@@ -380,7 +380,7 @@ public class ChatHandler {
                     }
                     break;
                 } else {
-                    ChatChannel.Channels.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id));
+                    ChatChannel.CHANNELS.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id));
                 }
                 break;
             case CHANNEL_GUILD:
@@ -405,7 +405,7 @@ public class ChatHandler {
                     Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((Client.lastChannelMessage.get(message.channel) + 60000L - System.currentTimeMillis()) / 1000) + ""}));
                     return;
                 }
-                ChatChannel.Channels.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id));
+                ChatChannel.CHANNELS.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.character.nickName, Client.getAccount().id));
                 Client.lastChannelMessage.put(message.channel, System.currentTimeMillis());
                 break;
             default:

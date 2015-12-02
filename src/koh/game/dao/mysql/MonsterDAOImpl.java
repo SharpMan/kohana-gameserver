@@ -26,6 +26,12 @@ public class MonsterDAOImpl extends MonsterDAO {
     @Inject
     private DatabaseSource dbSource;
 
+
+    @Override
+    public MonsterTemplate find(int id){
+        return this.templates.get(id);
+    }
+
     private int loadAll() {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from monster_templates", 0)) {

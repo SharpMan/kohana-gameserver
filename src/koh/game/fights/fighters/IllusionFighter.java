@@ -21,60 +21,60 @@ public class IllusionFighter extends StaticFighter {
 
     public IllusionFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
         super(Fight, Summoner);
-        this.Stats = new GenericStats();
-        this.Stats.merge(Summoner.Stats);
-        super.InitFighter(this.Stats, Fight.GetNextContextualId());
+        this.stats = new GenericStats();
+        this.stats.merge(Summoner.stats);
+        super.initFighter(this.stats, Fight.getNextContextualId());
         this.entityLook = EntityLookParser.Copy(Summoner.getEntityLook());
-        super.setLife(Summoner.Life());
-        super.setLifeMax(Summoner.MaxLife());
+        super.setLife(Summoner.getLife());
+        super.setLifeMax(Summoner.getMaxLife());
     }
 
     @Override
-    public int TryDie(int CasterId) {
-        if (Arrays.stream(new Exception().getStackTrace()).anyMatch(Method -> Method.getMethodName().equalsIgnoreCase("JoinFightTeam"))) { //Il viens de rejoindre la team rofl on le tue pas
+    public int tryDie(int casterId) {
+        if (Arrays.stream(new Exception().getStackTrace()).anyMatch(Method -> Method.getMethodName().equalsIgnoreCase("joinFightTeam"))) { //Il viens de rejoindre la team rofl on le tue pas
             return -1;
         }
         this.setLife(0);
 
-        this.Fight.sendToField(new GameActionFightVanishMessage(1029, this.Summoner(), ID));
+        this.fight.sendToField(new GameActionFightVanishMessage(1029, this.getSummonerID(), ID));
 
-        if (this.Fight.m_activableObjects.containsKey(this)) {
-            this.Fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
+        if (this.fight.m_activableObjects.containsKey(this)) {
+            this.fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
         }
 
         myCell.RemoveObject(this);
 
-        if (!this.Team.GetAliveFighters().anyMatch(x -> x instanceof IllusionFighter && x.Summoner() == this.Summoner())) {
-            ((CharacterFighter) this.Summoner).onCloneCleared();
+        if (!this.team.getAliveFighters().anyMatch(x -> x instanceof IllusionFighter && x.getSummonerID() == this.getSummonerID())) {
+            ((CharacterFighter) this.summoner).onCloneCleared();
         }
 
-        if (this.Fight.TryEndFight()) {
+        if (this.fight.tryEndFight()) {
             return -3;
         }
-        if (this.Fight.CurrentFighter == this) {
-            this.Fight.FightLoopState = Fight.FightLoopState.STATE_END_TURN;
+        if (this.fight.currentFighter == this) {
+            this.fight.fightLoopState = fight.fightLoopState.STATE_END_TURN;
         }
         return -2;
     }
 
     @Override
-    public int Level() {
-        return Summoner.Level();
+    public int getLevel() {
+        return summoner.getLevel();
     }
 
     @Override
-    public short MapCell() {
+    public short getMapCell() {
         return 0;
     }
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.Summoner).Character.nickName, ((CharacterFighter) this.Summoner).Character.getPlayerStatus(), (byte) this.Level(), ((CharacterFighter) this.Summoner).Character.getActorAlignmentInformations(), ((CharacterFighter) this.Summoner).Character.breed, ((CharacterFighter) this.Summoner).Character.hasSexe());
+        return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.summoner).Character.nickName, ((CharacterFighter) this.summoner).Character.getPlayerStatus(), (byte) this.getLevel(), ((CharacterFighter) this.summoner).Character.getActorAlignmentInformations(), ((CharacterFighter) this.summoner).Character.breed, ((CharacterFighter) this.summoner).Character.hasSexe());
     }
 
     @Override
-    public FightTeamMemberInformations GetFightTeamMemberInformations() {
-        return new FightTeamMemberCharacterInformations(this.ID, ((CharacterFighter) this.Summoner).Character.nickName, (byte) this.Level());
+    public FightTeamMemberInformations getFightTeamMemberInformations() {
+        return new FightTeamMemberCharacterInformations(this.ID, ((CharacterFighter) this.summoner).Character.nickName, (byte) this.getLevel());
     }
 
     @Override

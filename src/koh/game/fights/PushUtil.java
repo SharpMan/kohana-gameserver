@@ -1,13 +1,8 @@
 package koh.game.fights;
 
-import koh.game.entities.maps.pathfinding.MapPoint;
-import koh.game.entities.spells.EffectInstance;
-import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.fights.fighters.StaticFighter;
 import koh.protocol.client.enums.SpellShapeEnum;
-import koh.protocol.types.game.context.fight.GameFightFighterInformations;
-import org.apache.commons.lang.ArrayUtils;
 
 /**
  *
@@ -41,7 +36,7 @@ public class PushUtil {
      GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
      if (((targetInfos) && (isPushableEntity(pTargetId))))
      {
-     origin = ((!(hasMinSize(pEffect.ZoneShape()))) ? pCasterId.CellId() : pSpellImpactCell);
+     origin = ((!(hasMinSize(pEffect.ZoneShape()))) ? pCasterId.getCellId() : pSpellImpactCell);
      originPoint = MapPoint.fromCellId(origin);
      direction = originPoint.advancedOrientationTo(MapPoint.fromCellId(targetInfos.disposition.cellId), false);
      pushForce = getPushForce(origin, targetInfos, pSpellEffects, pEffect);
@@ -95,7 +90,7 @@ public class PushUtil {
      if (((((!((pullEffectIndex == -1))) && ((pullEffectIndex < pushEffectIndex)))) && (isPushableEntity(pTargetInfos))))
      {
      pullEffectForce = pullEffect.diceNum;
-     targetCell = MapPoint.fromCellId(pTargetInfos.CellId());
+     targetCell = MapPoint.fromCellId(pTargetInfos.getCellId());
      originCell = MapPoint.fromCellId(pPushOriginCell);
      cell = targetCell;
      orientation = targetCell.advancedOrientationTo(originCell);
@@ -164,7 +159,7 @@ public class PushUtil {
      return (blocking);
      }*/
     public static boolean isPushableEntity(Fighter pEntityInfo) {
-        boolean buffPreventPush = (((!((!pEntityInfo.HasState(6))) || (!((!pEntityInfo.HasState(97)))))));
+        boolean buffPreventPush = (((!((!pEntityInfo.hasState(6))) || (!((!pEntityInfo.hasState(97)))))));
         boolean canBePushed = true;
         if ((pEntityInfo instanceof MonsterFighter)) {
             canBePushed = ((MonsterFighter) pEntityInfo).Grade.Monster().canBePushed;

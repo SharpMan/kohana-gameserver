@@ -4,7 +4,6 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectHeal;
 import koh.protocol.client.enums.FightDispellableEnum;
-import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -25,8 +24,8 @@ public class BuffDamageBecomeHeal extends BuffEffect {
             return -1;
         }
         // mort
-        if (Caster.Dead()) {
-            //Target.Buffs.RemoveBuff(this);
+        if (Caster.isDead()) {
+            //Target.buff.RemoveBuff(this);
             return -1;
         }
         

@@ -51,12 +51,12 @@ public class FightHandler {
             return;
         }
 
-        if (Client.character.getFighter() != Client.character.getFighter().Team.Leader) {
+        if (Client.character.getFighter() != Client.character.getFighter().team.Leader) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
 
-        Client.character.getFight().ToggleLock(Client.character.getFighter(), FightOptionsEnum.valueOf(Message.option));
+        Client.character.getFight().toggleLock(Client.character.getFighter(), FightOptionsEnum.valueOf(Message.option));
     }
 
     @HandlerAttribute(ID = 718)
@@ -66,13 +66,13 @@ public class FightHandler {
             return;
         }
 
-        if (Client.character.getFight().FightState != FightState.STATE_ACTIVE) {
+        if (Client.character.getFight().fightState != FightState.STATE_ACTIVE) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.character.getFight().CurrentFighter == Client.character.getFighter()) {
-            Client.character.getFight().FightLoopState = FightLoopState.STATE_END_TURN;
+        if (Client.character.getFight().currentFighter == Client.character.getFighter()) {
+            Client.character.getFight().fightLoopState = FightLoopState.STATE_END_TURN;
         }
     }
 
@@ -83,7 +83,7 @@ public class FightHandler {
             return;
         }
 
-        if (Client.character.getFight().FightState != FightState.STATE_ACTIVE) {
+        if (Client.character.getFight().fightState != FightState.STATE_ACTIVE) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
@@ -92,13 +92,13 @@ public class FightHandler {
             return;
         }
 
-        Client.character.getFighter().TurnReady = true;
+        Client.character.getFighter().turnReady = true;
     }
 
     @HandlerAttribute(ID = 255)
     public static void HandleGameContextQuitMessage(WorldClient Client, GameContextQuitMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.character.getFight().LeaveFight(Client.character.getFighter());
+            Client.character.getFight().leaveFight(Client.character.getFighter());
         } else {
 
         }
@@ -111,7 +111,7 @@ public class FightHandler {
             return;
         }
 
-        if (Client.character.getFight().FightState != FightState.STATE_PLACE) {
+        if (Client.character.getFight().fightState != FightState.STATE_PLACE) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
@@ -121,65 +121,65 @@ public class FightHandler {
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsRequestMessage.M_ID)
     public static void HandleGameFightPlacementSwapPositionsRequestMessage(WorldClient Client, GameFightPlacementSwapPositionsRequestMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().FightState != FightState.STATE_PLACE || Client.character.getFighter().ID == Message.requestedId) {
+        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().fightState != FightState.STATE_PLACE || Client.character.getFighter().ID == Message.requestedId) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Fighter Fighter = Client.character.getFight().GetFighter(Message.requestedId);
+        Fighter Fighter = Client.character.getFight().getFighter(Message.requestedId);
         if (Fighter == null || Fighter == Client.character.getFighter()) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        if (Client.character.getFighter().Team.Leader != Client.character.getFighter()) {  //Demande
-            synchronized (Client.character.getFighter().Team.SwapRequests) {
-                SwapPositionRequest Request = new SwapPositionRequest(Fighter.Team.GetNextRequestId(), Client.character.ID, Client.character.getFighter().CellId(), Fighter.ID, Fighter.CellId());
-                Client.character.getFighter().Team.SwapRequests.add(Request);
-                Client.character.getFighter().Team.sendToField(new GameFightPlacementSwapPositionsOfferMessage(Request.requestId, Request.requesterId, Request.requesterCellId, Request.requestedId, Request.requestedCellId));
+        if (Client.character.getFighter().team.Leader != Client.character.getFighter()) {  //Demande
+            synchronized (Client.character.getFighter().team.swapRequests) {
+                SwapPositionRequest Request = new SwapPositionRequest(Fighter.team.getNextRequestId(), Client.character.ID, Client.character.getFighter().getCellId(), Fighter.ID, Fighter.getCellId());
+                Client.character.getFighter().team.swapRequests.add(Request);
+                Client.character.getFighter().team.sendToField(new GameFightPlacementSwapPositionsOfferMessage(Request.requestId, Request.requesterId, Request.requesterCellId, Request.requestedId, Request.requestedCellId));
             }
         } else {
-            Client.character.getFight().SwapPosition(Client.character.getFighter(), Fighter);
+            Client.character.getFight().swapPosition(Client.character.getFighter(), Fighter);
         }
     }
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsCancelMessage.M_ID)
     public static void HandleGameFightPlacementSwapPositionsCancelMessage(WorldClient Client, GameFightPlacementSwapPositionsCancelMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().FightState != FightState.STATE_PLACE || Client.character.getFighter().Team.GetRequest(Message.requestId) == null) {
+        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().fightState != FightState.STATE_PLACE || Client.character.getFighter().team.getRequest(Message.requestId) == null) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
 
-        Client.character.getFighter().Team.sendToField(new GameFightPlacementSwapPositionsCancelledMessage(Client.character.getFighter().Team.GetRequest(Message.requestId).requesterId, Client.character.ID));
+        Client.character.getFighter().team.sendToField(new GameFightPlacementSwapPositionsCancelledMessage(Client.character.getFighter().team.getRequest(Message.requestId).requesterId, Client.character.ID));
     }
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsAcceptMessage.M_ID)
     public static void HandleGameFightPlacementSwapPositionsAcceptMessage(WorldClient Client, GameFightPlacementSwapPositionsAcceptMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().FightState != FightState.STATE_PLACE || Client.character.getFighter().Team.GetRequest(Message.requestId) == null) {
+        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().fightState != FightState.STATE_PLACE || Client.character.getFighter().team.getRequest(Message.requestId) == null) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
         //TODO: +=Event onLeftFight remove all joined requests + delete this part of code
         Fighter Target = null;
-        if ((Target = Client.character.getFight().GetFighter(Client.character.getFighter().Team.GetRequest(Message.requestId).requesterId)) != null) {
-            Client.character.getFight().SwapPosition(Client.character.getFighter(), Target);
+        if ((Target = Client.character.getFight().getFighter(Client.character.getFighter().team.getRequest(Message.requestId).requesterId)) != null) {
+            Client.character.getFight().swapPosition(Client.character.getFighter(), Target);
         }
     }
 
     @HandlerAttribute(ID = 6081)
     public static void HandleGameContextKickMessage(WorldClient Client, GameContextKickMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            if (Client.character.getFight().FightState != FightState.STATE_PLACE) {
+            if (Client.character.getFight().fightState != FightState.STATE_PLACE) {
                 Client.send(new BasicNoOperationMessage());
-            } else if (Client.character.getFighter().Team.Leader != Client.character.getFighter()) {
+            } else if (Client.character.getFighter().team.Leader != Client.character.getFighter()) {
                 Client.send(new BasicNoOperationMessage());
             } else {
-                Fighter Fighter = Client.character.getFight().GetFighter(Message.targetId);
+                Fighter Fighter = Client.character.getFight().getFighter(Message.targetId);
 
                 if (Fighter == null || Fighter == Client.character.getFighter()) {
                     Client.send(new BasicNoOperationMessage());
-                } else if (Fighter.Team != Client.character.getFighter().Team) {
+                } else if (Fighter.team != Client.character.getFighter().team) {
                     Client.send(new BasicNoOperationMessage());
                 } else {
-                    Client.character.getFight().LeaveFight(Fighter);
+                    Client.character.getFight().leaveFight(Fighter);
                 }
             }
         }
@@ -191,15 +191,15 @@ public class FightHandler {
         Fight Fight = Client.character.currentMap.getFight(Message.fightId);
         if (Fight == null) {
             Client.send(new BasicNoOperationMessage());
-        } else if (Fight.FightState != FightState.STATE_PLACE) {
+        } else if (Fight.fightState != FightState.STATE_PLACE) {
             Client.send(new BasicNoOperationMessage());
         } else {
-            FightTeam Team = Fight.GetTeam(Message.fighterId);
+            FightTeam Team = Fight.getTeam(Message.fighterId);
             if (Team == null) { //Ne doit pas arriver
                 Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.JUST_RESPAWNED));
                 return;
             }
-            FighterRefusedReasonEnum Answer = Fight.CanJoin(Team, Client.character);
+            FighterRefusedReasonEnum Answer = Fight.canJoin(Team, Client.character);
             if (Answer == FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
                 Fighter Fighter = new CharacterFighter(Fight, Client);
 
@@ -207,7 +207,7 @@ public class FightHandler {
 
                 Client.addGameAction(FightAction);
 
-                Fight.JoinFightTeam(Fighter, Team, false, (short) -1, true);
+                Fight.joinFightTeam(Fighter, Team, false, (short) -1, true);
             } else {
                 Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, Answer));
             }
@@ -216,11 +216,11 @@ public class FightHandler {
 
     @HandlerAttribute(ID = GameFightPlacementPositionRequestMessage.M_ID)
     public static void HandleGameFightPlacementPositionRequestMessage(WorldClient Client, GameFightPlacementPositionRequestMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().FightState != FightState.STATE_PLACE || Client.character.getFighter().CellId() == Message.cellId) {
+        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.character.getFight().fightState != FightState.STATE_PLACE || Client.character.getFighter().getCellId() == Message.cellId) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.character.getFight().SetFighterPlace(Client.character.getFighter(), (short) Message.cellId);
+        Client.character.getFight().setFighterPlace(Client.character.getFighter(), (short) Message.cellId);
     }
 
     @HandlerAttribute(ID = 5732)

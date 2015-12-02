@@ -23,32 +23,32 @@ public class BuffPorter extends BuffEffect {
     public BuffPorter(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.Duration = -1;
-        Target.States.FakeState(FightStateEnum.Porté, true);
+        Target.states.fakeState(FightStateEnum.Porté, true);
         this.CastInfos.EffectType = StatsEnum.Add_State;
-        Target.SetCell(this.Caster.myCell);
+        Target.setCell(this.Caster.myCell);
     }
 
     @Override
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (this.Caster.CellId() != this.Target.CellId()) {
+        if (this.Caster.getCellId() != this.Target.getCellId()) {
             if (!isCalledBy("koh.game.fights.effects.EffectLancer", 6)) {
-                this.Caster.Fight.sendToField(new GameActionFightDropCharacterMessage(ACTION_CARRY_CHARACTER, this.Caster.ID, this.Target.ID, (short) this.Target.CellId()));
+                this.Caster.fight.sendToField(new GameActionFightDropCharacterMessage(ACTION_CARRY_CHARACTER, this.Caster.ID, this.Target.ID, (short) this.Target.getCellId()));
             }
-            this.Caster.Fight.sendToField(new GameActionFightDispellSpellMessage(406, this.Caster.ID, this.Target.ID, this.CastInfos.SpellId));
-            Main.Logs().writeDebug("3bada " + this.Caster.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).count());
-            Main.Logs().writeDebug("3bada " + this.Target.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).count());
-            Main.Logs().writeDebug("3bada " + this.Caster.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorteur).count());
-            Main.Logs().writeDebug("3bada " + this.Target.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorter).count());
-            this.Caster.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> {
+            this.Caster.fight.sendToField(new GameActionFightDispellSpellMessage(406, this.Caster.ID, this.Target.ID, this.CastInfos.SpellId));
+            Main.Logs().writeDebug("3bada " + this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).count());
+            Main.Logs().writeDebug("3bada " + this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).count());
+            Main.Logs().writeDebug("3bada " + this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur).count());
+            Main.Logs().writeDebug("3bada " + this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter).count());
+            this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> {
                 {
                     x.RemoveEffect();
-                    this.Caster.Fight.sendToField(new GameActionFightDispellEffectMessage(514, this.Caster.ID, this.Caster.ID, x.GetId()));
+                    this.Caster.fight.sendToField(new GameActionFightDispellEffectMessage(514, this.Caster.ID, this.Caster.ID, x.GetId()));
                 }
             });
-            this.Target.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).forEach(x -> {
+            this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).forEach(x -> {
                 {
                     x.RemoveEffect();
-                    this.Caster.Fight.sendToField(new GameActionFightDispellEffectMessage(514, this.Caster.ID, this.Target.ID, x.GetId()));
+                    this.Caster.fight.sendToField(new GameActionFightDispellEffectMessage(514, this.Caster.ID, this.Target.ID, x.GetId()));
                 }
             });
             this.Duration = 0;
@@ -58,7 +58,7 @@ public class BuffPorter extends BuffEffect {
 
     @Override
     public int RemoveEffect() {
-        Target.States.FakeState(FightStateEnum.Porté, false);
+        Target.states.fakeState(FightStateEnum.Porté, false);
 
         return super.RemoveEffect();
     }

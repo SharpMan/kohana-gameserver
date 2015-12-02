@@ -108,7 +108,7 @@ public class SpellBook {
         Book.addSpell(0, (byte) 1, i++, null);
         for (LearnableSpell ls :  DAO.getSpells().findLearnableSpell(Class)) {
             if (ls.obtainLevel <= Level) {
-                Book.addSpell(ls.Spell, (byte) 1, i++, null);
+                Book.addSpell(ls.spell, (byte) 1, i++, null);
             }
         }
         return Book;

@@ -98,7 +98,7 @@ public class InventoryHandler {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        if (Message.skinId > ItemLivingObject.GetLevelByObviXp(obviXp.value)) {
+        if (Message.skinId > ItemLivingObject.getLevelByObviXp(obviXp.value)) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }

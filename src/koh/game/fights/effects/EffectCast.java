@@ -58,7 +58,7 @@ public class EffectCast {
     public int Duration;
 
     public static int RandomValue(int i1, int i2) {
-        //Random rand = new Random();
+        //random rand = new random();
         return EFFECT_RANDOM.nextInt(i2 - i1 + 1) + i1;
     }
 
@@ -82,10 +82,10 @@ public class EffectCast {
         if ((int) num2 == 0) {
             return (short) num1;
         } else {
-            if (Target.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
+            if (Target.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
                 return (short) num1;
             }
-            if (Caster.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
+            if (Caster.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
                 return (short) num2;
             }
             return (short) RandomValue(num2, num1);
@@ -162,7 +162,7 @@ public class EffectCast {
     }
     
     public FightCell Cell(){
-        return this.Caster.Fight.GetCell(CellId);
+        return this.Caster.fight.getCell(CellId);
     }
 
     public String toString() {

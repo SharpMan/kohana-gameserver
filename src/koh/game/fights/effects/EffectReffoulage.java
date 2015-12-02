@@ -12,7 +12,7 @@ public class EffectReffoulage extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
        for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffReffoulage(CastInfos, Target));
+            Target.buff.addBuff(new BuffReffoulage(CastInfos, Target));
         }
 
         return -1;

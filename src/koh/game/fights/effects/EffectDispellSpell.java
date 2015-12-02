@@ -14,11 +14,11 @@ public class EffectDispellSpell extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             
-            if (Target.Buffs.Dispell(CastInfos.Effect.value) == -3) {
+            if (Target.buff.dispell(CastInfos.Effect.value) == -3) {
                 return -3;
             }
 
-            Target.Fight.sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.Caster.ID, Target.ID, CastInfos.Effect.value));
+            Target.fight.sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.Caster.ID, Target.ID, CastInfos.Effect.value));
         }
 
         return -1;

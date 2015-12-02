@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
 import java.util.HashMap;
-import koh.game.entities.spells.SpellLevel;
+
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffStats;
 import koh.protocol.client.enums.StatsEnum;
@@ -61,7 +61,7 @@ public class EffectStatsSteal extends EffectBase {
                 return -3;
             }
 
-            Target.Buffs.AddBuff(BuffStats);
+            Target.buff.addBuff(BuffStats);
 
             // Bonus au lanceur
             BuffStats = new BuffStats(BonusInfos, CastInfos.Caster);
@@ -69,7 +69,7 @@ public class EffectStatsSteal extends EffectBase {
                 return -3;
             }
 
-            CastInfos.Caster.Buffs.AddBuff(BuffStats);
+            CastInfos.Caster.buff.addBuff(BuffStats);
         }
 
         return -1;

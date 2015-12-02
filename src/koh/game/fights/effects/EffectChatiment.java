@@ -12,7 +12,7 @@ public class EffectChatiment extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffChatiment(CastInfos, Target));
+            Target.buff.addBuff(new BuffChatiment(CastInfos, Target));
         }
 
         return -1;

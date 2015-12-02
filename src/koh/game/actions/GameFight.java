@@ -21,10 +21,10 @@ public class GameFight extends GameAction {
     @Override
     public void abort(Object[] Args) {
         if (fight instanceof ChallengeFight) {
-            this.fight.LeaveFight((Fighter) actor);
+            this.fight.leaveFight((Fighter) actor);
         }
         else{
-            fight.Disconnect((CharacterFighter) actor);
+            fight.disconnect((CharacterFighter) actor);
         }
         
         super.abort(Args);

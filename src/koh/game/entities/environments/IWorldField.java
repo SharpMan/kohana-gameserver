@@ -9,5 +9,5 @@ import koh.game.entities.maps.pathfinding.Path;
  */
 public interface IWorldField {
 
-    void ActorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection);
+    void actorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection);
 }

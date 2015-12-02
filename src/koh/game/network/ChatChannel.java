@@ -11,7 +11,7 @@ import static koh.protocol.client.enums.ChatActivableChannelsEnum.*;
  */
 public class ChatChannel extends IWorldEventObserver {
     
-    public static Map<Byte, ChatChannel> Channels = new HashMap<Byte, ChatChannel>() {
+    public static final Map<Byte, ChatChannel> CHANNELS = new HashMap<Byte, ChatChannel>() {
         {
             put(CHANNEL_ADMIN, new ChatChannel());
             put(CHANNEL_SALES, new ChatChannel());
@@ -21,29 +21,29 @@ public class ChatChannel extends IWorldEventObserver {
         }
     };
 
-    public static void Register(WorldClient Client) {
-        Channels.forEach((k, v) -> {
+    public static void register(WorldClient client) {
+        CHANNELS.forEach((k, v) -> {
             {
                 if (k == CHANNEL_ADMIN) {
-                    if (Client.getAccount().right > 0) {
-                        v.registerPlayer(Client.character);
+                    if (client.getAccount().right > 0) {
+                        v.registerPlayer(client.character);
                     }
                 } else {
-                    v.registerPlayer(Client.character);
+                    v.registerPlayer(client.character);
                 }
             }
         });
     }
 
-    public static void UnRegister(WorldClient Client) {
-        Channels.forEach((k, v) -> {
+    public static void unRegister(WorldClient client) {
+        CHANNELS.forEach((k, v) -> {
             {
                 if (k == CHANNEL_ADMIN) {
-                    if (Client.getAccount().right > 0) {
-                        v.unregisterPlayer(Client.character);
+                    if (client.getAccount().right > 0) {
+                        v.unregisterPlayer(client.character);
                     }
                 } else {
-                    v.unregisterPlayer(Client.character);
+                    v.unregisterPlayer(client.character);
                 }
             }
         });

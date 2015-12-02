@@ -250,12 +250,12 @@ public class CharacterHandler {
                         account = client.getAccount();
                         level = (byte) Settings.GetIntElement("Register.StartLevel");
                         savedMap = mapid = Settings.GetIntElement("Register.StartMap");
-                        savedCell = Settings.GetShortElement("Register.StartCell");
+                        savedCell = Settings.GetShortElement("Register.getStartCell");
                         currentMap = DAO.getMaps().findTemplate(Settings.GetIntElement("Register.StartMap"));
                         if (currentMap != null) {
                             currentMap.Init();
                         }
-                        cell = currentMap.getCell(Settings.GetShortElement("Register.StartCell"));
+                        cell = currentMap.getCell(Settings.GetShortElement("Register.getStartCell"));
                         for (String s : Settings.GetStringElement("Register.Channels").split(",")) {
                             ennabledChannels.add(Byte.parseByte(s));
                         }

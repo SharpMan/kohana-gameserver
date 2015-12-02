@@ -8,7 +8,7 @@ import java.util.List;
 import com.google.inject.Inject;
 
 import static koh.game.MySQL.executeQuery;
-import static koh.game.entities.item.InventoryItem.DeserializeEffects;
+import static koh.game.entities.item.InventoryItem.deserializeEffects;
 
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.AccountDataDAO;
@@ -115,7 +115,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
                         try (Statement statement = conn.getConnection().createStatement()) {
                             ResultSet result = statement.executeQuery("SELECT * from storage_items where owner =" + id + ";");
                             while (result.next()) {
-                                List<ObjectEffect> effects = DeserializeEffects(result.getBytes("effects"));
+                                List<ObjectEffect> effects = deserializeEffects(result.getBytes("effects"));
                                 itemscache.put(result.getInt("id"), InventoryItem.getInstance(
                                         result.getInt("id"),
                                         result.getInt("template"),

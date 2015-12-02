@@ -15,8 +15,8 @@ public class EffectSpellCoolDown extends EffectBase {
 
         for (Fighter Target : CastInfos.Targets) {
             BuffEffect Buff = new BuffSpellCoolDown(CastInfos, Target);
-            if (!Target.Buffs.BuffMaxStackReached(Buff)) {
-                Target.Buffs.AddBuff(Buff);
+            if (!Target.buff.buffMaxStackReached(Buff)) {
+                Target.buff.addBuff(Buff);
                 if (Buff.ApplyEffect(null, null) == -3) {
                     return -3;
                 }

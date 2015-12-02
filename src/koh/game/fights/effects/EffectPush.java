@@ -24,14 +24,14 @@ public class EffectPush extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         byte Direction = 0;
-        for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.States.HasState(FightStateEnum.Porté) && !target.States.HasState(FightStateEnum.Inébranlable) && !target.States.HasState(FightStateEnum.Enraciné) && !target.States.HasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.states.hasState(FightStateEnum.Porté) && !target.states.hasState(FightStateEnum.Inébranlable) && !target.states.hasState(FightStateEnum.Enraciné) && !target.states.hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (CastInfos.EffectType) {
                 case PUSH_X_CELL:
                 case Push_Back:
-                    if (Pathfinder.inLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
-                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());
-                    } else if (Pathfinder.inLine(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId())) {
-                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId());
+                    if (Pathfinder.inLine(Target.fight.map, CastInfos.CellId, Target.getCellId()) && CastInfos.CellId != Target.getCellId()) {
+                        Direction = Pathfinder.getDirection(Target.fight.map, CastInfos.CellId, Target.getCellId());
+                    } else if (Pathfinder.inLine(Target.fight.map, CastInfos.Caster.getCellId(), Target.getCellId())) {
+                        Direction = Pathfinder.getDirection(Target.fight.map, CastInfos.Caster.getCellId(), Target.getCellId());
                     } else {
                         return -1;
                     }
@@ -41,12 +41,12 @@ public class EffectPush extends EffectBase {
                     CastInfos.Caster = Target;
                     Target = pp;
                     CastInfos.Targets.remove(0);
-                    Direction = Pathfinder.getDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
+                    Direction = Pathfinder.getDirection(Target.fight.map, Target.getCellId(), CastInfos.Caster.getCellId());
                     break;
                 case PullForward:
-                    Direction = Pathfinder.getDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
+                    Direction = Pathfinder.getDirection(Target.fight.map, Target.getCellId(), CastInfos.Caster.getCellId());
                     if(CastInfos.SpellId == 5382 || CastInfos.SpellId == 5475){
-                        Direction = Pathfinder.getDirection(Target.Fight.Map, Target.CellId(), CastInfos.targetKnownCellId);
+                        Direction = Pathfinder.getDirection(Target.fight.map, Target.getCellId(), CastInfos.targetKnownCellId);
                     }
                     break;
                 case BACK_CELL:
@@ -54,10 +54,10 @@ public class EffectPush extends EffectBase {
                     CastInfos.Caster = Target;
                     Target = p;
                     CastInfos.Targets.remove(0);
-                    if (Pathfinder.inLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
-                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());
-                    } else if (Pathfinder.inLine(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId())) {
-                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId());
+                    if (Pathfinder.inLine(Target.fight.map, CastInfos.CellId, Target.getCellId()) && CastInfos.CellId != Target.getCellId()) {
+                        Direction = Pathfinder.getDirection(Target.fight.map, CastInfos.CellId, Target.getCellId());
+                    } else if (Pathfinder.inLine(Target.fight.map, CastInfos.Caster.getCellId(), Target.getCellId())) {
+                        Direction = Pathfinder.getDirection(Target.fight.map, CastInfos.Caster.getCellId(), Target.getCellId());
                     }
                     break;
             }
@@ -70,14 +70,14 @@ public class EffectPush extends EffectBase {
 
     public static int ApplyPush(EffectCast CastInfos, Fighter target, byte direction, int length) {
         FightCell currentCell = target.myCell;
-        short StartCell = target.CellId();
+        short StartCell = target.getCellId();
         for (int i = 0; i < length; i++) {
-            FightCell nextCell = target.Fight.GetCell(Pathfinder.nextCell(currentCell.Id, direction));
+            FightCell nextCell = target.fight.getCell(Pathfinder.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.CanWalk()) {
                 if (nextCell.HasObject(FightObjectType.OBJECT_TRAP)) {
-                    target.Fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, nextCell.Id));
-                    return target.SetCell(nextCell);
+                    target.fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, nextCell.Id));
+                    return target.setCell(nextCell);
                 }
             } else {
                 int pushResult = -1;
@@ -89,12 +89,12 @@ public class EffectPush extends EffectBase {
                 }
 
                 if (i != 0) {
-                    target.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> x.Target.SetCell(target.Fight.GetCell(StartCell)));
-                    target.Fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, currentCell.Id));
+                    target.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> x.Target.setCell(target.fight.getCell(StartCell)));
+                    target.fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, currentCell.Id));
 
                 }
 
-                int result = target.SetCell(currentCell);
+                int result = target.setCell(currentCell);
 
                 if (pushResult < result) {
                     return pushResult;
@@ -105,30 +105,30 @@ public class EffectPush extends EffectBase {
             currentCell = nextCell;
         }
 
-        int result = target.SetCell(currentCell);
+        int result = target.setCell(currentCell);
 
-        target.Fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect == null ? 5 : CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, currentCell.Id));
+        target.fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect == null ? 5 : CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, currentCell.Id));
 
-        target.Buffs.GetAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> x.Target.SetCell(target.Fight.GetCell(StartCell)));
+        target.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> x.Target.setCell(target.fight.getCell(StartCell)));
 
         return result;
     }
 
     public static int ApplyPushBackDamages(EffectCast CastInfos, Fighter Target, int Length, int CurrentLength) {
         int DamageCoef = 0;
-        if (Target.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
+        if (Target.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
             DamageCoef = 7;
-        } else if (CastInfos.Caster.Buffs.GetAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
+        } else if (CastInfos.Caster.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
             DamageCoef = 4;
         } else {
             DamageCoef = 4 + EffectPush.RANDOM_PUSHDAMAGE.nextInt(3);
         }
 
-        double LevelCoef = CastInfos.Caster.Level() / 50;
+        double LevelCoef = CastInfos.Caster.getLevel() / 50;
         if (LevelCoef < 0.1) {
             LevelCoef = 0.1;
         }
-        double pushDmg = (CastInfos.Caster.Level() / 2 + (CastInfos.Caster.Stats.getTotal(StatsEnum.Add_Push_Damages_Bonus) - Target.Stats.getTotal(StatsEnum.Add_Push_Damages_Bonus)) + 32) * CastInfos.Effect.diceNum / (4 * Math.pow(2, CurrentLength));
+        double pushDmg = (CastInfos.Caster.getLevel() / 2 + (CastInfos.Caster.stats.getTotal(StatsEnum.Add_Push_Damages_Bonus) - Target.stats.getTotal(StatsEnum.Add_Push_Damages_Bonus)) + 32) * CastInfos.Effect.diceNum / (4 * Math.pow(2, CurrentLength));
         MutableInt DamageValue = new MutableInt(pushDmg);
         //MutableInt DamageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 

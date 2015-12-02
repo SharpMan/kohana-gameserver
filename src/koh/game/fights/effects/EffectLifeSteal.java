@@ -19,11 +19,11 @@ public class EffectLifeSteal extends EffectBase {
 
             // Ajout du buff
             CastInfos.Targets.stream().forEach((Target) -> {
-                Target.Buffs.AddBuff(new BuffLifeSteal(CastInfos, Target));
+                Target.buff.addBuff(new BuffLifeSteal(CastInfos, Target));
             });
         } else {
             for (Fighter Target : CastInfos.Targets) {
-                if (CastInfos.SpellId == 450 && Target.Team.Id != CastInfos.Caster.Team.Id) { //Folie
+                if (CastInfos.SpellId == 450 && Target.team.Id != CastInfos.Caster.team.Id) { //Folie
                     continue;
                 }
 

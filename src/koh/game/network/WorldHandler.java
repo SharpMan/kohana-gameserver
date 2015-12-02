@@ -18,7 +18,7 @@ import org.apache.mina.core.session.IoSession;
  */
 public class WorldHandler extends IoHandlerAdapter {
 
-    public static byte[] RawBytes;
+    public static byte[] rawBytes;
     public static char[] binaryKeys;
 
     @Override

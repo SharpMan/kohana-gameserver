@@ -23,20 +23,20 @@ public class BuffDamagePerPA extends BuffEffect {
     public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         int pas = this.CastInfos.Effect.diceNum;
         int val = this.CastInfos.Effect.diceSide;
-        int nbr = (int) Math.floor((double) Target.UsedAP / (double) pas);
+        int nbr = (int) Math.floor((double) Target.usedAP / (double) pas);
         DamageValue.setValue(val * nbr);
         //Poison Paralysant
 
         int inte = 0;
         if (CastInfos.EffectType == StatsEnum.PA_USED_LOST_X_PDV) {
-            inte += CastInfos.Caster.Stats.getTotal(StatsEnum.Agility);
+            inte += CastInfos.Caster.stats.getTotal(StatsEnum.Agility);
         } else /*if (CastInfos.EffectType == StatsEnum.Lose_PV_By_Using_PA)*/ {
-            inte += CastInfos.Caster.Stats.getTotal(StatsEnum.Intelligence);
+            inte += CastInfos.Caster.stats.getTotal(StatsEnum.Intelligence);
         }
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = CastInfos.Caster.Stats.getTotal(StatsEnum.AddDamagePercent);
+        int pdom = CastInfos.Caster.stats.getTotal(StatsEnum.AddDamagePercent);
         if (pdom < 0) {
             pdom = 0;
         }

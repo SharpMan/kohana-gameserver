@@ -98,13 +98,13 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.myGameActors.put(actor.ID, actor);
 
         //verify Todo
-        /*if (this.cells.length <  actor.CellId) {
-         if (this.myCells[actor.CellId].Walkable) {
-         this.myCells[actor.CellId].addActor(actor);
+        /*if (this.cells.length <  actor.getCellId) {
+         if (this.myCells[actor.getCellId].Walkable) {
+         this.myCells[actor.getCellId].addActor(actor);
          } else {
-         actor.CellId = this.GetFreeCell();
+         actor.getCellId = this.GetFreeCell();
 
-         this.myCells[actor.CellId].addActor(actor);
+         this.myCells[actor.getCellId].addActor(actor);
          }
          }*/
         this.cells[actor.cell.id].addActor(actor);
@@ -294,7 +294,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public static final ScheduledExecutorService GlobalTimer = Executors.newScheduledThreadPool(20);
 
     @Override
-    public void ActorMoved(Path path, IGameActor actor, short newCell, byte newDirection) {
+    public void actorMoved(Path path, IGameActor actor, short newCell, byte newDirection) {
         this.cells[actor.cell.id].delActor(actor);
         this.cells[newCell].addActor(actor);
         if (newDirection != -1) {
@@ -442,23 +442,23 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public short nextFightId() {
-        return (short) this.myFightController.NextFightId();
+        return (short) this.myFightController.nextFightId();
     }
 
     public void addFight(Fight fight) {
-        this.myFightController.AddFight(fight);
+        this.myFightController.addFight(fight);
 
         this.sendMapFightCountMessage();
     }
 
     public void removeFight(Fight fight) {
-        this.myFightController.RemoveFight(fight);
+        this.myFightController.removeFight(fight);
 
         this.sendMapFightCountMessage();
     }
 
     public void sendMapInfo(WorldClient client) {
-        this.myFightController.SendFightInfos(client);
+        this.myFightController.sendFightInfos(client);
         if (PaddockDAOImpl.paddocks.containsKey(id)) {
             client.send(new PaddockPropertiesMessage(PaddockDAOImpl.paddocks.get(id).getInformations()));
             if (PaddockDAOImpl.paddocks.get(id).items != null) {
@@ -474,15 +474,15 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public void sendMapFightCountMessage() {
-        this.sendToField(new MapFightCountMessage(this.myFightController.FightCount()));
+        this.sendToField(new MapFightCountMessage(this.myFightController.fightCount()));
     }
 
     public Fight getFight(int FightId) {
-        return this.myFightController.GetFight(FightId);
+        return this.myFightController.getFight(FightId);
     }
 
     public List<Fight> getFights() {
-        return this.myFightController.Fights();
+        return this.myFightController.getFights();
     }
 
     public DofusCell[] getCells() {

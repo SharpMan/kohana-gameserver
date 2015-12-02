@@ -35,7 +35,7 @@ public class MapPoint {
         return x + y >= 0 && x - y >= 0 && (long) (x - y) < 40L && (long) (x + y) < 28L;
     }
 
-    public static short CoordToCellId(int x, int y) {
+    public static short coordToCellId(int x, int y) {
         if (!(_bInit)) {
             init();
         }
@@ -326,7 +326,7 @@ public class MapPoint {
 
     @Override
     public String toString() {
-        return ((((((("[MapPoint(x:" + this._nX) + ", y:") + this._nY) + ", id:") + this._nCellId) + ")]"));
+        return ((((((("[getMapPoint(x:" + this._nX) + ", y:") + this._nY) + ", id:") + this._nCellId) + ")]"));
     }
 
     private void setFromCoords() {
@@ -348,7 +348,7 @@ public class MapPoint {
         this._nY = p.y;
     }
 
-    public static int GetX(int cell) {
+    public static int getx(int cell) {
         if (!(_bInit)) {
             init();
         }

@@ -9,7 +9,7 @@ import koh.game.Main;
  */
 public class ItemType {
 
-    public int SuperType;
+    public int superType;
     public boolean plural;
     public int gender;
     public String rawZone;
@@ -63,7 +63,7 @@ public class ItemType {
                 Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
             };
         } catch (java.lang.NumberFormatException e) {
-            Main.Logs().writeError(String.format("Error with ItemType %s", this.SuperType));
+            Main.Logs().writeError(String.format("Error with getItemType %s", this.superType));
         }
     }
 

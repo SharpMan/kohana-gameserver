@@ -75,7 +75,7 @@ public class EffectHelper {
 
         buff.putInt(Effects.length);
         for (EffectInstance e : Effects) {
-            buff.put(e.SerializationIdentifier());
+            buff.put(e.serializationIdentifier());
             e.toBinary(buff);
         }
 
@@ -99,8 +99,8 @@ public class EffectHelper {
     public static boolean verifyEffectTrigger(Fighter pCasterId, Fighter pTargetId, EffectInstance[] pSpellEffects, EffectInstance pEffect, boolean pWeaponEffect, String pTriggers, int pSpellImpactCell) {
 
         boolean verify = true;
-        boolean isTargetAlly = pCasterId.IsFriendlyWith(pTargetId);
-        int distance = Pathfinder.getDistance( pCasterId.CellId(), pTargetId.CellId());
+        boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
+        int distance = Pathfinder.getDistance( pCasterId.getCellId(), pTargetId.getCellId());
         
         for (String trigger : pTriggers.split("\\|")) {
             switch (trigger) {
@@ -248,11 +248,11 @@ public class EffectHelper {
                 short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 if (GenType == EffectGenerationType.MaxEffects) {
-                    Effects[i] = (new EffectInstanceInteger(e, !e.Template().operator.equalsIgnoreCase("-") ? num1 : num2));
+                    Effects[i] = (new EffectInstanceInteger(e, !e.getTemplate().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;
                 }
                 if (GenType == EffectGenerationType.MinEffects) {
-                    Effects[i] = (new EffectInstanceInteger(e, !e.Template().operator.equalsIgnoreCase("-") ? num2 : num1));
+                    Effects[i] = (new EffectInstanceInteger(e, !e.getTemplate().operator.equalsIgnoreCase("-") ? num2 : num1));
                     continue;
                 }
                 if ((int) num2 == 0) {
@@ -261,7 +261,7 @@ public class EffectHelper {
                     Effects[i] = (new EffectInstanceInteger(e, (short) randomValue((int) num2, (int) num1 /*+ 1*/)));
                 }
             } else if (e != null) {
-                throw new Error("Effect not suport" + e.SerializationIdentifier());
+                throw new Error("Effect not suport" + e.serializationIdentifier());
             }
             i++;
         }
@@ -302,11 +302,11 @@ public class EffectHelper {
                 short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 if (GenType == EffectGenerationType.MaxEffects) {
-                    Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num1 : num2));
+                    Effects.add(new ObjectEffectInteger(e.effectId, !e.getTemplate().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;
                 }
                 if (GenType == EffectGenerationType.MinEffects) {
-                    Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num2 : num1));
+                    Effects.add(new ObjectEffectInteger(e.effectId, !e.getTemplate().operator.equalsIgnoreCase("-") ? num2 : num1));
                     continue;
                 }
                 if ((int) num2 == 0) {

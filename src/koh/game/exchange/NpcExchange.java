@@ -35,39 +35,39 @@ public class NpcExchange extends Exchange {
     }
 
     @Override
-    public boolean MoveItem(WorldClient Client, int ItemID, int Quantity) {
+    public boolean moveItem(WorldClient Client, int itemID, int quantity) {
 
         return false;
     }
 
     @Override
-    public boolean MoveKamas(WorldClient Client, int Quantity) {
+    public boolean moveKamas(WorldClient Client, int quantity) {
         return false;
     }
 
     @Override
-    public boolean BuyItem(WorldClient Client, int TemplateId, int Quantity) {
+    public boolean buyItem(WorldClient Client, int templateId, int quantity) {
         if (this.myEnd) // ne devrait jamais arriver
         {
             return false;
         }
 
-        NpcItem npcItem = this.Npc.getTemplate().Items.get(TemplateId);
+        NpcItem npcItem = this.Npc.getTemplate().Items.get(templateId);
 
         if (npcItem == null) {
             Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }
-        if((npcItem.getTemplate().realWeight * Quantity) + Client.character.inventoryCache.getWeight() > Client.character.inventoryCache.getTotalWeight()){
+        if((npcItem.getTemplate().realWeight * quantity) + Client.character.inventoryCache.getWeight() > Client.character.inventoryCache.getTotalWeight()){
             PlayerController.SendServerErrorMessage(Client, "Erreur : Votre poids depasse les bornes...");
             return false;
         }
 
-        if (Ints.contains(unMergeableType, ItemTemplateDAOImpl.Cache.get(TemplateId).TypeId)) {
-            Quantity = 1;
+        if (Ints.contains(unMergeableType, ItemTemplateDAOImpl.Cache.get(templateId).TypeId)) {
+            quantity = 1;
         }
 
-        int amount1 = (int) ((double) npcItem.getPrice() * (double) Quantity);
+        int amount1 = (int) ((double) npcItem.getPrice() * (double) quantity);
 
         InventoryItem playerItem = null;
         
@@ -81,7 +81,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 21, new String[]{Quantity + "", TemplateId + ""}));
+        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 21, new String[]{quantity + "", templateId + ""}));
 
         if (playerItem != null) {
             Client.character.inventoryCache.updateObjectquantity(playerItem, playerItem.getQuantity() - amount1);
@@ -89,7 +89,7 @@ public class NpcExchange extends Exchange {
             Client.character.inventoryCache.substractKamas(amount1);
         }
 
-        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, TemplateId, 63, Client.character.ID, Quantity, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(TemplateId).possibleEffects, npcItem.genType(), ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon));
+        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, templateId, 63, Client.character.ID, quantity, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(templateId).possibleEffects, npcItem.genType(), ItemTemplateDAOImpl.Cache.get(templateId) instanceof Weapon));
         if (this.myClient.character.inventoryCache.add(Item, true)) {
             Item.needInsert = true;
         }
@@ -100,26 +100,26 @@ public class NpcExchange extends Exchange {
     }
 
     @Override
-    public boolean SellItem(WorldClient Client, InventoryItem Item, int Quantity) {
+    public boolean sellItem(WorldClient Client, InventoryItem item, int quantity) {
         if (this.myEnd) {
             return false;
         }
 
-        if (Item == null) {
+        if (item == null) {
             Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.SELL_ERROR));
             return false;
         }
 
-        NpcItem npcItem = this.Npc.getTemplate().Items.get(Item.templateId);
+        NpcItem npcItem = this.Npc.getTemplate().Items.get(item.templateId);
 
-        int Refund = npcItem == null ? (int) ((long) (int) Math.ceil((double) Item.getTemplate().price / 10.0) * (long) Quantity) : (int) ((long) (int) Math.ceil((double) npcItem.getPrice() / 10.0) * (long) Quantity);
-        if (Quantity == Item.getQuantity()) {
-            Client.character.inventoryCache.removeItem(Item);
+        int Refund = npcItem == null ? (int) ((long) (int) Math.ceil((double) item.getTemplate().price / 10.0) * (long) quantity) : (int) ((long) (int) Math.ceil((double) npcItem.getPrice() / 10.0) * (long) quantity);
+        if (quantity == item.getQuantity()) {
+            Client.character.inventoryCache.removeItem(item);
         } else {
-            Client.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - Quantity);
+            Client.character.inventoryCache.updateObjectquantity(item, item.getQuantity() - quantity);
         }
 
-        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{Quantity + "", Item.templateId + ""}));
+        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{quantity + "", item.templateId + ""}));
 
         Client.character.inventoryCache.addKamas(Refund);
 
@@ -127,20 +127,20 @@ public class NpcExchange extends Exchange {
     }
 
     @Override
-    public boolean Validate(WorldClient Client) {
+    public boolean validate(WorldClient Client) {
         return false;
     }
 
     @Override
-    public boolean Finish() {
+    public boolean finish() {
         this.myEnd = true;
 
         return true;
     }
 
     @Override
-    public boolean CloseExchange(boolean Success) {
-        this.Finish();
+    public boolean closeExchange(boolean Success) {
+        this.finish();
         this.myClient.myExchange = null;
         this.myClient.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
         this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
@@ -149,17 +149,17 @@ public class NpcExchange extends Exchange {
     }
 
     @Override
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
         this.myClient.send(Packet);
     }
 
     @Override
-    public boolean MoveItems(WorldClient Client, InventoryItem[] Items, boolean Add) {
+    public boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add) {
         return false;
     }
 
     @Override
-    public boolean TransfertAllToInv(WorldClient Client, InventoryItem[] Items) {
+    public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
         return false;
     }
 

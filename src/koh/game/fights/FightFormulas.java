@@ -3,7 +3,7 @@ package koh.game.fights;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import koh.game.Main;
-import koh.game.dao.mysql.ExpDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
@@ -19,31 +19,31 @@ import koh.protocol.messages.game.context.mount.MountSetMessage;
  */
 public class FightFormulas {
 
-    public static short CalculateEarnedDishonor(Fighter Character) {
-        return Character.Fight.GetEnnemyTeam(Character.Team).AlignmentSide != AlignmentSideEnum.ALIGNMENT_NEUTRAL ? (short) 0 : (short) 1;
+    public static short calculateEarnedDishonor(Fighter Character) {
+        return Character.fight.getEnnemyTeam(Character.team).alignmentSide != AlignmentSideEnum.ALIGNMENT_NEUTRAL ? (short) 0 : (short) 1;
     }
 
-    public static short HonorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser) {
-        return HonorPoint(Fighter, Winners, Lossers, isLosser, true);
+    public static short honorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser) {
+        return honorPoint(Fighter, Winners, Lossers, isLosser, true);
     }
 
-    public static short HonorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser, boolean End) {
+    public static short honorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser, boolean End) {
 
-        if (Fighter.Fight.GetEnnemyTeam(Fighter.Team).AlignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
+        if (Fighter.fight.getEnnemyTeam(Fighter.team).alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
             return (short) 0;
         }
 
-        if (System.currentTimeMillis() - Fighter.Fight.FightTime > 2 * 60 * 1000) {
+        if (System.currentTimeMillis() - Fighter.fight.fightTime > 2 * 60 * 1000) {
             ((CharacterFighter) Fighter).Character.addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
         }
 
-        if (End && Fighter.Fight.GetWinners().GetFighters().count() == 1L && Fighter.Fight.GetWinners().GetFighters().count() == Fighter.Fight.GetEnnemyTeam(Fighter.Fight.GetWinners()).GetFighters().count()) {
-            return isLosser ? CalculLooseHonor(Winners, Lossers) : CalculWinHonor(Winners, Lossers);
+        if (End && Fighter.fight.getWinners().getFighters().count() == 1L && Fighter.fight.getWinners().getFighters().count() == Fighter.fight.getEnnemyTeam(Fighter.fight.getWinners()).getFighters().count()) {
+            return isLosser ? calculLooseHonor(Winners, Lossers) : calculWinHonor(Winners, Lossers);
         }
 
-        double num1 = (double) Winners.mapToInt(x -> x.Level()).sum();
-        double num2 = (double) Lossers.mapToInt(x -> x.Level()).sum();
-        double num3 = Math.floor(Math.sqrt((double) Fighter.Level()) * 10.0 * (num2 / num1));
+        double num1 = (double) Winners.mapToInt(x -> x.getLevel()).sum();
+        double num2 = (double) Lossers.mapToInt(x -> x.getLevel()).sum();
+        double num3 = Math.floor(Math.sqrt((double) Fighter.getLevel()) * 10.0 * (num2 / num1));
         if (isLosser) {
             if (num3 > ((CharacterFighter) Fighter).Character.honor) {
                 num3 = -(short) ((CharacterFighter) Fighter).Character.honor;
@@ -56,8 +56,8 @@ public class FightFormulas {
 
     public static long XPDefie(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers) {
 
-        int lvlLoosers = Lossers.mapToInt(x -> x.Level()).sum();
-        int lvlWinners = Winners.mapToInt(x -> x.Level()).sum();
+        int lvlLoosers = Lossers.mapToInt(x -> x.getLevel()).sum();
+        int lvlWinners = Winners.mapToInt(x -> x.getLevel()).sum();
 
         int taux = Settings.GetIntElement("Rate.Challenge");
         float rapport = (float) lvlLoosers / (float) lvlWinners;
@@ -68,18 +68,18 @@ public class FightFormulas {
         if (rapport >= 1.0F) {
             malus = 1;
         }
-        long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) * (1 + (Fighter.Stats.getTotal(StatsEnum.Wisdom) * 0.01)));
+        long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(Fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (Fighter.stats.getTotal(StatsEnum.Wisdom) * 0.01)));
         if (xpWin < 0) {
-            Main.Logs().writeInfo("lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.Level())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.Stats.getTotal(StatsEnum.Wisdom) * 0.01)));
+            Main.Logs().writeInfo("lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.getLevel())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.stats.getTotal(StatsEnum.Wisdom) * 0.01)));
         }
         return xpWin;
     }
 
     private static long XpNeededAtLevel(int lvl) {
-        return (ExpDAOImpl.persoXpMax(lvl) - ExpDAOImpl.persoXpMin(lvl == 200 ? 199 : lvl));
+        return (DAO.getExps().getPlayerMaxExp(lvl) - DAO.getExps().getPlayerMinExp(lvl == 200 ? 199 : lvl));
     }
 
-    public static long GuildXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
+    public static long guildXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
         if (Fighter.Character == null) {
             return 0;
         }
@@ -89,7 +89,7 @@ public class FightFormulas {
 
         GuildMember gm = Fighter.Character.getGuildMember();
 
-        double xp = (double) xpWin.get(), Lvl = Fighter.Level(), LvlGuild = Fighter.Character.guild.entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
+        double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.Character.guild.entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
         double maxP = xp * pXpGive * 0.10;	//Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
         double diff = Math.abs(Lvl - LvlGuild);	//Calcul l'écart entre le niveau du personnage et le niveau de la guilde
@@ -111,7 +111,7 @@ public class FightFormulas {
         return (long) Math.round(toGuild);
     }
 
-    public static long MountXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
+    public static long mountXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
         if (Fighter == null) {
             return 0;
         }
@@ -122,7 +122,7 @@ public class FightFormulas {
             return 0;
         }
 
-        int diff = Math.abs(Fighter.Level() - Fighter.Character.mountInfo.mount.level);
+        int diff = Math.abs(Fighter.getLevel() - Fighter.Character.mountInfo.mount.level);
 
         double coeff = 0;
         double xp = (double) xpWin.get();
@@ -159,7 +159,7 @@ public class FightFormulas {
         return (long) Math.round(xp * pToMount * coeff);
     }
 
-    public static short CalculWinHonor(Stream<Fighter> winners, Stream<Fighter> loosers) {
+    public static short calculWinHonor(Stream<Fighter> winners, Stream<Fighter> loosers) {
         try {
             int TotalGradeWinner = 0;
             int TotalGradeLooser = 0;
@@ -199,7 +199,7 @@ public class FightFormulas {
         }
     }
 
-    public static short CalculLooseHonor(Stream<Fighter> loosers, Stream<Fighter> winners) {
+    public static short calculLooseHonor(Stream<Fighter> loosers, Stream<Fighter> winners) {
         try {
             int TotalGradeWinner = 0;
             int TotalGradeLooser = 0;

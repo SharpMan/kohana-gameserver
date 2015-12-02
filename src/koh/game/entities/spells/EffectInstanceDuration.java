@@ -13,7 +13,7 @@ import org.apache.mina.core.buffer.IoBuffer;
 public class EffectInstanceDuration extends EffectInstance  {
 
     @Override
-    public byte SerializationIdentifier() {
+    public byte serializationIdentifier() {
         return 7;
     }
 

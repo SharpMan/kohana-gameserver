@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import java.util.Arrays;
 import koh.game.Main;
 import koh.game.conditions.ConditionExpression;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.spells.EffectInstance;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
@@ -38,7 +38,7 @@ public class ItemTemplate {
     public int favoriteSubAreasBonus;
     private ConditionExpression m_criteriaExpression;
     
-    public ConditionExpression CriteriaExpression() {
+    public ConditionExpression getCriteriaExpression() {
         try {
             if (m_criteriaExpression == null) {
                 if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
@@ -55,7 +55,7 @@ public class ItemTemplate {
         }
     }
     
-    public EffectInstance GetEffect(int uid) {
+    public EffectInstance getEffect(int uid) {
         return Arrays.stream(possibleEffects).filter(x -> x.effectId == uid).findFirst().orElse(null);
     }
     
@@ -64,12 +64,12 @@ public class ItemTemplate {
     }
     
     public ItemSet getItemSet() {
-        return this.itemSetId < 0 ? null : ItemTemplateDAOImpl.Sets.get(this.itemSetId);
+        return this.itemSetId < 0 ? null : DAO.getItemTemplates().getSet(this.itemSetId);
     }
     
-    public ItemSuperTypeEnum GetSuperType() {
+    public ItemSuperTypeEnum getSuperType() {
         try {
-            return ItemSuperTypeEnum.valueOf(ItemTemplateDAOImpl.SuperTypes.get(typeId).SuperType);
+            return ItemSuperTypeEnum.valueOf(DAO.getItemTemplates().getType(typeId).superType);
         } catch (java.lang.NullPointerException e) {
             return ItemSuperTypeEnum.SUPERTYPE_UNKNOWN_0;
         }

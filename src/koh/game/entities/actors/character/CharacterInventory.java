@@ -51,7 +51,7 @@ import koh.protocol.types.game.look.SubEntity;
  */
 public class CharacterInventory {
 
-    //TODO : Updater PartyEntityLook if Dissociate/Associate LivingObject
+    //TODO : Updater PartyEntityLook if Dissociate/Associate livingObject
     private Player player;
     public Map<Integer, InventoryItem> itemsCache = Collections.synchronizedMap(new HashMap<>());
     public final static int[] unMergeableType = new int[]{97, 121, 18};
@@ -473,7 +473,7 @@ public class CharacterInventory {
     }
 
     public int getWeight() {
-        return this.itemsCache.values().stream().mapToInt(x -> x.Weight()).sum();
+        return this.itemsCache.values().stream().mapToInt(x -> x.getWeight()).sum();
     }
 
     public int getTotalWeight() {

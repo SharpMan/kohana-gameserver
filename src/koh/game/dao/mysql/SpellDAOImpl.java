@@ -179,9 +179,9 @@ public class SpellDAOImpl extends SpellDAO {
                 learnableSpells.get(result.getInt("breed_id")).add(new LearnableSpell() {
                     {
                         ID = result.getInt("id");
-                        Spell = result.getInt("spell");
+                        spell = result.getInt("spell");
                         obtainLevel = result.getInt("obtain_level");
-                        BreedID = result.getInt("breed_id");
+                        breedID = result.getInt("breed_id");
                     }
                 });
                 i++;

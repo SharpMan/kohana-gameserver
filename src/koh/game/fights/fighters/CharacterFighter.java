@@ -43,40 +43,40 @@ public class CharacterFighter extends Fighter {
 
     public CharacterFighter(Fight Fight, WorldClient Client) {
         super(Fight, null);
-        this.TurnReady = false;
+        this.turnReady = false;
         this.Character = Client.character;
 
         this.Character.setFight(Fight);
         this.Character.setFighter(this);
         this.Character.stopRegen();
         //this.character.currentMap.unregisterPlayer(character);
-        this.Fight.registerPlayer(Character);
-        super.InitFighter(this.Character.stats, this.Character.ID);
+        this.fight.registerPlayer(Character);
+        super.initFighter(this.Character.stats, this.Character.ID);
         super.setLife(this.Character.life);
         super.setLifeMax(this.Character.getMaxLife());
-        if (super.Life() == 0) {
+        if (super.getLife() == 0) {
             super.setLife(1);
         }
         this.entityLook = EntityLookParser.Copy(this.Character.getEntityLook());
     }
 
     @Override
-    public GameFightMinimalStats GetGameFightMinimalStats(Player character) {
-        if (this.Fight.FightState == FightState.STATE_PLACE) {
-            return new GameFightMinimalStatsPreparation(this.Life(), this.MaxLife(), this.Character.getMaxLife(), this.Stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.getTotal(StatsEnum.NeutralElementResistPercent), this.Stats.getTotal(StatsEnum.EarthElementResistPercent), this.Stats.getTotal(StatsEnum.WaterElementResistPercent), this.Stats.getTotal(StatsEnum.AirElementResistPercent), this.Stats.getTotal(StatsEnum.FireElementResistPercent), this.Stats.getTotal(StatsEnum.NeutralElementReduction), this.Stats.getTotal(StatsEnum.EarthElementReduction), this.Stats.getTotal(StatsEnum.WaterElementReduction), this.Stats.getTotal(StatsEnum.AirElementReduction), this.Stats.getTotal(StatsEnum.FireElementReduction), this.Stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.getTotal(StatsEnum.DodgePALostProbability), this.Stats.getTotal(StatsEnum.DodgePMLostProbability), this.Stats.getTotal(StatsEnum.Add_TackleBlock), this.Stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character), this.Initiative(false));
+    public GameFightMinimalStats getGameFightMinimalStats(Player character) {
+        if (this.fight.fightState == FightState.STATE_PLACE) {
+            return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), this.Character.getMaxLife(), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
         }
-        return new GameFightMinimalStats(this.Life(), this.MaxLife(), this.Character.getMaxLife(), this.Stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.getTotal(StatsEnum.NeutralElementResistPercent), this.Stats.getTotal(StatsEnum.EarthElementResistPercent), this.Stats.getTotal(StatsEnum.WaterElementResistPercent), this.Stats.getTotal(StatsEnum.AirElementResistPercent), this.Stats.getTotal(StatsEnum.FireElementResistPercent), this.Stats.getTotal(StatsEnum.NeutralElementReduction), this.Stats.getTotal(StatsEnum.EarthElementReduction), this.Stats.getTotal(StatsEnum.WaterElementReduction), this.Stats.getTotal(StatsEnum.AirElementReduction), this.Stats.getTotal(StatsEnum.FireElementReduction), this.Stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.getTotal(StatsEnum.DodgePALostProbability), this.Stats.getTotal(StatsEnum.DodgePMLostProbability), this.Stats.getTotal(StatsEnum.Add_TackleBlock), this.Stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
+        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), this.Character.getMaxLife(), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
     }
 
     public int fakeContextualId = -1000;
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(((fakeContextualId != -1000 && !this.IsMyFriend(character)) ? this.fakeContextualId : this.ID), this.getEntityLook(), this.getEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Character.nickName, this.Character.getPlayerStatus(), (byte) this.Level(), this.Character.getActorAlignmentInformations(), this.Character.breed, this.Character.hasSexe());
+        return new GameFightCharacterInformations(((fakeContextualId != -1000 && !this.isMyFriend(character)) ? this.fakeContextualId : this.ID), this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.Character.nickName, this.Character.getPlayerStatus(), (byte) this.getLevel(), this.Character.getActorAlignmentInformations(), this.Character.breed, this.Character.hasSexe());
     }
 
     @Override
-    public FightTeamMemberInformations GetFightTeamMemberInformations() {
+    public FightTeamMemberInformations getFightTeamMemberInformations() {
         return new FightTeamMemberCharacterInformations(this.ID, this.Character.nickName, (byte) this.Character.level);
     }
 
@@ -86,26 +86,26 @@ public class CharacterFighter extends Fighter {
     }
 
     @Override
-    public void MiddleTurn() {
+    public void middleTurn() {
         /*if (this.character.client != null) {
          this.character.client.send(this.FighterStatsListMessagePacket());
          }*/
-        super.MiddleTurn();
+        super.middleTurn();
     }
 
     @Override
-    public int EndTurn() {
+    public int endTurn() {
         if (this.Character.client == null) {
-            this.Fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 162, new String[]{this.Character.nickName, Integer.toString(this.TurnRunning)}));
-            this.TurnRunning--;
+            this.fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 162, new String[]{this.Character.nickName, Integer.toString(this.turnRunning)}));
+            this.turnRunning--;
         }
-        return super.EndTurn();
+        return super.endTurn();
     }
 
     public void CleanClone() {
         boolean updated = false;
-        for (Fighter Clone : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.Summoner == this)::iterator) {
-            Clone.TryDie(this.ID);
+        for (Fighter Clone : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner == this)::iterator) {
+            Clone.tryDie(this.ID);
             updated = true;
         }
         if (updated) {
@@ -114,37 +114,37 @@ public class CharacterFighter extends Fighter {
     }
 
     public void onCloneCleared() {
-        this.Fight.observers.stream().filter(x -> !this.IsMyFriend(((Player) x))).forEach(o -> ((Player) o).send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
+        this.fight.observers.stream().filter(x -> !this.isMyFriend(((Player) x))).forEach(o -> ((Player) o).send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
         this.fakeContextualId = -1000;
-        this.Buffs.Dispell(2763);
+        this.buff.dispell(2763);
 
         this.send(this.FighterStatsListMessagePacket());
     }
 
     @Override
-    public int BeginTurn() {
+    public int beginTurn() {
         this.CleanClone();
-        if (this.Character.client == null && this.TurnRunning <= 0) {
-            return this.TryDie(this.ID, true);
+        if (this.Character.client == null && this.turnRunning <= 0) {
+            return this.tryDie(this.ID, true);
         }
-        return super.BeginTurn();
+        return super.beginTurn();
     }
 
     @Override
-    public int TryDie(int Caster, boolean Force) {
+    public int tryDie(int casterId, boolean Force) {
 
         this.CleanClone();
-        return super.TryDie(Caster, Force);
+        return super.tryDie(casterId, Force);
     }
 
     @Override
-    public void LeaveFight() {
-        super.LeaveFight();
+    public void leaveFight() {
+        super.leaveFight();
         this.EndFight();
     }
 
     @Override
-    public int Level() {
+    public int getLevel() {
         return this.Character.level;
     }
 
@@ -155,15 +155,15 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public void EndFight() {
-        if (Fight.FightType != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
-            if (super.Life() <= 0) {
+        if (fight.fightType != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
+            if (super.getLife() <= 0) {
                 this.Character.life = 1;
             } else {
-                this.Character.life = super.Life();
+                this.Character.life = super.getLife();
             }
         }
 
-        this.Fight.unregisterPlayer(Character);
+        this.fight.unregisterPlayer(Character);
 
         if (this.Character.isInWorld) {
             this.Character.client.endGameAction(GameActionTypeEnum.FIGHT);
@@ -171,7 +171,7 @@ public class CharacterFighter extends Fighter {
             this.Character.send(new GameContextCreateMessage((byte) 1));
             //this.character.send(new LifePointsRegenBeginMessage());
             this.Character.refreshStats(false);
-            if (!(this.Fight instanceof ChallengeFight) && this.Team.Id == this.Fight.GetLoosers().Id) {
+            if (!(this.fight instanceof ChallengeFight) && this.team.Id == this.fight.getLoosers().Id) {
                 this.Character.teleport(this.Character.savedMap, this.Character.savedCell);
             } else {
                 this.Character.send(new CurrentMapMessage(this.Character.currentMap.id, "649ae451ca33ec53bbcbcc33becf15f4"));
@@ -185,7 +185,7 @@ public class CharacterFighter extends Fighter {
     }
 
     @Override
-    public short MapCell() {
+    public short getMapCell() {
         return this.Character.cell.id;
     }
 
@@ -196,37 +196,37 @@ public class CharacterFighter extends Fighter {
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
         return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) Character.experience, (double) ExpDAOImpl.persoXpMin(Character.level), (double) ExpDAOImpl.persoXpMax(Character.level), Character.kamas, Character.statPoints, 0, Character.spellPoints, Character.getActorAlignmentExtendInformations(),
-                Life(), MaxLife(), Character.energy, PlayerEnum.MaxEnergy,
-                (short) this.AP(), (short) this.MP(),
-                new CharacterBaseCharacteristic(this.Initiative(true), 0, Stats.getItem(StatsEnum.Initiative), 0, 0), Stats.getEffect(StatsEnum.Prospecting), Stats.getEffect(StatsEnum.ActionPoints),
-                Stats.getEffect(StatsEnum.MovementPoints), Stats.getEffect(StatsEnum.Strength), Stats.getEffect(StatsEnum.Vitality),
-                Stats.getEffect(StatsEnum.Wisdom), Stats.getEffect(StatsEnum.Chance), Stats.getEffect(StatsEnum.Agility),
-                Stats.getEffect(StatsEnum.Intelligence), Stats.getEffect(StatsEnum.Add_Range), Stats.getEffect(StatsEnum.AddSummonLimit),
-                Stats.getEffect(StatsEnum.DamageReflection), Stats.getEffect(StatsEnum.Add_CriticalHit), Character.inventoryCache.weaponCriticalHit(),
-                Stats.getEffect(StatsEnum.CriticalMiss), Stats.getEffect(StatsEnum.Add_Heal_Bonus), Stats.getEffect(StatsEnum.AllDamagesBonus),
-                Stats.getEffect(StatsEnum.WeaponDamagesBonusPercent), Stats.getEffect(StatsEnum.AddDamagePercent), Stats.getEffect(StatsEnum.TrapBonus),
-                Stats.getEffect(StatsEnum.Trap_Damage_Percent), Stats.getEffect(StatsEnum.GlyphBonusPercent), Stats.getEffect(StatsEnum.PermanentDamagePercent), Stats.getEffect(StatsEnum.Add_TackleBlock),
-                Stats.getEffect(StatsEnum.Add_TackleEvade), Stats.getEffect(StatsEnum.Add_RETRAIT_PA), Stats.getEffect(StatsEnum.Add_RETRAIT_PM), Stats.getEffect(StatsEnum.Add_Push_Damages_Bonus),
-                Stats.getEffect(StatsEnum.Add_Critical_Damages), Stats.getEffect(StatsEnum.Add_Neutral_Damages_Bonus), Stats.getEffect(StatsEnum.Add_Earth_Damages_Bonus),
-                Stats.getEffect(StatsEnum.Add_Water_Damages_Bonus), Stats.getEffect(StatsEnum.Add_Air_Damages_Bonus), Stats.getEffect(StatsEnum.Add_Fire_Damages_Bonus),
-                Stats.getEffect(StatsEnum.DodgePALostProbability), Stats.getEffect(StatsEnum.DodgePMLostProbability), Stats.getEffect(StatsEnum.NeutralElementResistPercent),
-                Stats.getEffect(StatsEnum.EarthElementResistPercent), Stats.getEffect(StatsEnum.WaterElementResistPercent), Stats.getEffect(StatsEnum.AirElementResistPercent),
-                Stats.getEffect(StatsEnum.FireElementResistPercent), Stats.getEffect(StatsEnum.NeutralElementReduction), Stats.getEffect(StatsEnum.EarthElementReduction),
-                Stats.getEffect(StatsEnum.WaterElementReduction), Stats.getEffect(StatsEnum.AirElementReduction), Stats.getEffect(StatsEnum.FireElementReduction),
-                Stats.getEffect(StatsEnum.Add_Push_Damages_Reduction), Stats.getEffect(StatsEnum.Add_Critical_Damages_Reduction), Stats.getEffect(StatsEnum.PvpNeutralElementResistPercent),
-                Stats.getEffect(StatsEnum.PvpEarthElementResistPercent), Stats.getEffect(StatsEnum.PvpWaterElementResistPercent), Stats.getEffect(StatsEnum.PvpAirElementResistPercent),
-                Stats.getEffect(StatsEnum.PvpFireElementResistPercent), Stats.getEffect(StatsEnum.PvpNeutralElementReduction), Stats.getEffect(StatsEnum.PvpEarthElementReduction),
-                Stats.getEffect(StatsEnum.PvpWaterElementReduction), Stats.getEffect(StatsEnum.PvpAirElementReduction), Stats.getEffect(StatsEnum.PvpFireElementReduction),
+                getLife(), getMaxLife(), Character.energy, PlayerEnum.MaxEnergy,
+                (short) this.getAP(), (short) this.getMP(),
+                new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.Initiative), 0, 0), stats.getEffect(StatsEnum.Prospecting), stats.getEffect(StatsEnum.ActionPoints),
+                stats.getEffect(StatsEnum.MovementPoints), stats.getEffect(StatsEnum.Strength), stats.getEffect(StatsEnum.Vitality),
+                stats.getEffect(StatsEnum.Wisdom), stats.getEffect(StatsEnum.Chance), stats.getEffect(StatsEnum.Agility),
+                stats.getEffect(StatsEnum.Intelligence), stats.getEffect(StatsEnum.Add_Range), stats.getEffect(StatsEnum.AddSummonLimit),
+                stats.getEffect(StatsEnum.DamageReflection), stats.getEffect(StatsEnum.Add_CriticalHit), Character.inventoryCache.weaponCriticalHit(),
+                stats.getEffect(StatsEnum.CriticalMiss), stats.getEffect(StatsEnum.Add_Heal_Bonus), stats.getEffect(StatsEnum.AllDamagesBonus),
+                stats.getEffect(StatsEnum.WeaponDamagesBonusPercent), stats.getEffect(StatsEnum.AddDamagePercent), stats.getEffect(StatsEnum.TrapBonus),
+                stats.getEffect(StatsEnum.Trap_Damage_Percent), stats.getEffect(StatsEnum.GlyphBonusPercent), stats.getEffect(StatsEnum.PermanentDamagePercent), stats.getEffect(StatsEnum.Add_TackleBlock),
+                stats.getEffect(StatsEnum.Add_TackleEvade), stats.getEffect(StatsEnum.Add_RETRAIT_PA), stats.getEffect(StatsEnum.Add_RETRAIT_PM), stats.getEffect(StatsEnum.Add_Push_Damages_Bonus),
+                stats.getEffect(StatsEnum.Add_Critical_Damages), stats.getEffect(StatsEnum.Add_Neutral_Damages_Bonus), stats.getEffect(StatsEnum.Add_Earth_Damages_Bonus),
+                stats.getEffect(StatsEnum.Add_Water_Damages_Bonus), stats.getEffect(StatsEnum.Add_Air_Damages_Bonus), stats.getEffect(StatsEnum.Add_Fire_Damages_Bonus),
+                stats.getEffect(StatsEnum.DodgePALostProbability), stats.getEffect(StatsEnum.DodgePMLostProbability), stats.getEffect(StatsEnum.NeutralElementResistPercent),
+                stats.getEffect(StatsEnum.EarthElementResistPercent), stats.getEffect(StatsEnum.WaterElementResistPercent), stats.getEffect(StatsEnum.AirElementResistPercent),
+                stats.getEffect(StatsEnum.FireElementResistPercent), stats.getEffect(StatsEnum.NeutralElementReduction), stats.getEffect(StatsEnum.EarthElementReduction),
+                stats.getEffect(StatsEnum.WaterElementReduction), stats.getEffect(StatsEnum.AirElementReduction), stats.getEffect(StatsEnum.FireElementReduction),
+                stats.getEffect(StatsEnum.Add_Push_Damages_Reduction), stats.getEffect(StatsEnum.Add_Critical_Damages_Reduction), stats.getEffect(StatsEnum.PvpNeutralElementResistPercent),
+                stats.getEffect(StatsEnum.PvpEarthElementResistPercent), stats.getEffect(StatsEnum.PvpWaterElementResistPercent), stats.getEffect(StatsEnum.PvpAirElementResistPercent),
+                stats.getEffect(StatsEnum.PvpFireElementResistPercent), stats.getEffect(StatsEnum.PvpNeutralElementReduction), stats.getEffect(StatsEnum.PvpEarthElementReduction),
+                stats.getEffect(StatsEnum.PvpWaterElementReduction), stats.getEffect(StatsEnum.PvpAirElementReduction), stats.getEffect(StatsEnum.PvpFireElementReduction),
                 new CharacterSpellModification[0], (short) 0));
     }
 
     @Override
     public int compareTo(IFightObject obj) {
-        return Priority().compareTo(obj.Priority());
+        return getPriority().compareTo(obj.getPriority());
     }
 
     @Override
-    public int Initiative(boolean Base) {
+    public int getInitiative(boolean Base) {
         return this.Character.getInitiative(Base);
     }
 

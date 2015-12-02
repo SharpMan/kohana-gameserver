@@ -43,10 +43,10 @@ public class MountInventoryItem extends InventoryItem {
             this.mount = new MountClientData();
             this.mount.ownerId = owner;
             this.mount.energy = this.mount.energyMax = this.mount.loveMax = this.mount.reproductionCountMax = this.mount.reproductionCountMax = this.mount.serenityMax = 10000;
-            this.mount.maxPods = 3000; //TODO: Mount inventory
+            this.mount.maxPods = 3000; //TODO: mount inventory
             this.mount.experience = 0;
-            this.mount.experienceForLevel = DAO.getExps().getLevel(1).Mount;
-            this.mount.experienceForNextLevel = (double) DAO.getExps().getLevel(2).Mount;
+            this.mount.experienceForLevel = DAO.getExps().getLevel(1).mount;
+            this.mount.experienceForNextLevel = (double) DAO.getExps().getLevel(2).mount;
             this.mount.id = (double) this.entity.animalID;
             this.mount.isRideable = true;
             this.mount.level = 1;
@@ -68,7 +68,7 @@ public class MountInventoryItem extends InventoryItem {
     public void addExperience(long amount) {
         this.mount.experience += amount;
 
-        while (this.mount.experience >= DAO.getExps().getLevel(this.mount.level + 1).Mount && this.mount.level < 100) {
+        while (this.mount.experience >= DAO.getExps().getLevel(this.mount.level + 1).mount && this.mount.level < 100) {
             levelUp();
         }
         this.save();

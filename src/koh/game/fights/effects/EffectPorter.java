@@ -13,8 +13,8 @@ public class EffectPorter extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            CastInfos.Caster.Buffs.AddBuff(new BuffPorteur(CastInfos, Target));
-            Target.Buffs.AddBuff(new BuffPorter(CastInfos, Target));
+            CastInfos.Caster.buff.addBuff(new BuffPorteur(CastInfos, Target));
+            Target.buff.addBuff(new BuffPorter(CastInfos, Target));
         }
 
         return -1;

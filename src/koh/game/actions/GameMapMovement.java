@@ -34,7 +34,7 @@ public class GameMapMovement extends GameAction {
                 if (!this.isFinish) {
                     // mouvement stoppé ?
                     if (!this.myAborted) {
-                        this.myField.ActorMoved(null, this.actor, (short) (keyMovements[keyMovements.length - 1] & 4095), (byte) (keyMovements[keyMovements.length - 1] >> 12 & 7));
+                        this.myField.actorMoved(null, this.actor, (short) (keyMovements[keyMovements.length - 1] & 4095), (byte) (keyMovements[keyMovements.length - 1] >> 12 & 7));
                     }
                 }
             }
@@ -62,7 +62,7 @@ public class GameMapMovement extends GameAction {
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        this.myField.ActorMoved(null, this.actor, StoppedCell, (byte) -1);
+                        this.myField.actorMoved(null, this.actor, StoppedCell, (byte) -1);
                     }
 
                     this.myAborted = true;

@@ -17,7 +17,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
-import static koh.game.entities.item.InventoryItem.DeserializeEffects;
+import static koh.game.entities.item.InventoryItem.deserializeEffects;
 
 public class ItemDAOImpl extends ItemDAO {
 
@@ -79,7 +79,7 @@ public class ItemDAOImpl extends ItemDAO {
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from " + table + " where owner =" + player + ";")) {
             ResultSet result = conn.getResult();
             while (result.next()) {
-                List<ObjectEffect> effects = DeserializeEffects(result.getBytes("effects"));
+                List<ObjectEffect> effects = deserializeEffects(result.getBytes("effects"));
                 cache.put(result.getInt("id"), InventoryItem.getInstance(
                         result.getInt("id"),
                         result.getInt("template"),
@@ -105,14 +105,14 @@ public class ItemDAOImpl extends ItemDAO {
             pStatement.setInt(3, item.templateId);
             pStatement.setInt(4, item.getPosition());
             pStatement.setInt(5, item.getQuantity());
-            pStatement.setBytes(6, item.SerializeEffectInstanceDice().array());
+            pStatement.setBytes(6, item.serializeEffectInstanceDice().array());
 
             item.needInsert = false;
             item.columsToUpdate = null;
 
             pStatement.execute();
 
-            //TODO better Dispose/totalClear pattern
+            //TODO better dispose/totalClear pattern
             return true;
         } catch (Exception e) {
             logger.error(e);
@@ -142,7 +142,7 @@ public class ItemDAOImpl extends ItemDAO {
 
             pStatement.execute();
 
-            //TODO better Dispose/totalClear pattern
+            //TODO better dispose/totalClear pattern
             /*if (clear) {
                 item.totalClear();
             }*/
@@ -171,7 +171,7 @@ public class ItemDAOImpl extends ItemDAO {
                     p.setInt(Seq, Item.getPosition());
                     break;
                 case "effects":
-                    p.setBytes(Seq, Item.SerializeEffectInstanceDice().array());
+                    p.setBytes(Seq, Item.serializeEffectInstanceDice().array());
                     //p.setBlob(Seq, new SerialBlob(item.serializeEffectInstanceDice()));
                     break;
 

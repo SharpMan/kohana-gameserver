@@ -20,18 +20,18 @@ public class EffectDistributesDamagesOccasioned extends EffectBase {
             }
 
             // Dommages superieur a la vie de la cible
-            if (DamageJet > Target.Life()) {
-                DamageJet = (Target.Life());
+            if (DamageJet > Target.getLife()) {
+                DamageJet = (Target.getLife());
             }
 
             // Deduit la vie
-            Target.setLife(Target.Life() - DamageJet);
+            Target.setLife(Target.getLife() - DamageJet);
 
             // Enois du packet combat subit des dommages
             if (DamageJet != 0) {
-                Target.Fight.sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, CastInfos.Caster.ID, Target.ID, DamageJet, 0));
+                Target.fight.sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, CastInfos.Caster.ID, Target.ID, DamageJet, 0));
             }
-            int newValue = Target.TryDie(CastInfos.Caster.ID);
+            int newValue = Target.tryDie(CastInfos.Caster.ID);
             if (newValue < Apply) {
                 Apply = newValue;
             }

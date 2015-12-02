@@ -14,14 +14,14 @@ public class EffectVitalityPercent extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             EffectCast SubInfos = new EffectCast(StatsEnum.Vitality, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.Caster, CastInfos.Targets, CastInfos.SpellLevel);
-            SubInfos.DamageValue = (int) (((double) Target.Life() / 100) * CastInfos.RandomJet(Target));
+            SubInfos.DamageValue = (int) (((double) Target.getLife() / 100) * CastInfos.RandomJet(Target));
             SubInfos.Duration = CastInfos.Duration;
             BuffStats BuffStats = new BuffStats(SubInfos, Target);
             if (BuffStats.ApplyEffect(null, null) == -3) {
                 return -3;
             }
 
-            Target.Buffs.AddBuff(BuffStats);
+            Target.buff.addBuff(BuffStats);
         }
 
         return -1;

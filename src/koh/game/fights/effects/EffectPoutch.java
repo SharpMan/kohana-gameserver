@@ -13,7 +13,7 @@ public class EffectPoutch extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
 
         for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffPoutch(CastInfos, Target));
+            Target.buff.addBuff(new BuffPoutch(CastInfos, Target));
         }
 
         return -1;

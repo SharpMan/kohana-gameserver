@@ -22,23 +22,23 @@ public class Path {
     private ObjectPosition m_endPathPosition;
     public DofusMap Map;
 
-    public DofusCell StartCell() {
+    public DofusCell getStartCell() {
         return this.m_cellsPath[0];
     }
 
-    public DofusCell EndCell() {
+    public DofusCell getEndCell() {
         return this.m_cellsPath[this.m_cellsPath.length - 1];
     }
 
-    public ObjectPosition EndPathPosition() {
+    public ObjectPosition endPathPosition() {
         ObjectPosition arg_2A_0;
         if ((arg_2A_0 = this.m_endPathPosition) == null) {
-            arg_2A_0 = (this.m_endPathPosition = new ObjectPosition(this.Map, this.EndCell(), this.GetEndCellDirection()));
+            arg_2A_0 = (this.m_endPathPosition = new ObjectPosition(this.Map, this.getEndCell(), this.getEndCellDirection()));
         }
         return arg_2A_0;
     }
 
-    public int MPCost() {
+    public int mpCost() {
         return this.m_cellsPath.length - 1;
     }
 
@@ -52,23 +52,23 @@ public class Path {
     private Path(DofusMap map, ObjectPosition[] compressedPath) {
         this.Map = map;
         this.m_compressedPath = compressedPath;
-        this.m_cellsPath = this.BuildCompletePath();
+        this.m_cellsPath = this.buildCompletePath();
         this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.id)).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
     }
 
-    public boolean IsEmpty() {
+    public boolean isEmpty() {
         return this.m_cellsPath.length == 0;
     }
 
-    public ObjectPosition[] GetCompressedPath() {
+    public ObjectPosition[] getCompressedPath() {
         ObjectPosition[] arg_19_0;
         if ((arg_19_0 = this.m_compressedPath) == null) {
-            arg_19_0 = (this.m_compressedPath = this.BuildCompressedPath());
+            arg_19_0 = (this.m_compressedPath = this.buildCompressedPath());
         }
         return arg_19_0;
     }
 
-    public DofusCell[] GetPath() {
+    public DofusCell[] getPath() {
         return this.m_cellsPath;
     }
 
@@ -76,22 +76,22 @@ public class Path {
         return Arrays.stream(this.m_cellsPath).anyMatch(x -> x.id == cellId);
     }
 
-    public Short[] GetServerPathKeys() {
+    public Short[] getServerPathKeys() {
         return Arrays.stream(this.m_cellsPath).map(x -> x.id).collect(Collectors.toList()).toArray(new Short[this.m_cellsPath.length]);
     }
 
-    public void CutPath(int index) {
+    public void cutPath(int index) {
         if (index <= this.m_cellsPath.length - 1) {
             //Take == get first element this.m_cellsPath = this.m_cellsPath.Take(index).ToArray<cell>();
             System.arraycopy(this.m_cellsPath, 0, this.m_cellsPath, 0, index);
 
             this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.id)).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
 
-            this.m_endPathPosition = new ObjectPosition(this.Map, this.EndCell(), this.GetEndCellDirection());
+            this.m_endPathPosition = new ObjectPosition(this.Map, this.getEndCell(), this.getEndCellDirection());
         }
     }
 
-    public int GetEndCellDirection() {
+    public int getEndCellDirection() {
         int result;
         if (this.m_cellsPath.length <= 1) {
             result = DirectionsEnum.RIGHT;
@@ -106,7 +106,7 @@ public class Path {
         return result;
     }
 
-    private ObjectPosition[] BuildCompressedPath() {
+    private ObjectPosition[] buildCompressedPath() {
         ObjectPosition[] result;
         if (this.m_cellsPath.length <= 0) {
             result = new ObjectPosition[0];
@@ -134,7 +134,7 @@ public class Path {
         return result;
     }
 
-    private DofusCell[] BuildCompletePath() {
+    private DofusCell[] buildCompletePath() {
         List<DofusCell> list = new ArrayList<>();
         for (int i = 0; i < this.m_compressedPath.length - 1; i++) {
             list.add(this.m_compressedPath[i].cell);
@@ -152,7 +152,7 @@ public class Path {
         return (DofusCell[]) list.toArray(); //Lol it's work ?
     }
 
-    public static Path BuildFromCompressedPath(DofusMap map, short[] keys) {
+    public static Path buildFromCompressedPath(DofusMap map, short[] keys) {
         ObjectPosition[] compressedPath = new ObjectPosition[keys.length];
         int i = 0;
         for (short key : keys) {
@@ -162,7 +162,7 @@ public class Path {
         return new Path(map, compressedPath);
     }
 
-    public static Path GetEmptyPath(DofusMap map, DofusCell startCell) {
+    public static Path getEmptyPath(DofusMap map, DofusCell startCell) {
         return new Path(map, new DofusCell[]{
             startCell
         });

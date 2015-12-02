@@ -83,7 +83,7 @@ public class JobDAOImpl extends JobDAO {
                 skills.put(result.getInt("id"), new InteractiveSkill() {
                     {
                         ID = result.getInt("id");
-                        Type = result.getString("name");
+                        type = result.getString("name");
                         parentJobId = result.getByte("parent_job");
                         isForgemagus = result.getBoolean("is_forgemagus");
                         modifiableItemTypeId = Enumerable.StringToIntArray(result.getString("modifiable_item_ids"));

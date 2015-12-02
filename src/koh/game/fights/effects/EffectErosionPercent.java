@@ -15,11 +15,11 @@ public class EffectErosionPercent extends EffectBase {
         BuffEffect Buf;
         for (Fighter Target : CastInfos.Targets) {
             Buf = new BuffErosionPercent(CastInfos, Target);
-            if (!Target.Buffs.BuffMaxStackReached(Buf)) {
+            if (!Target.buff.buffMaxStackReached(Buf)) {
                 if (Buf.ApplyEffect(null, null) == -3) {
                     return -3;
                 } else {
-                    Target.Buffs.AddBuff(Buf);
+                    Target.buff.addBuff(Buf);
                 }
             }
         }

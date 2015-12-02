@@ -2,12 +2,7 @@ package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
-import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectDamage;
-import koh.game.fights.effects.EffectDamage;
-import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.effects.buff.BuffDecrementType;
-import koh.game.fights.effects.buff.BuffEffect;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
@@ -29,7 +24,7 @@ public class BuffLifeDamage extends BuffEffect {
 
         // return EffectDamage.ApplyDamages(this.CastInfos, this.Target, ref Damage);
         int effectBase = CastInfos.RandomJet(Target);
-        MutableInt DamageValuea = new MutableInt((Target.CurrentLife / 100) * effectBase);
+        MutableInt DamageValuea = new MutableInt((Target.currentLife / 100) * effectBase);
         //DamageValuea = (-DamageValuea);
         return EffectDamage.ApplyDamages(this.CastInfos, this.Target, DamageValuea);
     }

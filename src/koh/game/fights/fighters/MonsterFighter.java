@@ -37,12 +37,12 @@ public class MonsterFighter extends Fighter {
 
 
     @Override
-    public short MapCell() {
+    public short getMapCell() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public FightTeamMemberInformations GetFightTeamMemberInformations() {
+    public FightTeamMemberInformations getFightTeamMemberInformations() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -52,18 +52,18 @@ public class MonsterFighter extends Fighter {
     }
 
     @Override
-    public int Level() {
+    public int getLevel() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     
      @Override
     public int compareTo(IFightObject obj) {
-        return Priority().compareTo(obj.Priority());
+        return getPriority().compareTo(obj.getPriority());
     }
 
     @Override
-    public int Initiative(boolean Base) {
+    public int getInitiative(boolean Base) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

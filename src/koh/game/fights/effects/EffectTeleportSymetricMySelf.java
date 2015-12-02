@@ -15,12 +15,12 @@ public class EffectTeleportSymetricMySelf extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         FightCell cell;
         for (Fighter Target : CastInfos.Targets) {
-            cell = CastInfos.Caster.Fight.GetCell(CastInfos.Caster.MapPoint().pointSymetry(Target.MapPoint()).get_cellId());
+            cell = CastInfos.Caster.fight.getCell(CastInfos.Caster.getMapPoint().pointSymetry(Target.getMapPoint()).get_cellId());
 
             if (cell != null && cell.IsWalkable()) {
-                CastInfos.Caster.Fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, CastInfos.Caster.ID, cell.Id));
+                CastInfos.Caster.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, CastInfos.Caster.ID, cell.Id));
 
-                return Target.SetCell(cell);
+                return Target.setCell(cell);
             }
         }
         return -1;

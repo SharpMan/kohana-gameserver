@@ -12,11 +12,11 @@ public class EffectSacrifice extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            if (Target.Team != CastInfos.Caster.Team || Target == CastInfos.Caster) {
+            if (Target.team != CastInfos.Caster.team || Target == CastInfos.Caster) {
                 continue;
             }
 
-            Target.Buffs.AddBuff(new BuffSacrifice(CastInfos, Target));
+            Target.buff.addBuff(new BuffSacrifice(CastInfos, Target));
         }
 
         return -1;

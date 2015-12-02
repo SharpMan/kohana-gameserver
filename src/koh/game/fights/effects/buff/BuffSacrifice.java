@@ -1,12 +1,9 @@
 package koh.game.fights.effects.buff;
 
-import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectDamage;
-import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
 import koh.protocol.client.enums.FightDispellableEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -27,8 +24,8 @@ public class BuffSacrifice extends BuffEffect {
             return -1;
         }
         // mort
-        if (Caster.Dead()) {
-            //Target.Buffs.RemoveBuff(this);
+        if (Caster.isDead()) {
+            //Target.buff.RemoveBuff(this);
             return -1;
         }
 

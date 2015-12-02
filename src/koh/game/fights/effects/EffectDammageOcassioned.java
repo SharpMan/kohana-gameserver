@@ -12,7 +12,7 @@ public class EffectDammageOcassioned extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffDammageOcassioned(CastInfos, Target));
+            Target.buff.addBuff(new BuffDammageOcassioned(CastInfos, Target));
         }
         return -1;
     }

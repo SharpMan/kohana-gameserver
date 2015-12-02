@@ -77,7 +77,7 @@ public class Line implements IZone {
         if (!MapPoint.IsInMap(x, y)) {
             return;
         }
-        container.add(MapPoint.CoordToCellId(x, y));
+        container.add(MapPoint.coordToCellId(x, y));
     }
 
     @Override

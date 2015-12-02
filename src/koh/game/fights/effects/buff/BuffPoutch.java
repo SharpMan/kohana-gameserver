@@ -37,13 +37,13 @@ public class BuffPoutch extends BuffEffect {
             return -1;
         }
         // mort
-        if (Caster.Dead()) {
-            //Target.Buffs.RemoveBuff(this);
+        if (Caster.isDead()) {
+            //Target.buff.RemoveBuff(this);
             return -1;
         }
 
         if (CastInfos.SpellId == 2809) {
-            if(Pathfinder.getGoalDistance(null, DamageInfos.Caster.CellId(), Target.CellId()) > 1){
+            if(Pathfinder.getGoalDistance(null, DamageInfos.Caster.getCellId(), Target.getCellId()) > 1){
                 return -1;
             }
             //Target = DamageInfos.Caster;
@@ -56,18 +56,18 @@ public class BuffPoutch extends BuffEffect {
         for (EffectInstanceDice Effect : SpellLevel.effects) {
             Main.Logs().writeDebug(Effect.toString());
             ArrayList<Fighter> Targets = new ArrayList<>();
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true), this.Caster.Fight.Map)).getCells(Target.CellId())) {
-                FightCell FightCell = Target.Fight.GetCell(Cell);
+            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(Target.getCellId()), true), this.Caster.fight.map)).getCells(Target.getCellId())) {
+                FightCell FightCell = Target.fight.getCell(Cell);
                 if (FightCell != null) {
                     if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
                         for (Fighter Target2 : FightCell.GetObjectsAsFighter()) {
                             if (CastInfos.SpellId == 2809 && Target2 == Target) {
                                 continue;
                             }
-                            if (Effect.IsValidTarget(this.Target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.Target, Target2, Effect,Target2.ID)) {
-                                if (Effect.targetMask.equals("C") && this.Target.GetCarriedActor() == Target2.ID) {
+                            if (Effect.isValidTarget(this.Target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.Target, Target2, Effect,Target2.ID)) {
+                                if (Effect.targetMask.equals("C") && this.Target.getCarriedActor() == Target2.ID) {
                                     continue;
-                                } else if (Effect.targetMask.equals("a,A") && this.Target.GetCarriedActor() != 0 & this.Target.ID == Target2.ID) {
+                                } else if (Effect.targetMask.equals("a,A") && this.Target.getCarriedActor() != 0 & this.Target.ID == Target2.ID) {
                                     continue;
                                 }
                                 Targets.add(Target2);
@@ -93,16 +93,16 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            EffectCast Cast2 = new EffectCast(Effect.EffectType(), SpellLevel.spellId, (CastInfos.EffectType == StatsEnum.Refoullage) ? Caster.CellId() : this.Target.CellId(), num1, Effect, this.Target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
-            Cast2.targetKnownCellId = Target.CellId();
+            EffectCast Cast2 = new EffectCast(Effect.EffectType(), SpellLevel.spellId, (CastInfos.EffectType == StatsEnum.Refoullage) ? Caster.getCellId() : this.Target.getCellId(), num1, Effect, this.Target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            Cast2.targetKnownCellId = Target.getCellId();
             if (EffectBase.TryApplyEffect(Cast2) == -3) {
                 return -3;
             }
         }
 
         /*int apply = -1;
-         for (short cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true))).getCells(Target.CellId())) {
-         FightCell FightCell = this.Target.fight.GetCell(cell);
+         for (short cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(Target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(Target.getCellId()), true))).getCells(Target.getCellId())) {
+         FightCell FightCell = this.Target.fight.getCell(cell);
          if (FightCell != null) {
          if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
          for (Fighter Target : FightCell.GetObjectsAsFighter()) {
