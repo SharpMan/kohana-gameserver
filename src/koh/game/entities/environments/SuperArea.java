@@ -6,9 +6,9 @@ package koh.game.entities.environments;
  */
 public class SuperArea {
 
-    public int Id, worldmapIdtype;
+    public int id, worldmapIdtype;
     //public String nameIdtype;
     public boolean hasWorldMaptype;
-    public Area[] Areas = new Area[0];
+    public Area[] areas = new Area[0];
 
 }

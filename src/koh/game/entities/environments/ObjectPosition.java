@@ -9,47 +9,47 @@ import koh.protocol.client.enums.DirectionsEnum;
  */
 public class ObjectPosition {
 
-    public int Direction;
-    public DofusCell Cell;
-    public DofusMap Map;
-    public MapPoint Point;
+    public int direction;
+    public DofusCell cell;
+    public DofusMap map;
+    public MapPoint point;
 
     public ObjectPosition(ObjectPosition position) {
-        this.Map = position.Map;
-        this.Cell = position.Cell;
-        this.Direction = position.Direction;
+        this.map = position.map;
+        this.cell = position.cell;
+        this.direction = position.direction;
     }
 
     public ObjectPosition(DofusMap map, DofusCell cell) {
-        this.Map = map;
-        this.Cell = cell;
-        this.Direction = DirectionsEnum.RIGHT;
+        this.map = map;
+        this.cell = cell;
+        this.direction = DirectionsEnum.RIGHT;
     }
 
     public ObjectPosition(DofusMap map, short cellId) {
-        this.Map = map;
-        this.Cell = map.getCell(cellId);
-        this.Direction = DirectionsEnum.RIGHT;
+        this.map = map;
+        this.cell = map.getCell(cellId);
+        this.direction = DirectionsEnum.RIGHT;
     }
 
     public ObjectPosition(DofusMap map, DofusCell cell, int direction) {
-        this.Map = map;
-        this.Cell = cell;
-        this.Direction = direction;
+        this.map = map;
+        this.cell = cell;
+        this.direction = direction;
     }
 
     public ObjectPosition(DofusMap map, short cellId, int direction) {
-        this.Map = map;
-        this.Cell = map.getCell(cellId);
-        this.Direction = direction;
+        this.map = map;
+        this.cell = map.getCell(cellId);
+        this.direction = direction;
     }
 
-    public ObjectPosition Clone() {
-        return new ObjectPosition(this.Map, this.Cell, this.Direction);
+    public ObjectPosition clone() {
+        return new ObjectPosition(this.map, this.cell, this.direction);
     }
 
-    public boolean IsValid() {
-        return this.Cell.id > 0 && (long) this.Cell.id < 560L && this.Direction > DirectionsEnum.RIGHT && this.Direction < DirectionsEnum.RIGHT && this.Map != null;
+    public boolean isValid() {
+        return this.cell.id > 0 && (long) this.cell.id < 560L && this.direction > DirectionsEnum.RIGHT && this.direction < DirectionsEnum.RIGHT && this.map != null;
     }
 
 }

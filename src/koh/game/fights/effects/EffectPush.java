@@ -28,10 +28,10 @@ public class EffectPush extends EffectBase {
             switch (CastInfos.EffectType) {
                 case PUSH_X_CELL:
                 case Push_Back:
-                    if (Pathfinder.InLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
-                        Direction = Pathfinder.GetDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());
-                    } else if (Pathfinder.InLine(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId())) {
-                        Direction = Pathfinder.GetDirection(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId());
+                    if (Pathfinder.inLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
+                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());
+                    } else if (Pathfinder.inLine(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId())) {
+                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId());
                     } else {
                         return -1;
                     }
@@ -41,12 +41,12 @@ public class EffectPush extends EffectBase {
                     CastInfos.Caster = Target;
                     Target = pp;
                     CastInfos.Targets.remove(0);
-                    Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
+                    Direction = Pathfinder.getDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
                     break;
                 case PullForward:
-                    Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
+                    Direction = Pathfinder.getDirection(Target.Fight.Map, Target.CellId(), CastInfos.Caster.CellId());
                     if(CastInfos.SpellId == 5382 || CastInfos.SpellId == 5475){
-                        Direction = Pathfinder.GetDirection(Target.Fight.Map, Target.CellId(), CastInfos.targetKnownCellId);
+                        Direction = Pathfinder.getDirection(Target.Fight.Map, Target.CellId(), CastInfos.targetKnownCellId);
                     }
                     break;
                 case BACK_CELL:
@@ -54,10 +54,10 @@ public class EffectPush extends EffectBase {
                     CastInfos.Caster = Target;
                     Target = p;
                     CastInfos.Targets.remove(0);
-                    if (Pathfinder.InLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
-                        Direction = Pathfinder.GetDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());
-                    } else if (Pathfinder.InLine(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId())) {
-                        Direction = Pathfinder.GetDirection(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId());
+                    if (Pathfinder.inLine(Target.Fight.Map, CastInfos.CellId, Target.CellId()) && CastInfos.CellId != Target.CellId()) {
+                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.CellId, Target.CellId());
+                    } else if (Pathfinder.inLine(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId())) {
+                        Direction = Pathfinder.getDirection(Target.Fight.Map, CastInfos.Caster.CellId(), Target.CellId());
                     }
                     break;
             }
@@ -72,7 +72,7 @@ public class EffectPush extends EffectBase {
         FightCell currentCell = target.myCell;
         short StartCell = target.CellId();
         for (int i = 0; i < length; i++) {
-            FightCell nextCell = target.Fight.GetCell(Pathfinder.NextCell(currentCell.Id, direction));
+            FightCell nextCell = target.Fight.GetCell(Pathfinder.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.CanWalk()) {
                 if (nextCell.HasObject(FightObjectType.OBJECT_TRAP)) {

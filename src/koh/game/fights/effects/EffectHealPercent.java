@@ -38,7 +38,7 @@ public class EffectHealPercent extends EffectBase {
     public static int ApplyHealPercent(EffectCast CastInfos, Fighter Target, int Heal) {
         Fighter Caster = CastInfos.Caster;
 
-        // Boost soin etc
+        // boost soin etc
         Heal = Heal * (Target.Life() / 100);
 
         // Si le soin est superieur a sa vie actuelle

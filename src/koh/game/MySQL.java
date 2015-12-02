@@ -187,7 +187,7 @@ public class MySQL {
         D2oDaoImpl.loadAll();
         Main.Logs().writeInfo(d2oReader.Breeds.size() + " Breeds catched");
         Main.Logs().writeInfo(d2oReader.Heads.size() + " Heads catched");
-        Main.Logs().writeInfo(d2oReader.Effects.size() + " Effects catched");
+        Main.Logs().writeInfo(d2oReader.Effects.size() + " effects catched");
         PlayerDAOImpl.InitializeNextIdentifiant();
         ItemTemplateDAOImpl.DistinctItems();
         PetsDAO.InitNextKey();
@@ -195,7 +195,7 @@ public class MySQL {
         ItemTemplateDAOImpl.InitializeNextIdentifiant();
         ExpDAOImpl.load_ExpLevels();
         Main.Logs().writeInfo(AreaDAOImpl.FindSuper() + " SuperAreas catched");
-        Main.Logs().writeInfo(AreaDAOImpl.FindAll() + " Areas catched");
+        Main.Logs().writeInfo(AreaDAOImpl.FindAll() + " areas catched");
         Main.Logs().writeInfo(AreaDAOImpl.FindSubAreas() + " subAreas catched");
         Main.Logs().writeInfo(MapDAOImpl.FindAll() + " DofusMaps catched");
         Main.Logs().writeInfo(MapDAOImpl.loadAllSatedElements() + " StatedElements catched");
@@ -222,7 +222,7 @@ public class MySQL {
         Main.Logs().writeInfo(NpcDAOImpl.FindReplies() + " NpcReplies catched ");
         Main.Logs().writeInfo(MapDAOImpl.FindTriggers() + " Triggers catched");
         Main.Logs().writeInfo(PaddockDAOImpl.FindAll() + " Paddocks catched");
-        Main.Logs().writeInfo(MountDAO.FindAll() + " Mounts catched");
+        Main.Logs().writeInfo(MountDAOImpl.FindAll() + " Mounts catched");
         Main.Logs().writeInfo(GuildDAO.FindAll() + " guild catched");
         Main.Logs().writeInfo(GuildDAO.FindMembers() + " GuildMembers catched");
         Main.Logs().writeInfo(JobDAOImpl.loadAllGatheringInfos() + " GatheringJob LevelInfos catched");

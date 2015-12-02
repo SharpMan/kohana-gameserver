@@ -20,7 +20,7 @@ public class EffectHeal extends EffectBase {
     public static int ApplyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal, boolean Calculate) {
         Fighter Caster = CastInfos.Caster;
 
-        // Boost soin etc
+        // boost soin etc
         if (Calculate) {
             Caster.CalculHeal(Heal);
         }

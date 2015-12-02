@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  */
 public abstract class MapDAO implements Service {
 
-    public abstract DofusMap getMap(int id);
+    public abstract DofusMap findTemplate(int id);
 
     public abstract DofusZaap getZaap(int id);
 

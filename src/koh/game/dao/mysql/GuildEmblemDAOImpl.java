@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class GuildEmblemDAOImpl extends GuildEmblemDao {
 
     private static final Logger logger = LogManager.getLogger(GuildEmblemDAOImpl.class);
-    private HashMap<Integer, EmblemSymbols> symbols = new HashMap<>(50);
+    private final HashMap<Integer, EmblemSymbols> symbols = new HashMap<>(50);
 
     @Inject
     private DatabaseSource dbSource;

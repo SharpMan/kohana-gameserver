@@ -38,11 +38,11 @@ public class ZaapAction extends GameAction {
             if (zaap == null) {
                 return;
             }
-            if (((Player) actor).kamas < getCostTo(zaap.Map())) {
+            if (((Player) actor).kamas < getCostTo(zaap.getMap())) {
                 actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
                 return;
             }
-            ((Player) actor).inventoryCache.substractKamas(getCostTo(zaap.Map()));
+            ((Player) actor).inventoryCache.substractKamas(getCostTo(zaap.getMap()));
             ((Player) actor).teleport(map, zaap.Cell);
 
             this.endExecute();
@@ -58,7 +58,7 @@ public class ZaapAction extends GameAction {
     }
 
     public int[] subAreaIds() {
-        return DAO.getMaps().getZaapsNot(((Player) actor).currentMap.id).mapToInt(x -> x.getValue().Map().subAreaId).toArray();
+        return DAO.getMaps().getZaapsNot(((Player) actor).currentMap.id).mapToInt(x -> x.getValue().getMap().subAreaId).toArray();
     }
 
     public int[] mapIds() {
@@ -68,7 +68,7 @@ public class ZaapAction extends GameAction {
     public int[] costs() {
         int[] Cost = new int[DAO.getMaps().getZaapsLength() - 1];
         int i = 0;
-        for (DofusMap zaap : DAO.getMaps().getZaapsNot(((Player) actor).currentMap.id).map(x -> x.getValue().Map()).toArray(DofusMap[]::new)) {
+        for (DofusMap zaap : DAO.getMaps().getZaapsNot(((Player) actor).currentMap.id).map(x -> x.getValue().getMap()).toArray(DofusMap[]::new)) {
             Cost[i] = getCostTo(zaap);
             i++;
         }

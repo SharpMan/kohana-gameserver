@@ -5,8 +5,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
+import koh.d2o.entities.Effect;
 import koh.game.Main;
-import static koh.game.dao.mysql.D2oDaoImpl.getEffect;
+
+import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;
@@ -67,7 +69,7 @@ public class EffectHelper {
         108//Heal
     };
 
-    public static IoBuffer SerializeEffectInstanceDice(EffectInstance[] Effects) {
+    public static IoBuffer serializeEffectInstanceDice(EffectInstance[] Effects) {
         IoBuffer buff = IoBuffer.allocate(65535);
         buff.setAutoExpand(true);
 
@@ -81,13 +83,17 @@ public class EffectHelper {
         return buff;
     }
 
-    public static int RandomValue(Couple<Integer, Integer> Couple) {
-        return RandomValue(Couple.first, Couple.second);
+    public static int randomValue(Couple<Integer, Integer> Couple) {
+        return randomValue(Couple.first, Couple.second);
     }
 
-    public static int RandomValue(int i1, int i2) {
+    public static int randomValue(int i1, int i2) {
         Random rand = new Random();
         return rand.nextInt(i2 - i1 + 1) + i1;
+    }
+
+    public static Effect getEffect(int eff){
+        return DAO.getD2oTemplates().getEffect(eff);
     }
 
     public static boolean verifyEffectTrigger(Fighter pCasterId, Fighter pTargetId, EffectInstance[] pSpellEffects, EffectInstance pEffect, boolean pWeaponEffect, String pTriggers, int pSpellImpactCell) {
@@ -215,7 +221,7 @@ public class EffectHelper {
         return array;
     }
 
-    public static EffectInstance[] GenerateIntegerEffectArray(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
+    public static EffectInstance[] generateIntegerEffectArray(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
         EffectInstance[] Effects = new EffectInstance[possibleEffects.length];
         int i = 0;
         for (EffectInstance e : possibleEffects) {
@@ -252,7 +258,7 @@ public class EffectHelper {
                 if ((int) num2 == 0) {
                     Effects[i] = (new EffectInstanceInteger(e, num1));
                 } else {
-                    Effects[i] = (new EffectInstanceInteger(e, (short) RandomValue((int) num2, (int) num1 /*+ 1*/)));
+                    Effects[i] = (new EffectInstanceInteger(e, (short) randomValue((int) num2, (int) num1 /*+ 1*/)));
                 }
             } else if (e != null) {
                 throw new Error("Effect not suport" + e.SerializationIdentifier());
@@ -262,7 +268,7 @@ public class EffectHelper {
         return Effects;
     }
 
-    public static List<ObjectEffect> GenerateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
+    public static List<ObjectEffect> generateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
         List<ObjectEffect> Effects = new ArrayList<>();
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
@@ -306,7 +312,7 @@ public class EffectHelper {
                 if ((int) num2 == 0) {
                     Effects.add(new ObjectEffectInteger(e.effectId, num1));
                 } else {
-                    Effects.add(new ObjectEffectInteger(e.effectId, (short) RandomValue((int) num2, (int) num1)));
+                    Effects.add(new ObjectEffectInteger(e.effectId, (short) randomValue((int) num2, (int) num1)));
                 }
             } else {
                 throw new Error("Effect not suport" + e.toString());
@@ -315,7 +321,7 @@ public class EffectHelper {
         return Effects;
     }
 
-    public static ObjectEffect[] ObjectEffects(List<EffectInstance> effects) {
+    public static ObjectEffect[] objectEffects(List<EffectInstance> effects) {
         ObjectEffect[] array = new ObjectEffect[effects.size()];
         for (int i = 0; i < array.length; ++i) {
             //EffectInstanceCreate 

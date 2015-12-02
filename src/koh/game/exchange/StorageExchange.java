@@ -31,7 +31,7 @@ public class StorageExchange extends Exchange {
         InventoryItem NewItem = null;
         if (Add) {
             for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().id, Item.getQuantity(), Item.Effects);
+                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.templateId, 63, Client.getAccount().id, Item.getQuantity(), Item.effects);
                 if (Client.getAccount().accountData.add(Client.character, NewItem, true)) {
                     NewItem.needInsert = true;
                 }
@@ -39,7 +39,7 @@ public class StorageExchange extends Exchange {
             }
         } else {
             for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Item.TemplateId, 63, Client.character.ID, Item.getQuantity(), Item.Effects);
+                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Item.templateId, 63, Client.character.ID, Item.getQuantity(), Item.effects);
                 if (Client.character.inventoryCache.add(NewItem, true)) {
                     NewItem.needInsert = true;
                 }
@@ -59,7 +59,7 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             Client.getAccount().accountData.updateObjectquantity(Client.character, BankItem, BankItem.getQuantity() + Quantity);
-            InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, BankItem.TemplateId, 63, Client.character.ID, -Quantity, BankItem.Effects);
+            InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, BankItem.templateId, 63, Client.character.ID, -Quantity, BankItem.effects);
             if (Client.character.inventoryCache.add(Item, true)) {
                 Item.needInsert = true;
             }
@@ -69,7 +69,7 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             Client.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - Quantity);
-            InventoryItem NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.TemplateId, 63, Client.getAccount().id, Quantity, Item.Effects);
+            InventoryItem NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.templateId, 63, Client.getAccount().id, Quantity, Item.effects);
             if (Client.getAccount().accountData.add(Client.character, NewItem, true)) {
                 NewItem.needInsert = true;
             }

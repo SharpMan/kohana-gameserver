@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.mysql.ItemTemplateDAOImpl;
-import koh.game.dao.sqlite.MountDAO;
+import koh.game.dao.mysql.MountDAOImpl;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.animal.MountInventoryItem;
 import koh.game.network.WorldClient;
@@ -40,8 +40,8 @@ public class MountHandler {
             Client.character.mountInfo.save();
             Client.send(new MountRenamedMessage(Message.name, Message.mountId));
         } else if (Client.character.inventoryCache.GetMount(Message.mountId) != null) {
-            Client.character.inventoryCache.GetMount(Message.mountId).Mount.name = Message.name;
-            Client.character.inventoryCache.GetMount(Message.mountId).Save();
+            Client.character.inventoryCache.GetMount(Message.mountId).mount.name = Message.name;
+            Client.character.inventoryCache.GetMount(Message.mountId).save();
             Client.send(new MountRenamedMessage(Message.name, Message.mountId));
         }
     }
@@ -112,8 +112,8 @@ public class MountHandler {
                          Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 19, new String[0]));
                          break;
                     }
-                    Client.character.mountInfo.mount = ((MountInventoryItem) Dragodinde).Mount;
-                    Client.character.mountInfo.entity = ((MountInventoryItem) Dragodinde).Entity;
+                    Client.character.mountInfo.mount = ((MountInventoryItem) Dragodinde).mount;
+                    Client.character.mountInfo.entity = ((MountInventoryItem) Dragodinde).entity;
                     Client.send(new MountRidingMessage(true));
                     Client.send(new MountSetMessage(Client.character.mountInfo.mount));
                     Client.character.inventoryCache.removeItem(Dragodinde);
@@ -124,10 +124,10 @@ public class MountHandler {
                         break;
                     }
 
-                    InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, MountDAO.Model(Client.character.mountInfo.mount.model).ScroolId, 63, Client.character.ID, 1, new ArrayList<ObjectEffect>() {
+                    InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, MountDAOImpl.find(Client.character.mountInfo.mount.model).scroolId, 63, Client.character.ID, 1, new ArrayList<ObjectEffect>() {
                         {
                             add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
-                            add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.character.mountInfo.mount.model, Client.character.mountInfo.entity.AnimalID));
+                            add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.character.mountInfo.mount.model, Client.character.mountInfo.entity.animalID));
                             add(new ObjectEffectString(987, Client.character.nickName));
                         }
                     });
@@ -153,7 +153,7 @@ public class MountHandler {
             return;
         } else {
             //client.character.inventoryCache.getMount(Message.id).getEffects().add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), "Melan"));
-            Client.character.send(new MountDataMessage(Client.character.inventoryCache.GetMount(Message.Id).Mount));
+            Client.character.send(new MountDataMessage(Client.character.inventoryCache.GetMount(Message.Id).mount));
         }
     }
 

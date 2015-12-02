@@ -97,7 +97,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
         this.myGameActors.put(actor.ID, actor);
 
-        //Verif Todo    
+        //verify Todo
         /*if (this.cells.length <  actor.CellId) {
          if (this.myCells[actor.CellId].Walkable) {
          this.myCells[actor.CellId].addActor(actor);
@@ -146,7 +146,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
         this.myGameActors.remove(actor.ID);
         this.sendToField(new GameContextRemoveElementMessage(actor.ID));
-        this.cells[actor.cell.id].DelActor(actor);
+        this.cells[actor.cell.id].delActor(actor);
     }
 
     public DofusCell getCell(short c) {
@@ -276,7 +276,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.relativeId = r;
         this.mapType = m;
         this.subAreaId = SubAreaId;
-        //Todo SubArea getInstance
+        //Todo subArea getInstance
         this.bottomNeighbourId = bn;
         this.topNeighbourId = tn;
         this.leftNeighbourId = ln;
@@ -295,7 +295,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     @Override
     public void ActorMoved(Path path, IGameActor actor, short newCell, byte newDirection) {
-        this.cells[actor.cell.id].DelActor(actor);
+        this.cells[actor.cell.id].delActor(actor);
         this.cells[newCell].addActor(actor);
         if (newDirection != -1) {
             actor.direction = newDirection;
@@ -304,7 +304,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     public void onMouvementConfirmed(Player Actor) {
         if (Actor.client.onMouvementConfirm != null) {
-            Actor.client.onMouvementConfirm.Apply(Actor);
+            Actor.client.onMouvementConfirm.apply(Actor);
             Actor.client.onMouvementConfirm = null;
         }
         if (droppedItems == null || droppedItems.isEmpty()) {
@@ -336,9 +336,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public InteractiveElement[] toInteractiveElements(Player Actor) {
         return this.interactiveElements.stream().map(Element -> new InteractiveElementWithAgeBonus(Element.elementId,
                 Element.elementTypeId,
-                Element.Skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId)).toArray(InteractiveElementSkill[]::new),
-                Element.Skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId))).toArray(InteractiveElementSkill[]::new),
-                Element.AgeBonus)
+                Element.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId)).toArray(InteractiveElementSkill[]::new),
+                Element.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId))).toArray(InteractiveElementSkill[]::new),
+                Element.ageBonus)
         ).toArray(InteractiveElement[]::new);
     }
 
@@ -346,9 +346,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         InteractiveElementStruct Struct = this.getInteractiveElementStruct(elementId);
         return new InteractiveElementWithAgeBonus(Struct.elementId,
                 Struct.elementTypeId,
-                Struct.Skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId)).toArray(InteractiveElementSkill[]::new),
-                Struct.Skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId))).toArray(InteractiveElementSkill[]::new),
-                Struct.AgeBonus
+                Struct.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId)).toArray(InteractiveElementSkill[]::new),
+                Struct.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId))).toArray(InteractiveElementSkill[]::new),
+                Struct.ageBonus
         );
     }
 
@@ -389,7 +389,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         if (this.doors == null) {
             this.doors = new HashMap();
         }
-        this.doors.put(d.ElementID, d);
+        this.doors.put(d.elementID, d);
     }
 
     public MapDoor getDoor(int id) {
@@ -413,14 +413,14 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             droppedItems = Collections.synchronizedMap(new HashMap<>());
         }
         this.droppedItems.put(cell, item);
-        this.sendToField(new ObjectGroundAddedMessage(cell, item.TemplateId));
+        this.sendToField(new ObjectGroundAddedMessage(cell, item.templateId));
     }
 
     public ObjectGroundListAddedMessage objectsGround() {
         if (this.droppedItems == null || this.droppedItems.size() <= 0) {
             return null;
         }
-        return new ObjectGroundListAddedMessage(droppedItems.keySet().toArray(new Short[droppedItems.size()]), droppedItems.values().stream().mapToInt(x -> x.TemplateId).toArray());
+        return new ObjectGroundListAddedMessage(droppedItems.keySet().toArray(new Short[droppedItems.size()]), droppedItems.values().stream().mapToInt(x -> x.templateId).toArray());
     }
 
     public IGameActor getActor(int target) {
@@ -460,9 +460,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public void sendMapInfo(WorldClient client) {
         this.myFightController.SendFightInfos(client);
         if (PaddockDAOImpl.paddocks.containsKey(id)) {
-            client.send(new PaddockPropertiesMessage(PaddockDAOImpl.paddocks.get(id).Informations()));
-            if (PaddockDAOImpl.paddocks.get(id).Items != null) {
-                client.send(new GameDataPaddockObjectListAddMessage(PaddockDAOImpl.paddocks.get(id).Items));
+            client.send(new PaddockPropertiesMessage(PaddockDAOImpl.paddocks.get(id).getInformations()));
+            if (PaddockDAOImpl.paddocks.get(id).items != null) {
+                client.send(new GameDataPaddockObjectListAddMessage(PaddockDAOImpl.paddocks.get(id).items));
             }
         }
         client.send(getAgressableActorsStatus(client.character));

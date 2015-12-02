@@ -28,7 +28,7 @@ public class GuildDAO {
             doOpenConnectionSource();
             guildsDao.queryForAll().forEach(x -> {
                 {
-                    Cache.put(x.GuildID, new Guild(x));
+                    Cache.put(x.guildID, new Guild(x));
                 }
             });
             return Cache.size();
@@ -66,11 +66,11 @@ public class GuildDAO {
     }
     
     public static boolean EmblemExist(GuildEmblem e){
-        return GuildDAO.Cache.values().stream().map(x -> x.GetGuildEmblem()).anyMatch(x -> x.equals(e));
+        return GuildDAO.Cache.values().stream().map(x -> x.getGuildEmblem()).anyMatch(x -> x.equals(e));
     }
     
     public static boolean NameExist(String name){
-        return GuildDAO.Cache.values().stream().map(x -> x.Entity.Name.toLowerCase().trim()).anyMatch(x -> x.equalsIgnoreCase(name.toLowerCase().trim()));
+        return GuildDAO.Cache.values().stream().map(x -> x.entity.name.toLowerCase().trim()).anyMatch(x -> x.equalsIgnoreCase(name.toLowerCase().trim()));
     }
 
     public static Long FindMembers() {
@@ -78,9 +78,9 @@ public class GuildDAO {
             guildsMembersDao.queryForAll().forEach(x -> {
                 {
                     try {
-                        Cache.get(x.GuildID).Members.put(x.CharacterID, x);
+                        Cache.get(x.guildID).members.put(x.characterID, x);
                     } catch (NullPointerException e) {
-                        Main.Logs().writeError(x.GuildID + " nulled for guildmember " + x.CharacterID);
+                        Main.Logs().writeError(x.guildID + " nulled for guildmember " + x.characterID);
                         e.printStackTrace();
                     }
                 }
@@ -102,7 +102,7 @@ public class GuildDAO {
     
     public static void Remove(GuildEntity Item) {
         try {
-            Cache.remove(Item.GuildID);
+            Cache.remove(Item.guildID);
             guildsDao.delete(Item);
         } catch (Exception e) {
             e.printStackTrace();
@@ -120,7 +120,7 @@ public class GuildDAO {
     
     public static void Insert(GuildMember Item) {
         try {
-            guildsMembersDao.deleteById(Item.CharacterID);
+            guildsMembersDao.deleteById(Item.characterID);
             guildsMembersDao.create(Item);
         } catch (Exception e) {
             e.printStackTrace();

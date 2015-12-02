@@ -46,7 +46,7 @@ public class DofusCell {
         }
     }
 
-    public void DelActor(IGameActor actor) {
+    public void delActor(IGameActor actor) {
         this.myActors.remove(actor.ID);
     }
     

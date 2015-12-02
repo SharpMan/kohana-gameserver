@@ -23,7 +23,7 @@ public class DAO {
     private static MonsterDAO monsters;
 
     @Inject @Getter
-    private static PlayerDAOImpl players;
+    private static PlayerDAO players;
 
     @Inject @Getter
     private static PaddockDAO paddocks;

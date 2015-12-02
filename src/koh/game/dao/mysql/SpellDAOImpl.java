@@ -22,10 +22,10 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class SpellDAOImpl extends SpellDAO {
 
-    public final Map<Integer, SpellLevel> levels = Collections.synchronizedMap(new HashMap<>(16000));
-    public final Map<Integer, Spell> spells = Collections.synchronizedMap(new HashMap<>(5000));
-    public final Map<Integer, ArrayList<LearnableSpell>> learnableSpells = Collections.synchronizedMap(new HashMap<>(1179));
-    public final Map<Integer, SpellBomb> bombs = Collections.synchronizedMap(new HashMap<>(5));
+    private final Map<Integer, SpellLevel> levels = Collections.synchronizedMap(new HashMap<>(16000));
+    private final Map<Integer, Spell> spells = Collections.synchronizedMap(new HashMap<>(5000));
+    private final Map<Integer, ArrayList<LearnableSpell>> learnableSpells = Collections.synchronizedMap(new HashMap<>(1179));
+    private final Map<Integer, SpellBomb> bombs = Collections.synchronizedMap(new HashMap<>(5));
 
     private static final Logger logger = LogManager.getLogger(AreaDAOImpl.class);
 

@@ -28,7 +28,7 @@ import java.util.Map;
 public class PaddockDAOImpl extends PaddockDAO {
 
     private static final Logger logger = LogManager.getLogger(PaddockDAOImpl.class);
-    public static Map<Integer, Paddock> paddocks = new HashMap<>(1500);
+    private final Map<Integer, Paddock> paddocks = new HashMap<>(1500);
     @Inject
     private DatabaseSource dbSource;
 
@@ -61,21 +61,21 @@ public class PaddockDAOImpl extends PaddockDAO {
             IoBuffer buf;
             switch (column) {
                 case "id":
-                    p.setInt(seq, item.Id);
+                    p.setInt(seq, item.id);
                     break;
                 case "abandonned":
-                    p.setBoolean(seq, item.Abandonned);
+                    p.setBoolean(seq, item.abandonned);
                     break;
                 case "loocked":
-                    p.setBoolean(seq, item.Loocked);
+                    p.setBoolean(seq, item.loocked);
                     break;
                 case "mounts_informations":
-                    buf = serializeMountsInformations(item.MountInformations);
+                    buf = serializeMountsInformations(item.mountInformationsForPaddocks);
                     p.setBytes(seq, buf.array());
                     buf.clear();
                     break;
                 case "items":
-                    buf = serializeItemsInformations(item.Items);
+                    buf = serializeItemsInformations(item.items);
                     p.setBytes(seq, buf.array());
                     buf.clear();
                     break;
@@ -85,16 +85,16 @@ public class PaddockDAOImpl extends PaddockDAO {
                     buf.clear();
                     break;
                 case "sell_informations":
-                    p.setString(seq, item.SelledId + "," + item.OwnerName);
+                    p.setString(seq, item.selledId + "," + item.ownerName);
                     break;
                 case "price":
-                    p.setInt(seq, item.Price);
+                    p.setInt(seq, item.price);
                     break;
                 case "max_outdoor_mount":
-                    p.setInt(seq, item.MaxOutDoorMount);
+                    p.setInt(seq, item.maxOutDoorMount);
                     break;
                 case "max_items":
-                    p.setInt(seq, item.MaxItem);
+                    p.setInt(seq, item.maxItem);
                     break;
 
             }
@@ -113,27 +113,27 @@ public class PaddockDAOImpl extends PaddockDAO {
             while (result.next()) {
                 paddocks.put(result.getInt("map"), new Paddock() {
                     {
-                        this.Id = result.getInt("id");
-                        this.Map = result.getInt("map");
-                        this.SubArea = result.getShort("sub_area");
-                        this.Abandonned = result.getBoolean("abandonned");
-                        this.Loocked = result.getBoolean("loocked");
-                        this.Price = result.getInt("price");
-                        this.MaxOutDoorMount = result.getInt("max_outdoor_mount");
-                        this.MaxItem = result.getInt("max_items");
+                        this.id = result.getInt("id");
+                        this.map = result.getInt("map");
+                        this.subArea = result.getShort("sub_area");
+                        this.abandonned = result.getBoolean("abandonned");
+                        this.loocked = result.getBoolean("loocked");
+                        this.price = result.getInt("price");
+                        this.maxOutDoorMount = result.getInt("max_outdoor_mount");
+                        this.maxItem = result.getInt("max_items");
                         if (result.getBytes("items") != null) {
                             IoBuffer buf = IoBuffer.wrap(result.getBytes("items"));
-                            this.Items = new PaddockItem[buf.getInt()];
-                            for (int i = 0; i < this.Items.length; ++i) {
-                                this.Items[i] = new PaddockItem(buf.getInt(), buf.getInt(), new ItemDurability(buf.getShort(), buf.getShort()));
+                            this.items = new PaddockItem[buf.getInt()];
+                            for (int i = 0; i < this.items.length; ++i) {
+                                this.items[i] = new PaddockItem(buf.getInt(), buf.getInt(), new ItemDurability(buf.getShort(), buf.getShort()));
                             }
                             buf.clear();
                         }
                         if (result.getBytes("mounts_informations") != null) {
                             IoBuffer buf = IoBuffer.wrap(result.getBytes("mounts_informations"));
-                            this.MountInformations = new MountInformationsForPaddock[buf.getInt()];
-                            for (int i = 0; i < this.MountInformations.length; ++i) {
-                                this.MountInformations[i] = new MountInformationsForPaddock(buf.get(), BufUtils.readUTF(buf), BufUtils.readUTF(buf));
+                            this.mountInformationsForPaddocks = new MountInformationsForPaddock[buf.getInt()];
+                            for (int i = 0; i < this.mountInformationsForPaddocks.length; ++i) {
+                                this.mountInformationsForPaddocks[i] = new MountInformationsForPaddock(buf.get(), BufUtils.readUTF(buf), BufUtils.readUTF(buf));
                             }
                             buf.clear();
                         }
@@ -143,8 +143,8 @@ public class PaddockDAOImpl extends PaddockDAO {
                             buf.clear();
                         }
                         if (result.getString("sell_informations") != null) {
-                            this.SelledId = Integer.parseInt(result.getString("sell_informations").split(",")[0]);
-                            this.OwnerName = result.getString("sell_informations").split(",")[1];
+                            this.selledId = Integer.parseInt(result.getString("sell_informations").split(",")[0]);
+                            this.ownerName = result.getString("sell_informations").split(",")[1];
                         }
                     }
                 });

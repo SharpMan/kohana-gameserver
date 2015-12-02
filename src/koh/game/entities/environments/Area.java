@@ -22,15 +22,15 @@ public class Area {
             @Override
             public void run() {
                 Arrays.stream(subAreas).forEach(Sub -> Arrays.stream(Sub.mapIds)
-                        .forEach(Id -> DAO.getMaps().getMap(Id).interactiveElements.stream()
-                                .filter(Element -> DAO.getMaps().getMap(Id).getStatedElementById(Element.elementId) != null && DAO.getMaps().getMap(Id).getStatedElementById(Element.elementId).elementState == 0)
+                        .forEach(Id -> DAO.getMaps().findTemplate(Id).interactiveElements.stream()
+                                .filter(Element -> DAO.getMaps().findTemplate(Id).getStatedElementById(Element.elementId) != null && DAO.getMaps().findTemplate(Id).getStatedElementById(Element.elementId).elementState == 0)
                                 .forEach(Interactive -> {
                                     {
-                                        if (Interactive.AgeBonus == -1) {
-                                            Interactive.AgeBonus = 0;
+                                        if (Interactive.ageBonus == -1) {
+                                            Interactive.ageBonus = 0;
                                         }
-                                        if (Interactive.AgeBonus != 200) {
-                                            Interactive.AgeBonus += 4;
+                                        if (Interactive.ageBonus != 200) {
+                                            Interactive.ageBonus += 4;
                                         }
 
                                     }
@@ -42,18 +42,18 @@ public class Area {
             public void run() {
                 Arrays.stream(subAreas)
                         .forEach(Sub -> Arrays.stream(Sub.mapIds)
-                                .filter(Id -> DAO.getMaps().getMap(Id).myInitialized)
+                                .filter(Id -> DAO.getMaps().findTemplate(Id).myInitialized)
                                 .forEach(Id -> {
                                     {
                                         boolean Modified = false;
-                                        for (StatedElement element : (Iterable<StatedElement>) Arrays.stream(DAO.getMaps().getMap(Id).elementsStated)
+                                        for (StatedElement element : (Iterable<StatedElement>) Arrays.stream(DAO.getMaps().findTemplate(Id).elementsStated)
                                         .filter(statedElement -> statedElement.deadAt != -1 && statedElement.elementState > 0 && (System.currentTimeMillis() - statedElement.deadAt) > Settings.GetIntElement("Job.Spawn") * 60000)::iterator) {
                                             element.deadAt = -1;
                                             element.elementState = 0;
                                             Modified = true;
                                         }
                                         if (Modified) {
-                                            DAO.getMaps().getMap(Id).sendToField(new StatedMapUpdateMessage(DAO.getMaps().getMap(Id).elementsStated));
+                                            DAO.getMaps().findTemplate(Id).sendToField(new StatedMapUpdateMessage(DAO.getMaps().findTemplate(Id).elementsStated));
                                         }
 
                                     }
@@ -72,7 +72,7 @@ public class Area {
 
     /*public IntStream Mapids() {
      if (Maps.length == 0) {
-     for (SubArea Sub : subAreas) {
+     for (subArea Sub : subAreas) {
      Maps = ArrayUtils.addAll(Maps, Sub.mapIds);
      }
      }

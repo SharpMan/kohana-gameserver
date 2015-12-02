@@ -192,14 +192,14 @@ public class ChatHandler {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    break;//RemovePaddockItem
+                    break;//removePaddockItem
                 } else if (message.Content.startsWith("!remove_item")) {
                     try {
                         if (!PaddockDAOImpl.paddocks.containsKey(Client.character.currentMap.id)) {
                             break;
                         }
                         int cellid = Integer.parseInt(message.Content.split(" ")[1]);
-                        PaddockDAOImpl.paddocks.get(Client.character.currentMap.id).RemovePaddockItem(cellid);
+                        PaddockDAOImpl.paddocks.get(Client.character.currentMap.id).removePaddockItem(cellid);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -218,7 +218,7 @@ public class ChatHandler {
                         int object = Integer.parseInt(message.Content.split(" ")[2]);
                         short durability = Short.parseShort(message.Content.split(" ")[3]);
                         short durabilityMax = Short.parseShort(message.Content.split(" ")[4]);
-                        PaddockDAOImpl.paddocks.get(Client.character.currentMap.id).AddPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
+                        PaddockDAOImpl.paddocks.get(Client.character.currentMap.id).addPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -237,7 +237,7 @@ public class ChatHandler {
 
                         MapPosition[] SubAreas = MapDAOImpl.getSubAreaOfPos(X, Y);
                         if (SubAreas.length > 1 && subArea == -1) {
-                            PlayerController.sendServerMessage(Client, "This position contains a lots of SubArea so try one of this ..");
+                            PlayerController.sendServerMessage(Client, "This position contains a lots of subArea so try one of this ..");
                             for (MapPosition s : SubAreas) {
                                 PlayerController.sendServerMessage(Client, "!go " + X + " " + Y + " " + s.subAreaId + " (Or choose mapid " + s.id);
                             }
@@ -368,7 +368,7 @@ public class ChatHandler {
                         if (ItemTemplateDAOImpl.Cache.get(Id).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
                             Qua = 1;
                         }
-                        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Id, 63, Client.character.ID, Qua, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Id).possibleEffects, Type, ItemTemplateDAOImpl.Cache.get(Id) instanceof Weapon));
+                        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Id, 63, Client.character.ID, Qua, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Id).possibleEffects, Type, ItemTemplateDAOImpl.Cache.get(Id) instanceof Weapon));
 
                         if (Client.character.inventoryCache.add(Item, true)) {
                             Item.needInsert = true;

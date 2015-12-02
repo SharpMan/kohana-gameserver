@@ -89,7 +89,7 @@ public class FightFormulas {
 
         GuildMember gm = Fighter.Character.getGuildMember();
 
-        double xp = (double) xpWin.get(), Lvl = Fighter.Level(), LvlGuild = Fighter.Character.guild.Entity.Level, pXpGive = (double) gm.experienceGivenPercent / 100;
+        double xp = (double) xpWin.get(), Lvl = Fighter.Level(), LvlGuild = Fighter.Character.guild.entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
         double maxP = xp * pXpGive * 0.10;	//Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
         double diff = Math.abs(Lvl - LvlGuild);	//Calcul l'écart entre le niveau du personnage et le niveau de la guilde
@@ -190,8 +190,8 @@ public class FightFormulas {
                 TotalGradeLooserForEached++;
             }
             int EcartGrade = (TotalGradeWinner / TotalGradeWinnerForEached) - (TotalGradeLooser / TotalGradeLooserForEached);
-            int RandomGain = EffectHelper.RandomValue(100, 120);
-            int RandomGain2 = EffectHelper.RandomValue(140, 160);
+            int RandomGain = EffectHelper.randomValue(100, 120);
+            int RandomGain2 = EffectHelper.randomValue(140, 160);
             return (short) (TotalGradeWinner <= 5 ? (RandomGain + (EcartGrade < 0 ? 10 * -EcartGrade : 0)) : (RandomGain2 + (EcartGrade < 0 ? 10 * -EcartGrade : 7 * -EcartGrade)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -233,31 +233,31 @@ public class FightFormulas {
             int RandomPerte = 0;
             switch (TotalGradeWinner) {
                 case 1:
-                    RandomPerte = EffectHelper.RandomValue(40, 50);
+                    RandomPerte = EffectHelper.randomValue(40, 50);
                     break;
                 case 2:
-                    RandomPerte = EffectHelper.RandomValue(50, 60);
+                    RandomPerte = EffectHelper.randomValue(50, 60);
                     break;
                 case 3:
-                    RandomPerte = EffectHelper.RandomValue(60, 70);
+                    RandomPerte = EffectHelper.randomValue(60, 70);
                     break;
                 case 4:
-                    RandomPerte = EffectHelper.RandomValue(70, 80);
+                    RandomPerte = EffectHelper.randomValue(70, 80);
                     break;
                 case 5:
-                    RandomPerte = EffectHelper.RandomValue(80, 90);
+                    RandomPerte = EffectHelper.randomValue(80, 90);
                     break;
                 case 6:
-                    RandomPerte = EffectHelper.RandomValue(100, 200);
+                    RandomPerte = EffectHelper.randomValue(100, 200);
                     break;
                 case 7:
-                    RandomPerte = EffectHelper.RandomValue(200, 300);
+                    RandomPerte = EffectHelper.randomValue(200, 300);
                     break;
                 case 8:
-                    RandomPerte = EffectHelper.RandomValue(300, 400);
+                    RandomPerte = EffectHelper.randomValue(300, 400);
                     break;
                 case 9:
-                    RandomPerte = EffectHelper.RandomValue(400, 500);
+                    RandomPerte = EffectHelper.randomValue(400, 500);
                     break;
                 case 10:
                     RandomPerte = 500;

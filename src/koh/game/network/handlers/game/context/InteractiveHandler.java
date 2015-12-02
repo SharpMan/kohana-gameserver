@@ -30,7 +30,7 @@ public class InteractiveHandler {
             Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
-        InteractiveElementSkill Skill = Element.GetSkill(Message.skillInstanceUid);
+        InteractiveElementSkill Skill = Element.getSkill(Message.skillInstanceUid);
         if (Skill == null) {
             Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;

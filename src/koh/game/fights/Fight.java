@@ -526,7 +526,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
         int TargetId = TargetE == null ? -1 : TargetE.ID;
 
-        if (!(Pathfinder.GoalDistance(Map, CellId, Fighter.CellId()) <= Weapon.WeaponTemplate().range && Pathfinder.GoalDistance(Map, CellId, Fighter.CellId()) >= Weapon.WeaponTemplate().minRange && Fighter.AP() >= Weapon.WeaponTemplate().apCost)) {
+        if (!(Pathfinder.getGoalDistance(Map, CellId, Fighter.CellId()) <= Weapon.WeaponTemplate().range && Pathfinder.getGoalDistance(Map, CellId, Fighter.CellId()) >= Weapon.WeaponTemplate().minRange && Fighter.AP() >= Weapon.WeaponTemplate().apCost)) {
             Fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             return;
         }
@@ -718,7 +718,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     private void GameLoop() {
         try {
-            // Switch sur le status et verif fin de tour
+            // Switch sur le status et verify fin de tour
             switch (this.FightLoopState) {
                 case STATE_WAIT_START: // En attente de lancement
                     this.FightState = FightState.STATE_ACTIVE;
@@ -893,7 +893,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     protected void OnTackled(Fighter Fighter, MovementPath path) {
-        ArrayList<Fighter> tacklers = Pathfinder.GetEnnemyNearToTakle(this, Fighter.Team, Fighter.CellId());
+        ArrayList<Fighter> tacklers = Pathfinder.getEnnemyNearToTakle(this, Fighter.Team, Fighter.CellId());
 
         int tackledMp = Fighter.GetTackledMP();
         int tackledAp = Fighter.GetTackledAP();
@@ -908,10 +908,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, Fighter.ID, Fighter.ID, (short) -tackledAp));
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, Fighter.ID, Fighter.ID, (short) -tackledMp));
 
-            if (path.MovementLength <= Fighter.MP()) {
+            if (path.movementLength <= Fighter.MP()) {
                 return;
             }
-            path.CutPath(Fighter.MP() + 1);
+            path.cutPath(Fighter.MP() + 1);
         }
     }
 
@@ -961,9 +961,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         // Pas assez de point de mouvement
-        if (Path.MovementLength > Fighter.MP() || Path.MovementLength == -1) {
-            System.out.println(Path.MovementLength > Fighter.MP());
-            System.out.println(Path.MovementLength + " " + Fighter.MP());
+        if (Path.movementLength > Fighter.MP() || Path.movementLength == -1) {
+            System.out.println(Path.movementLength > Fighter.MP());
+            System.out.println(Path.movementLength + " " + Fighter.MP());
             return null;
         }
 
@@ -971,25 +971,25 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         if ((Fighter.GetTackledMP() > 0 || Fighter.GetTackledAP() > 0) && !this.CurrentFighter.States.HasState(FightStateEnum.Enraciné)) {
             this.OnTackled(Fighter, Path);
-            if (Path.TransitCells.isEmpty() || Path.MovementLength == 0) {
+            if (Path.transitCells.isEmpty() || Path.movementLength == 0) {
                 this.EndSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
                 return null;
             }
 
         }
-        GameMapMovement GameMovement = new GameMapMovement(this, Fighter, Path.SerializePath());
+        GameMapMovement GameMovement = new GameMapMovement(this, Fighter, Path.serializePath());
 
-        this.sendToField(new FieldNotification(new GameMapMovementMessage(Path.SerializePath(), Fighter.ID)) {
+        this.sendToField(new FieldNotification(new GameMapMovementMessage(Path.serializePath(), Fighter.ID)) {
             @Override
             public boolean can(Player perso) {
                 return Fighter.IsVisibleFor(perso);
             }
         });
 
-        Fighter.UsedMP += Path.MovementLength;
-        this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, Fighter.ID, Fighter.ID, (short) -Path.MovementLength));
+        Fighter.UsedMP += Path.movementLength;
+        this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, Fighter.ID, Fighter.ID, (short) -Path.movementLength));
 
-        Fighter.SetCell(this.GetCell(Path.EndCell()));
+        Fighter.SetCell(this.GetCell(Path.getEndCell()));
         this.EndSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
         return GameMovement;
 
@@ -1000,7 +1000,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             throw new Error("State != Placement, cannot give placement direction");
         }
         FightTeam fightTeam = fighter.Team == this.myTeam1 ? this.myTeam2 : this.myTeam1;
-        Couple<Short, Integer> bestPos = null; //@Param1 = Cellid,@Param2 = Distance
+        Couple<Short, Integer> bestPos = null; //@Param1 = cellid,@Param2 = Distance
         for (Fighter fightActor : (Iterable<Fighter>) fightTeam.GetFighters()::iterator) {
             MapPoint point = fightActor.MapPoint();
             if (bestPos == null) {

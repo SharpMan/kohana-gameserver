@@ -75,7 +75,7 @@ public class CharacterInventory {
 
     public boolean add(InventoryItem item, boolean merge) //muste be true
     {
-        if (merge && !Ints.contains(unMergeableType, item.getTemplate().typeId) && tryMergeItem(item.TemplateId, item.Effects, item.getSlot(), item.getQuantity(), item, false)) {
+        if (merge && !Ints.contains(unMergeableType, item.getTemplate().typeId) && tryMergeItem(item.templateId, item.effects, item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
         if (item.getOwner() != this.player.ID) {
@@ -107,7 +107,7 @@ public class CharacterInventory {
     public boolean tryMergeItem(int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int quantity, InventoryItem removeItem, boolean send) {
         if (slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.itemsCache.values()) {
-                if (Item.TemplateId == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.ID == Item.ID) && Item.Equals(stats)) {
+                if (Item.templateId == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.ID == Item.ID) && Item.Equals(stats)) {
                     if (removeItem != null) {
                         this.removeFromDic(removeItem.ID);
                         removeItem.needInsert = false;
@@ -157,7 +157,7 @@ public class CharacterInventory {
     }
 
     public MountInventoryItem GetMount(double id) {
-        return (MountInventoryItem) this.itemsCache.values().stream().filter(x -> x instanceof MountInventoryItem && ((MountInventoryItem) x).Entity.AnimalID == (int) id).findFirst().orElse(null);
+        return (MountInventoryItem) this.itemsCache.values().stream().filter(x -> x instanceof MountInventoryItem && ((MountInventoryItem) x).entity.animalID == (int) id).findFirst().orElse(null);
     }
 
     public synchronized void removeApparence(short appearence) {
@@ -184,24 +184,24 @@ public class CharacterInventory {
 
     public void MoveLivingItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
         InventoryItem Item = this.itemsCache.get(guid);
-        slot = this.getLivingObjectSlot(Item.TemplateId);
+        slot = this.getLivingObjectSlot(Item.templateId);
         InventoryItem exItem = this.getItemInSlot(slot);
         if (exItem == null) {
             player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
             return;
         }
-        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972);
-        ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808), exchangeTime = (ObjectEffectDate) Item.GetEffect(983);
-        if (exItem.GetEffect(970) != null) {
+        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972);
+        ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808), exchangeTime = (ObjectEffectDate) Item.getEffect(983);
+        if (exItem.getEffect(970) != null) {
             PlayerController.sendServerMessage(player.client, "action Impossible : cet objet est déjà associé à un objet d'apparance.");
             return;
         }
         if (obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
             return;
         }
-        if (exItem.GetEffect(983) != null || exItem.getQuantity() != 1) {
+        if (exItem.getEffect(983) != null || exItem.getQuantity() != 1) {
 
-            PlayerController.sendServerMessage(player.client, "action Impossible : cet objet ne peut pas être associé." + exItem.GetEffect(983).toString());
+            PlayerController.sendServerMessage(player.client, "action Impossible : cet objet ne peut pas être associé." + exItem.getEffect(983).toString());
             return;
         }
         if (exItem.getApparrance() != 0) {
@@ -209,7 +209,7 @@ public class CharacterInventory {
             //this.player.getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(exItem.getApparrance()));
         }
 
-        exItem.getEffects().add(new ObjectEffectInteger(970, Item.TemplateId));
+        exItem.getEffects().add(new ObjectEffectInteger(970, Item.templateId));
         exItem.getEffects().add(obviXp.Clone());
         exItem.getEffects().add(obviTime.Clone());
         exItem.getEffects().add(obviType.Clone());
@@ -275,7 +275,7 @@ public class CharacterInventory {
 
             if (item.getQuantity() > 1) {
                 /*InventoryItem NewItem = */
-                tryCreateItem(item.TemplateId, this.player, 1, slot.value(), item.getEffectsCopy());
+                tryCreateItem(item.templateId, this.player, 1, slot.value(), item.getEffectsCopy());
                 this.updateObjectquantity(item, item.getQuantity() - 1);
                 return;
             }
@@ -292,12 +292,12 @@ public class CharacterInventory {
                         if (this.player.mountInfo.isToogled) {
                             this.player.mountInfo.onGettingOff();
                         }
-                        //TODO:  Clean Code + clear old ArrayList from  memory
+                        //TODO:  clean Code + clear old ArrayList from  memory
                         if (item.getTemplate().typeId == 121) { //Montelier
                             this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
                             this.player.getEntityLook().bonesId = item.getApparrance();
                             this.player.getEntityLook().skins.clear();
-                            if (item.TemplateId != ItemsEnum.Kramkram) {
+                            if (item.templateId != ItemsEnum.Kramkram) {
                                 this.player.getEntityLook().indexedColors.clear();
                             }
                             this.player.getEntityLook().scales.clear();
@@ -324,7 +324,7 @@ public class CharacterInventory {
                 this.player.refreshStats();
             }
             // On tente de fusionner
-            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET || !this.tryMergeItem(item.TemplateId, item.Effects, slot, item.getQuantity(), item)) {
+            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET || !this.tryMergeItem(item.templateId, item.effects, slot, item.getQuantity(), item)) {
                 item.setPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
                 player.send(new ObjectMovementMessage(item.ID, (byte) item.getPosition()));
             }
@@ -386,7 +386,7 @@ public class CharacterInventory {
     }
 
     public void sendSetUpdateMessage(ItemSet set, int count) {
-        this.player.send(new SetUpdateMessage(set.id, this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().itemSetId == set.id).mapToInt(x -> x.TemplateId).toArray(), set.toObjectEffects(count)));
+        this.player.send(new SetUpdateMessage(set.id, this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().itemSetId == set.id).mapToInt(x -> x.templateId).toArray(), set.toObjectEffects(count)));
     }
 
     private int countItemSetEquiped(int id) {
@@ -422,7 +422,7 @@ public class CharacterInventory {
             return null;
 
         // Creation
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.ID : -1, quantity, (Stats == null ? EffectHelper.GenerateIntegerEffect(Template.possibleEffects, EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.ID : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(Template.possibleEffects, EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
         item.needInsert = true;
         item.getStats();
         if (character != null) {
@@ -434,7 +434,7 @@ public class CharacterInventory {
 
     private boolean unEquipedDouble(InventoryItem itemToEquip) {
         if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_DOFUS) {
-            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.TemplateId == itemToEquip.TemplateId).findFirst();
+            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.templateId == itemToEquip.templateId).findFirst();
 
             if (playerItem.isPresent()) {
                 this.moveItem(playerItem.get().ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
@@ -442,7 +442,7 @@ public class CharacterInventory {
             }
         }
         if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_RING) {
-            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.TemplateId == itemToEquip.TemplateId && x.getTemplate().itemSetId > 0).findFirst();
+            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.templateId == itemToEquip.templateId && x.getTemplate().itemSetId > 0).findFirst();
 
             if (playerItem.isPresent()) {
                 this.moveItem(playerItem.get().ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
@@ -457,7 +457,7 @@ public class CharacterInventory {
     }
 
     public InventoryItem getItemInTemplate(int template) {
-            return this.itemsCache.values().stream().filter(x -> x.TemplateId == template).findFirst().orElse(null);
+            return this.itemsCache.values().stream().filter(x -> x.templateId == template).findFirst().orElse(null);
     }
 
     public InventoryItem getItemInSlot(CharacterInventoryPositionEnum slot) {
@@ -590,7 +590,7 @@ public class CharacterInventory {
     }
 
     public boolean hasItemId(int parseInt) {
-        return this.itemsCache.values().stream().filter(x -> x.TemplateId == parseInt).findAny().isPresent();
+        return this.itemsCache.values().stream().filter(x -> x.templateId == parseInt).findAny().isPresent();
     }
 
     private void checkItemsCriterias() {

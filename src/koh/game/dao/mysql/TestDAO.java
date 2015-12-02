@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import koh.game.MySQL;
-import static koh.game.entities.item.EffectHelper.SerializeEffectInstanceDice;
+import static koh.game.entities.item.EffectHelper.serializeEffectInstanceDice;
 import koh.game.entities.spells.EffectInstance;
 import koh.game.entities.spells.EffectInstanceDice;
 import org.apache.commons.lang.ArrayUtils;
@@ -20,7 +20,7 @@ public class TestDAO {
     public synchronized static void SetMaxEffects(int id, EffectInstance[] Effects) {
         try {
             PreparedStatement p = MySQL.prepareQuery("UPDATE `item_pets` set max_effects = ? WHERE id = ?;", MySQL.Connection());
-            p.setBytes(1, SerializeEffectInstanceDice(Effects).array());
+            p.setBytes(1, serializeEffectInstanceDice(Effects).array());
             p.setInt(2, id);
             p.execute();
 

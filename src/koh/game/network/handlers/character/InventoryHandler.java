@@ -93,7 +93,7 @@ public class InventoryHandler {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviSkin = (ObjectEffectInteger) Item.GetEffect(972);
+        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviSkin = (ObjectEffectInteger) Item.getEffect(972);
         if (obviXp == null || obviSkin == null) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
@@ -105,7 +105,7 @@ public class InventoryHandler {
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getApparrance() != 0) {
             Client.character.inventoryCache.removeApparence(Item.getApparrance());
         }
-        Item.RemoveEffect(972);
+        Item.removeEffect(972);
         Item.getEffects().add(((ObjectEffectInteger) obviSkin.Clone()).SetValue(Message.skinId));
         Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getApparrance() != 0) {
@@ -128,7 +128,7 @@ public class InventoryHandler {
             return;
         }
         if (Item instanceof PetsInventoryItem) {
-            if (!((PetsInventoryItem) Item).Eat(Client.character, Food)) {
+            if (!((PetsInventoryItem) Item).eat(Client.character, Food)) {
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 53, new String[0]));
             } else {
                 int newQua = Food.getQuantity() - 1;
@@ -141,8 +141,8 @@ public class InventoryHandler {
             }
 
         } else if (Item.isLivingObject()) {
-            ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972), obviItem = (ObjectEffectInteger) Item.GetEffect(970);
-            ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808);
+            ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972), obviItem = (ObjectEffectInteger) Item.getEffect(970);
+            ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808);
             if (obviItem == null || obviType == null || obviType.value != Food.getTemplate().typeId || obviTime == null || obviXp == null || obviState == null || obviSkin == null) {
                 Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
                 return;
@@ -161,13 +161,13 @@ public class InventoryHandler {
             } else {
                 Client.character.inventoryCache.updateObjectquantity(Food, newqua);
             }
-            Item.RemoveEffect(974);
+            Item.removeEffect(974);
             Item.getEffects().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
             if (state < 2) {
-                Item.RemoveEffect(971);
+                Item.removeEffect(971);
                 Item.getEffects().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
             }
-            Item.RemoveEffect(808);
+            Item.removeEffect(808);
             Calendar now = Calendar.getInstance();
             Item.getEffects().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
 
@@ -190,8 +190,8 @@ public class InventoryHandler {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972), obviTemplate = (ObjectEffectInteger) Item.GetEffect(970);
-        ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808), exchangeTime = (ObjectEffectDate) Item.GetEffect(983);
+        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972), obviTemplate = (ObjectEffectInteger) Item.getEffect(970);
+        ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808), exchangeTime = (ObjectEffectDate) Item.getEffect(983);
         if (obviTemplate == null || obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
@@ -213,13 +213,13 @@ public class InventoryHandler {
             }
         });
 
-        Item.RemoveEffect(974);
-        Item.RemoveEffect(973);
-        Item.RemoveEffect(971);
-        Item.RemoveEffect(972);
-        Item.RemoveEffect(808);
-        Item.RemoveEffect(983);
-        Item.RemoveEffect(970);
+        Item.removeEffect(974);
+        Item.removeEffect(973);
+        Item.removeEffect(971);
+        Item.removeEffect(972);
+        Item.removeEffect(808);
+        Item.removeEffect(983);
+        Item.removeEffect(970);
 
         Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getTemplate().appearanceId != 0) {

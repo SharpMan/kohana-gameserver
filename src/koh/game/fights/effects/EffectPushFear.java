@@ -14,19 +14,19 @@ public class EffectPushFear extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) { //TODO : Prise compte etat
-        byte direction = Pathfinder.GetDirection(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
-        short targetFighterCell = Pathfinder.NextCell(CastInfos.Caster.CellId(), direction);
+        byte direction = Pathfinder.getDirection(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
+        short targetFighterCell = Pathfinder.nextCell(CastInfos.Caster.CellId(), direction);
 
         Fighter target = CastInfos.Caster.Fight.GetFighterOnCell(targetFighterCell);
         if (target == null) {
             return -1;
         }
         short StartCell = target.CellId();
-        int distance = Pathfinder.GoalDistance(CastInfos.Caster.Fight.Map, target.CellId(), CastInfos.CellId);
+        int distance = Pathfinder.getGoalDistance(CastInfos.Caster.Fight.Map, target.CellId(), CastInfos.CellId);
         FightCell currentCell = target.myCell;
 
         for (int i = 0; i < distance; i++) {
-            FightCell nextCell = CastInfos.Caster.Fight.GetCell(Pathfinder.NextCell(currentCell.Id, direction));
+            FightCell nextCell = CastInfos.Caster.Fight.GetCell(Pathfinder.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.CanWalk()) {
                 if (nextCell.HasObject(IFightObject.FightObjectType.OBJECT_TRAP)) {

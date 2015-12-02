@@ -207,7 +207,7 @@ public class Player extends IGameActor implements Observer {
             if (this.guild != null) {
                 Options = ArrayUtils.add(Options, new HumanOptionGuild(this.guild.toGuildInformations()));
             }
-            // Options = ArrayUtils.add(Options, new HumanOptionAlliance(this.PvPEnabled, new AllianceInformations(1191, "a", "ta race", this.guild.GetGuildEmblem())));
+            // Options = ArrayUtils.add(Options, new HumanOptionAlliance(this.PvPEnabled, new AllianceInformations(1191, "a", "ta race", this.guild.getGuildEmblem())));
             this.cachedHumanInformations = new HumanInformations(new ActorRestrictionsInformations(), this.sexe == 1, Options);
         }
         return this.cachedHumanInformations;
@@ -229,7 +229,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public GuildMember getGuildMember() {
-        return this.guild.Members.get(ID);
+        return this.guild.members.get(ID);
     }
 
     public synchronized void teleport(int newMapID, int newCellID) {
@@ -238,7 +238,7 @@ public class Player extends IGameActor implements Observer {
             this.currentMap.sendToField(new TeleportOnSameMapMessage(ID, cell.id));
             return;
         }
-        DofusMap NextMap = DAO.getMaps().getMap(newMapID);
+        DofusMap NextMap = DAO.getMaps().findTemplate(newMapID);
         if (NextMap == null) {
             PlayerController.sendServerMessage(client, "Signal on the bugTracker nulled map -> " + newMapID);
             //client.sendPacket(new ErrorMapNotFoundMessage());

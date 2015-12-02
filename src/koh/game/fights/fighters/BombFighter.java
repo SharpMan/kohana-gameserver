@@ -161,11 +161,11 @@ public class BombFighter extends StaticFighter {
                 Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).Remove());
             }
             Short[] Cells;
-            for (Fighter Friend : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.Summoner == this.Summoner && Pathfinder.InLine(null, this.CellId(), Fighter.CellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
-                int Distance = Pathfinder.GoalDistance(null, CellId(), Friend.CellId());
+            for (Fighter Friend : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.Summoner == this.Summoner && Pathfinder.inLine(null, this.CellId(), Fighter.CellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
+                int Distance = Pathfinder.getGoalDistance(null, CellId(), Friend.CellId());
                 Main.Logs().writeDebug("Distance = " + Distance);
                 if (Distance >= 2 && Distance <= 7) {
-                    Cells = Pathfinder.GetLineCellsBetweenBomb(Fight, this.CellId(), Pathfinder.GetDirection(null, this.CellId(), Friend.CellId()), Friend.CellId(), false);
+                    Cells = Pathfinder.getLineCellsBetweenBomb(Fight, this.CellId(), Pathfinder.getDirection(null, this.CellId(), Friend.CellId()), Friend.CellId(), false);
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.CellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.CellId());

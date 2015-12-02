@@ -16,7 +16,7 @@ public class Algo {
         short team1_baseCell = map.getRandomWalkableCell();
         short team2_baseCell = map.getRandomWalkableCell();
 
-        if (Pathfinder.GoalDistance(map, team1_baseCell, team2_baseCell) < 3) {
+        if (Pathfinder.getGoalDistance(map, team1_baseCell, team2_baseCell) < 3) {
             return GetRandomBaseCellPlaces(map);
         } else {
             return new Couple<>(team1_baseCell, team2_baseCell);

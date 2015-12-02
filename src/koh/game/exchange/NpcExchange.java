@@ -89,7 +89,7 @@ public class NpcExchange extends Exchange {
             Client.character.inventoryCache.substractKamas(amount1);
         }
 
-        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, TemplateId, 63, Client.character.ID, Quantity, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(TemplateId).possibleEffects, npcItem.genType(), ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon));
+        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, TemplateId, 63, Client.character.ID, Quantity, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(TemplateId).possibleEffects, npcItem.genType(), ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon));
         if (this.myClient.character.inventoryCache.add(Item, true)) {
             Item.needInsert = true;
         }
@@ -110,7 +110,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        NpcItem npcItem = this.Npc.getTemplate().Items.get(Item.TemplateId);
+        NpcItem npcItem = this.Npc.getTemplate().Items.get(Item.templateId);
 
         int Refund = npcItem == null ? (int) ((long) (int) Math.ceil((double) Item.getTemplate().price / 10.0) * (long) Quantity) : (int) ((long) (int) Math.ceil((double) npcItem.getPrice() / 10.0) * (long) Quantity);
         if (Quantity == Item.getQuantity()) {
@@ -119,7 +119,7 @@ public class NpcExchange extends Exchange {
             Client.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - Quantity);
         }
 
-        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{Quantity + "", Item.TemplateId + ""}));
+        this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{Quantity + "", Item.templateId + ""}));
 
         Client.character.inventoryCache.addKamas(Refund);
 

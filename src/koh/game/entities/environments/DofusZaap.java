@@ -1,6 +1,6 @@
 package koh.game.entities.environments;
 
-import koh.game.dao.mysql.MapDAOImpl;
+import koh.game.dao.DAO;
 
 /**
  *
@@ -12,8 +12,8 @@ public class DofusZaap {
     public short Cell;
     public int SubArea;
     
-    public DofusMap Map(){
-        return MapDAOImpl.dofusMaps.get(Mapid);
+    public DofusMap getMap(){
+        return DAO.getMaps().findTemplate(Mapid);
     }
     
 }

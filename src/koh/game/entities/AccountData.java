@@ -86,7 +86,7 @@ public class AccountData {
 
     public boolean add(Player player, InventoryItem item, boolean merge) //muste be true
     {
-        if (merge && tryMergeItem(player, item.TemplateId, item.Effects, item.getSlot(), item.getQuantity(), item, false)) {
+        if (merge && tryMergeItem(player, item.templateId, item.effects, item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
         if (item.getOwner() != id) {
@@ -105,7 +105,7 @@ public class AccountData {
     public boolean tryMergeItem(Player player, int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int quantity, InventoryItem removeItem, boolean send) {
         if (slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.itemscache.values()) {
-                if (Item.TemplateId == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.ID == Item.ID) && Item.Equals(stats) ) {
+                if (Item.templateId == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.ID == Item.ID) && Item.Equals(stats) ) {
                     if (removeItem != null) {
                         this.removeFromDic(removeItem.ID);
                         removeItem.needInsert = false;

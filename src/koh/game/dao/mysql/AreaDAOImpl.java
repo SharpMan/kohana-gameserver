@@ -44,7 +44,7 @@ public class AreaDAOImpl extends AreaDAO {
                         this.containPaddocks = result.getBoolean("contain_paddocks");
                         this.worldmapId = result.getInt("world_map_id");
                         this.hasWorldMap = result.getBoolean("has_world_map");
-                        superAreas.get(result.getInt("super_area")).Areas = ArrayUtils.add(superAreas.get(result.getInt("super_area")).Areas, this);
+                        superAreas.get(result.getInt("super_area")).areas = ArrayUtils.add(superAreas.get(result.getInt("super_area")).areas, this);
                     }
                 });
 
@@ -65,7 +65,7 @@ public class AreaDAOImpl extends AreaDAO {
             while (result.next()) {
                 subAreas.put(result.getInt("id"), new SubArea() {
                     {
-                        this.Id = result.getInt("id");
+                        this.id = result.getInt("id");
                         this.area = areas.get(result.getInt("area_id"));
                         this.mapIds = Enumerable.StringToIntArray(result.getString("map_ids"));
                         this.shape = Enumerable.StringToIntArray(result.getString("shape"));
@@ -99,7 +99,7 @@ public class AreaDAOImpl extends AreaDAO {
             while (result.next()) {
                 superAreas.put(result.getInt("id"), new SuperArea() {
                     {
-                        this.Id = result.getInt("id");
+                        this.id = result.getInt("id");
                         this.worldmapIdtype = result.getInt("world_map_id");
                         this.hasWorldMaptype = result.getBoolean("has_world_map");
                     }

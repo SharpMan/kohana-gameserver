@@ -56,22 +56,22 @@ public class GuildHandler {
     @HandlerAttribute(ID = GuildSpellUpgradeRequestMessage.M_ID)
     public static void HandleGuildSpellUpgradeRequestMessage(WorldClient Client, GuildSpellUpgradeRequestMessage Message) {
         if (Client.character.guild != null && Client.character.getGuildMember().manageGuildBoosts()) {
-            if (Client.character.guild.Entity.Boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)) {
+            if (Client.character.guild.entity.boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)) {
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
 
-            byte SpellLevel = Client.character.guild.SpellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)];
+            byte SpellLevel = Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)];
             if (SpellLevel >= SpellDAOImpl.spells.get(Message.pellId).spellLevels.length) { //action Asyn ^^
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
-            Client.character.guild.SpellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)]++;
-            Client.character.guild.Entity.Boost -= 5;
+            Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)]++;
+            Client.character.guild.entity.boost -= 5;
             Client.character.guild.sendToField(Client.character.guild.toGuildInfosUpgradeMessage());
 
-            Client.character.guild.Entity.Spells = Enumerable.Join(Client.character.guild.SpellLevel, ',');
-            GuildDAO.Update(Client.character.guild.Entity);
+            Client.character.guild.entity.spells = Enumerable.Join(Client.character.guild.spellLevel, ',');
+            GuildDAO.Update(Client.character.guild.entity);
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -80,54 +80,54 @@ public class GuildHandler {
     @HandlerAttribute(ID = GuildCharacsUpgradeRequestMessage.ID)
     public static void HandleGuildCharacsUpgradeRequestMessage(WorldClient Client, GuildCharacsUpgradeRequestMessage Message) {
         if (Client.character.guild != null && Client.character.getGuildMember().manageGuildBoosts()) {
-            if (Client.character.guild.Entity.Boost <= 0) {
+            if (Client.character.guild.entity.boost <= 0) {
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
 
             switch (Message.charaTypeTarget) {
                 case 0:
-                    if (Client.character.guild.Entity.Pods >= 5000) {
+                    if (Client.character.guild.entity.pods >= 5000) {
                         return;
                     }
-                    Client.character.guild.Entity.Pods += 20;
-                    if (Client.character.guild.Entity.Pods >= 5000) {
-                        Client.character.guild.Entity.Pods = 5000;
+                    Client.character.guild.entity.pods += 20;
+                    if (Client.character.guild.entity.pods >= 5000) {
+                        Client.character.guild.entity.pods = 5000;
                     }
                     break;
                 case 1:
-                    if (Client.character.guild.Entity.Prospecting >= 500) {
+                    if (Client.character.guild.entity.prospecting >= 500) {
                         return;
                     }
-                    Client.character.guild.Entity.Prospecting++;
-                    if (Client.character.guild.Entity.Prospecting >= 500) {
-                        Client.character.guild.Entity.Prospecting = 500;
+                    Client.character.guild.entity.prospecting++;
+                    if (Client.character.guild.entity.prospecting >= 500) {
+                        Client.character.guild.entity.prospecting = 500;
                     }
                     break;
                 case 2:
-                    if (Client.character.guild.Entity.Wisdom >= 400) {
+                    if (Client.character.guild.entity.wisdom >= 400) {
                         return;
                     }
-                    Client.character.guild.Entity.Wisdom++;
-                    if (Client.character.guild.Entity.Wisdom >= 400) {
-                        Client.character.guild.Entity.Wisdom = 400;
+                    Client.character.guild.entity.wisdom++;
+                    if (Client.character.guild.entity.wisdom >= 400) {
+                        Client.character.guild.entity.wisdom = 400;
                     }
                     break;
                 case 3:
-                    if (Client.character.guild.Entity.MaxTaxCollectors >= 500 || Client.character.guild.Entity.Boost <= 10) {
+                    if (Client.character.guild.entity.maxTaxCollectors >= 500 || Client.character.guild.entity.boost <= 10) {
                         Client.send(new BasicNoOperationMessage());
                         return;
                     }
-                    Client.character.guild.Entity.Boost -= 9;
-                    Client.character.guild.Entity.MaxTaxCollectors++;
-                    if (Client.character.guild.Entity.MaxTaxCollectors >= 50) {
-                        Client.character.guild.Entity.MaxTaxCollectors = 50;
+                    Client.character.guild.entity.boost -= 9;
+                    Client.character.guild.entity.maxTaxCollectors++;
+                    if (Client.character.guild.entity.maxTaxCollectors >= 50) {
+                        Client.character.guild.entity.maxTaxCollectors = 50;
                     }
                     break;
             }
-            Client.character.guild.Entity.Boost--;
+            Client.character.guild.entity.boost--;
             Client.character.guild.sendToField(Client.character.guild.toGuildInfosUpgradeMessage());
-            GuildDAO.Update(Client.character.guild.Entity);
+            GuildDAO.Update(Client.character.guild.entity);
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -182,7 +182,7 @@ public class GuildHandler {
 
                             Client.send(new GuildInvitationStateRecruterMessage(character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_SENT));
                             character.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.send(new GuildInvitedMessage(Client.character.ID, Client.character.nickName, Client.character.guild.GetBasicGuildInformations()));
+                            character.send(new GuildInvitedMessage(Client.character.ID, Client.character.nickName, Client.character.guild.getBasicGuildInformations()));
                         }
                     }
                 }
@@ -222,7 +222,7 @@ public class GuildHandler {
 
                             Client.send(new GuildInvitationStateRecruterMessage(character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_SENT));
                             character.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.send(new GuildInvitedMessage(Client.character.ID, Client.character.nickName, Client.character.guild.GetBasicGuildInformations()));
+                            character.send(new GuildInvitedMessage(Client.character.ID, Client.character.nickName, Client.character.guild.getBasicGuildInformations()));
                         }
                     }
                 }
@@ -235,9 +235,9 @@ public class GuildHandler {
     @HandlerAttribute(ID = 5549)
     public static void HandleGuildChangeMemberParametersMessage(WorldClient Client, GuildChangeMemberParametersMessage Message) {
         if (Client.character.guild != null) {
-            GuildMember guildMember = Client.character.guild.Members.get(Message.memberId);
+            GuildMember guildMember = Client.character.guild.members.get(Message.memberId);
             if (guildMember != null) {
-                Client.character.guild.ChangeParameters(Client.character, guildMember, Message.rank, Message.experienceGivenPercent, Message.rights);
+                Client.character.guild.changeParameters(Client.character, guildMember, Message.rank, Message.experienceGivenPercent, Message.rights);
             }
 
         } else {
@@ -248,9 +248,9 @@ public class GuildHandler {
     @HandlerAttribute(ID = GuildKickRequestMessage.M_ID)
     public static void HandleGuildKickRequestMessage(WorldClient Client, GuildKickRequestMessage Message) {
         if (Client.character.guild != null) {
-            GuildMember guildMember = Client.character.guild.Members.get(Message.kickedId);
+            GuildMember guildMember = Client.character.guild.members.get(Message.kickedId);
             if (guildMember != null) {
-                Client.character.guild.KickMember(Client.character, guildMember);
+                Client.character.guild.kickMember(Client.character, guildMember);
             }
         } else {
             Client.send(new BasicNoOperationMessage());
@@ -298,43 +298,43 @@ public class GuildHandler {
         } else {
             new Guild(new GuildEntity() {
                 {
-                    this.GuildID = GuildDAO.NextGuildID++;
-                    this.CreationDate = (int) Instant.now().getEpochSecond();
-                    this.EmblemBackgroundColor = Message.guildEmblem.backgroundColor;
-                    this.EmblemBackgroundShape = Message.guildEmblem.backgroundShape;
-                    this.EmblemForegroundColor = Message.guildEmblem.symbolColor;
-                    this.EmblemForegroundShape = Message.guildEmblem.symbolShape;
-                    this.Level = 1;
-                    this.Experience = "0";
-                    this.MaxTaxCollectors = 1;
-                    this.Name = Message.guildName;
-                    this.Pods = 1000;
-                    this.Prospecting = 100;
+                    this.guildID = GuildDAO.NextGuildID++;
+                    this.creationDate = (int) Instant.now().getEpochSecond();
+                    this.emblemBackgroundColor = Message.guildEmblem.backgroundColor;
+                    this.emblemBackgroundShape = Message.guildEmblem.backgroundShape;
+                    this.emblemForegroundColor = Message.guildEmblem.symbolColor;
+                    this.emblemForegroundShape = Message.guildEmblem.symbolShape;
+                    this.level = 1;
+                    this.experience = "0";
+                    this.maxTaxCollectors = 1;
+                    this.name = Message.guildName;
+                    this.pods = 1000;
+                    this.prospecting = 100;
 
-                    this.Spells = "0,0,0,0,0,0,0,0,0,0,0,0";
+                    this.spells = "0,0,0,0,0,0,0,0,0,0,0,0";
                     GuildDAO.Insert(this);
                 }
             }) {
                 {
-                    this.addMember(new GuildMember(this.Entity.GuildID) {
+                    this.addMember(new GuildMember(this.entity.guildID) {
                         {
-                            this.AccountID = Client.getAccount().id;
-                            this.Breed = Client.character.breed;
-                            this.CharacterID = Client.character.ID;
-                            this.LastConnection = System.currentTimeMillis() + "";
-                            this.Level = Client.character.level;
-                            this.Name = Client.character.nickName;
-                            this.Rank = 1;
-                            this.Experience = "0";
-                            this.Rights = GuildRightsBitEnum.GUILD_RIGHT_BOSS;
-                            this.Sex = Client.character.sexe == 1;
+                            this.accountID = Client.getAccount().id;
+                            this.breed = Client.character.breed;
+                            this.characterID = Client.character.ID;
+                            this.lastConnection = System.currentTimeMillis() + "";
+                            this.level = Client.character.level;
+                            this.name = Client.character.nickName;
+                            this.rank = 1;
+                            this.experience = "0";
+                            this.rights = GuildRightsBitEnum.GUILD_RIGHT_BOSS;
+                            this.sex = Client.character.sexe == 1;
                             this.achievementPoints = Client.character.achievementPoints;
                             this.alignmentSide = Client.character.alignmentSide.value;
                             GuildDAO.Insert(this);
                         }
                     }, Client.character);
                     this.registerPlayer(Client.character);
-                    this.SetBoss(this.Members.get(Client.character.ID));
+                    this.setBoss(this.members.get(Client.character.ID));
                 }
             };
 

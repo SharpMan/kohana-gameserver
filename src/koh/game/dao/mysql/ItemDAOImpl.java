@@ -102,7 +102,7 @@ public class ItemDAOImpl extends ItemDAO {
 
             pStatement.setInt(1, item.ID);
             pStatement.setInt(2, item.getOwner());
-            pStatement.setInt(3, item.TemplateId);
+            pStatement.setInt(3, item.templateId);
             pStatement.setInt(4, item.getPosition());
             pStatement.setInt(5, item.getQuantity());
             pStatement.setBytes(6, item.SerializeEffectInstanceDice().array());
@@ -172,7 +172,7 @@ public class ItemDAOImpl extends ItemDAO {
                     break;
                 case "effects":
                     p.setBytes(Seq, Item.SerializeEffectInstanceDice().array());
-                    //p.setBlob(Seq, new SerialBlob(item.SerializeEffectInstanceDice()));
+                    //p.setBlob(Seq, new SerialBlob(item.serializeEffectInstanceDice()));
                     break;
 
             }

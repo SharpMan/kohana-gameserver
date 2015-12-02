@@ -1,6 +1,8 @@
 package koh.game.entities.environments;
 
 import java.util.Arrays;
+
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.dao.mysql.PaddockDAOImpl;
 import koh.protocol.messages.game.context.mount.GameDataPaddockObjectAddMessage;
@@ -20,59 +22,55 @@ import org.apache.commons.lang3.ArrayUtils;
  */
 public class Paddock {
 
-    public int Id, Map;
-    public short SubArea;
-    public boolean Abandonned;
-    public boolean Loocked;
-    public int Price, MaxOutDoorMount, MaxItem;
-    public PaddockItem[] Items;
-    public MountInformationsForPaddock[] MountInformations;
-    public int SelledId;
-    public String OwnerName;
+    public int id, map;
+    public short subArea;
+    public boolean abandonned;
+    public boolean loocked;
+    public int price, maxOutDoorMount, maxItem;
+    public PaddockItem[] items;
+    public MountInformationsForPaddock[] mountInformationsForPaddocks;
+    public int selledId;
+    public String ownerName;
     public GuildInformations guildInfo;
 
-    public PaddockInformations Informations() {
-        if (this.Price == -1 && this.OwnerName == null && MaxOutDoorMount == 5) {
-            return new PaddockInformations(this.MaxOutDoorMount, this.MaxItem);
+    public PaddockInformations getInformations() {
+        if (this.price == -1 && this.ownerName == null && maxOutDoorMount == 5) {
+            return new PaddockInformations(this.maxOutDoorMount, this.maxItem);
         } else if (guildInfo != null) {
-            return new PaddockPrivateInformations(this.MaxOutDoorMount, this.MaxItem, this.Price, this.Loocked, this.guildInfo.guildId, this.guildInfo);
-        } else if (this.Abandonned) {
-            return new PaddockAbandonnedInformations(this.MaxOutDoorMount, this.MaxItem, this.Price, this.Loocked, 0);
-        } else if (Price > 0) {
-            return new PaddockBuyableInformations(this.MaxOutDoorMount, this.MaxItem, this.Price, this.Loocked);
+            return new PaddockPrivateInformations(this.maxOutDoorMount, this.maxItem, this.price, this.loocked, this.guildInfo.guildId, this.guildInfo);
+        } else if (this.abandonned) {
+            return new PaddockAbandonnedInformations(this.maxOutDoorMount, this.maxItem, this.price, this.loocked, 0);
+        } else if (price > 0) {
+            return new PaddockBuyableInformations(this.maxOutDoorMount, this.maxItem, this.price, this.loocked);
         } else {
-            return new PaddockAbandonnedInformations(this.MaxOutDoorMount, this.MaxItem, this.Price, this.Loocked, 0);
+            return new PaddockAbandonnedInformations(this.maxOutDoorMount, this.maxItem, this.price, this.loocked, 0);
         }
     }
 
-    public void AddPaddockItem(PaddockItem Item) {
-        if (this.Items == null) {
-            this.Items = new PaddockItem[0];
+    public void addPaddockItem(PaddockItem Item) {
+        if (this.items == null) {
+            this.items = new PaddockItem[0];
         }
-        this.Items = ArrayUtils.add(Items, Item);
-        PaddockDAOImpl.update(this, new String[]{"items"});
-        MapDAOImpl.dofusMaps.get(this.Map).sendToField(new GameDataPaddockObjectAddMessage(Item));
+        this.items = ArrayUtils.add(items, Item);
+        DAO.getPaddocks().update(this, new String[]{"items"});
+        DAO.getMaps().findTemplate(this.map).sendToField(new GameDataPaddockObjectAddMessage(Item));
 
     }
 
-    public PaddockItem GetItem(int cell) {
-        try {
-            return Arrays.stream(this.Items).filter(x -> x.cellId == cell).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+    public PaddockItem getItem(int cell) {
+        return Arrays.stream(this.items).filter(x -> x.cellId == cell).findFirst().orElse(null);
     }
 
-    public void RemovePaddockItem(int Cell) {
-        if (this.Items == null) {
-            this.Items = new PaddockItem[0];
-        } else if (GetItem(Cell) == null) {
+    public void removePaddockItem(int Cell) {
+        if (this.items == null) {
+            this.items = new PaddockItem[0];
+        } else if (getItem(Cell) == null) {
             return;
         }
 
-        this.Items = ArrayUtils.removeElement(Items, GetItem(Cell));
-        PaddockDAOImpl.update(this, new String[]{"items"});
-        MapDAOImpl.dofusMaps.get(this.Map).sendToField(new GameDataPaddockObjectRemoveMessage(Cell));
+        this.items = ArrayUtils.removeElement(items, getItem(Cell));
+        DAO.getPaddocks().update(this, new String[]{"items"});
+        DAO.getMaps().findTemplate(this.map).sendToField(new GameDataPaddockObjectRemoveMessage(Cell));
 
     }
 

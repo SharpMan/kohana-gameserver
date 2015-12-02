@@ -26,9 +26,9 @@ import java.util.stream.Stream;
 public class MapDAOImpl extends MapDAO {
 
     private static final Logger logger = LogManager.getLogger(MapDAOImpl.class);
-    public Map<Integer, DofusMap> dofusMaps = new HashMap<>();
-    public Map<Integer, DofusZaap> zaaps = new HashMap<>(30);
-    public Map<Integer, ArrayList<DofusZaap>> subWays = new HashMap<>(40); //@Param1 = AreaId , ^Param2 = List of Subways
+    private final Map<Integer, DofusMap> dofusMaps = new HashMap<>();
+    private final Map<Integer, DofusZaap> zaaps = new HashMap<>(30);
+    private final Map<Integer, ArrayList<DofusZaap>> subWays = new HashMap<>(40); //@Param1 = AreaId , ^Param2 = List of Subways
     @Inject
     private DatabaseSource dbSource;
 
@@ -145,10 +145,10 @@ public class MapDAOImpl extends MapDAO {
                     dofusMaps.get(result.getInt("old_map")).Init();
                     dofusMaps.get(result.getInt("old_map")).getCell(result.getShort("old_cell")).myAction = new DofusTrigger() {
                         {
-                            this.Type = result.getInt("type");
-                            this.NewMap = result.getInt("map");
-                            this.NewCell = result.getShort("cell");
-                            this.Criteria = result.getString("conditions");
+                            this.type = result.getInt("type");
+                            this.newMap = result.getInt("map");
+                            this.newCell = result.getShort("cell");
+                            this.criteria = result.getString("conditions");
                         }
                     };
                 } catch (Exception e) {
@@ -172,11 +172,11 @@ public class MapDAOImpl extends MapDAO {
                 try {
                     dofusMaps.get(result.getInt("map")).addDoor(new MapDoor() {
                         {
-                            this.ElementID = result.getInt("elem_id");
-                            this.Map = result.getInt("map");
-                            this.Type = result.getInt("type");
-                            this.Parameters = result.getString("parameters");
-                            this.Criteria = result.getString("criteria");
+                            this.elementID = result.getInt("elem_id");
+                            this.map = result.getInt("map");
+                            this.type = result.getInt("type");
+                            this.parameters = result.getString("parameters");
+                            this.criteria = result.getString("criteria");
                         }
                     });
                 } catch (Exception e) {
@@ -315,7 +315,7 @@ public class MapDAOImpl extends MapDAO {
     }
 
     @Override
-    public DofusMap getMap(int id) {
+    public DofusMap findTemplate(int id) {
         return this.dofusMaps.get(id);
     }
 

@@ -82,7 +82,7 @@ public class Path {
 
     public void CutPath(int index) {
         if (index <= this.m_cellsPath.length - 1) {
-            //Take == Get first element this.m_cellsPath = this.m_cellsPath.Take(index).ToArray<cell>();
+            //Take == get first element this.m_cellsPath = this.m_cellsPath.Take(index).ToArray<cell>();
             System.arraycopy(this.m_cellsPath, 0, this.m_cellsPath, 0, index);
 
             this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.id)).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
@@ -97,7 +97,7 @@ public class Path {
             result = DirectionsEnum.RIGHT;
         } else {
             if (this.m_compressedPath != null) {
-                result = this.m_compressedPath[this.m_compressedPath.length].Direction;
+                result = this.m_compressedPath[this.m_compressedPath.length].direction;
                 //result = this.m_compressedPath.Last<ObjectPosition>().direction;
             } else {
                 result = this.m_path[this.m_path.length - 2].orientationTo(this.m_path[this.m_path.length - 1]);
@@ -120,10 +120,10 @@ public class Path {
                 for (int i = 1; i < this.m_cellsPath.length; i++) {
                     list.add(new ObjectPosition(this.Map, this.m_cellsPath[i - 1], this.m_path[i - 1].orientationTo(this.m_path[i])));
                 }
-                list.add(new ObjectPosition(this.Map, this.m_cellsPath[this.m_cellsPath.length - 1], list.get(list.size() - 1).Direction));
+                list.add(new ObjectPosition(this.Map, this.m_cellsPath[this.m_cellsPath.length - 1], list.get(list.size() - 1).direction));
                 if (list.size() > 0) {
                     for (int i = list.size() - 2; i > 0; i--) {
-                        if (list.get(i).Direction == list.get(i - 1).Direction) {
+                        if (list.get(i).direction == list.get(i - 1).direction) {
                             list.remove(i);
                         }
                     }
@@ -137,10 +137,10 @@ public class Path {
     private DofusCell[] BuildCompletePath() {
         List<DofusCell> list = new ArrayList<>();
         for (int i = 0; i < this.m_compressedPath.length - 1; i++) {
-            list.add(this.m_compressedPath[i].Cell);
+            list.add(this.m_compressedPath[i].cell);
             int num = 0;
-            MapPoint mapPoint = this.m_compressedPath[i].Point;
-            while ((mapPoint = mapPoint.getNearestCellInDirection(this.m_compressedPath[i].Direction)) != null && mapPoint.get_cellId() != this.m_compressedPath[i + 1].Cell.id) {
+            MapPoint mapPoint = this.m_compressedPath[i].point;
+            while ((mapPoint = mapPoint.getNearestCellInDirection(this.m_compressedPath[i].direction)) != null && mapPoint.get_cellId() != this.m_compressedPath[i + 1].cell.id) {
                 if ((long) num > 54L) {
                     Main.Logs().writeError("Path too long. Maybe an orientation problem ?");
                 }
@@ -148,7 +148,7 @@ public class Path {
                 num++;
             }
         }
-        list.add(this.m_compressedPath[this.m_compressedPath.length - 1].Cell);
+        list.add(this.m_compressedPath[this.m_compressedPath.length - 1].cell);
         return (DofusCell[]) list.toArray(); //Lol it's work ?
     }
 

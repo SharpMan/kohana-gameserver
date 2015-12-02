@@ -15,8 +15,8 @@ public class MountTemplate {
     }
 
     public int Id;
-    public EntityLook Look;
-    public ArrayList<Couple<Integer, Double>> Stats = new ArrayList<>();
-    public int ScroolId;
+    public EntityLook entityLook;
+    public ArrayList<Couple<Integer, Double>> stats = new ArrayList<>();
+    public int scroolId;
 
 }

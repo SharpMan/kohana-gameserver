@@ -57,17 +57,9 @@ public class JobDAOImpl extends JobDAO {
             while (result.next()) {
                 gatheringJobs.put(result.getInt("start_level"), new JobGatheringInfos() {
                     {
-                        this.gatheringByLevel.put(0, this.toCouple(result.getString("level0")));
-                        this.gatheringByLevel.put(20, this.toCouple(result.getString("level20")));
-                        this.gatheringByLevel.put(40, this.toCouple(result.getString("level40")));
-                        this.gatheringByLevel.put(60, this.toCouple(result.getString("level60")));
-                        this.gatheringByLevel.put(80, this.toCouple(result.getString("level80")));
-                        this.gatheringByLevel.put(100, this.toCouple(result.getString("level100")));
-                        this.gatheringByLevel.put(120, this.toCouple(result.getString("level120")));
-                        this.gatheringByLevel.put(140, this.toCouple(result.getString("level140")));
-                        this.gatheringByLevel.put(160, this.toCouple(result.getString("level160")));
-                        this.gatheringByLevel.put(180, this.toCouple(result.getString("level180")));
-                        this.gatheringByLevel.put(200, this.toCouple(result.getString("level200")));
+                        for(int i=0; i<=200; i+=20) {
+                            this.gatheringByLevel.put(i, this.toCouple(result.getString("level"+i)));
+                        }
                         this.bonusMin = Integer.parseInt(result.getString("bonus").split("-")[0]);
                         this.bonusMax = Integer.parseInt(result.getString("bonus").split("-")[1]);
                         this.xpEarned = result.getInt("xp_earned");

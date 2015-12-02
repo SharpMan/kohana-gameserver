@@ -10,30 +10,30 @@ import koh.game.entities.actors.Player;
  */
 public class MapDoor {
 
-    public int ElementID;
-    public int Type, Map;
-    public String Parameters;
-    public String Criteria;
+    public int elementID;
+    public int type, map;
+    public String parameters;
+    public String criteria;
 
     private ConditionExpression m_criteriaExpression;
 
-    public ConditionExpression CriteriaExpression() {
+    public ConditionExpression getCriteriaExpression() {
         if (m_criteriaExpression == null) {
-            if (Strings.isNullOrEmpty(Criteria) || this.Criteria.equalsIgnoreCase("null")) {
+            if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                 return null;
             } else {
-                this.m_criteriaExpression = ConditionExpression.Parse(this.Criteria);
+                this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
             }
         }
         return m_criteriaExpression;
     }
 
-    public boolean AreConditionFilled(Player character) {
+    public boolean areConditionFilled(Player character) {
         try {
-            if (this.CriteriaExpression() == null) {
+            if (this.getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.CriteriaExpression().Eval(character);
+                return this.getCriteriaExpression().Eval(character);
             }
         } catch (Exception e) {
             e.printStackTrace();

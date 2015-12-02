@@ -6,12 +6,12 @@ package koh.game.entities.environments;
  */
  public class NeighBourStruct {
 
-        public int Mapid;
-        public int Cellid;
+        public int mapid;
+        public int cellid;
 
         public NeighBourStruct(int Mapid, int Cellid) {
-            this.Mapid = Mapid;
-            this.Cellid = Cellid;
+            this.mapid = Mapid;
+            this.cellid = Cellid;
         }
     }
 

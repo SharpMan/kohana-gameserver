@@ -12,7 +12,7 @@ import com.j256.ormlite.table.DatabaseTable;
 public class PetsInventoryItemEntity {
 
     @DatabaseField(columnName = "id", dataType = DataType.INTEGER, id = true)
-    public int PetsID;
+    public int petsID;
 
     @DatabaseField(columnDefinition = "LONGBLOB not null", columnName = "infos", dataType = DataType.BYTE_ARRAY)
     public byte[] informations;
@@ -21,14 +21,14 @@ public class PetsInventoryItemEntity {
     public String lastEat;
 
     @DatabaseField(columnName = "hormone_used", dataType = DataType.INTEGER)
-    public int PointsUsed;
+    public int pointsUsed;
 
     void totalClear() {
         try {
-            this.PetsID = 0;
+            this.petsID = 0;
             this.informations = null;
             this.lastEat = null;
-            this.PointsUsed = 0;
+            this.pointsUsed = 0;
             this.finalize();
         } catch (Throwable tr) {
         }

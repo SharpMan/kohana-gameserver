@@ -150,7 +150,7 @@ public class FightTeam {
         return fighter.Team.Id == this.Id;
     }
 
-    public void sendToField(Message Message) { //TODO : Clean this fucking code
+    public void sendToField(Message Message) { //TODO : clean this fucking code
         this.Fight.sendToField(new FieldNotification(Message) {
             @Override
             public boolean can(Player perso) {

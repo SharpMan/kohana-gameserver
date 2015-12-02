@@ -32,18 +32,18 @@ public class GuildJoinRequest extends GameBaseRequest {
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             if (this.requester.character.guild != null) {
-                this.requester.character.guild.addMember(new GuildMember(this.requester.character.guild.Entity.GuildID) {
+                this.requester.character.guild.addMember(new GuildMember(this.requester.character.guild.entity.guildID) {
                     {
-                        this.AccountID = requested.getAccount().id;
-                        this.Breed = requested.character.breed;
-                        this.CharacterID = requested.character.ID;
-                        this.LastConnection = System.currentTimeMillis() + "";
-                        this.Level = requested.character.level;
-                        this.Name = requested.character.nickName;
-                        this.Rank = 0;
-                        this.Experience = "0";
-                        this.Rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
-                        this.Sex = requested.character.sexe == 1;
+                        this.accountID = requested.getAccount().id;
+                        this.breed = requested.character.breed;
+                        this.characterID = requested.character.ID;
+                        this.lastConnection = System.currentTimeMillis() + "";
+                        this.level = requested.character.level;
+                        this.name = requested.character.nickName;
+                        this.rank = 0;
+                        this.experience = "0";
+                        this.rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
+                        this.sex = requested.character.sexe == 1;
                         this.achievementPoints = requested.character.achievementPoints;
                         this.alignmentSide = requested.character.alignmentSide.value;
                         GuildDAO.Insert(this);

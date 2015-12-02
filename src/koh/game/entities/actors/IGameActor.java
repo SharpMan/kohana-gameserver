@@ -28,7 +28,7 @@ public abstract class IGameActor {
     public byte direction = 1;
 
     public DofusMap getDofusMap() {
-        return DAO.getMaps().getMap(this.mapid);
+        return DAO.getMaps().findTemplate(this.mapid);
     }
 
     public GameContextActorInformations getGameContextActorInformations(Player character) {

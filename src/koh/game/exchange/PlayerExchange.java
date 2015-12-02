@@ -127,7 +127,7 @@ public class PlayerExchange extends Exchange {
             return false;
         }
         if (Item.IsLinked() || Item.isEquiped()) {
-            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{Item.TemplateId + "", Item.ID + ""}));
+            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{Item.templateId + "", Item.ID + ""}));
             return false;
         }
         this.UnValidateAll();
@@ -251,8 +251,8 @@ public class PlayerExchange extends Exchange {
         }
 
         Main.Logs().writeDebug("PlayerExchange(" + this.myClient1.character.nickName + " - " + this.myClient1.character.nickName + ")::Finish()"
-                + "\n          -- P1(Items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient1).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient1) + ")"
-                + "\n          -- P2(Items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
+                + "\n          -- P1(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient1).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient1) + ")"
+                + "\n          -- P2(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient1).entrySet()) {
             InventoryItem Item = this.myClient1.character.inventoryCache.itemsCache.get(ItemData.getKey());
@@ -265,7 +265,7 @@ public class PlayerExchange extends Exchange {
                 this.myClient1.character.inventoryCache.ChangeOwner(Item, this.myClient2.character);
             } else {
                 this.myClient1.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.TemplateId, this.myClient2.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                CharacterInventory.tryCreateItem(Item.templateId, this.myClient2.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 
@@ -280,7 +280,7 @@ public class PlayerExchange extends Exchange {
                 this.myClient2.character.inventoryCache.ChangeOwner(Item, this.myClient1.character);
             } else {
                 this.myClient2.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.TemplateId, this.myClient1.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                CharacterInventory.tryCreateItem(Item.templateId, this.myClient1.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 

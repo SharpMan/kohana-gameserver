@@ -26,11 +26,11 @@ import org.apache.mina.core.buffer.IoBuffer;
 public class InventoryItem {
 
     public int ID;
-    public int TemplateId;
+    public int templateId;
     private int Position;
     private int Owner;
     private int Quantity;
-    public List<ObjectEffect> Effects; //FIXME : Think if we should migrate to Array or not , trought newArray = ArraysUtils.add(T[] Array,T Element);
+    public List<ObjectEffect> effects; //FIXME : Think if we should migrate to Array or not , trought newArray = ArraysUtils.add(T[] Array,T Element);
     public boolean needInsert, NeedRemove;
     public List<String> columsToUpdate = null;
 
@@ -52,19 +52,19 @@ public class InventoryItem {
 
     public InventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
         this.ID = ID;
-        this.TemplateId = TemplateId;
+        this.templateId = TemplateId;
         this.Position = Position;
         this.Owner = Owner;
         this.Quantity = Quantity;
-        this.Effects = Effects;
+        this.effects = Effects;
     }
 
     public ObjectItem getObjectItem(int WithQuantity) {
-        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, WithQuantity);
+        return new ObjectItem(this.Position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, WithQuantity);
     }
 
     public ObjectItem getObjectItem() {
-        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.Quantity);
+        return new ObjectItem(this.Position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.Quantity);
     }
 
     public ItemSuperTypeEnum getSuperType() {
@@ -80,15 +80,15 @@ public class InventoryItem {
     }
 
     public boolean isLivingObject() {
-        return this.getTemplate().typeId == 113 || (this.GetEffect(970) != null && this.GetEffect(971) != null);
+        return this.getTemplate().typeId == 113 || (this.getEffect(970) != null && this.getEffect(971) != null);
     }
 
     public short getApparrance() {
-        ObjectEffectInteger effect = (ObjectEffectInteger) this.GetEffect(972);
+        ObjectEffectInteger effect = (ObjectEffectInteger) this.getEffect(972);
         if (effect == null) {
             return this.getTemplate().appearanceId;
         } else {
-            ObjectEffectInteger type = (ObjectEffectInteger) this.GetEffect(970);
+            ObjectEffectInteger type = (ObjectEffectInteger) this.getEffect(970);
             if (type == null) {
                 return this.getTemplate().appearanceId;
             }
@@ -102,7 +102,7 @@ public class InventoryItem {
 
     public void setPosition(int i) {
         this.Position = i;
-        this.NotifiedColumn("position");
+        this.notifyColumn("position");
     }
 
     public int getQuantity() {
@@ -111,7 +111,7 @@ public class InventoryItem {
 
     public void SetQuantity(int i) {
         this.Quantity = i;
-        this.NotifiedColumn("stack");
+        this.notifyColumn("stack");
     }
 
     public int getOwner() {
@@ -120,10 +120,10 @@ public class InventoryItem {
 
     public void setOwner(int i) {
         this.Owner = i;
-        this.NotifiedColumn("owner");
+        this.notifyColumn("owner");
     }
 
-    public void NotifiedColumn(String C) {
+    public void notifyColumn(String C) {
         if (this.columsToUpdate == null) {
             this.columsToUpdate = new ArrayList<>();
         }
@@ -133,15 +133,15 @@ public class InventoryItem {
     }
 
     public boolean hasEffect(int id) {
-        return this.Effects.stream().anyMatch(x -> x.actionId == id);
+        return this.effects.stream().anyMatch(x -> x.actionId == id);
     }
 
-    public ObjectEffect GetEffect(int id) {
-        return this.Effects.stream().filter(x -> x.actionId == id).findFirst().orElse(null);
+    public ObjectEffect getEffect(int id) {
+        return this.effects.stream().filter(x -> x.actionId == id).findFirst().orElse(null);
     }
 
     public ItemTemplate getTemplate() {
-        return ItemTemplateDAOImpl.Cache.get(TemplateId);
+        return ItemTemplateDAOImpl.Cache.get(templateId);
     }
 
     public ItemType ItemType() {
@@ -149,33 +149,33 @@ public class InventoryItem {
     }
 
     public Weapon WeaponTemplate() {
-        return (Weapon) ItemTemplateDAOImpl.Cache.get(TemplateId);
+        return (Weapon) ItemTemplateDAOImpl.Cache.get(templateId);
     }
 
     public CharacterInventoryPositionEnum getSlot() {
         return CharacterInventoryPositionEnum.valueOf((byte) this.Position);
     }
 
-    public void RemoveEffect(int... id) {
+    public void removeEffect(int... id) {
         for (int i : id) {
-            this.RemoveEffect(i);
+            this.removeEffect(i);
         }
     }
 
-    private void RemoveEffect(int id) {
-        if (this.Effects.removeIf(x -> x.actionId == id)) {
-            this.NotifiedColumn("effects");
+    private void removeEffect(int id) {
+        if (this.effects.removeIf(x -> x.actionId == id)) {
+            this.notifyColumn("effects");
         }
     }
 
     public List<ObjectEffect> getEffects() {
-        this.NotifiedColumn("effects");
-        return Effects;
+        this.notifyColumn("effects");
+        return effects;
     }
 
     public List<ObjectEffect> getEffectsCopy() {
         List<ObjectEffect> effects = new ArrayList<>();
-        this.Effects.stream().forEach((e) -> { //TODO: Parralel Stream
+        this.effects.stream().forEach((e) -> { //TODO: Parralel Stream
             effects.add(e.Clone());
         });
         return effects;
@@ -192,16 +192,16 @@ public class InventoryItem {
 
     public void setPosition(CharacterInventoryPositionEnum Slot) {
         this.Position = Slot.value();
-        this.NotifiedColumn("position");
+        this.notifyColumn("position");
     }
 
     public boolean Equals(Collection<ObjectEffect> Effects) {
         ObjectEffect Get = null;
-        if (Effects.size() != this.Effects.size()) {
+        if (Effects.size() != this.effects.size()) {
             return false;
         }
         for (ObjectEffect e : Effects) {
-            Get = this.GetEffect(e.actionId);
+            Get = this.getEffect(e.actionId);
             if (Get == null || !Get.equals(e)) {
                 return false;
             }
@@ -225,8 +225,8 @@ public class InventoryItem {
         IoBuffer buff = IoBuffer.allocate(65535);
         buff.setAutoExpand(true);
 
-        buff.putInt(Effects.size());
-        for (ObjectEffect e : Effects) {
+        buff.putInt(effects.size());
+        for (ObjectEffect e : effects) {
             buff.putInt(e.getTypeId());
             e.serialize(buff);
         }
@@ -250,14 +250,14 @@ public class InventoryItem {
     }
 
     public boolean isWeapon() {
-        return ItemTemplateDAOImpl.Cache.get(TemplateId) instanceof Weapon;
+        return ItemTemplateDAOImpl.Cache.get(templateId) instanceof Weapon;
     }
 
     private void ParseStats() {
         this.myStats = new GenericStats();
 
         StatsEnum Stat;
-        for (ObjectEffect e : this.Effects) {
+        for (ObjectEffect e : this.effects) {
             if (e instanceof ObjectEffectInteger) {
                 Stat = StatsEnum.valueOf(e.actionId);
                 if (Stat == null) {
@@ -283,15 +283,15 @@ public class InventoryItem {
     public void totalClear() {
         try {
             ID = 0;
-            TemplateId = 0;
+            templateId = 0;
             Position = 0;
             Owner = 0;
             Quantity = 0;
-            /*for (ObjectEffect e : Effects) {
+            /*for (ObjectEffect e : effects) {
              e.totalClear();
              }*/
-            Effects.clear();
-            Effects = null;
+            effects.clear();
+            effects = null;
             needInsert = false;
             NeedRemove = false;
             columsToUpdate.clear();

@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.guilds.GuildEntity;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.animal.MountInventoryItemEntity;
@@ -35,6 +34,9 @@ public class PetsDAO {
 
     private static Dao<PetsInventoryItemEntity, Integer> accountDao;
     private static Dao<MountInventoryItemEntity, Integer> mountsDao;
+
+
+    public static volatile int nextPetId, nextMountID; //Do not modify to Statement.GET-KEY beacause of many behind codes to modif so avoid this stupid code
 
     public static void doOpenConnectionSource() throws Exception {
         if (connectionSource == null) {
@@ -77,17 +79,17 @@ public class PetsDAO {
             List<String[]> results = rawResults.getResults();
             String[] resultArray = results.get(0);
             if (resultArray == null || resultArray[0] == null) {
-                ItemTemplateDAOImpl.nextPetId = 0;
+                nextPetId = 0;
             } else {
-                ItemTemplateDAOImpl.nextPetId = Integer.parseInt(resultArray[0]) + 1;
+                nextPetId = Integer.parseInt(resultArray[0]) + 1;
             }
             rawResults = accountDao.queryRaw("select MAX(id) from mounts");
             results = rawResults.getResults();
             resultArray = results.get(0);
             if (resultArray == null || resultArray[0] == null) {
-                ItemTemplateDAOImpl.NextMountsID = 0;
+                nextMountID = 0;
             } else {
-                ItemTemplateDAOImpl.NextMountsID = Integer.parseInt(resultArray[0]) + 1;
+                nextMountID = Integer.parseInt(resultArray[0]) + 1;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,7 +114,7 @@ public class PetsDAO {
         }
     }
 
-    public static PetsInventoryItemEntity Get(int id) {
+    public static PetsInventoryItemEntity get(int id) {
         try {
             doOpenConnectionSource();
             return accountDao.queryForId(id);

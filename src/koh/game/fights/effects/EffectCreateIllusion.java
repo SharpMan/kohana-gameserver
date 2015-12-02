@@ -25,8 +25,8 @@ public class EffectCreateIllusion extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        int DistanceCharacterFromHidedPlace = Pathfinder.GoalDistance(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
-        byte IgnoredDirection = Pathfinder.GetDirection(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
+        int DistanceCharacterFromHidedPlace = Pathfinder.getGoalDistance(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
+        byte IgnoredDirection = Pathfinder.getDirection(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
         short StartCell = CastInfos.Caster.CellId();
 
         BuffState Buff = new BuffState(new EffectCast(StatsEnum.Invisibility, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.Caster, null), CastInfos.Caster);
@@ -54,7 +54,7 @@ public class EffectCreateIllusion extends EffectBase {
             if (IgnoredDirection == Direction) {
                 continue;
             }
-            FightCell Cell = CastInfos.Caster.Fight.GetCell(Pathfinder.NextCell(StartCell, Direction, DistanceCharacterFromHidedPlace));
+            FightCell Cell = CastInfos.Caster.Fight.GetCell(Pathfinder.nextCell(StartCell, Direction, DistanceCharacterFromHidedPlace));
             if (Cell != null && Cell.CanWalk()) {
                 IllusionFighter Clone = new IllusionFighter(CastInfos.Caster.Fight, CastInfos.Caster);
                 Clone.Fight.JoinFightTeam(Clone, CastInfos.Caster.Team, false, Cell.Id, true);

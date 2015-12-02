@@ -56,9 +56,9 @@ public class InteractiveUsage implements InteractiveAction {
             PlayerController.sendServerMessage(actor.client, "Door not implanted yet ..." + element);
             return;
         }
-        switch (ActionType.valueOf(actor.currentMap.getDoor(element).Type)) {
+        switch (ActionType.valueOf(actor.currentMap.getDoor(element).type)) {
             case TELEPORT:
-                actor.teleport(Integer.parseInt(actor.currentMap.getDoor(element).Parameters.split(",")[0]), Integer.parseInt(actor.currentMap.getDoor(element).Parameters.split(",")[1]));
+                actor.teleport(Integer.parseInt(actor.currentMap.getDoor(element).parameters.split(",")[0]), Integer.parseInt(actor.currentMap.getDoor(element).parameters.split(",")[1]));
                 break;
             case CREATE_GUILDE:
                 //if (actor.client.canGameAction(GameActionTypeEnum.CREATE_GUILD)) {

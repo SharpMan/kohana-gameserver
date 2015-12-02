@@ -43,7 +43,7 @@ public class BuffPoutch extends BuffEffect {
         }
 
         if (CastInfos.SpellId == 2809) {
-            if(Pathfinder.GoalDistance(null, DamageInfos.Caster.CellId(), Target.CellId()) > 1){
+            if(Pathfinder.getGoalDistance(null, DamageInfos.Caster.CellId(), Target.CellId()) > 1){
                 return -1;
             }
             //Target = DamageInfos.Caster;
@@ -100,21 +100,21 @@ public class BuffPoutch extends BuffEffect {
             }
         }
 
-        /*int Apply = -1;
+        /*int apply = -1;
          for (short cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true))).getCells(Target.CellId())) {
          FightCell FightCell = this.Target.fight.GetCell(cell);
          if (FightCell != null) {
          if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
          for (Fighter Target : FightCell.GetObjectsAsFighter()) {
          int newValue = EffectDamage.ApplyDamages(DamageInfos, Target, new MutableInt((DamageInfos.RandomJet(Target) * 20) / 100));
-         if (newValue < Apply) {
-         Apply = newValue;
+         if (newValue < apply) {
+         apply = newValue;
          }
          }
          }
          }
          }
-         return Apply;*/
+         return apply;*/
         //return EffectDamage.ApplyDamages(DamageInfos, Target, new MutableInt((DamageInfos.RandomJet(Target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
         return super.ApplyEffect(DamageValue, DamageInfos);
     }

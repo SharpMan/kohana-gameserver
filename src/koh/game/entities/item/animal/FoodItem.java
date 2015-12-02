@@ -6,13 +6,13 @@ package koh.game.entities.item.animal;
  */
 public class FoodItem {
 
-    public int ItemID, Point, Stats, StatsPoints;
+    public int itemID, point, stats, statsPoints;
 
     public FoodItem(int ItemID, int Point, int Stats, int StatsPoints) {
-        this.ItemID = ItemID;
-        this.Point = Point;
-        this.Stats = Stats;
-        this.StatsPoints = StatsPoints;
+        this.itemID = ItemID;
+        this.point = Point;
+        this.stats = Stats;
+        this.statsPoints = StatsPoints;
     }
     
     

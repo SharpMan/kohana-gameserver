@@ -162,7 +162,7 @@ public class FightPortal extends FightActivableObject {
     static void shuffle(FightPortal[] array) {
         int n = array.length;
         for (int i = 0; i < array.length; i++) {
-            // Get a random index of the array past i.
+            // get a random index of the array past i.
             int random = i + (int) (Math.random() * (n - i));
             // Swap the random element with the present element.
             FightPortal randomElement = array[random];

@@ -19,19 +19,35 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @author Neo-Craft
  */
 public class NpcDAOImpl extends NpcDAO {
 
-    private static final Logger logger = LogManager.getLogger(NpcDAOImpl.class);
-    public static Map<Integer, NpcTemplate> templates = new HashMap<>(2500);
-    public static Map<Integer, ArrayList<Npc>> npcs = new HashMap<>(1000);
-    public static Map<Integer, NpcMessage> messages = new HashMap<>(20000);
-    public static List<NpcReply> replies = new ArrayList<>(100);
+    private final Logger logger = LogManager.getLogger(NpcDAOImpl.class);
+    private final Map<Integer, NpcTemplate> templates = new HashMap<>(2500);
+    private final Map<Integer, ArrayList<Npc>> npcs = new HashMap<>(1000);
+    private final Map<Integer, NpcMessage> messages = new HashMap<>(20000);
+    private final List<NpcReply> replies = new ArrayList<>(100);
+
     @Inject
     private DatabaseSource dbSource;
+
+
+    @Override
+    public NpcTemplate findTemplate(int id) { return this.templates.get(id);}
+
+    @Override
+    public NpcMessage getNpcMessage(int id){
+        return this.messages.get(id);
+    }
+
+    @Override
+    public Stream<NpcReply> repliesAsStream(){
+        return this.replies.stream();
+    }
 
     private int loadAllReplies() {
         int i = 0;
@@ -193,7 +209,7 @@ public class NpcDAOImpl extends NpcDAO {
                         this.dialogReplies = Enumerable.StringToMultiArray(result.getString("dialog_replies"));
                         this.actions = Enumerable.StringToIntArray(result.getString("actions"));
                         this.gender = result.getInt("gender");
-                        this.look = result.getString("look");
+                        this.look = result.getString("entityLook");
                         this.fastAnimsFun = result.getBoolean("fast_anims_fun");
                         this.OrderItemsByLevel = result.getBoolean("order_items_level");
                         this.OrderItemsByPrice = result.getBoolean("order_items_price");

@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class MonsterDAOImpl extends MonsterDAO {
 
     private static final Logger logger = LogManager.getLogger(MonsterDAOImpl.class);
-    private static HashMap<Integer, MonsterTemplate> templates = new HashMap<>(3000);
+    private final HashMap<Integer, MonsterTemplate> templates = new HashMap<>(3000);
     @Inject
     private DatabaseSource dbSource;
 
@@ -38,7 +38,7 @@ public class MonsterDAOImpl extends MonsterDAO {
                         gfxId = result.getInt("gfx_id");
                         race = result.getInt("race");
                         grades = new MonsterGrade[0];
-                        look = result.getString("look");
+                        look = result.getString("entityLook");
                         useSummonSlot = result.getBoolean("use_summon_slot");
                         useBombSlot = result.getBoolean("use_bomb_slot");
                         canPlay = result.getBoolean("can_play");

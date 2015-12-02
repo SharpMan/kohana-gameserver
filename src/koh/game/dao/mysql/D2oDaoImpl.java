@@ -17,7 +17,7 @@ public class D2oDaoImpl extends D2oDAO {
     private static d2oReader d2oBreeds, d2oHeads, d2oEffects, d2oStates = null;
 
     public void loadAll() {
-        d2oEffects = new d2oReader("data/Effects.d2o");
+        d2oEffects = new d2oReader("data/effects.d2o");
         d2oBreeds = new d2oReader("data/Breeds.d2o");
         d2oHeads = new d2oReader("data/Heads.d2o");
         d2oStates = new d2oReader("data/SpellStates.d2o");

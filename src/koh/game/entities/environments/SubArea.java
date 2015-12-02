@@ -9,7 +9,7 @@ import koh.protocol.types.game.prism.PrismSubareaEmptyInfo;
  */
 public class SubArea {
 
-    public int Id;
+    public int id;
     //public String nameId;
     public Area area;
     public int[] mapIds;

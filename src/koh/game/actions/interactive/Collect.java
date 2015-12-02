@@ -56,8 +56,8 @@ public class Collect implements InteractiveAction {
             return;
         }
         actor.currentMap.getStatedElementById(element).elementState = 2;
-        this.AgeBonus = actor.currentMap.getInteractiveElementStruct(element).AgeBonus;
-        actor.currentMap.getInteractiveElementStruct(element).AgeBonus = -1;
+        this.AgeBonus = actor.currentMap.getInteractiveElementStruct(element).ageBonus;
+        actor.currentMap.getInteractiveElementStruct(element).ageBonus = -1;
 
         actor.currentMap.sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(actor.currentMap.toInteractiveElement(Player, element))));
         actor.currentMap.sendToField(new StatedElementUpdatedMessage(actor.currentMap.getStatedElementById(element)));
@@ -84,12 +84,12 @@ public class Collect implements InteractiveAction {
             return;
         }
         player.currentMap.sendToField(new InteractiveUseEndedMessage(element, this.Skill.ID));
-        int quantityGathered = EffectHelper.RandomValue(player.myJobs.getJob(Skill.parentJobId).quantity(Skill.levelMin));
-        int bonusQuantity = EffectHelper.RandomValue(player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).bonusMin, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).bonusMax);
+        int quantityGathered = EffectHelper.randomValue(player.myJobs.getJob(Skill.parentJobId).quantity(Skill.levelMin));
+        int bonusQuantity = EffectHelper.randomValue(player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).bonusMin, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).bonusMax);
         if (AgeBonus > 0) {
             bonusQuantity += (int) ((float) bonusQuantity * AgeBonus / 100);
         }
-        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Skill.gatheredRessourceItem, 63, player.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.GenerateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
+        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Skill.gatheredRessourceItem, 63, player.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
         if (player.inventoryCache.add(Item, true)) {
             Item.needInsert = true;
         }
@@ -98,7 +98,7 @@ public class Collect implements InteractiveAction {
         player.myJobs.addExperience(player, Skill.parentJobId, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).xpEarned * Settings.GetIntElement("Job.Rate"));
         player.currentMap.getStatedElementById(element).elementState = 1;
         player.currentMap.getStatedElementById(element).deadAt = System.currentTimeMillis();
-        player.currentMap.getInteractiveElementStruct(element).AgeBonus = -1;
+        player.currentMap.getInteractiveElementStruct(element).ageBonus = -1;
 
         player.currentMap.sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(player.currentMap.toInteractiveElement(Player, element))));
         player.currentMap.sendToField(new StatedElementUpdatedMessage(player.currentMap.getStatedElementById(element)));
@@ -109,7 +109,7 @@ public class Collect implements InteractiveAction {
     public void abort(Player Actor, int element) {
         this.Aborted = true;
         Actor.currentMap.getStatedElementById(element).elementState = 0;
-        Actor.currentMap.getInteractiveElementStruct(element).AgeBonus = (short) this.AgeBonus;
+        Actor.currentMap.getInteractiveElementStruct(element).ageBonus = (short) this.AgeBonus;
 
         Actor.currentMap.sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(Actor.currentMap.toInteractiveElement(Player, element))));
         Actor.currentMap.sendToField(new StatedElementUpdatedMessage(Actor.currentMap.getStatedElementById(element)));

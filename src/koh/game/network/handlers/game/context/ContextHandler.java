@@ -88,7 +88,7 @@ public class ContextHandler {
         if (Item == null || Item.getQuantity() < Message.quantity) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
             return;
-        } else if (Item.GetEffect(983) != null) {
+        } else if (Item.getEffect(983) != null) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.NOT_TRADABLE));
             return;
         }
@@ -131,7 +131,7 @@ public class ContextHandler {
             ItemTemplateDAOImpl.Update(Item, false, "character_items");
         } else {
             Client.character.inventoryCache.updateObjectquantity(Item, newQua);
-            Item = CharacterInventory.tryCreateItem(Item.TemplateId, null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
+            Item = CharacterInventory.tryCreateItem(Item.templateId, null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
         }
 
         Client.character.currentMap.addItem(cellID, Item);
@@ -174,7 +174,7 @@ public class ContextHandler {
         }
 
         if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            MovementPath Path = Pathfinder.IsValidPath(Client.character.getFight(), Client.character.getFighter(), Client.character.getFighter().CellId(), Client.character.getFighter().direction, Message.keyMovements);
+            MovementPath Path = Pathfinder.isValidPath(Client.character.getFight(), Client.character.getFighter(), Client.character.getFighter().CellId(), Client.character.getFighter().direction, Message.keyMovements);
             if (Path != null) {
                 if (Client.character.getFighter().Dead()) {
                     Client.send(new BasicNoOperationMessage());

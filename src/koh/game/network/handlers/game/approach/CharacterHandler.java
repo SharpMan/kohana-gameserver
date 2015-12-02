@@ -251,7 +251,7 @@ public class CharacterHandler {
                         level = (byte) Settings.GetIntElement("Register.StartLevel");
                         savedMap = mapid = Settings.GetIntElement("Register.StartMap");
                         savedCell = Settings.GetShortElement("Register.StartCell");
-                        currentMap = DAO.getMaps().getMap(Settings.GetIntElement("Register.StartMap"));
+                        currentMap = DAO.getMaps().findTemplate(Settings.GetIntElement("Register.StartMap"));
                         if (currentMap != null) {
                             currentMap.Init();
                         }
