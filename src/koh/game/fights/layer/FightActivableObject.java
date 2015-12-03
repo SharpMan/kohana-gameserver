@@ -4,7 +4,7 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import koh.game.dao.mysql.SpellDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -34,21 +34,21 @@ import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
 public abstract class FightActivableObject implements IFightObject {
 
     public int Priority;
-    public BuffActiveType ActivationType;
+    public BuffActiveType activationType;
     public Color Color;
     public int Duration;
     public boolean Activated;
     public FightCell Cell;
-    public ArrayList<Fighter> Targets;
+    public ArrayList<Fighter> targets;
     protected Fight m_fight;
     public Fighter m_caster;
     protected SpellLevel m_actionEffect;
     public int m_spellId;
     public byte m_spell_level;
-    public Short AffectedCells[];
-    public GameActionFightInvisibilityStateEnum VisibileState;
-    public byte Size;
-    public GameActionMarkCellsTypeEnum Shape;
+    public Short affectedCells[];
+    public GameActionFightInvisibilityStateEnum visibileState;
+    public byte size;
+    public GameActionMarkCellsTypeEnum shape;
     public short ID;
 
     protected MapPoint CachedMapPoints;
@@ -70,18 +70,18 @@ public abstract class FightActivableObject implements IFightObject {
         m_spellId = castInfos.SpellId;
         m_spell_level = castInfos.SpellLevel.grade;
         try {
-            m_actionEffect = SpellDAOImpl.spells.get(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1];
+            m_actionEffect = DAO.getSpells().findSpell(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1];
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
         }
         Cell = fight.getCell(cell);
-        ActivationType = activeType;
+        activationType = activeType;
         Color = color;
-        Targets = new ArrayList<>();
-        AffectedCells = new Zone(castInfos.Effect.ZoneShape(), size,fight.map).getCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).getCells(cell.id)*/;
+        targets = new ArrayList<>();
+        affectedCells = new Zone(castInfos.Effect.ZoneShape(), size,fight.map).getCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).getCells(cell.id)*/;
         Duration = duration;
-        this.VisibileState = visibleState;
-        Size = size;
-        Shape = shap;
+        this.visibileState = visibleState;
+        this.size = size;
+        shape = shap;
 
         if (m_actionEffect != null) {
             for (EffectInstanceDice effect : m_actionEffect.effects) {
@@ -95,7 +95,7 @@ public abstract class FightActivableObject implements IFightObject {
         }
 
         // On ajout l'objet a toutes les cells qu'il affecte
-        for (short cellId : this.AffectedCells) {
+        for (short cellId : this.affectedCells) {
             if (m_fight.getCell(cellId) != null) {
                 m_fight.getCell(cellId).AddObject(this);
             }
@@ -108,84 +108,84 @@ public abstract class FightActivableObject implements IFightObject {
         }
     }
 
-    public synchronized void LoadTargets(Fighter target) {
-        if (!Targets.contains(target)) {
-            Targets.add(target);
+    public synchronized void loadTargets(Fighter target) {
+        if (!targets.contains(target)) {
+            targets.add(target);
         }
 
-        switch (ActivationType) {
+        switch (activationType) {
             case ACTIVE_ENDMOVE:
                 FightCell Cell = null;
-                for (short cell : AffectedCells) {
+                for (short cell : affectedCells) {
                     Cell = m_fight.getCell(cell);
                     if (Cell != null) {
-                        Targets.addAll(Cell.GetObjectsAsFighterList(x -> x.getObjectType() == FightObjectType.OBJECT_FIGHTER && !Targets.contains(x)));
-                        //Targets.AddRange(cell.FightObjects.OfType < FighterBase > ().Where(fighter =  > !Targets.Contains(fighter)));
+                        targets.addAll(Cell.GetObjectsAsFighterList(x -> x.getObjectType() == FightObjectType.OBJECT_FIGHTER && !targets.contains(x)));
+                        //targets.AddRange(cell.FightObjects.OfType < FighterBase > ().Where(fighter =  > !targets.Contains(fighter)));
                     }
                 }
                 break;
         }
     }
 
-    public void Enable(Fighter fighter) {
+    public void enable(Fighter fighter) {
 
     }
 
-    public int LoadEnnemyTargetsAndActive(Fighter target) {
+    public int loadEnnemyTargetsAndActive(Fighter target) {
         FightCell Cell = null;
-        for (short cell : AffectedCells) {
+        for (short cell : affectedCells) {
             Cell = m_fight.getCell(cell);
             if (Cell != null) {
-                Targets.addAll(Cell.GetObjectsAsFighterList(x -> x.getObjectType() == FightObjectType.OBJECT_FIGHTER && !Targets.contains(x) && ((Fighter) x).isEnnemyWith(target)));
+                targets.addAll(Cell.GetObjectsAsFighterList(x -> x.getObjectType() == FightObjectType.OBJECT_FIGHTER && !targets.contains(x) && ((Fighter) x).isEnnemyWith(target)));
             }
         }
-        return this.Activate(target);
+        return this.activate(target);
     }
 
-    public MapPoint MapPoint() {
+    public MapPoint getMapPoint() {
         if (CachedMapPoints == null) {
             this.CachedMapPoints = MapPoint.fromCellId(this.getCellId());
         }
         return this.CachedMapPoints;
     }
 
-    public synchronized int Activate(Fighter activator) {
+    public synchronized int activate(Fighter activator) {
         Activated = true;
         if (this.getObjectType() == FightObjectType.OBJECT_TRAP) {
-            Remove();
+            remove();
         }
 
-        m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(GameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.m_caster.ID, this.ID, activator.ID, this.m_spellId));
+        m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(getGameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.m_caster.ID, this.ID, activator.ID, this.m_spellId));
         activator.fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         for (EffectInstanceDice Effect : m_actionEffect.effects) {
             //TODO : MASK
-            EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.spellId, Cell.Id, 100, Effect, m_caster, Targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
+            EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.spellId, Cell.Id, 100, Effect, m_caster, targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
             CastInfos.IsTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {
-                Targets.clear();
+                targets.clear();
                 activator.fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
                 return -3;
             }
         }
 
-        Targets.clear();
+        targets.clear();
 
         activator.fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         return -1;
     }
 
-    public void DecrementDuration() {
+    public void decrementDuration() {
         Duration--;
 
         if (Duration <= 0) {
-            Remove();
+            remove();
         }
     }
 
-    public void Remove() {
+    public void remove() {
         DisappearForAll();
 
-        for (short cell : AffectedCells) {
+        for (short cell : affectedCells) {
             this.m_fight.getCell(cell).RemoveObject(this);
         }
         if (this.m_fight.m_activableObjects.containsKey(this.m_caster)) {
@@ -194,17 +194,17 @@ public abstract class FightActivableObject implements IFightObject {
 
     }
 
-    public abstract GameActionMarkTypeEnum GameActionMarkType();
+    public abstract GameActionMarkTypeEnum getGameActionMarkType();
 
-    public abstract GameActionMark GetHiddenGameActionMark();
+    public abstract GameActionMark getHiddenGameActionMark();
 
-    public abstract GameActionMark GetGameActionMark();
+    public abstract GameActionMark getGameActionMark();
 
-    public GameActionMarkedCell[] GetGameActionMarkedCell() {
-        if (Shape == GameActionMarkCellsTypeEnum.CELLS_SQUARE) {
-            return Arrays.stream(this.AffectedCells).map(x -> new GameActionMarkedCell(x, (byte) 0, getRGB(Color), this.Shape.value)).toArray(GameActionMarkedCell[]::new);
+    public GameActionMarkedCell[] getGameActionMarkedCell() {
+        if (shape == GameActionMarkCellsTypeEnum.CELLS_SQUARE) {
+            return Arrays.stream(this.affectedCells).map(x -> new GameActionMarkedCell(x, (byte) 0, getRGB(Color), this.shape.value)).toArray(GameActionMarkedCell[]::new);
         } else {
-            return new GameActionMarkedCell[]{new GameActionMarkedCell(this.getCellId(), this.Size, getRGB(Color), this.Shape.value)};
+            return new GameActionMarkedCell[]{new GameActionMarkedCell(this.getCellId(), this.size, getRGB(Color), this.shape.value)};
         }
     }
 

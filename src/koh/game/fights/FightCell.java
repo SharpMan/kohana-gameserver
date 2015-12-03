@@ -41,9 +41,9 @@ public class FightCell {
         for (IFightObject Object : myFightObjects) {
             if (Object instanceof FightActivableObject) {
                 FightActivableObject activableObject = (FightActivableObject) Object;
-                if (activableObject.ActivationType == BuffActiveType.ACTIVE_BEGINTURN || activableObject instanceof FightBomb) {
-                    activableObject.LoadTargets(fighter);
-                    int Result = activableObject.Activate(fighter);
+                if (activableObject.activationType == BuffActiveType.ACTIVE_BEGINTURN || activableObject instanceof FightBomb) {
+                    activableObject.loadTargets(fighter);
+                    int Result = activableObject.activate(fighter);
                     if(Result == -3){
                         return -3;
                     }
@@ -58,9 +58,9 @@ public class FightCell {
         for (IFightObject Object : myFightObjects) {
             if (Object instanceof FightActivableObject) {
                 FightActivableObject activableObject = (FightActivableObject) Object;
-                if (activableObject.ActivationType == BuffActiveType.ACTIVE_ENDTURN || activableObject instanceof FightBomb) {
-                    activableObject.LoadTargets(fighter);
-                    int Result = activableObject.Activate(fighter);
+                if (activableObject.activationType == BuffActiveType.ACTIVE_ENDTURN || activableObject instanceof FightBomb) {
+                    activableObject.loadTargets(fighter);
+                    int Result = activableObject.activate(fighter);
                     if(Result == -3){
                         return -3;
                     }
@@ -156,10 +156,10 @@ public class FightCell {
                 if (Object instanceof FightActivableObject) {
                     FightActivableObject activableObject = (FightActivableObject) Object;
 
-                    if (activableObject.ActivationType == BuffActiveType.ACTIVE_ENDMOVE) {
+                    if (activableObject.activationType == BuffActiveType.ACTIVE_ENDMOVE) {
                         if (!fighter.isDead()) {
-                            activableObject.LoadTargets(fighter);
-                            int Result = activableObject.Activate(fighter);
+                            activableObject.loadTargets(fighter);
+                            int Result = activableObject.activate(fighter);
                             if(Result == -3)
                                 return Result;
                         }

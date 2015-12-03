@@ -38,13 +38,13 @@ public class EffectSummonBomb extends EffectBase {
                                               .filter(Cell -> Cell.hasFighter())
                                               .forEach(C -> {{
                                                   for(Fighter F : C.GetObjectsAsFighter()){
-                                                      ((FightBomb)Bombe).LoadTargets(F);
-                                                      ((FightBomb)Bombe).Activate(F);
+                                                      ((FightBomb)Bombe).loadTargets(F);
+                                                      ((FightBomb)Bombe).activate(F);
                                                   }
                                               }}));
                 } else {
                     //CastInfos.Caster.fight.affectSpellTo(CastInfos.Caster, CastInfos.Caster.fight.getCell(CastInfos.getCellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId);
-                    CastInfos.Caster.fight.launchSpell(CastInfos.Caster, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId).SpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
+                    CastInfos.Caster.fight.launchSpell(CastInfos.Caster, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId).getSpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
                 }
             }
         }

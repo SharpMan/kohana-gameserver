@@ -41,7 +41,7 @@ public class FightPortal extends FightActivableObject {
 
     @Override
     public void AppearForAll() {
-        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.ID, GetGameActionMark()));
+        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.ID, getGameActionMark()));
         this.m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, this.m_caster.ID, this.ID, true));
     }
 
@@ -56,14 +56,14 @@ public class FightPortal extends FightActivableObject {
     }
 
     @Override
-    public GameActionMarkTypeEnum GameActionMarkType() {
+    public GameActionMarkTypeEnum getGameActionMarkType() {
         return GameActionMarkTypeEnum.PORTAL;
     }
 
     private int turnUsed;
 
     @Override
-    public synchronized void Enable(Fighter fighter) {
+    public synchronized void enable(Fighter fighter) {
         Enable(fighter, false);
     }
 
@@ -104,8 +104,8 @@ public class FightPortal extends FightActivableObject {
     }
 
     @Override
-    public synchronized int Activate(Fighter activator) {
-        if (Arrays.stream(new Exception().getStackTrace()).filter(Method -> Method.getMethodName().equalsIgnoreCase("FightPortal.Activate")).count() > 1) { //Il viens de rejoindre la team rofl on le tue pas
+    public synchronized int activate(Fighter activator) {
+        if (Arrays.stream(new Exception().getStackTrace()).filter(Method -> Method.getMethodName().equalsIgnoreCase("FightPortal.activate")).count() > 1) { //Il viens de rejoindre la team rofl on le tue pas
             return -1;
         }
         if (!Enabled) {
@@ -132,7 +132,7 @@ public class FightPortal extends FightActivableObject {
             return -1;
         }
 
-        final int[] Links = LinkedCellsManager.getLinks(this.MapPoint(), Arrays.stream(Portails).map(Portail -> Portail.MapPoint()).toArray(MapPoint[]::new));
+        final int[] Links = LinkedCellsManager.getLinks(this.getMapPoint(), Arrays.stream(Portails).map(Portail -> Portail.getMapPoint()).toArray(MapPoint[]::new));
         //System.out.println(Enumerable.Join(Links));
         FightPortal lastPortal = Arrays.stream(Portails).filter(x -> x.getCellId() == (short) Links[Links.length - 1]).findFirst().get();
 
@@ -148,7 +148,7 @@ public class FightPortal extends FightActivableObject {
         lastPortal.Enabled = false;
         lastPortal.turnUsed = m_fight.myWorker.fightTurn;
 
-        Targets.clear();
+        targets.clear();
 
         activator.fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         return activator.setCell(lastPortal.Cell);
@@ -167,13 +167,13 @@ public class FightPortal extends FightActivableObject {
     }
 
     @Override
-    public GameActionMark GetHiddenGameActionMark() {
-        return GetGameActionMark();
+    public GameActionMark getHiddenGameActionMark() {
+        return getGameActionMark();
     }
 
     @Override
-    public GameActionMark GetGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.getCellId(), this.GetGameActionMarkedCell(), true);
+    public GameActionMark getGameActionMark() {
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.getCellId(), this.getGameActionMarkedCell(), true);
     }
 
     @Override

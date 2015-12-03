@@ -291,7 +291,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 if (Object instanceof FightPortal && ((FightPortal) Object).Enabled) {
                     Portails = ArrayUtils.add(Portails, (FightPortal) Object);
                     if (Object.getCellId() == param1) {
-                        _loc3_ = Object.MapPoint();
+                        _loc3_ = Object.getMapPoint();
                     }
                 }
             }
@@ -302,7 +302,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (_loc3_ == null) {
             return new Three<>(param1, new int[0], 0);
         }
-        final int[] _loc10_ = LinkedCellsManager.getLinks(_loc3_, Arrays.stream(Portails)/*.filter(x -> x.m_caster.team == Fighter.team)*/.map(x -> x.MapPoint()).toArray(MapPoint[]::new));
+        final int[] _loc10_ = LinkedCellsManager.getLinks(_loc3_, Arrays.stream(Portails)/*.filter(x -> x.m_caster.team == Fighter.team)*/.map(x -> x.getMapPoint()).toArray(MapPoint[]::new));
         MapPoint _loc11_ = MapPoint.fromCellId(_loc10_[/*_loc10_.length == 0 ? 0 :*/_loc10_.length - 1]);
         MapPoint _loc12_ = MapPoint.fromCellId(Fighter.getCellId());
         if (_loc12_ == null) {
@@ -478,7 +478,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, fighter.ID, new FightTriggeredEffect(Target.nextBuffUid.incrementAndGet(), Target.ID, (short) Effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.spellId, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
                 });
 
-                /*for (Fighter Target : Targets.get(Effect)) {
+                /*for (Fighter Target : targets.get(Effect)) {
                  Target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), getSpellLevel.spellId, getCellId, num1, Effect, Fighter, new ArrayList<Fighter>() {
                  {
                  add(Target);
@@ -857,7 +857,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (this.currentFighter.endTurn() == -3) {
             return;
         } else if (m_activableObjects.containsKey(currentFighter)) {
-            m_activableObjects.get(currentFighter).stream().filter(x -> x instanceof FightGlyph).forEach(y -> y.DecrementDuration());
+            m_activableObjects.get(currentFighter).stream().filter(x -> x instanceof FightGlyph).forEach(y -> y.decrementDuration());
             m_activableObjects.get(currentFighter).removeIf(fightObject -> fightObject.getObjectType() == FightObjectType.OBJECT_GLYPHE && fightObject.Duration <= 0);
         }
         this.endSequence(SequenceTypeEnum.SEQUENCE_TURN_END, false);
@@ -918,8 +918,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void affectSpellTo(Fighter caster, Fighter target, int level, int... spells) {
         SpellLevel spell;
-        for (int Spellid : spells) {
-            spell =  DAO.getSpells().findSpell(Spellid).SpellLevel(level);
+        for (int spellid : spells) {
+            spell =  DAO.getSpells().findSpell(spellid).getSpellLevel(level);
             double num1 = Fight.RANDOM.nextDouble();
             double num2 = (double) Arrays.stream(spell.effects).mapToInt(x -> x.random).sum();
             boolean flag = false;
@@ -942,11 +942,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     }
                 };
                 if (Effect.delay > 0) {
-                    target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), Spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell), Effect.delay));
-                    this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, caster.ID, new FightTriggeredEffect(target.nextBuffUid.incrementAndGet(), target.ID, (short) Effect.duration, FightDispellableEnum.DISPELLABLE, Spellid, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
+                    target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell), Effect.delay));
+                    this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, caster.ID, new FightTriggeredEffect(target.nextBuffUid.incrementAndGet(), target.ID, (short) Effect.duration, FightDispellableEnum.DISPELLABLE, spellid, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
                     continue;
                 }
-                EffectCast CastInfos = new EffectCast(Effect.EffectType(), Spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell);
+                EffectCast CastInfos = new EffectCast(Effect.EffectType(), spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell);
                 CastInfos.targetKnownCellId = target.getCellId();
                 if (EffectBase.TryApplyEffect(CastInfos) == -3) {
                     break;
@@ -1244,7 +1244,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         GameActionMark[] gameActionMarks = new GameActionMark[0];
         for (CopyOnWriteArrayList<FightActivableObject> objs : this.m_activableObjects.values()) {
             for (FightActivableObject Object : objs) {
-                gameActionMarks = ArrayUtils.add(gameActionMarks, Object.GetHiddenGameActionMark());
+                gameActionMarks = ArrayUtils.add(gameActionMarks, Object.getHiddenGameActionMark());
             }
         }
         return gameActionMarks;

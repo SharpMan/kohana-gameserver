@@ -180,7 +180,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             this.team.getAliveFighters().filter(x -> x.summoner != null && x.summoner.ID == this.ID).forEach(Fighter -> Fighter.tryDie(this.ID, true));
 
             if (this.fight.m_activableObjects.containsKey(this)) {
-                this.fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
+                this.fight.m_activableObjects.get(this).stream().forEach(y -> y.remove());
 
             }
 
@@ -222,7 +222,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int endTurn() {
         this.fight.m_activableObjects.values().stream().forEach((Objects) -> {
             Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
-                ((FightPortal) Object).Enable(this);
+                ((FightPortal) Object).enable(this);
             });
         });
         this.spellsController.endTurn();
@@ -612,7 +612,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (!_loc3_) {
             return _loc2_;
         }
-        final int[] _loc6_ = LinkedCellsManager.getLinks(MapPoint.fromCellId(param1), Arrays.stream(_loc8_).map(x -> x.MapPoint()).toArray(MapPoint[]::new));
+        final int[] _loc6_ = LinkedCellsManager.getLinks(MapPoint.fromCellId(param1), Arrays.stream(_loc8_).map(x -> x.getMapPoint()).toArray(MapPoint[]::new));
         int _loc7_ = _loc6_.length;
         if (_loc7_ > 1) {
             while (_loc9_ < _loc7_) {

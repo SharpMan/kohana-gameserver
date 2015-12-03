@@ -124,16 +124,16 @@ public class BombFighter extends StaticFighter {
                 return this.buff.getAllBuffs().filter(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().ApplyEffect(null, null);
             } else {
                 if (this.FightBombs != null) {
-                    this.FightBombs.forEach(Bomb -> Bomb.Remove());
+                    this.FightBombs.forEach(Bomb -> Bomb.remove());
                 }
                 return super.tryDie(casterId, force);
             }
         }
         if (this.getLife() <= 0 || force) {
             SlefMurder(casterId);
-            fight.launchSpell(this, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(this.Grade.monsterId).explodSpellId).SpellLevel(this.Grade.Grade), this.getCellId(), true, true, false);
+            fight.launchSpell(this, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(this.Grade.monsterId).explodSpellId).getSpellLevel(this.Grade.Grade), this.getCellId(), true, true, false);
             if (this.FightBombs != null) {
-                this.FightBombs.forEach(Bomb -> Bomb.Remove());
+                this.FightBombs.forEach(Bomb -> Bomb.remove());
             }
         }
         return super.tryDie(casterId, force);
@@ -155,10 +155,10 @@ public class BombFighter extends StaticFighter {
                 return -2;
             }
             if (this.FightBombs != null) {
-                this.FightBombs.forEach(Bomb -> Bomb.Remove());
+                this.FightBombs.forEach(Bomb -> Bomb.remove());
             }
             if (this.myCell.HasGameObject(FightObjectType.OBJECT_BOMB)) {
-                Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).Remove());
+                Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
             Short[] Cells;
             for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.summoner == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
@@ -169,7 +169,7 @@ public class BombFighter extends StaticFighter {
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.getCellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.getCellId());
-                        FightBomb Bomb = new FightBomb(this.summoner, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId).SpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                        FightBomb Bomb = new FightBomb(this.summoner, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId).getSpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
                         fight.addActivableObject(this.summoner, Bomb);
                     }
                 }

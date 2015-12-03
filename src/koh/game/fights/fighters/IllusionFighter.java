@@ -39,7 +39,7 @@ public class IllusionFighter extends StaticFighter {
         this.fight.sendToField(new GameActionFightVanishMessage(1029, this.getSummonerID(), ID));
 
         if (this.fight.m_activableObjects.containsKey(this)) {
-            this.fight.m_activableObjects.get(this).stream().forEach(y -> y.Remove());
+            this.fight.m_activableObjects.get(this).stream().forEach(y -> y.remove());
         }
 
         myCell.RemoveObject(this);

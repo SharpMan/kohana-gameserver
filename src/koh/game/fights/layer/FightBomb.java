@@ -43,15 +43,15 @@ public class FightBomb extends FightActivableObject {
         m_spellId = Spell.spellId;
         m_spell_level = Spell.grade;
         m_actionEffect = Spell;
-        ActivationType = BuffActiveType.ACTIVE_ENDMOVE;
+        activationType = BuffActiveType.ACTIVE_ENDMOVE;
 
         Color = color;
-        Targets = new ArrayList<>();
-        AffectedCells = Cells;
+        targets = new ArrayList<>();
+        affectedCells = Cells;
         Duration = 0;
-        this.VisibileState = GameActionFightInvisibilityStateEnum.VISIBLE;
-        Size = 0;
-        this.Shape = GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
+        this.visibileState = GameActionFightInvisibilityStateEnum.VISIBLE;
+        size = 0;
+        this.shape = GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
 
         for (EffectInstanceDice effect : m_actionEffect.effects) {
             if (EffectCast.IsDamageEffect(effect.EffectType())) {
@@ -61,9 +61,9 @@ public class FightBomb extends FightActivableObject {
                 Priority += 50;
             }
         }
-        Cell = m_fight.getCell(AffectedCells[0]);
+        Cell = m_fight.getCell(affectedCells[0]);
         // On ajout l'objet a toutes les cells qu'il affecte
-        for (short cellId : AffectedCells) {
+        for (short cellId : affectedCells) {
             if(!this.m_fight.getCell(cellId).IsWalkable())
                 continue;
             this.Cells.put(cellId, (short) m_fight.NextTriggerUid.incrementAndGet());
@@ -100,31 +100,31 @@ public class FightBomb extends FightActivableObject {
     }
 
     @Override
-    public synchronized int Activate(Fighter activator) {
-        Targets.removeIf(Fighter -> Fighter instanceof BombFighter);
-        if (Targets.isEmpty()) {
+    public synchronized int activate(Fighter activator) {
+        targets.removeIf(Fighter -> Fighter instanceof BombFighter);
+        if (targets.isEmpty()) {
             return -1;
         }
-        return super.Activate(activator);
+        return super.activate(activator);
     }
 
     @Override
-    public GameActionMarkTypeEnum GameActionMarkType() {
+    public GameActionMarkTypeEnum getGameActionMarkType() {
         return GameActionMarkTypeEnum.WALL;
     }
 
     @Override
-    public GameActionMark GetHiddenGameActionMark() {
-        return GetGameActionMark();
+    public GameActionMark getHiddenGameActionMark() {
+        return getGameActionMark();
     }
 
     @Override
-    public GameActionMark GetGameActionMark() {
+    public GameActionMark getGameActionMark() {
         return null;
     }
 
     public GameActionMark GetGameActionMark(short cell) {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.Cells.get(cell), GameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.Size, getRGB(Color), this.Shape.value)}, true);
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.Cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
     }
 
     @Override

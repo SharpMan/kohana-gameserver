@@ -36,10 +36,10 @@ public class EffectActivableObject extends EffectBase {
                 break;
             case LAYING_PORTAIL:
                 if (CastInfos.Cell().HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-                    ((FightPortal) CastInfos.Cell().GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Remove();
+                    ((FightPortal) CastInfos.Cell().GetObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
                 } else if (CastInfos.Caster.fight.m_activableObjects.get(CastInfos.Caster) != null
                         && CastInfos.Caster.fight.m_activableObjects.get(CastInfos.Caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
-                    CastInfos.Caster.fight.m_activableObjects.get(CastInfos.Caster).stream().findFirst().get().Remove();
+                    CastInfos.Caster.fight.m_activableObjects.get(CastInfos.Caster).stream().findFirst().get().remove();
                 }
                 /*if (!CastInfos.Caster.fight.canPutObject(CastInfos.getCellId)) {
                  return -1;

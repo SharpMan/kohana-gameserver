@@ -26,8 +26,8 @@ public class EffectPerception extends EffectBase {
             FightCell fightCell = CastInfos.Caster.fight.getCell(Cell);
             if (fightCell != null) {
                 fightCell.GetObjects().stream().filter((fightObject) -> (fightObject.getCellId() == Cell)).forEach((fightObject) -> {
-                    if (fightObject.getObjectType() == FightObjectType.OBJECT_TRAP && ((FightTrap) fightObject).VisibileState == GameActionFightInvisibilityStateEnum.INVISIBLE && ((FightTrap) fightObject).m_caster.isEnnemyWith(CastInfos.Caster)) {
-                        ((FightTrap) fightObject).VisibileState = GameActionFightInvisibilityStateEnum.DETECTED;
+                    if (fightObject.getObjectType() == FightObjectType.OBJECT_TRAP && ((FightTrap) fightObject).visibileState == GameActionFightInvisibilityStateEnum.INVISIBLE && ((FightTrap) fightObject).m_caster.isEnnemyWith(CastInfos.Caster)) {
+                        ((FightTrap) fightObject).visibileState = GameActionFightInvisibilityStateEnum.DETECTED;
                         ((FightTrap) fightObject).AppearForAll();
                     } else if (fightObject instanceof IllusionFighter) {
                         ((IllusionFighter) fightObject).tryDie(CastInfos.Caster.ID);

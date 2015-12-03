@@ -24,7 +24,7 @@ public class FightGlyph extends FightActivableObject {
 
     @Override
     public void AppearForAll() {
-        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.ID, GetGameActionMark()));
+        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.ID, getGameActionMark()));
     }
 
     @Override
@@ -38,18 +38,18 @@ public class FightGlyph extends FightActivableObject {
     }
 
     @Override
-    public GameActionMarkTypeEnum GameActionMarkType() {
+    public GameActionMarkTypeEnum getGameActionMarkType() {
         return GameActionMarkTypeEnum.GLYPH;
     }
 
     @Override
-    public GameActionMark GetHiddenGameActionMark() {
-       return GetGameActionMark();
+    public GameActionMark getHiddenGameActionMark() {
+       return getGameActionMark();
     }
 
     @Override
-    public GameActionMark GetGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.getCellId(), this.GetGameActionMarkedCell(), true);
+    public GameActionMark getGameActionMark() {
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.getCellId(), this.getGameActionMarkedCell(), true);
     }
 
     @Override

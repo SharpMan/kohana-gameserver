@@ -28,18 +28,18 @@ public class FightTrap extends FightActivableObject {
 
     @Override
     public void AppearForAll() {
-        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, GetGameActionMark()));
+        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, getGameActionMark()));
     }
 
     @Override
     public void Appear(FightTeam dispatcher) {
-        this.m_fight.sendToField(new FieldNotification(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, GetHiddenGameActionMark())) {
+        this.m_fight.sendToField(new FieldNotification(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, getHiddenGameActionMark())) {
             @Override
             public boolean can(Player perso) {
                 return !(perso.client != null && perso.getFighter() != null && perso.getFighter().team.Id == dispatcher.Id);
             }
         });
-        dispatcher.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, GetGameActionMark()));
+        dispatcher.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, getGameActionMark()));
     }
 
     @Override
@@ -48,18 +48,18 @@ public class FightTrap extends FightActivableObject {
     }
 
     @Override
-    public GameActionMarkTypeEnum GameActionMarkType() {
+    public GameActionMarkTypeEnum getGameActionMarkType() {
         return GameActionMarkTypeEnum.TRAP;
     }
 
     @Override
-    public GameActionMark GetHiddenGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.VisibileState == VISIBLE ? this.getCellId() : (short) -1, new GameActionMarkedCell[0], true);
+    public GameActionMark getHiddenGameActionMark() {
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.visibileState == VISIBLE ? this.getCellId() : (short) -1, new GameActionMarkedCell[0], true);
     }
 
     @Override
-    public GameActionMark GetGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, GameActionMarkType().value(), this.getCellId(), this.GetGameActionMarkedCell(), true);
+    public GameActionMark getGameActionMark() {
+        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.getCellId(), this.getGameActionMarkedCell(), true);
     }
 
     @Override
