@@ -85,7 +85,7 @@ public class FighterState {
 
     public void removeState(FightStateEnum State) {
         if (this.hasState(State)) {
-            this.myStates.get(State).RemoveEffect();
+            this.myStates.get(State).removeEffect();
         }
     }
     
@@ -98,7 +98,7 @@ public class FighterState {
 
     public void debuff() {
         for (BuffEffect State : this.myStates.values()) {
-            State.RemoveEffect();
+            State.removeEffect();
         }
 
         this.myStates.clear();

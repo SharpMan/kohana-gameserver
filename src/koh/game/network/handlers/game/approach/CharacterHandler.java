@@ -7,7 +7,6 @@ import koh.d2o.entities.Head;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.MountInformations;
@@ -15,7 +14,6 @@ import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.actors.character.ShortcutBook;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
-import koh.game.utils.Settings;
 import koh.inter.messages.PlayerCreatedMessage;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.AggressableStatusEnum;
@@ -172,7 +170,7 @@ public class CharacterHandler {
     }
 
     public static void SendCharacterStatsListMessage(WorldClient client) {
-        client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.character.experience, (double) ExpDAOImpl.persoXpMin(client.character.level), (double) ExpDAOImpl.persoXpMax(client.character.level), client.character.kamas, client.character.statPoints, 0, client.character.spellPoints, client.character.getActorAlignmentExtendInformations(),
+        client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.character.experience, (double) DAO.getExps().getPlayerMinExp(client.character.level), (double) DAO.getExps().getPlayerMaxExp(client.character.level), client.character.kamas, client.character.statPoints, 0, client.character.spellPoints, client.character.getActorAlignmentExtendInformations(),
                 client.character.life, client.character.getMaxLife(), client.character.energy, PlayerEnum.MaxEnergy,
                 (short) client.character.stats.getTotal(StatsEnum.ActionPoints), (short) client.character.stats.getTotal(StatsEnum.MovementPoints),
                 new CharacterBaseCharacteristic(client.character.getInitiative(true), 0, client.character.stats.getItem(StatsEnum.Initiative), 0, 0), client.character.stats.getEffect(StatsEnum.Prospecting), client.character.stats.getEffect(StatsEnum.ActionPoints),
@@ -248,22 +246,22 @@ public class CharacterHandler {
                             }
                         };
                         account = client.getAccount();
-                        level = (byte) Settings.GetIntElement("Register.StartLevel");
-                        savedMap = mapid = Settings.GetIntElement("Register.StartMap");
-                        savedCell = Settings.GetShortElement("Register.getStartCell");
-                        currentMap = DAO.getMaps().findTemplate(Settings.GetIntElement("Register.StartMap"));
+                        level = (byte) DAO.getSettings().getIntElement("Register.StartLevel");
+                        savedMap = mapid = DAO.getSettings().getIntElement("Register.StartMap");
+                        savedCell = DAO.getSettings().getShortElement("Register.getStartCell");
+                        currentMap = DAO.getMaps().findTemplate(DAO.getSettings().getIntElement("Register.StartMap"));
                         if (currentMap != null) {
                             currentMap.Init();
                         }
-                        cell = currentMap.getCell(Settings.GetShortElement("Register.getStartCell"));
-                        for (String s : Settings.GetStringElement("Register.Channels").split(",")) {
+                        cell = currentMap.getCell(DAO.getSettings().getShortElement("Register.getStartCell"));
+                        for (String s : DAO.getSettings().getStringElement("Register.Channels").split(",")) {
                             ennabledChannels.add(Byte.parseByte(s));
                         }
-                        statPoints = (Settings.GetIntElement("Register.StartLevel") - 1) * 5;
-                        spellPoints = (Settings.GetIntElement("Register.StartLevel") - 1);
+                        statPoints = (DAO.getSettings().getIntElement("Register.StartLevel") - 1) * 5;
+                        spellPoints = (DAO.getSettings().getIntElement("Register.StartLevel") - 1);
                         life = breedTemplate.getHealPoint() + ((level - 1) * 5);
-                        experience = DAO.getExps().getPlayerMinExp(Settings.GetIntElement("Register.StartLevel"));
-                        kamas = Settings.GetIntElement("Register.KamasStart");
+                        experience = DAO.getExps().getPlayerMinExp(DAO.getSettings().getIntElement("Register.StartLevel"));
+                        kamas = DAO.getSettings().getIntElement("Register.KamasStart");
                         shortcuts = new ShortcutBook();
                         emotes = new byte[]{1, 8, 19};
                         ornaments = titles = new int[0];

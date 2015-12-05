@@ -17,7 +17,7 @@ public class EffectLostPdvPercent extends EffectBase {
             SubInfos.DamageValue = (int) (((double) Target.getLife() / 100) * CastInfos.RandomJet(Target));
             SubInfos.Duration = CastInfos.Duration;
             BuffStats BuffStats = new BuffStats(SubInfos, Target);
-            if (BuffStats.ApplyEffect(null, null) == -3) {
+            if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 

@@ -19,7 +19,7 @@ public class BuffErosion extends BuffEffect {
 
     
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         float pdamage = this.CastInfos.RandomJet(Target) / 100.00f;
         int BuffValue = this.Target.getMaxLife() - (int) (DamageValue.getValue() * pdamage);
         if (BuffValue < 0) {
@@ -27,11 +27,11 @@ public class BuffErosion extends BuffEffect {
         }
         this.Target.setLifeMax(BuffValue);
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.CastInfos.RandomJet(Target)));
     }
 }

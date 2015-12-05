@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class MountDAOImpl extends MountDAO {
 
-    public static HashMap<Integer, MountTemplate> cache = new HashMap<>();
+    private HashMap<Integer, MountTemplate> cache = new HashMap<>();
 
     private static final Logger logger = LogManager.getLogger(MountDAOImpl.class);
     @Inject

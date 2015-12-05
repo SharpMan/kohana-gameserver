@@ -17,7 +17,7 @@ public class EffectSpellCoolDown extends EffectBase {
             BuffEffect Buff = new BuffSpellCoolDown(CastInfos, Target);
             if (!Target.buff.buffMaxStackReached(Buff)) {
                 Target.buff.addBuff(Buff);
-                if (Buff.ApplyEffect(null, null) == -3) {
+                if (Buff.applyEffect(null, null) == -3) {
                     return -3;
                 }
             }

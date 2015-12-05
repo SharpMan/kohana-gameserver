@@ -3,7 +3,7 @@ package koh.game.fights.effects.buff;
 import java.util.ArrayList;
 import java.util.Arrays;
 import koh.game.Main;
-import koh.game.dao.mysql.SpellDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
@@ -32,7 +32,7 @@ public class BuffPoutch extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         if (DamageInfos.IsReflect || DamageInfos.IsReturnedDamages || DamageInfos.IsPoison) {
             return -1;
         }
@@ -49,7 +49,7 @@ public class BuffPoutch extends BuffEffect {
             //Target = DamageInfos.Caster;
         }
 
-        SpellLevel SpellLevel = SpellDAOImpl.spells.get(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
+        SpellLevel SpellLevel = DAO.getSpells().findSpell(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();
         double num2 = (double) Arrays.stream(SpellLevel.effects).mapToInt(x -> x.random).sum();
         boolean flag = false;
@@ -116,11 +116,11 @@ public class BuffPoutch extends BuffEffect {
          }
          return apply;*/
         //return EffectDamage.ApplyDamages(DamageInfos, Target, new MutableInt((DamageInfos.RandomJet(Target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
     }
 

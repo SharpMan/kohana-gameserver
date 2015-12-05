@@ -4,6 +4,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameParty;
 import koh.game.actions.requests.PartyRequest;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.Party;
@@ -218,7 +219,7 @@ public class PartyHandler {
     @HandlerAttribute(ID = 5585)
     public static void HandlePartyInvitationRequestMessage(WorldClient Client, Message Message) {
 
-        Player Target = PlayerDAOImpl.getCharacter(((PartyInvitationRequestMessage) Message).name);
+        Player Target = DAO.getPlayers().getCharacter(((PartyInvitationRequestMessage) Message).name);
         if (Target == null) {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_NOT_FOUND));
             return;

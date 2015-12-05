@@ -29,7 +29,7 @@ public class BuffPorter extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         if (this.Caster.getCellId() != this.Target.getCellId()) {
             if (!isCalledBy("koh.game.fights.effects.EffectLancer", 6)) {
                 this.Caster.fight.sendToField(new GameActionFightDropCharacterMessage(ACTION_CARRY_CHARACTER, this.Caster.ID, this.Target.ID, (short) this.Target.getCellId()));
@@ -41,13 +41,13 @@ public class BuffPorter extends BuffEffect {
             Main.Logs().writeDebug("3bada " + this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter).count());
             this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> {
                 {
-                    x.RemoveEffect();
+                    x.removeEffect();
                     this.Caster.fight.sendToField(new GameActionFightDispellEffectMessage(514, this.Caster.ID, this.Caster.ID, x.GetId()));
                 }
             });
             this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).forEach(x -> {
                 {
-                    x.RemoveEffect();
+                    x.removeEffect();
                     this.Caster.fight.sendToField(new GameActionFightDispellEffectMessage(514, this.Caster.ID, this.Target.ID, x.GetId()));
                 }
             });
@@ -57,18 +57,18 @@ public class BuffPorter extends BuffEffect {
     }
 
     @Override
-    public int RemoveEffect() {
+    public int removeEffect() {
         Target.states.fakeState(FightStateEnum.Porté, false);
 
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostStateEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 3, this.CastInfos.ParentUID, (short) 1, (short) 8);
     }
 
-    public static boolean isCalledBy(String Comparant, int... indexes) {
+    public static boolean isCalledBy(String Comparant, int... indexes) { //Do not modif long story
         for (int i : indexes) {
             if (sun.reflect.Reflection.getCallerClass(i).toString().equalsIgnoreCase("class " + Comparant)) {
                 return true;

@@ -48,7 +48,7 @@ public class AccountData {
         return itemscache.values().stream().map(InventoryItem::getObjectItem).collect(Collectors.toList());
     }
 
-    public void updateObjectquantity(Player player, InventoryItem item, int quantity) {
+    public void updateObjectQuantity(Player player, InventoryItem item, int quantity) {
         item.SetQuantity(quantity);
         if (item.getQuantity() <= 0) {
             this.removeItem(player, item);
@@ -112,7 +112,7 @@ public class AccountData {
                         DAO.getItems().delete(removeItem, "storage_items");
                         removeItem.columsToUpdate = null;
                     }
-                    this.updateObjectquantity(player, Item, Item.getQuantity() + quantity);
+                    this.updateObjectQuantity(player, Item, Item.getQuantity() + quantity);
                     return true;
                 }
             }

@@ -7,9 +7,6 @@ package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
-import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.effects.buff.BuffDecrementType;
-import koh.game.fights.effects.buff.BuffEffect;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
@@ -29,13 +26,13 @@ public class BuffDamagePercentReduced extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         DamageValue.subtract((DamageValue.intValue() * this.Jet) / 100);
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
     }
 

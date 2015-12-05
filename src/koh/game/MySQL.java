@@ -10,13 +10,10 @@ import java.sql.Statement;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
-import koh.d2o.d2oReader;
 
-import static koh.game.dao.mysql.PlayerDAOImpl.AccountInUnload;
+//import static koh.game.dao.mysql.PlayerDAOImpl.AccountInUnload;
 
-import koh.game.dao.mysql.*;
-import koh.game.dao.sqlite.*;
-import koh.game.utils.Settings;
+import koh.game.dao.DAO;
 
 /**
  *
@@ -59,7 +56,7 @@ public class MySQL {
         try {
             myLocker.lock();
             try {
-                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
+                Connection = DriverManager.getConnection("jdbc:mysql://" + DAO.getSettings().getStringElement("Database.Host") + "/" + DAO.getSettings().getStringElement("Database.name"), DAO.getSettings().getStringElement("Database.User"), DAO.getSettings().getStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(1000)) || (!Connection.isValid(1000))) {
                     Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
@@ -114,7 +111,7 @@ public class MySQL {
                     } catch (Exception e) {
                     }
                 }
-                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
+                Connection = DriverManager.getConnection("jdbc:mysql://" + DAO.getSettings().getStringElement("Database.Host") + "/" + DAO.getSettings().getStringElement("Database.name"), DAO.getSettings().getStringElement("Database.User"), DAO.getSettings().getStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(60000))) {
                     Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
@@ -150,7 +147,7 @@ public class MySQL {
                     MySQL.commitDatabase();
                     MySQL.needCommit = false;
                 }
-            }, Settings.GetIntElement("Database.Commit"), Settings.GetIntElement("Database.Commit"));
+            }, DAO.getSettings().getIntElement("Database.Commit"), DAO.getSettings().getIntElement("Database.Commit"));
         } else {
             if (timerCommit != null) {
                 timerCommit.cancel();
@@ -184,7 +181,7 @@ public class MySQL {
     }
 
     public static void LoadCache() {
-        D2oDaoImpl.loadAll();
+        /*D2oDaoImpl.loadAll();
         Main.Logs().writeInfo(d2oReader.Breeds.size() + " Breeds catched");
         Main.Logs().writeInfo(d2oReader.Heads.size() + " Heads catched");
         Main.Logs().writeInfo(d2oReader.Effects.size() + " effects catched");
@@ -229,7 +226,7 @@ public class MySQL {
         Main.Logs().writeInfo(JobDAOImpl.loadAllSkills() + " InteractiveSkills LevelInfos catched");
         Main.Logs().writeInfo(MonsterDAOImpl.FindAll() + " Monster Templates catched");
         Main.Logs().writeInfo(MonsterDAOImpl.FindGrades() + " Monster Grades catched");
-        Main.Logs().writeInfo(MonsterDAOImpl.FindDrops() + " Monster Drops catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindDrops() + " Monster Drops catched");*/
     }
 
     public synchronized Savepoint commitDatabase(boolean createSavePoint) {

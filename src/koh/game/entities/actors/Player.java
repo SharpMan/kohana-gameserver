@@ -18,7 +18,6 @@ import koh.game.entities.actors.character.FieldNotification;
 import koh.game.entities.environments.DofusMap;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
-import koh.game.utils.Settings;
 import koh.game.entities.actors.character.*;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildMember;
@@ -277,7 +276,7 @@ public class Player extends IGameActor implements Observer {
                 client.send(new CurrentMapMessage(currentMap.id, "649ae451ca33ec53bbcbcc33becf15f4")); //kdpelrkdpaielcmspekdprcvkdparkdb
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
-                PlayerController.sendServerMessage(client, Settings.GetStringElement("World.onLogged"), Settings.GetStringElement("World.onLoggedColor"));
+                PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
                 // client.send(new BasicNoOperationMessage());
                 client.send(new AlignmentRankUpdateMessage(this.alignmentGrade, false));
                 client.sequenceMessage();
@@ -317,7 +316,7 @@ public class Player extends IGameActor implements Observer {
                     if(PlayerDAOImpl.myCharacterByTime.stream().anyMatch(x -> x.second.nickName.equalsIgnoreCase(p.nickName))){
                         System.out.println(p.nickName + " already aded");
                     }
-                    PlayerDAOImpl.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + Settings.GetIntElement("account.DeleteMemoryTime") * 60 * 1000, p));
+                    PlayerDAOImpl.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("account.DeleteMemoryTime") * 60 * 1000, p));
                     Main.Logs().writeInfo(p.nickName + " aded" + this.account.characters.size());
                 }
             } else {
@@ -641,7 +640,7 @@ public class Player extends IGameActor implements Observer {
             if (this.inventoryCache != null) {
                 this.inventoryCache.save(Clear);
             }
-            PlayerDAOImpl.update(this, Clear);
+            DAO.getPlayers().update(this, Clear);
             if (!Clear && this.account != null && this.account.accountData != null) {
                 this.account.accountData.save(false);
             }

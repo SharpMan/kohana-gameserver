@@ -50,14 +50,14 @@ public class MountInventoryItem extends InventoryItem {
             this.mount.id = (double) this.entity.animalID;
             this.mount.isRideable = true;
             this.mount.level = 1;
-            this.mount.model = MountDAOImpl.cache.get(this.templateId).Id;
-            this.mount.effectList = MountDAOImpl.getMountByEffect(this.mount.model, this.mount.level);
+            this.mount.model = DAO.getMounts().find(this.templateId).Id;
+            this.mount.effectList = DAO.getMounts().getMountByEffect(this.mount.model, this.mount.level);
             this.serializeInformations();
 
             this.removeEffect(995);
             this.removeEffect(998);
 
-            this.effects.add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), MountDAOImpl.cache.get(this.templateId).Id, this.entity.animalID));
+            this.effects.add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(),DAO.getMounts().find(this.templateId).Id, this.entity.animalID));
             this.effects.add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
             this.notifyColumn("effects");
 
@@ -77,7 +77,7 @@ public class MountInventoryItem extends InventoryItem {
     public void levelUp() {
         this.mount.level++;
         this.mount.effectList = ArrayUtils.removeAll(this.mount.effectList);
-        this.mount.effectList = MountDAOImpl.getMountByEffect(this.mount.model, this.mount.level);
+        this.mount.effectList = DAO.getMounts().getMountByEffect(this.mount.model, this.mount.level);
     }
 
     public void save() {

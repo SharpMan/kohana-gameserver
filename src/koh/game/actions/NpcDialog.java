@@ -5,7 +5,6 @@ import java.util.Arrays;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.NpcDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
@@ -33,7 +32,7 @@ public class NpcDialog extends GameAction {
     public void changeMessage(int id, int pos) {
         NpcMessage Message = null;
         try {
-            Message = DAO.getNpcs().getNpcMessage(this.NPC.getTemplate().getDialogMessage(id, pos)).getMessage((Player) this.actor);
+            Message = DAO.getNpcs().findMessage(this.NPC.getTemplate().getDialogMessage(id, pos)).getMessage((Player) this.actor);
         } catch (Exception e) {
             e.printStackTrace();
         }

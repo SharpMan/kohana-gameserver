@@ -1,5 +1,6 @@
 package koh.game.network.handlers.game.approach;
 
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.network.WorldClient;
@@ -17,7 +18,8 @@ public class BasicHandler {
 
     @HandlerAttribute(ID = BasicWhoIsRequestMessage.MESSAGE_ID)
     public static void HandleBasicWhoIsRequestMessage(WorldClient Client, BasicWhoIsRequestMessage Message) {
-        Player Shearch = PlayerDAOImpl.getCharacter(Message.search.toLowerCase());
+        //TODO: Maybe anti flood
+        Player Shearch = DAO.getPlayers().getCharacter(Message.search.toLowerCase());
         if (Shearch == null) {
             Client.send(new BasicWhoIsNoMatchMessage(Message.search));
             return;

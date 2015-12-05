@@ -22,7 +22,7 @@ public class BuffTpFirstPos extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         if (Target.previousFirstCellPos.isEmpty()) {
             return -1;
         }
@@ -39,7 +39,7 @@ public class BuffTpFirstPos extends BuffEffect {
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
     }
 }

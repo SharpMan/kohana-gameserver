@@ -6,7 +6,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameRequest;
 import koh.game.actions.requests.GuildJoinRequest;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.SpellDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.dao.sqlite.GuildDAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
@@ -56,17 +56,17 @@ public class GuildHandler {
     @HandlerAttribute(ID = GuildSpellUpgradeRequestMessage.M_ID)
     public static void HandleGuildSpellUpgradeRequestMessage(WorldClient Client, GuildSpellUpgradeRequestMessage Message) {
         if (Client.character.guild != null && Client.character.getGuildMember().manageGuildBoosts()) {
-            if (Client.character.guild.entity.boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)) {
+            if (Client.character.guild.entity.boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, Message.spellId)) {
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
 
-            byte SpellLevel = Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)];
-            if (SpellLevel >= SpellDAOImpl.spells.get(Message.pellId).spellLevels.length) { //action Asyn ^^
+            byte SpellLevel = Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.spellId)];
+            if (SpellLevel >= DAO.getSpells().findSpell(Message.spellId).spellLevels.length) { //action Asyn ^^
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
-            Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.pellId)]++;
+            Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.spellId)]++;
             Client.character.guild.entity.boost -= 5;
             Client.character.guild.sendToField(Client.character.guild.toGuildInfosUpgradeMessage());
 
@@ -158,7 +158,7 @@ public class GuildHandler {
             if (!Client.character.getGuildMember().inviteNewMembers()) {
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
             } else {
-                Player character = PlayerDAOImpl.getCharacter(Message.name);
+                Player character = DAO.getPlayers().getCharacter(Message.name);
                 if (character == null || character.client == null) {
                     Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
                 } else {
@@ -198,7 +198,7 @@ public class GuildHandler {
             if (!Client.character.getGuildMember().inviteNewMembers()) {
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
             } else {
-                Player character = PlayerDAOImpl.getCharacter(Message.targetId);
+                Player character = DAO.getPlayers().getCharacter(Message.targetId);
                 if (character == null || character.client == null) {
                     Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
                 } else {

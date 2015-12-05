@@ -194,6 +194,9 @@ public class SpellDAOImpl extends SpellDAO {
     }
 
     @Override
+    public SpellBomb findBomb(int id) { return this.bombs.get(id); }
+
+    @Override
     public Spell findSpell(int id)
     {
         return this.spells.get(id);

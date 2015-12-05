@@ -237,11 +237,13 @@ public class WorldClient {
     }
 
     public void sequenceMessage() {
-        this.send(new BasicAckMessage(Seq, lastPacketId, null));
+        //TODO : Right seq and lastPacketId value
+        this.send(new BasicAckMessage(Seq, lastPacketId));
     }
 
     public void sequenceMessage(Message Dofus) {
-        this.send(new BasicAckMessage(Seq, lastPacketId, Dofus));
+        //TODO: SequenceMessage BASIC + Dofus blinded
+        //this.send(new BasicAckMessage(Seq, lastPacketId, Dofus));
     }
 
     public void timeOut() {

@@ -1,5 +1,6 @@
 package koh.game.conditions;
 
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.utils.Settings;
 
@@ -24,6 +25,6 @@ public class ServerCriterion extends Criterion {
 
     @Override
     public boolean Eval(Player character) {
-        return Settings.GetIntElement("World.id") == this.Server;
+        return DAO.getSettings().getIntElement("World.id") == this.Server;
     }
 }

@@ -33,7 +33,7 @@ public class EffectCreateIllusion extends EffectBase {
         Buff.Duration = 1;
         Buff.DecrementType = BuffDecrementType.TYPE_BEGINTURN;
         CastInfos.Caster.buff.addBuff(Buff);
-        if (Buff.ApplyEffect(null, null) == -3) {
+        if (Buff.applyEffect(null, null) == -3) {
             return -3;
         }
         Buff.Duration = -1;

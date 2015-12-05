@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.dao.mysql.MountDAOImpl;
 import koh.game.entities.item.InventoryItem;
@@ -124,7 +125,7 @@ public class MountHandler {
                         break;
                     }
 
-                    InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, MountDAOImpl.find(Client.character.mountInfo.mount.model).scroolId, 63, Client.character.ID, 1, new ArrayList<ObjectEffect>() {
+                    InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), DAO.getMounts().find(Client.character.mountInfo.mount.model).scroolId, 63, Client.character.ID, 1, new ArrayList<ObjectEffect>() {
                         {
                             add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
                             add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.character.mountInfo.mount.model, Client.character.mountInfo.entity.animalID));

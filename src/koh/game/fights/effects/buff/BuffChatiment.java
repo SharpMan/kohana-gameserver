@@ -19,7 +19,7 @@ public class BuffChatiment extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt BuffValue = new MutableInt(DamageValue.getValue() / 2); // Divise par deux les stats a boost car c'est un personnage.
         //var StatsType = (EffectEnum)this.CastInfos.Value1 == EffectEnum.Heal ? EffectEnum.AddVitalite : (EffectEnum)this.CastInfos.Value1;
         int MaxValue = this.CastInfos.Effect.diceSide;
@@ -45,15 +45,15 @@ public class BuffChatiment extends BuffEffect {
             this.CastInfos.DamageValue += BuffValue.getValue();
             BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.CastInfos.Effect.diceNum), this.CastInfos.SpellId, this.CastInfos.CellId, 0, null, CastInfos.Caster, null, false, this.CastInfos.EffectType, BuffValue.getValue(), null, Duration, this.GetId()), this.Target);
 
-            BuffStats.ApplyEffect(BuffValue, DamageInfos);
+            BuffStats.applyEffect(BuffValue, DamageInfos);
             this.Target.buff.addBuff(BuffStats);
         }
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
     }
 

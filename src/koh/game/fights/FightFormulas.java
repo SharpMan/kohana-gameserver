@@ -59,7 +59,7 @@ public class FightFormulas {
         int lvlLoosers = Lossers.mapToInt(x -> x.getLevel()).sum();
         int lvlWinners = Winners.mapToInt(x -> x.getLevel()).sum();
 
-        int taux = Settings.GetIntElement("Rate.Challenge");
+        int taux = DAO.getSettings().getIntElement("Rate.Challenge");
         float rapport = (float) lvlLoosers / (float) lvlWinners;
         int malus = 1;
         if ((double) rapport < 0.84999999999999998D) {

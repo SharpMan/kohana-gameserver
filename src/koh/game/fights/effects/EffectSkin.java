@@ -17,7 +17,7 @@ public class EffectSkin extends EffectBase {
             Buff = new BuffSkin(CastInfos, Target);
             if (!Target.buff.buffMaxStackReached(Buff)) {
                 Target.buff.addBuff(Buff);
-                if (Buff.ApplyEffect(null, null) == -3) {
+                if (Buff.applyEffect(null, null) == -3) {
                     return -3;
                 }
             }

@@ -50,13 +50,13 @@ public class MountInformations {
         this.isToogled = true;
         this.enableStats(true);
         this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
-        this.player.getEntityLook().bonesId = MountDAOImpl.find(this.mount.model).entityLook.bonesId;
-        this.player.getEntityLook().indexedColors = MountDAOImpl.find(this.mount.model).entityLook.indexedColors;
+        this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).entityLook.bonesId;
+        this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).entityLook.indexedColors;
         this.player.getEntityLook().skins.clear();
         /*if (item.templateId != ItemsEnum.Kramkram) { //Todo KAMELEONE
          this.player.getEntityLook().indexedColors.clear();
          }*/
-        this.player.getEntityLook().scales = MountDAOImpl.find(this.mount.model).entityLook.scales;
+        this.player.getEntityLook().scales = DAO.getMounts().find(this.mount.model).entityLook.scales;
         this.player.refreshEntitie();
     }
 
@@ -122,7 +122,7 @@ public class MountInformations {
     public void levelUp() {
         this.mount.level++;
         this.mount.effectList = ArrayUtils.removeAll(this.mount.effectList);
-        this.mount.effectList = MountDAOImpl.getMountByEffect(this.mount.model, this.mount.level);
+        this.mount.effectList = DAO.getMounts().getMountByEffect(this.mount.model, this.mount.level);
         if (this.isToogled) {
             this.enableStats(false);
             this.myStats = null;

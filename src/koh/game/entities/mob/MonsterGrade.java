@@ -1,5 +1,6 @@
 package koh.game.entities.mob;
 
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.MonsterDAOImpl;
 import koh.game.entities.actors.character.GenericStats;
 import koh.protocol.client.enums.StatsEnum;
@@ -70,7 +71,7 @@ public class MonsterGrade {
     }
 
     public MonsterTemplate Monster() {
-        return MonsterDAOImpl.Cache.get(this.monsterId);
+        return DAO.getMonsters().find(this.monsterId);
     }
 
     public GenericStats GetStats() {

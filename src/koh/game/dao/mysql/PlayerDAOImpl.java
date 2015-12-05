@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.google.inject.Inject;
+import koh.game.dao.DAO;
 import koh.game.dao.DatabaseSource;
 import koh.game.utils.sql.ConnectionStatement;
 import org.apache.logging.log4j.LogManager;
@@ -140,7 +141,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             level = result.getInt("level");
                             account = account;
                             mapid = result.getInt("map");
-                            this.currentMap = MapDAOImpl.dofusMaps.get(mapid);
+                            this.currentMap = DAO.getMaps().findTemplate(mapid);
 
                             if (currentMap != null) {
                                 currentMap.Init();

@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import koh.game.Main;
+import koh.game.dao.DAO;
 import koh.game.executors.GameLoader;
 import koh.game.network.codec.ProtocolDecoder;
-import koh.game.utils.Settings;
 import koh.protocol.client.Message;
 import koh.protocol.client.codec.Dofus2ProtocolEncoder;
 import org.apache.mina.core.session.IoSession;
@@ -35,7 +35,7 @@ public class WorldServer {
 
     public WorldServer(int port) {
         this.acceptor = new NioSocketAcceptor(Runtime.getRuntime().availableProcessors() * 4);
-        this.adress = new InetSocketAddress(Settings.GetStringElement("World.Host"), port);
+        this.adress = new InetSocketAddress(DAO.getSettings().getStringElement("World.Host"), port);
     }
 
     public WorldServer configure() {

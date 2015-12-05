@@ -26,12 +26,12 @@ public class BuffPorteur extends BuffEffect {
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostStateEffect(this.GetId(), this.Caster.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 2, this.CastInfos.ParentUID, (short) 1, (short) 3);
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         // Si effet finis
         if (!this.Target.states.hasState(FightStateEnum.Porté)) {
             this.Duration = 0;
@@ -43,10 +43,10 @@ public class BuffPorteur extends BuffEffect {
     }
 
     @Override
-    public int RemoveEffect() {
+    public int removeEffect() {
         CastInfos.Caster.states.fakeState(FightStateEnum.Porteur, false);
         this.Duration = 0;
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
 }

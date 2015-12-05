@@ -2,6 +2,7 @@ package koh.game.dao.api;
 
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.DofusZaap;
+import koh.game.entities.environments.MapPosition;
 import koh.patterns.services.api.Service;
 
 import java.util.ArrayList;
@@ -12,6 +13,12 @@ import java.util.stream.Stream;
  * Created by Melancholia on 11/28/15.
  */
 public abstract class MapDAO implements Service {
+
+    public abstract DofusMap findMapByPos(int X, int Y);
+
+    public abstract MapPosition[] getSubAreaOfPos(int X, int Y);
+
+    public abstract DofusMap findMapByPos(int X, int Y, int subArea);
 
     public abstract DofusMap findTemplate(int id);
 

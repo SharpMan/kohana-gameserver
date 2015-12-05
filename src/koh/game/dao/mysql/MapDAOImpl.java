@@ -239,15 +239,18 @@ public class MapDAOImpl extends MapDAO {
         return i;
     }
 
+    @Override
     public DofusMap findMapByPos(int X, int Y) {
         return dofusMaps.values().stream().filter(x -> x.position != null && x.position.posX == X && x.position.posY == Y)
                 .findFirst().orElse(null);
     }
 
+    @Override
     public MapPosition[] getSubAreaOfPos(int X, int Y) {
         return dofusMaps.values().stream().filter(x -> x.position != null && x.position.posX == X && x.position.posY == Y).map(x -> x.position).toArray(MapPosition[]::new);
     }
 
+    @Override
     public DofusMap findMapByPos(int X, int Y, int subArea) {
         return dofusMaps.values().stream()
                 .filter(x -> x.position != null && x.position.posX == X && x.position.posY == Y && x.position.subAreaId == subArea).

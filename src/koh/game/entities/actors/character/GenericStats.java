@@ -4,8 +4,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
-import koh.game.utils.Settings;
 import koh.protocol.client.enums.BreedEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
@@ -156,14 +157,14 @@ public class GenericStats {
                 total += getTotal(StatsEnum.Wisdom) / 4;
                 break;
             case ActionPoints:
-                if (isCharacterFighter && (total - myStats.get(effectType).additionnal) > Settings.GetIntElement("Limit.Pa")) {
-                    total -= (total - myStats.get(effectType).additionnal) - Settings.GetIntElement("Limit.Pa");
+                if (isCharacterFighter && (total - myStats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pa")) {
+                    total -= (total - myStats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pa");
                 }
                 total += getTotal(StatsEnum.AddPABis);
                 break;
             case MovementPoints:
-                if (isCharacterFighter && (total - myStats.get(effectType).additionnal) > Settings.GetIntElement("Limit.Pm")) {
-                    total -= (total - myStats.get(effectType).additionnal) - Settings.GetIntElement("Limit.Pm");
+                if (isCharacterFighter && (total - myStats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pm")) {
+                    total -= (total - myStats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pm");
                 }
                 total += getTotal(StatsEnum.Add_PM);
                 break;

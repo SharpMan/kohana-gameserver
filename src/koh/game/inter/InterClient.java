@@ -2,7 +2,7 @@ package koh.game.inter;
 
 import java.net.InetSocketAddress;
 import koh.game.Main;
-import koh.game.utils.Settings;
+import koh.game.dao.DAO;
 import koh.inter.InterMessage;
 import koh.inter.IntercomDecoder;
 import koh.inter.IntercomEncoder;
@@ -18,7 +18,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 public class InterClient {
 
     private IoConnector connector = new NioSocketConnector();
-    private InetSocketAddress address = new InetSocketAddress(Settings.GetStringElement("Inter.Host"), Settings.GetIntElement("Inter.Port"));
+    private InetSocketAddress address = new InetSocketAddress(DAO.getSettings().getStringElement("Inter.Host"), DAO.getSettings().getIntElement("Inter.Port"));
     private IoSession session;
 
     public InterClient() {

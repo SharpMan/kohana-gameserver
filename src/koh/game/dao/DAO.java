@@ -2,10 +2,15 @@ package koh.game.dao;
 
 import com.google.inject.Inject;
 import koh.game.dao.api.*;
+import koh.game.dao.mysql.MountDAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
+import koh.game.utils.Settings;
 import lombok.Getter;
 
 public class DAO {
+
+    @Inject @Getter
+    private static Settings settings;
 
     @Inject @Getter
     private static AccountDataDAO accountDatas;
@@ -21,6 +26,9 @@ public class DAO {
 
     @Inject @Getter
     private static MonsterDAO monsters;
+
+    @Inject @Getter
+    private static MountDAO mounts;
 
     @Inject @Getter
     private static PlayerDAO players;

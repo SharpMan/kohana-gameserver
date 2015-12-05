@@ -32,7 +32,7 @@ public class BuffSkin extends BuffEffect {
      * @return
      */
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.oldBonesID = Target.getEntityLook().bonesId;
         this.oldScales = Target.getEntityLook().scales;
         switch (this.CastInfos.SpellId) {
@@ -69,13 +69,13 @@ public class BuffSkin extends BuffEffect {
 
         //this.Target.entityLook.bonesId = (short) Math.abs((this.CastInfos.Effect.value * 44) / 666);
         this.Caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.getEntityLook()));
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public int RemoveEffect() {
+    public int removeEffect() {
         if (this.Target.entityLook.bonesId == this.oldBonesID && (skinToRemove == 0 || oldScales == null)) {
-            return super.RemoveEffect();
+            return super.removeEffect();
         }
         this.Target.entityLook.bonesId = this.oldBonesID;
         this.Target.entityLook.scales = this.oldScales;
@@ -83,11 +83,11 @@ public class BuffSkin extends BuffEffect {
             this.Target.entityLook.skins.remove(this.Target.entityLook.skins.indexOf(this.skinToRemove));
         }
         this.Caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.getEntityLook()));
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) 0);
     }
 

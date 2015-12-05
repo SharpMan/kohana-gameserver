@@ -42,6 +42,10 @@ public class Settings {
         return Integer.parseInt(fastElement(e));
     }
 
+    public short getShortElement(String e){
+        return Short.parseShort(fastElement(e));
+    }
+
     public boolean getBoolElement(String e) {
         return Boolean.parseBoolean(fastElement(e));
     }

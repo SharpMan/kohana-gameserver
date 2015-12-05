@@ -23,7 +23,7 @@ public class EffectSubAllResist extends EffectBase {
                 return -1;
             }
 
-            if (BuffStats.ApplyEffect(null, null) == -3) {
+            if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 

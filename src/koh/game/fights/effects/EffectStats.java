@@ -23,7 +23,7 @@ public class EffectStats extends EffectBase {
             }
             EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets,CastInfos.SpellLevel);
             BuffStats BuffStats = new BuffStats(SubInfos, Target);
-            if (BuffStats.ApplyEffect(null, null) == -3) {
+            if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 

@@ -6,14 +6,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import koh.game.Main;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.dao.sqlite.GuildDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.FieldNotification;
 import koh.game.entities.environments.IWorldEventObserver;
 import koh.game.network.ChatChannel;
-import koh.game.utils.Settings;
 import koh.protocol.client.enums.GuildRightsBitEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
@@ -52,7 +50,7 @@ public class Guild extends IWorldEventObserver {
     public void onFighterAddedExperience(GuildMember member, long XP) {
         member.addExperience(XP);
         this.entity.addExperience(XP);
-        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).guild && this.entity.level < Settings.GetIntElement("Max.GuildLevel")) {
+        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).guild && this.entity.level < DAO.getSettings().getIntElement("Max.GuildLevel")) {
             this.entity.level++;
             this.entity.boost += 5;
             this.sendToField(new GuildLevelUpMessage(this.entity.level));
@@ -209,7 +207,7 @@ public class Guild extends IWorldEventObserver {
     }
 
     public GuildInformationsGeneralMessage toGeneralInfos() {
-        return new GuildInformationsGeneralMessage(true, false, (byte) this.entity.level, (long) ExpDAOImpl.getFloorByLevel(this.entity.level).Guild, this.entity.getExperience(), (long) ExpDAOImpl.getFloorByLevel(this.entity.level + 1).Guild, this.entity.creationDate, this.members.size(), this.characters.size());
+        return new GuildInformationsGeneralMessage(true, false, (byte) this.entity.level, (long) DAO.getExps().getLevel(this.entity.level).guild, this.entity.getExperience(), (long) DAO.getExps().getLevel(this.entity.level + 1).guild, this.entity.creationDate, this.members.size(), this.characters.size());
     }
 
     protected void updateMember(GuildMember member) {

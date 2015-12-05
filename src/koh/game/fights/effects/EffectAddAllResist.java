@@ -21,7 +21,7 @@ public class EffectAddAllResist extends EffectBase {
             if (Target.buff.buffMaxStackReached(BuffStats)) {
                 return -1;
             }
-            if (BuffStats.ApplyEffect(null, null) == -3) {
+            if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 

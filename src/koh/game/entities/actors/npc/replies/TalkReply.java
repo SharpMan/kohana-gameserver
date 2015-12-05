@@ -2,7 +2,7 @@ package koh.game.entities.actors.npc.replies;
 
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.NpcDialog;
-import koh.game.dao.mysql.NpcDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.npc.NpcReply;
 
@@ -17,7 +17,7 @@ public class TalkReply extends NpcReply {
         if (!super.execute(p)) {
             return false;
         }
-        ((NpcDialog) p.client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).changeMessage(NpcDAOImpl.messages.get(Integer.parseInt(this.parameters[0])));
+        ((NpcDialog) p.client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).changeMessage(DAO.getNpcs().findMessage(Integer.parseInt(this.parameters[0])));
         return true;
     }
 

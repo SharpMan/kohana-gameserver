@@ -57,7 +57,7 @@ public class EffectStatsSteal extends EffectBase {
 
             // Malus a la cible
             BuffStats BuffStats = new BuffStats(MalusInfos, Target);
-            if (BuffStats.ApplyEffect(DamageValue, null) == -3) {
+            if (BuffStats.applyEffect(DamageValue, null) == -3) {
                 return -3;
             }
 
@@ -65,7 +65,7 @@ public class EffectStatsSteal extends EffectBase {
 
             // Bonus au lanceur
             BuffStats = new BuffStats(BonusInfos, CastInfos.Caster);
-            if (BuffStats.ApplyEffect(DamageValue, null) == -3) {
+            if (BuffStats.applyEffect(DamageValue, null) == -3) {
                 return -3;
             }
 

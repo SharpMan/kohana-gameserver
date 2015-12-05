@@ -1,8 +1,7 @@
 package koh.game.network;
 
-import java.net.InetSocketAddress;
-import koh.game.Logs;
 import koh.game.Main;
+import koh.game.dao.DAO;
 import koh.game.utils.Settings;
 import koh.protocol.client.Message;
 import koh.protocol.messages.game.approach.HelloGameMessage;
@@ -24,7 +23,7 @@ public class WorldHandler extends IoHandlerAdapter {
     @Override
     public void sessionOpened(IoSession session) throws Exception {
         session.setAttribute("session", new WorldClient(session));
-        session.write(new ProtocolRequired(Settings.GetIntElement("Protocol.requiredVersion"), Settings.GetIntElement("Protocol.currentVersion")));
+        session.write(new ProtocolRequired(DAO.getSettings().getIntElement("Protocol.requiredVersion"), DAO.getSettings().getIntElement("Protocol.currentVersion")));
         session.write(new HelloGameMessage());
     }
 

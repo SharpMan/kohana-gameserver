@@ -1,6 +1,7 @@
 package koh.game.inter;
 
 import koh.game.Main;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.AccountTicketDAO;
 import koh.game.entities.Account;
 import koh.game.utils.Settings;
@@ -27,7 +28,8 @@ class InterHandler extends IoHandlerAdapter {
         if (connector != null) {
             System.out.println(new StringBuilder("InterServer connected : ").append(session.getRemoteAddress().toString()));
             connector.setSession(session);
-            session.write(new HelloMessage(Settings.FastElement("World.Key")));
+            //TODO to final var foreach 90value in dic each moment ...
+            session.write(new HelloMessage(DAO.getSettings().fastElement("World.Key")));
         } else {
             session.close(false);
         }

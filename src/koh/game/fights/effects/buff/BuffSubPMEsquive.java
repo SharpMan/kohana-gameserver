@@ -21,7 +21,7 @@ public class BuffSubPMEsquive extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt LostPM = new MutableInt(CastInfos.RandomJet(Target));
         LostPM.setValue(LostPM.getValue() > Target.getAP() ? Target.getAP() : LostPM.getValue());
         CastInfos.DamageValue = Target.calculDodgeAPMP(CastInfos.Caster, LostPM.intValue(), true, CastInfos.Duration > 0);
@@ -32,18 +32,18 @@ public class BuffSubPMEsquive extends BuffEffect {
 
         if (CastInfos.DamageValue > 0) {
             BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PM, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.Caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, Duration, 0), this.Target);
-            BuffStats.ApplyEffect(LostPM, null);
+            BuffStats.applyEffect(LostPM, null);
             this.Target.buff.addBuff(BuffStats);
             if (Target.ID == Target.fight.currentFighter.ID) {
                 // Target.fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_LOST, this.Caster.id, Target.id, (short) -CastInfos.DamageValue));
             }
         }
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
     }
 

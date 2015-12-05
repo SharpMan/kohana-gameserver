@@ -19,20 +19,20 @@ public class BuffState extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.Target.states.addState(this);
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public int RemoveEffect() {
+    public int removeEffect() {
         this.Target.states.delState(this);
 
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostStateEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE_BY_STRONG_DISPEL, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) (CastInfos.Effect == null ? FightStateEnum.Invisible.value : Math.abs(this.CastInfos.RandomJet(Target))), (short) (CastInfos.Effect == null ? FightStateEnum.Invisible.value : CastInfos.Effect.value));
     }
 

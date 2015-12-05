@@ -19,7 +19,7 @@ public class EffectSubPAEsquive extends EffectBase {
                 EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.Caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
-                Buff.ApplyEffect(DamageValue, null);
+                Buff.applyEffect(DamageValue, null);
                 Target.buff.addBuff(Buff);
             }
         } else {
@@ -27,7 +27,7 @@ public class EffectSubPAEsquive extends EffectBase {
                 EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.Caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, 0, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
-                Buff.ApplyEffect(DamageValue, null);
+                Buff.applyEffect(DamageValue, null);
 
                 Target.buff.addBuff(Buff);
             }

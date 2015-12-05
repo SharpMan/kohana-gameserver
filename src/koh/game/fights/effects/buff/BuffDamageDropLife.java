@@ -20,7 +20,7 @@ public class BuffDamageDropLife extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageJet, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageJet, EffectCast DamageInfos) {
             //var Damage = this.CastInfos.RandomJet;
 
         // return EffectDamage.ApplyDamages(this.CastInfos, this.Target, ref Damage);
@@ -38,7 +38,7 @@ public class BuffDamageDropLife extends BuffEffect {
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.CastInfos.RandomJet(Target)));
     }
 

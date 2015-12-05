@@ -4,12 +4,11 @@ import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.jobs.InteractiveSkill;
-import koh.game.utils.Settings;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.interactive.InteractiveElementUpdatedMessage;
@@ -89,13 +88,13 @@ public class Collect implements InteractiveAction {
         if (AgeBonus > 0) {
             bonusQuantity += (int) ((float) bonusQuantity * AgeBonus / 100);
         }
-        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Skill.gatheredRessourceItem, 63, player.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
-        if (player.inventoryCache.add(Item, true)) {
-            Item.needInsert = true;
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.gatheredRessourceItem, 63, player.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
+        if (player.inventoryCache.add(item, true)) {
+            item.needInsert = true;
         }
         player.myJobs.getJob(Skill.parentJobId).gatheringItems += bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered;
         player.send(bonusQuantity > 0 ? new ObtainedItemWithBonusMessage(Skill.gatheredRessourceItem, quantityGathered, bonusQuantity) : new ObtainedItemMessage(Skill.gatheredRessourceItem, quantityGathered));
-        player.myJobs.addExperience(player, Skill.parentJobId, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).xpEarned * Settings.GetIntElement("job.Rate"));
+        player.myJobs.addExperience(player, Skill.parentJobId, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).xpEarned * DAO.getSettings().getIntElement("job.Rate"));
         player.currentMap.getStatedElementById(element).elementState = 1;
         player.currentMap.getStatedElementById(element).deadAt = System.currentTimeMillis();
         player.currentMap.getInteractiveElementStruct(element).ageBonus = -1;

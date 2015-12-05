@@ -1,5 +1,6 @@
 package koh.game.fights.effects;
 
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.MonsterDAOImpl;
 import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.mob.MonsterGrade;
@@ -21,7 +22,7 @@ public class EffectSummonBomb extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         // Possibilité de spawn une creature sur la case ?
 
-        MonsterTemplate Monster = MonsterDAOImpl.Cache.get(CastInfos.Effect.diceNum);
+        MonsterTemplate Monster = DAO.getMonsters().find(CastInfos.Effect.diceNum);
         // getTemplate de monstre existante
         if (Monster != null) {
             MonsterGrade MonsterLevel = Monster.getLevelOrNear(CastInfos.Effect.diceSide);
@@ -44,7 +45,7 @@ public class EffectSummonBomb extends EffectBase {
                                               }}));
                 } else {
                     //CastInfos.Caster.fight.affectSpellTo(CastInfos.Caster, CastInfos.Caster.fight.getCell(CastInfos.getCellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId);
-                    CastInfos.Caster.fight.launchSpell(CastInfos.Caster, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId).getSpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
+                    CastInfos.Caster.fight.launchSpell(CastInfos.Caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(CastInfos.Effect.diceNum).instantSpellId).getSpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
                 }
             }
         }

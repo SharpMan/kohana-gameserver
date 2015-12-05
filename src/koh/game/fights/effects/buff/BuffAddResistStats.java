@@ -22,7 +22,7 @@ public class BuffAddResistStats extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
 
         this.Value1 = CastInfos.RandomJet(Target);
 
@@ -31,22 +31,22 @@ public class BuffAddResistStats extends BuffEffect {
         this.Target.stats.addBoost(StatsEnum.AirElementResistPercent, this.Value1);
         this.Target.stats.addBoost(StatsEnum.EarthElementResistPercent, this.Value1);
         this.Target.stats.addBoost(StatsEnum.NeutralElementResistPercent, this.Value1);
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public int RemoveEffect() {
+    public int removeEffect() {
         this.Target.stats.getEffect(StatsEnum.WaterElementResistPercent).additionnal -= this.Value1;
         this.Target.stats.getEffect(StatsEnum.FireElementResistPercent).additionnal -= this.Value1;
         this.Target.stats.getEffect(StatsEnum.AirElementResistPercent).additionnal -= this.Value1;
         this.Target.stats.getEffect(StatsEnum.EarthElementResistPercent).additionnal -= this.Value1;
         this.Target.stats.getEffect(StatsEnum.NeutralElementResistPercent).additionnal -= this.Value1;
 
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, this.IsDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Value1));
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Value1));
     }
 }

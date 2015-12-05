@@ -259,13 +259,14 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.compressedLayers = null;
         this.compressedBlueCells = null;
         this.compressedRedCells = null;
-        if (NpcDAOImpl.npcs.containsKey(this.id)) {
-            for (Npc npc : NpcDAOImpl.npcs.get(this.id)) {
-                npc.ID = this.myNextActorId--;
-                npc.cell = this.getCell(npc.cellID);
-                this.spawnActor(npc);
+        //throw un nullP mieux que referencer une liste on 111000 map object
+        try {
+            for (Npc npc : DAO.getNpcs().getMapNpc(this.id)) {
+                    npc.ID = this.myNextActorId--;
+                    npc.cell = this.getCell(npc.cellID);
+                    this.spawnActor(npc);
             }
-        }
+        } catch(NullPointerException e) {}
         this.myFightController = new FightController();
         //this.interactiveElements.forEach(x -> System.out.println(x.toString()));
     }
@@ -457,12 +458,15 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.sendMapFightCountMessage();
     }
 
+
     public void sendMapInfo(WorldClient client) {
         this.myFightController.sendFightInfos(client);
-        if (PaddockDAOImpl.paddocks.containsKey(id)) {
-            client.send(new PaddockPropertiesMessage(PaddockDAOImpl.paddocks.get(id).getInformations()));
-            if (PaddockDAOImpl.paddocks.get(id).items != null) {
-                client.send(new GameDataPaddockObjectListAddMessage(PaddockDAOImpl.paddocks.get(id).items));
+        //FIXME : Dafuk am certain some maps have 2 paddocks
+        Paddock paddock = DAO.getPaddocks().find(id);
+        if (paddock != null) {
+            client.send(new PaddockPropertiesMessage(paddock.getInformations()));
+            if (paddock.items != null) {
+                client.send(new GameDataPaddockObjectListAddMessage(paddock.items));
             }
         }
         client.send(getAgressableActorsStatus(client.character));

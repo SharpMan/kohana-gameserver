@@ -13,6 +13,8 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public abstract class PaddockDAO implements Service {
 
+    public abstract Paddock find(int id);
+
     public abstract boolean update(Paddock item, String[] columns);
 
     public static IoBuffer serializeGuildInformations(GuildInformations m) {

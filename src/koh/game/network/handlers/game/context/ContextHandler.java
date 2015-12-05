@@ -5,6 +5,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameFight;
 import koh.game.actions.GameMapMovement;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.character.CharacterInventory;
 import koh.game.entities.environments.DofusCell;
@@ -128,7 +129,7 @@ public class ContextHandler {
         int newQua = Item.getQuantity() - Message.quantity;
         if (newQua <= 0) {
             Client.character.inventoryCache.removeItemFromInventory(Item);
-            ItemTemplateDAOImpl.Update(Item, false, "character_items");
+            DAO.getItems().save(Item, false, "character_items");
         } else {
             Client.character.inventoryCache.updateObjectquantity(Item, newQua);
             Item = CharacterInventory.tryCreateItem(Item.templateId, null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());

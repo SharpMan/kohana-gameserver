@@ -16,7 +16,7 @@ public class EffectErosionPercent extends EffectBase {
         for (Fighter Target : CastInfos.Targets) {
             Buf = new BuffErosionPercent(CastInfos, Target);
             if (!Target.buff.buffMaxStackReached(Buf)) {
-                if (Buf.ApplyEffect(null, null) == -3) {
+                if (Buf.applyEffect(null, null) == -3) {
                     return -3;
                 } else {
                     Target.buff.addBuff(Buf);

@@ -28,7 +28,7 @@ public class BuffHealPercent extends BuffEffect {
      * @return
      */
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         if (EffectHealPercent.ApplyHealPercent(CastInfos, Target, CastInfos.RandomJet(Target)) == -3) {
             return -3;
         }
@@ -36,7 +36,7 @@ public class BuffHealPercent extends BuffEffect {
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) Math.abs(CastInfos.RandomJet(Target)));
     }
 

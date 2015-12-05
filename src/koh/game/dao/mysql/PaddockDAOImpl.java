@@ -32,6 +32,10 @@ public class PaddockDAOImpl extends PaddockDAO {
     @Inject
     private DatabaseSource dbSource;
 
+
+    @Override
+    public Paddock find(int id) { return this.paddocks.get(id); }
+
     @Override
     public boolean update(Paddock item, String[] columns) {
         int i = 1;

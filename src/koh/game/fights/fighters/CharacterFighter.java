@@ -1,6 +1,7 @@
 package koh.game.fights.fighters;
 
 import koh.game.actions.GameActionTypeEnum;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.fights.Fight;
@@ -195,7 +196,7 @@ public class CharacterFighter extends Fighter {
     }
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
-        return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) Character.experience, (double) ExpDAOImpl.persoXpMin(Character.level), (double) ExpDAOImpl.persoXpMax(Character.level), Character.kamas, Character.statPoints, 0, Character.spellPoints, Character.getActorAlignmentExtendInformations(),
+        return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) Character.experience, (double) DAO.getExps().getPlayerMinExp(Character.level), (double) DAO.getExps().getPlayerMaxExp(Character.level), Character.kamas, Character.statPoints, 0, Character.spellPoints, Character.getActorAlignmentExtendInformations(),
                 getLife(), getMaxLife(), Character.energy, PlayerEnum.MaxEnergy,
                 (short) this.getAP(), (short) this.getMP(),
                 new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.Initiative), 0, 0), stats.getEffect(StatsEnum.Prospecting), stats.getEffect(StatsEnum.ActionPoints),

@@ -72,7 +72,7 @@ public class FighterBuff {
         }
         this.buffsAct.get(buff.ActiveType).add(buff);
         this.buffsDec.get(buff.DecrementType).add(buff);
-        buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.Effect.effectId*/buff.CastInfos.EffectType.value(), buff.Caster.ID, buff.GetAbstractFightDispellableEffect()));
+        buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.Effect.effectId*/buff.CastInfos.EffectType.value(), buff.Caster.ID, buff.getAbstractFightDispellableEffect()));
         Main.Logs().writeDebug("Buff " + buff.getClass().getName() + " added");
     }
 
@@ -99,19 +99,19 @@ public class FighterBuff {
          }
          this.buffsAct.get(Buff.ActiveType).add(Buff);
          this.buffsDec.get(Buff.DecrementType).add(Buff);
-         Buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.CastInfos.EffectType.value(), Buff.Caster.id, Buff.GetAbstractFightDispellableEffect()));
+         Buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.CastInfos.EffectType.value(), Buff.Caster.id, Buff.getAbstractFightDispellableEffect()));
 
          }
          }*/
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_BEGINTURN)) {
-            if (Buff.ApplyEffect(Damage, null) == -3) {
+            if (Buff.applyEffect(Damage, null) == -3) {
                 return -3;
             }
         }
 
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
-            if (Buff.Duration != -1 && Buff.DecrementDuration() <= 0) {
-                if (Buff.RemoveEffect() == -3) {
+            if (Buff.Duration != -1 && Buff.decrementDuration() <= 0) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
@@ -129,14 +129,14 @@ public class FighterBuff {
     public int endTurn() {
         MutableInt Damage = new MutableInt(0);
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ENDTURN)) {
-            if (Buff.ApplyEffect(Damage, null) == -3) {
+            if (Buff.applyEffect(Damage, null) == -3) {
                 return -3;
             }
         }
 
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN)) {
-            if (Buff.Duration != -1 && Buff.DecrementDuration() <= 0) {
-                if (Buff.RemoveEffect() == -3) {
+            if (Buff.Duration != -1 && Buff.decrementDuration() <= 0) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
@@ -154,7 +154,7 @@ public class FighterBuff {
     public int endMove() {
         MutableInt Damage = new MutableInt(0);
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ENDMOVE)) {
-            if (Buff.ApplyEffect(Damage, null) == -3) {
+            if (Buff.applyEffect(Damage, null) == -3) {
                 return -3;
             }
         }
@@ -171,7 +171,7 @@ public class FighterBuff {
     /// <param name="DamageValue"></param>
     public int onHealPostJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_HEAL_AFTER_JET)) {
-            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }
@@ -186,7 +186,7 @@ public class FighterBuff {
     /// <param name="DamageValue"></param>
     public int onAttackPostJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACK_POST_JET)) {
-            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }
@@ -201,7 +201,7 @@ public class FighterBuff {
     /// <param name="DamageValue"></param>
     public int onAttackAfterJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACK_AFTER_JET)) {
-            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }
@@ -214,7 +214,7 @@ public class FighterBuff {
     /// <param name="DamageValue"></param>
     public int onAttackedPostJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_POST_JET)) {
-            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }
@@ -227,7 +227,7 @@ public class FighterBuff {
     /// <param name="DamageValue"></param>
     public int onAttackedPostJetTrap(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_POST_JET_TRAP)) {
-            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }
@@ -240,7 +240,7 @@ public class FighterBuff {
     /// <param name="DamageValue"></param>
     public int onattackedafterjet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET)) {
-            if (Buff.ApplyEffect(DamageValue, CastInfos) == -3) {
+            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }
@@ -249,26 +249,26 @@ public class FighterBuff {
 
     public int decrementEffectDuration(int duration) {
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
-            if (Buff.IsDebuffable() && Buff.DecrementDuration(duration) <= 0) {
-                if (Buff.RemoveEffect() == -3) {
+            if (Buff.isDebuffable() && Buff.decrementDuration(duration) <= 0) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
         }
 
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN)) {
-            if (Buff.IsDebuffable() && Buff.DecrementDuration(duration) <= 0) {
-                if (Buff.RemoveEffect() == -3) {
+            if (Buff.isDebuffable() && Buff.decrementDuration(duration) <= 0) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
         }
 
-        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.IsDebuffable() && x.Duration <= 0);
-        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.IsDebuffable() && x.Duration <= 0);
+        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.isDebuffable() && x.Duration <= 0);
+        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.isDebuffable() && x.Duration <= 0);
 
         this.buffsAct.values().stream().forEach((BuffList) -> {
-            BuffList.removeIf(x -> x.IsDebuffable() && x.Duration <= 0);
+            BuffList.removeIf(x -> x.isDebuffable() && x.Duration <= 0);
         });
 
         return -1;
@@ -277,7 +277,7 @@ public class FighterBuff {
     public int dispell(int spell) {
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
             if (Buff.CastInfos != null && Buff.CastInfos.SpellId == spell) {
-                if (Buff.RemoveEffect() == -3) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
@@ -285,7 +285,7 @@ public class FighterBuff {
 
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN)) {
             if (Buff.CastInfos != null && Buff.CastInfos.SpellId == spell) {
-                if (Buff.RemoveEffect() == -3) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
@@ -303,26 +303,26 @@ public class FighterBuff {
 
     public int debuff() {
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
-            if (Buff.IsDebuffable()) {
-                if (Buff.RemoveEffect() == -3) {
+            if (Buff.isDebuffable()) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
         }
 
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN)) {
-            if (Buff.IsDebuffable()) {
-                if (Buff.RemoveEffect() == -3) {
+            if (Buff.isDebuffable()) {
+                if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
         }
 
-        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.IsDebuffable());
-        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.IsDebuffable());
+        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.isDebuffable());
+        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.isDebuffable());
 
         this.buffsAct.values().stream().forEach((BuffList) -> {
-            BuffList.removeIf(x -> x.IsDebuffable());
+            BuffList.removeIf(x -> x.isDebuffable());
         });
 
         return -1;

@@ -3,6 +3,7 @@ package koh.game.exchange;
 import com.google.common.primitives.Ints;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.Npc;
 import static koh.game.entities.actors.character.CharacterInventory.unMergeableType;
@@ -63,7 +64,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        if (Ints.contains(unMergeableType, ItemTemplateDAOImpl.Cache.get(templateId).TypeId)) {
+        if (Ints.contains(unMergeableType, DAO.getItemTemplates().getTemplate(templateId).typeId)) {
             quantity = 1;
         }
 
@@ -89,7 +90,7 @@ public class NpcExchange extends Exchange {
             Client.character.inventoryCache.substractKamas(amount1);
         }
 
-        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, templateId, 63, Client.character.ID, quantity, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(templateId).possibleEffects, npcItem.genType(), ItemTemplateDAOImpl.Cache.get(templateId) instanceof Weapon));
+        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.character.ID, quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).possibleEffects, npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
         if (this.myClient.character.inventoryCache.add(Item, true)) {
             Item.needInsert = true;
         }

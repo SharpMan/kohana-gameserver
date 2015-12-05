@@ -1,6 +1,7 @@
 package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
+import com.sun.xml.internal.bind.annotation.OverrideAnnotationOf;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.NpcDAO;
 import koh.game.entities.actors.Npc;
@@ -37,10 +38,13 @@ public class NpcDAOImpl extends NpcDAO {
 
 
     @Override
+    public ArrayList<Npc> getMapNpc(int mapid) { return this.npcs.get(mapid); }
+
+    @Override
     public NpcTemplate findTemplate(int id) { return this.templates.get(id);}
 
     @Override
-    public NpcMessage getNpcMessage(int id){
+    public NpcMessage findMessage(int id){
         return this.messages.get(id);
     }
 

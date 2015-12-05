@@ -5,7 +5,6 @@ import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
-import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -22,13 +21,13 @@ public class BuffDammageOcassioned extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         DamageValue.setValue((DamageValue.intValue() * this.Jet) / 100);
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
     }
 

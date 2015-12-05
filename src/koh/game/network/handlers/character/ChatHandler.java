@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.*;
 import koh.game.dao.mysql.MapDAOImpl;
 import koh.game.entities.actors.Player;
@@ -12,6 +13,7 @@ import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.MapPosition;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
+import koh.game.entities.item.ItemTemplate;
 import koh.game.entities.item.Weapon;
 import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
@@ -69,7 +71,8 @@ public class ChatHandler {
             Client.character.DisabledChannels.add(message.channel);
             Client.character.ennabledChannels.remove(Client.character.ennabledChannels.indexOf(message.channel));
         } else {
-            if (Settings.GetBoolElement("Logging.Debug")) {
+            //TODO: Fix this stupid flood message
+            if (DAO.getSettings().getBoolElement("Logging.Debug")) {
                 System.out.println("Eroror " + message.enable + " " + message.channel);
                 for (byte b : Client.character.ennabledChannels) {
                     System.out.println("enabled " + b);
@@ -91,7 +94,7 @@ public class ChatHandler {
             HandleChatClientPrivateMessage(Client, Message);
             return;
         }
-        Player Target = PlayerDAOImpl.getCharacter(Message.Receiver);
+        Player Target = DAO.getPlayers().getCharacter(Message.Receiver);
         if (Target == null || Target.client == null) {
             Client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
         } else {
@@ -102,7 +105,7 @@ public class ChatHandler {
 
     @HandlerAttribute(ID = ChatClientPrivateMessage.MESSAGE_ID)
     public static void HandleChatClientPrivateMessage(WorldClient Client, ChatClientPrivateMessage Message) {
-        Player Target = PlayerDAOImpl.getCharacter(Message.Receiver);
+        Player Target = DAO.getPlayers().getCharacter(Message.Receiver);
         if (Target == null || Target.client == null) {
             Client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
         } else {
@@ -195,11 +198,11 @@ public class ChatHandler {
                     break;//removePaddockItem
                 } else if (message.Content.startsWith("!remove_item")) {
                     try {
-                        if (!PaddockDAOImpl.paddocks.containsKey(Client.character.currentMap.id)) {
+                        /* check map null if (!PaddockDAOImpl.paddocks.containsKey(Client.character.currentMap.id)) {
                             break;
-                        }
+                        }*/
                         int cellid = Integer.parseInt(message.Content.split(" ")[1]);
-                        PaddockDAOImpl.paddocks.get(Client.character.currentMap.id).removePaddockItem(cellid);
+                        DAO.getPaddocks().find(Client.character.currentMap.id).removePaddockItem(cellid);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -211,14 +214,14 @@ public class ChatHandler {
                     break;
                 } else if (message.Content.startsWith("!item_paddock")) {
                     try {
-                        if (!PaddockDAOImpl.paddocks.containsKey(Client.character.currentMap.id)) {
+                        /* check map null if (!PaddockDAOImpl.paddocks.containsKey(Client.character.currentMap.id)) {
                             break;
-                        }
+                        } */
                         int cellid = Integer.parseInt(message.Content.split(" ")[1]);
                         int object = Integer.parseInt(message.Content.split(" ")[2]);
                         short durability = Short.parseShort(message.Content.split(" ")[3]);
                         short durabilityMax = Short.parseShort(message.Content.split(" ")[4]);
-                        PaddockDAOImpl.paddocks.get(Client.character.currentMap.id).addPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
+                        DAO.getPaddocks().find(Client.character.currentMap.id).addPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -235,7 +238,7 @@ public class ChatHandler {
 
                         }
 
-                        MapPosition[] SubAreas = MapDAOImpl.getSubAreaOfPos(X, Y);
+                        MapPosition[] SubAreas = DAO.getMaps().getSubAreaOfPos(X, Y);
                         if (SubAreas.length > 1 && subArea == -1) {
                             PlayerController.sendServerMessage(Client, "This position contains a lots of subArea so try one of this ..");
                             for (MapPosition s : SubAreas) {
@@ -245,7 +248,7 @@ public class ChatHandler {
                             if (subArea == -1) {
                                 subArea = SubAreas[0].subAreaId;
                             }
-                            DofusMap Map = MapDAOImpl.findMapByPos(X, Y, subArea);
+                            DofusMap Map = DAO.getMaps().findMapByPos(X, Y, subArea);
                             if (Map == null) {
                                 PlayerController.sendServerMessage(Client, "map Inconnue");
                                 break;
@@ -283,12 +286,12 @@ public class ChatHandler {
                     return;
                 } else if (message.Content.startsWith("!level")) {
                     int Level = Integer.parseInt(message.Content.split(" ")[1]);
-                    Player Target = message.Content.length() >= 2 ? Client.character : PlayerDAOImpl.getCharacter(message.Content.split(" ")[2]);
+                    Player Target = message.Content.length() >= 2 ? Client.character : DAO.getPlayers().getCharacter(message.Content.split(" ")[2]);
                     if (Target == null || !Target.isInWorld) {
                         PlayerController.sendServerMessage(Client, "player " + message.Content.split(" ")[2] + " Offline");
                         return;
                     }
-                    Target.addExperience((ExpDAOImpl.persoXpMin(Level) + 1) - Target.experience);
+                    Target.addExperience((DAO.getExps().getPlayerMinExp(Level) + 1) - Target.experience);
                     PlayerController.sendServerMessage(Client, "level seted successfully");
                 } else if (message.Content.startsWith("!ange")) {
                     Client.character.changeAlignementSide(AlignmentSideEnum.ALIGNMENT_ANGEL);
@@ -361,19 +364,20 @@ public class ChatHandler {
                                 Type = EffectGenerationType.Normal;
                                 break;
                         }
-                        if (ItemTemplateDAOImpl.Cache.get(Id) == null) {
+                        ItemTemplate template = DAO.getItemTemplates().getTemplate(Id);
+                        if (template == null) {
                             PlayerController.sendServerMessage(Client, "Inexistant item");
                             return;
                         }
-                        if (ItemTemplateDAOImpl.Cache.get(Id).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
+                        if (template.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
                             Qua = 1;
                         }
-                        InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Id, 63, Client.character.ID, Qua, EffectHelper.generateIntegerEffect(ItemTemplateDAOImpl.Cache.get(Id).possibleEffects, Type, ItemTemplateDAOImpl.Cache.get(Id) instanceof Weapon));
+                        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Id, 63, Client.character.ID, Qua, EffectHelper.generateIntegerEffect(template.possibleEffects, Type, template instanceof Weapon));
 
                         if (Client.character.inventoryCache.add(Item, true)) {
                             Item.needInsert = true;
                         }
-                        PlayerController.sendServerMessage(Client, String.format("%s  added to your inventory with %s stats", ItemTemplateDAOImpl.Cache.get(Id).nameId, Type.toString()));
+                        PlayerController.sendServerMessage(Client, String.format("%s  added to your inventory with %s stats", template.nameId, Type.toString()));
 
                     } catch (Exception e) {
                         e.printStackTrace();

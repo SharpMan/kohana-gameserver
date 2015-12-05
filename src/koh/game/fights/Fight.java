@@ -1255,12 +1255,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         for (Stream<BuffEffect> Buffs : (Iterable<Stream<BuffEffect>>) this.getAliveFighters().map(x -> x.buff.getAllBuffs())::iterator) {
             for (BuffEffect Buff : (Iterable<BuffEffect>) Buffs::iterator) {
-                FightDispellableEffectExtendedInformations = ArrayUtils.add(FightDispellableEffectExtendedInformations, new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.Caster.ID, Buff.GetAbstractFightDispellableEffect()));
+                FightDispellableEffectExtendedInformations = ArrayUtils.add(FightDispellableEffectExtendedInformations, new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.Caster.ID, Buff.getAbstractFightDispellableEffect()));
             }
         }
         /*return Stream.of(this.getAliveFighters()
          .map(x -> x.buff.getAllBuffs()
-         .map(Buff -> (new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.Caster.id, Buff.GetAbstractFightDispellableEffect())))
+         .map(Buff -> (new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.Caster.id, Buff.getAbstractFightDispellableEffect())))
          )).toArray(FightDispellableEffectExtendedInformations[]::new);*/
         return FightDispellableEffectExtendedInformations;
     }

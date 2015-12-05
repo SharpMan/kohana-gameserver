@@ -40,7 +40,7 @@ public abstract class BuffEffect {
     }
 
     //TODO: Create List in Setting
-    public boolean IsDebuffable() {
+    public boolean isDebuffable() {
         switch (this.CastInfos.EffectType) {
             case Damage_Armor_Reduction:
                 return CastInfos.SpellId != SpellIDEnum.TREVE;
@@ -74,24 +74,24 @@ public abstract class BuffEffect {
         this.DecrementType = DecrementType;
     }
 
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         return this.Target.tryDie(this.Caster.ID);
     }
 
-    public abstract AbstractFightDispellableEffect GetAbstractFightDispellableEffect();
+    public abstract AbstractFightDispellableEffect getAbstractFightDispellableEffect();
 
     /// <summary>
     /// Fin du buff
     /// </summary>
     /// <returns></returns>
-    public int RemoveEffect() {
+    public int removeEffect() {
         return this.Target.tryDie(this.Caster.ID);
     }
 
     /// <summary>
     /// decrement le buff
     /// </summary>
-    public int DecrementDuration() {
+    public int decrementDuration() {
         this.Duration--;
 
         this.CastInfos.FakeValue = 0;
@@ -99,7 +99,7 @@ public abstract class BuffEffect {
         return this.Duration;
     }
 
-    public int DecrementDuration(int Duration) {
+    public int decrementDuration(int Duration) {
         this.Duration -= Duration;
 
         this.CastInfos.FakeValue = 0;

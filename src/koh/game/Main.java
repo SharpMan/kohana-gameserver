@@ -1,5 +1,6 @@
 package koh.game;
 
+import koh.game.dao.DAO;
 import koh.game.inter.InterClient;
 import koh.game.inter.TransfererTimeOut;
 import koh.game.network.WorldServer;
@@ -46,7 +47,7 @@ public class Main {
 
             });
             long time = System.currentTimeMillis();
-            Settings.Initialize();
+            //Settings.initialize();
             $Logs = new Logs();
             MySQL.ConnectDatabase();
             MySQL.LoadCache();
@@ -55,7 +56,7 @@ public class Main {
             $TransfererTimeOut = new TransfererTimeOut();
             $InterClient = new InterClient();
             $InterClient.bind();
-            $WorldServer = new WorldServer(Settings.GetIntElement("World.Port")).configure().launch();
+            $WorldServer = new WorldServer(DAO.getSettings().getIntElement("World.Port")).configure().launch();
             running = true;
             $Logs.writeInfo(new StringBuilder("WorldServer start in ").append(System.currentTimeMillis() - time).append(" ms.").toString());
 

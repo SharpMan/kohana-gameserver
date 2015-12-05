@@ -19,14 +19,14 @@ public class BuffReflectSpell extends BuffEffect {
     }
 
     @Override
-    public int RemoveEffect() {
+    public int removeEffect() {
         this.Target.states.delState(this);
 
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

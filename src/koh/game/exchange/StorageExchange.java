@@ -1,7 +1,7 @@
 package koh.game.exchange;
 
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
+import koh.game.dao.DAO;
 import koh.game.entities.item.InventoryItem;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
@@ -28,22 +28,22 @@ public class StorageExchange extends Exchange {
 
     @Override
     public boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add) {
-        InventoryItem NewItem = null;
+        InventoryItem newItem = null;
         if (add) {
             for (InventoryItem Item : items) {
-                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.templateId, 63, Client.getAccount().id, Item.getQuantity(), Item.effects);
-                if (Client.getAccount().accountData.add(Client.character, NewItem, true)) {
-                    NewItem.needInsert = true;
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.templateId, 63, Client.getAccount().id, Item.getQuantity(), Item.effects);
+                if (Client.getAccount().accountData.add(Client.character, newItem, true)) {
+                    newItem.needInsert = true;
                 }
                 Client.character.inventoryCache.updateObjectquantity(Item, 0);
             }
         } else {
             for (InventoryItem Item : items) {
-                NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, Item.templateId, 63, Client.character.ID, Item.getQuantity(), Item.effects);
-                if (Client.character.inventoryCache.add(NewItem, true)) {
-                    NewItem.needInsert = true;
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.templateId, 63, Client.character.ID, Item.getQuantity(), Item.effects);
+                if (Client.character.inventoryCache.add(newItem, true)) {
+                    newItem.needInsert = true;
                 }
-                Client.getAccount().accountData.updateObjectquantity(Client.character, Item, 0);
+                Client.getAccount().accountData.updateObjectQuantity(Client.character, Item, 0);
             }
         }
         return true;
@@ -58,8 +58,8 @@ public class StorageExchange extends Exchange {
             if (BankItem == null) {
                 return false;
             }
-            Client.getAccount().accountData.updateObjectquantity(Client.character, BankItem, BankItem.getQuantity() + quantity);
-            InventoryItem Item = InventoryItem.getInstance(ItemTemplateDAOImpl.nextId++, BankItem.templateId, 63, Client.character.ID, -quantity, BankItem.effects);
+            Client.getAccount().accountData.updateObjectQuantity(Client.character, BankItem, BankItem.getQuantity() + quantity);
+            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.templateId, 63, Client.character.ID, -quantity, BankItem.effects);
             if (Client.character.inventoryCache.add(Item, true)) {
                 Item.needInsert = true;
             }
@@ -69,7 +69,7 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             Client.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - quantity);
-            InventoryItem NewItem = InventoryItem.getInstance(ItemTemplateDAOImpl.nextStorageId++, Item.templateId, 63, Client.getAccount().id, quantity, Item.effects);
+            InventoryItem NewItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.templateId, 63, Client.getAccount().id, quantity, Item.effects);
             if (Client.getAccount().accountData.add(Client.character, NewItem, true)) {
                 NewItem.needInsert = true;
             }

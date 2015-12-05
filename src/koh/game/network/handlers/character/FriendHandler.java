@@ -1,5 +1,6 @@
 package koh.game.network.handlers.character;
 
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.AccountData.FriendContact;
 import koh.game.entities.AccountData.IgnoredContact;
@@ -44,7 +45,7 @@ public class FriendHandler {
 
     @HandlerAttribute(ID = IgnoredAddRequestMessage.M_ID)
     public static void HandleIgnoredAddRequestMessage(WorldClient Client, IgnoredAddRequestMessage Message) {
-        Player Target = PlayerDAOImpl.getCharacter(Message.name);
+        Player Target = DAO.getPlayers().getCharacter(Message.name);
         if (Target == null || Target.client == null) {
             Client.send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
         } else if (Client.getAccount().accountData.ignore(Target.account.id)) {
@@ -64,7 +65,7 @@ public class FriendHandler {
 
     @HandlerAttribute(ID = FriendAddRequestMessage.ID)
     public static void HandleFriendAddRequestMessage(WorldClient Client, FriendAddRequestMessage Message) {
-        Player Target = PlayerDAOImpl.getCharacter(Message.Name);
+        Player Target = DAO.getPlayers().getCharacter(Message.Name);
         if (Target == null || Target.client == null) {
             Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
         } else if (Target.account == null || Target.account.accountData == null) {

@@ -5,7 +5,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.dao.DAO;
-import koh.game.utils.Settings;
 import koh.protocol.messages.game.interactive.StatedMapUpdateMessage;
 import koh.protocol.types.game.interactive.StatedElement;
 
@@ -18,7 +17,7 @@ public class Area {
     public final ScheduledExecutorService BackGroundWorker = Executors.newScheduledThreadPool(50);
 
     public Area() {
-        new CancellableScheduledRunnable(BackGroundWorker, ((Settings.GetIntElement("job.AgeBonusTime") + this.id) * 60) * 1000, (Settings.GetIntElement("job.AgeBonusTime") * 60) * 1000) {
+        new CancellableScheduledRunnable(BackGroundWorker, ((DAO.getSettings().getIntElement("job.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("job.AgeBonusTime") * 60) * 1000) {
             @Override
             public void run() {
                 Arrays.stream(subAreas).forEach(Sub -> Arrays.stream(Sub.mapIds)
@@ -37,7 +36,7 @@ public class Area {
                                 })));
             }
         };
-        new CancellableScheduledRunnable(BackGroundWorker, (Settings.GetIntElement("job.Spawn") + this.id) * 60 * 1000, Settings.GetIntElement("job.Spawn") * 60 * 1000) {
+        new CancellableScheduledRunnable(BackGroundWorker, (DAO.getSettings().getIntElement("job.Spawn") + this.id) * 60 * 1000, DAO.getSettings().getIntElement("job.Spawn") * 60 * 1000) {
             @Override
             public void run() {
                 Arrays.stream(subAreas)
@@ -47,7 +46,7 @@ public class Area {
                                     {
                                         boolean Modified = false;
                                         for (StatedElement element : (Iterable<StatedElement>) Arrays.stream(DAO.getMaps().findTemplate(Id).elementsStated)
-                                        .filter(statedElement -> statedElement.deadAt != -1 && statedElement.elementState > 0 && (System.currentTimeMillis() - statedElement.deadAt) > Settings.GetIntElement("job.Spawn") * 60000)::iterator) {
+                                        .filter(statedElement -> statedElement.deadAt != -1 && statedElement.elementState > 0 && (System.currentTimeMillis() - statedElement.deadAt) > DAO.getSettings().getIntElement("job.Spawn") * 60000)::iterator) {
                                             element.deadAt = -1;
                                             element.elementState = 0;
                                             Modified = true;

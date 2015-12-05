@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import koh.game.Main;
+import koh.game.dao.DAO;
 import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfinder;
@@ -121,7 +122,7 @@ public class BombFighter extends StaticFighter {
     public int tryDie(int casterId, boolean force) {
         if (this.getLife() <= 0 && !force) {
             if (this.buff.getAllBuffs().anyMatch(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE)) {
-                return this.buff.getAllBuffs().filter(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().ApplyEffect(null, null);
+                return this.buff.getAllBuffs().filter(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().applyEffect(null, null);
             } else {
                 if (this.FightBombs != null) {
                     this.FightBombs.forEach(Bomb -> Bomb.remove());
@@ -131,7 +132,7 @@ public class BombFighter extends StaticFighter {
         }
         if (this.getLife() <= 0 || force) {
             SlefMurder(casterId);
-            fight.launchSpell(this, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(this.Grade.monsterId).explodSpellId).getSpellLevel(this.Grade.Grade), this.getCellId(), true, true, false);
+            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.Grade.monsterId).explodSpellId).getSpellLevel(this.Grade.Grade), this.getCellId(), true, true, false);
             if (this.FightBombs != null) {
                 this.FightBombs.forEach(Bomb -> Bomb.remove());
             }
@@ -169,7 +170,7 @@ public class BombFighter extends StaticFighter {
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.getCellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.getCellId());
-                        FightBomb Bomb = new FightBomb(this.summoner, SpellDAOImpl.spells.get(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId).getSpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAOImpl.bombs.get(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                        FightBomb Bomb = new FightBomb(this.summoner, DAO.getSpells().findSpell(DAO.getSpells().findBomb(Grade.monsterId).wallSpellId).getSpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(DAO.getSpells().findBomb(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
                         fight.addActivableObject(this.summoner, Bomb);
                     }
                 }
