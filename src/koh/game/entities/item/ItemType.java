@@ -1,7 +1,8 @@
 package koh.game.entities.item;
 
 import com.mysql.jdbc.StringUtils;
-import koh.game.Main;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -14,6 +15,8 @@ public class ItemType {
     public int gender;
     public String rawZone;
     public boolean needUseConfirm, mimickable;
+
+    private static final Logger logger = LogManager.getLogger(ItemType.class);
 
     private int _zoneSize = Integer.MAX_VALUE;
     private int _zoneShape = Integer.MAX_VALUE;
@@ -60,10 +63,10 @@ public class ItemType {
                     this._zoneMinSize = 0;
                 };
             } else {
-                Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
+                logger.error("Zone incorrect ({})",this.rawZone);
             };
         } catch (java.lang.NumberFormatException e) {
-            Main.Logs().writeError(String.format("Error with getItemType %s", this.superType));
+            logger.error("Error with getItemType {}", this.superType);
         }
     }
 

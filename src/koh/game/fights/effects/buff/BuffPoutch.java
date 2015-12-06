@@ -20,12 +20,16 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class BuffPoutch extends BuffEffect {
+
+    private static final Logger logger = LogManager.getLogger(BuffPoutch.class);
 
     public BuffPoutch(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
@@ -54,7 +58,7 @@ public class BuffPoutch extends BuffEffect {
         double num2 = (double) Arrays.stream(SpellLevel.effects).mapToInt(x -> x.random).sum();
         boolean flag = false;
         for (EffectInstanceDice Effect : SpellLevel.effects) {
-            Main.Logs().writeDebug(Effect.toString());
+            logger.debug(Effect.toString());
             ArrayList<Fighter> Targets = new ArrayList<>();
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(Target.getCellId()), true), this.Caster.fight.map)).getCells(Target.getCellId())) {
                 FightCell FightCell = Target.fight.getCell(Cell);

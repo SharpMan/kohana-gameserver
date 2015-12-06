@@ -38,6 +38,8 @@ import koh.protocol.messages.game.basic.BasicAckMessage;
 import koh.protocol.messages.game.basic.BasicLatencyStatsMessage;
 import koh.protocol.messages.game.basic.BasicTimeMessage;
 import koh.protocol.messages.secure.TrustStatusMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
 
 /**
@@ -60,6 +62,8 @@ public class WorldClient {
     public Exchange myExchange = null;
     private GameBaseRequest myBaseRequest = null;
     private CopyOnWriteArrayList<PartyRequest> partyRequests;
+    private static final Logger logger = LogManager.getLogger(WorldClient.class);
+
 
     public Map<Byte, Long> lastChannelMessage = new HashMap<Byte, Long>() {
         {
@@ -217,7 +221,7 @@ public class WorldClient {
             if (MessageIdentifier != null) {
                 MessageIdentifier.invoke(null, this, message);
             } else {
-                Main.Logs().writeInfo("Packet not handled " + message.getMessageId());
+                logger.error("Packet not handled {}" , message.getMessageId());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -302,7 +306,7 @@ public class WorldClient {
 
         this.showQueue = false;
         if (this.character != null) {
-            Main.Logs().writeDebug("player " + this.character.nickName + " disconnected");
+            logger.debug("Player {} disconnected",this.character.nickName);
             ChatChannel.unRegister(this);
             this.character.onDisconnect();
             this.character = null;

@@ -6,12 +6,17 @@ import koh.game.fights.effects.buff.BuffHeal;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMessage;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class EffectHeal extends EffectBase {
+
+
+    private static final Logger logger = LogManager.getLogger(EffectHeal.class);
 
     public static int ApplyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal) {
         return ApplyHeal(CastInfos, Target, Heal, true);
@@ -33,7 +38,7 @@ public class EffectHeal extends EffectBase {
         if (Target.getLife() + Heal.getValue() > Target.getMaxLife()) {
             Heal.setValue(Target.getMaxLife() - Target.getLife());
             if (Heal.getValue() < 0) {
-                Main.Logs().writeError("TargetMaxlife" + Target.getMaxLife() + " TargettLife" + Target.getLife());
+                logger.error("TargetMaxlife {} TargettLife {}" ,Target.getMaxLife(), Target.getLife());
             }
         }
 

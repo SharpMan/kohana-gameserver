@@ -69,7 +69,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             delCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
                             accountInUnload.add(ref.second.account.id);
                             cleanMap(ref.second);
-                            Main.Logs().writeInfo("player " + ref.second.nickName + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
+                            logger.debug("player " + ref.second.nickName + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
                             ref.second.save(true);
                             MySQL.needCommit = true;
                         }

@@ -12,12 +12,16 @@ import koh.game.utils.Settings;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.mount.MountSetMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class FightFormulas {
+
+    private static final Logger logger = LogManager.getLogger(FightFormulas.class);
 
     public static short calculateEarnedDishonor(Fighter Character) {
         return Character.fight.getEnnemyTeam(Character.team).alignmentSide != AlignmentSideEnum.ALIGNMENT_NEUTRAL ? (short) 0 : (short) 1;
@@ -70,7 +74,7 @@ public class FightFormulas {
         }
         long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(Fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (Fighter.stats.getTotal(StatsEnum.Wisdom) * 0.01)));
         if (xpWin < 0) {
-            Main.Logs().writeInfo("lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.getLevel())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.stats.getTotal(StatsEnum.Wisdom) * 0.01)));
+            logger.error("xpWin <0 on lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.getLevel())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.stats.getTotal(StatsEnum.Wisdom) * 0.01)));
         }
         return xpWin;
     }
@@ -116,7 +120,7 @@ public class FightFormulas {
             return 0;
         }
         if (Fighter.Character.mountInfo == null) {
-            Main.Logs().writeError("mountInfo Null " + Fighter.Character.toString());
+            logger.error("mountInfo Null {} ", Fighter.Character.toString());
         }
         if (!Fighter.Character.mountInfo.isToogled) {
             return 0;

@@ -1,6 +1,7 @@
 package koh.game.entities.item;
 
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.spells.EffectInstance;
 import koh.game.entities.spells.EffectInstanceCreature;
@@ -23,6 +24,8 @@ import koh.protocol.types.game.data.items.effects.ObjectEffectMinMax;
 import koh.protocol.types.game.data.items.effects.ObjectEffectMount;
 import koh.protocol.types.game.data.items.effects.ObjectEffectString;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -35,8 +38,11 @@ public class ItemSet {
     public boolean bonusIsSecret;
     public EffectInstance[][] effects; //Dice
     private GenericStats[] myStats;
-    
+
+    private static final Logger logger = LogManager.getLogger(ItemSet.class);
+
     //TODO: Create dofusMaps  ObjectEffect[] toObjectEffects
+    //TODO@: se rappeller poruquoi je voulais faire sa
 
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -55,7 +61,7 @@ public class ItemSet {
                 if (e instanceof EffectInstanceInteger) {
                     Stat = StatsEnum.valueOf(e.effectId);
                     if (Stat == null) {
-                        Main.Logs().writeError("Undefinied Stat id " + e.effectId);
+                        logger.error("Undefined Stat id {} ", e.effectId);
                         continue;
                     }
                     this.myStats[i].addItem(Stat, ((EffectInstanceInteger) e).value);

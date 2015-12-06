@@ -37,6 +37,8 @@ import koh.protocol.messages.game.context.roleplay.MapInformationsRequestMessage
 import koh.protocol.messages.game.inventory.items.ObjectDropMessage;
 import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
 import koh.protocol.types.game.context.ActorOrientation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -44,12 +46,14 @@ import koh.protocol.types.game.context.ActorOrientation;
  */
 public class ContextHandler {
 
+    private static final Logger logger = LogManager.getLogger(ContextHandler.class);
+
     @HandlerAttribute(ID = GameMapChangeOrientationRequestMessage.M_ID)
     public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client, GameMapChangeOrientationRequestMessage Message) {
         if (Client.character.getFight() == null) {
             Client.character.direction = Message.direction;
             Client.character.currentMap.sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.character.ID, Client.character.direction)));
-            Main.Logs().writeDebug("New direction for actor " + Client.character.ID + "~" + Message.direction);
+            logger.debug("New direction for actor {}~{}" , Client.character.ID , Message.direction);
         }
     }
 
@@ -169,7 +173,7 @@ public class ContextHandler {
     public static void HandleGameMapMovementRequestMessage(WorldClient Client, GameMapMovementRequestMessage Message) {
 
         if (Message.keyMovements.length <= 0) {
-            Main.Logs().writeError("Empty Path" + Client.getIP());
+            logger.error("Empty Path{}" , Client.getIP());
             Client.send(new BasicNoOperationMessage());
             return;
         }
@@ -193,7 +197,7 @@ public class ContextHandler {
         if (Client.character.currentMap == null) {
             Client.send(new GameMapNoMovementMessage());
             PlayerController.SendServerErrorMessage(Client, "Votre map est absente veuillez le signalez au staff ");
-            Main.Logs().writeError("map Absente " + Client.character.toString());
+            logger.error("Vacant map {} " , Client.character.toString());
             return;
         }
         if (!Client.canGameAction(GameActionTypeEnum.MAP_MOVEMENT)) {

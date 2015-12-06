@@ -5,6 +5,7 @@ import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -16,12 +17,16 @@ import koh.protocol.messages.game.interactive.InteractiveUseEndedMessage;
 import koh.protocol.messages.game.interactive.StatedElementUpdatedMessage;
 import koh.protocol.messages.game.inventory.items.ObtainedItemMessage;
 import koh.protocol.messages.game.inventory.items.ObtainedItemWithBonusMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class Collect implements InteractiveAction {
+
+    private static final Logger logger = LogManager.getLogger(InteractiveAction.class);
 
     private final InteractiveSkill Skill;
     public float AgeBonus;
@@ -36,7 +41,7 @@ public class Collect implements InteractiveAction {
         try {
             return actor.myJobs.getJob(Skill.parentJobId).jobLevel >= Skill.levelMin;
         } catch (Exception e) {
-            Main.Logs().writeError(String.format("Enabled %s with SkillLevel %s", Skill.parentJobId, Skill.levelMin));
+            logger.error("Enabled {} with SkillLevel {}", Skill.parentJobId, Skill.levelMin);
             e.printStackTrace();
             return false;
         }

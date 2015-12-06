@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import koh.game.Main;
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.TaxCollector;
@@ -29,12 +30,16 @@ import koh.protocol.types.game.guild.tax.TaxCollectorInformations;
 import koh.protocol.types.game.house.HouseInformationsForGuild;
 import koh.protocol.types.game.paddock.PaddockContentInformations;
 import koh.utils.Enumerable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class Guild extends IWorldEventObserver {
+
+    private static final Logger logger = LogManager.getLogger(Guild.class);
 
     public volatile ChatChannel chatChannel = new ChatChannel();
 
@@ -65,7 +70,7 @@ public class Guild extends IWorldEventObserver {
         if (this.bossCache == null) {
             this.members.values().stream().filter(GuildMember::isBoss).forEach(GM -> {
                 if (this.bossCache != null) {
-                    Main.Logs().writeError(String.format("There is at least two boss in guild {0} ({1}) BossSecond {3}", this.entity.guildID, this.entity.name, GM.name));
+                    logger.error("There is at least two boss in guild {0} ({1}) BossSecond {2}", this.entity.guildID, this.entity.name, GM.name);
                 }
                 this.bossCache = GM;
             });

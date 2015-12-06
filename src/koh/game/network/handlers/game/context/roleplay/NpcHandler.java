@@ -13,12 +13,16 @@ import koh.protocol.messages.game.context.roleplay.npc.NpcDialogReplyMessage;
 import koh.protocol.messages.game.context.roleplay.npc.NpcGenericActionRequestMessage;
 import koh.protocol.messages.game.inventory.exchanges.ExchangeStartOkNpcShopMessage;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class NpcHandler {
+
+    private static final Logger logger = LogManager.getLogger(NpcHandler.class);
 
     @HandlerAttribute(ID = NpcDialogReplyMessage.MESSAGE_ID)
     public static void HandleNpcDialogReplyMessage(WorldClient Client, NpcDialogReplyMessage Message) {
@@ -46,7 +50,7 @@ public class NpcHandler {
         }
         final NpcActionTypeEnum Action = NpcActionTypeEnum.valueOf(Message.npcActionId);
         if (Action == null) {
-            Main.Logs().writeError(String.format("Unknow action %s by character %s", Byte.toString(Message.npcActionId), Client.character.nickName));
+            logger.error("Unknow action {} by character {}", Message.npcActionId, Client.character.nickName);
             return;
         } else if (!ArrayUtils.contains(PNJ.getTemplate().actions, Message.npcActionId)) {
             PlayerController.sendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");

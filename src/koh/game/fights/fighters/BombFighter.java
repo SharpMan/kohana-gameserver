@@ -31,6 +31,8 @@ import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import koh.protocol.types.game.look.EntityLook;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -38,6 +40,8 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BombFighter extends StaticFighter {
 
+
+    private static final Logger logger = LogManager.getLogger(BombFighter.class);
     public BombFighter(Fight Fight, Fighter Summoner, MonsterGrade Monster) {
         super(Fight, Summoner);
         this.Grade = Monster;
@@ -164,7 +168,7 @@ public class BombFighter extends StaticFighter {
             Short[] Cells;
             for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.summoner == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
                 int Distance = Pathfinder.getGoalDistance(null, getCellId(), Friend.getCellId());
-                Main.Logs().writeDebug("Distance = " + Distance);
+                logger.debug("Bomb Distance = {}" , Distance);
                 if (Distance >= 2 && Distance <= 7) {
                     Cells = Pathfinder.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfinder.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
                     if (Cells != null) {

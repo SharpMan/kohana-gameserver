@@ -9,10 +9,6 @@ import koh.game.executors.GameLoader;
 import koh.game.network.codec.ProtocolDecoder;
 import koh.protocol.client.Message;
 import koh.protocol.client.codec.Dofus2ProtocolEncoder;
-<<<<<<< HEAD
-=======
-import org.apache.mina.core.buffer.CachedBufferAllocator;
->>>>>>> 01507a8... Edit WorldServer parameters (improve config)
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -46,14 +42,8 @@ public class WorldServer {
         acceptor.setReuseAddress(true);
         acceptor.setBacklog(100000);
 
-<<<<<<< HEAD
         this.acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new Dofus2ProtocolEncoder(),
                 new ProtocolDecoder()));
-=======
-        this.acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new Dofus2ProtocolEncoder(
-                new CachedBufferAllocator(4, 0xFFFF)
-        ), new ProtocolDecoder()));
->>>>>>> 01507a8... Edit WorldServer parameters (improve config)
         this.acceptor.setHandler(new WorldHandler());
 
         this.acceptor.getSessionConfig().setMaxReadBufferSize(MAX_READ_SIZE);

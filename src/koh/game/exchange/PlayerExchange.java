@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.character.CharacterInventory;
 import koh.game.entities.item.InventoryItem;
 import koh.game.network.WorldClient;
@@ -31,6 +32,8 @@ import koh.protocol.messages.game.inventory.items.ExchangeObjectsRemovedMessage;
 import koh.protocol.types.game.data.items.ObjectItem;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -43,6 +46,8 @@ public class PlayerExchange extends Exchange {
     private Map<WorldClient, Integer> myKamasToTrade = Collections.synchronizedMap(new HashMap<WorldClient, Integer>());
     private Map<WorldClient, Boolean> myValidate = Collections.synchronizedMap(new HashMap<WorldClient, Boolean>());
 
+    private static final Logger logger = LogManager.getLogger(PlayerExchange.class);
+
     public PlayerExchange(WorldClient Client1, WorldClient Client2) {
         this.myItemsToTrade.put(Client1, new HashMap<>());
         this.myItemsToTrade.put(Client2, new HashMap<>());
@@ -54,7 +59,7 @@ public class PlayerExchange extends Exchange {
         this.myClient1 = Client1;
         this.myClient2 = Client2;
 
-        Main.Logs().writeDebug("PlayerExchange launched : Player1=" + this.myClient1.getAccount().nickName + " Player2=" + this.myClient2.getAccount().nickName);
+        logger.debug("PlayerExchange launched : Player1={}" + " Player2={}" ,this.myClient1.getAccount().nickName, this.myClient2.getAccount().nickName);
     }
 
     public void Open() {
@@ -182,7 +187,7 @@ public class PlayerExchange extends Exchange {
 
     @Override
     public synchronized boolean moveKamas(WorldClient Client, int quantity) {
-        Main.Logs().writeDebug("PlayerExchange(" + this.myClient1.character.nickName + " - " + this.myClient2.character.nickName + ")::moveKamas : player=" + Client.character.nickName);
+        logger.debug("PlayerExchange({} - {})::moveKamas : player={}" ,this.myClient1.character.nickName,this.myClient2.character.nickName, Client.character.nickName);
 
         this.UnValidateAll();
 
@@ -250,14 +255,14 @@ public class PlayerExchange extends Exchange {
             return false;
         }
 
-        Main.Logs().writeDebug("PlayerExchange(" + this.myClient1.character.nickName + " - " + this.myClient1.character.nickName + ")::finish()"
+        logger.debug("PlayerExchange(" + this.myClient1.character.nickName + " - " + this.myClient1.character.nickName + ")::finish()"
                 + "\n          -- P1(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient1).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient1) + ")"
                 + "\n          -- P2(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient1).entrySet()) {
             InventoryItem Item = this.myClient1.character.inventoryCache.itemsCache.get(ItemData.getKey());
             if (Item == null) {
-                Main.Logs().writeError(this.myClient1.character.nickName + " - " + this.myClient2.character.nickName + " " + ItemData.getKey() + " item not Found");
+                logger.error(this.myClient1.character.nickName + " - " + this.myClient2.character.nickName + " " + ItemData.getKey() + " item not Found");
                 continue;
             }
 
@@ -272,7 +277,7 @@ public class PlayerExchange extends Exchange {
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient2).entrySet()) {
             InventoryItem Item = this.myClient2.character.inventoryCache.itemsCache.get(ItemData.getKey());
             if (Item == null) {
-                Main.Logs().writeError(this.myClient2.character.nickName + " - " + this.myClient1.character.nickName + " " + ItemData.getKey() + " item not Found");
+                logger.error(this.myClient2.character.nickName + " - " + this.myClient1.character.nickName + " " + ItemData.getKey() + " item not Found");
                 continue;
             }
 

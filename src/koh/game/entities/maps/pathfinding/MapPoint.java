@@ -4,8 +4,11 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.environments.DofusMap;
 import koh.protocol.client.enums.DirectionsEnum;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -26,6 +29,8 @@ public class MapPoint {
     public static final int MAP_HEIGHT = 20;
     private static boolean _bInit = false;
     public static Point[] CELLPOS = new Point[MAP_HEIGHT * (MAP_WIDTH * 2)];
+
+    private static final Logger logger = LogManager.getLogger(MapPoint.class);
 
     static {
         init();
@@ -341,7 +346,7 @@ public class MapPoint {
             init();
         }
         if (CELLPOS[this._nCellId] == null) {
-            Main.Logs().writeError((("cell identifier out of bounds (" + this._nCellId) + ")."));
+            logger.error("cell identifier out of bounds ({}).",this._nCellId);
         }
         Point p = CELLPOS[this._nCellId];
         this._nX = p.x;

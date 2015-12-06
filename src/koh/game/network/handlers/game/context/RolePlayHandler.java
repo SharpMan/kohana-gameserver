@@ -18,6 +18,8 @@ import koh.protocol.messages.game.context.roleplay.ChangeMapMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayRequestMessage;
 import koh.protocol.messages.game.context.roleplay.stats.StatsUpgradeResultMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -35,6 +37,8 @@ public class RolePlayHandler {
             put(StatsBoostEnum.Intelligence, StatsEnum.Intelligence);
         }
     };
+
+    private static final Logger logger = LogManager.getLogger(RolePlayHandler.class);
 
     @HandlerAttribute(ID = EmotePlayRequestMessage.MESSAGE_ID)
     public static void EmotePlayRequestMessage(WorldClient Client, EmotePlayRequestMessage Message) {
@@ -137,7 +141,7 @@ public class RolePlayHandler {
             Client.character.teleport(Client.character.currentMap.newNeighbour != null ? Client.character.currentMap.newNeighbour[3].mapid : Message.mapId, Client.character.currentMap.newNeighbour != null ? Client.character.currentMap.newNeighbour[3].cellid : (Client.character.cell.id - 13));
         } else {
             // client.character.teleport(Message.mapId, -1);
-            Main.Logs().writeError("client " + Client.character.nickName + " teleport from " + Client.character.currentMap.id + " to " + Message.mapId);
+            logger.error("client {} teleport from {} to {}" ,Client.character.nickName,Client.character.currentMap.id, Message.mapId);
             Client.send(new BasicNoOperationMessage());
             //System.out.println("undefinied map");
         }

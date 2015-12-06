@@ -13,12 +13,18 @@ import koh.protocol.messages.game.actions.fight.GameActionFightDropCharacterMess
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostStateEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class BuffPorter extends BuffEffect {
+
+    //NOTE: This class's code is daamned even the author didn't undestand it
+
+    private static final Logger logger = LogManager.getLogger(BuffPorter.class);
 
     public BuffPorter(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
@@ -35,10 +41,10 @@ public class BuffPorter extends BuffEffect {
                 this.Caster.fight.sendToField(new GameActionFightDropCharacterMessage(ACTION_CARRY_CHARACTER, this.Caster.ID, this.Target.ID, (short) this.Target.getCellId()));
             }
             this.Caster.fight.sendToField(new GameActionFightDispellSpellMessage(406, this.Caster.ID, this.Target.ID, this.CastInfos.SpellId));
-            Main.Logs().writeDebug("3bada " + this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).count());
-            Main.Logs().writeDebug("3bada " + this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).count());
-            Main.Logs().writeDebug("3bada " + this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur).count());
-            Main.Logs().writeDebug("3bada " + this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter).count());
+            logger.debug("3bada " + this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).count());
+            logger.debug("3bada " + this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).count());
+            logger.debug("3bada " + this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur).count());
+            logger.debug("3bada " + this.Target.buff.getAllBuffs().filter(x -> x instanceof BuffPorter).count());
             this.Caster.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> {
                 {
                     x.removeEffect();

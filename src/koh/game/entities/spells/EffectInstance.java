@@ -10,6 +10,7 @@ import jregex.REFlags;
 import koh.d2o.entities.Effect;
 import koh.game.Main;
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;
@@ -24,6 +25,8 @@ import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -34,7 +37,7 @@ public class EffectInstance implements Serializable {
 
     //private static final RegExp exclusiveTargetMasks = RegExpFactory.create("\\*?[bBeEfFzZKoOPpTWUvV][0-9]*", "g");
     private static final java.util.regex.Pattern exclusiveTargetMasks = java.util.regex.Pattern.compile("(\\*?[bBeEfFzZKoOPpTWUvV][0-9]*)");
-
+    private static final Logger logger = LogManager.getLogger(EffectInstance.class);
     public static final int classID = 1;
 
     public byte serializationIdentifier() {
@@ -362,7 +365,7 @@ public class EffectInstance implements Serializable {
                 }
             }
         } else {
-            Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
+            logger.error("Zone incorrect ({})",this.rawZone);
         };
         if (this.zoneMinSize >= 63) {
             this.zoneMinSize = 63;

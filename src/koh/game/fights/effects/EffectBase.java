@@ -3,12 +3,16 @@ package koh.game.fights.effects;
 import java.util.HashMap;
 import koh.game.Main;
 import koh.protocol.client.enums.StatsEnum;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public abstract class EffectBase {
+
+    private static final Logger logger = LogManager.getLogger(EffectBase.class);
 
     //TODO Effect 406
     private static final HashMap<StatsEnum, EffectBase> Effects = new HashMap<StatsEnum, EffectBase>() {
@@ -287,7 +291,7 @@ public abstract class EffectBase {
     public static int TryApplyEffect(EffectCast CastInfos) {
 
         if (!EffectBase.Effects.containsKey(CastInfos.EffectType)) {
-            Main.Logs().writeDebug("Unexist effect " + CastInfos.Effect.effectId);
+            logger.debug("Unexist effect {} " , CastInfos.Effect.effectId);
             return -1;
         }
 

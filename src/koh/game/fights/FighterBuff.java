@@ -15,6 +15,8 @@ import koh.game.fights.effects.buff.BuffState;
 import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.utils.Couple;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -23,6 +25,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class FighterBuff {
 
     public List<Couple<EffectCast, Integer>> delayedEffects = new CopyOnWriteArrayList<>();
+    private static final Logger logger = LogManager.getLogger(FighterBuff.class);
 
     private HashMap<BuffActiveType, ArrayList<BuffEffect>> buffsAct = new HashMap<BuffActiveType, ArrayList<BuffEffect>>() {
         {
@@ -67,13 +70,13 @@ public class FighterBuff {
          return;
          }*/
         if (buffMaxStackReached(buff)) {  //Vue que ces effets s'activent auto à leur lancement
-            Main.Logs().writeDebug("Buff " + buff.getClass().getName() + " canceled due to stack");
+            logger.debug("Buff {} canceled due to stack",buff.getClass().getName());
             return;
         }
         this.buffsAct.get(buff.ActiveType).add(buff);
         this.buffsDec.get(buff.DecrementType).add(buff);
         buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.Effect.effectId*/buff.CastInfos.EffectType.value(), buff.Caster.ID, buff.getAbstractFightDispellableEffect()));
-        Main.Logs().writeDebug("Buff " + buff.getClass().getName() + " added");
+        logger.debug("Buff {} added",buff,getClass().getName());
     }
 
     //Le -1 definie l'infini

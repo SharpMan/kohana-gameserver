@@ -6,6 +6,7 @@ import java.util.List;
 
 import koh.game.Main;
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.item.animal.MountInventoryItem;
@@ -17,6 +18,8 @@ import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.ObjectItem;
 import koh.protocol.types.game.data.items.effects.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -24,6 +27,8 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author Neo-Craft
  */
 public class InventoryItem {
+
+    private static final Logger logger = LogManager.getLogger(InventoryItem.class);
 
     public int ID;
     public int templateId;
@@ -243,7 +248,7 @@ public class InventoryItem {
                 return this.getTemplate().getCriteriaExpression().Eval(character);
             }
         } catch (Exception e) {
-            Main.Logs().writeError(String.format("Bugged item %s Condition %s", this.getTemplate().id, this.getTemplate().criteria));
+            logger.error("Bugged item {} condition {}", this.getTemplate().id, this.getTemplate().criteria);
             e.printStackTrace();
             return false;
         }
@@ -261,7 +266,7 @@ public class InventoryItem {
             if (e instanceof ObjectEffectInteger) {
                 Stat = StatsEnum.valueOf(e.actionId);
                 if (Stat == null) {
-                    Main.Logs().writeError("Undefinied Stat id " + e.actionId);
+                    logger.error("Undefinied Stat id {}", e.actionId);
                     continue;
                 }
                 this.myStats.addItem(Stat, ((ObjectEffectInteger) e).value);

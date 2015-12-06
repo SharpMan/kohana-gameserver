@@ -9,6 +9,7 @@ import koh.d2o.entities.Effect;
 import koh.game.Main;
 
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;
@@ -17,6 +18,8 @@ import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
 import koh.utils.Couple;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -24,6 +27,8 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author Neo-Craft
  */
 public class EffectHelper {
+
+    private static final Logger logger = LogManager.getLogger(EffectHelper.class);
 
     public static final int NEUTRAL_ELEMENT = 0;
     public static final int EARTH_ELEMENT = 1;
@@ -272,7 +277,7 @@ public class EffectHelper {
         List<ObjectEffect> Effects = new ArrayList<>();
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
-                Main.Logs().writeDebug(e.toString());
+                logger.debug(e.toString());
                 if (e.effectId == 984 || e.effectId == 800) //Truc familiers pas sur
                 {
                     continue;

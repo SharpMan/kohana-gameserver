@@ -5,10 +5,13 @@ import java.util.Arrays;
 import koh.game.Main;
 import koh.game.conditions.ConditionExpression;
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.spells.EffectInstance;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -37,6 +40,8 @@ public class ItemTemplate {
     public int[] favoriteSubAreas;
     public int favoriteSubAreasBonus;
     private ConditionExpression m_criteriaExpression;
+
+    private static final Logger logger = LogManager.getLogger(ItemTemplate.class);
     
     public ConditionExpression getCriteriaExpression() {
         try {
@@ -49,7 +54,7 @@ public class ItemTemplate {
             }
             return m_criteriaExpression;
         } catch (Error e) {
-            Main.Logs().writeError(this.toString());
+            logger.error(this.toString());
             e.printStackTrace();
             return null;
         }

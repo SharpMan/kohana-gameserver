@@ -5,10 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.ObjectPosition;
 import koh.protocol.client.enums.DirectionsEnum;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -21,6 +24,8 @@ public class Path {
     private ObjectPosition[] m_compressedPath;
     private ObjectPosition m_endPathPosition;
     public DofusMap Map;
+
+    private static final Logger logger = LogManager.getLogger(Path.class);
 
     public DofusCell getStartCell() {
         return this.m_cellsPath[0];
@@ -142,7 +147,7 @@ public class Path {
             MapPoint mapPoint = this.m_compressedPath[i].point;
             while ((mapPoint = mapPoint.getNearestCellInDirection(this.m_compressedPath[i].direction)) != null && mapPoint.get_cellId() != this.m_compressedPath[i + 1].cell.id) {
                 if ((long) num > 54L) {
-                    Main.Logs().writeError("Path too long. Maybe an orientation problem ?");
+                    logger.error("Path too long. Maybe an orientation problem ?");
                 }
                 list.add(this.Map.getCell((short) mapPoint.get_cellId()));
                 num++;

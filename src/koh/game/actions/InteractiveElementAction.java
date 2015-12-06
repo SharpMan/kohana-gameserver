@@ -51,7 +51,7 @@ public class InteractiveElementAction extends GameAction {
         this.skill = skill;
         this.action = InteractiveActionEnum.valueOf(skill.skillId);
         this.elementID = elementID;
-        Main.Logs().writeDebug(skill.skillId + " used");
+        logger.debug("Skill ID {} used",skill.skillId);
     }
 
     @Override

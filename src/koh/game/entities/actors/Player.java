@@ -8,6 +8,7 @@ import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
@@ -62,12 +63,16 @@ import koh.protocol.types.game.context.roleplay.HumanOptionTitle;
 import koh.protocol.types.game.look.EntityLook;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class Player extends IGameActor implements Observer {
+
+    private static final Logger logger = LogManager.getLogger(Player.class);
 
     public int owner;
     public String nickName;
@@ -178,7 +183,7 @@ public class Player extends IGameActor implements Observer {
     @Override
     public boolean canBeSee(IGameActor Actor) {
         if (this.account == null) {
-            Main.Logs().writeError("NulledGameContext" + this.nickName + this.ID);
+            logger.error("NulledGameContext {} {}",this.nickName,this.ID);
             return false;
         }
         return true;
@@ -187,7 +192,7 @@ public class Player extends IGameActor implements Observer {
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
         if (this.account == null) {
-            Main.Logs().writeError("NulledGameContext" + this.nickName);
+            logger.error("NulledGameContext {}" , this.nickName);
         }
         return new GameRolePlayCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.nickName, this.getHumanInformations(), this.account.id, this.getActorAlignmentInformations());
     }
@@ -307,18 +312,18 @@ public class Player extends IGameActor implements Observer {
             this.client = null;
             if (this.account != null) {
                 if (this.account.characters == null) {
-                    Main.Logs().writeError("NulledAccountCharacters " + this.nickName);
-                    Main.Logs().writeError(this.toString());
+                    logger.error("NulledAccountCharacters {} ", this.nickName); //pas sence arriver
+                    logger.error(this.toString());
                 }
                 for (Player p : this.account.characters) { //TODO: ALleos
                     if(PlayerDAOImpl.myCharacterByTime.stream().anyMatch(x -> x.second.nickName.equalsIgnoreCase(p.nickName))){
-                        System.out.println(p.nickName + " already aded");
+                        logger.debug(p.nickName + " already aded");
                     }
                     PlayerDAOImpl.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("account.DeleteMemoryTime") * 60 * 1000, p));
-                    Main.Logs().writeInfo(p.nickName + " aded" + this.account.characters.size());
+                    logger.debug(p.nickName + " aded" + this.account.characters.size());
                 }
             } else {
-                Main.Logs().writeError(nickName + " Nulled account on disconnection");
+                logger.error(nickName + " Nulled account on disconnection");
             }
 
         } catch (Exception e) {

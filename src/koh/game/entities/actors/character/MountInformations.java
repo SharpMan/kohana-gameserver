@@ -2,6 +2,7 @@ package koh.game.entities.actors.character;
 
 import koh.game.Main;
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.animal.MountInventoryItemEntity;
 import koh.protocol.client.BufUtils;
@@ -13,6 +14,8 @@ import koh.protocol.types.game.look.EntityLook;
 import koh.protocol.types.game.look.SubEntity;
 import koh.protocol.types.game.mount.MountClientData;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -20,6 +23,8 @@ import org.apache.mina.core.buffer.IoBuffer;
  * @author Neo-Craft
  */
 public class MountInformations {
+
+    private static final Logger logger = LogManager.getLogger(MountInformations.class);
 
     public MountClientData mount;
     public byte ratio;
@@ -80,7 +85,7 @@ public class MountInformations {
 
             Stat = StatsEnum.valueOf(e.actionId);
             if (Stat == null) {
-                Main.Logs().writeError("Undefinied MountStat id " + e.actionId);
+                logger.error("Undefined MountStat id {} ", e.actionId);
                 continue;
             }
             this.myStats.addItem(Stat, e.value);

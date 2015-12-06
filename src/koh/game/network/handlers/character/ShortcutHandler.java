@@ -14,12 +14,16 @@ import koh.protocol.messages.game.shortcut.ShortcutBarRemoveRequestMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarRemovedMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarSwapRequestMessage;
 import koh.protocol.types.game.shortcut.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class ShortcutHandler {
+
+    private static final Logger logger = LogManager.getLogger(ShortcutHandler.class);
 
     @HandlerAttribute(ID = SpellUpgradeRequestMessage.MESSAGE_ID)
     public static void HandleSpellUpgradeRequestMessage(WorldClient Client, SpellUpgradeRequestMessage Message) {
@@ -65,7 +69,7 @@ public class ShortcutHandler {
         switch (Message.barType) {
             case ShortcutBarEnum.SPELL_SHORTCUT_BAR:
                 if (!(Message.shortcut instanceof ShortcutSpell)) {
-                    Main.Logs().writeError("Trying to parse SpellShortcut with " + Message.shortcut.getTypeId());
+                    logger.error("Trying to parse SpellShortcut with {}" , Message.shortcut.getTypeId());
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }
@@ -73,7 +77,7 @@ public class ShortcutHandler {
                 break;
             case ShortcutBarEnum.GENERAL_SHORTCUT_BAR:
                 if (!(Message.shortcut instanceof ShortcutObjectItem)) {
-                    Main.Logs().writeError("Trying to parse SpellShortcut with " + Message.shortcut.getTypeId());
+                    logger.error("Trying to parse SpellShortcut with  {}" , Message.shortcut.getTypeId());
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }

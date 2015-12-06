@@ -113,6 +113,8 @@ import koh.protocol.types.game.idol.Idol;
 import koh.utils.Couple;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -122,6 +124,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     //public static final ImprovedCachedThreadPool BackGroundWorker2 = new ImprovedCachedThreadPool(5, 50, 2);
     public static final ScheduledExecutorService BackGroundWorker = Executors.newScheduledThreadPool(50);
+    private static final Logger logger = LogManager.getLogger(Fight.class);
 
     public static final Random RANDOM = new Random();
     private static final HashMap<Integer, HashMap<Integer, Short[]>> MAP_FIGHTCELLS = new HashMap<>();
@@ -375,7 +378,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (Fight.RANDOM.nextInt(TauxCC) == 0) {
                 IsCc = true;
             }
-            Main.Logs().writeDebug("CC: " + IsCc + " TauxCC " + TauxCC + " getSpellLevel.criticalHitProbability " + spellLevel.criticalHitProbability);
+            logger.debug("CC: " + IsCc + " TauxCC " + TauxCC + " getSpellLevel.criticalHitProbability " + spellLevel.criticalHitProbability);
         }
         IsCc &= !fighter.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
         if (IsCc && fighter.stats.getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Tutu
@@ -422,9 +425,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                 Targets.get(Effect).add(fighter);
                                 break;
                             }
-                            System.out.println(EffectHelper.verifyEffectTrigger(fighter, Target, Effects, Effect, false, Effect.triggers, cellId));
-                            System.out.println(Effect.isValidTarget(fighter, Target));
-                            System.out.println(EffectInstanceDice.verifySpellEffectMask(fighter, Target, Effect));
+                            logger.debug(EffectHelper.verifyEffectTrigger(fighter, Target, Effects, Effect, false, Effect.triggers, cellId));
+                            logger.debug(Effect.isValidTarget(fighter, Target));
+                            logger.debug(EffectInstanceDice.verifySpellEffectMask(fighter, Target, Effect));
 
                             if (EffectHelper.verifyEffectTrigger(fighter, Target, Effects, Effect, false, Effect.triggers, cellId) && Effect.isValidTarget(fighter, Target) && EffectInstanceDice.verifySpellEffectMask(fighter, Target, Effect)) {
                                 if (Effect.targetMask.equals("C") && fighter.getCarriedActor() == Target.ID) {
@@ -441,7 +444,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                 /*if(Effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect)){
                                  continue;
                                  }*/
-                                Main.Logs().writeDebug("Targeet Aded!");
+                                logger.debug("Targeet Aded!");
                                 Targets.get(Effect).add(Target);
                             }
                         }
@@ -899,7 +902,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         int tackledMp = fighter.getTackledMP();
         int tackledAp = fighter.getTackledAP();
         if (fighter.getMP() - tackledMp < 0) {
-            Main.Logs().writeError(String.format("Cannot apply tackle : mp tackled ({0}) > available mp ({1})", tackledMp, fighter.getMP()));
+            logger.error("Cannot apply tackle : mp tackled ({0}) > available mp ({1})", tackledMp, fighter.getMP());
         } else {
             this.sendToField(new GameActionFightTackledMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_TACKLED, fighter.ID, tacklers.stream().mapToInt(x -> x.ID).toArray()));
 
@@ -1089,15 +1092,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.joinFightTeam(defender, this.myTeam2, true, (short) - 1, true);
 
         // Si un timer pour le lancement du combat
-<<<<<<< HEAD
         if (this.getStartTimer() != -1) {
             //FIXME remove Thread.sleep
             this.startTimer(new CancellableScheduledRunnable(BackGroundWorker, (getStartTimer() * 1000)) {
-=======
-        if (this.GetStartTimer() != -1) {
-            //FIXME remove Thread.sleep
-            this.StartTimer(new CancellableExecutorRunnable(BackGroundWorker, (GetStartTimer() * 1000)) {
->>>>>>> 01507a8... Edit WorldServer parameters (improve config)
                 @Override
                 public void run() {
                     try {
@@ -1360,7 +1357,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.waitAcknowledgment = true;
         SequenceTypeEnum sequenceTypeEnum = this.m_sequences.pop();
         if (sequenceTypeEnum != sequenceType) {
-            Main.Logs().writeDebug(String.format("Popped sequence different ({0} != {1})", sequenceTypeEnum.value, sequenceType.value));
+            logger.debug("Popped sequence different ({0} != {1})", sequenceTypeEnum.value, sequenceType.value);
         }
         this.sendToField(new SequenceEndMessage(this.m_lastSequenceAction.value, this.currentFighter.ID, sequenceType.value));
         return true;

@@ -7,12 +7,16 @@ import java.util.stream.Collectors;
 
 import koh.game.Main;
 import koh.protocol.messages.game.context.fight.GameFightNewRoundMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class FightWorker {
+
+    private static final Logger logger = LogManager.getLogger(FightWorker.class);
 
     private Fight fight;
 
@@ -85,7 +89,7 @@ public class FightWorker {
         } catch (IndexOutOfBoundsException e) {
             return null;
         } catch (Exception e1) {
-            Main.Logs().writeError("FightWorker::getNextFighter() -> " + e1.getMessage());
+            logger.error("FightWorker::getNextFighter() ->  {}" , e1.getMessage());
             e1.printStackTrace();
             return null;
         }

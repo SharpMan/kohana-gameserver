@@ -5,6 +5,7 @@ import java.util.Arrays;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
@@ -15,12 +16,16 @@ import koh.protocol.client.enums.DialogTypeEnum;
 import koh.protocol.messages.game.context.roleplay.npc.NpcDialogCreationMessage;
 import koh.protocol.messages.game.context.roleplay.npc.NpcDialogQuestionMessage;
 import koh.protocol.messages.game.dialog.LeaveDialogMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class NpcDialog extends GameAction {
+
+    private static final Logger logger = LogManager.getLogger(NpcDialog.class);
 
     public Npc NPC;
 
@@ -67,7 +72,7 @@ public class NpcDialog extends GameAction {
             x.execute(((Player) actor));
         }
         if (Stream.length == 0) {
-            Main.Logs().writeDebug("Undefinied reponse " + rep);
+            logger.debug("Undefined reponse ID {} ", rep);
             PlayerController.sendServerMessage(((Player) actor).client, "Ce discours n'est pas encore parametré...");
         }
 

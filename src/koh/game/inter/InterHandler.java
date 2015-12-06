@@ -8,6 +8,8 @@ import koh.game.utils.Settings;
 import koh.inter.messages.ExpulseAccountMessage;
 import koh.inter.messages.HelloMessage;
 import koh.inter.messages.PlayerComingMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
@@ -16,6 +18,8 @@ import org.apache.mina.core.session.IoSession;
  * @author Neo-Craft
  */
 class InterHandler extends IoHandlerAdapter {
+
+    private static final Logger logger = LogManager.getLogger(InterHandler.class);
 
     private final InterClient connector;
 
@@ -37,7 +41,7 @@ class InterHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession is, Throwable cause) throws Exception {
-        Main.Logs().writeError("(server->proxy->client)::Error:{" + cause.getMessage() + "}::cause.toString(){" + cause.toString() + "}");
+        logger.error("(server->proxy->client)::Error: {} ::cause.toString() {}",cause.getMessage(),cause.toString());
     }
 
     @Override

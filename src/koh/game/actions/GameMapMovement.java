@@ -1,15 +1,20 @@
 package koh.game.actions;
 
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.environments.IWorldField;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class GameMapMovement extends GameAction {
+
+    private static final Logger logger = LogManager.getLogger(GameMapMovement.class);
 
     // syncro
     private final Object sync = new Object();
@@ -40,7 +45,7 @@ public class GameMapMovement extends GameAction {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Main.Logs().writeError(this.toString());
+            logger.error(this.toString());
         }
         super.execute();
     }

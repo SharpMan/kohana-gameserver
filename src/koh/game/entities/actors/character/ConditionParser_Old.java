@@ -5,10 +5,15 @@ import com.singularsys.jep.JepException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.StatsEnum;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ConditionParser_Old {
+
+    private static final Logger logger = LogManager.getLogger(ConditionParser_Old.class);
 
     public static boolean validConditions(Player perso, String req) {
         if ((req == null) || (req.equals(""))) {
@@ -66,7 +71,7 @@ public class ConditionParser_Old {
             }
             return ok;
         } catch (JepException e) {
-            Main.Logs().writeError("An error occurred: " + e.getMessage());
+            logger.error("An error occurred: {} ", e.getMessage());
         }
         return true;
     }
@@ -81,7 +86,7 @@ public class ConditionParser_Old {
                 continue;
             }
             if (cur.split("[=]").length < 2) {
-                Main.Logs().writeError("False .. Condition " + cond);
+                logger.error("False .. Condition " + cond);
                 continue;
             }
             if (perso != null && perso.inventoryCache.hasItemId(Integer.parseInt(cur.split("[=]")[1]))) {
