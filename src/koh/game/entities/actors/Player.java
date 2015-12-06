@@ -8,8 +8,6 @@ import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 
-import static koh.game.dao.sqlite.GuildDAO.HasGuild;
-
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
@@ -152,7 +150,7 @@ public class Player extends IGameActor implements Observer {
             };
         }
 
-        this.guild = HasGuild(this.ID);
+        this.guild = DAO.getGuilds().getForPlayer(this.ID);
 
         this.stats = new GenericStats(this);
 
@@ -228,7 +226,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public GuildMember getGuildMember() {
-        return this.guild.members.get(ID);
+        return this.guild.getMember(ID);
     }
 
     public synchronized void teleport(int newMapID, int newCellID) {

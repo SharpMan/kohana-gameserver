@@ -35,6 +35,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
 
     @Override
     public void save(AccountData data, Account account) {
+        //TODO extract them to Entity-Side (they pollute 1feature-per-class logic...)
         int i = 1;
         String query = "UPDATE `accounts_data` set ";
         query = data.columsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);
@@ -95,9 +96,9 @@ public class AccountDataDAOImpl extends AccountDataDAO {
     private static final String SAVE_ACCOUNT_DATA = "INSERT INTO `accounts_data` VALUES (?,?,?,?,?,?,?,?);";
 
     @Override
-    public AccountData get(int id) {
+    public AccountData get(int accountId) {
 
-        try (ConnectionResult conn = dbSource.executeQuery("SELECT * FROM `accounts_data` where id = '" + id + "';")) {
+        try (ConnectionResult conn = dbSource.executeQuery("SELECT * FROM `accounts_data` where id = '" + accountId + "';")) {
             ResultSet result = conn.getResult();
 
             if(result.first()) {
@@ -134,7 +135,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
             } else {
                 return new AccountData() {
                     {
-                        id = id;
+                        id = accountId;
                         kamas = 0;
                         friends = new FriendContact[0];
                         ignored = new IgnoredContact[0];

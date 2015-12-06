@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  */
 public class NpcDAOImpl extends NpcDAO {
 
-    private final Logger logger = LogManager.getLogger(NpcDAOImpl.class);
+    private final Logger logger = LogManager.getLogger(NpcDAO.class);
     private final Map<Integer, NpcTemplate> templates = new HashMap<>(2500);
     private final Map<Integer, ArrayList<Npc>> npcs = new HashMap<>(1000);
     private final Map<Integer, NpcMessage> messages = new HashMap<>(20000);
@@ -36,9 +36,8 @@ public class NpcDAOImpl extends NpcDAO {
     @Inject
     private DatabaseSource dbSource;
 
-
     @Override
-    public ArrayList<Npc> getMapNpc(int mapid) { return this.npcs.get(mapid); }
+    public ArrayList<Npc> forMap(int mapid) { return this.npcs.get(mapid); }
 
     @Override
     public NpcTemplate findTemplate(int id) { return this.templates.get(id);}

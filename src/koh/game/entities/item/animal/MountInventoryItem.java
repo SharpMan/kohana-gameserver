@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.List;
 
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.MountDAOImpl;
-import koh.game.dao.sqlite.PetsDAO;
 import koh.game.entities.item.InventoryItem;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
@@ -26,7 +24,7 @@ public class MountInventoryItem extends InventoryItem {
     public MountInventoryItem(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects, boolean create) {
         super(ID, templateId, position, owner, quantity, effects);
         if (!create) {
-            this.entity = PetsDAO.getMount(((ObjectEffectMount) this.getEffect(995)).mountId);
+            this.entity = DAO.getMountInventories().get(((ObjectEffectMount) this.getEffect(995)).mountId);
             if (this.entity != null) {
                 this.initialize();
             }
@@ -38,7 +36,7 @@ public class MountInventoryItem extends InventoryItem {
         }
         if (this.entity == null) {
             this.entity = new MountInventoryItemEntity();
-            this.entity.animalID = PetsDAO.nextMountID++;
+            this.entity.animalID = DAO.getMountInventories().nextId();
             this.entity.lastEat = (System.currentTimeMillis() - (24 * 3600 * 1000)) + "";
             this.mount = new MountClientData();
             this.mount.ownerId = owner;
@@ -61,7 +59,7 @@ public class MountInventoryItem extends InventoryItem {
             this.effects.add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
             this.notifyColumn("effects");
 
-            PetsDAO.Insert(this.entity);
+            DAO.getMountInventories().insert(this.entity);
         }
     }
 
@@ -82,17 +80,14 @@ public class MountInventoryItem extends InventoryItem {
 
     public void save() {
         this.serializeInformations();
-        PetsDAO.update(entity);
+        DAO.getMountInventories().update(entity);
     }
 
     public void serializeInformations() {
-        IoBuffer buf = IoBuffer.allocate(65535);
-        buf.setAutoExpand(true);
+        IoBuffer buf = IoBuffer.allocate(0xFFF)
+                .setAutoExpand(true);
         this.mount.serialize(buf);
-        buf.flip();
-        this.entity.informations = buf.array();
-        buf.clear();
-        buf = null;
+        this.entity.informations = buf.flip().array();
     }
 
     public synchronized void initialize() {

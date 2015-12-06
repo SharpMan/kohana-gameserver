@@ -43,7 +43,7 @@ public class Account {
     public Player currentCharacter = null;
 
     public List<CharacterBaseInformations> toBaseInformations() {
-        return characters.stream().map(x -> x.toBaseInformations()).collect(Collectors.toList());
+        return characters.stream().map(Player::toBaseInformations).collect(Collectors.toList());
     }
     
     public Player getPlayerInFight(){

@@ -3,10 +3,13 @@ package koh.game.entities.guilds;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
+
 import koh.game.Main;
 import koh.game.dao.DAO;
-import koh.game.dao.sqlite.GuildDAO;
+import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.FieldNotification;
@@ -34,16 +37,17 @@ import koh.utils.Enumerable;
 public class Guild extends IWorldEventObserver {
 
     public volatile ChatChannel chatChannel = new ChatChannel();
-    public Map<Integer, Player> characters;
-    public Map<Integer, GuildMember> members;
-    public GuildEntity entity;
+
+    private final Map<Integer, Player> characters = new ConcurrentHashMap<>();
+    private final Map<Integer, GuildMember> members = new ConcurrentHashMap<>();
+
+    public final GuildEntity entity;
     private GuildMember bossCache;
     private GuildEmblem emblemeCache;
     public byte[] spellLevel;
 
     public Guild(GuildEntity Entity) {
         this.entity = Entity;
-        this.members = Collections.synchronizedMap(new HashMap<>());
         this.spellLevel = Enumerable.StringToByteArray(Entity.spells);
     }
 
@@ -59,7 +63,7 @@ public class Guild extends IWorldEventObserver {
 
     public GuildMember getBoss() {
         if (this.bossCache == null) {
-            this.members.values().stream().filter(GM -> GM.isBoss()).forEach(GM -> {
+            this.members.values().stream().filter(GuildMember::isBoss).forEach(GM -> {
                 if (this.bossCache != null) {
                     Main.Logs().writeError(String.format("There is at least two boss in guild {0} ({1}) BossSecond {3}", this.entity.guildID, this.entity.name, GM.name));
                 }
@@ -129,30 +133,32 @@ public class Guild extends IWorldEventObserver {
         return result;
     }
 
-    public boolean kickMember(GuildMember kickedMember, boolean kicked) {
-        if (kickedMember.isBoss() && this.members.size() > 1) {
+    public boolean kickMember(GuildMember target, boolean kicked) {
+        if (target.isBoss() && this.members.size() > 1) {
             return false;
         }
-        if (DAO.getPlayers().getCharacter(kickedMember.characterID) != null) {
-            DAO.getPlayers().getCharacter(kickedMember.characterID).guild = null;
+        if (DAO.getPlayers().getCharacter(target.characterID) != null) {
+            DAO.getPlayers().getCharacter(target.characterID).guild = null;
         }
-        if (this.characters.containsKey(kickedMember.characterID)) {
-            this.characters.get(kickedMember.characterID).refreshActor();
-            this.characters.get(kickedMember.characterID).send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 176, new String[0]));
-            this.characters.get(kickedMember.characterID).send(new GuildLeftMessage());
-            this.unregisterPlayer(this.characters.get(kickedMember.characterID));
+        if (this.characters.containsKey(target.characterID)) {
+            this.characters.get(target.characterID).refreshActor();
+            this.characters.get(target.characterID).send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 176, new String[0]));
+            this.characters.get(target.characterID).send(new GuildLeftMessage());
+            this.unregisterPlayer(this.characters.get(target.characterID));
         }
-        this.members.remove(kickedMember.characterID);
-        this.sendToField(new GuildMemberLeavingMessage(true, kickedMember.characterID));
-        if (kickedMember.isBoss() && this.members.isEmpty()) {
+        this.members.remove(target.characterID);
+        this.sendToField(new GuildMemberLeavingMessage(true, target.characterID));
+        if (target.isBoss() && this.members.isEmpty()) {
             this.deleteGuild();
         }
-        GuildDAO.Remove(kickedMember);
+
+        DAO.getGuildMembers().delete(target);
+
         return true;
     }
 
     public void deleteGuild() {
-        GuildDAO.Remove(entity);
+        DAO.getGuilds().remove(entity);
         //TODO : TAX
     }
 
@@ -225,9 +231,6 @@ public class Guild extends IWorldEventObserver {
 
     @Override
     public void registerPlayer(Player p) {
-        if (this.characters == null) {
-            this.characters = Collections.synchronizedMap(new HashMap<Integer, Player>());
-        }
         if (this.characters.containsKey(p.ID)) {
             throw new Error("Two different Clients logged ! ");
         }
@@ -265,7 +268,28 @@ public class Guild extends IWorldEventObserver {
         this.onMemberDisconnected(this.members.get(p.ID));
     }
 
-    private static final double[][] XP_PER_GAP = new double[][]{
+    public Stream<Player> playerStream() {
+        return characters.values().stream();
+    }
+
+    public Stream<GuildMember> memberStream() {
+        return members.values().stream();
+    }
+
+    public BasicGuildInformations getBasicGuildInformations() {
+        //TODO cache that !
+        return new BasicGuildInformations(this.entity.guildID, this.entity.name);
+    }
+
+    public void addMember(GuildMember member) {
+        members.put(member.characterID, member);
+    }
+
+    public GuildMember getMember(int playerId) {
+        return members.get(playerId);
+    }
+
+    /*private static final double[][] XP_PER_GAP = new double[][]{
         new double[]{
             0.0,
             10.0
@@ -298,7 +322,7 @@ public class Guild extends IWorldEventObserver {
             70.0,
             1.0
         }
-    };
+    };*/
     public static final int[] TAX_COLLECTOR_SPELLS = new int[]{
         458,
         457,
@@ -313,10 +337,5 @@ public class Guild extends IWorldEventObserver {
         452,
         461
     };
-
-    public BasicGuildInformations getBasicGuildInformations() {
-
-        return new BasicGuildInformations(this.entity.guildID, this.entity.name);
-    }
 
 }

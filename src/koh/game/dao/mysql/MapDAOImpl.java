@@ -25,8 +25,9 @@ import java.util.stream.Stream;
  */
 public class MapDAOImpl extends MapDAO {
 
-    private static final Logger logger = LogManager.getLogger(MapDAOImpl.class);
-    private final Map<Integer, DofusMap> dofusMaps = new HashMap<>();
+    private static final Logger logger = LogManager.getLogger(MapDAO.class);
+
+    private final Map<Integer, DofusMap> dofusMaps = new HashMap<>(5000);
     private final Map<Integer, DofusZaap> zaaps = new HashMap<>(30);
     private final Map<Integer, ArrayList<DofusZaap>> subWays = new HashMap<>(40); //@Param1 = AreaId , ^Param2 = List of Subways
     @Inject
@@ -39,12 +40,13 @@ public class MapDAOImpl extends MapDAO {
             while (result.next()) {
                 dofusMaps.put(result.getInt("id"), new DofusMap(result.getInt("id"), (byte) result.getInt("version"), result.getInt("relativeid"), (byte) result.getInt("maptype"), result.getInt("subareaid"), result.getInt("bottomneighbourId"), result.getInt("topneighbourid"), result.getInt("leftneighbourId"), result.getInt("rightneighbourId"), result.getInt("shadowbonusonentities"), result.getByte("uselowpassfilter") == 1, result.getByte("usereverb") == 1, result.getInt("presetid"), result.getString("bluecells"), result.getString("redcells"), result.getBytes("cells"), result.getBytes("layers")));
                 if (result.getString("new_neighbour") != null) {
+                    String[] neighbours = result.getString("new_neighbour").split(",");
                     dofusMaps.get(result.getInt("id")).newNeighbour = new NeighBourStruct[]
                             {   //TOKISS : @alleos split
-                                    new NeighBourStruct(Integer.parseInt(result.getString("new_neighbour").split(",")[0].split(":")[0]), Integer.parseInt(result.getString("new_neighbour").split(",")[0].split(":")[1])),
-                                    new NeighBourStruct(Integer.parseInt(result.getString("new_neighbour").split(",")[1].split(":")[0]), Integer.parseInt(result.getString("new_neighbour").split(",")[1].split(":")[1])),
-                                    new NeighBourStruct(Integer.parseInt(result.getString("new_neighbour").split(",")[2].split(":")[0]), Integer.parseInt(result.getString("new_neighbour").split(",")[2].split(":")[1])),
-                                    new NeighBourStruct(Integer.parseInt(result.getString("new_neighbour").split(",")[3].split(":")[0]), Integer.parseInt(result.getString("new_neighbour").split(",")[3].split(":")[1]))
+                                    new NeighBourStruct(neighbours[0].split(":")),
+                                    new NeighBourStruct(neighbours[1].split(":")),
+                                    new NeighBourStruct(neighbours[2].split(":")),
+                                    new NeighBourStruct(neighbours[3].split(":"))
                             };
                 }
             }
@@ -200,10 +202,11 @@ public class MapDAOImpl extends MapDAO {
             while (result.next()) {
                 dofusMaps.get(result.getInt("map")).houses.add(new HouseInformations() {
                     {
-                        this.doorsOnMap = new int[result.getString("doors_on_map").split(",").length];
-                        for (int i = 0; i < result.getString("doors_on_map").split(",").length; i++) {
-                            this.doorsOnMap[i] = Integer.parseInt(result.getString("doors_on_map").split(",")[i]);
-                        }
+                        String[] doorsInfos = result.getString("doors_on_map").split(",");
+                        this.doorsOnMap = new int[doorsInfos.length];
+                        for (int i = 0; i < doorsInfos.length; i++)
+                            this.doorsOnMap[i] = Integer.parseInt(doorsInfos[i]);
+
                         houseId = result.getInt("id");
                         ownerName = result.getString("owner");
                         isOnSale = result.getBoolean("on_sale");

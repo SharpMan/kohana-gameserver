@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.sqlite.PetsDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
 import koh.protocol.client.enums.ItemsEnum;
@@ -38,8 +37,8 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public void serializeInformations() {
-        IoBuffer buf = IoBuffer.allocate(1000);
-        buf.setAutoExpand(true);
+        IoBuffer buf = IoBuffer.allocate(0xFFF)
+                .setAutoExpand(true);
 
         buf.putInt(eatedFoods.size());
         for (Entry<Integer, Integer> e : eatedFoods.entrySet()) {
@@ -53,23 +52,20 @@ public class PetsInventoryItem extends InventoryItem {
             buf.putInt(e.getValue());
         }
 
-        buf.flip();
-        this.entity.informations = buf.array();
-        buf.clear();
-        buf = null;
+        this.entity.informations = buf.flip().array();
     }
 
     public PetsInventoryItem(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects, boolean create) {
         super(ID, templateId, position, owner, quantity, effects);
         if (!create) {
-            this.entity = PetsDAO.get(((ObjectEffectInteger) this.getEffect(995)).value);
+            this.entity = DAO.getPetInventories().get(((ObjectEffectInteger) this.getEffect(995)).value);
             if (this.entity != null) {
                 this.initialize();
             }
         }
         if (this.entity == null) {
             this.entity = new PetsInventoryItemEntity();
-            this.entity.petsID = PetsDAO.nextPetId++;
+            this.entity.petsID = DAO.getPetInventories().nextId();
             this.entity.lastEat = (System.currentTimeMillis() - (24 * 3600 * 1000)) + "";
             this.entity.pointsUsed = 0;
             this.serializeInformations();
@@ -78,7 +74,7 @@ public class PetsInventoryItem extends InventoryItem {
             this.effects.add(new ObjectEffectInteger(995, this.entity.petsID));
             this.notifyColumn("effects");
 
-            PetsDAO.Insert(this.entity);
+            DAO.getPetInventories().insert(this.entity);
         }
     }
 
@@ -180,7 +176,7 @@ public class PetsInventoryItem extends InventoryItem {
 
     public void save() {
         this.serializeInformations();
-        PetsDAO.update(entity);
+        DAO.getPetInventories().update(entity);
     }
 
     public void checkLastEffect() {

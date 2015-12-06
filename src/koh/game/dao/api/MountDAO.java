@@ -1,4 +1,4 @@
-package koh.game.dao.mysql;
+package koh.game.dao.api;
 
 import koh.game.entities.item.animal.MountTemplate;
 import koh.patterns.services.api.Service;

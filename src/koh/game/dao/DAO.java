@@ -2,8 +2,7 @@ package koh.game.dao;
 
 import com.google.inject.Inject;
 import koh.game.dao.api.*;
-import koh.game.dao.mysql.MountDAO;
-import koh.game.dao.mysql.PlayerDAOImpl;
+import koh.game.dao.api.MountDAO;
 import koh.game.utils.Settings;
 import lombok.Getter;
 
@@ -53,5 +52,17 @@ public class DAO {
 
     @Inject @Getter
     private static D2oDAO d2oTemplates;
+
+    @Inject @Getter
+    private static GuildDAO guilds;
+
+    @Inject @Getter
+    private static GuildMemberDAO guildMembers;
+
+    @Inject @Getter
+    private static PetInventoryDAO petInventories;
+
+    @Inject @Getter
+    private static MountInventoryDAO mountInventories;
 
 }

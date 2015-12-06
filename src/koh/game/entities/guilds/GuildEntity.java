@@ -3,7 +3,8 @@ package koh.game.entities.guilds;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import koh.game.dao.sqlite.GuildDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.sqlite.GuildDAOImpl;
 
 /**
  *
@@ -11,11 +12,10 @@ import koh.game.dao.sqlite.GuildDAO;
  */
 @DatabaseTable(tableName = "guilds")
 public class GuildEntity {
-    
-    public void Save() {
-        GuildDAO.Update(this);
-    }
 
+    public void Save() {
+        DAO.getGuilds().update(this);
+    }
 
     @DatabaseField(columnName = "id", dataType = DataType.INTEGER, id = true)
     public int guildID;

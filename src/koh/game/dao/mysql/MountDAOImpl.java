@@ -1,14 +1,13 @@
 package koh.game.dao.mysql;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import com.google.inject.Inject;
 import koh.game.dao.DatabaseSource;
+import koh.game.dao.api.MountDAO;
 import koh.game.entities.item.animal.MountTemplate;
 import java.util.HashMap;
-import koh.game.MySQL;
-import koh.game.utils.Settings;
+
 import koh.game.utils.sql.ConnectionResult;
 import koh.look.EntityLookParser;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;

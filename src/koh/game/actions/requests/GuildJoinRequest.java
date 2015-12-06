@@ -1,7 +1,8 @@
 package koh.game.actions.requests;
 
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.dao.sqlite.GuildDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.GuildInvitationStateEnum;
@@ -46,7 +47,7 @@ public class GuildJoinRequest extends GameBaseRequest {
                         this.sex = requested.character.sexe == 1;
                         this.achievementPoints = requested.character.achievementPoints;
                         this.alignmentSide = requested.character.alignmentSide.value;
-                        GuildDAO.Insert(this);
+                        DAO.getGuildMembers().insert(this);
                     }
                 }, this.requested.character);
                 this.requester.character.guild.registerPlayer(requested.character);

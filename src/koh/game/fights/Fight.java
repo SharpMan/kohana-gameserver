@@ -1089,9 +1089,15 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.joinFightTeam(defender, this.myTeam2, true, (short) - 1, true);
 
         // Si un timer pour le lancement du combat
+<<<<<<< HEAD
         if (this.getStartTimer() != -1) {
             //FIXME remove Thread.sleep
             this.startTimer(new CancellableScheduledRunnable(BackGroundWorker, (getStartTimer() * 1000)) {
+=======
+        if (this.GetStartTimer() != -1) {
+            //FIXME remove Thread.sleep
+            this.StartTimer(new CancellableExecutorRunnable(BackGroundWorker, (GetStartTimer() * 1000)) {
+>>>>>>> 01507a8... Edit WorldServer parameters (improve config)
                 @Override
                 public void run() {
                     try {

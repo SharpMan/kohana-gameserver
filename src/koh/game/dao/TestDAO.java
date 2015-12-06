@@ -1,4 +1,4 @@
-package koh.game.dao.mysql;
+package koh.game.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

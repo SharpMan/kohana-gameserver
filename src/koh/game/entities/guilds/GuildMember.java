@@ -3,7 +3,8 @@ package koh.game.entities.guilds;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import koh.game.dao.sqlite.GuildDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.sqlite.GuildDAOImpl;
 
 /**
  *
@@ -12,13 +13,9 @@ import koh.game.dao.sqlite.GuildDAO;
 @DatabaseTable(tableName = "guilds_members")
 public class GuildMember {
 
-    public GuildMember() {
+    public GuildMember() { }
 
-    }
-
-    public void save() {
-        GuildDAO.Update(this);
-    }
+    public void save() { DAO.getGuildMembers().update(this); }
 
     public GuildMember(int GID) {
         this.guildID = GID;
@@ -83,7 +80,6 @@ public class GuildMember {
         return this.getRankId() == 1;
     }
 
-    //Fucking code of course java don't have FlagBitsCheck on the Enumerate..
     public boolean manageGuildBoosts() {
         return (((((this.isBoss()) || (this.manageRights()))) || (((2 & this.rights) > 0))));
     }

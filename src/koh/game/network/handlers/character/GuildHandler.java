@@ -7,8 +7,7 @@ import koh.game.actions.GameRequest;
 import koh.game.actions.requests.GuildJoinRequest;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.sqlite.GuildDAO;
-import koh.game.dao.mysql.PlayerDAOImpl;
+import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildEntity;
@@ -47,31 +46,30 @@ import org.apache.commons.lang3.ArrayUtils;
 public class GuildHandler {
 
     private final static String ENCRYPTED_REGEX = "[a-zA-Z0-9éèêëïöôùç -]*";
-    public final static Pattern ENCRYPTED_MATCHER = Pattern.compile(ENCRYPTED_REGEX);
+    private final static Pattern ENCRYPTED_MATCHER = Pattern.compile(ENCRYPTED_REGEX);
 
-    public static boolean isValidName(String packet) {
+    private static boolean isValidName(String packet) {
         return ENCRYPTED_MATCHER.matcher(packet).matches();
     }
 
     @HandlerAttribute(ID = GuildSpellUpgradeRequestMessage.M_ID)
-    public static void HandleGuildSpellUpgradeRequestMessage(WorldClient Client, GuildSpellUpgradeRequestMessage Message) {
+    public static void HandleGuildSpellUpgradeRequestMessage(WorldClient Client, GuildSpellUpgradeRequestMessage message) {
         if (Client.character.guild != null && Client.character.getGuildMember().manageGuildBoosts()) {
-            if (Client.character.guild.entity.boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, Message.spellId)) {
+            if (Client.character.guild.entity.boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, message.spellId)) {
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
 
-            byte SpellLevel = Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.spellId)];
-            if (SpellLevel >= DAO.getSpells().findSpell(Message.spellId).spellLevels.length) { //action Asyn ^^
+            byte SpellLevel = Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, message.spellId)];
+            if (SpellLevel >= DAO.getSpells().findSpell(message.spellId).spellLevels.length) { //action Asyn ^^
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
-            Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, Message.spellId)]++;
+            Client.character.guild.spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, message.spellId)]++;
             Client.character.guild.entity.boost -= 5;
             Client.character.guild.sendToField(Client.character.guild.toGuildInfosUpgradeMessage());
-
             Client.character.guild.entity.spells = Enumerable.Join(Client.character.guild.spellLevel, ',');
-            GuildDAO.Update(Client.character.guild.entity);
+            DAO.getGuilds().update(Client.character.guild.entity);
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -127,7 +125,7 @@ public class GuildHandler {
             }
             Client.character.guild.entity.boost--;
             Client.character.guild.sendToField(Client.character.guild.toGuildInfosUpgradeMessage());
-            GuildDAO.Update(Client.character.guild.entity);
+            DAO.getGuilds().update(Client.character.guild.entity);
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -152,13 +150,11 @@ public class GuildHandler {
         }
     }
 
-    @HandlerAttribute(ID = 6115)
-    public static void HandleGuildInvitationByNameMessage(WorldClient Client, GuildInvitationByNameMessage Message) {
+    private static void inviteTargetOnGuild(WorldClient Client, Player character) {
         if (Client.character.guild != null) {
             if (!Client.character.getGuildMember().inviteNewMembers()) {
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
             } else {
-                Player character = DAO.getPlayers().getCharacter(Message.name);
                 if (character == null || character.client == null) {
                     Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
                 } else {
@@ -192,50 +188,20 @@ public class GuildHandler {
         }
     }
 
+    @HandlerAttribute(ID = 6115)
+    public static void HandleGuildInvitationByNameMessage(WorldClient Client, GuildInvitationByNameMessage Message) {
+        inviteTargetOnGuild(Client, DAO.getPlayers().getCharacter(Message.name));
+    }
+
     @HandlerAttribute(ID = 5551)
     public static void HandleGuildInvitationMessage(WorldClient Client, GuildInvitationMessage Message) {
-        if (Client.character.guild != null) {
-            if (!Client.character.getGuildMember().inviteNewMembers()) {
-                Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 207, new String[0]));
-            } else {
-                Player character = DAO.getPlayers().getCharacter(Message.targetId);
-                if (character == null || character.client == null) {
-                    Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 208, new String[0]));
-                } else {
-                    if (character.guild != null) {
-                        Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 206, new String[0]));
-                    } else {
-                        if (!character.client.canGameAction(GameActionTypeEnum.BASIC_REQUEST) || !Client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-                            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 209, new String[0]));
-                        } else if (!Client.character.guild.canAddMember()) {
-                            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 55, new String[]{String.valueOf(50)}));
-                        } else {
-
-                            GuildJoinRequest Request = new GuildJoinRequest(Client, character.client);
-                            GameRequest RequestAction = new GameRequest(Client.character, Request);
-
-                            Client.addGameAction(RequestAction);
-                            character.client.addGameAction(RequestAction);
-
-                            Client.setBaseRequest(Request);
-                            character.client.setBaseRequest(Request);
-
-                            Client.send(new GuildInvitationStateRecruterMessage(character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_SENT));
-                            character.send(new GuildInvitedMessage(Client.character.ID, Client.character.nickName, Client.character.guild.getBasicGuildInformations()));
-                        }
-                    }
-                }
-            }
-        } else {
-            Client.send(new BasicNoOperationMessage());
-        }
+        inviteTargetOnGuild(Client, DAO.getPlayers().getCharacter(Message.targetId));
     }
 
     @HandlerAttribute(ID = 5549)
     public static void HandleGuildChangeMemberParametersMessage(WorldClient Client, GuildChangeMemberParametersMessage Message) {
         if (Client.character.guild != null) {
-            GuildMember guildMember = Client.character.guild.members.get(Message.memberId);
+            GuildMember guildMember = Client.character.guild.getMember(Message.memberId);
             if (guildMember != null) {
                 Client.character.guild.changeParameters(Client.character, guildMember, Message.rank, Message.experienceGivenPercent, Message.rights);
             }
@@ -248,7 +214,7 @@ public class GuildHandler {
     @HandlerAttribute(ID = GuildKickRequestMessage.M_ID)
     public static void HandleGuildKickRequestMessage(WorldClient Client, GuildKickRequestMessage Message) {
         if (Client.character.guild != null) {
-            GuildMember guildMember = Client.character.guild.members.get(Message.kickedId);
+            GuildMember guildMember = Client.character.guild.getMember(Message.kickedId);
             if (guildMember != null) {
                 Client.character.guild.kickMember(Client.character, guildMember);
             }
@@ -283,36 +249,35 @@ public class GuildHandler {
     }
 
     @HandlerAttribute(ID = 5546)
-    public static void HandleGuildCreationValidMessage(WorldClient Client, GuildCreationValidMessage Message) {
+    public static void HandleGuildCreationValidMessage(WorldClient Client, GuildCreationValidMessage message) {
         if (Client.character.guild != null) {
             Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_ALREADY_IN_GROUP));
         } else if (!Client.character.inventoryCache.hasItemId(1575)) {
             Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_REQUIREMENT_UNMET));
             PlayerController.sendServerMessage(Client, "La crétion d'une guilde nécessite une guildalogemme qui est commerciable en <b>Boutique</b>");
-        } else if (GuildDAO.EmblemExist(Message.guildEmblem)) {
+        } else if (DAO.getGuilds().alreadyTakenEmblem(message.guildEmblem)) {
             Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_EMBLEM_ALREADY_EXISTS));
         } else if (!Client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {
             Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_CANCEL));
-        } else if (GuildDAO.NameExist(Message.guildName) || !isValidName(Message.guildName) || Message.guildName.length() < 4 || Message.guildName.length() > 16) {
+        } else if (DAO.getGuilds().alreadyTakenName(message.guildName) || !isValidName(message.guildName) || message.guildName.length() < 4 || message.guildName.length() > 16) {
             Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_NAME_INVALID));
         } else {
-            new Guild(new GuildEntity() {
+            DAO.getGuilds().insert(new Guild(new GuildEntity() {
                 {
-                    this.guildID = GuildDAO.NextGuildID++;
+                    this.guildID = DAO.getGuilds().nextId();
                     this.creationDate = (int) Instant.now().getEpochSecond();
-                    this.emblemBackgroundColor = Message.guildEmblem.backgroundColor;
-                    this.emblemBackgroundShape = Message.guildEmblem.backgroundShape;
-                    this.emblemForegroundColor = Message.guildEmblem.symbolColor;
-                    this.emblemForegroundShape = Message.guildEmblem.symbolShape;
+                    this.emblemBackgroundColor = message.guildEmblem.backgroundColor;
+                    this.emblemBackgroundShape = message.guildEmblem.backgroundShape;
+                    this.emblemForegroundColor = message.guildEmblem.symbolColor;
+                    this.emblemForegroundShape = message.guildEmblem.symbolShape;
                     this.level = 1;
                     this.experience = "0";
                     this.maxTaxCollectors = 1;
-                    this.name = Message.guildName;
+                    this.name = message.guildName;
                     this.pods = 1000;
                     this.prospecting = 100;
 
                     this.spells = "0,0,0,0,0,0,0,0,0,0,0,0";
-                    GuildDAO.Insert(this);
                 }
             }) {
                 {
@@ -330,13 +295,13 @@ public class GuildHandler {
                             this.sex = Client.character.sexe == 1;
                             this.achievementPoints = Client.character.achievementPoints;
                             this.alignmentSide = Client.character.alignmentSide.value;
-                            GuildDAO.Insert(this);
+                            DAO.getGuildMembers().update(this);
                         }
                     }, Client.character);
                     this.registerPlayer(Client.character);
-                    this.setBoss(this.members.get(Client.character.ID));
+                    this.setBoss(getMember(Client.character.ID));
                 }
-            };
+            });
 
             Client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_OK));
 

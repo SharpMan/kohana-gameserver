@@ -7,7 +7,6 @@ import java.util.Map;
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.D2oDaoImpl;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.StatsBoostEnum;

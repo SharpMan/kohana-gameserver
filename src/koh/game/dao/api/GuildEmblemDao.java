@@ -6,9 +6,8 @@ import koh.patterns.services.api.Service;
 /**
  * Created by Melancholia on 11/29/15.
  */
-public abstract class GuildEmblemDao implements Service {
+public abstract class GuildEmblemDAO implements Service {
 
     public abstract EmblemSymbols get(int id);
-
 
 }

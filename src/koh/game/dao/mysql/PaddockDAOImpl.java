@@ -38,16 +38,16 @@ public class PaddockDAOImpl extends PaddockDAO {
 
     @Override
     public boolean update(Paddock item, String[] columns) {
-        int i = 1;
+        int i = 0;
         String Query = "UPDATE `paddocks_template` set ";
         Query = Arrays.stream(columns).map((s) -> s + " =?,").reduce(Query, String::concat);
         Query = StringUtil.removeLastChar(Query);
         Query += " WHERE id = ?;";
         try (PreparedStatement p = (PreparedStatement) dbSource.prepareStatement(Query)) {
             for (String s : columns) {
-                setValue(p, s, i++, item);
+                setValue(p, s, ++i, item);
             }
-            setValue(p, "id", i++, item);
+            setValue(p, "id", ++i, item);
             p.execute();
             //MySQL.closePreparedStatement(p);
         } catch (Exception e) {
@@ -55,14 +55,12 @@ public class PaddockDAOImpl extends PaddockDAO {
             logger.warn(e.getMessage());
             return false;
         }
-        columns = null;
         return true;
     }
 
 
     private void setValue(PreparedStatement p, String column, int seq, Paddock item) {
         try {
-            IoBuffer buf;
             switch (column) {
                 case "id":
                     p.setInt(seq, item.id);
@@ -74,19 +72,13 @@ public class PaddockDAOImpl extends PaddockDAO {
                     p.setBoolean(seq, item.loocked);
                     break;
                 case "mounts_informations":
-                    buf = serializeMountsInformations(item.mountInformationsForPaddocks);
-                    p.setBytes(seq, buf.array());
-                    buf.clear();
+                    p.setBytes(seq, serializeMountsInformations(item.mountInformationsForPaddocks).array());
                     break;
                 case "items":
-                    buf = serializeItemsInformations(item.items);
-                    p.setBytes(seq, buf.array());
-                    buf.clear();
+                    p.setBytes(seq, serializeItemsInformations(item.items).array());
                     break;
                 case "guild_informations":
-                    buf = serializeGuildInformations(item.guildInfo);
-                    p.setBytes(seq, buf.array());
-                    buf.clear();
+                    p.setBytes(seq, serializeGuildInformations(item.guildInfo).array());
                     break;
                 case "sell_informations":
                     p.setString(seq, item.selledId + "," + item.ownerName);
@@ -100,9 +92,7 @@ public class PaddockDAOImpl extends PaddockDAO {
                 case "max_items":
                     p.setInt(seq, item.maxItem);
                     break;
-
             }
-            buf = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -163,7 +153,7 @@ public class PaddockDAOImpl extends PaddockDAO {
 
     @Override
     public void start() {
-        logger.info("loaded {} paddocks");
+        logger.info("loaded {} paddocks", this.loadAll());
     }
 
     @Override

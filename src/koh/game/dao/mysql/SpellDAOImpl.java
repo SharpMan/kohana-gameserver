@@ -136,25 +136,26 @@ public class SpellDAOImpl extends SpellDAO {
                         } else {
                             this.statesForbidden = new int[0];
                         }
-                        IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));
-                        this.effects = new EffectInstanceDice[buf.getInt()];
-                        for (int i = 0; i < this.effects.length; i++) {
-                            this.effects[i] = new EffectInstanceDice(buf);
-                            if (this.spellId == 126) {//To patch in DAO After
-                                this.effects[i].targetMask = "a";
-                            }
+
+                        {
+                            IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));
+                            this.effects = new EffectInstanceDice[buf.getInt()];
+                            for (int i = 0; i < this.effects.length; i++) {
+                                this.effects[i] = new EffectInstanceDice(buf);
+                                if (this.spellId == 126) {//To patch in DAO After
+                                    this.effects[i].targetMask = "a";
+                                }
                             /* if(this.effects[i].effectId == 165)
                              System.out.println("hn"+this.spellId);*/
-                        }
-                        buf.clear();
+                            }
+                            buf.clear();
 
-                        buf = IoBuffer.wrap(result.getBytes("critical_effects"));
-                        this.criticalEffect = new EffectInstanceDice[buf.getInt()];
-                        for (int i = 0; i < this.criticalEffect.length; i++) {
-                            this.criticalEffect[i] = new EffectInstanceDice(buf);
+                            buf = IoBuffer.wrap(result.getBytes("critical_effects"));
+                            this.criticalEffect = new EffectInstanceDice[buf.getInt()];
+                            for (int i = 0; i < this.criticalEffect.length; i++) {
+                                this.criticalEffect[i] = new EffectInstanceDice(buf);
+                            }
                         }
-                        buf.clear();
-                        buf = null;
 
                     }
                 });

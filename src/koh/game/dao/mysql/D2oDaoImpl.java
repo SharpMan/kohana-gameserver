@@ -12,7 +12,7 @@ import koh.protocol.client.enums.FightStateEnum;
  *
  * @author Neo-Craft
  */
-public class D2oDaoImpl extends D2oDAO {
+public class D2oDAOImpl extends D2oDAO {
 
     private static d2oReader d2oBreeds, d2oHeads, d2oEffects, d2oStates = null;
 

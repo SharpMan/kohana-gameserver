@@ -3,7 +3,7 @@ package koh.game.dao.mysql;
 import com.google.inject.Inject;
 import koh.d2o.entities.EmblemSymbols;
 import koh.game.dao.DatabaseSource;
-import koh.game.dao.api.GuildEmblemDao;
+import koh.game.dao.api.GuildEmblemDAO;
 import koh.game.utils.sql.ConnectionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,9 +14,9 @@ import java.util.HashMap;
 /**
  * @author Neo-Craft
  */
-public class GuildEmblemDAOImpl extends GuildEmblemDao {
+public class GuildEmblemDAOImpl extends GuildEmblemDAO {
 
-    private static final Logger logger = LogManager.getLogger(GuildEmblemDAOImpl.class);
+    private static final Logger logger = LogManager.getLogger(GuildEmblemDAO.class);
     private final HashMap<Integer, EmblemSymbols> symbols = new HashMap<>(50);
 
     @Inject

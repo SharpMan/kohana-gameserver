@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 import koh.game.actions.InteractiveElementAction;
 import koh.game.controllers.MapController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.NpcDAOImpl;
-import koh.game.dao.mysql.PaddockDAOImpl;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
@@ -68,7 +67,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private byte[] compressedCells, compressedLayers;
     private String compressedBlueCells, compressedRedCells;
     public boolean myInitialized = false;
-    private final Map<Integer, IGameActor> myGameActors = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Integer, IGameActor> myGameActors = new ConcurrentHashMap<>();
     public StatedElement[] elementsStated = new StatedElement[0];
     public List<InteractiveElementStruct> interactiveElements = new ArrayList<>();
     private Map<Short, InventoryItem> droppedItems;
@@ -261,12 +260,12 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.compressedRedCells = null;
         //throw un nullP mieux que referencer une liste on 111000 map object
         try {
-            for (Npc npc : DAO.getNpcs().getMapNpc(this.id)) {
+            for (Npc npc : DAO.getNpcs().forMap(this.id)) {
                     npc.ID = this.myNextActorId--;
                     npc.cell = this.getCell(npc.cellID);
                     this.spawnActor(npc);
             }
-        } catch(NullPointerException e) {}
+        } catch(NullPointerException ignored) {}
         this.myFightController = new FightController();
         //this.interactiveElements.forEach(x -> System.out.println(x.toString()));
     }

@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ExpDAOImpl extends ExpDAO {
 
-    private static final Logger logger = LogManager.getLogger(ExpDAOImpl.class);
+    private static final Logger logger = LogManager.getLogger(ExpDAO.class);
 
     @Inject
     private DatabaseSource dbSource;

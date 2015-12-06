@@ -43,7 +43,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PlayerDAOImpl extends PlayerDAO {
 
-    private static final Logger logger = LogManager.getLogger(PlayerDAOImpl.class);
+    private static final Logger logger = LogManager.getLogger(PlayerDAO.class);
 
     private final Map<Integer, Player> myCharacterById = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, Player> myCharacterByName = Collections.synchronizedMap(new HashMap<>());
@@ -309,24 +309,21 @@ public class PlayerDAOImpl extends PlayerDAO {
 
     @Override
     public boolean containsName(String name) {
-        boolean exist = false;
-        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("SELECT nickname FROM `character` WHERE nickname LIKE ?;")) {
+        if(myCharacterByName.get(name.toLowerCase()) != null)
+            return true;//if already loaded
+
+        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("SELECT 1 FROM `character` WHERE LOWER(nickname) = LOWER(?);")) {
             PreparedStatement pStatement = conn.getStatement();
 
             //FIXME SELECT 1 FROM characters WHERE name=@0
             pStatement.setString(1, name);
-            ResultSet resultSet = pStatement.executeQuery();
-            while (resultSet.next()) {
-                if (resultSet.getString("nickname").toLowerCase().equals(name.toLowerCase())) {
-                    exist = true;
-                }
-            }
-            resultSet.close();
+
+            return pStatement.executeQuery().first();
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
-        return exist;
+        return false;
     }
 
     @Override

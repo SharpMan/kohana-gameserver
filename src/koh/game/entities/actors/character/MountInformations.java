@@ -2,8 +2,6 @@ package koh.game.entities.actors.character;
 
 import koh.game.Main;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.MountDAOImpl;
-import koh.game.dao.sqlite.PetsDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.animal.MountInventoryItemEntity;
 import koh.protocol.client.BufUtils;
@@ -37,7 +35,7 @@ public class MountInformations {
     public void save() {
         if (this.mount != null && this.entity != null) {
             this.serializeInformations();
-            PetsDAO.update(entity);
+            DAO.getMountInventories().update(entity);
         }
     }
 
@@ -144,20 +142,17 @@ public class MountInformations {
     }
 
     public void serializeInformations() {
-        IoBuffer buf = IoBuffer.allocate(65535);
-        buf.setAutoExpand(true);
+        IoBuffer buf = IoBuffer.allocate(0xFFF)
+                .setAutoExpand(true);
         this.mount.serialize(buf);
-        buf.flip();
-        this.entity.informations = buf.array();
-        buf.clear();
-        buf = null;
+        this.entity.informations = buf.flip().array();
     }
 
     public synchronized void initialize(int id) {
-        if (id == -1) {
+        if (id == -1)
             return;
-        }
-        this.entity = PetsDAO.getMount(id);
+
+        this.entity = DAO.getMountInventories().get(id);
         if (this.entity != null) {
             IoBuffer buf = IoBuffer.wrap(this.entity.informations);
             this.mount = new MountClientData();
