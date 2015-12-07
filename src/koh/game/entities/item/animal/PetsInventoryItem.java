@@ -104,14 +104,14 @@ public class PetsInventoryItem extends InventoryItem {
         } else if (food.templateId == ItemsEnum.EneripsaPouder) {
             //TODO : life
             return true;
-        } else if (this.entity.pointsUsed >= getAnimal().Hormone) {
+        } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
             return false;
-        } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < pet.minDurationBeforeMeal) {
-            PlayerController.sendServerMessage(p.client, "Veuillez patientez " + ((getAnimal().minDurationBeforeMeal) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " heures pour le prochain repas");
+        } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < pet.getMinDurationBeforeMeal()) {
+            PlayerController.sendServerMessage(p.client, "Veuillez patientez " + ((getAnimal().getMinDurationBeforeMeal()) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " heures pour le prochain repas");
             return false;
         }
 
-        for (FoodItem i : getAnimal().foodItems) {
+        for (FoodItem i : getAnimal().getFoodItems()) {
             if (food.templateId == i.itemID) {
                 if (!this.eatedFoods.containsKey(food.templateId)) {
                     this.eatedFoods.put(food.templateId, 0);
@@ -127,7 +127,7 @@ public class PetsInventoryItem extends InventoryItem {
                 return true;
             }
         }
-        for (FoodItem i : getAnimal().foodTypes) {
+        for (FoodItem i : getAnimal().getFoodTypes()) {
             if (food.getTemplate().typeId == i.itemID) {
                 if (!this.eatedFoodsType.containsKey(food.getTemplate().typeId)) {
                     this.eatedFoodsType.put(food.getTemplate().typeId, 0);

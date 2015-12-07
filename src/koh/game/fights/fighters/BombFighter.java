@@ -3,9 +3,7 @@ package koh.game.fights.fighters;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import koh.game.Main;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.SpellDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
@@ -45,8 +43,8 @@ public class BombFighter extends StaticFighter {
     public BombFighter(Fight Fight, Fighter Summoner, MonsterGrade Monster) {
         super(Fight, Summoner);
         this.Grade = Monster;
-        super.initFighter(this.Grade.GetStats(), Fight.getNextContextualId());
-        this.entityLook = EntityLookParser.Copy(this.Grade.Monster().getEntityLook());
+        super.initFighter(this.Grade.getStats(), Fight.getNextContextualId());
+        this.entityLook = EntityLookParser.Copy(this.Grade.getMonster().getEntityLook());
         super.AdjustStats();
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());

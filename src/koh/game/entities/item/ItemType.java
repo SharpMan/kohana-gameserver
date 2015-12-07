@@ -1,6 +1,8 @@
 package koh.game.entities.item;
 
 import com.mysql.jdbc.StringUtils;
+import lombok.Builder;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,13 +10,19 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Neo-Craft
  */
+@Builder
 public class ItemType {
 
-    public int superType;
-    public boolean plural;
-    public int gender;
-    public String rawZone;
-    public boolean needUseConfirm, mimickable;
+    @Getter
+    private int superType;
+    @Getter
+    private boolean plural;
+    @Getter
+    private int gender;
+    @Getter
+    private String rawZone;
+    @Getter
+    private boolean needUseConfirm, mimickable;
 
     private static final Logger logger = LogManager.getLogger(ItemType.class);
 

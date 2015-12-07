@@ -23,30 +23,17 @@ public class GuildEmblemDAOImpl extends GuildEmblemDAO {
     private DatabaseSource dbSource;
 
     private int loadAll() {
-        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from guilds_emblems")) {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                symbols.put(result.getInt("id"), new EmblemSymbols() {
-                    {
-                        this.idtype = result.getInt("id");
-                        this.categoryIdtype = result.getInt("category_id");
-                        this.iconIdtype = result.getInt("icon_id");
-                        this.skinIdtype = result.getInt("skin_id");
-                        this.ordertype = result.getInt("order");
-                        this.colorizabletype = result.getBoolean("colorizable");
-
-                    }
-                });
-
-                i++;
+                symbols.put(result.getInt("id"), new EmblemSymbols(result));
             }
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
-        return i;
+        return symbols.size();
     }
 
     @Override

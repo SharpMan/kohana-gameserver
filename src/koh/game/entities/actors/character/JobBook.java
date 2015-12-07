@@ -46,7 +46,7 @@ public class JobBook {
         } while (floor.job < this.myJobs.get(parentJobId).xp && this.myJobs.get(parentJobId).jobLevel != 200);
 
         if (this.myJobs.get(parentJobId).jobLevel != lastLevel) {
-            actor.send(new JobLevelUpMessage((byte)this.myJobs.get(parentJobId).jobLevel,new JobDescription(parentJobId, DAO.getJobTemplates().streamSkills().filter(Skill -> Skill.parentJobId == parentJobId && this.myJobs.get(parentJobId).jobLevel >= Skill.levelMin).map(Skill -> jobToSkill(Skill, this.myJobs.get(parentJobId))).toArray(SkillActionDescription[]::new))));
+            actor.send(new JobLevelUpMessage((byte)this.myJobs.get(parentJobId).jobLevel,new JobDescription(parentJobId, DAO.getJobTemplates().streamSkills().filter(Skill -> Skill.getParentJobId() == parentJobId && this.myJobs.get(parentJobId).jobLevel >= Skill.getLevelMin()).map(Skill -> jobToSkill(Skill, this.myJobs.get(parentJobId))).toArray(SkillActionDescription[]::new))));
         }
 
         actor.send(new JobExperienceUpdateMessage(new JobExperience(parentJobId, (byte) this.myJobs.get(parentJobId).jobLevel, this.myJobs.get(parentJobId).xp, DAO.getExps().getLevel(this.myJobs.get(parentJobId).jobLevel).job, DAO.getExps().getLevel(this.myJobs.get(parentJobId).jobLevel + 1).job)));
@@ -132,7 +132,7 @@ public class JobBook {
     }
 
     public JobDescription[] getDescriptions() {
-        return this.myJobs.values().stream().map(Job -> new JobDescription(Job.id, DAO.getJobTemplates().streamSkills().filter(Skill -> Skill.parentJobId == Job.id && Job.jobLevel >= Skill.levelMin).map(Skill -> jobToSkill(Skill, Job)).toArray(SkillActionDescription[]::new))).toArray(JobDescription[]::new);
+        return this.myJobs.values().stream().map(Job -> new JobDescription(Job.id, DAO.getJobTemplates().streamSkills().filter(Skill -> Skill.getParentJobId() == Job.id && Job.jobLevel >= Skill.getLevelMin()).map(Skill -> jobToSkill(Skill, Job)).toArray(SkillActionDescription[]::new))).toArray(JobDescription[]::new);
     }
 
     public JobExperience[] getExperiences() {
@@ -144,12 +144,12 @@ public class JobBook {
     }
 
     public SkillActionDescription jobToSkill(InteractiveSkill skill, JobInfo job) {
-        if (skill.isForgemagus) {
-            return new SkillActionDescriptionCraft(skill.ID, job.probability());
-        } else if (skill.gatheredRessourceItem != -1) {
-            return new SkillActionDescriptionCollect(skill.ID, (byte) 30, job.quantity(skill.levelMin).first, job.quantity(skill.levelMin).second);
+        if (skill.isForgemagus()) {
+            return new SkillActionDescriptionCraft(skill.getID(), job.probability());
+        } else if (skill.getGatheredRessourceItem() != -1) {
+            return new SkillActionDescriptionCollect(skill.getID(), (byte) 30, job.quantity(skill.getLevelMin()).first, job.quantity(skill.getLevelMin()).second);
         } else {
-            return new SkillActionDescriptionCraft(skill.ID, (byte) 100);
+            return new SkillActionDescriptionCraft(skill.getID(), (byte) 100);
         }
         /*else  {
          throw new Error(String.format("Unknow skill %s Ability %s job %s", skill.id, skill.type, job.id));

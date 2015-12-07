@@ -66,9 +66,9 @@ public class CharacterInventory {
     }
 
     public void generalItemSetApply() {
-        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(Set -> {
+        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(set -> {
             {
-                this.applyItemSetEffects(Set, this.countItemSetEquiped(Set.id), true, false);
+                this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false);
             }
         });
     }
@@ -386,7 +386,7 @@ public class CharacterInventory {
     }
 
     public void sendSetUpdateMessage(ItemSet set, int count) {
-        this.player.send(new SetUpdateMessage(set.id, this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().itemSetId == set.id).mapToInt(x -> x.templateId).toArray(), set.toObjectEffects(count)));
+        this.player.send(new SetUpdateMessage(set.getId(), this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().itemSetId == set.getId()).mapToInt(x -> x.templateId).toArray(), set.toObjectEffects(count)));
     }
 
     private int countItemSetEquiped(int id) {

@@ -225,8 +225,8 @@ public class MySQL {
         Main.Logs().writeInfo(JobDAOImpl.loadAllGatheringInfos() + " GatheringJob LevelInfos catched");
         Main.Logs().writeInfo(JobDAOImpl.loadAllSkills() + " InteractiveSkills LevelInfos catched");
         Main.Logs().writeInfo(MonsterDAOImpl.FindAll() + " Monster Templates catched");
-        Main.Logs().writeInfo(MonsterDAOImpl.FindGrades() + " Monster Grades catched");
-        Main.Logs().writeInfo(MonsterDAOImpl.FindDrops() + " Monster Drops catched");*/
+        Main.Logs().writeInfo(MonsterDAOImpl.FindGrades() + " getMonster Grades catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindDrops() + " getMonster Drops catched");*/
     }
 
     public synchronized Savepoint commitDatabase(boolean createSavePoint) {

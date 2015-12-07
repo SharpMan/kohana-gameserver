@@ -1,5 +1,9 @@
 package koh.game.dao.mysql;
 
+/**
+ * Created by Melancholia on 12/7/15.
+ */
+
 import koh.d2o.d2oReader;
 import koh.d2o.entities.Breed;
 import koh.d2o.entities.Effect;
@@ -58,3 +62,4 @@ public class D2oDAOImpl extends D2oDAO {
 
     }
 }
+

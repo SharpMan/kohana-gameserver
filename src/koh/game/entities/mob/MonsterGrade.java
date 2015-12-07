@@ -1,9 +1,11 @@
 package koh.game.entities.mob;
 
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.MonsterDAOImpl;
 import koh.game.entities.actors.character.GenericStats;
 import koh.protocol.client.enums.StatsEnum;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -18,7 +20,33 @@ public class MonsterGrade {
 
     private GenericStats myStats;
 
-    private void ParseStats() {
+    public MonsterGrade(ResultSet result) throws SQLException {
+        Grade = result.getByte("grade");
+        monsterId = result.getInt("monster_id");
+        Level = result.getInt("level");
+        lifePoints = result.getInt("life_points");
+        actionPoints = result.getInt("action_points");
+        movementPoints = result.getInt("movement_points");
+        paDodge = result.getInt("pa_dodge");
+        pmDodge = result.getInt("pm_dodge");
+        Wisdom = result.getInt("wisdom");
+        tackleEvade = result.getInt("tackle_evade");
+        tackleBlock = result.getInt("tackle_block");
+        Strenght = result.getInt("strength");
+        Chance = result.getInt("chance");
+        Intelligence = result.getInt("intelligence");
+        Agility = result.getInt("agility");
+        earthResistance = result.getInt("earth_resistance");
+        airResistance = result.getInt("air_resistance");
+        fireResistance = result.getInt("fire_resistance");
+        waterResistance = result.getInt("water_resistance");
+        neutralResistance = result.getInt("neutral_resistance");
+        gradeXp = result.getInt("grade_xp");
+        damageReflect = result.getInt("damage_reflect");
+        hiddenLevel = result.getInt("hidden_level");
+    }
+
+    private void parseStats() {
         this.myStats = new GenericStats();
 
         this.myStats.addBase(StatsEnum.Vitality, this.lifePoints);
@@ -31,7 +59,7 @@ public class MonsterGrade {
         this.myStats.addBase(StatsEnum.Add_TackleEvade, this.tackleEvade);
         this.myStats.addBase(StatsEnum.Add_TackleBlock, this.tackleBlock);
 
-        if (!this.Monster().useBombSlot && !this.Monster().useSummonSlot && this.Strenght == 0 && this.Chance == 0 && this.Intelligence == 0 && this.Agility == 0) {
+        if (!this.getMonster().isUseBombSlot() && !this.getMonster().isUseSummonSlot() && this.Strenght == 0 && this.Chance == 0 && this.Intelligence == 0 && this.Agility == 0) {
             int Bonus;
             switch (this.Grade) {
                 case 1:
@@ -53,7 +81,7 @@ public class MonsterGrade {
             this.myStats.addBase(StatsEnum.Strength, Bonus);
             this.myStats.addBase(StatsEnum.Chance, Bonus);
             this.myStats.addBase(StatsEnum.Intelligence, Bonus);
-            this.myStats.addBase(StatsEnum.Agility, this.Monster().canTackle ? Bonus : 0);
+            this.myStats.addBase(StatsEnum.Agility, this.getMonster().isCanTackle() ? Bonus : 0);
         } else {
             this.myStats.addBase(StatsEnum.Strength, this.Strenght);
             this.myStats.addBase(StatsEnum.Chance, this.Chance);
@@ -70,13 +98,13 @@ public class MonsterGrade {
 
     }
 
-    public MonsterTemplate Monster() {
+    public MonsterTemplate getMonster() {
         return DAO.getMonsters().find(this.monsterId);
     }
 
-    public GenericStats GetStats() {
+    public GenericStats getStats() {
         if (this.myStats == null) {
-            this.ParseStats();
+            this.parseStats();
         }
         return myStats;
     }

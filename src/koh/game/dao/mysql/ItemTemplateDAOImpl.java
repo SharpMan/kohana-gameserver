@@ -3,27 +3,20 @@ package koh.game.dao.mysql;
 import com.google.inject.Inject;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.ItemTemplateDAO;
+import koh.game.entities.item.ItemSet;
+import koh.game.entities.item.ItemTemplate;
+import koh.game.entities.item.ItemType;
+import koh.game.entities.item.Weapon;
 import koh.game.entities.item.animal.PetTemplate;
+import koh.game.utils.sql.ConnectionResult;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import koh.game.Logs;
-
-import static koh.game.MySQL.executeQuery;
-import koh.game.entities.item.*;
-import koh.game.entities.item.animal.*;
-import koh.game.entities.spells.*;
-import koh.game.utils.sql.ConnectionResult;
-import koh.utils.Enumerable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.mina.core.buffer.IoBuffer;
-
 /**
- *
  * @author Neo-Craft
  */
 public class ItemTemplateDAOImpl extends ItemTemplateDAO {
@@ -38,25 +31,36 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
     @Inject
     private DatabaseSource dbSource;
 
+    private static int[] parseIds(String recipe_ids) {
+        if (!recipe_ids.trim().isEmpty()) {
+            String[] recipes = recipe_ids.split(",");
+            int[] ids = new int[recipes.length];
+            for (int i = 0; i < recipes.length; i++)
+                ids[i] = Integer.parseInt(recipes[i]);
+            return ids;
+        } else {
+            return new int[0];
+        }
+    }
+
     private int loadAllItemTypes() {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from item_types", 0)) {
             ResultSet result = conn.getResult();
-
+            ItemType type;
             while (result.next()) {
-                itemTypes.put(result.getInt("id"), new ItemType() {
-                    {
-                        superType = result.getInt("super_type_id");
-                        plural = result.getBoolean("plural");
-                        gender = result.getInt("gender");
-                        rawZone = result.getString("raw_zone");
-                        needUseConfirm = result.getBoolean("need_use_confirm");
-                        mimickable = result.getBoolean("mimickable");
-                    }
-                });
+                type = ItemType.builder()
+                        .superType(result.getInt("super_type_id"))
+                        .plural(result.getBoolean("plural"))
+                        .gender(result.getInt("gender"))
+                        .rawZone(result.getString("raw_zone"))
+                        .needUseConfirm(result.getBoolean("need_use_confirm"))
+                        .mimickable(result.getBoolean("mimickable"))
+                        .build();
+                itemTypes.put(result.getInt("id"), type);
                 ++i;
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -64,104 +68,30 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
     }
 
     private int loadAllItemSets() {
-        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from item_sets", 0)) {
             ResultSet result = conn.getResult();
-
             while (result.next()) {
-                itemSets.put(result.getInt("id"), new ItemSet() {
-                    {
-                        id = result.getInt("id");
-
-                        this.items = new int[result.getString("items").split(",").length];
-                        for (int i = 0; i < result.getString("items").split(",").length; i++) {
-                            this.items[i] = Integer.parseInt(result.getString("items").split(",")[i]);
-                        }
-                        this.bonusIsSecret = result.getBoolean("bonus_is_secret");
-                        IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));
-                        this.effects = new EffectInstance[buf.getInt()][];
-                        for (int i = 0; i < this.effects.length; ++i) {
-                            this.effects[i] = ItemTemplateDAO.readEffectInstance(buf);
-                        }
-                    }
-                });
-                ++i;
+                itemSets.put(result.getInt("id"), new ItemSet(result));
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
-        return i;
+        return itemSets.size();
     }
 
     private int loadAllPets() {
-        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from item_pets", 0)) {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                pets.put(result.getInt("id"), new PetTemplate() {
-                    {
-                        this.Id = result.getInt("id");
-                        if (result.getString("food_items").isEmpty() || result.getString("food_items").equalsIgnoreCase("2239")) {
-                            this.foodItems = new FoodItem[0];
-                        } else {
-                            ArrayList<FoodItem> Foods = new ArrayList<>();
-                            for (String s : result.getString("food_items").split(",")) {
-                                if (s.equalsIgnoreCase("2239")) {
-                                    continue;
-                                }
-                                Foods.add(new FoodItem(Integer.parseInt(s.split(";")[0]), Integer.parseInt(s.split(";")[1]), Integer.parseInt(s.split(";")[2]), Integer.parseInt(s.split(";")[3])));
-                            }
-                            this.foodItems = Foods.stream().toArray(FoodItem[]::new);
-                            Foods.clear();
-                            Foods = null;
-                        }
-                        if (result.getString("food_types").isEmpty()) {
-                            this.foodTypes = new FoodItem[0];
-                        } else {
-                            this.foodTypes = new FoodItem[result.getString("food_types").split(",").length];
-                            for (int i = 0; i < this.foodTypes.length; ++i) {
-                                this.foodTypes[i] = new FoodItem(Integer.parseInt(result.getString("food_types").split(",")[i].split(";")[0]), Integer.parseInt(result.getString("food_types").split(",")[i].split(";")[1]), Integer.parseInt(result.getString("food_types").split(",")[i].split(";")[2]), Integer.parseInt(result.getString("food_types").split(",")[i].split(";")[3]));
-                            }
-                        }
-                        if (result.getString("monster_food").isEmpty()) {
-                            this.monsterBoosts = new MonsterBooster[0];
-                        } else {
-                            this.monsterBoosts = new MonsterBooster[result.getString("monster_food").split(",").length];
-                            for (int i = 0; i < this.monsterBoosts.length; ++i) {
-                                this.monsterBoosts[i] = new MonsterBooster(Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[0]), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[1]), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[2]), Enumerable.StringToIntArray(result.getString("monster_food").split(",")[i].split(";")[3], ":"), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[4]), result.getString("monster_food").split(",")[i].split(";").length > 5 ? result.getString("monster_food").split(",")[i].split(";")[5] : null);
-                            }
-                        }
-                        this.minDurationBeforeMeal = result.getInt("min_duration_before_meal");
-                        this.maxDurationBeforeMeal = result.getInt("max_duration_before_meal");
-                        IoBuffer buf = IoBuffer.wrap(result.getBytes("possible_effects"));
-                        this.possibleEffects = new EffectInstanceDice[buf.getInt()];
-                        for (int i = 0; i < this.possibleEffects.length; i++) {
-                            this.possibleEffects[i] = new EffectInstanceDice(buf);
-                        }
-                        buf.clear();
-                        if (result.getBytes("max_effects") != null) {
-                            buf = IoBuffer.wrap(result.getBytes("max_effects"));
-                            this.maxEffects = new EffectInstanceDice[buf.getInt()];
-                            for (int i = 0; i < this.maxEffects.length; i++) {
-                                this.maxEffects[i] = new EffectInstanceDice(buf);
-                            }
-                            buf.clear();
-                        }
-                        this.Hormone = result.getInt("total_points");
-                        if (Logs.DEBUG) {
-                            this.verify();
-                        }
-                    }
-                });
-                ++i;
+                pets.put(result.getInt("id"), new PetTemplate(result));
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
-        return i;
+        return pets.size();
     }
 
     private int loadAll() {
@@ -201,14 +131,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                         this.dropMonsterIds = parseIds(result.getString("drop_monster_ids"));
 
                         this.bonusIsSecret = result.getBoolean("bonus_is_secret");
-
-                        {
-                            IoBuffer buf = IoBuffer.wrap(result.getBytes("possible_effects"));
-                            this.possibleEffects = new EffectInstanceDice[buf.getInt()];
-                            for (int i = 0; i < this.possibleEffects.length; i++) {
-                                this.possibleEffects[i] = new EffectInstanceDice(buf);
-                            }
-                        }
+                        this.possibleEffects = readDiceEffects(result.getBytes("possible_effects"));
 
                         this.favoriteSubAreas = parseIds(result.getString("favorite_sub_areas"));
 
@@ -218,23 +141,11 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                 });
                 ++i;
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
         return i;
-    }
-
-    private static int[] parseIds(String recipe_ids) {
-        if (!recipe_ids.trim().isEmpty()) {
-            String[] recipes = recipe_ids.split(",");
-            int[] ids = new int[recipes.length];
-            for (int i = 0; i < recipes.length; i++)
-                ids[i] = Integer.parseInt(recipes[i]);
-            return ids;
-        } else {
-            return new int[0];
-        }
     }
 
     private int loadAllWeapons() {
@@ -275,13 +186,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
 
                         this.bonusIsSecret = result.getBoolean("bonus_is_secret");
 
-                        {
-                            IoBuffer buf = IoBuffer.wrap(result.getBytes("possible_effects"));
-                            this.possibleEffects = new EffectInstanceDice[buf.getInt()];
-                            for (int i = 0; i < this.possibleEffects.length; i++) {
-                                this.possibleEffects[i] = new EffectInstanceDice(buf);
-                            }
-                        }
+                        this.possibleEffects = readDiceEffects(result.getBytes("possible_effects"));
 
                         this.favoriteSubAreas = parseIds(result.getString("favorite_sub_areas"));
 
@@ -300,7 +205,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                 });
                 ++i;
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }

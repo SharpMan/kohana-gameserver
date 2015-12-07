@@ -37,9 +37,9 @@ public class Collect implements InteractiveAction {
     @Override
     public boolean isEnabled(Player actor) {
         try {
-            return actor.myJobs.getJob(Skill.parentJobId).jobLevel >= Skill.levelMin;
+            return actor.myJobs.getJob(Skill.getParentJobId()).jobLevel >= Skill.getLevelMin();
         } catch (Exception e) {
-            logger.error("Enabled {} with SkillLevel {}", Skill.parentJobId, Skill.levelMin);
+            logger.error("Enabled {} with SkillLevel {}", Skill.getParentJobId(), Skill.getLevelMin());
             e.printStackTrace();
             return false;
         }
@@ -85,19 +85,19 @@ public class Collect implements InteractiveAction {
         if (Aborted) {
             return;
         }
-        player.currentMap.sendToField(new InteractiveUseEndedMessage(element, this.Skill.ID));
-        int quantityGathered = EffectHelper.randomValue(player.myJobs.getJob(Skill.parentJobId).quantity(Skill.levelMin));
-        int bonusQuantity = EffectHelper.randomValue(player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).bonusMin, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).bonusMax);
+        player.currentMap.sendToField(new InteractiveUseEndedMessage(element, this.Skill.getID()));
+        int quantityGathered = EffectHelper.randomValue(player.myJobs.getJob(Skill.getParentJobId()).quantity(Skill.getLevelMin()));
+        int bonusQuantity = EffectHelper.randomValue(player.myJobs.getJob(Skill.getParentJobId()).jobEntity(Skill.getLevelMin()).getBonusMin(), player.myJobs.getJob(Skill.getParentJobId()).jobEntity(Skill.getLevelMin()).getBonusMax());
         if (AgeBonus > 0) {
             bonusQuantity += (int) ((float) bonusQuantity * AgeBonus / 100);
         }
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.gatheredRessourceItem, 63, player.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.getGatheredRessourceItem(), 63, player.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.getGatheredRessourceItem()).possibleEffects, EffectGenerationType.Normal, false));
         if (player.inventoryCache.add(item, true)) {
             item.needInsert = true;
         }
-        player.myJobs.getJob(Skill.parentJobId).gatheringItems += bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered;
-        player.send(bonusQuantity > 0 ? new ObtainedItemWithBonusMessage(Skill.gatheredRessourceItem, quantityGathered, bonusQuantity) : new ObtainedItemMessage(Skill.gatheredRessourceItem, quantityGathered));
-        player.myJobs.addExperience(player, Skill.parentJobId, player.myJobs.getJob(Skill.parentJobId).jobEntity(Skill.levelMin).xpEarned * DAO.getSettings().getIntElement("job.Rate"));
+        player.myJobs.getJob(Skill.getParentJobId()).gatheringItems += bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered;
+        player.send(bonusQuantity > 0 ? new ObtainedItemWithBonusMessage(Skill.getGatheredRessourceItem(), quantityGathered, bonusQuantity) : new ObtainedItemMessage(Skill.getGatheredRessourceItem(), quantityGathered));
+        player.myJobs.addExperience(player, Skill.getParentJobId(), player.myJobs.getJob(Skill.getParentJobId()).jobEntity(Skill.getLevelMin()).getXpEarned() * DAO.getSettings().getIntElement("job.Rate"));
         player.currentMap.getStatedElementById(element).elementState = 1;
         player.currentMap.getStatedElementById(element).deadAt = System.currentTimeMillis();
         player.currentMap.getInteractiveElementStruct(element).ageBonus = -1;

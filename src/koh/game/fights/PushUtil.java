@@ -162,9 +162,9 @@ public class PushUtil {
         boolean buffPreventPush = (((!((!pEntityInfo.hasState(6))) || (!((!pEntityInfo.hasState(97)))))));
         boolean canBePushed = true;
         if ((pEntityInfo instanceof MonsterFighter)) {
-            canBePushed = ((MonsterFighter) pEntityInfo).Grade.Monster().canBePushed;
+            canBePushed = ((MonsterFighter) pEntityInfo).Grade.getMonster().canBePushed;
         } else if ((pEntityInfo instanceof StaticFighter)) {
-            canBePushed = ((StaticFighter) pEntityInfo).Grade.Monster().canBePushed;
+            canBePushed = ((StaticFighter) pEntityInfo).Grade.getMonster().canBePushed;
         }
         return (((!(buffPreventPush)) && (canBePushed)));
     }

@@ -51,61 +51,30 @@ public class JobDAOImpl extends JobDAO {
     }
     
     private int loadAllGathering() {
-        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from job_gathering", 0)) {
             ResultSet result = conn.getResult();
             while (result.next()) {
-                gatheringJobs.put(result.getInt("start_level"), new JobGatheringInfos() {
-                    {
-                        for(int i=0; i<=200; i+=20) {
-                            this.gatheringByLevel.put(i, this.toCouple(result.getString("level"+i)));
-                        }
-                        this.bonusMin = Integer.parseInt(result.getString("bonus").split("-")[0]);
-                        this.bonusMax = Integer.parseInt(result.getString("bonus").split("-")[1]);
-                        this.xpEarned = result.getInt("xp_earned");
-                    }
-                });
-                i++;
+                gatheringJobs.put(result.getInt("start_level"), new JobGatheringInfos(result));
             }
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
-        return i;
+        return gatheringJobs.size();
     }
     
     public int loadAllSkills() {
-        int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from maps_interactive_skills", 0)) {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                skills.put(result.getInt("id"), new InteractiveSkill() {
-                    {
-                        ID = result.getInt("id");
-                        type = result.getString("name");
-                        parentJobId = result.getByte("parent_job");
-                        isForgemagus = result.getBoolean("is_forgemagus");
-                        modifiableItemTypeId = Enumerable.StringToIntArray(result.getString("modifiable_item_ids"));
-                        gatheredRessourceItem = result.getInt("gathered_ressource_item");
-                        craftableItemIds = Enumerable.StringToIntArray(result.getString("craftable_item_ids"));
-                        interactiveId = result.getInt("interactive_id");
-                        useAnimation = result.getString("use_animation");
-                        elementActionId = result.getInt("element_action_id");
-                        isRepair = result.getBoolean("is_repair");
-                        cursor = result.getInt("cursor");
-                        availableInHouse = result.getBoolean("available_in_house");
-                        clientDisplay = result.getBoolean("client_display");
-                        levelMin = result.getInt("level_min");
-                    }
-                });
-                i++;
+                skills.put(result.getInt("id"), new InteractiveSkill(result));
             }
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
-        return i;
+        return skills.size();
     }
 
     @Override

@@ -20,6 +20,16 @@ public abstract class ItemTemplateDAO implements Service {
 
     private static final Logger logger = LogManager.getLogger(ItemTemplateDAO.class);
 
+    public static EffectInstanceDice[] readDiceEffects(byte[] blob){
+        IoBuffer buf = IoBuffer.wrap(blob);
+        EffectInstanceDice[] possibleEffects = new EffectInstanceDice[buf.getInt()];
+        for (int i = 0; i < possibleEffects.length; i++) {
+            possibleEffects[i] = new EffectInstanceDice(buf);
+        }
+        buf.clear();
+        return possibleEffects;
+    }
+
     public static EffectInstance[] readEffectInstance(IoBuffer buf) {
         EffectInstance[] possibleEffectstype = new EffectInstance[buf.getInt()];
         for (int i = 0; i < possibleEffectstype.length; ++i) {

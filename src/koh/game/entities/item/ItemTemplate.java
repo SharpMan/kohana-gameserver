@@ -74,7 +74,7 @@ public class ItemTemplate {
     
     public ItemSuperTypeEnum getSuperType() {
         try {
-            return ItemSuperTypeEnum.valueOf(DAO.getItemTemplates().getType(typeId).superType);
+            return ItemSuperTypeEnum.valueOf(DAO.getItemTemplates().getType(typeId).getSuperType());
         } catch (java.lang.NullPointerException e) {
             return ItemSuperTypeEnum.SUPERTYPE_UNKNOWN_0;
         }

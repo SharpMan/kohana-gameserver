@@ -338,7 +338,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return (int) Math.floor((double) this.stats.getTotal(StatsEnum.Wisdom) / 4) + this.stats.getTotal(StatsEnum.DodgePMLostProbability);
     }
 
-    public int getTackledMP() { //Sould be implements in summoner,Monster return 0
+    public int getTackledMP() { //Sould be implements in summoner,getMonster return 0
         if (this.visibleState != GameActionFightInvisibilityStateEnum.VISIBLE) {
             return 0;
         }
