@@ -1,11 +1,9 @@
 package koh.game.actions.interactive;
 
 import koh.concurrency.CancellableScheduledRunnable;
-import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -65,7 +63,7 @@ public class Collect implements InteractiveAction {
 
         actor.currentMap.sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(actor.currentMap.toInteractiveElement(Player, element))));
         actor.currentMap.sendToField(new StatedElementUpdatedMessage(actor.currentMap.getStatedElementById(element)));
-        new CancellableScheduledRunnable(actor.currentMap.getArea().BackGroundWorker, this.getDuration() * 100) {
+        new CancellableScheduledRunnable(actor.currentMap.getArea().backGroundWorker, this.getDuration() * 100) {
             @Override
             public void run() {
                 try {

@@ -90,11 +90,11 @@ public class MapDAOImpl extends MapDAO {
 
             while (result.next()) {
                 try {
-                    if (subWays.get(DAO.getAreas().getSubArea(result.getInt("subarea")).area.id) == null) {
-                        subWays.put(DAO.getAreas().getSubArea(result.getInt("subarea")).area.id, new ArrayList<>());
+                    if (subWays.get(DAO.getAreas().getSubArea(result.getInt("subarea")).getArea().getId()) == null) {
+                        subWays.put(DAO.getAreas().getSubArea(result.getInt("subarea")).getArea().getId(), new ArrayList<>());
                     }
 
-                    subWays.get(DAO.getAreas().getSubArea(result.getInt("subarea")).area.id).add(new DofusZaap() {
+                    subWays.get(DAO.getAreas().getSubArea(result.getInt("subarea")).getArea().getId()).add(new DofusZaap() {
                         {
                             this.Mapid = result.getInt("mapid");
                             this.Cell = result.getShort("cell");

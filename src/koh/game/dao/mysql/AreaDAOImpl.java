@@ -34,19 +34,19 @@ public class AreaDAOImpl extends AreaDAO {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from areas", 0)) {
             ResultSet result = conn.getResult();
-
+            Area myArea = null;
             while (result.next()) {
-                areas.put(result.getInt("id"), new Area() {
-                    {
-                        this.id = result.getInt("id");
-                        this.superArea = superAreas.get(result.getInt("super_area"));
-                        this.containHouses = result.getBoolean("contain_houses");
-                        this.containPaddocks = result.getBoolean("contain_paddocks");
-                        this.worldmapId = result.getInt("world_map_id");
-                        this.hasWorldMap = result.getBoolean("has_world_map");
-                        superAreas.get(result.getInt("super_area")).areas = ArrayUtils.add(superAreas.get(result.getInt("super_area")).areas, this);
-                    }
-                });
+                myArea = Area.builder()
+                        .id(result.getInt("id"))
+                        .superArea(superAreas.get(result.getInt("super_area")))
+                        .containHouses(result.getBoolean("contain_houses"))
+                        .containPaddocks(result.getBoolean("contain_paddocks"))
+                        .worldmapId(result.getInt("world_map_id"))
+                        .hasWorldMap(result.getBoolean("has_world_map"))
+                        .build();
+                myArea.getSuperArea().setAreas(ArrayUtils.add(myArea.getSuperArea().getAreas(), myArea));
+                myArea.onBuilt();
+                areas.put(result.getInt("id"), myArea);
 
                 ++i;
             }
@@ -61,27 +61,26 @@ public class AreaDAOImpl extends AreaDAO {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from sub_area", 0)) {
             ResultSet result = conn.getResult();
-
+            SubArea mySubarea = null;
             while (result.next()) {
-                subAreas.put(result.getInt("id"), new SubArea() {
-                    {
-                        this.id = result.getInt("id");
-                        this.area = areas.get(result.getInt("area_id"));
-                        this.mapIds = Enumerable.StringToIntArray(result.getString("map_ids"));
-                        this.shape = Enumerable.StringToIntArray(result.getString("shape"));
-                        this.customWorldMaptype = Enumerable.StringToIntArray(result.getString("custom_world_map"));
-                        this.packId = result.getInt("pack_id");
-                        this.level = result.getInt("level");
-                        this.isConquestVillage = result.getBoolean("is_conquest_village");
-                        this.basicAccountAllowed = result.getBoolean("basic_account_allowed");
-                        this.displayOnWorldMap = result.getBoolean("display_on_world_map");
-                        this.monsters = Enumerable.StringToIntArray(result.getString("monsters"));
-                        this.entranceMapIds = Enumerable.StringToIntArray(result.getString("entrance_map_ids"));
-                        this.exitMapIds = Enumerable.StringToIntArray(result.getString("exit_map_ids"));
-                        this.capturable = result.getBoolean("capturable");
-                        areas.get(result.getInt("area_id")).subAreas = ArrayUtils.add(areas.get(result.getInt("area_id")).subAreas, this);
-                    }
-                });
+                mySubarea = SubArea.builder()
+                        .id(result.getInt("id"))
+                        .area(areas.get(result.getInt("area_id")))
+                        .mapIds(Enumerable.StringToIntArray(result.getString("map_ids")))
+                        .shape(Enumerable.StringToIntArray(result.getString("shape")))
+                        .customWorldMaptype(Enumerable.StringToIntArray(result.getString("custom_world_map")))
+                        .packId(result.getInt("pack_id"))
+                        .level(result.getInt("level"))
+                        .isConquestVillage(result.getBoolean("is_conquest_village"))
+                        .basicAccountAllowed(result.getBoolean("basic_account_allowed"))
+                        .displayOnWorldMap(result.getBoolean("display_on_world_map"))
+                        .monsters(Enumerable.StringToIntArray(result.getString("monsters")))
+                        .entranceMapIds(Enumerable.StringToIntArray(result.getString("entrance_map_ids")))
+                        .exitMapIds(Enumerable.StringToIntArray(result.getString("exit_map_ids")))
+                        .capturable(result.getBoolean("capturable"))
+                        .build();
+                mySubarea.getArea().getSubAreas().add(mySubarea);
+                subAreas.put(result.getInt("id"), mySubarea);
 
                 ++i;
             }
@@ -96,14 +95,14 @@ public class AreaDAOImpl extends AreaDAO {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from super_areas", 0)) {
             ResultSet result = conn.getResult();
+            SuperArea klass;
             while (result.next()) {
-                superAreas.put(result.getInt("id"), new SuperArea() {
-                    {
-                        this.id = result.getInt("id");
-                        this.worldmapIdtype = result.getInt("world_map_id");
-                        this.hasWorldMaptype = result.getBoolean("has_world_map");
-                    }
-                });
+                klass = SuperArea.builder()
+                        .id(result.getInt("id"))
+                        .worldMapId(result.getInt("world_map_id"))
+                        .hasWorldMaptype(result.getBoolean("has_world_map"))
+                        .build();
+                superAreas.put(result.getInt("id"), klass);
 
                 ++i;
             }

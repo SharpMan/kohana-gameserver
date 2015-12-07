@@ -124,7 +124,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public Area getArea() {
-        return getSubArea() != null ? getSubArea().area : DAO.getAreas().getSubArea(0).area;
+        return getSubArea() != null ? getSubArea().getArea() : DAO.getAreas().getSubArea(0).getArea();
     }
 
     public MapCoordinates coordinates() {
