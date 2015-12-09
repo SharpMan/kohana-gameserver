@@ -413,14 +413,14 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             droppedItems = Collections.synchronizedMap(new HashMap<>());
         }
         this.droppedItems.put(cell, item);
-        this.sendToField(new ObjectGroundAddedMessage(cell, item.templateId));
+        this.sendToField(new ObjectGroundAddedMessage(cell, item.getTemplateId()));
     }
 
     public ObjectGroundListAddedMessage objectsGround() {
         if (this.droppedItems == null || this.droppedItems.size() <= 0) {
             return null;
         }
-        return new ObjectGroundListAddedMessage(droppedItems.keySet().toArray(new Short[droppedItems.size()]), droppedItems.values().stream().mapToInt(x -> x.templateId).toArray());
+        return new ObjectGroundListAddedMessage(droppedItems.keySet().toArray(new Short[droppedItems.size()]), droppedItems.values().stream().mapToInt(x -> x.getTemplateId()).toArray());
     }
 
     public IGameActor getActor(int target) {

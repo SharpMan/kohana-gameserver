@@ -78,7 +78,7 @@ public class InventoryHandler {
             return;
         }
         //int msgId, int timeStamp, String owner, int objectGenericId
-        Client.send(new LivingObjectMessageMessage(Message.msgId, (int) Instant.now().getEpochSecond(), Client.character.nickName, Item.ID));
+        Client.send(new LivingObjectMessageMessage(Message.msgId, (int) Instant.now().getEpochSecond(), Client.character.nickName, Item.getID()));
         Client.send(new BasicNoOperationMessage());
     }
 
@@ -106,7 +106,7 @@ public class InventoryHandler {
             Client.character.inventoryCache.removeApparence(Item.getApparrance());
         }
         Item.removeEffect(972);
-        Item.getEffects().add(((ObjectEffectInteger) obviSkin.Clone()).SetValue(Message.skinId));
+        Item.getEffects$Notify().add(((ObjectEffectInteger) obviSkin.Clone()).SetValue(Message.skinId));
         Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getApparrance() != 0) {
             Client.character.inventoryCache.addApparence(Item.getApparrance());
@@ -143,7 +143,7 @@ public class InventoryHandler {
         } else if (Item.isLivingObject()) {
             ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972), obviItem = (ObjectEffectInteger) Item.getEffect(970);
             ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808);
-            if (obviItem == null || obviType == null || obviType.value != Food.getTemplate().typeId || obviTime == null || obviXp == null || obviState == null || obviSkin == null) {
+            if (obviItem == null || obviType == null || obviType.value != Food.getTemplate().getTypeId() || obviTime == null || obviXp == null || obviState == null || obviSkin == null) {
                 Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
                 return;
             }
@@ -153,7 +153,7 @@ public class InventoryHandler {
                 Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
                 return;
             }
-            int xp = Food.getTemplate().level / 2,
+            int xp = Food.getTemplate().getLevel() / 2,
                     oldxp = obviXp.value,
                     state = obviState.value;
             if (newqua == 0) {
@@ -162,14 +162,14 @@ public class InventoryHandler {
                 Client.character.inventoryCache.updateObjectquantity(Food, newqua);
             }
             Item.removeEffect(974);
-            Item.getEffects().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
+            Item.getEffects$Notify().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
             if (state < 2) {
                 Item.removeEffect(971);
-                Item.getEffects().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
+                Item.getEffects$Notify().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
             }
             Item.removeEffect(808);
             Calendar now = Calendar.getInstance();
-            Item.getEffects().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
+            Item.getEffects$Notify().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
 
             Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
             Client.character.send(new InventoryWeightMessage(Client.character.inventoryCache.getWeight(), Client.character.inventoryCache.getTotalWeight()));
@@ -222,7 +222,7 @@ public class InventoryHandler {
         Item.removeEffect(970);
 
         Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
-        if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getTemplate().appearanceId != 0) {
+        if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getTemplate().getAppearanceId() != 0) {
             Client.character.inventoryCache.addApparence(Item.getApparrance());
             Client.character.refreshEntitie();
         }

@@ -58,10 +58,10 @@ public class AccountData {
     }
 
     public void removeItem(Player player, InventoryItem item) {
-        item.needInsert = false;
+        item.setNeedInsert(false);
         item.columsToUpdate = null;
-        this.removeFromDic(item.ID);
-        player.send(new StorageObjectRemoveMessage(item.ID));
+        this.removeFromDic(item.getID());
+        player.send(new StorageObjectRemoveMessage(item.getID()));
         DAO.getItems().delete(item, "storage_items");
     }
 
@@ -86,16 +86,16 @@ public class AccountData {
 
     public boolean add(Player player, InventoryItem item, boolean merge) //muste be true
     {
-        if (merge && tryMergeItem(player, item.templateId, item.effects, item.getSlot(), item.getQuantity(), item, false)) {
+        if (merge && tryMergeItem(player, item.getTemplateId(), item.getEffects$Notify(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
         if (item.getOwner() != id) {
             item.setOwner(id);
         }
-        if (itemscache.containsKey(item.ID)) {
-            removeFromDic(item.ID);
+        if (itemscache.containsKey(item.getID())) {
+            removeFromDic(item.getID());
         }
-        itemscache.put(item.ID, item);
+        itemscache.put(item.getID(), item);
 
         player.send(new StorageObjectUpdateMessage(item.getObjectItem()));
 
@@ -105,10 +105,10 @@ public class AccountData {
     public boolean tryMergeItem(Player player, int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int quantity, InventoryItem removeItem, boolean send) {
         if (slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.itemscache.values()) {
-                if (Item.templateId == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.ID == Item.ID) && Item.Equals(stats) ) {
+                if (Item.getTemplateId() == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.getID() == Item.getID()) && Item.Equals(stats) ) {
                     if (removeItem != null) {
-                        this.removeFromDic(removeItem.ID);
-                        removeItem.needInsert = false;
+                        this.removeFromDic(removeItem.getID());
+                        removeItem.setNeedInsert(false);;
                         DAO.getItems().delete(removeItem, "storage_items");
                         removeItem.columsToUpdate = null;
                     }
@@ -220,9 +220,9 @@ public class AccountData {
     public void save(boolean clear) {
         synchronized (itemscache) {
             this.itemscache.values().parallelStream().forEach(Item -> {
-                if (Item.NeedRemove) {
+                if (Item.isNeedRemove()) {
                     DAO.getItems().delete(Item, "storage_items");
-                } else if (Item.needInsert) {
+                } else if (Item.isNeedInsert()) {
                     DAO.getItems().create(Item, clear, "storage_items");
                 } else if (Item.columsToUpdate != null && !Item.columsToUpdate.isEmpty()) {
                     DAO.getItems().save(Item, clear, "storage_items");

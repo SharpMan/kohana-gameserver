@@ -82,7 +82,7 @@ public class PetTemplate {
 
 
     public boolean canEat(ItemTemplate Item) {
-        return Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.itemID).toArray(), Item.id) || Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.itemID).toArray(), Item.typeId);
+        return Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.itemID).toArray(), Item.getId()) || Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.itemID).toArray(), Item.getTypeId());
     }
 
     public EffectInstance getEffect(int id) {

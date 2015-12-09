@@ -75,16 +75,16 @@ public class CharacterInventory {
 
     public boolean add(InventoryItem item, boolean merge) //muste be true
     {
-        if (merge && !Ints.contains(unMergeableType, item.getTemplate().typeId) && tryMergeItem(item.templateId, item.effects, item.getSlot(), item.getQuantity(), item, false)) {
+        if (merge && !Ints.contains(unMergeableType, item.getTemplate().getTypeId()) && tryMergeItem(item.getTemplateId(), item.getEffects(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
         if (item.getOwner() != this.player.ID) {
             item.setOwner(this.player.ID);
         }
-        if (itemsCache.containsKey(item.ID)) {
-            removeFromDic(item.ID);
+        if (itemsCache.containsKey(item.getID())) {
+            removeFromDic(item.getID());
         }
-        itemsCache.put(item.ID, item);
+        itemsCache.put(item.getID(), item);
 
         player.send(new ObjectAddedMessage(item.getObjectItem()));
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
@@ -107,14 +107,14 @@ public class CharacterInventory {
     public boolean tryMergeItem(int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int quantity, InventoryItem removeItem, boolean send) {
         if (slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             for (InventoryItem Item : this.itemsCache.values()) {
-                if (Item.templateId == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.ID == Item.ID) && Item.Equals(stats)) {
+                if (Item.getTemplateId() == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.getID() == Item.getID()) && Item.Equals(stats)) {
                     if (removeItem != null) {
-                        this.removeFromDic(removeItem.ID);
-                        removeItem.needInsert = false;
+                        this.removeFromDic(removeItem.getID());
+                        removeItem.setNeedInsert(false);
                         DAO.getItems().delete(removeItem, "character_items");
                         removeItem.columsToUpdate = null;
                         if (send) {
-                            player.send(new ObjectDeletedMessage(removeItem.ID));
+                            player.send(new ObjectDeletedMessage(removeItem.getID()));
                         }
                     }
                     this.updateObjectquantity(Item, Item.getQuantity() + quantity);
@@ -184,7 +184,7 @@ public class CharacterInventory {
 
     public void MoveLivingItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
         InventoryItem Item = this.itemsCache.get(guid);
-        slot = this.getLivingObjectSlot(Item.templateId);
+        slot = this.getLivingObjectSlot(Item.getTemplateId());
         InventoryItem exItem = this.getItemInSlot(slot);
         if (exItem == null) {
             player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
@@ -209,15 +209,15 @@ public class CharacterInventory {
             //this.player.getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(exItem.getApparrance()));
         }
 
-        exItem.getEffects().add(new ObjectEffectInteger(970, Item.templateId));
-        exItem.getEffects().add(obviXp.Clone());
-        exItem.getEffects().add(obviTime.Clone());
-        exItem.getEffects().add(obviType.Clone());
-        exItem.getEffects().add(obviState.Clone());
-        exItem.getEffects().add(obviSkin.Clone());
+        exItem.getEffects$Notify().add(new ObjectEffectInteger(970, Item.getTemplateId()));
+        exItem.getEffects$Notify().add(obviXp.Clone());
+        exItem.getEffects$Notify().add(obviTime.Clone());
+        exItem.getEffects$Notify().add(obviType.Clone());
+        exItem.getEffects$Notify().add(obviState.Clone());
+        exItem.getEffects$Notify().add(obviSkin.Clone());
 
         if (exchangeTime != null) {
-            exItem.getEffects().add(exchangeTime.Clone());
+            exItem.getEffects$Notify().add(exchangeTime.Clone());
         }
 
         if (Item.getQuantity() == 1) {
@@ -240,9 +240,9 @@ public class CharacterInventory {
             player.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_UNEQUIP));
             return;
         }
-        int count = this.countItemSetEquiped(item.getTemplate().itemSetId);
+        int count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
         if (slot != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            if (item.getTemplate().typeId == 113) {
+            if (item.getTemplate().getTypeId() == 113) {
                 this.MoveLivingItem(guid, slot, quantity);
                 return;
             }
@@ -254,7 +254,7 @@ public class CharacterInventory {
             this.unEquipItem(this.getItemInSlot(slot));
             this.unEquipedDouble(item);
 
-            if (item.getTemplate().level > player.level) {
+            if (item.getTemplate().getLevel() > player.level) {
                 player.send(new ObjectErrorMessage(ObjectErrorEnum.LEVEL_TOO_LOW));
                 return;
             }
@@ -263,7 +263,7 @@ public class CharacterInventory {
                 player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 78, new String[0]));
                 return;
             }
-            if (item.isWeapon() && item.getTemplate().twoHanded && getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD) != null) {
+            if (item.isWeapon() && item.getTemplate().isTwoHanded() && getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD) != null) {
                 player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 79, new String[0]));
                 return;
             }
@@ -275,29 +275,29 @@ public class CharacterInventory {
 
             if (item.getQuantity() > 1) {
                 /*InventoryItem NewItem = */
-                tryCreateItem(item.templateId, this.player, 1, slot.value(), item.getEffectsCopy());
+                tryCreateItem(item.getTemplateId(), this.player, 1, slot.value(), item.getEffectsCopy());
                 this.updateObjectquantity(item, item.getQuantity() - 1);
                 return;
             }
             if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
                 item.setPosition(slot);
-                player.send(new ObjectMovementMessage(item.ID, (byte) item.getPosition()));
+                player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
             } else {
                 player.stats.merge(item.getStats());
                 this.player.life += item.getStats().getTotal(StatsEnum.Vitality);
                 item.setPosition(slot);
-                player.send(new ObjectMovementMessage(item.ID, (byte) item.getPosition()));
+                player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
                 if (item.getApparrance() != 0) {
                     if (slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) {
                         if (this.player.mountInfo.isToogled) {
                             this.player.mountInfo.onGettingOff();
                         }
                         //TODO:  clean Code + clear old ArrayList from  memory
-                        if (item.getTemplate().typeId == 121) { //Montelier
+                        if (item.getTemplate().getTypeId() == 121) { //Montelier
                             this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
                             this.player.getEntityLook().bonesId = item.getApparrance();
                             this.player.getEntityLook().skins.clear();
-                            if (item.templateId != ItemsEnum.Kramkram) {
+                            if (item.getTemplateId() != ItemsEnum.Kramkram) {
                                 this.player.getEntityLook().indexedColors.clear();
                             }
                             this.player.getEntityLook().scales.clear();
@@ -324,14 +324,14 @@ public class CharacterInventory {
                 this.player.refreshStats();
             }
             // On tente de fusionner
-            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET || !this.tryMergeItem(item.templateId, item.effects, slot, item.getQuantity(), item)) {
+            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET || !this.tryMergeItem(item.getTemplateId(), item.getEffects(), slot, item.getQuantity(), item)) {
                 item.setPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
-                player.send(new ObjectMovementMessage(item.ID, (byte) item.getPosition()));
+                player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
             }
 
             if (item.getApparrance() != 0) {
                 if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-                    if (item.getTemplate().typeId == 121) { //Montelier
+                    if (item.getTemplate().getTypeId() == 121) { //Montelier
                         try {
                             this.player.getEntityLook().bonesId = (short) 1;
                             this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
@@ -354,7 +354,7 @@ public class CharacterInventory {
             if (count >= 0) {
                 this.applyItemSetEffects(item.getTemplate().getItemSet(), count, false, true);
             }
-            count = this.countItemSetEquiped(item.getTemplate().itemSetId);
+            count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
             if (count > 0) {
                 this.applyItemSetEffects(item.getTemplate().getItemSet(), count, true, false);
             }
@@ -368,7 +368,7 @@ public class CharacterInventory {
 
     public void beforeItemSet(InventoryItem Item) {
         if (Item.getTemplate().getItemSet() != null) {
-            int count = this.countItemSetEquiped(Item.getTemplate().itemSetId);
+            int count = this.countItemSetEquiped(Item.getTemplate().getItemSetId());
             if (count >= 0) {
                 this.applyItemSetEffects(Item.getTemplate().getItemSet(), count, false, true);
             }
@@ -377,7 +377,7 @@ public class CharacterInventory {
 
     public void afterItemSet(InventoryItem Item) {
         if (Item.getTemplate().getItemSet() != null) {
-            int count = this.countItemSetEquiped(Item.getTemplate().itemSetId);
+            int count = this.countItemSetEquiped(Item.getTemplate().getItemSetId());
             if (count > 0) {
                 this.applyItemSetEffects(Item.getTemplate().getItemSet(), count, true, false);
             }
@@ -386,11 +386,11 @@ public class CharacterInventory {
     }
 
     public void sendSetUpdateMessage(ItemSet set, int count) {
-        this.player.send(new SetUpdateMessage(set.getId(), this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().itemSetId == set.getId()).mapToInt(x -> x.templateId).toArray(), set.toObjectEffects(count)));
+        this.player.send(new SetUpdateMessage(set.getId(), this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSetId() == set.getId()).mapToInt(x -> x.getTemplateId()).toArray(), set.toObjectEffects(count)));
     }
 
     private int countItemSetEquiped(int id) {
-        return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().itemSetId == id).count();
+        return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSetId() == id).count();
     }
 
     private void applyItemSetEffects(ItemSet itemSet, int count, boolean apply, boolean send) {
@@ -422,8 +422,8 @@ public class CharacterInventory {
             return null;
 
         // Creation
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.ID : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(Template.possibleEffects, EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
-        item.needInsert = true;
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.ID : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(Template.getPossibleEffects(), EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
+        item.setNeedInsert(true);
         item.getStats();
         if (character != null) {
             character.inventoryCache.add(item, Merge);
@@ -434,18 +434,18 @@ public class CharacterInventory {
 
     private boolean unEquipedDouble(InventoryItem itemToEquip) {
         if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_DOFUS) {
-            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.templateId == itemToEquip.templateId).findFirst();
+            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.getID() != itemToEquip.getID() && x.getTemplateId() == itemToEquip.getTemplateId()).findFirst();
 
             if (playerItem.isPresent()) {
-                this.moveItem(playerItem.get().ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
+                this.moveItem(playerItem.get().getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
                 return true;
             }
         }
         if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_RING) {
-            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.templateId == itemToEquip.templateId && x.getTemplate().itemSetId > 0).findFirst();
+            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.getID() != itemToEquip.getID() && x.getTemplateId()== itemToEquip.getTemplateId() && x.getTemplate().getItemSetId() > 0).findFirst();
 
             if (playerItem.isPresent()) {
-                this.moveItem(playerItem.get().ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
+                this.moveItem(playerItem.get().getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
                 return true;
             }
         }
@@ -457,7 +457,7 @@ public class CharacterInventory {
     }
 
     public InventoryItem getItemInTemplate(int template) {
-            return this.itemsCache.values().stream().filter(x -> x.templateId == template).findFirst().orElse(null);
+            return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == template).findFirst().orElse(null);
     }
 
     public InventoryItem getItemInSlot(CharacterInventoryPositionEnum slot) {
@@ -469,7 +469,7 @@ public class CharacterInventory {
     }
 
     public boolean hasWeaponTwoHanded() {
-        return getWeapon() != null && getWeapon().getTemplate().twoHanded;
+        return getWeapon() != null && getWeapon().getTemplate().isTwoHanded();
     }
 
     public int getWeight() {
@@ -486,30 +486,30 @@ public class CharacterInventory {
             this.removeItem(item);
             return;
         }
-        player.send(new ObjectQuantityMessage(item.ID, item.getQuantity()));
+        player.send(new ObjectQuantityMessage(item.getID(), item.getQuantity()));
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
     }
 
     public void removeItem(InventoryItem item) {
-        item.needInsert = false;
-        this.removeFromDic(item.ID);
-        player.send(new ObjectDeletedMessage(item.ID));
+        item.setNeedInsert(false);
+        this.removeFromDic(item.getID());
+        player.send(new ObjectDeletedMessage(item.getID()));
         DAO.getItems().delete(item, "character_items");
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
     }
 
     public void ChangeOwner(InventoryItem item, Player trader) {
-        this.removeFromDic(item.ID);
-        player.send(new ObjectDeletedMessage(item.ID));
+        this.removeFromDic(item.getID());
+        player.send(new ObjectDeletedMessage(item.getID()));
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
         trader.inventoryCache.add(item, true);
     }
 
     public void removeItemFromInventory(InventoryItem item) {
-        item.needInsert = false;
+        item.setNeedInsert(false);
         item.setOwner(-1);
-        this.removeFromDic(item.ID);
-        player.send(new ObjectDeletedMessage(item.ID));
+        this.removeFromDic(item.getID());
+        player.send(new ObjectDeletedMessage(item.getID()));
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
     }
 
@@ -552,7 +552,7 @@ public class CharacterInventory {
     }
 
     public boolean isDriven() {
-        return this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null && this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS).getTemplate().typeId == 121;
+        return this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null && this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS).getTemplate().getTypeId() == 121;
     }
 
     public void unEquipItem(InventoryItem equipedItem) {
@@ -565,7 +565,7 @@ public class CharacterInventory {
         this.player.life -= equipedItem.getStats().getTotal(StatsEnum.Vitality);
         if (equipedItem.getApparrance() != 0) {
             if (equipedItem.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-                if (equipedItem.getTemplate().typeId == 121) { //Montelier
+                if (equipedItem.getTemplate().getTypeId() == 121) { //Montelier
                     try {
                         this.player.getEntityLook().bonesId = (short) 1;
                         this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
@@ -585,25 +585,25 @@ public class CharacterInventory {
         }
         equipedItem.setPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
         this.afterItemSet(equipedItem);
-        player.send(new ObjectMovementMessage(equipedItem.ID, (byte) equipedItem.getPosition()));
+        player.send(new ObjectMovementMessage(equipedItem.getID(), (byte) equipedItem.getPosition()));
 
     }
 
     public boolean hasItemId(int parseInt) {
-        return this.itemsCache.values().stream().filter(x -> x.templateId == parseInt).findAny().isPresent();
+        return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == parseInt).findAny().isPresent();
     }
 
     private void checkItemsCriterias() {
         //(!ConditionParser.validConditions(player, x.getTemplate().criteria)))
         this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && !x.areConditionFilled(player)).forEach((Item) -> {
-            this.moveItem(Item.ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
+            this.moveItem(Item.getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
         });
     }
 
     public short weaponCriticalHit() {
         InventoryItem playerItem;
         if ((playerItem = this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)) != null) {
-            return playerItem.getTemplate() instanceof Weapon ? (short) ((Weapon) playerItem.getTemplate()).criticalHitBonus : 0;
+            return playerItem.getTemplate() instanceof Weapon ? (short) ((Weapon) playerItem.getTemplate()).getCriticalHitBonus() : 0;
         } else {
             return 0;
         }
@@ -611,9 +611,9 @@ public class CharacterInventory {
 
     public void save(boolean Clear) {
         this.itemsCache.values().parallelStream().forEach(Item -> {
-            if (Item.NeedRemove) {
+            if (Item.isNeedRemove()) {
                 DAO.getItems().delete(Item, "character_items");
-            } else if (Item.needInsert) {
+            } else if (Item.isNeedInsert()) {
                 DAO.getItems().create(Item, Clear, "character_items");
             } else if (Item.columsToUpdate != null && !Item.columsToUpdate.isEmpty()) {
                 DAO.getItems().create(Item, Clear, "character_items");

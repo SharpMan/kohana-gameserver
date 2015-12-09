@@ -98,14 +98,14 @@ public class ItemDAOImpl extends ItemDAO {
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `" + table + "` VALUES (?,?,?,?,?,?);")) {
             PreparedStatement pStatement = conn.getStatement();
 
-            pStatement.setInt(1, item.ID);
+            pStatement.setInt(1, item.getID());
             pStatement.setInt(2, item.getOwner());
-            pStatement.setInt(3, item.templateId);
+            pStatement.setInt(3, item.getTemplateId());
             pStatement.setInt(4, item.getPosition());
             pStatement.setInt(5, item.getQuantity());
             pStatement.setBytes(6, item.serializeEffectInstanceDice().array());
 
-            item.needInsert = false;
+            item.setNeedInsert(false);;
             item.columsToUpdate = null;
 
             pStatement.execute();
@@ -157,7 +157,7 @@ public class ItemDAOImpl extends ItemDAO {
         try {
             switch (Column) {
                 case "id":
-                    p.setInt(Seq, Item.ID);
+                    p.setInt(Seq, Item.getID());
                     break;
                 case "owner":
                     p.setInt(Seq, Item.getOwner());
@@ -185,7 +185,7 @@ public class ItemDAOImpl extends ItemDAO {
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("DELETE from `" + table + "` WHERE id = ?;")) {
             PreparedStatement pStatement = conn.getStatement();
 
-            pStatement.setInt(1, item.ID);
+            pStatement.setInt(1, item.getID());
             pStatement.execute();
 
             return true;

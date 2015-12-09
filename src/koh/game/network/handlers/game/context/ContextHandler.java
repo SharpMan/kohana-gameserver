@@ -136,7 +136,7 @@ public class ContextHandler {
             DAO.getItems().save(Item, false, "character_items");
         } else {
             Client.character.inventoryCache.updateObjectquantity(Item, newQua);
-            Item = CharacterInventory.tryCreateItem(Item.templateId, null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
+            Item = CharacterInventory.tryCreateItem(Item.getTemplateId(), null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
         }
 
         Client.character.currentMap.addItem(cellID, Item);

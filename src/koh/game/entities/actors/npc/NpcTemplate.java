@@ -62,13 +62,13 @@ public class NpcTemplate {
             } else {
                 Stream<NpcItem> Objects = this.Items.values().stream();
                 if (this.id == 816) {
-                    Objects = Objects.filter(Item -> Item.getTemplate().level > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().typeId, e2.getTemplate().typeId)), ((e1, e2) -> Integer.compare(e1.getTemplate().level, e2.getTemplate().level))));
+                    Objects = Objects.filter(Item -> Item.getTemplate().getLevel() > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().getTypeId(), e2.getTemplate().getTypeId())), ((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()))));
                 }
                 if (this.OrderItemsByPrice) {
                     Objects = Objects.sorted((e1, e2) -> Float.compare(e1.getPrice(), e2.getPrice()));
                 }
                 if (this.OrderItemsByLevel) {
-                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().level, e2.getTemplate().level));
+                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()));
                 }
 
                 itemList = Objects.map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);

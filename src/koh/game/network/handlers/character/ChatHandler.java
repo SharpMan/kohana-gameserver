@@ -372,12 +372,12 @@ public class ChatHandler {
                         if (template.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
                             Qua = 1;
                         }
-                        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Id, 63, Client.character.ID, Qua, EffectHelper.generateIntegerEffect(template.possibleEffects, Type, template instanceof Weapon));
+                        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Id, 63, Client.character.ID, Qua, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), Type, template instanceof Weapon));
 
                         if (Client.character.inventoryCache.add(Item, true)) {
-                            Item.needInsert = true;
+                            Item.setNeedInsert(true);
                         }
-                        PlayerController.sendServerMessage(Client, String.format("%s  added to your inventory with %s stats", template.nameId, Type.toString()));
+                        PlayerController.sendServerMessage(Client, String.format("%s  added to your inventory with %s stats", template.getNameId(), Type.toString()));
 
                     } catch (Exception e) {
                         e.printStackTrace();

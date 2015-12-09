@@ -19,7 +19,7 @@ public class NpcItem {
     public float customPrice;
 
     public float getPrice() {
-        return customPrice == -1 ? getTemplate().price : this.customPrice;
+        return customPrice == -1 ? getTemplate().getPrice() : this.customPrice;
     }
 
     public EffectGenerationType genType(){
@@ -36,7 +36,7 @@ public class NpcItem {
 
     /*/int objectGID, ObjectEffect[] effects, int objectPrice, String buyCriterion*/
     public ObjectItemToSellInNpcShop toShop() {
-        return new ObjectItemToSellInNpcShop(this.item, EffectHelper.toObjectEffects(this.getTemplate().possibleEffects), (int) getPrice(), this.buyCriterion);
+        return new ObjectItemToSellInNpcShop(this.item, EffectHelper.toObjectEffects(this.getTemplate().getPossibleEffects()), (int) getPrice(), this.buyCriterion);
     }
 
     public NpcItem() {

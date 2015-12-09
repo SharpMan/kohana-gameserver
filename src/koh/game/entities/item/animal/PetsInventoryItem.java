@@ -93,7 +93,7 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public PetTemplate getAnimal() {
-        return DAO.getItemTemplates().getPetTemplate(this.templateId);
+        return DAO.getItemTemplates().getPetTemplate(this.getTemplateId());
     }
 
     public boolean eat(Player p, InventoryItem food) {
@@ -101,7 +101,7 @@ public class PetsInventoryItem extends InventoryItem {
         PetTemplate pet = getAnimal();
         if (pet == null) {
             return false;
-        } else if (food.templateId == ItemsEnum.EneripsaPouder) {
+        } else if (food.getTemplateId() == ItemsEnum.EneripsaPouder) {
             //TODO : life
             return true;
         } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
@@ -112,14 +112,14 @@ public class PetsInventoryItem extends InventoryItem {
         }
 
         for (FoodItem i : getAnimal().getFoodItems()) {
-            if (food.templateId == i.itemID) {
-                if (!this.eatedFoods.containsKey(food.templateId)) {
-                    this.eatedFoods.put(food.templateId, 0);
+            if (food.getTemplateId() == i.itemID) {
+                if (!this.eatedFoods.containsKey(food.getTemplateId())) {
+                    this.eatedFoods.put(food.getTemplateId(), 0);
                 }
-                this.eatedFoods.put(food.templateId, this.eatedFoods.get(food.templateId) + 1);
+                this.eatedFoods.put(food.getTemplateId(), this.eatedFoods.get(food.getTemplateId()) + 1);
                 this.entity.pointsUsed += i.point;
                 this.boost(i.stats, i.statsPoints);
-                updateFood(food.templateId);
+                updateFood(food.getTemplateId());
                 this.updateDate();
                 this.checkLastEffect();
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
@@ -128,14 +128,14 @@ public class PetsInventoryItem extends InventoryItem {
             }
         }
         for (FoodItem i : getAnimal().getFoodTypes()) {
-            if (food.getTemplate().typeId == i.itemID) {
-                if (!this.eatedFoodsType.containsKey(food.getTemplate().typeId)) {
-                    this.eatedFoodsType.put(food.getTemplate().typeId, 0);
+            if (food.getTemplate().getTypeId() == i.itemID) {
+                if (!this.eatedFoodsType.containsKey(food.getTemplate().getTypeId())) {
+                    this.eatedFoodsType.put(food.getTemplate().getTypeId(), 0);
                 }
-                this.eatedFoodsType.put(food.getTemplate().typeId, this.eatedFoodsType.get(food.getTemplate().typeId) + 1);
+                this.eatedFoodsType.put(food.getTemplate().getTypeId(), this.eatedFoodsType.get(food.getTemplate().getTypeId()) + 1);
                 this.entity.pointsUsed += i.point;
                 this.boost(i.stats, i.statsPoints);
-                updateFood(food.templateId);
+                updateFood(food.getTemplateId());
                 this.updateDate();
                 this.checkLastEffect();
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));

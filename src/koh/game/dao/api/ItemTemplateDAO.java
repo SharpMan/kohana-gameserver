@@ -30,6 +30,18 @@ public abstract class ItemTemplateDAO implements Service {
         return possibleEffects;
     }
 
+    public static int[] parseIds(String recipe_ids) {
+        if (!recipe_ids.trim().isEmpty()) {
+            String[] recipes = recipe_ids.split(",");
+            int[] ids = new int[recipes.length];
+            for (int i = 0; i < recipes.length; i++)
+                ids[i] = Integer.parseInt(recipes[i]);
+            return ids;
+        } else {
+            return new int[0];
+        }
+    }
+
     public static EffectInstance[] readEffectInstance(IoBuffer buf) {
         EffectInstance[] possibleEffectstype = new EffectInstance[buf.getInt()];
         for (int i = 0; i < possibleEffectstype.length; ++i) {

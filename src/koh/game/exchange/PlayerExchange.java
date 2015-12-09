@@ -78,11 +78,11 @@ public class PlayerExchange extends Exchange {
             List<InventoryItem> ModifiedObjects = null;
 
             for (InventoryItem Item : items) {
-                if (this.myItemsToTrade.get(Client).containsKey(Item.ID)) {
-                    if (Item.getQuantity() == this.myItemsToTrade.get(Client).get(Item.ID)) {
+                if (this.myItemsToTrade.get(Client).containsKey(Item.getID())) {
+                    if (Item.getQuantity() == this.myItemsToTrade.get(Client).get(Item.getID())) {
                         items = ArrayUtils.removeElement(items, Item);
                     } else {
-                        this.myItemsToTrade.get(Client).put(Item.ID, Item.getQuantity());
+                        this.myItemsToTrade.get(Client).put(Item.getID(), Item.getQuantity());
                         if (ModifiedObjects == null) {
                             ModifiedObjects = new ArrayList<>();
                         }
@@ -90,7 +90,7 @@ public class PlayerExchange extends Exchange {
                         items = ArrayUtils.removeElement(items, Item);
                     }
                 } else {
-                    this.myItemsToTrade.get(Client).put(Item.ID, Item.getQuantity());
+                    this.myItemsToTrade.get(Client).put(Item.getID(), Item.getQuantity());
                 }
             }
             if (ModifiedObjects != null) {
@@ -132,52 +132,52 @@ public class PlayerExchange extends Exchange {
             return false;
         }
         if (Item.isLinked() || Item.isEquiped()) {
-            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{Item.templateId + "", Item.ID + ""}));
+            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{Item.getTemplateId() + "", Item.getID() + ""}));
             return false;
         }
         this.UnValidateAll();
 
-        if (!this.myItemsToTrade.get(Client).containsKey(Item.ID)) {  //add new item
+        if (!this.myItemsToTrade.get(Client).containsKey(Item.getID())) {  //add new item
             if (quantity <= 0) {
                 return false;
             }
             if (quantity > Item.getQuantity()) {
                 quantity = Item.getQuantity();
             }
-            this.myItemsToTrade.get(Client).put(Item.ID, quantity);
+            this.myItemsToTrade.get(Client).put(Item.getID(), quantity);
 
             if (Client == this.myClient1) {
-                this.myClient1.send(new ExchangeObjectAddedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
-                this.myClient2.send(new ExchangeObjectAddedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
+                this.myClient1.send(new ExchangeObjectAddedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                this.myClient2.send(new ExchangeObjectAddedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
             } else {
-                this.myClient2.send(new ExchangeObjectAddedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
-                this.myClient1.send(new ExchangeObjectAddedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
+                this.myClient2.send(new ExchangeObjectAddedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                this.myClient1.send(new ExchangeObjectAddedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
             }
         } else {
 
-            if (Item.getQuantity() < (this.myItemsToTrade.get(Client).get(Item.ID) + quantity) || (this.myItemsToTrade.get(Client).get(Item.ID) + quantity) < 0) {
+            if (Item.getQuantity() < (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity) || (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity) < 0) {
                 return false;
             }
 
-            if (this.myItemsToTrade.get(Client).get(Item.ID) + quantity == 0) {
-                this.myItemsToTrade.get(Client).remove(Item.ID);
+            if (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity == 0) {
+                this.myItemsToTrade.get(Client).remove(Item.getID());
 
                 if (Client == this.myClient1) {
-                    this.myClient1.send(new ExchangeObjectRemovedMessage(false, Item.ID));
-                    this.myClient2.send(new ExchangeObjectRemovedMessage(true, Item.ID));
+                    this.myClient1.send(new ExchangeObjectRemovedMessage(false, Item.getID()));
+                    this.myClient2.send(new ExchangeObjectRemovedMessage(true, Item.getID()));
                 } else {
-                    this.myClient2.send(new ExchangeObjectRemovedMessage(false, Item.ID));
-                    this.myClient1.send(new ExchangeObjectRemovedMessage(true, Item.ID));
+                    this.myClient2.send(new ExchangeObjectRemovedMessage(false, Item.getID()));
+                    this.myClient1.send(new ExchangeObjectRemovedMessage(true, Item.getID()));
                 }
             } else {
-                this.myItemsToTrade.get(Client).put(Item.ID, (this.myItemsToTrade.get(Client).get(Item.ID) + quantity));
+                this.myItemsToTrade.get(Client).put(Item.getID(), (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity));
 
                 if (Client == this.myClient1) {
-                    this.myClient1.send(new ExchangeObjectModifiedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
-                    this.myClient2.send(new ExchangeObjectModifiedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
+                    this.myClient1.send(new ExchangeObjectModifiedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                    this.myClient2.send(new ExchangeObjectModifiedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
                 } else {
-                    this.myClient2.send(new ExchangeObjectModifiedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
-                    this.myClient1.send(new ExchangeObjectModifiedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.ID))));
+                    this.myClient2.send(new ExchangeObjectModifiedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                    this.myClient1.send(new ExchangeObjectModifiedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
                 }
             }
         }
@@ -270,7 +270,7 @@ public class PlayerExchange extends Exchange {
                 this.myClient1.character.inventoryCache.ChangeOwner(Item, this.myClient2.character);
             } else {
                 this.myClient1.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.templateId, this.myClient2.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient2.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 
@@ -285,7 +285,7 @@ public class PlayerExchange extends Exchange {
                 this.myClient2.character.inventoryCache.ChangeOwner(Item, this.myClient1.character);
             } else {
                 this.myClient2.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.templateId, this.myClient1.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient1.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 

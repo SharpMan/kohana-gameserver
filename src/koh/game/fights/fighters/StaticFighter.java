@@ -51,7 +51,7 @@ public abstract class StaticFighter extends Fighter {
 
     public void onBeginTurn() {
         if (firstTurn) {
-            this.fight.affectSpellTo(this, this, this.Grade.Grade, this.Grade.getMonster().spells);
+            this.fight.affectSpellTo(this, this, this.Grade.Grade, this.Grade.getMonster().getSpells());
             this.firstTurn = false;
         }
     }

@@ -207,7 +207,7 @@ public class EffectInstance implements Serializable {
             if (((((targetIsCarried) && (!((pEffect.ZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.ZoneShape() == SpellShapeEnum.a))))) {
                 return (true);
             };
-            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(DAO.getMonsters().find(monsterInfo.creatureGenericId).canPlay)))) {
+            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(DAO.getMonsters().find(monsterInfo.creatureGenericId).isCanPlay())))) {
                 targetMaskPattern = ((isTargetAlly) ? "agsj" : "ASJ");
             } else {
                 if (targetInfos.stats.summoned) {

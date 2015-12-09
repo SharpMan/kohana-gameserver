@@ -31,17 +31,17 @@ public class StorageExchange extends Exchange {
         InventoryItem newItem = null;
         if (add) {
             for (InventoryItem Item : items) {
-                newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.templateId, 63, Client.getAccount().id, Item.getQuantity(), Item.effects);
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, Client.getAccount().id, Item.getQuantity(), Item.getEffects());
                 if (Client.getAccount().accountData.add(Client.character, newItem, true)) {
-                    newItem.needInsert = true;
+                    newItem.setNeedInsert(true);
                 }
                 Client.character.inventoryCache.updateObjectquantity(Item, 0);
             }
         } else {
             for (InventoryItem Item : items) {
-                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.templateId, 63, Client.character.ID, Item.getQuantity(), Item.effects);
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, Client.character.ID, Item.getQuantity(), Item.getEffects());
                 if (Client.character.inventoryCache.add(newItem, true)) {
-                    newItem.needInsert = true;
+                    newItem.setNeedInsert(true);
                 }
                 Client.getAccount().accountData.updateObjectQuantity(Client.character, Item, 0);
             }
@@ -59,9 +59,9 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             Client.getAccount().accountData.updateObjectQuantity(Client.character, BankItem, BankItem.getQuantity() + quantity);
-            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.templateId, 63, Client.character.ID, -quantity, BankItem.effects);
+            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.getTemplateId(), 63, Client.character.ID, -quantity, BankItem.getEffects());
             if (Client.character.inventoryCache.add(Item, true)) {
-                Item.needInsert = true;
+                Item.setNeedInsert(true);
             }
         } else { //add In bank
             InventoryItem Item = Client.character.inventoryCache.itemsCache.get(itemID);
@@ -69,9 +69,9 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             Client.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - quantity);
-            InventoryItem NewItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.templateId, 63, Client.getAccount().id, quantity, Item.effects);
+            InventoryItem NewItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, Client.getAccount().id, quantity, Item.getEffects());
             if (Client.getAccount().accountData.add(Client.character, NewItem, true)) {
-                NewItem.needInsert = true;
+                NewItem.setNeedInsert(true);
             }
         }
         return true;

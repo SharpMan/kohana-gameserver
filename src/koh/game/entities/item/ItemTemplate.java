@@ -1,14 +1,19 @@
 package koh.game.entities.item;
 
 import com.google.common.base.Strings;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import koh.game.Main;
 import koh.game.conditions.ConditionExpression;
 import koh.game.dao.DAO;
 import koh.game.dao.api.AccountDataDAO;
+import koh.game.dao.api.ItemTemplateDAO;
 import koh.game.entities.spells.EffectInstance;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
+import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,31 +23,76 @@ import org.apache.logging.log4j.Logger;
  * @author Neo-Craft
  */
 public class ItemTemplate {
-    
-    public int id;
-    public String nameId;
-    public int typeId;
-    public int iconId, level, realWeight;
-    public boolean cursed;
-    public int useAnimationId;
-    public boolean usable, targetable, exchangeable;
-    public float price;
-    public boolean twoHanded, etheral;
-    public int itemSetId;
-    public String criteria, criteriaTarget;
-    public boolean hideEffects, enhanceable, nonUsableOnAnother;
-    public short appearanceId;
-    public boolean secretRecipe;
-    public int recipeSlots;
-    public int[] recipeIds, dropMonsterIds;
-    public boolean bonusIsSecret;
-    public EffectInstance[] possibleEffects;
-    public int[] favoriteSubAreas;
-    public int favoriteSubAreasBonus;
+
+    @Getter
+    protected int id,typeId;
+    @Getter
+    private String nameId;
+    @Getter
+    private int iconId, level, realWeight,useAnimationId,itemSetId;
+    @Getter
+    private boolean cursed;
+    @Getter
+    private boolean usable, targetable, exchangeable;
+    @Getter
+    private float price;
+    @Getter
+    private boolean twoHanded, etheral;
+    @Getter
+    private String criteria, criteriaTarget;
+    @Getter
+    private boolean hideEffects, enhanceable, nonUsableOnAnother;
+    @Getter
+    private short appearanceId;
+    @Getter
+    private boolean secretRecipe,bonusIsSecret;
+    @Getter
+    private int recipeSlots;
+    @Getter
+    private int[] recipeIds, dropMonsterIds;
+    @Getter
+    protected EffectInstance[] possibleEffects;
+    @Getter
+    private int[] favoriteSubAreas;
+    @Getter
+    private int favoriteSubAreasBonus;
+    @Getter
     private ConditionExpression m_criteriaExpression;
 
     private static final Logger logger = LogManager.getLogger(ItemTemplate.class);
-    
+
+    public ItemTemplate(ResultSet result) throws SQLException {
+        id = result.getInt("id");
+        this.nameId = result.getString("name");
+        this.typeId = result.getInt("type_id");
+        this.iconId = result.getInt("icon_id");
+        this.level = result.getInt("level");
+        this.realWeight = result.getInt("real_weight");
+        this.cursed = result.getBoolean("cursed");
+        this.useAnimationId = result.getInt("use_animation_id");
+        this.usable = result.getBoolean("usable");
+        this.targetable = result.getBoolean("targetable");
+        this.exchangeable = result.getBoolean("exchangeable");
+        this.price = result.getFloat("price");
+        this.twoHanded = result.getBoolean("two_handed");
+        this.etheral = result.getBoolean("etheral");
+        this.itemSetId = result.getInt("item_set_id");
+        this.criteria = result.getString("criteria");
+        this.criteriaTarget = result.getString("criteria_target");
+        this.hideEffects = result.getBoolean("hide_effects");
+        this.enhanceable = result.getBoolean("enhanceable");
+        this.nonUsableOnAnother = result.getBoolean("non_usable_on_another");
+        this.appearanceId = result.getShort("apprance_id");
+        this.secretRecipe = result.getBoolean("secret_recipe");
+        this.recipeSlots = result.getInt("recipe_slots");
+        this.recipeIds = ItemTemplateDAO.parseIds(result.getString("recipe_ids"));
+        this.dropMonsterIds = ItemTemplateDAO.parseIds(result.getString("drop_monster_ids"));
+        this.bonusIsSecret = result.getBoolean("bonus_is_secret");
+        this.possibleEffects = ItemTemplateDAO.readDiceEffects(result.getBytes("possible_effects"));
+        this.favoriteSubAreas = ItemTemplateDAO.parseIds(result.getString("favorite_sub_areas"));
+        this.favoriteSubAreasBonus = result.getInt("favorite_sub_areas_bonus");
+    }
+
     public ConditionExpression getCriteriaExpression() {
         try {
             if (m_criteriaExpression == null) {

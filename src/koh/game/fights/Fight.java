@@ -19,7 +19,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import koh.concurrency.CancellableScheduledRunnable;
-import koh.game.Main;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameMapMovement;
 import koh.game.entities.actors.IGameActor;
@@ -520,7 +519,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
         InventoryItem Weapon = fighter.Character.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
-        if (Weapon.getTemplate().typeId == 83) { //Pière d'Ame
+        if (Weapon.getTemplate().getTypeId() == 83) { //Pière d'Ame
             return;
         }
         // La cible si elle existe
@@ -530,18 +529,18 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
         int TargetId = TargetE == null ? -1 : TargetE.ID;
 
-        if (!(Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) <= Weapon.getWeaponTemplate().range && Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) >= Weapon.getWeaponTemplate().minRange && fighter.getAP() >= Weapon.getWeaponTemplate().apCost)) {
+        if (!(Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) <= Weapon.getWeaponTemplate().getRange() && Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) >= Weapon.getWeaponTemplate().getMinRange() && fighter.getAP() >= Weapon.getWeaponTemplate().getApCost())) {
             fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             return;
         }
 
         this.startSequence(SequenceTypeEnum.SEQUENCE_WEAPON);
 
-        fighter.usedAP += Weapon.getWeaponTemplate().apCost;
+        fighter.usedAP += Weapon.getWeaponTemplate().getApCost();
 
         boolean IsCc = false;
 
-        int TauxCC = Weapon.getWeaponTemplate().criticalHitProbability - fighter.stats.getTotal(StatsEnum.Add_CriticalHit);
+        int TauxCC = Weapon.getWeaponTemplate().getCriticalHitProbability() - fighter.stats.getTotal(StatsEnum.Add_CriticalHit);
         if (TauxCC < 2) {
             TauxCC = 2;
         }
@@ -564,14 +563,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         Targets.removeIf(F -> F.isDead());
         Targets.remove(fighter);
-        ObjectEffectDice[] Effects = Weapon.getEffects().stream().filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId)).map(x -> (ObjectEffectDice) x).toArray(ObjectEffectDice[]::new);
+        ObjectEffectDice[] Effects = Weapon.getEffects$Notify().stream().filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId)).map(x -> (ObjectEffectDice) x).toArray(ObjectEffectDice[]::new);
 
         double num1 = Fight.RANDOM.nextDouble();
 
         double num2 = (double) Arrays.stream(Effects).mapToInt(Effect -> ((EffectInstanceDice) Weapon.getTemplate().getEffect(Effect.actionId)).random).sum();
         boolean flag = false;
 
-        this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.ID, TargetId, cellId, (byte) (IsCc ? 2 : 1), false, Weapon.getTemplate().id));
+        this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.ID, TargetId, cellId, (byte) (IsCc ? 2 : 1), false, Weapon.getTemplate().getId()));
 
         EffectInstanceDice EffectFather;
         for (ObjectEffectDice Effect : Effects) {
@@ -595,7 +594,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         }
 
-        this.sendToField(new GameActionFightPointsVariationMessage(!IsCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, fighter.ID, fighter.ID, (short) Weapon.getWeaponTemplate().apCost));
+        this.sendToField(new GameActionFightPointsVariationMessage(!IsCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, fighter.ID, fighter.ID, (short) Weapon.getWeaponTemplate().getApCost()));
         this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
     }
 

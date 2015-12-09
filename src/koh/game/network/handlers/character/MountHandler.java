@@ -133,7 +133,7 @@ public class MountHandler {
                         }
                     });
                     if (Client.character.inventoryCache.add(Item, true)) {
-                        Item.needInsert = true;
+                        Item.setNeedInsert(true);
                     }
                     Client.character.mountInfo.onGettingOff();
                     Client.character.mountInfo.mount = null;
@@ -153,7 +153,7 @@ public class MountHandler {
         if (Client.character.inventoryCache.GetMount(Message.Id) == null) {
             return;
         } else {
-            //client.character.inventoryCache.getMount(Message.id).getEffects().add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), "Melan"));
+            //client.character.inventoryCache.getMount(Message.id).getEffects$Notify().add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), "Melan"));
             Client.character.send(new MountDataMessage(Client.character.inventoryCache.GetMount(Message.Id).mount));
         }
     }
