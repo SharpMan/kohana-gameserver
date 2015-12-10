@@ -107,16 +107,16 @@ public class ContextHandler {
         {
             switch (a) {
                 case 0:
-                    cellID = (short) (Client.character.cell.id - 14);
+                    cellID = (short) (Client.character.cell.getId() - 14);
                     break;
                 case 1:
-                    cellID = (short) (Client.character.cell.id - 14 + 1);
+                    cellID = (short) (Client.character.cell.getId() - 14 + 1);
                     break;
                 case 2:
-                    cellID = (short) (Client.character.cell.id + 14 - 1);
+                    cellID = (short) (Client.character.cell.getId() + 14 - 1);
                     break;
                 case 3:
-                    cellID = (short) (Client.character.cell.id + 14);
+                    cellID = (short) (Client.character.cell.getId() + 14);
                     break;
             }
             DofusCell curcell = Client.character.currentMap.getCell(cellID);

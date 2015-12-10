@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
+import lombok.Getter;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -14,13 +15,18 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class DofusCell {
 
-    public DofusMap map;
-    public short id;
-    public short floor;
+    @Getter
+    private  DofusMap map;
+    @Getter
+    private  short id;
+    @Getter
+    private  short floor;
     public int losMov = 3;
-    public byte speed;
+    @Getter
+    private  byte speed;
     public int mapChangeData;
-    public int moveZone;
+    @Getter
+    private int moveZone;
 
     private final Map<Integer, IGameActor> myActors = Collections.synchronizedMap(new HashMap<>());
     public DofusTrigger myAction = null;

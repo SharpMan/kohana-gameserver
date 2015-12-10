@@ -132,13 +132,13 @@ public class RolePlayHandler {
 
         //System.out.println(cell.mapChangeData + "cell" + cell.id);
         if (Client.character.currentMap.getTopNeighbourId() == Message.mapId) {
-            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[0].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[0].getCellid() : (Client.character.cell.id + 532));
+            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[0].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[0].getCellid() : (Client.character.cell.getId() + 532));
         } else if (Client.character.currentMap.getBottomNeighbourId() == Message.mapId) {
-            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[1].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[1].getCellid() : (Client.character.cell.id - 532));
+            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[1].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[1].getCellid() : (Client.character.cell.getId() - 532));
         } else if (Client.character.currentMap.getLeftNeighbourId() == Message.mapId) {
-            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[2].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[2].getCellid() : (Client.character.cell.id + 13));
+            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[2].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[2].getCellid() : (Client.character.cell.getId() + 13));
         } else if (Client.character.currentMap.getRightNeighbourId() == Message.mapId) {
-            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[3].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[3].getCellid() : (Client.character.cell.id - 13));
+            Client.character.teleport(Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[3].getMapid() : Message.mapId, Client.character.currentMap.getNewNeighbour() != null ? Client.character.currentMap.getNewNeighbour()[3].getCellid() : (Client.character.cell.getId() - 13));
         } else {
             // client.character.teleport(Message.mapId, -1);
             logger.error("client {} teleport from {} to {}" ,Client.character.nickName,Client.character.currentMap.getId(), Message.mapId);

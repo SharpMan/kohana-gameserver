@@ -8,6 +8,7 @@ import koh.game.entities.item.InventoryItem;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
 import koh.protocol.types.game.mount.MountClientData;
+import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -18,8 +19,10 @@ import org.apache.mina.core.buffer.IoBuffer;
 public class MountInventoryItem extends InventoryItem {
 
     protected boolean myInitialized = false;
-    public MountInventoryItemEntity entity;
-    public MountClientData mount;
+    @Getter
+    private MountInventoryItemEntity entity;
+    @Getter
+    private MountClientData mount;
 
     public MountInventoryItem(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects, boolean create) {
         super(ID, templateId, position, owner, quantity, effects);
@@ -43,8 +46,8 @@ public class MountInventoryItem extends InventoryItem {
             this.mount.energy = this.mount.energyMax = this.mount.loveMax = this.mount.reproductionCountMax = this.mount.reproductionCountMax = this.mount.serenityMax = 10000;
             this.mount.maxPods = 3000; //TODO: mount inventory
             this.mount.experience = 0;
-            this.mount.experienceForLevel = DAO.getExps().getLevel(1).mount;
-            this.mount.experienceForNextLevel = (double) DAO.getExps().getLevel(2).mount;
+            this.mount.experienceForLevel = DAO.getExps().getLevel(1).getMount();
+            this.mount.experienceForNextLevel = (double) DAO.getExps().getLevel(2).getMount();
             this.mount.id = (double) this.entity.animalID;
             this.mount.isRideable = true;
             this.mount.level = 1;
@@ -66,7 +69,7 @@ public class MountInventoryItem extends InventoryItem {
     public void addExperience(long amount) {
         this.mount.experience += amount;
 
-        while (this.mount.experience >= DAO.getExps().getLevel(this.mount.level + 1).mount && this.mount.level < 100) {
+        while (this.mount.experience >= DAO.getExps().getLevel(this.mount.level + 1).getMount() && this.mount.level < 100) {
             levelUp();
         }
         this.save();

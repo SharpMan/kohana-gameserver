@@ -207,7 +207,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private void initCells() {
         // Ajout des cells
         for (DofusCell Cell : this.map.getCells()) {
-            this.myCells.put(Cell.id, new FightCell(Cell.id, Cell.mov(), Cell.los()));
+            this.myCells.put(Cell.getId(), new FightCell(Cell.getId(), Cell.mov(), Cell.los()));
         }
         this.myFightCells.put(myTeam1, new HashMap<>());
         this.myFightCells.put(myTeam2, new HashMap<>());
@@ -1116,7 +1116,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 this.myTeam1.bladePosition = this.myTeam1.Leader.getMapCell();
                 this.myTeam2.bladePosition = this.myTeam2.Leader.getMapCell();
             } else {
-                this.myTeam1.bladePosition = this.map.getRandomAdjacentFreeCell(this.myTeam2.Leader.getMapCell()).id;
+                this.myTeam1.bladePosition = this.map.getRandomAdjacentFreeCell(this.myTeam2.Leader.getMapCell()).getId();
                 this.myTeam2.bladePosition = this.myTeam2.Leader.getMapCell();
             }
         }

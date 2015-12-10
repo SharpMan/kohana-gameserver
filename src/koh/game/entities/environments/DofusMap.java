@@ -114,7 +114,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
          this.myCells[actor.getCellId].addActor(actor);
          }
          }*/
-        this.cells[actor.cell.id].addActor(actor);
+        this.cells[actor.cell.getId()].addActor(actor);
 
     }
 
@@ -153,7 +153,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
         this.myGameActors.remove(actor.ID);
         this.sendToField(new GameContextRemoveElementMessage(actor.ID));
-        this.cells[actor.cell.id].delActor(actor);
+        this.cells[actor.cell.getId()].delActor(actor);
     }
 
     public DofusCell getCell(short c) {
@@ -193,8 +193,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
             if (((((((mov) && (useNewSystem))) && (!((previousCellId == -1))))) && (!((previousCellId == cellId))))) {
                 previousCellData = cells[previousCellId];
-                dif = Math.abs((Math.abs(cellData.floor) - Math.abs(previousCellData.floor)));
-                if (((((!((previousCellData.moveZone == cellData.moveZone))) && ((dif > 0)))) || ((((((previousCellData.moveZone == cellData.moveZone)) && ((cellData.moveZone == 0)))) && ((dif > TOLERANCE_ELEVATION)))))) {
+                dif = Math.abs((Math.abs(cellData.getFloor()) - Math.abs(previousCellData.getFloor())));
+                if (((((!((previousCellData.getMoveZone() == cellData.getMoveZone()))) && ((dif > 0)))) || ((((((previousCellData.getMoveZone() == cellData.getMoveZone())) && ((cellData.getMoveZone() == 0)))) && ((dif > TOLERANCE_ELEVATION)))))) {
                     mov = false;
                 }
             }
@@ -224,11 +224,11 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public MapComplementaryInformationsDataMessage getMapComplementaryInformationsDataMessage(Player character) {
-        return new MapComplementaryInformationsDataMessage(subAreaId, id, houses, this.myGameActors.values().stream().filter(x -> x.canBeSee(character)).map(x -> (GameRolePlayActorInformations) x.getGameContextActorInformations(character)).collect(Collectors.toList()), this.toInteractiveElements(character), elementsStated, new MapObstacle[0], new FightCommonInformations[0]);
+        return new MapComplementaryInformationsDataMessage(subAreaId, id, houses, this.myGameActors.values().stream().filter(x -> x.canBeSeen(character)).map(x -> (GameRolePlayActorInformations) x.getGameContextActorInformations(character)).collect(Collectors.toList()), this.toInteractiveElements(character), elementsStated, new MapObstacle[0], new FightCommonInformations[0]);
     }
 
     public int getCellSpeed(int cellId) {
-        return this.cells[(short) cellId].speed;
+        return this.cells[(short) cellId].getSpeed();
     }
     
     private boolean isUsingNewMovementSystem = false;
@@ -245,9 +245,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         for (short i = 0; i < this.cells.length; i++) {
             this.cells[i] = new DofusCell(this, i, buf);
             if(_oldMvtSystem == -1){
-                _oldMvtSystem = this.cells[i].moveZone;
+                _oldMvtSystem = this.cells[i].getMoveZone();
             }
-            if(this.cells[i].moveZone != _oldMvtSystem){
+            if(this.cells[i].getMoveZone() != _oldMvtSystem){
                this.isUsingNewMovementSystem = true;
             }
         }
@@ -303,7 +303,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     @Override
     public void actorMoved(Path path, IGameActor actor, short newCell, byte newDirection) {
-        this.cells[actor.cell.id].delActor(actor);
+        this.cells[actor.cell.getId()].delActor(actor);
         this.cells[newCell].addActor(actor);
         if (newDirection != -1) {
             actor.direction = newDirection;
@@ -319,10 +319,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             return;
         }
         synchronized (droppedItems) {
-            if (droppedItems.containsKey(Actor.cell.id)) {
-                Actor.inventoryCache.add(droppedItems.get(Actor.cell.id), true);
-                droppedItems.remove(Actor.cell.id);
-                this.sendToField(new ObjectGroundRemovedMessage(Actor.cell.id));
+            if (droppedItems.containsKey(Actor.cell.getId())) {
+                Actor.inventoryCache.add(droppedItems.get(Actor.cell.getId()), true);
+                droppedItems.remove(Actor.cell.getId());
+                this.sendToField(new ObjectGroundRemovedMessage(Actor.cell.getId()));
                 if (droppedItems.isEmpty()) {
                     this.droppedItems = null;
                 }
@@ -365,7 +365,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public boolean hasActorOnCell(short cell) {
-        return this.myGameActors.values().stream().filter(x -> x.cell != null && x.cell.id == cell).count() > 0;
+        return this.myGameActors.values().stream().filter(x -> x.cell != null && x.cell.getId() == cell).count() > 0;
     }
 
     public Npc getNpc(int contextualid) {
@@ -375,7 +375,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private final static Random RANDOM = new Random();
 
     public short getRandomCell() {
-        return this.cells[RANDOM.nextInt(this.cells.length)].id;
+        return this.cells[RANDOM.nextInt(this.cells.length)].getId();
         //return this.myCells.Keys.FirstOrDefault(x => x == RANDOM.Next(this.myCells.Keys.Count));
     }
 

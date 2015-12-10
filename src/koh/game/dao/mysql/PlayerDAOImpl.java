@@ -232,7 +232,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setInt(5, character.level);
             pStatement.setString(6, StringUtils.join(character.indexedColors, ','));
             pStatement.setInt(7, character.currentMap.getId());
-            pStatement.setInt(8, character.cell.id);
+            pStatement.setInt(8, character.cell.getId());
             pStatement.setString(9, StringUtils.join(character.ennabledChannels, ','));
             pStatement.setInt(10, character.statPoints);
             pStatement.setInt(11, character.spellPoints);
@@ -279,7 +279,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setInt(8, character.level);
             pStatement.setString(9, StringUtils.join(character.indexedColors, ','));
             pStatement.setInt(10, character.mapid);
-            pStatement.setInt(11, character.cell.id);
+            pStatement.setInt(11, character.cell.getId());
             pStatement.setString(12, StringUtils.join(character.ennabledChannels, ','));
             pStatement.setInt(13, character.statPoints);
             pStatement.setInt(14, character.spellPoints);

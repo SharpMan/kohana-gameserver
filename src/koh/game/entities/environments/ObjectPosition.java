@@ -49,7 +49,7 @@ public class ObjectPosition {
     }
 
     public boolean isValid() {
-        return this.cell.id > 0 && (long) this.cell.id < 560L && this.direction > DirectionsEnum.RIGHT && this.direction < DirectionsEnum.RIGHT && this.map != null;
+        return this.cell.getId() > 0 && (long) this.cell.getId() < 560L && this.direction > DirectionsEnum.RIGHT && this.direction < DirectionsEnum.RIGHT && this.map != null;
     }
 
 }

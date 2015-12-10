@@ -157,7 +157,7 @@ public class CharacterInventory {
     }
 
     public MountInventoryItem GetMount(double id) {
-        return (MountInventoryItem) this.itemsCache.values().stream().filter(x -> x instanceof MountInventoryItem && ((MountInventoryItem) x).entity.animalID == (int) id).findFirst().orElse(null);
+        return (MountInventoryItem) this.itemsCache.values().stream().filter(x -> x instanceof MountInventoryItem && ((MountInventoryItem) x).getEntity().animalID == (int) id).findFirst().orElse(null);
     }
 
     public synchronized void removeApparence(short appearence) {

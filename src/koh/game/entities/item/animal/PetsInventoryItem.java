@@ -112,13 +112,13 @@ public class PetsInventoryItem extends InventoryItem {
         }
 
         for (FoodItem i : getAnimal().getFoodItems()) {
-            if (food.getTemplateId() == i.itemID) {
+            if (food.getTemplateId() == i.getItemID()) {
                 if (!this.eatedFoods.containsKey(food.getTemplateId())) {
                     this.eatedFoods.put(food.getTemplateId(), 0);
                 }
                 this.eatedFoods.put(food.getTemplateId(), this.eatedFoods.get(food.getTemplateId()) + 1);
-                this.entity.pointsUsed += i.point;
-                this.boost(i.stats, i.statsPoints);
+                this.entity.pointsUsed += i.getPoint();
+                this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
                 this.updateDate();
                 this.checkLastEffect();
@@ -128,13 +128,13 @@ public class PetsInventoryItem extends InventoryItem {
             }
         }
         for (FoodItem i : getAnimal().getFoodTypes()) {
-            if (food.getTemplate().getTypeId() == i.itemID) {
+            if (food.getTemplate().getTypeId() == i.getItemID()) {
                 if (!this.eatedFoodsType.containsKey(food.getTemplate().getTypeId())) {
                     this.eatedFoodsType.put(food.getTemplate().getTypeId(), 0);
                 }
                 this.eatedFoodsType.put(food.getTemplate().getTypeId(), this.eatedFoodsType.get(food.getTemplate().getTypeId()) + 1);
-                this.entity.pointsUsed += i.point;
-                this.boost(i.stats, i.statsPoints);
+                this.entity.pointsUsed += i.getPoint();
+                this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
                 this.updateDate();
                 this.checkLastEffect();

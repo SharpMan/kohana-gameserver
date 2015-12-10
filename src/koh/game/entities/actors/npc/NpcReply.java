@@ -3,6 +3,7 @@ package koh.game.entities.actors.npc;
 import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.entities.actors.Player;
+import lombok.Getter;
 
 /**
  *
@@ -10,10 +11,12 @@ import koh.game.entities.actors.Player;
  */
 public class NpcReply {
 
-    public String type;
-    public int replyID;
-    public String criteria;
-    public String[] parameters;
+    private String type;
+    @Getter
+    private int replyID;
+    private String criteria;
+    @Getter
+    private String[] parameters;
 
     private ConditionExpression m_criteriaExpression;
 

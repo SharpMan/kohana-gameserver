@@ -64,7 +64,7 @@ public class NpcDialog extends GameAction {
     }
 
     public void reply(int rep) {
-        NpcReply[] Stream = DAO.getNpcs().repliesAsStream().filter(x -> x.replyID == rep).toArray(NpcReply[]::new);
+        NpcReply[] Stream = DAO.getNpcs().repliesAsStream().filter(x -> x.getReplyID() == rep).toArray(NpcReply[]::new);
         if (!Arrays.stream(Stream).anyMatch(x -> x instanceof TalkReply)) {
             this.getClient().endGameAction(GameActionTypeEnum.NPC_DAILOG);
         }
@@ -80,7 +80,7 @@ public class NpcDialog extends GameAction {
 
     @Override
     public void execute() {
-        this.actor.send(new NpcDialogCreationMessage(NPC.cell.map.getId(), NPC.ID));
+        this.actor.send(new NpcDialogCreationMessage(NPC.cell.getMap().getId(), NPC.ID));
         this.changeMessage(0, 0);
         super.execute();
     }

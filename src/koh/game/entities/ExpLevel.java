@@ -1,21 +1,21 @@
 package koh.game.entities;
 
+import lombok.Getter;
+
 /**
  *
  * @author Alleos13
  */
 public class ExpLevel {
 
-    public final int level;
-    public final long player;
-    public final long job;
-    public final long mount;
-    public final long guild;
-    public final int guildMembers;
-    public final int livingObject;
-    public final int PvP;
-    public final long tourmentors;
-    public final long bandits;
+    @Getter
+    private final int level;
+    @Getter
+    private final long player,job,mount,guild;
+    @Getter
+    private final int guildMembers,livingObject,PvP;
+    @Getter
+    private final long tourmentors,bandits;
 
     public ExpLevel(int lvl, long a, long b, long c, long d, int e, int f, int g, long h, long i) {
         this.level = lvl;

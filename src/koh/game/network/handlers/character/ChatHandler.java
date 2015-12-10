@@ -254,7 +254,7 @@ public class ChatHandler {
                                 break;
                             }
 
-                            Client.character.teleport(Map.getId(), Map.getAnyCellWalakable().id); //Todo random walakable cell
+                            Client.character.teleport(Map.getId(), Map.getAnyCellWalakable().getId()); //Todo random walakable cell
                         }
 
                     } catch (Exception e) {

@@ -82,7 +82,7 @@ public class PetTemplate {
 
 
     public boolean canEat(ItemTemplate Item) {
-        return Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.itemID).toArray(), Item.getId()) || Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.itemID).toArray(), Item.getTypeId());
+        return Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.getItemID()).toArray(), Item.getId()) || Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.getItemID()).toArray(), Item.getTypeId());
     }
 
     public EffectInstance getEffect(int id) {
@@ -96,7 +96,7 @@ public class PetTemplate {
     public void verify() {
         int[] MonsterEffect = new int[0];
         for (MonsterBooster b : this.monsterBoosts) {
-            for (int i : b.Stats) {
+            for (int i : b.stats) {
                 MonsterEffect = ArrayUtils.add(MonsterEffect, i);
                 if (!Ints.contains(Arrays.stream(possibleEffects).mapToInt(x -> x.effectId).toArray(), i)) {
                     System.out.println("Familier" + Id + "undefinied statm " + i);
@@ -109,28 +109,28 @@ public class PetTemplate {
                     if (total != (int) (b.getStatsBoost(i) * (hormone / b.point))) {
                         System.out.println("ErreurEffect stat " + i + " Familier " + id + " StatsNormalMax " + ((int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide) + " != " + b.getStatsBoost(i)  * (hormone / b.point));
                         int maySet = total / (hormone / b.point);
-                        System.out.println("Familier" + ItemDAO.dofusMaps.get(id).nameId + "id " + id + " getMonster " + b.MonsterFamily + " you should put " + b.MonsterFamily + ";" + b.DeathNumber + ";" + b.point + ";" + Enumerable.Join(b.stats, ':') + ";" + maySet);
+                        System.out.println("Familier" + ItemDAO.dofusMaps.get(id).nameId + "id " + id + " getMonster " + b.monsterFamily + " you should put " + b.monsterFamily + ";" + b.deathNumber + ";" + b.point + ";" + Enumerable.Join(b.stats, ':') + ";" + maySet);
                     }
                 }*/
 
             }
         }
         for (EffectInstance i : this.possibleEffects) {
-            if (!Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.stats).toArray(), i.effectId) && !Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.stats).toArray(), i.effectId) && !Ints.contains(MonsterEffect, i.effectId)) {
+            if (!Ints.contains(Arrays.stream(foodItems).mapToInt(x -> x.getStats()).toArray(), i.effectId) && !Ints.contains(Arrays.stream(foodTypes).mapToInt(x -> x.getStats()).toArray(), i.effectId) && !Ints.contains(MonsterEffect, i.effectId)) {
                 System.out.println("Familier" + Id + " stat not set " + i.effectId);
             }
         }
         for (FoodItem i : this.foodItems) {
-            if (!Ints.contains(Arrays.stream(possibleEffects).mapToInt(x -> x.effectId).toArray(), i.stats)) {
-                System.out.println("Familier" + Id + "undefinied stat " + i.stats);
+            if (!Ints.contains(Arrays.stream(possibleEffects).mapToInt(x -> x.effectId).toArray(), i.getStats())) {
+                System.out.println("Familier" + Id + "undefinied stat " + i.getStats());
                 for (int io : Arrays.stream(possibleEffects).mapToInt(x -> x.effectId).toArray()) {
                     System.out.println("You must set " + io);
                 }
             }
         }
         for (FoodItem i : this.foodTypes) {
-            if (!Ints.contains(Arrays.stream(possibleEffects).mapToInt(x -> x.effectId).toArray(), i.stats)) {
-                System.out.println("Familier" + Id + "undefinied stat " + i.stats);
+            if (!Ints.contains(Arrays.stream(possibleEffects).mapToInt(x -> x.effectId).toArray(), i.getStats())) {
+                System.out.println("Familier" + Id + "undefinied stat " + i.getStats());
                 for (int io : Arrays.stream(possibleEffects).mapToInt(x -> x.effectId).toArray()) {
                     System.out.println("You must set " + io);
                 }

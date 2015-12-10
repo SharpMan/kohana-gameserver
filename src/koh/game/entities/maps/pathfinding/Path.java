@@ -51,14 +51,14 @@ public class Path {
     {
         this.Map = map;
         this.m_cellsPath = path;
-        this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.id)).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
+        this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.getId())).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
     }
 
     private Path(DofusMap map, ObjectPosition[] compressedPath) {
         this.Map = map;
         this.m_compressedPath = compressedPath;
         this.m_cellsPath = this.buildCompletePath();
-        this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.id)).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
+        this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.getId())).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
     }
 
     public boolean isEmpty() {
@@ -78,11 +78,11 @@ public class Path {
     }
 
     public boolean Contains(short cellId) {
-        return Arrays.stream(this.m_cellsPath).anyMatch(x -> x.id == cellId);
+        return Arrays.stream(this.m_cellsPath).anyMatch(x -> x.getId() == cellId);
     }
 
     public Short[] getServerPathKeys() {
-        return Arrays.stream(this.m_cellsPath).map(x -> x.id).collect(Collectors.toList()).toArray(new Short[this.m_cellsPath.length]);
+        return Arrays.stream(this.m_cellsPath).map(x -> x.getId()).collect(Collectors.toList()).toArray(new Short[this.m_cellsPath.length]);
     }
 
     public void cutPath(int index) {
@@ -90,7 +90,7 @@ public class Path {
             //Take == get first element this.m_cellsPath = this.m_cellsPath.Take(index).ToArray<cell>();
             System.arraycopy(this.m_cellsPath, 0, this.m_cellsPath, 0, index);
 
-            this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.id)).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
+            this.m_path = Arrays.stream(this.m_cellsPath).map(x -> MapPoint.fromCellId(x.getId())).collect(Collectors.toList()).toArray(new MapPoint[this.m_cellsPath.length]);
 
             this.m_endPathPosition = new ObjectPosition(this.Map, this.getEndCell(), this.getEndCellDirection());
         }
@@ -145,7 +145,7 @@ public class Path {
             list.add(this.m_compressedPath[i].cell);
             int num = 0;
             MapPoint mapPoint = this.m_compressedPath[i].point;
-            while ((mapPoint = mapPoint.getNearestCellInDirection(this.m_compressedPath[i].direction)) != null && mapPoint.get_cellId() != this.m_compressedPath[i + 1].cell.id) {
+            while ((mapPoint = mapPoint.getNearestCellInDirection(this.m_compressedPath[i].direction)) != null && mapPoint.get_cellId() != this.m_compressedPath[i + 1].cell.getId()) {
                 if ((long) num > 54L) {
                     logger.error("Path too long. Maybe an orientation problem ?");
                 }

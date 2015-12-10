@@ -17,7 +17,7 @@ public class TalkReply extends NpcReply {
         if (!super.execute(p)) {
             return false;
         }
-        ((NpcDialog) p.client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).changeMessage(DAO.getNpcs().findMessage(Integer.parseInt(this.parameters[0])));
+        ((NpcDialog) p.client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).changeMessage(DAO.getNpcs().findMessage(Integer.parseInt(this.getParameters()[0])));
         return true;
     }
 

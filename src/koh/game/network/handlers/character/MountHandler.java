@@ -41,7 +41,7 @@ public class MountHandler {
             Client.character.mountInfo.save();
             Client.send(new MountRenamedMessage(Message.name, Message.mountId));
         } else if (Client.character.inventoryCache.GetMount(Message.mountId) != null) {
-            Client.character.inventoryCache.GetMount(Message.mountId).mount.name = Message.name;
+            Client.character.inventoryCache.GetMount(Message.mountId).getMount().name = Message.name;
             Client.character.inventoryCache.GetMount(Message.mountId).save();
             Client.send(new MountRenamedMessage(Message.name, Message.mountId));
         }
@@ -113,8 +113,8 @@ public class MountHandler {
                          Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 19, new String[0]));
                          break;
                     }
-                    Client.character.mountInfo.mount = ((MountInventoryItem) Dragodinde).mount;
-                    Client.character.mountInfo.entity = ((MountInventoryItem) Dragodinde).entity;
+                    Client.character.mountInfo.mount = ((MountInventoryItem) Dragodinde).getMount();
+                    Client.character.mountInfo.entity = ((MountInventoryItem) Dragodinde).getEntity();
                     Client.send(new MountRidingMessage(true));
                     Client.send(new MountSetMessage(Client.character.mountInfo.mount));
                     Client.character.inventoryCache.removeItem(Dragodinde);
@@ -154,7 +154,7 @@ public class MountHandler {
             return;
         } else {
             //client.character.inventoryCache.getMount(Message.id).getEffects$Notify().add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), "Melan"));
-            Client.character.send(new MountDataMessage(Client.character.inventoryCache.GetMount(Message.Id).mount));
+            Client.character.send(new MountDataMessage(Client.character.inventoryCache.GetMount(Message.Id).getMount()));
         }
     }
 

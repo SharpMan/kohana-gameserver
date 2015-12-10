@@ -59,7 +59,7 @@ public class Guild extends IWorldEventObserver {
     public void onFighterAddedExperience(GuildMember member, long XP) {
         member.addExperience(XP);
         this.entity.addExperience(XP);
-        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).guild && this.entity.level < DAO.getSettings().getIntElement("Max.GuildLevel")) {
+        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).getGuild() && this.entity.level < DAO.getSettings().getIntElement("Max.GuildLevel")) {
             this.entity.level++;
             this.entity.boost += 5;
             this.sendToField(new GuildLevelUpMessage(this.entity.level));
@@ -218,7 +218,7 @@ public class Guild extends IWorldEventObserver {
     }
 
     public GuildInformationsGeneralMessage toGeneralInfos() {
-        return new GuildInformationsGeneralMessage(true, false, (byte) this.entity.level, (long) DAO.getExps().getLevel(this.entity.level).guild, this.entity.getExperience(), (long) DAO.getExps().getLevel(this.entity.level + 1).guild, this.entity.creationDate, this.members.size(), this.characters.size());
+        return new GuildInformationsGeneralMessage(true, false, (byte) this.entity.level, (long) DAO.getExps().getLevel(this.entity.level).getGuild(), this.entity.getExperience(), (long) DAO.getExps().getLevel(this.entity.level + 1).getGuild(), this.entity.creationDate, this.members.size(), this.characters.size());
     }
 
     protected void updateMember(GuildMember member) {

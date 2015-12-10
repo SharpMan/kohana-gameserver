@@ -14,7 +14,7 @@ public class TeleportReply extends NpcReply {
         if (!super.execute(p)) {
             return false;
         }
-        p.teleport(Integer.parseInt(this.parameters[0]), Integer.parseInt(this.parameters[1]));
+        p.teleport(Integer.parseInt(this.getParameters()[0]), Integer.parseInt(this.getParameters()[1]));
         return true;
     }
     

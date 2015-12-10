@@ -12,7 +12,7 @@ import koh.protocol.types.game.look.EntityLook;
 /**
  *
  * @author Neo-Craft
- */
+ * No refactor for the moment to many problems */
 public abstract class IGameActor {
 
     public int ID;
@@ -35,7 +35,7 @@ public abstract class IGameActor {
         return new GameRolePlayActorInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character));
     }
 
-    public boolean canBeSee(IGameActor Actor) {
+    public boolean canBeSeen(IGameActor Actor) {
         //Todo: player Invisibile ?
         return true;
     }
@@ -47,7 +47,7 @@ public abstract class IGameActor {
     }
 
     public EntityDispositionInformations getEntityDispositionInformations(Player character) {
-        return new EntityDispositionInformations(this.cell.id, direction);
+        return new EntityDispositionInformations(this.cell.getId(), direction);
     }
 
     //public DirectionsEnum direction;

@@ -187,7 +187,7 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public short getMapCell() {
-        return this.Character.cell.id;
+        return this.Character.cell.getId();
     }
 
     @Override

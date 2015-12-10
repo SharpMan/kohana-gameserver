@@ -181,7 +181,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     @Override
-    public boolean canBeSee(IGameActor Actor) {
+    public boolean canBeSeen(IGameActor Actor) {
         if (this.account == null) {
             logger.error("NulledGameContext {} {}",this.nickName,this.ID);
             return false;
@@ -237,7 +237,7 @@ public class Player extends IGameActor implements Observer {
     public synchronized void teleport(int newMapID, int newCellID) {
         if (this.currentMap.getId() == newMapID) {
             this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
-            this.currentMap.sendToField(new TeleportOnSameMapMessage(ID, cell.id));
+            this.currentMap.sendToField(new TeleportOnSameMapMessage(ID, cell.getId()));
             return;
         }
         DofusMap NextMap = DAO.getMaps().findTemplate(newMapID);
@@ -478,7 +478,7 @@ public class Player extends IGameActor implements Observer {
             this.alignmentGrade = 10;
         } else {
             for (byte n = 1; n <= 10; n++) {
-                if (honor < DAO.getExps().getLevel(n).PvP) {
+                if (honor < DAO.getExps().getLevel(n).getPvP()) {
                     this.alignmentGrade = (byte) (n - 1);
 
                     break;
@@ -519,7 +519,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public ActorExtendedAlignmentInformations getActorAlignmentExtendInformations() {
-        return new ActorExtendedAlignmentInformations(this.alignmentSide.value, this.alignmentValue, this.PvPEnabled == AggressableStatusEnum.NON_AGGRESSABLE ? 0 : this.alignmentGrade, this.getCharacterPower(), this.honor, DAO.getExps().getLevel(this.alignmentGrade).PvP, DAO.getExps().getLevel(this.alignmentGrade == 10 ? 10 : this.alignmentGrade + 1).PvP, this.PvPEnabled);
+        return new ActorExtendedAlignmentInformations(this.alignmentSide.value, this.alignmentValue, this.PvPEnabled == AggressableStatusEnum.NON_AGGRESSABLE ? 0 : this.alignmentGrade, this.getCharacterPower(), this.honor, DAO.getExps().getLevel(this.alignmentGrade).getPvP(), DAO.getExps().getLevel(this.alignmentGrade == 10 ? 10 : this.alignmentGrade + 1).getPvP(), this.PvPEnabled);
     }
 
     public CharacterBaseInformations toBaseInformations() {
@@ -547,12 +547,12 @@ public class Player extends IGameActor implements Observer {
 
         if (this.level != DAO.getExps().getMaxLevel()) {
 
-            ExpLevel Floor;
+            ExpLevel floor;
 
             Integer lastLevel = this.level;
             do {
-                Floor = DAO.getExps().getLevel(this.level + 1);
-                if (Floor.player < this.experience) {
+                floor = DAO.getExps().getLevel(this.level + 1);
+                if (floor.getPlayer() < this.experience) {
                     this.level++;
                     this.statPoints += 5;
                     this.spellPoints++;
@@ -570,7 +570,7 @@ public class Player extends IGameActor implements Observer {
                     }
 
                 }
-            } while (Floor.player < this.experience && this.level != 200);
+            } while (floor.getPlayer() < this.experience && this.level != 200);
 
             if (this.level != lastLevel) {
                 this.life = this.getMaxLife();
