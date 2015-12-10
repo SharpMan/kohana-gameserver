@@ -22,32 +22,32 @@ public class FighterSpell {
     }
 
     public boolean canLaunchSpell(SpellLevel Spell, int TargetId) {
-        if (Spell.minCastInterval > 0) {
-            if (this.myinitialCooldown.containsKey(Spell.spellId)) {
-                if (this.myinitialCooldown.get(Spell.spellId) != null) {
-                    int newCoolDown = minCastInterval(Spell.spellId);
-                    if ((newCoolDown == 0 ? this.myinitialCooldown.get(Spell.spellId).initialCooldown : newCoolDown) > 0) {
+        if (Spell.getMinCastInterval() > 0) {
+            if (this.myinitialCooldown.containsKey(Spell.getSpellId())) {
+                if (this.myinitialCooldown.get(Spell.getSpellId()) != null) {
+                    int newCoolDown = minCastInterval(Spell.getSpellId());
+                    if ((newCoolDown == 0 ? this.myinitialCooldown.get(Spell.getSpellId()).initialCooldown : newCoolDown) > 0) {
                         return false;
                     }
                 }
             }
         }
-        if (Spell.maxCastPerTurn == 0 && Spell.maxCastPerTarget == 0) {
+        if (Spell.getMaxCastPerTurn() == 0 && Spell.getMaxCastPerTarget() == 0) {
             return true;
         }
 
-        if (Spell.maxCastPerTurn > 0) {
-            if (this.myTargets.containsKey(Spell.spellId)) {
-                if (this.myTargets.get(Spell.spellId).size() >= Spell.maxCastPerTurn) {
+        if (Spell.getMaxCastPerTurn() > 0) {
+            if (this.myTargets.containsKey(Spell.getSpellId())) {
+                if (this.myTargets.get(Spell.getSpellId()).size() >= Spell.getMaxCastPerTurn()) {
                     return false;
                 }
             }
         }
 
-        if (Spell.maxCastPerTarget > 0) {
-            if (this.myTargets.containsKey(Spell.spellId)) {
-                if (this.myTargets.get(Spell.spellId).stream().filter(x -> x.targetId == TargetId).count() >= Spell.maxCastPerTarget) {
-                    //System.out.println("ici" + this.myTargets.get(spell.spellId).stream().filter(x -> x.targetId == targetId).count());
+        if (Spell.getMaxCastPerTarget() > 0) {
+            if (this.myTargets.containsKey(Spell.getSpellId())) {
+                if (this.myTargets.get(Spell.getSpellId()).stream().filter(x -> x.targetId == TargetId).count() >= Spell.getMaxCastPerTarget()) {
+                    //System.out.println("ici" + this.myTargets.get(Spell.getSpellId()).stream().filter(x -> x.targetId == targetId).count());
                     return false;
                 }
             }
@@ -66,22 +66,22 @@ public class FighterSpell {
     }
 
     public void actualize(SpellLevel spell, int targetId) {
-        if (spell.minCastInterval > 0) {
-            if (!this.myinitialCooldown.containsKey(spell.spellId)) {
-                this.myinitialCooldown.put(spell.spellId, new SpellinitialCooldown(spell.minCastInterval));
+        if (spell.getMinCastInterval() > 0) {
+            if (!this.myinitialCooldown.containsKey(spell.getSpellId())) {
+                this.myinitialCooldown.put(spell.getSpellId(), new SpellinitialCooldown(spell.getMinCastInterval()));
             } else {
-                this.myinitialCooldown.get(spell.spellId).initialCooldown = spell.minCastInterval;
+                this.myinitialCooldown.get(spell.getSpellId()).initialCooldown = spell.getMinCastInterval();
             }
         }
 
-        if (spell.maxCastPerTurn == 0 && spell.maxCastPerTarget == 0) {
+        if (spell.getMaxCastPerTurn() == 0 && spell.getMaxCastPerTarget() == 0) {
             return;
         }
 
-        if (!this.myTargets.containsKey(spell.spellId)) {
-            this.myTargets.put(spell.spellId, new ArrayList<>());
+        if (!this.myTargets.containsKey(spell.getSpellId())) {
+            this.myTargets.put(spell.getSpellId(), new ArrayList<>());
         }
-        this.myTargets.get(spell.spellId).add(new SpellTarget(targetId));
+        this.myTargets.get(spell.getSpellId()).add(new SpellTarget(targetId));
     }
 
     public void endTurn() {

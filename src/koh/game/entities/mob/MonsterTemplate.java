@@ -70,10 +70,10 @@ public class MonsterTemplate {
         int Near = 10000;
         MonsterGrade objNear = null;
         for (MonsterGrade objLevel : grades) {
-            if (objLevel.Grade == Level) {
+            if (objLevel.getGrade() == Level) {
                 return objLevel;
             } else {
-                int Diff = Math.abs(objLevel.Grade - Level);
+                int Diff = Math.abs(objLevel.getGrade() - Level);
                 if (Near > Diff) {
                     Near = Diff;
                     objNear = objLevel;

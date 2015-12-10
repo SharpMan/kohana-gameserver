@@ -363,35 +363,35 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public Short[] getCastZone(SpellLevel spellLevel) {
-        int num = spellLevel.range;
+        int num = spellLevel.getRange();
         for (BuffEffect Buff : (Iterable<BuffEffect>) this.buff.getAllBuffs().filter(buff -> buff instanceof BuffSpellDommage)::iterator) {
             num += Buff.CastInfos.Effect.value;
         }
 
-        if (spellLevel.rangeCanBeBoosted) {
+        if (spellLevel.isRangeCanBeBoosted()) {
             int val1 = num + this.stats.getTotal(StatsEnum.Add_Range);
-            if (val1 < spellLevel.minRange) {
-                val1 = spellLevel.minRange;
+            if (val1 < spellLevel.getMinRange()) {
+                val1 = spellLevel.getMinRange();
             }
             num = Math.min(val1, 280);
         }
         IZone shape;
-        if (spellLevel.castInDiagonal && spellLevel.castInLine) {
-            shape = new CrossZone((byte) spellLevel.minRange, (byte) num) {
+        if (spellLevel.isCastInDiagonal() && spellLevel.isCastInLine()) {
+            shape = new CrossZone((byte) spellLevel.getMinRange(), (byte) num) {
                 {
                     AllDirections = true;
                 }
             };
-        } else if (spellLevel.castInLine) {
-            shape = new CrossZone((byte) spellLevel.minRange, (byte) num);
-        } else if (spellLevel.castInDiagonal) {
-            shape = new CrossZone((byte) spellLevel.minRange, (byte) num) {
+        } else if (spellLevel.isCastInLine()) {
+            shape = new CrossZone((byte) spellLevel.getMinRange(), (byte) num);
+        } else if (spellLevel.isCastInDiagonal()) {
+            shape = new CrossZone((byte) spellLevel.getMinRange(), (byte) num) {
                 {
                     Diagonal = true;
                 }
             };
         } else {
-            shape = new Lozenge((byte) spellLevel.minRange, (byte) num, this.fight.map);
+            shape = new Lozenge((byte) spellLevel.getMinRange(), (byte) num, this.fight.map);
         }
         return shape.getCells(this.getCellId());
     }

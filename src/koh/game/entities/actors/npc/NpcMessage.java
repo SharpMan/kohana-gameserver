@@ -4,6 +4,11 @@ import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
+import koh.utils.Enumerable;
+import lombok.Getter;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -11,13 +16,31 @@ import koh.game.entities.actors.Player;
  */
 public class NpcMessage {
 
-    public int id, messageId;
-    public String[] parameters;
-    public String criteria;
-    public int falseQuestion;
-    public int[] replies;
+    @Getter
+    private int id, messageId;
+    @Getter
+    private String[] parameters;
+    private String criteria;
+    private int falseQuestion;
+    @Getter
+    private int[] replies;
 
     private ConditionExpression m_criteriaExpression;
+
+    public NpcMessage(ResultSet result) throws SQLException {
+        this.id = result.getInt("id");
+        this.messageId = result.getInt("message_id");
+        this.parameters = result.getString("parameters").split("\\|");
+        this.criteria = result.getString("criteria");
+        this.falseQuestion = result.getInt("if_false");
+        if (result.getString("replies") != null) {
+            if (result.getString("replies").isEmpty()) {
+                this.replies = new int[0];
+            } else {
+                this.replies = Enumerable.StringToIntArray(result.getString("replies"));
+            }
+        }
+    }
 
     public ConditionExpression getCriteriaExpression() {
         if (m_criteriaExpression == null) {

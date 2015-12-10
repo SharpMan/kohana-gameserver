@@ -11,7 +11,7 @@ import koh.protocol.client.enums.StatsEnum;
  */
 public abstract class StaticFighter extends Fighter {
 
-    public MonsterGrade Grade;
+    public MonsterGrade grade;
 
     public StaticFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
         super(Fight, Summoner);
@@ -51,7 +51,7 @@ public abstract class StaticFighter extends Fighter {
 
     public void onBeginTurn() {
         if (firstTurn) {
-            this.fight.affectSpellTo(this, this, this.Grade.Grade, this.Grade.getMonster().getSpells());
+            this.fight.affectSpellTo(this, this, this.grade.getGrade(), this.grade.getMonster().getSpells());
             this.firstTurn = false;
         }
     }

@@ -53,7 +53,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        NpcItem npcItem = this.Npc.getTemplate().Items.get(templateId);
+        NpcItem npcItem = this.Npc.getTemplate().getItems().get(templateId);
 
         if (npcItem == null) {
             Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
@@ -73,7 +73,7 @@ public class NpcExchange extends Exchange {
         InventoryItem playerItem = null;
         
         if (npcItem.getItemToken() != null) {
-            playerItem = Client.character.inventoryCache.getItemInTemplate(npcItem.token);
+            playerItem = Client.character.inventoryCache.getItemInTemplate(npcItem.getToken());
             if (playerItem == null || (double) playerItem.getQuantity() < amount1) {
                 return false;
             }
@@ -111,7 +111,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        NpcItem npcItem = this.Npc.getTemplate().Items.get(item.getTemplateId());
+        NpcItem npcItem = this.Npc.getTemplate().getItems().get(item.getTemplateId());
 
         int Refund = npcItem == null ? (int) ((long) (int) Math.ceil((double) item.getTemplate().getPrice() / 10.0) * (long) quantity) : (int) ((long) (int) Math.ceil((double) npcItem.getPrice() / 10.0) * (long) quantity);
         if (quantity == item.getQuantity()) {

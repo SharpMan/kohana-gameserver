@@ -149,7 +149,7 @@ public class GenericStats {
 
         switch (effectType) {
             /*case getInitiative:
-             Total += getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.Intelligence) + getTotal(StatsEnum.agility);*/
+             Total += getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
             case DodgePALostProbability:
             case DodgePMLostProbability:
             case Add_RETRAIT_PA:
@@ -213,7 +213,7 @@ public class GenericStats {
         }
         switch (effectType) {
             /*case getInitiative:
-             return this.myStats.get(EffectType).Base + getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.Intelligence) + getTotal(StatsEnum.agility);*/
+             return this.myStats.get(EffectType).Base + getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
             default:
                 return this.myStats.get(effectType).Base;
         }

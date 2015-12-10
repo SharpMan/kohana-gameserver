@@ -68,9 +68,9 @@ public abstract class FightActivableObject implements IFightObject {
         m_fight = fight;
         m_caster = caster;
         m_spellId = castInfos.SpellId;
-        m_spell_level = castInfos.SpellLevel.grade;
+        m_spell_level = castInfos.SpellLevel.getGrade();
         try {
-            m_actionEffect = DAO.getSpells().findSpell(castInfos.Effect.diceNum).spellLevels[castInfos.Effect.diceSide - 1];
+            m_actionEffect = DAO.getSpells().findSpell(castInfos.Effect.diceNum).getSpellLevels()[castInfos.Effect.diceSide - 1];
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
         }
         Cell = fight.getCell(cell);
@@ -84,7 +84,7 @@ public abstract class FightActivableObject implements IFightObject {
         shape = shap;
 
         if (m_actionEffect != null) {
-            for (EffectInstanceDice effect : m_actionEffect.effects) {
+            for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
                 if (EffectCast.IsDamageEffect(effect.EffectType())) {
                     Priority--;
                 }
@@ -157,9 +157,9 @@ public abstract class FightActivableObject implements IFightObject {
 
         m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(getGameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.m_caster.ID, this.ID, activator.ID, this.m_spellId));
         activator.fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        for (EffectInstanceDice Effect : m_actionEffect.effects) {
+        for (EffectInstanceDice Effect : m_actionEffect.getEffects()) {
             //TODO : MASK
-            EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.spellId, Cell.Id, 100, Effect, m_caster, targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
+            EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.getSpellId(), Cell.Id, 100, Effect, m_caster, targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
             CastInfos.IsTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {
                 targets.clear();

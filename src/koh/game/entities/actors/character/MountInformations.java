@@ -53,13 +53,13 @@ public class MountInformations {
         this.isToogled = true;
         this.enableStats(true);
         this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
-        this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).entityLook.bonesId;
-        this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).entityLook.indexedColors;
+        this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
+        this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
         this.player.getEntityLook().skins.clear();
         /*if (item.templateId != ItemsEnum.Kramkram) { //Todo KAMELEONE
          this.player.getEntityLook().indexedColors.clear();
          }*/
-        this.player.getEntityLook().scales = DAO.getMounts().find(this.mount.model).entityLook.scales;
+        this.player.getEntityLook().scales = DAO.getMounts().find(this.mount.model).getEntityLook().scales;
         this.player.refreshEntitie();
     }
 

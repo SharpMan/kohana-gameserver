@@ -42,9 +42,9 @@ public class BombFighter extends StaticFighter {
     private static final Logger logger = LogManager.getLogger(BombFighter.class);
     public BombFighter(Fight Fight, Fighter Summoner, MonsterGrade Monster) {
         super(Fight, Summoner);
-        this.Grade = Monster;
-        super.initFighter(this.Grade.getStats(), Fight.getNextContextualId());
-        this.entityLook = EntityLookParser.Copy(this.Grade.getMonster().getEntityLook());
+        this.grade = Monster;
+        super.initFighter(this.grade.getStats(), Fight.getNextContextualId());
+        this.entityLook = EntityLookParser.Copy(this.grade.getMonster().getEntityLook());
         super.AdjustStats();
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());
@@ -99,7 +99,7 @@ public class BombFighter extends StaticFighter {
                         if (Target.ID == this.ID) {
                             continue;
                         }
-                        if (Target instanceof BombFighter /*&& ((BombFighter) Target).Grade.monsterId == this.Grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).Boosted) {
+                        if (Target instanceof BombFighter /*&& ((BombFighter) Target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).Boosted) {
                             Targets.add((BombFighter) Target);
                             TotalCombo += 40;
                         }
@@ -134,7 +134,7 @@ public class BombFighter extends StaticFighter {
         }
         if (this.getLife() <= 0 || force) {
             SlefMurder(casterId);
-            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.Grade.monsterId).explodSpellId).getSpellLevel(this.Grade.Grade), this.getCellId(), true, true, false);
+            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false);
             if (this.FightBombs != null) {
                 this.FightBombs.forEach(Bomb -> Bomb.remove());
             }
@@ -164,7 +164,7 @@ public class BombFighter extends StaticFighter {
                 Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
             Short[] Cells;
-            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.summoner == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
+            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.summoner == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
                 int Distance = Pathfinder.getGoalDistance(null, getCellId(), Friend.getCellId());
                 logger.debug("Bomb Distance = {}" , Distance);
                 if (Distance >= 2 && Distance <= 7) {
@@ -172,7 +172,7 @@ public class BombFighter extends StaticFighter {
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.getCellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.getCellId());
-                        FightBomb Bomb = new FightBomb(this.summoner, DAO.getSpells().findSpell(DAO.getSpells().findBomb(Grade.monsterId).wallSpellId).getSpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(DAO.getSpells().findBomb(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                        FightBomb Bomb = new FightBomb(this.summoner, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.GetColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
                         fight.addActivableObject(this.summoner, Bomb);
                     }
                 }
@@ -191,7 +191,7 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public int getLevel() {
-        return this.Grade.Level;
+        return this.grade.getLevel();
     }
 
     @Override
@@ -201,12 +201,12 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightMonsterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.Grade.monsterId, this.Grade.Grade);
+        return new GameFightMonsterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.grade.getMonsterId(), this.grade.getGrade());
     }
 
     @Override
     public FightTeamMemberInformations getFightTeamMemberInformations() {
-        return new FightTeamMemberMonsterInformations(this.ID, this.Grade.monsterId, this.Grade.Grade);
+        return new FightTeamMemberMonsterInformations(this.ID, this.grade.getMonsterId(), this.grade.getGrade());
     }
 
     @Override

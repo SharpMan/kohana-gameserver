@@ -10,11 +10,11 @@ import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
  */
 public class BuffReflectSpell extends BuffEffect {
 
-    public byte ReflectLevel = 0;
+    public byte reflectLevel = 0;
 
     public BuffReflectSpell(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
-        this.ReflectLevel = CastInfos.SpellLevel.grade;
+        this.reflectLevel = CastInfos.SpellLevel.getGrade();
         this.Target.states.addState(this);
     }
 

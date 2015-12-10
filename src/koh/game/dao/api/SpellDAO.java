@@ -4,6 +4,7 @@ package koh.game.dao.api;
 import koh.d2o.entities.SpellBomb;
 import koh.game.entities.spells.LearnableSpell;
 import koh.game.entities.spells.Spell;
+import koh.game.entities.spells.SpellLevel;
 import koh.patterns.services.api.Service;
 
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 public abstract class SpellDAO implements Service {
 
     public abstract SpellBomb findBomb(int id);
+
+    public abstract SpellLevel findLevel(int id);
 
     public abstract Spell findSpell(int id);
 

@@ -1,6 +1,5 @@
 package koh.game.network.handlers.game.context.roleplay;
 
-import koh.game.Main;
 import koh.game.actions.*;
 import koh.game.controllers.PlayerController;
 import koh.game.entities.actors.Npc;
@@ -52,7 +51,7 @@ public class NpcHandler {
         if (Action == null) {
             logger.error("Unknow action {} by character {}", Message.npcActionId, Client.character.nickName);
             return;
-        } else if (!ArrayUtils.contains(PNJ.getTemplate().actions, Message.npcActionId)) {
+        } else if (!ArrayUtils.contains(PNJ.getTemplate().getActions(), Message.npcActionId)) {
             PlayerController.sendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
             return;
         }
@@ -61,7 +60,7 @@ public class NpcHandler {
                 if (Client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
                     Client.myExchange = new NpcExchange(Client, PNJ);
                     Client.addGameAction(new GameExchange(Client.character, Client.myExchange));
-                    Client.send(new ExchangeStartOkNpcShopMessage(PNJ.ID, PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems()));
+                    Client.send(new ExchangeStartOkNpcShopMessage(PNJ.ID, PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems$Array()));
                 }
                 break;
             case ACTION_TALK:

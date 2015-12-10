@@ -53,7 +53,7 @@ public class BuffPoutch extends BuffEffect {
             //Target = DamageInfos.Caster;
         }
 
-        SpellLevel SpellLevel = DAO.getSpells().findSpell(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
+        SpellLevel SpellLevel = DAO.getSpells().findSpell(CastInfos.Effect.diceNum).getSpellLevels()[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();
         double num2 = (double) Arrays.stream(SpellLevel.effects).mapToInt(x -> x.random).sum();
         boolean flag = false;
@@ -97,7 +97,7 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            EffectCast Cast2 = new EffectCast(Effect.EffectType(), SpellLevel.spellId, (CastInfos.EffectType == StatsEnum.Refoullage) ? Caster.getCellId() : this.Target.getCellId(), num1, Effect, this.Target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            EffectCast Cast2 = new EffectCast(Effect.EffectType(), SpellLevel.getSpellId(), (CastInfos.EffectType == StatsEnum.Refoullage) ? Caster.getCellId() : this.Target.getCellId(), num1, Effect, this.Target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
             Cast2.targetKnownCellId = Target.getCellId();
             if (EffectBase.TryApplyEffect(Cast2) == -3) {
                 return -3;

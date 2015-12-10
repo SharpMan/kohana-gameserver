@@ -392,7 +392,7 @@ public class Player extends IGameActor implements Observer {
      coef += this.stats.getTotal(StatsEnum.getInitiative);
      coef += this.stats.getTotal(StatsEnum.agility);
      coef += this.stats.getTotal(StatsEnum.chance);
-     coef += this.stats.getTotal(StatsEnum.Intelligence);
+     coef += this.stats.getTotal(StatsEnum.intelligence);
      coef += this.stats.getTotal(StatsEnum.strength);
 
      int init = 1;
@@ -562,10 +562,10 @@ public class Player extends IGameActor implements Observer {
                     }
                     // Apprend des nouveaux sorts
                     for (LearnableSpell learnableSpell : DAO.getSpells().findLearnableSpell(this.breed)) {
-                        if ((int) learnableSpell.obtainLevel > (int) level && this.mySpells.hasSpell(learnableSpell.spell)) {
-                            this.mySpells.removeSpell(this, learnableSpell.spell);
-                        } else if ((int) learnableSpell.obtainLevel <= (int) level && !this.mySpells.hasSpell(learnableSpell.spell)) {
-                            this.mySpells.addSpell(learnableSpell.spell, (byte) 1, this.mySpells.getFreeSlot(), this.client);
+                        if ((int) learnableSpell.getObtainLevel() > (int) level && this.mySpells.hasSpell(learnableSpell.getSpell())) {
+                            this.mySpells.removeSpell(this, learnableSpell.getSpell());
+                        } else if ((int) learnableSpell.getObtainLevel() <= (int) level && !this.mySpells.hasSpell(learnableSpell.getSpell())) {
+                            this.mySpells.addSpell(learnableSpell.getSpell(), (byte) 1, this.mySpells.getFreeSlot(), this.client);
                         }
                     }
 

@@ -8,22 +8,29 @@ import java.util.stream.Stream;
 import koh.look.EntityLookParser;
 import koh.protocol.types.game.data.items.ObjectItemToSellInNpcShop;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  *
  * @author Neo-Craft
  */
+@Builder
 public class NpcTemplate {
 
-    public int id;
-    public String name;
-    public int[][] dialogMessages, dialogReplies;
-    public int[] actions;
-    public int gender;
-    public String look;
-    public boolean fastAnimsFun, OrderItemsByPrice, OrderItemsByLevel;
-    public Map<Integer, NpcItem> Items;
+    @Getter
+    private int id;
+    private String name;
+    private int[][] dialogMessages, dialogReplies;
+    @Getter
+    private int[] actions;
+    private int gender;
+    private String look;
+    private boolean fastAnimsFun, orderItemsByPrice, orderItemsByLevel;
+    @Getter @Setter
+    private Map<Integer, NpcItem> Items;
 
     public int[] getReply(int id) {
         try {
@@ -55,7 +62,7 @@ public class NpcTemplate {
         };
     }
 
-    public ObjectItemToSellInNpcShop[] getItems() {
+    public ObjectItemToSellInNpcShop[] getItems$Array() {
         if (itemList == null) {
             if (Items == null) {
                 itemList = new ObjectItemToSellInNpcShop[0];
@@ -64,10 +71,10 @@ public class NpcTemplate {
                 if (this.id == 816) {
                     Objects = Objects.filter(Item -> Item.getTemplate().getLevel() > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().getTypeId(), e2.getTemplate().getTypeId())), ((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()))));
                 }
-                if (this.OrderItemsByPrice) {
+                if (this.orderItemsByPrice) {
                     Objects = Objects.sorted((e1, e2) -> Float.compare(e1.getPrice(), e2.getPrice()));
                 }
-                if (this.OrderItemsByLevel) {
+                if (this.orderItemsByLevel) {
                     Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()));
                 }
 
@@ -94,7 +101,7 @@ public class NpcTemplate {
         if (Items == null) {
             return 0;
         }
-        return this.Items.values().stream().findFirst().get().token;
+        return this.Items.values().stream().findFirst().get().getToken();
 
     }
 

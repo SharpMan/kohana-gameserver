@@ -125,7 +125,7 @@ public class MountHandler {
                         break;
                     }
 
-                    InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), DAO.getMounts().find(Client.character.mountInfo.mount.model).scroolId, 63, Client.character.ID, 1, new ArrayList<ObjectEffect>() {
+                    InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), DAO.getMounts().find(Client.character.mountInfo.mount.model).getScroolId(), 63, Client.character.ID, 1, new ArrayList<ObjectEffect>() {
                         {
                             add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
                             add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.character.mountInfo.mount.model, Client.character.mountInfo.entity.animalID));

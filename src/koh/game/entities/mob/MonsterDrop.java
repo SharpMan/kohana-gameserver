@@ -1,5 +1,7 @@
 package koh.game.entities.mob;
 
+import lombok.Getter;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -9,17 +11,17 @@ import java.sql.SQLException;
  */
 public class MonsterDrop {
 
-    public int dropId;
-    public int monsterId;
-    public int objectId;
-    public double percentDropForGrade1;
-    public double percentDropForGrade2;
-    public double percentDropForGrade3;
-    public double percentDropForGrade4;
-    public double percentDropForGrade5;
-    public int DropLimit, ProspectingLock;
-    public boolean hasCriteria;
-    public String criteria;
+    @Getter
+    private int dropId,monsterId,objectId;
+    @Getter
+    private double percentDropForGrade1,percentDropForGrade2;
+    @Getter
+    private double percentDropForGrade3,percentDropForGrade4,percentDropForGrade5;
+    @Getter
+    public int dropLimit, prospectingLock;
+    @Getter
+    private boolean hasCriteria;
+    private String criteria;
 
     public MonsterDrop(ResultSet result) throws SQLException {
         dropId = result.getInt("drop_id");
@@ -30,8 +32,8 @@ public class MonsterDrop {
         percentDropForGrade3 = result.getDouble("percent_drop_for_grade3");
         percentDropForGrade4 = result.getDouble("percent_drop_for_grade4");
         percentDropForGrade5 = result.getDouble("percent_drop_for_grade5");
-        DropLimit = result.getInt("drop_limit");
-        ProspectingLock = result.getInt("prospecting_lock");
+        dropLimit = result.getInt("drop_limit");
+        prospectingLock = result.getInt("prospecting_lock");
         hasCriteria = result.getBoolean("has_criteria");
         criteria = result.getString("criteria");
     }

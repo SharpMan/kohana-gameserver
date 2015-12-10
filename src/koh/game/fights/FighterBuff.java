@@ -57,8 +57,8 @@ public class FighterBuff {
     }
 
     public boolean buffMaxStackReached(BuffEffect Buff) { //CLEARCODE : Distinct state ?
-        return Buff.CastInfos.SpellLevel != null && Buff.CastInfos.SpellLevel.maxStack > 0
-                && Buff.CastInfos.SpellLevel.maxStack
+        return Buff.CastInfos.SpellLevel != null && Buff.CastInfos.SpellLevel.getMaxStack() > 0
+                && Buff.CastInfos.SpellLevel.getMaxStack()
                 <= (Buff instanceof BuffState
                         ? this.getAllBuffs().filter(x -> x.CastInfos.SpellId == Buff.CastInfos.SpellId && x instanceof BuffState && ((BuffState) x).CastInfos.Effect.value == Buff.CastInfos.Effect.value).count()
                         : this.getAllBuffs().filter(x -> x.CastInfos.SpellId == Buff.CastInfos.SpellId && x.CastInfos.EffectType == Buff.CastInfos.EffectType).count());

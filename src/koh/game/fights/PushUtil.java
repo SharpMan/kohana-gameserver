@@ -164,7 +164,7 @@ public class PushUtil {
         if ((pEntityInfo instanceof MonsterFighter)) {
             canBePushed = ((MonsterFighter) pEntityInfo).Grade.getMonster().isCanBePushed();
         } else if ((pEntityInfo instanceof StaticFighter)) {
-            canBePushed = ((StaticFighter) pEntityInfo).Grade.getMonster().isCanBePushed();
+            canBePushed = ((StaticFighter) pEntityInfo).grade.getMonster().isCanBePushed();
         }
         return (((!(buffPreventPush)) && (canBePushed)));
     }

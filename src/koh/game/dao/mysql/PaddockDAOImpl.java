@@ -63,34 +63,34 @@ public class PaddockDAOImpl extends PaddockDAO {
         try {
             switch (column) {
                 case "id":
-                    p.setInt(seq, item.id);
+                    p.setInt(seq, item.getId());
                     break;
                 case "abandonned":
-                    p.setBoolean(seq, item.abandonned);
+                    p.setBoolean(seq, item.isAbandonned());
                     break;
                 case "loocked":
-                    p.setBoolean(seq, item.loocked);
+                    p.setBoolean(seq, item.isLoocked());
                     break;
                 case "mounts_informations":
-                    p.setBytes(seq, serializeMountsInformations(item.mountInformationsForPaddocks).array());
+                    p.setBytes(seq, serializeMountsInformations(item.getMountInformationsForPaddocks()).array());
                     break;
                 case "items":
-                    p.setBytes(seq, serializeItemsInformations(item.items).array());
+                    p.setBytes(seq, serializeItemsInformations(item.getItems()).array());
                     break;
                 case "guild_informations":
-                    p.setBytes(seq, serializeGuildInformations(item.guildInfo).array());
+                    p.setBytes(seq, serializeGuildInformations(item.getGuildInfo()).array());
                     break;
                 case "sell_informations":
-                    p.setString(seq, item.selledId + "," + item.ownerName);
+                    p.setString(seq, item.getSelledId() + "," + item.getOwnerName());
                     break;
                 case "price":
-                    p.setInt(seq, item.price);
+                    p.setInt(seq, item.getPrice());
                     break;
                 case "max_outdoor_mount":
-                    p.setInt(seq, item.maxOutDoorMount);
+                    p.setInt(seq, item.getMaxOutDoorMount());
                     break;
                 case "max_items":
-                    p.setInt(seq, item.maxItem);
+                    p.setInt(seq, item.getMaxItem());
                     break;
             }
         } catch (Exception e) {
@@ -105,43 +105,7 @@ public class PaddockDAOImpl extends PaddockDAO {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                paddocks.put(result.getInt("map"), new Paddock() {
-                    {
-                        this.id = result.getInt("id");
-                        this.map = result.getInt("map");
-                        this.subArea = result.getShort("sub_area");
-                        this.abandonned = result.getBoolean("abandonned");
-                        this.loocked = result.getBoolean("loocked");
-                        this.price = result.getInt("price");
-                        this.maxOutDoorMount = result.getInt("max_outdoor_mount");
-                        this.maxItem = result.getInt("max_items");
-                        if (result.getBytes("items") != null) {
-                            IoBuffer buf = IoBuffer.wrap(result.getBytes("items"));
-                            this.items = new PaddockItem[buf.getInt()];
-                            for (int i = 0; i < this.items.length; ++i) {
-                                this.items[i] = new PaddockItem(buf.getInt(), buf.getInt(), new ItemDurability(buf.getShort(), buf.getShort()));
-                            }
-                            buf.clear();
-                        }
-                        if (result.getBytes("mounts_informations") != null) {
-                            IoBuffer buf = IoBuffer.wrap(result.getBytes("mounts_informations"));
-                            this.mountInformationsForPaddocks = new MountInformationsForPaddock[buf.getInt()];
-                            for (int i = 0; i < this.mountInformationsForPaddocks.length; ++i) {
-                                this.mountInformationsForPaddocks[i] = new MountInformationsForPaddock(buf.get(), BufUtils.readUTF(buf), BufUtils.readUTF(buf));
-                            }
-                            buf.clear();
-                        }
-                        if (result.getBytes("guild_informations") != null) {
-                            IoBuffer buf = IoBuffer.wrap(result.getBytes("guild_informations"));
-                            this.guildInfo = new GuildInformations(buf.getInt(), BufUtils.readUTF(buf), new GuildEmblem(buf.getInt(), buf.getInt(), buf.get(), buf.getInt()));
-                            buf.clear();
-                        }
-                        if (result.getString("sell_informations") != null) {
-                            this.selledId = Integer.parseInt(result.getString("sell_informations").split(",")[0]);
-                            this.ownerName = result.getString("sell_informations").split(",")[1];
-                        }
-                    }
-                });
+                paddocks.put(result.getInt("map"), new Paddock(result));
                 i++;
             }
         } catch (Exception e) {

@@ -270,7 +270,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         try {
             for (Npc npc : DAO.getNpcs().forMap(this.id)) {
                     npc.ID = this.myNextActorId--;
-                    npc.cell = this.getCell(npc.cellID);
+                    npc.cell = this.getCell(npc.getCellID());
                     this.spawnActor(npc);
             }
         } catch(NullPointerException ignored) {}
@@ -472,8 +472,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         Paddock paddock = DAO.getPaddocks().find(id);
         if (paddock != null) {
             client.send(new PaddockPropertiesMessage(paddock.getInformations()));
-            if (paddock.items != null) {
-                client.send(new GameDataPaddockObjectListAddMessage(paddock.items));
+            if (paddock.getItems() != null) {
+                client.send(new GameDataPaddockObjectListAddMessage(paddock.getItems()));
             }
         }
         client.send(getAgressableActorsStatus(client.character));

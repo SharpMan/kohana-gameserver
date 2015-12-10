@@ -6,17 +6,21 @@ import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.ItemTemplate;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.types.game.data.items.ObjectItemToSellInNpcShop;
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  *
  * @author Neo-Craft
  */
+@Builder
 public class NpcItem {
 
-    public boolean maximiseStats;
-    public int item, token;
-    public String buyCriterion;
-    public float customPrice;
+    private boolean maximiseStats;
+    @Getter
+    private int item, token;
+    private String buyCriterion;
+    private float customPrice;
 
     public float getPrice() {
         return customPrice == -1 ? getTemplate().getPrice() : this.customPrice;
@@ -39,8 +43,5 @@ public class NpcItem {
         return new ObjectItemToSellInNpcShop(this.item, EffectHelper.toObjectEffects(this.getTemplate().getPossibleEffects()), (int) getPrice(), this.buyCriterion);
     }
 
-    public NpcItem() {
-
-    }
 
 }

@@ -49,7 +49,7 @@ public class NpcDialog extends GameAction {
             }
             return;
         }
-        actor.send(new NpcDialogQuestionMessage(Message.id, Message.getParameters((Player) this.actor), Message.replies != null ? Message.replies : this.NPC.getTemplate().getReply(id)));
+        actor.send(new NpcDialogQuestionMessage(Message.getId(), Message.getParameters((Player) this.actor), Message.getReplies() != null ? Message.getReplies() : this.NPC.getTemplate().getReply(id)));
     }
 
     public void changeMessage(NpcMessage Message) {
@@ -60,7 +60,7 @@ public class NpcDialog extends GameAction {
             }
             return;
         }
-        actor.send(new NpcDialogQuestionMessage(Message.id, Message.parameters, Message.replies != null ? Message.replies : this.NPC.getTemplate().getReply(this.NPC.getTemplate().getMessageOffset(Message.id))));
+        actor.send(new NpcDialogQuestionMessage(Message.getId(), Message.getParameters(), Message.getReplies() != null ? Message.getReplies() : this.NPC.getTemplate().getReply(this.NPC.getTemplate().getMessageOffset(Message.getId()))));
     }
 
     public void reply(int rep) {

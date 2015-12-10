@@ -14,7 +14,6 @@ import koh.game.entities.spells.*;
 import koh.game.utils.sql.ConnectionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  *
@@ -33,31 +32,17 @@ public class SpellDAOImpl extends SpellDAO {
     private DatabaseSource dbSource;
 
     private int loadAll() {
-            int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from spells", 0)) {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                spells.put(result.getInt("id"), new Spell() {
-                    {
-                        id = result.getInt("id");
-                        typeId = result.getInt("type_id");
-                        iconId = result.getInt("icon_id");
-                        verbose_casttype = result.getBoolean("verbose_cast");
-                        spellLevels = new SpellLevel[result.getString("spell_levels").split(",").length];
-                        for (int i = 0; i < result.getString("spell_levels").split(",").length; i++) {
-                            this.spellLevels[i] = levels.get(Integer.parseInt(result.getString("spell_levels").split(",")[i]));
-
-                        }
-                    }
-                });
-                i++;
+                spells.put(result.getInt("id"), new Spell(result));
             }
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }
-        return i;
+        return spells.size();
     }
 
     private int loadAllBombs() {
@@ -65,7 +50,7 @@ public class SpellDAOImpl extends SpellDAO {
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from spell_bombs", 0)) {
             ResultSet result = conn.getResult();
             while (result.next()) {
-                bombs.put(result.getInt("id"), new SpellBomb() {
+                bombs.put(result.getInt("id"), new SpellBomb() { //d2o no refact then
                     {
                         Id = result.getInt("id");
                         chainReactionSpellId = result.getInt("chain_reaction_spellId");
@@ -91,74 +76,7 @@ public class SpellDAOImpl extends SpellDAO {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                levels.put(result.getInt("id"), new SpellLevel() {
-                    {
-                        this.id = result.getInt("id");
-                        this.spellId = result.getInt("spell_id");
-                        this.grade = result.getByte("grade");
-                        this.spellBreed = result.getInt("spell_breed");
-                        this.ApCost = result.getInt("ap_cost");
-                        this.minRange = result.getInt("min_range");
-                        this.range = result.getInt("range");
-                        this.castInLine = result.getBoolean("cast_in_line");
-                        this.castInDiagonal = result.getBoolean("cast_in_diagonal");
-                        this.castTestLos = result.getBoolean("cast_test_los");
-                        this.criticalHitProbability = result.getInt("critical_hit_probability");
-                        this.criticalFailureProbability = result.getInt("critical_failure_probability");
-                        this.needFreeCell = result.getBoolean("need_free_cell");
-                        this.needTakenCell = result.getBoolean("need_taken_cell");
-                        this.needFreeTrapCell = result.getBoolean("need_free_trap_cell");
-                        this.rangeCanBeBoosted = result.getBoolean("range_can_be_boosted");
-                        this.maxStack = result.getInt("max_stack");
-                        this.maxCastPerTurn = result.getInt("max_cast_per_turn");
-                        this.maxCastPerTarget = result.getInt("max_cast_per_target");
-                        this.minCastInterval = result.getByte("min_cast_interval");
-                        this.initialCooldown = result.getByte("initial_cooldown");
-                        this.globalCooldown = result.getInt("global_cooldown");
-                        this.minPlayerLevel = result.getInt("min_player_level");
-                        this.criticalFailureEndsTurn = result.getBoolean("critical_failure_ends_turn");
-                        this.hideEffects = result.getBoolean("hide_effects");
-                        this.hidden = result.getBoolean("hidden");
-
-                        if (!result.getString("states_required").isEmpty()) {
-                            this.statesRequired = new int[result.getString("states_required").split(",").length];
-                            for (int i = 0; i < result.getString("states_required").split(",").length; i++) {
-                                this.statesRequired[i] = Integer.parseInt(result.getString("states_required").split(",")[i]);
-                            }
-                        } else {
-                            this.statesRequired = new int[0];
-                        }
-                        if (!result.getString("states_forbidden").isEmpty()) {
-                            this.statesForbidden = new int[result.getString("states_forbidden").split(",").length];
-                            for (int i = 0; i < result.getString("states_forbidden").split(",").length; i++) {
-                                this.statesForbidden[i] = Integer.parseInt(result.getString("states_forbidden").split(",")[i]);
-                            }
-                        } else {
-                            this.statesForbidden = new int[0];
-                        }
-
-                        {
-                            IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));
-                            this.effects = new EffectInstanceDice[buf.getInt()];
-                            for (int i = 0; i < this.effects.length; i++) {
-                                this.effects[i] = new EffectInstanceDice(buf);
-                                if (this.spellId == 126) {//To patch in DAO After
-                                    this.effects[i].targetMask = "a";
-                                }
-                            /* if(this.effects[i].effectId == 165)
-                             System.out.println("hn"+this.spellId);*/
-                            }
-                            buf.clear();
-
-                            buf = IoBuffer.wrap(result.getBytes("critical_effects"));
-                            this.criticalEffect = new EffectInstanceDice[buf.getInt()];
-                            for (int i = 0; i < this.criticalEffect.length; i++) {
-                                this.criticalEffect[i] = new EffectInstanceDice(buf);
-                            }
-                        }
-
-                    }
-                });
+                levels.put(result.getInt("id"), new SpellLevel(result));
                 i++;
             }
         } catch (Exception e) {
@@ -177,14 +95,7 @@ public class SpellDAOImpl extends SpellDAO {
                 if (!learnableSpells.containsKey(result.getInt("breed_id"))) {
                     learnableSpells.put(result.getInt("breed_id"), new ArrayList<>());
                 }
-                learnableSpells.get(result.getInt("breed_id")).add(new LearnableSpell() {
-                    {
-                        ID = result.getInt("id");
-                        spell = result.getInt("spell");
-                        obtainLevel = result.getInt("obtain_level");
-                        breedID = result.getInt("breed_id");
-                    }
-                });
+                learnableSpells.get(result.getInt("breed_id")).add(new LearnableSpell(result));
                 i++;
             }
         } catch (Exception e) {
@@ -196,6 +107,9 @@ public class SpellDAOImpl extends SpellDAO {
 
     @Override
     public SpellBomb findBomb(int id) { return this.bombs.get(id); }
+
+    @Override
+    public SpellLevel findLevel(int id) { return this.levels.get(id); }
 
     @Override
     public Spell findSpell(int id)

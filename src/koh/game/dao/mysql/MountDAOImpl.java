@@ -31,42 +31,26 @@ public class MountDAOImpl extends MountDAO {
     private int loadAll() {
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from mount_templates", 0)) {
             ResultSet result = conn.getResult();
-            int i = 0;
 
             while (result.next()) {
-                cache.put(result.getInt("scroll_id"), new MountTemplate() {
-                    {
-                        this.Id = result.getInt("id");
-                        this.scroolId =result.getInt("scroll_id");
-                        this.entityLook = EntityLookParser.fromString(result.getString("entityLook"));
-                        if (!result.getString("stats").isEmpty()) {
-                            for (String stat : result.getString("stats").split("\\|")) {
-                                String[] infos = stat.split("=");
-                                Couple<Integer, Double> c = new Couple<Integer, Double>(Integer.parseInt(infos[0]), (infos.length > 1 ? Double.parseDouble(infos[1]) : 0));
-                                stats.add(c);
-                            }
-                        }
-                    }
-                });
-                i++;
+                cache.put(result.getInt("scroll_id"), new MountTemplate(result));
             }
-            return i;
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
-            return 0;
         }
+        return cache.size();
     }
 
     @Override
     public MountTemplate find(int model) {
-        return cache.values().stream().filter(x -> x.Id == model).findFirst().orElse(null);
+        return cache.values().stream().filter(x -> x.getId() == model).findFirst().orElse(null);
     }
 
     @Override
     public ObjectEffectInteger[] getMountByEffect(int model, int level) {
         ObjectEffectInteger[] Effects = new ObjectEffectInteger[0];
-        for (Couple<Integer, Double> Stat : find(model).stats) {
+        for (Couple<Integer, Double> Stat : find(model).getStats()) {
             if ((int) (level / Stat.second) <= 0) {
                 continue;
             }

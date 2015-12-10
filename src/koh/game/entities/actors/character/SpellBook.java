@@ -49,11 +49,11 @@ public class SpellBook {
         }
 
         public SpellLevel getSpellLevel() {
-            return DAO.getSpells().findSpell(id).spellLevels[level -1];
+            return DAO.getSpells().findSpell(id).getSpellLevels()[level -1];
         }
 
         public SpellLevel getSpellLevel(byte Level) {
-            return  DAO.getSpells().findSpell(id).spellLevels[Level - 1];
+            return  DAO.getSpells().findSpell(id).getSpellLevels()[Level - 1];
         }
 
         public SpellItem getSpellItem() {
@@ -107,8 +107,8 @@ public class SpellBook {
         byte i = 0;
         Book.addSpell(0, (byte) 1, i++, null);
         for (LearnableSpell ls :  DAO.getSpells().findLearnableSpell(Class)) {
-            if (ls.obtainLevel <= Level) {
-                Book.addSpell(ls.spell, (byte) 1, i++, null);
+            if (ls.getObtainLevel() <= Level) {
+                Book.addSpell(ls.getSpell(), (byte) 1, i++, null);
             }
         }
         return Book;
@@ -261,7 +261,7 @@ public class SpellBook {
         } else if (client.character.spellPoints < (int) spell.level) {
             return false;
         } else {
-            return spell.getSpellLevel((byte) (spell.level + 1)).minPlayerLevel <= client.character.level;
+            return spell.getSpellLevel((byte) (spell.level + 1)).getMinPlayerLevel() <= client.character.level;
         }
     }
 

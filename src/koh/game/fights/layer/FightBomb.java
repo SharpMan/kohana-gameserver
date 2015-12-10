@@ -40,8 +40,8 @@ public class FightBomb extends FightActivableObject {
         m_fight = Caster.fight;
         ID = (short) m_fight.NextTriggerUid.incrementAndGet();
         m_caster = Caster;
-        m_spellId = Spell.spellId;
-        m_spell_level = Spell.grade;
+        m_spellId = Spell.getSpellId();
+        m_spell_level = Spell.getGrade();
         m_actionEffect = Spell;
         activationType = BuffActiveType.ACTIVE_ENDMOVE;
 

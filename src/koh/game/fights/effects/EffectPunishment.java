@@ -47,7 +47,7 @@ public class EffectPunishment extends EffectBase {
 
     public static int ApplyDamages(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
 
-        if (Target.states.hasState(FightStateEnum.STATE_REFLECT_SPELL) && !CastInfos.IsPoison && ((BuffReflectSpell) Target.states.getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).ReflectLevel >= CastInfos.SpellLevel.grade) {
+        if (Target.states.hasState(FightStateEnum.STATE_REFLECT_SPELL) && !CastInfos.IsPoison && ((BuffReflectSpell) Target.states.getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).reflectLevel >= CastInfos.SpellLevel.getGrade()) {
             Target.fight.sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, Target.ID, CastInfos.Caster.ID));
             Target = CastInfos.Caster;
         }
