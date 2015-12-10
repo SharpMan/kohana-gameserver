@@ -235,7 +235,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public synchronized void teleport(int newMapID, int newCellID) {
-        if (this.currentMap.id == newMapID) {
+        if (this.currentMap.getId() == newMapID) {
             this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
             this.currentMap.sendToField(new TeleportOnSameMapMessage(ID, cell.id));
             return;
@@ -257,7 +257,7 @@ public class Player extends IGameActor implements Observer {
             this.cell = NextMap.getCell((short) newCellID);
         }
         this.currentMap.spawnActor(this);
-        client.send(new CurrentMapMessage(currentMap.id, "649ae451ca33ec53bbcbcc33becf15f4"));
+        client.send(new CurrentMapMessage(currentMap.getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
         if (this.followers != null) {
             this.followers.parallelStream().forEach(e -> e.send(new CompassUpdatePartyMemberMessage(CompassTypeEnum.COMPASS_TYPE_PARTY, this.currentMap.coordinates(), this.ID)));
         }
@@ -276,7 +276,7 @@ public class Player extends IGameActor implements Observer {
                     this.spawnToMap();
                     client.send(this.currentMap.getAgressableActorsStatus(this));
                 }
-                client.send(new CurrentMapMessage(currentMap.id, "649ae451ca33ec53bbcbcc33becf15f4")); //kdpelrkdpaielcmspekdprcvkdparkdb
+                client.send(new CurrentMapMessage(currentMap.getId(), "649ae451ca33ec53bbcbcc33becf15f4")); //kdpelrkdpaielcmspekdprcvkdparkdb
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
                 PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));

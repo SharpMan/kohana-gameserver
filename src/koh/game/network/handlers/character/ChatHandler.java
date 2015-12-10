@@ -202,7 +202,7 @@ public class ChatHandler {
                             break;
                         }*/
                         int cellid = Integer.parseInt(message.Content.split(" ")[1]);
-                        DAO.getPaddocks().find(Client.character.currentMap.id).removePaddockItem(cellid);
+                        DAO.getPaddocks().find(Client.character.currentMap.getId()).removePaddockItem(cellid);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -221,7 +221,7 @@ public class ChatHandler {
                         int object = Integer.parseInt(message.Content.split(" ")[2]);
                         short durability = Short.parseShort(message.Content.split(" ")[3]);
                         short durabilityMax = Short.parseShort(message.Content.split(" ")[4]);
-                        DAO.getPaddocks().find(Client.character.currentMap.id).addPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
+                        DAO.getPaddocks().find(Client.character.currentMap.getId()).addPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -242,11 +242,11 @@ public class ChatHandler {
                         if (SubAreas.length > 1 && subArea == -1) {
                             PlayerController.sendServerMessage(Client, "This position contains a lots of subArea so try one of this ..");
                             for (MapPosition s : SubAreas) {
-                                PlayerController.sendServerMessage(Client, "!go " + X + " " + Y + " " + s.subAreaId + " (Or choose mapid " + s.id);
+                                PlayerController.sendServerMessage(Client, "!go " + X + " " + Y + " " + s.getSubAreaId() + " (Or choose mapid " + s.getId());
                             }
                         } else {
                             if (subArea == -1) {
-                                subArea = SubAreas[0].subAreaId;
+                                subArea = SubAreas[0].getSubAreaId();
                             }
                             DofusMap Map = DAO.getMaps().findMapByPos(X, Y, subArea);
                             if (Map == null) {
@@ -254,7 +254,7 @@ public class ChatHandler {
                                 break;
                             }
 
-                            Client.character.teleport(Map.id, Map.getAnyCellWalakable().id); //Todo random walakable cell
+                            Client.character.teleport(Map.getId(), Map.getAnyCellWalakable().id); //Todo random walakable cell
                         }
 
                     } catch (Exception e) {

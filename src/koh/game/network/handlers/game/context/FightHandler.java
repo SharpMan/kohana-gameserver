@@ -247,7 +247,7 @@ public class FightHandler {
             Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
         } else if (Target == Client.character) {
             Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.FIGHT_MYSELF));
-        } else if (Target.currentMap.id != Client.character.currentMap.id) {
+        } else if (Target.currentMap.getId() != Client.character.currentMap.getId()) {
             Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.WRONG_MAP));
         } else if (Message.friendly) {
             if (!Target.client.canGameAction(GameActionTypeEnum.BASIC_REQUEST) || !Target.isInWorld) {

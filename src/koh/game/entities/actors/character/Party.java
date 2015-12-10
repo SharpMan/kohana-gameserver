@@ -95,15 +95,15 @@ public class Party extends IWorldEventObserver {
     }
 
     public PartyMemberInformations toMemberInformations(Player x) {
-        return new PartyMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.life, x.getMaxLife(), x.getProspection(), x.regenRate, x.getInitiative(false), x.alignmentSide.value, x.currentMap.position.posX, x.currentMap.position.posY, x.currentMap.id, x.currentMap.subAreaId, new PlayerStatus(x.status.value()), new PartyCompanionMemberInformations[0]);
+        return new PartyMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.life, x.getMaxLife(), x.getProspection(), x.regenRate, x.getInitiative(false), x.alignmentSide.value, x.currentMap.getPosition().getPosX(), x.currentMap.getPosition().getPosY(), x.currentMap.getId(), x.currentMap.getSubAreaId(), new PlayerStatus(x.status.value()), new PartyCompanionMemberInformations[0]);
     }
 
     public PartyMemberInformations[] toMemberInformations() {
-        return this.players.stream().map(x -> new PartyMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.life, x.getMaxLife(), x.getProspection(), x.regenRate, x.getInitiative(false), x.alignmentSide.value, x.currentMap.position.posX, x.currentMap.position.posY, x.currentMap.id, x.currentMap.subAreaId, new PlayerStatus(x.status.value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformations[]::new);
+        return this.players.stream().map(x -> new PartyMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.life, x.getMaxLife(), x.getProspection(), x.regenRate, x.getInitiative(false), x.alignmentSide.value, x.currentMap.getPosition().getPosX(), x.currentMap.getPosition().getPosY(), x.currentMap.getId(), x.currentMap.getSubAreaId(), new PlayerStatus(x.status.value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformations[]::new);
     }
 
     public PartyInvitationMemberInformations[] toPartyInvitationMemberInformations() {
-        return this.players.stream().map(x -> new PartyInvitationMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.currentMap.position.posX, x.currentMap.position.posY, x.currentMap.id, x.currentMap.subAreaId, new PartyCompanionBaseInformations[0])).toArray(PartyInvitationMemberInformations[]::new);
+        return this.players.stream().map(x -> new PartyInvitationMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.currentMap.getPosition().getPosX(), x.currentMap.getPosition().getPosY(), x.currentMap.getId(), x.currentMap.getSubAreaId(), new PartyCompanionBaseInformations[0])).toArray(PartyInvitationMemberInformations[]::new);
     }
 
     public void addGuest(Player p) {

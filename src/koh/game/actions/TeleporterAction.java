@@ -43,7 +43,7 @@ public class TeleporterAction extends GameAction {
                 return;
             }
             ((Player) actor).inventoryCache.substractKamas(getCostTo(null));
-            ((Player) actor).teleport(map, subway.Cell);
+            ((Player) actor).teleport(map, subway.getCell());
 
             this.endExecute();
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class TeleporterAction extends GameAction {
         if (zaaps == null) {
             return Enumerable.DuplicatedKeyInt(39, ((Player) actor).mapid);
         }
-        return zaaps.stream().mapToInt(x -> x.SubArea).toArray();
+        return zaaps.stream().mapToInt(x -> x.getSubArea()).toArray();
     }
 
     public int[] mapIds() {
@@ -70,7 +70,7 @@ public class TeleporterAction extends GameAction {
         if (zaaps == null) {
             return Enumerable.DuplicatedKeyInt(39, ((Player) actor).mapid);
         }
-        return zaaps.stream().mapToInt(x -> x.Mapid).toArray();
+        return zaaps.stream().mapToInt(x -> x.getMapid()).toArray();
     }
 
     public int[] getCost() {

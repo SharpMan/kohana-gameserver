@@ -231,7 +231,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setInt(4, character.sexe);
             pStatement.setInt(5, character.level);
             pStatement.setString(6, StringUtils.join(character.indexedColors, ','));
-            pStatement.setInt(7, character.currentMap.id);
+            pStatement.setInt(7, character.currentMap.getId());
             pStatement.setInt(8, character.cell.id);
             pStatement.setString(9, StringUtils.join(character.ennabledChannels, ','));
             pStatement.setInt(10, character.statPoints);

@@ -3,6 +3,10 @@ package koh.game.entities.environments;
 import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.entities.actors.Player;
+import lombok.Getter;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -10,12 +14,19 @@ import koh.game.entities.actors.Player;
  */
 public class DofusTrigger {
 
-    public int type;
-    public int newMap;
-    public int newCell;
-    public String criteria;
+    private int type;
+    private int newMap;
+    private int newCell;
+    private String criteria;
 
      private ConditionExpression m_criteriaExpression;
+
+    public DofusTrigger(ResultSet result) throws SQLException {
+        this.type = result.getInt("type");
+        this.newMap = result.getInt("map");
+        this.newCell = result.getShort("cell");
+        this.criteria = result.getString("conditions");
+    }
 
     public ConditionExpression getCriteriaExpression() {
         if (m_criteriaExpression == null) {

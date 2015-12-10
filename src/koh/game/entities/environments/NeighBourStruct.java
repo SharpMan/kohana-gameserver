@@ -1,13 +1,17 @@
 package koh.game.entities.environments;
 
+import lombok.Getter;
+
 /**
  *
  * @author Neo-Craft
  */
  public class NeighBourStruct {
 
-    public int mapid;
-    public int cellid;
+    @Getter
+    private int mapid;
+    @Getter
+    private int cellid;
 
     public NeighBourStruct(int Mapid, int Cellid) {
         this.mapid = Mapid;

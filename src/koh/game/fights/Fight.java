@@ -212,20 +212,20 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.myFightCells.put(myTeam1, new HashMap<>());
         this.myFightCells.put(myTeam2, new HashMap<>());
 
-        if (Fight.MAP_FIGHTCELLS.containsKey(this.map.id)) {
+        if (Fight.MAP_FIGHTCELLS.containsKey(this.map.getId())) {
             // Ajout
             synchronized (Fight.MAP_FIGHTCELLS) {
-                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.id).get(0)) {
+                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(0)) {
                     this.myFightCells.get(this.myTeam1).put(Cell, this.myCells.get(Cell));
                 }
-                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.id).get(1)) {
+                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(1)) {
                     this.myFightCells.get(this.myTeam2).put(Cell, this.myCells.get(Cell));
                 }
             }
             return;
         }
 
-        for (Short CellValue : this.map.redCells) {
+        for (Short CellValue : this.map.getRedCells()) {
             FightCell Cell = this.myCells.get(CellValue);
             if (Cell == null || !Cell.CanWalk()) {
                 continue;
@@ -233,7 +233,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.myFightCells.get(this.myTeam1).put(CellValue, Cell);
         }
 
-        for (Short CellValue : this.map.blueCells) {
+        for (Short CellValue : this.map.getBlueCells()) {
             FightCell Cell = this.myCells.get(CellValue);
             if (Cell == null || !Cell.CanWalk()) {
                 continue;
@@ -241,7 +241,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.myFightCells.get(this.myTeam2).put(CellValue, Cell);
         }
 
-        if (this.map.blueCells.length == 0 || this.map.redCells.length == 0) {
+        if (this.map.getBlueCells().length == 0 || this.map.getRedCells().length == 0) {
             this.myFightCells.get(this.myTeam1).clear();
             this.myFightCells.get(this.myTeam2).clear();
             Couple<ArrayList<FightCell>, ArrayList<FightCell>> startCells = Algo.genRandomFightPlaces(this);
@@ -252,9 +252,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 this.myFightCells.get(this.myTeam2).put(Cell.Id, Cell);
             }
             synchronized (Fight.MAP_FIGHTCELLS) {
-                Fight.MAP_FIGHTCELLS.put(this.map.id, new HashMap<>());
-                Fight.MAP_FIGHTCELLS.get(this.map.id).put(0, this.myFightCells.get(this.myTeam1).keySet().toArray(new Short[this.myFightCells.get(this.myTeam1).size()]));
-                Fight.MAP_FIGHTCELLS.get(this.map.id).put(1, this.myFightCells.get(this.myTeam2).keySet().toArray(new Short[this.myFightCells.get(this.myTeam2).size()]));
+                Fight.MAP_FIGHTCELLS.put(this.map.getId(), new HashMap<>());
+                Fight.MAP_FIGHTCELLS.get(this.map.getId()).put(0, this.myFightCells.get(this.myTeam1).keySet().toArray(new Short[this.myFightCells.get(this.myTeam1).size()]));
+                Fight.MAP_FIGHTCELLS.get(this.map.getId()).put(1, this.myFightCells.get(this.myTeam2).keySet().toArray(new Short[this.myFightCells.get(this.myTeam2).size()]));
             }
         }
 

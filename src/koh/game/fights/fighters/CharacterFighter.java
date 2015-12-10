@@ -175,7 +175,7 @@ public class CharacterFighter extends Fighter {
             if (!(this.fight instanceof ChallengeFight) && this.team.Id == this.fight.getLoosers().Id) {
                 this.Character.teleport(this.Character.savedMap, this.Character.savedCell);
             } else {
-                this.Character.send(new CurrentMapMessage(this.Character.currentMap.id, "649ae451ca33ec53bbcbcc33becf15f4"));
+                this.Character.send(new CurrentMapMessage(this.Character.currentMap.getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
                 //this.character.send(new BasicTimeMessage((double) (new Date().getTime()), 0));
                 this.Character.currentMap.spawnActor(this.Character);
 

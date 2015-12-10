@@ -45,6 +45,8 @@ import koh.protocol.types.game.house.HouseInformations;
 import koh.protocol.types.game.interactive.InteractiveElement;
 import koh.protocol.types.game.interactive.InteractiveElementSkill;
 import koh.protocol.types.game.interactive.InteractiveElementWithAgeBonus;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -53,31 +55,37 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class DofusMap extends IWorldEventObserver implements IWorldField {
 
-    public int id;
-    public byte version;
-    public int relativeId;
-    public byte mapType;
-    public int subAreaId;
-    public int bottomNeighbourId;
-    public int topNeighbourId;
-    public int leftNeighbourId, rightNeighbourId, shadowBonusOnEntities;
-    public NeighBourStruct[] newNeighbour;
+    @Getter
+    private int id;
+    private byte version,mapType;
+    @Getter
+    private int relativeId,subAreaId;
+    @Getter
+    public int bottomNeighbourId,topNeighbourId, leftNeighbourId, rightNeighbourId, shadowBonusOnEntities;
+    @Getter @Setter
+    private NeighBourStruct[] newNeighbour;
     public boolean useLowPassFilter, useReverb;
-    public int presetId;
+    private int presetId;
     private byte[] compressedCells, compressedLayers;
     private String compressedBlueCells, compressedRedCells;
-    public boolean myInitialized = false;
+    @Getter
+    private boolean myInitialized = false;
     private final Map<Integer, IGameActor> myGameActors = new ConcurrentHashMap<>();
-    public StatedElement[] elementsStated = new StatedElement[0];
-    public List<InteractiveElementStruct> interactiveElements = new ArrayList<>();
+    @Getter @Setter
+    private StatedElement[] elementsStated = new StatedElement[0];
+    @Getter
+    private List<InteractiveElementStruct> interactiveElements = new ArrayList<>();
     private Map<Short, InventoryItem> droppedItems;
-    public List<HouseInformations> houses = new ArrayList<>();
+    @Getter
+    private List<HouseInformations> houses = new ArrayList<>();
+    @Getter @Setter
     public MapPosition position;
     private int myNextActorId = -1;
     private Map<Integer, MapDoor> doors;
     private FightController myFightController;
     /*After loadAll */
-    public short[] blueCells, redCells;
+    @Getter
+    private short[] blueCells, redCells;
     private DofusCell[] cells;
     private Layer[] layers;
 
@@ -129,7 +137,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     public MapCoordinates coordinates() {
         try {
-            return new MapCoordinates(this.position.posX, this.position.posY);
+            return new MapCoordinates(this.position.getPosX(), this.position.getPosY());
         } catch (Exception e) {
             return new MapCoordinates(); //Dj ecT..
         }
@@ -389,7 +397,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         if (this.doors == null) {
             this.doors = new HashMap();
         }
-        this.doors.put(d.elementID, d);
+        this.doors.put(d.getElementID(), d);
     }
 
     public MapDoor getDoor(int id) {

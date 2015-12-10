@@ -114,10 +114,6 @@ public class InventoryItem {
         this.notifyColumn("stack");
     }
 
-    public int getOwner() {
-        return owner;
-    }
-
     public void setOwner(int i) {
         this.owner = i;
         this.notifyColumn("owner");

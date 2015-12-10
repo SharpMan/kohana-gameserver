@@ -36,7 +36,7 @@ public class Area {
             @Override
             public void run() {
                 subAreas.forEach(Sub -> Arrays.stream(Sub.getMapIds())
-                        .forEach(Id -> DAO.getMaps().findTemplate(Id).interactiveElements.stream()
+                        .forEach(Id -> DAO.getMaps().findTemplate(Id).getInteractiveElements().stream()
                                 .filter(Element -> DAO.getMaps().findTemplate(Id).getStatedElementById(Element.elementId) != null && DAO.getMaps().findTemplate(Id).getStatedElementById(Element.elementId).elementState == 0)
                                 .forEach(Interactive -> {
                                     {
@@ -56,18 +56,18 @@ public class Area {
             public void run() {
                 subAreas
                         .forEach(Sub -> Arrays.stream(Sub.getMapIds())
-                                .filter(Id -> DAO.getMaps().findTemplate(Id).myInitialized)
+                                .filter(Id -> DAO.getMaps().findTemplate(Id).isMyInitialized())
                                 .forEach(Id -> {
                                     {
                                         boolean Modified = false;
-                                        for (StatedElement element : (Iterable<StatedElement>) Arrays.stream(DAO.getMaps().findTemplate(Id).elementsStated)
+                                        for (StatedElement element : (Iterable<StatedElement>) Arrays.stream(DAO.getMaps().findTemplate(Id).getElementsStated())
                                                 .filter(statedElement -> statedElement.deadAt != -1 && statedElement.elementState > 0 && (System.currentTimeMillis() - statedElement.deadAt) > DAO.getSettings().getIntElement("job.Spawn") * 60000)::iterator) {
                                             element.deadAt = -1;
                                             element.elementState = 0;
                                             Modified = true;
                                         }
                                         if (Modified) {
-                                            DAO.getMaps().findTemplate(Id).sendToField(new StatedMapUpdateMessage(DAO.getMaps().findTemplate(Id).elementsStated));
+                                            DAO.getMaps().findTemplate(Id).sendToField(new StatedMapUpdateMessage(DAO.getMaps().findTemplate(Id).getElementsStated()));
                                         }
 
                                     }

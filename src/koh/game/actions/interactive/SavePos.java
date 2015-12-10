@@ -22,7 +22,7 @@ public class SavePos implements InteractiveAction {
 
     @Override
     public void execute(Player actor, int element) {
-        actor.savedMap = actor.currentMap.id;
+        actor.savedMap = actor.currentMap.getId();
         actor.savedCell = actor.cell.id;
         actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 6, new String[0]));
 

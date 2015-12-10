@@ -9,7 +9,7 @@ import koh.game.entities.actors.Player;
 public class SubAreaCriterion extends Criterion {
 
     public static String Identifier = "PB";
-    public Integer SubArea;
+    public Integer subArea;
 
     @Override
     public String toString() {
@@ -18,11 +18,11 @@ public class SubAreaCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.SubArea = Integer.parseInt(Literal);
+        this.subArea = Integer.parseInt(Literal);
     }
 
     @Override
     public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.currentMap.subAreaId, this.SubArea);
+        return this.Compare((Comparable<Integer>) character.currentMap.getSubAreaId(), this.subArea);
     }
 }
