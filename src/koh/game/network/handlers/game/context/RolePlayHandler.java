@@ -27,7 +27,8 @@ import org.apache.logging.log4j.Logger;
  */
 public class RolePlayHandler {
 
-    public static Map<Integer, StatsEnum> BOOST_ID_TO_STATS = new HashMap<Integer, StatsEnum>() {
+    //TODO ImmutableMap
+    public static final Map<Integer, StatsEnum> BOOST_ID_TO_STATS = new HashMap<Integer, StatsEnum>(6) {
         {
             put(StatsBoostEnum.Strength, StatsEnum.Strength);
             put(StatsBoostEnum.Vitality, StatsEnum.Vitality);
