@@ -199,6 +199,10 @@ public class GenericStats {
         }
     }
 
+    public void resetBase(){
+        this.myStats.values().forEach(stat -> stat.Base = 0);
+    }
+
     public void addBoost(StatsEnum effectType, int value) {
         if (!this.myStats.containsKey(effectType)) {
             this.myStats.put(effectType, new CharacterBaseCharacteristic(0, value, 0, 0, 0));

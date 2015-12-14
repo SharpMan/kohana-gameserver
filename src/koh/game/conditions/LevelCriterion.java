@@ -22,7 +22,7 @@ public class LevelCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         return this.Compare((Comparable<Integer>) character.level, this.Level);
     }
 

@@ -234,7 +234,7 @@ public class ExchangeHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.myExchange.sellItem(Client, Client.character.inventoryCache.itemsCache.get(Message.objectToSellId), SecureParser.ItemQuantity(Message.quantity));
+        Client.myExchange.sellItem(Client, Client.character.inventoryCache.find(Message.objectToSellId), SecureParser.ItemQuantity(Message.quantity));
     }
 
 }

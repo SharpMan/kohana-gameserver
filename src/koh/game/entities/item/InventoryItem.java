@@ -236,7 +236,7 @@ public class InventoryItem {
             if (this.getTemplate().getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.getTemplate().getCriteriaExpression().Eval(character);
+                return this.getTemplate().getCriteriaExpression().eval(character);
             }
         } catch (Exception e) {
             logger.error("Bugged item {} condition {}", this.getTemplate().getId(), this.getTemplate().getCriteria());

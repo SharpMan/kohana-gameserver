@@ -89,7 +89,7 @@ public class ContextHandler {
 
     @HandlerAttribute(ID = ObjectDropMessage.MESSAGE_ID)
     public static void HandleObjectDropMessage(WorldClient Client, ObjectDropMessage Message) {
-        InventoryItem Item = Client.character.inventoryCache.itemsCache.get(Message.objectUID);
+        InventoryItem Item = Client.character.inventoryCache.find(Message.objectUID);
         if (Item == null || Item.getQuantity() < Message.quantity) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
             return;

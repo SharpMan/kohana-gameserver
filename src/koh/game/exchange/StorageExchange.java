@@ -64,7 +64,7 @@ public class StorageExchange extends Exchange {
                 Item.setNeedInsert(true);
             }
         } else { //add In bank
-            InventoryItem Item = Client.character.inventoryCache.itemsCache.get(itemID);
+            InventoryItem Item = Client.character.inventoryCache.find(itemID);
             if (Item == null) {
                 return false;
             }

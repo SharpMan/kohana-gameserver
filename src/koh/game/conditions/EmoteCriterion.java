@@ -23,7 +23,7 @@ public class EmoteCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         //FIXME : See if another operator exist for this
         switch (this.Operator) {
             case INEQUALS:

@@ -11,8 +11,8 @@ public class PriorityOperator extends ConditionExpression {
     public ConditionExpression Expression;
 
     @Override
-    public boolean Eval(Player character) {
-        return this.Expression.Eval(character);
+    public boolean eval(Player character) {
+        return this.Expression.eval(character);
     }
 
     @Override

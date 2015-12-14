@@ -59,7 +59,7 @@ public class StatsCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
 
         if (this.Field != null) {
             return this.Compare((Comparable<Integer>) (this.Base ? character.stats.getBase(Field) : character.stats.getTotal(Field)), this.Comparand);

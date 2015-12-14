@@ -3,7 +3,6 @@ package koh.game.entities.environments;
 import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.entities.actors.Player;
-import lombok.Getter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,7 +32,7 @@ public class DofusTrigger {
             if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                 return null;
             } else {
-                this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
+                this.m_criteriaExpression = ConditionExpression.parse(this.criteria);
             }
         }
         return m_criteriaExpression;
@@ -44,7 +43,7 @@ public class DofusTrigger {
             if (this.getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.getCriteriaExpression().Eval(character);
+                return this.getCriteriaExpression().eval(character);
             }
         } catch (Exception e) {
             e.printStackTrace();

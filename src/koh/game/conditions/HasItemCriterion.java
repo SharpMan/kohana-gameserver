@@ -26,7 +26,7 @@ public class HasItemCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         if (this.Operator == ComparaisonOperatorEnum.EQUALS) {
             return character.inventoryCache.hasItemId(this.Item);
         }

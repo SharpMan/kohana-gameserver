@@ -4,12 +4,13 @@ import com.google.common.base.Strings;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import koh.game.Main;
+
 import koh.game.conditions.ConditionExpression;
 import koh.game.dao.DAO;
-import koh.game.dao.api.AccountDataDAO;
 import koh.game.dao.api.ItemTemplateDAO;
+import koh.game.entities.actors.Player;
 import koh.game.entities.spells.EffectInstance;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
@@ -58,6 +59,7 @@ public class ItemTemplate {
     private int favoriteSubAreasBonus;
     @Getter
     private ConditionExpression m_criteriaExpression;
+    private ArrayList<ItemAction> actions = null;
 
     private static final Logger logger = LogManager.getLogger(ItemTemplate.class);
 
@@ -99,7 +101,7 @@ public class ItemTemplate {
                 if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                     return null;
                 } else {
-                    this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
+                    this.m_criteriaExpression = ConditionExpression.parse(this.criteria);
                 }
             }
             return m_criteriaExpression;
@@ -200,7 +202,21 @@ public class ItemTemplate {
         }
         return false;
     }
-    
+
+    public void addItemAction(ItemAction action){
+        if(this.actions == null)
+            this.actions = new ArrayList<>(2);
+        this.actions.add(action);
+    }
+
+    public boolean use(Player plr){
+        if(this.actions == null)
+            return false;
+        return this.actions.stream().allMatch(x -> x.execute(plr));
+    }
+
+
+
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }

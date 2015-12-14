@@ -43,18 +43,18 @@ public class BoolOperator extends ConditionExpression {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         if (this.Operator != BoolOperatorEnum.AND && this.Operator != BoolOperatorEnum.OR) {
             throw new Error(String.format("Cannot evaluate {0} : illegal bool operator {1}", this, this.Operator));
         }
-        boolean flag1 = this.Left.Eval(character);
+        boolean flag1 = this.Left.eval(character);
         if (this.Operator == BoolOperatorEnum.AND && !flag1) {
             return false;
         }
         if (this.Operator == BoolOperatorEnum.OR && flag1) {
             return true;
         }
-        boolean flag2 = this.Right.Eval(character);
+        boolean flag2 = this.Right.eval(character);
         if (this.Operator == BoolOperatorEnum.AND) {
             return flag1 && flag2;
         }

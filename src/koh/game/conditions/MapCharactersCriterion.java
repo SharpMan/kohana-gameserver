@@ -30,7 +30,7 @@ public class MapCharactersCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         int count = character.currentMap.playersCount();
         if (this.MapId != -1) {
             return this.Compare((Comparable<Integer>) character.currentMap.getId(), this.MapId) && this.Compare((Comparable<Integer>) count, this.CharactersCount);

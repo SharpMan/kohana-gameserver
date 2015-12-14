@@ -1,12 +1,11 @@
 package koh.game.dao.mysql;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.ItemTemplateDAO;
-import koh.game.entities.item.ItemSet;
-import koh.game.entities.item.ItemTemplate;
-import koh.game.entities.item.ItemType;
-import koh.game.entities.item.Weapon;
+import koh.game.entities.item.*;
+import koh.game.entities.item.actions.*;
 import koh.game.entities.item.animal.PetTemplate;
 import koh.game.utils.sql.ConnectionResult;
 import org.apache.logging.log4j.LogManager;
@@ -27,9 +26,51 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
     private final Map<Integer, ItemSet> itemSets = new HashMap<>(377);
     private final Map<Integer, PetTemplate> pets = new HashMap<>(114);
     private final Map<Integer, ItemType> itemTypes = new HashMap<>(171);
+    private final ImmutableMap<Integer, Class<? extends ItemAction>> itemActions = ImmutableMap
+            .of(0, Teleportation.class)
+            .of(4, Kamas.class)
+            .of(5, CreateItem.class)
+            .of(6, LearnJob.class)
+            .of(7, ReturnToSavePos.class)
+            .of(8, AddBaseStat.class)
+            .of(9, LearnSpell.class)
+            .of(10, GenLife.class)
+            .of(11, SetAlign.class)
+            .of(12, SpawnMonsterGroup.class)
+            .of(13, Restat.class)
+            .of(14, ForgetSpell.class)
+            .of(15, TeleportDj.class)
+            .of(20, AddSpellPoint.class)
+            .of(21, AddEnergy.class)
+            .of(22, AddExperience.class);
+    //.of(24,morph)
+    //.of(25,demorph)
+    //.of(26,guildEnnclos)
+    //.of(50,traque)
+    //.of(51,localistraque)
+
+    private final Class[] actionArgs = new Class[]{String[].class, String.class};
 
     @Inject
     private DatabaseSource dbSource;
+
+    private int loadAllUsableItems() {
+        int i = 0;
+        try (ConnectionResult conn = dbSource.executeQuery("SELECT * from item_usable_actions", 0)) {
+            ResultSet result = conn.getResult();
+            ItemType type;
+            while (result.next()) {
+                if (itemActions.get(result.getInt("action")) == null)
+                    continue;
+                this.getTemplate(result.getInt("template")).addItemAction(itemActions.get(result.getInt("action")).getDeclaredConstructor(this.actionArgs).newInstance(result.getString("args").split(","), result.getString("criteria")));
+                ++i;
+            }
+        } catch (Exception e) {
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+        return i;
+    }
 
     private int loadAllItemTypes() {
         int i = 0;
@@ -121,6 +162,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
         logger.info("Loaded {} template pets", this.loadAllPets());
         logger.info("Loaded {} templates", this.loadAll());
         logger.info("Loaded {} template weapons", this.loadAllWeapons());
+        logger.info("Loaded {} usable items action", this.loadAllUsableItems());
     }
 
     @Override

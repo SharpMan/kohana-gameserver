@@ -3,12 +3,13 @@ package koh.game.entities.actors.character;
 import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
@@ -53,7 +54,7 @@ public class CharacterInventory {
 
     //TODO : Updater PartyEntityLook if Dissociate/Associate livingObject
     private Player player;
-    public Map<Integer, InventoryItem> itemsCache = Collections.synchronizedMap(new HashMap<>());
+    private Map<Integer, InventoryItem> itemsCache = new ConcurrentHashMap<>();
     public final static int[] unMergeableType = new int[]{97, 121, 18};
 
     public CharacterInventory(Player character) {
@@ -61,16 +62,45 @@ public class CharacterInventory {
         DAO.getItems().initInventoryCache(player.ID, itemsCache, "character_items");
     }
 
+    public InventoryItem find(int id){
+        return this.itemsCache.get(id);
+    }
+
+    public InventoryItem findTemplate(int template){
+        return this.getItems().filter(x -> x.getTemplateId() == template).findFirst().orElse(null);
+    }
+
+    public void safeDelete(InventoryItem item, int quantity){
+        if (item == null || quantity <= 0) {
+            this.player.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
+            return;
+        }
+        if (item.getPosition() != 63) {
+            unEquipItem(item);
+        }
+        int newQua = item.getQuantity() - quantity;
+        if (newQua <= 0) {
+            removeItem(item);
+        } else {
+            updateObjectquantity(item, newQua);
+        }
+    }
+
+    public Stream<InventoryItem> getItems(){
+        return this.itemsCache.values().stream();
+    }
+
+
     public int getItemSetCount() {
         return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().count();
     }
 
     public void generalItemSetApply() {
-        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(set -> {
+        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(set ->
             {
                 this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false);
             }
-        });
+        );
     }
 
     public boolean add(InventoryItem item, boolean merge) //muste be true
@@ -156,7 +186,7 @@ public class CharacterInventory {
         }
     }
 
-    public MountInventoryItem GetMount(double id) {
+    public MountInventoryItem getMount(double id) {
         return (MountInventoryItem) this.itemsCache.values().stream().filter(x -> x instanceof MountInventoryItem && ((MountInventoryItem) x).getEntity().animalID == (int) id).findFirst().orElse(null);
     }
 
@@ -182,7 +212,7 @@ public class CharacterInventory {
         }
     }
 
-    public void MoveLivingItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
+    public void moveLivingItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
         InventoryItem Item = this.itemsCache.get(guid);
         slot = this.getLivingObjectSlot(Item.getTemplateId());
         InventoryItem exItem = this.getItemInSlot(slot);
@@ -243,7 +273,7 @@ public class CharacterInventory {
         int count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
         if (slot != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             if (item.getTemplate().getTypeId() == 113) {
-                this.MoveLivingItem(guid, slot, quantity);
+                this.moveLivingItem(guid, slot, quantity);
                 return;
             }
 
@@ -498,7 +528,7 @@ public class CharacterInventory {
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
     }
 
-    public void ChangeOwner(InventoryItem item, Player trader) {
+    public void changeOwner(InventoryItem item, Player trader) {
         this.removeFromDic(item.getID());
         player.send(new ObjectDeletedMessage(item.getID()));
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
@@ -591,6 +621,10 @@ public class CharacterInventory {
 
     public boolean hasItemId(int parseInt) {
         return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == parseInt).findAny().isPresent();
+    }
+
+    public boolean hasItemId(int parseInt, int qua) {
+        return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == parseInt).mapToInt(x -> x.getQuantity()).sum() > qua;
     }
 
     private void checkItemsCriterias() {

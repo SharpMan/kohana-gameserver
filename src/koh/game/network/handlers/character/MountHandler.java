@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
-import koh.game.dao.mysql.MountDAOImpl;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.animal.MountInventoryItem;
 import koh.game.network.WorldClient;
@@ -40,16 +38,16 @@ public class MountHandler {
             Client.character.mountInfo.mount.name = Message.name;
             Client.character.mountInfo.save();
             Client.send(new MountRenamedMessage(Message.name, Message.mountId));
-        } else if (Client.character.inventoryCache.GetMount(Message.mountId) != null) {
-            Client.character.inventoryCache.GetMount(Message.mountId).getMount().name = Message.name;
-            Client.character.inventoryCache.GetMount(Message.mountId).save();
+        } else if (Client.character.inventoryCache.getMount(Message.mountId) != null) {
+            Client.character.inventoryCache.getMount(Message.mountId).getMount().name = Message.name;
+            Client.character.inventoryCache.getMount(Message.mountId).save();
             Client.send(new MountRenamedMessage(Message.name, Message.mountId));
         }
     }
 
     @HandlerAttribute(ID = MountFeedRequestMessage.M_ID)
     public static void HandleMountFeedRequestMessage(WorldClient Client, MountFeedRequestMessage Message) {
-        InventoryItem Food = Client.character.inventoryCache.itemsCache.get(Message.mountFoodUid);
+        InventoryItem Food = Client.character.inventoryCache.find(Message.mountFoodUid);
         if (Food == null || Food.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
@@ -104,7 +102,7 @@ public class MountHandler {
                         PlayerController.sendServerMessage(Client, "You are already in a mount");
                         break;
                     }
-                    InventoryItem Dragodinde = Client.character.inventoryCache.itemsCache.get(Message.ridesId[0]);
+                    InventoryItem Dragodinde = Client.character.inventoryCache.find(Message.ridesId[0]);
                     if (Dragodinde == null) {
                         PlayerController.sendServerMessage(Client, "Nullable InventoryMount");
                         break;
@@ -150,11 +148,11 @@ public class MountHandler {
 
     @HandlerAttribute(ID = MountInformationRequestMessage.M_ID)
     public static void HandleMountInformationRequestMessage(WorldClient Client, MountInformationRequestMessage Message) {
-        if (Client.character.inventoryCache.GetMount(Message.Id) == null) {
+        if (Client.character.inventoryCache.getMount(Message.Id) == null) {
             return;
         } else {
             //client.character.inventoryCache.getMount(Message.id).getEffects$Notify().add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), "Melan"));
-            Client.character.send(new MountDataMessage(Client.character.inventoryCache.GetMount(Message.Id).getMount()));
+            Client.character.send(new MountDataMessage(Client.character.inventoryCache.getMount(Message.Id).getMount()));
         }
     }
 

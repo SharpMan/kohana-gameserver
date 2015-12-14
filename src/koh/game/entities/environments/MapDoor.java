@@ -37,7 +37,7 @@ public class MapDoor {
             if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                 return null;
             } else {
-                this.m_criteriaExpression = ConditionExpression.Parse(this.criteria);
+                this.m_criteriaExpression = ConditionExpression.parse(this.criteria);
             }
         }
         return m_criteriaExpression;
@@ -48,7 +48,7 @@ public class MapDoor {
             if (this.getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.getCriteriaExpression().Eval(character);
+                return this.getCriteriaExpression().eval(character);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -22,7 +22,7 @@ public class MariedCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
          return true;
     }
 

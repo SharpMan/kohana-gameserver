@@ -61,6 +61,8 @@ import koh.protocol.types.game.context.roleplay.HumanOptionGuild;
 import koh.protocol.types.game.context.roleplay.HumanOptionOrnament;
 import koh.protocol.types.game.context.roleplay.HumanOptionTitle;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
@@ -100,12 +102,8 @@ public class Player extends IGameActor implements Observer {
     //GenericStats
     /*public int getAP;
      public int getMP;*/
-    public int vitality;
-    public int wisdom;
-    public int strength;
-    public int intell;
-    public int agility;
-    public int chance, life;
+    @Setter @Getter
+    public int chance, life, vitality,wisdom, strength, intell, agility;
     public short activableTitle, activableOrnament;
     public byte regenRate;
     public byte[] emotes;
@@ -115,9 +113,11 @@ public class Player extends IGameActor implements Observer {
 
     //stats
     public long experience;
+    @Getter @Setter
     public int kamas, statPoints, spellPoints;
     public byte alignmentValue, alignmentGrade, PvPEnabled;
     public AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_NEUTRAL;
+    @Getter @Setter
     public int honor, dishonor, energy;
 
     public CopyOnWriteArrayList<Player> followers;
@@ -161,7 +161,7 @@ public class Player extends IGameActor implements Observer {
 
         this.inventoryCache = new CharacterInventory(this);
 
-        this.inventoryCache.itemsCache.values().stream().filter(x -> x.getPosition() != 63).forEach(Item -> {
+        this.inventoryCache.getItems().filter(x -> x.getPosition() != 63).forEach(Item -> {
             this.stats.merge(Item.getStats());
             //this.life += item.getStats().getTotal(StatsEnum.vitality);
         });

@@ -22,7 +22,7 @@ public class NameCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         return this.Compare(character.nickName, this.Name);
     }
 }

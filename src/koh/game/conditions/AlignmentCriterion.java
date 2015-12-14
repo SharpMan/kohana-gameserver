@@ -22,7 +22,7 @@ public class AlignmentCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         return this.Compare((Comparable<Byte>) character.alignmentSide.value, this.AlignmentSide);
     }
 
