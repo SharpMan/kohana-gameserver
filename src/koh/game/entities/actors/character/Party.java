@@ -68,7 +68,7 @@ public class Party extends IWorldEventObserver {
 
     public Player getPlayerById(int id) {
         try {
-            return this.players.stream().filter(x -> x.ID == id).findFirst().get();
+            return this.players.stream().filter(x -> x.getID() == id).findFirst().get();
         } catch (Exception e) {
             return null;
         }
@@ -85,7 +85,7 @@ public class Party extends IWorldEventObserver {
         this.sendToField(new PartyNewMemberMessage(this.id, toMemberInformations(character)));
         //this.updateMember(character);
         this.registerPlayer(character);
-        character.send(new PartyJoinMessage(this.id, type, this.chief.ID, MAX_PARTICIPANTS, toMemberInformations(), toPartyGuestInformations(), this.restricted, this.partyName));
+        character.send(new PartyJoinMessage(this.id, type, this.chief.getID(), MAX_PARTICIPANTS, toMemberInformations(), toPartyGuestInformations(), this.restricted, this.partyName));
     }
 
     public void updateMember(Player character) {
@@ -113,7 +113,7 @@ public class Party extends IWorldEventObserver {
     }
 
     public PartyGuestInformations[] toPartyGuestInformations() {
-        return this.guests.stream().map(player -> new PartyGuestInformations(player.getID(), this.chief.ID, player.getNickName(), player.getEntityLook(), player.getBreed(), player.hasSexe(), player.getStatus(), new PartyCompanionBaseInformations[0])).toArray(PartyGuestInformations[]::new);
+        return this.guests.stream().map(player -> new PartyGuestInformations(player.getID(), this.chief.getID(), player.getNickName(), player.getEntityLook(), player.getBreed(), player.hasSexe(), player.getStatus(), new PartyCompanionBaseInformations[0])).toArray(PartyGuestInformations[]::new);
     }
 
     public boolean isFull() {
@@ -128,19 +128,19 @@ public class Party extends IWorldEventObserver {
             return;
         }
         if (kicked) {
-            player.send(new PartyKickedByMessage(this.id, this.chief.ID));
+            player.send(new PartyKickedByMessage(this.id, this.chief.getID()));
             player.getClient().delGameAction(GameActionTypeEnum.GROUP);
         }
         if (player.getFollowers() != null) { //int partyId, boolean success, int followedId
             player.getFollowers().forEach(x -> {
-                x.send(new PartyFollowStatusUpdateMessage(this.id, true, player.ID));
+                x.send(new PartyFollowStatusUpdateMessage(this.id, true, player.getID()));
             });
             player.getFollowers().clear();
         }
         this.unregisterPlayer(player);
         players.remove(player);
         if (!kicked) {
-            this.sendToField(new PartyMemberRemoveMessage(this.id, player.ID));
+            this.sendToField(new PartyMemberRemoveMessage(this.id, player.getID()));
         }
         if (this.memberCounts() <= 1) {
             clear();
@@ -154,7 +154,7 @@ public class Party extends IWorldEventObserver {
 
     public synchronized void updateLeader(Player p) {
         this.chief = p == null ? this.players.get(0) : p;
-        this.sendToField(new PartyLeaderUpdateMessage(this.id, chief.ID));
+        this.sendToField(new PartyLeaderUpdateMessage(this.id, chief.getID()));
     }
 
     public void abortRequest(WorldClient client, int guestId) {
@@ -169,15 +169,15 @@ public class Party extends IWorldEventObserver {
     }
 
     public boolean isChief(int id) {
-        return this.chief != null && this.chief.ID == id;
+        return this.chief != null && this.chief.getID() == id;
     }
 
     public boolean isChief(Player perso) {
-        return this.chief != null && perso != null && perso.ID == this.chief.ID;
+        return this.chief != null && perso != null && perso.getID() == this.chief.getID();
     }
 
     public PartyGuestInformations toPartyGuestInformations(Player player) {
-        return new PartyGuestInformations(player.getID(), this.chief.ID, player.getNickName(), player.getEntityLook(), player.getBreed(), player.hasSexe(), player.getStatus(), new PartyCompanionBaseInformations[0]);
+        return new PartyGuestInformations(player.getID(), this.chief.getID(), player.getNickName(), player.getEntityLook(), player.getBreed(), player.hasSexe(), player.getStatus(), new PartyCompanionBaseInformations[0]);
     }
 
     public void clear() {
@@ -200,18 +200,18 @@ public class Party extends IWorldEventObserver {
 
     public void followAll(Player playerById) {
         if (playerById != null) {
-            this.players.stream().filter(x -> x.ID != playerById.ID).forEach(x -> {
+            this.players.stream().filter(x -> x.getID() != playerById.getID()).forEach(x -> {
                 playerById.addFollower(x);
             });
         }
     }
 
     public void unFollowAll(Player playerById) {
-        if (playerById != null && playerById.followers != null) {
-            playerById.followers.forEach(x -> {
-                x.send(new PartyFollowStatusUpdateMessage(this.id, false, playerById.ID));
+        if (playerById != null && playerById.getFollowers() != null) {
+            playerById.getFollowers().forEach(x -> {
+                x.send(new PartyFollowStatusUpdateMessage(this.id, false, playerById.getID()));
             });
-            playerById.followers.clear();
+            playerById.getFollowers().clear();
         }
     }
 

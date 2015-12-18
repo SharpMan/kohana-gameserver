@@ -18,18 +18,18 @@ public class BuffArmor extends BuffEffect {
     public BuffArmor(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
         this.Jet = CastInfos.RandomJet(Target);
-        Target.stats.addBoost(StatsEnum.AddArmor, (Jet * (100 + (CastInfos.Caster.getLevel() * 5)) / 100));
+        Target.stats.addBoost(StatsEnum.AddArmor, (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100));
     }
 
     @Override
     public int removeEffect() {
-        Target.stats.getEffect(StatsEnum.AddArmor).additionnal -= (Jet * (100 + (CastInfos.Caster.getLevel() * 5)) / 100);
+        Target.stats.getEffect(StatsEnum.AddArmor).additionnal -= (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100);
         return super.removeEffect();
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
+        return new FightTemporaryBoostEffect(this.GetId(), this.Target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
     }
 
 }

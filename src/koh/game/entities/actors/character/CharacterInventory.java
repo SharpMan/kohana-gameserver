@@ -59,7 +59,7 @@ public class CharacterInventory {
 
     public CharacterInventory(Player character) {
         this.player = character;
-        DAO.getItems().initInventoryCache(player.ID, itemsCache, "character_items");
+        DAO.getItems().initInventoryCache(player.getID(), itemsCache, "character_items");
     }
 
     public InventoryItem find(int id){
@@ -108,8 +108,8 @@ public class CharacterInventory {
         if (merge && !Ints.contains(unMergeableType, item.getTemplate().getTypeId()) && tryMergeItem(item.getTemplateId(), item.getEffects(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
-        if (item.getOwner() != this.player.ID) {
-            item.setOwner(this.player.ID);
+        if (item.getOwner() != this.player.getID()) {
+            item.setOwner(this.player.getID());
         }
         if (itemsCache.containsKey(item.getID())) {
             removeFromDic(item.getID());
@@ -123,8 +123,8 @@ public class CharacterInventory {
                 this.addApparence(item.getApparrance());
             }
             player.refreshEntitie();
-            player.stats.merge(item.getStats());
-            player.life += item.getStats().getTotal(StatsEnum.Vitality);
+            player.getStats().merge(item.getStats());
+            player.addLife(item.getStats().getTotal(StatsEnum.Vitality));
             player.refreshStats();
         }
         return true;
@@ -313,8 +313,8 @@ public class CharacterInventory {
                 item.setPosition(slot);
                 player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
             } else {
-                player.stats.merge(item.getStats());
-                this.player.life += item.getStats().getTotal(StatsEnum.Vitality);
+                player.getStats().merge(item.getStats());
+                this.player.addLife(item.getStats().getTotal(StatsEnum.Vitality));
                 item.setPosition(slot);
                 player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
                 if (item.getApparrance() != 0) {
@@ -346,10 +346,10 @@ public class CharacterInventory {
         } else {
             if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
                 //Retire les stats
-                this.player.stats.unMerge(item.getStats());
-                this.player.life -= item.getStats().getTotal(StatsEnum.Vitality);
-                if (player.life <= 0) {
-                    player.life = 1;
+                this.player.getStats().unMerge(item.getStats());
+                this.player.addLife(-item.getStats().getTotal(StatsEnum.Vitality));
+                if (player.getLife() <= 0) {
+                    player.setLife(1);
                 }
                 this.player.refreshStats();
             }
@@ -426,11 +426,11 @@ public class CharacterInventory {
     private void applyItemSetEffects(ItemSet itemSet, int count, boolean apply, boolean send) {
         try {
             if (apply) {
-                player.stats.merge(itemSet.getStats(count));
-                this.player.life += itemSet.getStats(count).getTotal(StatsEnum.Vitality);
+                player.getStats().merge(itemSet.getStats(count));
+                this.player.addLife(itemSet.getStats(count).getTotal(StatsEnum.Vitality));
             } else {
-                player.stats.unMerge(itemSet.getStats(count));
-                this.player.life -= itemSet.getStats(count).getTotal(StatsEnum.Vitality);
+                player.getStats().unMerge(itemSet.getStats(count));
+                this.player.addLife(-itemSet.getStats(count).getTotal(StatsEnum.Vitality));
             }
             if (send) {
                 this.player.refreshStats();;
@@ -452,7 +452,7 @@ public class CharacterInventory {
             return null;
 
         // Creation
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.ID : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(Template.getPossibleEffects(), EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(Template.getPossibleEffects(), EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
         item.setNeedInsert(true);
         item.getStats();
         if (character != null) {
@@ -507,7 +507,7 @@ public class CharacterInventory {
     }
 
     public int getTotalWeight() {
-        return 1000 + this.player.stats.getTotal(StatsEnum.AddPods);
+        return 1000 + this.player.getStats().getTotal(StatsEnum.AddPods);
     }
 
     public void updateObjectquantity(InventoryItem item, int quantity) {
@@ -560,8 +560,8 @@ public class CharacterInventory {
     }
 
     public void addKamas(int value, boolean send) {
-        this.player.kamas += value;
-        this.player.send(new KamasUpdateMessage(this.player.kamas));
+        this.player.addKamas(value);
+        this.player.send(new KamasUpdateMessage(this.player.getKamas()));
         //this.player.refreshStats();
         if (send) {
             this.player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 45, new String[]{value + ""}));
@@ -573,8 +573,8 @@ public class CharacterInventory {
     }
 
     public void substractKamas(int value, boolean send) {
-        this.player.kamas -= value;
-        this.player.send(new KamasUpdateMessage(this.player.kamas));
+        this.player.addKamas(- value);
+        this.player.send(new KamasUpdateMessage(this.player.getKamas()));
         //this.player.refreshStats();
         if (send) {
             this.player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 46, new String[]{value + ""}));
@@ -591,8 +591,8 @@ public class CharacterInventory {
         }
         this.beforeItemSet(equipedItem);
         //Deplacement dans l'inventaire
-        player.stats.unMerge(equipedItem.getStats());
-        this.player.life -= equipedItem.getStats().getTotal(StatsEnum.Vitality);
+        player.getStats().unMerge(equipedItem.getStats());
+        this.player.addLife(-equipedItem.getStats().getTotal(StatsEnum.Vitality));
         if (equipedItem.getApparrance() != 0) {
             if (equipedItem.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
                 if (equipedItem.getTemplate().getTypeId() == 121) { //Montelier

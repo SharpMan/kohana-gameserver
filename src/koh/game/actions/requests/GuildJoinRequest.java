@@ -37,7 +37,7 @@ public class GuildJoinRequest extends GameBaseRequest {
                     {
                         this.accountID = requested.getAccount().id;
                         this.breed = requested.getCharacter().getBreed();
-                        this.characterID = requested.getCharacter().ID;
+                        this.characterID = requested.getCharacter().getID();
                         this.lastConnection = System.currentTimeMillis() + "";
                         this.level = requested.getCharacter().getLevel();
                         this.name = requested.getCharacter().getNickName();

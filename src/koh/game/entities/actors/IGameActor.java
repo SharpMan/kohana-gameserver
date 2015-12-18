@@ -20,10 +20,9 @@ public abstract class IGameActor {
 
     @Getter
     @Setter
-    public int ID;
+    protected int ID;
     @Getter
-    @Setter
-    public volatile DofusCell cell;
+    protected volatile DofusCell cell;
     @Getter
     @Setter
     public int mapid;
@@ -33,6 +32,10 @@ public abstract class IGameActor {
     public abstract EntityLook getEntityLook();
 
     public byte direction = 1;
+
+    public void setActorCell(DofusCell cell){
+        this.cell = cell;
+    }
 
     public DofusMap getDofusMap() {
         return DAO.getMaps().findTemplate(this.mapid);

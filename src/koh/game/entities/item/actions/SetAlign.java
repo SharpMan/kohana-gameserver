@@ -24,7 +24,7 @@ public class SetAlign  extends ItemAction {
     public boolean execute(Player p) {
         if(!super.execute(p) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
-        if(p.alignmentSide!= AlignmentSideEnum.ALIGNMENT_NEUTRAL && !replace)
+        if(p.getAlignmentSide() != AlignmentSideEnum.ALIGNMENT_NEUTRAL && !replace)
             return false;
         p.changeAlignementSide(AlignmentSideEnum.valueOf(newAlign));
         return true;

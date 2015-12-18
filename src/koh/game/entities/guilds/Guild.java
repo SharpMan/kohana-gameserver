@@ -99,17 +99,17 @@ public class Guild extends IWorldEventObserver {
         }
     }
 
-    public void addMember(GuildMember member, Player Client) {
+    public void addMember(GuildMember member, Player client) {
         this.members.put(member.characterID, member);
-        Client.guild = this;
-        Client.refreshActor();
-        Client.send(new GuildJoinedMessage(this.toGuildInformations(), member.rights, true));
+        client.setGuild(this);
+        client.refreshActor();
+        client.send(new GuildJoinedMessage(this.toGuildInformations(), member.rights, true));
     }
 
     public synchronized boolean changeParameters(Player modifier, GuildMember member, int rank, byte xpPercent, int rights) {
         boolean result;
 
-        if (modifier.guild.entity.guildID != member.guildID) {
+        if (modifier.getGuild().entity.guildID != member.guildID) {
             result = false;
         } else {
             if (modifier.getGuildMember() != member && modifier.getGuildMember().isBoss() && rank == 1) {
@@ -143,7 +143,7 @@ public class Guild extends IWorldEventObserver {
             return false;
         }
         if (DAO.getPlayers().getCharacter(target.characterID) != null) {
-            DAO.getPlayers().getCharacter(target.characterID).guild = null;
+            DAO.getPlayers().getCharacter(target.characterID).setGuild(null);
         }
         if (this.characters.containsKey(target.characterID)) {
             this.characters.get(target.characterID).refreshActor();
@@ -171,10 +171,10 @@ public class Guild extends IWorldEventObserver {
         if (kicker.getGuildMember() != kickedMember && (!kicker.getGuildMember().banMembers() || kickedMember.isBoss())) {
             return false;
         }
-        if (kicker.ID != kickedMember.characterID) {
+        if (kicker.getID() != kickedMember.characterID) {
             kicker.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 117, new String[]{kickedMember.name}));
         }
-        return this.kickMember(kickedMember, kickedMember.characterID == kicker.ID);
+        return this.kickMember(kickedMember, kickedMember.characterID == kicker.getID());
     }
 
     private void onMemberConnected(GuildMember member) {
@@ -231,19 +231,19 @@ public class Guild extends IWorldEventObserver {
     }
 
     public koh.protocol.types.game.guild.GuildMember toGM(GuildMember m) {
-        return new koh.protocol.types.game.guild.GuildMember(m.characterID, m.level, m.name, (byte) m.breed, m.sex, m.rank, m.getExperience(), (byte) m.experienceGivenPercent, m.rights, this.characters.containsKey(m.characterID) ? (byte) 1 : (byte) 0, (byte) m.alignmentSide, (short) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(m.lastConnection)), this.characters.containsKey(m.characterID) ? this.characters.get(m.characterID).moodSmiley : (byte) -1, m.accountID, m.achievementPoints, new PlayerStatus(this.characters.containsKey(m.characterID) ? this.characters.get(m.characterID).status.value() : 0));
+        return new koh.protocol.types.game.guild.GuildMember(m.characterID, m.level, m.name, (byte) m.breed, m.sex, m.rank, m.getExperience(), (byte) m.experienceGivenPercent, m.rights, this.characters.containsKey(m.characterID) ? (byte) 1 : (byte) 0, (byte) m.alignmentSide, (short) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(m.lastConnection)), this.characters.containsKey(m.characterID) ? this.characters.get(m.characterID).getMoodSmiley() : (byte) -1, m.accountID, m.achievementPoints, new PlayerStatus(this.characters.containsKey(m.characterID) ? this.characters.get(m.characterID).getStatus().value() : 0));
     }
 
     @Override
     public void registerPlayer(Player p) {
-        if (this.characters.containsKey(p.ID)) {
+        if (this.characters.containsKey(p.getID())) {
             throw new Error("Two different Clients logged ! ");
         }
-        this.characters.put(p.ID, p);
-        this.onMemberConnected(this.members.get(p.ID));
+        this.characters.put(p.getID(), p);
+        this.onMemberConnected(this.members.get(p.getID()));
         super.registerPlayer(p);
 
-        p.send(new GuildMembershipMessage(this.toGuildInformations(), this.members.get(p.ID).rights, true));
+        p.send(new GuildMembershipMessage(this.toGuildInformations(), this.members.get(p.getID()).rights, true));
         p.send(this.toGeneralInfos());
         p.send(new GuildInformationsMembersMessage(this.allGuildMembers()));
     }
@@ -267,10 +267,10 @@ public class Guild extends IWorldEventObserver {
     @Override
     public void unregisterPlayer(Player p) {
         if (this.characters != null) {
-            this.characters.remove(p.ID);
+            this.characters.remove(p.getID());
         }
         super.unregisterPlayer(p);
-        this.onMemberDisconnected(this.members.get(p.ID));
+        this.onMemberDisconnected(this.members.get(p.getID()));
     }
 
     public Stream<Player> playerStream() {

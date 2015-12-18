@@ -62,7 +62,7 @@ public class InteractiveElementAction extends GameAction {
             actor.send(new BasicNoOperationMessage());
             return;
         }
-        ((Player) this.actor).getCurrentMap().sendToField(new InteractiveUsedMessage(actor.ID, elementID, skill.skillId, HANDLERS.get(action).getDuration()));
+        ((Player) this.actor).getCurrentMap().sendToField(new InteractiveUsedMessage(actor.getID(), elementID, skill.skillId, HANDLERS.get(action).getDuration()));
         HANDLERS.get(action).execute((Player) this.actor, elementID);
 
         super.execute();

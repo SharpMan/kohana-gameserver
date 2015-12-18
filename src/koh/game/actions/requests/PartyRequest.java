@@ -37,8 +37,8 @@ public class PartyRequest extends GameBaseRequest {
             return;
         }
         try {
-            this.requester.getParty().sendToField(new PartyCancelInvitationNotificationMessage(this.requester.getParty().id, this.requester.character.ID, this.requested.character.ID));
-            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requester.character.ID));
+            this.requester.getParty().sendToField(new PartyCancelInvitationNotificationMessage(this.requester.getParty().id, this.requester.character.getID(), this.requested.character.getID()));
+            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requester.character.getID()));
             this.requester.getParty().removeGuest(this.requested.character);
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,9 +53,9 @@ public class PartyRequest extends GameBaseRequest {
             return false;
         }
         try {
-            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requested.character.ID));
+            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requested.character.getID()));
 
-            this.requester.getParty().sendToField(new PartyRefuseInvitationNotificationMessage(this.requester.getParty().id, this.requested.character.ID));
+            this.requester.getParty().sendToField(new PartyRefuseInvitationNotificationMessage(this.requester.getParty().id, this.requested.character.getID()));
 
             this.requester.getParty().removeGuest(this.requested.character);
         } catch (Exception e) {

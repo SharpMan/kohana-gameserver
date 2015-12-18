@@ -41,8 +41,8 @@ public class FightPortal extends FightActivableObject {
 
     @Override
     public void AppearForAll() {
-        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.ID, getGameActionMark()));
-        this.m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, this.m_caster.ID, this.ID, true));
+        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.getID(), getGameActionMark()));
+        this.m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, this.m_caster.getID(), this.ID, true));
     }
 
     @Override
@@ -52,7 +52,7 @@ public class FightPortal extends FightActivableObject {
 
     @Override
     public void DisappearForAll() {
-        this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.ID, this.ID));
+        this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.getID(), this.ID));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class FightPortal extends FightActivableObject {
 
     @Override
     public synchronized void enable(Fighter fighter) {
-        Enable(fighter, false);
+        enable(fighter, false);
     }
 
     public boolean DisabledByCaster = false;
@@ -78,7 +78,7 @@ public class FightPortal extends FightActivableObject {
         }
     }
 
-    public synchronized void Enable(Fighter fighter, boolean check) {
+    public synchronized void enable(Fighter fighter, boolean check) {
         if (DisabledByCaster || Enabled || (check && turnUsed == m_fight.myWorker.fightTurn) || this.Cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) || this.Cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
             return;
         }
@@ -88,18 +88,18 @@ public class FightPortal extends FightActivableObject {
     public void onEnable(Fighter fighter) {
         this.Enabled = true;
         m_fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, fighter.ID, this.ID, true));
+        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, fighter.getID(), this.ID, true));
         m_fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
     }
 
-    public void Disable(Fighter fighter) {
+    public void disable(Fighter fighter) {
         if (!Enabled) {
             return;
         }
         this.Enabled = false;
         this.DisabledByCaster = true;
         m_fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, fighter.ID, this.ID, false));
+        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, fighter.getID(), this.ID, false));
         m_fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
     }
 
@@ -114,7 +114,7 @@ public class FightPortal extends FightActivableObject {
 
         activator.fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
 
-        m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH, this.m_caster.ID, this.ID, activator.ID, this.m_spellId));
+        m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH, this.m_caster.getID(), this.ID, activator.getID(), this.m_spellId));
 
         FightPortal[] Portails = new FightPortal[0];
         for (CopyOnWriteArrayList<FightActivableObject> Objects : this.m_fight.m_activableObjects.values()) {
@@ -127,7 +127,7 @@ public class FightPortal extends FightActivableObject {
         this.turnUsed = m_fight.myWorker.fightTurn;
         Enabled = false;
         if (Portails.length == 0) {
-            m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.ID, this.ID, false));
+            m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.getID(), this.ID, false));
             activator.fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
             return -1;
         }
@@ -136,14 +136,14 @@ public class FightPortal extends FightActivableObject {
         //System.out.println(Enumerable.Join(Links));
         FightPortal lastPortal = Arrays.stream(Portails).filter(x -> x.getCellId() == (short) Links[Links.length - 1]).findFirst().get();
 
-        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.ID, ID, false));
-        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.ID, lastPortal.ID, false));
+        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.getID(), ID, false));
+        m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.getID(), lastPortal.ID, false));
 
         //Portails = Arrays.stream(Portails).sorted((FightPortail b2, FightPortail b1) -> (int) (b2.id) - b1.id).toArray(FightPortail[]::new);
         //Arrays.stream(Portails).forEach(Portail -> m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.id, Portail.id, false)));
         m_fight.affectSpellTo(m_caster, activator, 1, 5426);
 
-        m_fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, activator.ID, activator.ID, lastPortal.getCellId()));
+        m_fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, activator.getID(), activator.getID(), lastPortal.getCellId()));
 
         lastPortal.Enabled = false;
         lastPortal.turnUsed = m_fight.myWorker.fightTurn;
@@ -173,7 +173,7 @@ public class FightPortal extends FightActivableObject {
 
     @Override
     public GameActionMark getGameActionMark() {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.getCellId(), this.getGameActionMarkedCell(), true);
+        return new GameActionMark(this.m_caster.getID(), this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.getCellId(), this.getGameActionMarkedCell(), true);
     }
 
     @Override

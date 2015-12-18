@@ -62,8 +62,8 @@ public class PlayerExchange extends Exchange {
     }
 
     public void Open() {
-        this.myClient1.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient1.getCharacter().ID, this.myClient1.getCharacter().getInventoryCache().getWeight(), this.myClient1.getCharacter().getInventoryCache().getTotalWeight(), this.myClient2.getCharacter().ID, this.myClient2.getCharacter().getInventoryCache().getWeight(), this.myClient2.getCharacter().getInventoryCache().getTotalWeight()));
-        this.myClient2.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient2.getCharacter().ID, this.myClient2.getCharacter().getInventoryCache().getWeight(), this.myClient2.getCharacter().getInventoryCache().getTotalWeight(), this.myClient1.getCharacter().ID, this.myClient1.getCharacter().getInventoryCache().getWeight(), this.myClient1.getCharacter().getInventoryCache().getTotalWeight()));
+        this.myClient1.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient1.getCharacter().getID(), this.myClient1.getCharacter().getInventoryCache().getWeight(), this.myClient1.getCharacter().getInventoryCache().getTotalWeight(), this.myClient2.getCharacter().getID(), this.myClient2.getCharacter().getInventoryCache().getWeight(), this.myClient2.getCharacter().getInventoryCache().getTotalWeight()));
+        this.myClient2.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient2.getCharacter().getID(), this.myClient2.getCharacter().getInventoryCache().getWeight(), this.myClient2.getCharacter().getInventoryCache().getTotalWeight(), this.myClient1.getCharacter().getID(), this.myClient1.getCharacter().getInventoryCache().getWeight(), this.myClient1.getCharacter().getInventoryCache().getTotalWeight()));
     }
 
     @Override
@@ -190,8 +190,8 @@ public class PlayerExchange extends Exchange {
 
         this.unValidateAll();
 
-        if (quantity > Client.character.kamas || quantity < 0) {
-            quantity = Client.character.kamas;
+        if (quantity > Client.character.getKamas() || quantity < 0) {
+            quantity = Client.character.getKamas();
         }
 
         this.myKamasToTrade.put(Client, quantity);
@@ -221,15 +221,15 @@ public class PlayerExchange extends Exchange {
         this.myValidate.put(this.myClient1, false);
         this.myValidate.put(this.myClient2, false);
 
-        this.send(new ExchangeIsReadyMessage(this.myClient1.getCharacter().ID, false));
-        this.send(new ExchangeIsReadyMessage(this.myClient2.getCharacter().ID, false));
+        this.send(new ExchangeIsReadyMessage(this.myClient1.getCharacter().getID(), false));
+        this.send(new ExchangeIsReadyMessage(this.myClient2.getCharacter().getID(), false));
     }
 
     @Override
     public synchronized boolean validate(WorldClient Client) {
         this.myValidate.put(Client, this.myValidate.get(Client) == false);
 
-        this.send(new ExchangeIsReadyMessage(Client.character.ID, this.myValidate.get(Client)));
+        this.send(new ExchangeIsReadyMessage(Client.character.getID(), this.myValidate.get(Client)));
         if (this.myValidate.entrySet().stream().allMatch(x -> x.getValue())) {
             this.finish();
 
@@ -259,7 +259,7 @@ public class PlayerExchange extends Exchange {
                 + "\n          -- P2(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient1).entrySet()) {
-            InventoryItem Item = this.myClient1.find(ItemData.getKey());
+            InventoryItem Item = this.myClient1.getCharacter().getInventoryCache().find(ItemData.getKey());
             if (Item == null) {
                 logger.error(this.myClient1.getCharacter().getNickName() + " - " + this.myClient2.getCharacter().getNickName() + " " + ItemData.getKey() + " item not Found");
                 continue;

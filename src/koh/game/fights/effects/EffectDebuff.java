@@ -17,7 +17,7 @@ public class EffectDebuff extends EffectBase {
                 return -3;
             }
 
-            Target.fight.sendToField(new GameActionFightDispellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.Caster.ID, Target.ID));
+            Target.fight.sendToField(new GameActionFightDispellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.caster.getID(), Target.getID()));
         }
 
         return -1;

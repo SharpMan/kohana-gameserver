@@ -21,7 +21,7 @@ public class EffectTpPrevPos extends EffectBase {
             FightCell cell = Target.fight.getCell(Target.previousCellPos.get(Target.previousCellPos.size() - 1));
 
             if (cell != null) {
-                Target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, Target.ID, cell.Id));
+                Target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), Target.getID(), cell.Id));
 
                 toReturn = Target.setCell(cell);
             }

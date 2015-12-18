@@ -80,7 +80,7 @@ public class NpcDialog extends GameAction {
 
     @Override
     public void execute() {
-        this.actor.send(new NpcDialogCreationMessage(NPC.cell.getMap().getId(), NPC.ID));
+        this.actor.send(new NpcDialogCreationMessage(NPC.getCell().getMap().getId(), NPC.getID()));
         this.changeMessage(0, 0);
         super.execute();
     }

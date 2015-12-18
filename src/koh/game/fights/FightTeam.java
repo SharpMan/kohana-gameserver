@@ -41,7 +41,7 @@ public class FightTeam {
     private ArrayList<Fighter> myFighters = new ArrayList<>(8);
     public byte Id;
     public int LeaderId;
-    public Fighter Leader;
+    public Fighter leader;
     public Fight Fight;
     public ArrayList<SwapPositionRequest> swapRequests = new ArrayList<>();
 
@@ -63,7 +63,7 @@ public class FightTeam {
     }
 
     public FighterRefusedReasonEnum canJoin(Player Character) {
-        if (this.Leader instanceof MonsterFighter) {
+        if (this.leader instanceof MonsterFighter) {
             return FighterRefusedReasonEnum.WRONG_ALIGNMENT;
         }
         if (this.Fight.fightState != FightState.STATE_PLACE) {
@@ -77,27 +77,27 @@ public class FightTeam {
             return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
         }
         if (this.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)) {
-            if (!(((CharacterFighter) this.Leader).character.getClient().getParty() != null && ((CharacterFighter) this.Leader).character.getClient().getParty().containsPlayer(Character))) {
+            if (!(((CharacterFighter) this.leader).character.getClient().getParty() != null && ((CharacterFighter) this.leader).character.getClient().getParty().containsPlayer(Character))) {
                 return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
             }
         }
-        return this.alignmentSide != AlignmentSideEnum.ALIGNMENT_WITHOUT && Character.alignmentSide != this.alignmentSide ? FighterRefusedReasonEnum.WRONG_ALIGNMENT : FighterRefusedReasonEnum.FIGHTER_ACCEPTED;
+        return this.alignmentSide != AlignmentSideEnum.ALIGNMENT_WITHOUT && Character.getAlignmentSide() != this.alignmentSide ? FighterRefusedReasonEnum.WRONG_ALIGNMENT : FighterRefusedReasonEnum.FIGHTER_ACCEPTED;
     }
 
     public byte getTeamType() {
-        if (this.Leader instanceof CharacterFighter) {
+        if (this.leader instanceof CharacterFighter) {
             return TeamTypeEnum.TEAM_TYPE_PLAYER;
         }
-        return this.Leader instanceof MonsterFighter ? TeamTypeEnum.TEAM_TYPE_MONSTER : TeamTypeEnum.TEAM_TYPE_BAD_PLAYER;
+        return this.leader instanceof MonsterFighter ? TeamTypeEnum.TEAM_TYPE_MONSTER : TeamTypeEnum.TEAM_TYPE_BAD_PLAYER;
     }
 
-    public void setLeader(Fighter Fighter) {
-        this.Leader = Fighter;
-        this.LeaderId = Fighter.ID;
+    public void setLeader(Fighter fighter) {
+        this.leader = fighter;
+        this.LeaderId = fighter.getID();
     }
 
     public FightTeamInformations getFightTeamInformations() {
-        return new FightTeamInformations(this.Id, this.Leader != null ? this.Leader.ID : 0, this.alignmentSide.value, this.getTeamType(), (byte) 0, this.getFighters().map(x -> x.getFightTeamMemberInformations()).toArray(FightTeamMemberInformations[]::new));
+        return new FightTeamInformations(this.Id, this.leader != null ? this.leader.getID() : 0, this.alignmentSide.value, this.getTeamType(), (byte) 0, this.getFighters().map(x -> x.getFightTeamMemberInformations()).toArray(FightTeamMemberInformations[]::new));
     }
 
     public FightOptionsInformations getFightOptionsInformations() {
@@ -141,7 +141,7 @@ public class FightTeam {
         this.myFighters.clear();
 
         this.myFighters = null;
-        this.Leader = null;
+        this.leader = null;
     }
 
     public boolean isFriendly(Fighter fighter) {

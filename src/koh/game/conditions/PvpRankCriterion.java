@@ -8,10 +8,9 @@ import koh.game.entities.actors.Player;
  */
 public class PvpRankCriterion extends Criterion {
 
-    public static String Identifier = "PP";
-    public static String Identifier2 = "Pp";
+    public static final String IDENTIFIER = "PP", IDENTIFIER_2 = "Pp";
 
-    public Byte Rank;
+    public Byte rank;
 
     @Override
     public String toString() {
@@ -20,11 +19,11 @@ public class PvpRankCriterion extends Criterion {
 
     @Override
     public void Build() {
-        Rank = Byte.parseByte(literal);
+        rank = Byte.parseByte(literal);
     }
 
     @Override
     public boolean eval(Player character) {
-        return this.Compare((Comparable<Byte>) character.alignmentGrade, this.Rank);
+        return this.Compare((Comparable<Byte>) character.getAlignmentGrade(), this.rank);
     }
 }

@@ -53,7 +53,7 @@ public class FightBomb extends FightActivableObject {
         size = 0;
         this.shape = GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
 
-        for (EffectInstanceDice effect : m_actionEffect.effects) {
+        for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
             if (EffectCast.IsDamageEffect(effect.EffectType())) {
                 Priority--;
             }
@@ -81,7 +81,7 @@ public class FightBomb extends FightActivableObject {
     @Override
     public void AppearForAll() {
         this.Cells.keySet().stream().forEach((cell) -> {
-            this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.ID, GetGameActionMark(cell)));
+            this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.getID(), GetGameActionMark(cell)));
         });
     }
 
@@ -94,7 +94,7 @@ public class FightBomb extends FightActivableObject {
     public void DisappearForAll() {
         //m_fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         this.Cells.keySet().stream().forEach((cell) -> {
-            this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.ID, this.Cells.get(cell)));
+            this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.getID(), this.Cells.get(cell)));
         });
         //m_fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
     }
@@ -124,7 +124,7 @@ public class FightBomb extends FightActivableObject {
     }
 
     public GameActionMark GetGameActionMark(short cell) {
-        return new GameActionMark(this.m_caster.ID, this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.Cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
+        return new GameActionMark(this.m_caster.getID(), this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.Cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
     }
 
     @Override

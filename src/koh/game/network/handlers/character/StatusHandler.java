@@ -21,9 +21,9 @@ public class StatusHandler {
         }
         Client.character.status = PlayerStatusEnum.valueOf(Message.status.statusId);
         if (Client.character.getFight() != null) {
-            Client.character.getFight().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.ID, Message.status));
+            Client.character.getFight().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.getID(), Message.status));
         } else {
-            Client.character.getCurrentMap().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.ID, Message.status));
+            Client.character.getCurrentMap().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.getID(), Message.status));
         }
     }
 

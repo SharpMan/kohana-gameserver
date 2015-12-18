@@ -51,8 +51,8 @@ public class CharacterFighter extends Fighter {
         this.character.stopRegen();
         //this.character.currentMap.unregisterPlayer(character);
         this.fight.registerPlayer(character);
-        super.initFighter(this.character.stats, this.character.ID);
-        super.setLife(this.character.life);
+        super.initFighter(this.character.getStats(), this.character.getID());
+        super.setLife(this.character.getLife());
         super.setLifeMax(this.character.getMaxLife());
         if (super.getLife() == 0) {
             super.setLife(1);
@@ -157,15 +157,15 @@ public class CharacterFighter extends Fighter {
     public void EndFight() {
         if (fight.fightType != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
             if (super.getLife() <= 0) {
-                this.character.life = 1;
+                this.character.setLife(1);
             } else {
-                this.character.life = super.getLife();
+                this.character.setLife(super.getLife());
             }
         }
 
         this.fight.unregisterPlayer(character);
 
-        if (this.character.isInWorld) {
+        if (this.character.isInWorld()) {
             this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
             this.character.send(new GameContextDestroyMessage());
             this.character.send(new GameContextCreateMessage((byte) 1));
@@ -186,7 +186,7 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public short getMapCell() {
-        return this.character.cell.getId();
+        return this.character.getCell().getId();
     }
 
     @Override
@@ -195,8 +195,8 @@ public class CharacterFighter extends Fighter {
     }
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
-        return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) character.experience, (double) DAO.getExps().getPlayerMinExp(character.level), (double) DAO.getExps().getPlayerMaxExp(character.getLevel()), character.kamas, character.statPoints, 0, character.spellPoints, character.getActorAlignmentExtendInformations(),
-                getLife(), getMaxLife(), character.energy, PlayerEnum.MaxEnergy,
+        return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) character.getExperience(), (double) DAO.getExps().getPlayerMinExp(character.level), (double) DAO.getExps().getPlayerMaxExp(character.getLevel()), character.getKamas(), character.getStatPoints(), 0, character.getSpellPoints(), character.getActorAlignmentExtendInformations(),
+                getLife(), getMaxLife(), character.getEnergy(), PlayerEnum.MaxEnergy,
                 (short) this.getAP(), (short) this.getMP(),
                 new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.Initiative), 0, 0), stats.getEffect(StatsEnum.Prospecting), stats.getEffect(StatsEnum.ActionPoints),
                 stats.getEffect(StatsEnum.MovementPoints), stats.getEffect(StatsEnum.Strength), stats.getEffect(StatsEnum.Vitality),

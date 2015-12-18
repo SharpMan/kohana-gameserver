@@ -46,12 +46,12 @@ public class EffectStatsSteal extends EffectBase {
         StatsEnum MalusType = TargetMalus.get(CastInfos.EffectType);
         StatsEnum BonusType = CasterBonus.get(CastInfos.EffectType);
 
-        EffectCast MalusInfos = new EffectCast(MalusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
-        EffectCast BonusInfos = new EffectCast(BonusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration - 1, 0);
+        EffectCast MalusInfos = new EffectCast(MalusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.caster, CastInfos.Targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
+        EffectCast BonusInfos = new EffectCast(BonusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.caster, CastInfos.Targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration - 1, 0);
         MutableInt DamageValue = new MutableInt();
 
         for (Fighter Target : CastInfos.Targets) {
-            if (Target == CastInfos.Caster) {
+            if (Target == CastInfos.caster) {
                 continue;
             }
 
@@ -64,12 +64,12 @@ public class EffectStatsSteal extends EffectBase {
             Target.buff.addBuff(BuffStats);
 
             // Bonus au lanceur
-            BuffStats = new BuffStats(BonusInfos, CastInfos.Caster);
+            BuffStats = new BuffStats(BonusInfos, CastInfos.caster);
             if (BuffStats.applyEffect(DamageValue, null) == -3) {
                 return -3;
             }
 
-            CastInfos.Caster.buff.addBuff(BuffStats);
+            CastInfos.caster.buff.addBuff(BuffStats);
         }
 
         return -1;

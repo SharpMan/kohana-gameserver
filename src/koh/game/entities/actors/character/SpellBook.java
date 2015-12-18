@@ -247,7 +247,7 @@ public class SpellBook {
                 if (!this.CanBoostSpell(client, this.mySpells.get(spellId))) {
                     break;
                 }
-                client.character.spellPoints -= this.mySpells.get(spellId).level;
+                client.getCharacter().setSpellPoints(client.getCharacter().getSpellPoints() - this.mySpells.get(spellId).level);
                 this.mySpells.get(spellId).level++;
             }
             client.send(new SpellUpgradeSuccessMessage(spellId, this.mySpells.get(spellId).level));
@@ -258,7 +258,7 @@ public class SpellBook {
     public boolean CanBoostSpell(WorldClient client, SpellInfo spell) {
         if (spell.level >= 6) {
             return false;
-        } else if (client.character.spellPoints < (int) spell.level) {
+        } else if (client.character.getSpellPoints() < (int) spell.level) {
             return false;
         } else {
             return spell.getSpellLevel((byte) (spell.level + 1)).getMinPlayerLevel() <= client.character.getLevel();

@@ -27,7 +27,7 @@ public abstract class BuffEffect {
     public BuffDecrementType DecrementType;
     public BuffActiveType ActiveType;
     public EffectCast CastInfos;
-    public Fighter Caster;
+    public Fighter caster;
     public Fighter Target;
     public int Duration, Delay;
     private int Uid = -1;
@@ -63,11 +63,11 @@ public abstract class BuffEffect {
         this.Duration = (CastInfos.Duration == -1) ? -1 : (DecrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.Duration : (CastInfos.Duration) - CastInfos.Delay());
         
         //System.out.println(Target.fight.currentFighter == Target);
-        if (DecrementType == BuffDecrementType.TYPE_ENDTURN && Target.ID == CastInfos.Caster.ID) {
+        if (DecrementType == BuffDecrementType.TYPE_ENDTURN && Target.getID() == CastInfos.caster.getID()) {
             this.Duration++;
         }
         this.Delay = CastInfos.Delay();
-        this.Caster = CastInfos.Caster;
+        this.caster = CastInfos.caster;
         this.Target = Target;
 
         this.ActiveType = ActiveType;
@@ -75,7 +75,7 @@ public abstract class BuffEffect {
     }
 
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        return this.Target.tryDie(this.Caster.ID);
+        return this.Target.tryDie(this.caster.getID());
     }
 
     public abstract AbstractFightDispellableEffect getAbstractFightDispellableEffect();
@@ -85,7 +85,7 @@ public abstract class BuffEffect {
     /// </summary>
     /// <returns></returns>
     public int removeEffect() {
-        return this.Target.tryDie(this.Caster.ID);
+        return this.Target.tryDie(this.caster.getID());
     }
 
     /// <summary>

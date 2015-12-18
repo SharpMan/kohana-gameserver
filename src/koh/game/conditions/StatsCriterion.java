@@ -40,7 +40,7 @@ public class StatsCriterion extends Criterion {
         }
     };
 
-    private final static String[] ExtraCriterions = new String[]{"Ce", "CE", "CD", "CH"};
+    private final static String[] EXTRA_CRITERIONS = new String[]{"Ce", "CE", "CD", "CH"};
 
     public String Identifier;
 
@@ -55,14 +55,14 @@ public class StatsCriterion extends Criterion {
     }
 
     public static boolean IsStatsIdentifier(String identifier) {
-        return StatsCriterion.CriterionsBinds.containsKey(identifier) || StatsCriterion.CriterionsStatsBaseBinds.containsKey(identifier) || Arrays.stream(ExtraCriterions).anyMatch(x -> x.equalsIgnoreCase(identifier));
+        return StatsCriterion.CriterionsBinds.containsKey(identifier) || StatsCriterion.CriterionsStatsBaseBinds.containsKey(identifier) || Arrays.stream(EXTRA_CRITERIONS).anyMatch(x -> x.equalsIgnoreCase(identifier));
     }
 
     @Override
     public boolean eval(Player character) {
 
         if (this.Field != null) {
-            return this.Compare((Comparable<Integer>) (this.Base ? character.stats.getBase(Field) : character.stats.getTotal(Field)), this.Comparand);
+            return this.Compare((Comparable<Integer>) (this.Base ? character.getStats().getBase(Field) : character.getStats().getTotal(Field)), this.Comparand);
         }
         //return this.Compare<Integer>((Comparable<Integer>) (this.Base ? character.stats.getBase(Field) : character.stats.getTotal(Field)), this.Comparand);
         switch (this.Identifier) {
@@ -87,7 +87,7 @@ public class StatsCriterion extends Criterion {
         } else if (StatsCriterion.CriterionsStatsBaseBinds.containsKey(this.Identifier)) {
             this.Field = StatsCriterion.CriterionsStatsBaseBinds.get(this.Identifier);
             this.Base = true;
-        } else if (!Arrays.stream(StatsCriterion.ExtraCriterions).anyMatch(x -> x.equalsIgnoreCase(this.Identifier))) //else if (!Enumerable.Any<string>((IEnumerable<string>) StatsCriterion.ExtraCriterions, (Func<string, bool>) (entry => entry == this.IDENTIFIER)))
+        } else if (!Arrays.stream(StatsCriterion.EXTRA_CRITERIONS).anyMatch(x -> x.equalsIgnoreCase(this.Identifier))) //else if (!Enumerable.Any<string>((IEnumerable<string>) StatsCriterion.EXTRA_CRITERIONS, (Func<string, bool>) (entry => entry == this.IDENTIFIER)))
         {
             throw new Error(String.format("Cannot build StatsCriterion, {0} is not a stats identifier", this.Identifier));
         }

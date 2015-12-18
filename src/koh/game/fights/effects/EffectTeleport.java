@@ -17,11 +17,11 @@ public class EffectTeleport extends EffectBase {
     }
 
     public static int ApplyTeleport(EffectCast castInfos) {
-        Fighter caster = castInfos.Caster;
+        Fighter caster = castInfos.caster;
         FightCell cell = caster.fight.getCell(castInfos.CellId);
 
         if (cell != null) {
-            caster.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, caster.ID, caster.ID, castInfos.CellId));
+            caster.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, caster.getID(), caster.getID(), castInfos.CellId));
 
             return caster.setCell(cell);
         }

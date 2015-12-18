@@ -15,8 +15,8 @@ public class ChallengeFightRequest extends GameBaseRequest {
 
     public ChallengeFightRequest(WorldClient Client, WorldClient Target) {
         super(Client, Target);
-        this.requester.send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.requested.character.ID, this.requester.character.ID, this.requested.character.ID));
-        this.requested.send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.requester.character.ID, this.requester.character.ID, this.requested.character.ID));
+        this.requester.send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.requested.character.getID(), this.requester.character.getID(), this.requested.character.getID()));
+        this.requested.send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.requester.character.getID(), this.requester.character.getID(), this.requested.character.getID()));
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ChallengeFightRequest extends GameBaseRequest {
         }
 
         try {
-            this.requester.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requested.character.ID, this.requester.character.ID, this.requested.character.ID, true));
+            this.requester.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requested.character.getID(), this.requester.character.getID(), this.requested.character.getID(), true));
 
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
@@ -49,7 +49,7 @@ public class ChallengeFightRequest extends GameBaseRequest {
         }
 
         try {//int fightId, int sourceId, int targetId, boolean accept
-            this.requested.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requester.character.ID, this.requester.character.ID, this.requested.character.ID, false));
+            this.requested.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requester.character.getID(), this.requester.character.getID(), this.requested.character.getID(), false));
 
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
@@ -69,7 +69,7 @@ public class ChallengeFightRequest extends GameBaseRequest {
         }
 
         try {//int fightId, int sourceId, int targetId, boolean accept
-            this.requester.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requested.character.ID, this.requester.character.ID, this.requested.character.ID, false));
+            this.requester.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requested.character.getID(), this.requester.character.getID(), this.requested.character.getID(), false));
 
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);

@@ -59,7 +59,7 @@ public class FriendHandler {
                     accountName = target.getAccount().nickName;
                 }
             });
-            Client.send(new IgnoredAddedMessage(new IgnoredOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.ID, target.getNickName(), target.getBreed(), target.hasSexe()), message.session));
+            Client.send(new IgnoredAddedMessage(new IgnoredOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getID(), target.getNickName(), target.getBreed(), target.hasSexe()), message.session));
         }
     }
 
@@ -84,9 +84,9 @@ public class FriendHandler {
                 }
             });
             if (target.getAccount().accountData.hasFriend(Client.getAccount().id)) {
-                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.ID, target.getNickName(), (byte) target.getLevel(), target.getAlignmentSide().value, target.getBreed(), target.hasSexe(), target.getBasicGuildInformations(), target.getMoodSmiley(), new PlayerStatus(target.getStatus().value()))));
+                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) target.getLevel(), target.getAlignmentSide().value, target.getBreed(), target.hasSexe(), target.getBasicGuildInformations(), target.getMoodSmiley(), new PlayerStatus(target.getStatus().value()))));
             } else {
-                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, PlayerStateEnum.UNKNOWN_STATE, -1, target.getAchievementPoints(), target.ID, target.getNickName(), (byte) 0, (byte) -1, target.getBreed(), target.hasSexe(), new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(target.getStatus().value()))));
+                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, PlayerStateEnum.UNKNOWN_STATE, -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) 0, (byte) -1, target.getBreed(), target.hasSexe(), new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(target.getStatus().value()))));
             }
         }
     }

@@ -38,7 +38,7 @@ public class ZaapAction extends GameAction {
             if (zaap == null) {
                 return;
             }
-            if (((Player) actor).kamas < getCostTo(zaap.getMap())) {
+            if (((Player) actor).getKamas() < getCostTo(zaap.getMap())) {
                 actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
                 return;
             }

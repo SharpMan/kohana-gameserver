@@ -27,7 +27,7 @@ public class BuffSpellCoolDown extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         //FighterSpell.SpellinitialCooldown CurrentCooldown = this.Target.spellsController.myinitialCooldown.get(spell);
-        this.Target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, Value));
+        this.Target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), Target.getID(), Spell, Value));
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
@@ -35,14 +35,14 @@ public class BuffSpellCoolDown extends BuffEffect {
     public int removeEffect() {
         FighterSpell.SpellinitialCooldown CurrentCooldown = this.Target.spellsController.myinitialCooldown.get(Spell);
         if (CurrentCooldown != null) {
-            this.Target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, CurrentCooldown.initialCooldown + 1));
+            this.Target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), Target.getID(), Spell, CurrentCooldown.initialCooldown + 1));
         }
         return super.removeEffect();
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+        return new FightTriggeredEffect(this.GetId(), this.Target.getID(), (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
     }
 
 }

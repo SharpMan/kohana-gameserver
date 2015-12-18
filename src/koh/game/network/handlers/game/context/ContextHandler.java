@@ -1,12 +1,10 @@
 package koh.game.network.handlers.game.context;
 
-import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameFight;
 import koh.game.actions.GameMapMovement;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.character.CharacterInventory;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.MovementPath;
@@ -52,8 +50,8 @@ public class ContextHandler {
     public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client, GameMapChangeOrientationRequestMessage Message) {
         if (Client.character.getFight() == null) {
             Client.character.direction = Message.direction;
-            Client.character.getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.character.ID, Client.character.direction)));
-            logger.debug("New direction for actor {}~{}" , Client.character.ID , Message.direction);
+            Client.character.getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.character.getID(), Client.character.direction)));
+            logger.debug("New direction for actor {}~{}" , Client.character.getID() , Message.direction);
         }
     }
 
@@ -76,7 +74,7 @@ public class ContextHandler {
 
     @HandlerAttribute(ID = GameContextCreateRequestMessage.MESSAGE_ID)
     public static void HandleGameContextCreateRequestMessage(WorldClient Client, Message message) {
-        if (Client.character.isInWorld) {
+        if (Client.character.isInWorld()) {
             PlayerController.sendServerMessage(Client, "You are already Logged !");
         } else {
             Client.sequenceMessage(new GameContextDestroyMessage());
@@ -107,16 +105,16 @@ public class ContextHandler {
         {
             switch (a) {
                 case 0:
-                    cellID = (short) (Client.character.cell.getId() - 14);
+                    cellID = (short) (Client.character.getCell().getId() - 14);
                     break;
                 case 1:
-                    cellID = (short) (Client.character.cell.getId() - 14 + 1);
+                    cellID = (short) (Client.character.getCell().getId() - 14 + 1);
                     break;
                 case 2:
-                    cellID = (short) (Client.character.cell.getId() + 14 - 1);
+                    cellID = (short) (Client.character.getCell().getId() + 14 - 1);
                     break;
                 case 3:
-                    cellID = (short) (Client.character.cell.getId() + 14);
+                    cellID = (short) (Client.character.getCell().getId() + 14);
                     break;
             }
             DofusCell curcell = Client.character.getCurrentMap().getCell(cellID);
@@ -206,7 +204,7 @@ public class ContextHandler {
             return;
         }
         Client.addGameAction(new GameMapMovement(Client.character.getCurrentMap(), Client.character, Message.keyMovements));
-        Client.character.getCurrentMap().sendToField(new GameMapMovementMessage(Message.keyMovements, Client.character.ID));
+        Client.character.getCurrentMap().sendToField(new GameMapMovementMessage(Message.keyMovements, Client.character.getID()));
     }
 
 }

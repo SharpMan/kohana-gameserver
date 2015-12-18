@@ -10,10 +10,10 @@ public class EffectIncreaseSpellJet extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        if (CastInfos.Caster == null) {
+        if (CastInfos.caster == null) {
             return -1;
         }
-        CastInfos.Caster.buff.addBuff(new BuffIncreaseSpellJet(CastInfos, CastInfos.Caster));
+        CastInfos.caster.buff.addBuff(new BuffIncreaseSpellJet(CastInfos, CastInfos.caster));
 
         return -1;
     }

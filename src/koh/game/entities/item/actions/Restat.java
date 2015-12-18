@@ -23,8 +23,8 @@ public class Restat  extends ItemAction {
         p.setIntell(0);
         p.setAgility(0);
         p.setChance(0);
-        p.stats.resetBase();
-        p.statPoints = (p.getLevel() - 1) * 5 - p.getStatPoints();
+        p.getStats().resetBase();
+        p.setStatPoints((p.getLevel() - 1) * 5 - p.getStatPoints());
         p.refreshStats();
         return true;
     }

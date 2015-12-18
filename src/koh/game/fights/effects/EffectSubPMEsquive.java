@@ -14,14 +14,14 @@ public class EffectSubPMEsquive extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         if (CastInfos.Duration > 1) {
             for (Fighter Target : CastInfos.Targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.Caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
+                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
                 BuffSubPMEsquive Buff = new BuffSubPMEsquive(SubInfos, Target);
                 Buff.applyEffect(null, null);
                 Target.buff.addBuff(Buff);
             }
         } else {
             for (Fighter Target : CastInfos.Targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.Caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, 0, 0);
+                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, 0, 0);
 
                 BuffSubPMEsquive Buff = new BuffSubPMEsquive(SubInfos, Target);
                 Buff.applyEffect(null, null);

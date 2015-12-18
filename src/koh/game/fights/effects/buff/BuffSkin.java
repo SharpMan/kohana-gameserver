@@ -68,7 +68,7 @@ public class BuffSkin extends BuffEffect {
         }
 
         //this.Target.entityLook.bonesId = (short) Math.abs((this.CastInfos.Effect.value * 44) / 666);
-        this.Caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.getEntityLook()));
+        this.caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.Target.getID(), this.Target.getEntityLook()));
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
@@ -82,13 +82,13 @@ public class BuffSkin extends BuffEffect {
         if (this.skinToRemove != 0) {
             this.Target.entityLook.skins.remove(this.Target.entityLook.skins.indexOf(this.skinToRemove));
         }
-        this.Caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.Caster.ID, this.Target.ID, this.Target.getEntityLook()));
+        this.caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.Target.getID(), this.Target.getEntityLook()));
         return super.removeEffect();
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) 0);
+        return new FightTemporaryBoostEffect(this.GetId(), this.Target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) 0);
     }
 
 }

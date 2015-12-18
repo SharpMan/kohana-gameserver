@@ -21,7 +21,7 @@ public class EffectStats extends EffectBase {
             if(Target instanceof IllusionFighter){
                 continue;//Roulette tue clone ...
             }
-            EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets,CastInfos.SpellLevel);
+            EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.caster, CastInfos.Targets,CastInfos.SpellLevel);
             BuffStats BuffStats = new BuffStats(SubInfos, Target);
             if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;

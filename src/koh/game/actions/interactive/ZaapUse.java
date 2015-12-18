@@ -12,7 +12,7 @@ public class ZaapUse implements InteractiveAction {
 
     @Override
     public boolean isEnabled(Player actor) {
-        return actor.dishonor <= 0;
+        return actor.getDishonor() <= 2;
     }
 
     @Override

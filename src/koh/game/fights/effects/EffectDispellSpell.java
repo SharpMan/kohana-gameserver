@@ -18,7 +18,7 @@ public class EffectDispellSpell extends EffectBase {
                 return -3;
             }
 
-            Target.fight.sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.Caster.ID, Target.ID, CastInfos.Effect.value));
+            Target.fight.sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.caster.getID(), Target.getID(), CastInfos.Effect.value));
         }
 
         return -1;

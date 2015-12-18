@@ -16,7 +16,7 @@ public class EffectAddAllResist extends EffectBase {
             if (Target instanceof IllusionFighter) {
                 continue;//Roulette tue clone ...
             }
-            EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets, CastInfos.SpellLevel);
+            EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.caster, CastInfos.Targets, CastInfos.SpellLevel);
             BuffAddResistStats BuffStats = new BuffAddResistStats(SubInfos, Target);
             if (Target.buff.buffMaxStackReached(BuffStats)) {
                 return -1;

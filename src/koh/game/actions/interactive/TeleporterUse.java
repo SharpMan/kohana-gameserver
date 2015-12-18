@@ -12,7 +12,7 @@ public class TeleporterUse implements InteractiveAction {
 
     @Override
     public boolean isEnabled(Player actor) {
-        return actor.dishonor <= 0;
+        return actor.getDishonor() <= 0;
     }
 
     @Override

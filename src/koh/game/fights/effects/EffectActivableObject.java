@@ -22,14 +22,14 @@ public class EffectActivableObject extends EffectBase {
             case LAYING_GLYPH_RANKED:
             case LAYING_GLYPH_RANKED_2:
             case LAYING_GLYPH:
-                if (CastInfos.Caster.fight.hasObjectOnCell(FightObjectType.OBJECT_FIGHTER, CastInfos.CellId)) {
+                if (CastInfos.caster.fight.hasObjectOnCell(FightObjectType.OBJECT_FIGHTER, CastInfos.CellId)) {
                     return -1;
                 }
                 obj = new FightGlyph(CastInfos, CastInfos.Duration, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), GetMarkType(CastInfos.Effect.ZoneShape()));
                 break;
 
             case LAYING_TRAP_LEVEL:
-                if (!CastInfos.Caster.fight.canPutObject(CastInfos.CellId)) {
+                if (!CastInfos.caster.fight.canPutObject(CastInfos.CellId)) {
                     return -1;
                 }
                 obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), GetMarkType(CastInfos.Effect.ZoneShape()));
@@ -37,19 +37,19 @@ public class EffectActivableObject extends EffectBase {
             case LAYING_PORTAIL:
                 if (CastInfos.Cell().HasGameObject(FightObjectType.OBJECT_PORTAL)) {
                     ((FightPortal) CastInfos.Cell().GetObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
-                } else if (CastInfos.Caster.fight.m_activableObjects.get(CastInfos.Caster) != null
-                        && CastInfos.Caster.fight.m_activableObjects.get(CastInfos.Caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
-                    CastInfos.Caster.fight.m_activableObjects.get(CastInfos.Caster).stream().findFirst().get().remove();
+                } else if (CastInfos.caster.fight.m_activableObjects.get(CastInfos.caster) != null
+                        && CastInfos.caster.fight.m_activableObjects.get(CastInfos.caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
+                    CastInfos.caster.fight.m_activableObjects.get(CastInfos.caster).stream().findFirst().get().remove();
                 }
-                /*if (!CastInfos.Caster.fight.canPutObject(CastInfos.getCellId)) {
+                /*if (!CastInfos.caster.fight.canPutObject(CastInfos.getCellId)) {
                  return -1;
                  }*/
-                obj = new FightPortal(CastInfos.Caster.fight, CastInfos.Caster, CastInfos, CastInfos.CellId);
+                obj = new FightPortal(CastInfos.caster.fight, CastInfos.caster, CastInfos, CastInfos.CellId);
                 break;
         }
 
         if (obj != null) {
-            CastInfos.Caster.fight.addActivableObject(CastInfos.Caster, obj);
+            CastInfos.caster.fight.addActivableObject(CastInfos.caster, obj);
         }
         return -1;
     }

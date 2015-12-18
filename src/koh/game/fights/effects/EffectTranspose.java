@@ -17,29 +17,29 @@ public class EffectTranspose extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.states.hasState(FightStateEnum.Porté) && !target.states.hasState(FightStateEnum.Inébranlable) && !target.states.hasState(FightStateEnum.Enraciné) && !target.states.hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             if (CastInfos.SpellId == 445) {
-                if (Target.team == CastInfos.Caster.team) {
+                if (Target.team == CastInfos.caster.team) {
                     continue;
                 }
             } else if (CastInfos.SpellId == 438) {
-                if (Target.team != CastInfos.Caster.team) {
+                if (Target.team != CastInfos.caster.team) {
                     continue;
                 }
             }
-            FightCell CasterCell = CastInfos.Caster.myCell, TargetCell = Target.myCell;
-            CastInfos.Caster.fight.sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, CastInfos.Caster.ID, Target.ID, Target.getCellId(), CastInfos.Caster.getCellId()));
-            CastInfos.Caster.setCell(null);
+            FightCell CasterCell = CastInfos.caster.myCell, TargetCell = Target.myCell;
+            CastInfos.caster.fight.sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, CastInfos.caster.getID(), Target.getID(), Target.getCellId(), CastInfos.caster.getCellId()));
+            CastInfos.caster.setCell(null);
             Target.setCell(null);
 
-            if (CastInfos.Caster.setCell(TargetCell, false) == -3 || Target.setCell(CasterCell, false) == -3) {
+            if (CastInfos.caster.setCell(TargetCell, false) == -3 || Target.setCell(CasterCell, false) == -3) {
                 return -3;
             }
 
             //Separated for false Sync wih piège call pushBackEffect
-            if (CastInfos.Caster.onCellChanged() == -3 || Target.onCellChanged() == -3) {
+            if (CastInfos.caster.onCellChanged() == -3 || Target.onCellChanged() == -3) {
                 return -3;
             }
 
-            int Result = CastInfos.Caster.myCell.onObjectAdded(CastInfos.Caster);
+            int Result = CastInfos.caster.myCell.onObjectAdded(CastInfos.caster);
             if (Result == -3) {
                 return Result;
             }

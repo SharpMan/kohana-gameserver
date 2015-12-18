@@ -78,8 +78,8 @@ public class NpcDAOImpl extends NpcDAO {
                     default:
                         continue;
                 }
-                npcReply.replyID = result.getInt("reply_id");
-                npcReply.criteria = result.getString("criteria");
+                npcReply.setReplyID(result.getInt("reply_id"));
+                npcReply.setCriteria(result.getString("criteria"));
                 if (result.getString("parameter0") != null) {
                     params.add(result.getString("parameter0"));
                 }
@@ -98,7 +98,7 @@ public class NpcDAOImpl extends NpcDAO {
                 if (result.getString("additional_parameters") != null) {
                     params.addAll(Arrays.asList(result.getString("additional_parameters").split("\\|")));
                 }
-                npcReply.parameters = params.toArray(new String[params.size()]);
+                npcReply.setParameters(params.toArray(new String[params.size()]));
                 params.clear();
                 replies.add(npcReply);
 

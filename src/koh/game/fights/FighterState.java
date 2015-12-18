@@ -46,7 +46,7 @@ public class FighterState {
             case Invisibility:
                 myFighter.visibleState = GameActionFightInvisibilityStateEnum.INVISIBLE;
                 for (Player o : this.myFighter.fight.Observable$stream()) {
-                    o.send(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.Caster.ID, myFighter.ID, myFighter.getVisibleStateFor(o)));
+                    o.send(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.caster.getID(), myFighter.getID(), myFighter.getVisibleStateFor(o)));
                 }
                 this.myStates.put(FightStateEnum.Invisible, Buff);
                 return;
@@ -67,7 +67,7 @@ public class FighterState {
         switch (Buff.CastInfos.EffectType) {
             case Invisibility:
                 this.myFighter.visibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
-                this.myFighter.fight.sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.Caster.ID, myFighter.ID, myFighter.getVisibleStateFor(null)));
+                this.myFighter.fight.sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.caster.getID(), myFighter.getID(), myFighter.getVisibleStateFor(null)));
                 this.myFighter.fight.sendToField(new GameFightRefreshFighterMessage(myFighter.getGameContextActorInformations(null)));
                 this.myStates.remove(FightStateEnum.Invisible);
                 return;

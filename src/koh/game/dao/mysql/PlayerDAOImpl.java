@@ -114,7 +114,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                     }
                     p = new Player() {
                         {
-                            ID = result.getInt("id");
+                            setID(result.getInt("id"));
                             nickName = result.getString("nickname");
                             breed = (byte) result.getInt("breed");
                             sexe = result.getInt("sex");
@@ -232,12 +232,12 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setInt(5, character.getLevel());
             pStatement.setString(6, StringUtils.join(character.getIndexedColors(), ','));
             pStatement.setInt(7, character.getCurrentMap().getId());
-            pStatement.setInt(8, character.cell.getId());
+            pStatement.setInt(8, character.getCell().getId());
             pStatement.setString(9, StringUtils.join(character.getEnnabledChannels(), ','));
             pStatement.setInt(10, character.getStatPoints());
             pStatement.setInt(11, character.getSpellPoints());
-            pStatement.setString(12, character.vitality + "," + character.wisdom + "," + character.strength + "," + character.intell + "," + character.agility + "," + character.chance + "," + character.life + "," + character.experience + "," + character.activableTitle + "," + character.activableOrnament);
-            pStatement.setBytes(13, character.mySpells.serialize());
+            pStatement.setString(12, character.getVitality() + "," + character.getWisdom() + "," + character.getStrength() + "," + character.getIntell() + "," + character.getAgility() + "," + character.getChance() + "," + character.getLife() + "," + character.getExperience() + "," + character.getActivableTitle() + "," + character.getActivableOrnament());
+            pStatement.setBytes(13, character.getMySpells().serialize());
             pStatement.setLong(14, character.getKamas());
             pStatement.setBytes(15, character.getShortcuts().serialize());
             pStatement.setString(16, character.getSavedMap() + "," + character.getSavedCell());
@@ -247,9 +247,9 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setBytes(20, character.getMountInfo().serialize());
             pStatement.setBytes(21, character.getMyJobs().serialize());
             pStatement.setInt(22, character.getHonor());
-            pStatement.setString(23, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor();
+            pStatement.setString(23, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor());
             pStatement.setString(24, StringUtils.join(character.getScores().values(), ','));
-            pStatement.setInt(25, character.ID);
+            pStatement.setInt(25, character.getID());
 
             pStatement.executeUpdate();
             if (clear) {
@@ -269,7 +269,7 @@ public class PlayerDAOImpl extends PlayerDAO {
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `character` (`id`,`owner`,`nickname`,`breed`,`skins`,`scales`,`sex`,`level`,`colors`,`map`,`cell`,`chat_channels`,`stat_points`,`spell_points`,`stats`,`spells`,`shortcuts`,`savedpos`,`entity_look`,`emotes`,`tinsel`,`job_informations`,`honor_points`,`alignment_informations`,`scores`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",true)) {
             PreparedStatement pStatement = conn.getStatement();
 
-            pStatement.setInt(1, character.ID);
+            pStatement.setInt(1, character.getID());
             pStatement.setInt(2, character.getOwner());
             pStatement.setString(3, character.getNickName());
             pStatement.setInt(4, character.getBreed());
@@ -298,7 +298,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             ResultSet resultSet = pStatement.getGeneratedKeys();
             if(!resultSet.first())//character not created ?
                 return false;
-            character.ID = resultSet.getInt(1);
+            character.setID(resultSet.getInt(1));
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
@@ -328,7 +328,7 @@ public class PlayerDAOImpl extends PlayerDAO {
 
     @Override
     public void addCharacter(Player character) {
-        myCharacterById.put(character.ID, character);
+        myCharacterById.put(character.getID(), character);
         myCharacterByName.put(character.getNickName().toLowerCase(), character);
     }
 
@@ -340,7 +340,7 @@ public class PlayerDAOImpl extends PlayerDAO {
 
     @Override
     public void delCharacter(Player character) {
-        myCharacterById.remove(character.ID);
+        myCharacterById.remove(character.getID());
         myCharacterByName.remove(character.getNickName().toLowerCase());
     }
 

@@ -187,7 +187,7 @@ public class EffectInstance implements Serializable {
         if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
             return (false);
         };
-        boolean targetIsCaster = (pTargetId.ID == pCasterId.ID);
+        boolean targetIsCaster = (pTargetId.getID() == pCasterId.getID());
         boolean targetIsCarried = pTargetId.getCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
         GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
@@ -283,7 +283,7 @@ public class EffectInstance implements Serializable {
                         verify = true;
                         break;
                     case 'O':
-                        verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.ID == pTriggeringSpellCasterId)));
+                        verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.getID() == pTriggeringSpellCasterId)));
                         break;
                     case 'p':
                         break;

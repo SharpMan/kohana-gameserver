@@ -12,7 +12,7 @@ public class EffectSacrifice extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            if (Target.team != CastInfos.Caster.team || Target == CastInfos.Caster) {
+            if (Target.team != CastInfos.caster.team || Target == CastInfos.caster) {
                 continue;
             }
 

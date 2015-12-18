@@ -149,7 +149,7 @@ public class Player extends IGameActor implements Observer {
     public CopyOnWriteArrayList<Player> followers;
 
     @Getter @Setter
-    public boolean isInWorld;
+    public boolean inWorld;
     protected boolean myInitialized = false;
     private HumanInformations cachedHumanInformations = null;
 
@@ -296,10 +296,14 @@ public class Player extends IGameActor implements Observer {
         this.scores.put(Type, this.scores.get(Type) + 1);
     }
 
+    public void addKamas(int val){
+        this.kamas += val;
+    }
+
     public synchronized void onLogged() {
         try {
-            if (!this.isInWorld) {
-                this.isInWorld = true;
+            if (!this.inWorld) {
+                this.inWorld = true;
                 this.account.currentIP = client.getIP();
                 if (this.getFighter() == null) {
                     this.spawnToMap();
@@ -325,7 +329,7 @@ public class Player extends IGameActor implements Observer {
 
     public synchronized void onDisconnect() {
         try {
-            if (!this.isInWorld) {
+            if (!this.inWorld) {
                 return;
             }
             if (this.guild != null) {
@@ -358,7 +362,7 @@ public class Player extends IGameActor implements Observer {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.isInWorld = false;
+            this.inWorld = false;
         }
     }
 
@@ -386,6 +390,14 @@ public class Player extends IGameActor implements Observer {
 
     public void stopRegen() {
         //TODo
+    }
+
+    public void addLife(int val){
+        this.life += val;
+    }
+
+    public void addStatPoints(int val){
+        this.statPoints += val;
     }
 
     public int getInitiative(boolean Base) {
@@ -635,13 +647,13 @@ public class Player extends IGameActor implements Observer {
             if (o instanceof DofusMap && (getFight() != null || getFighter() != null)) {
                 return;
             }
-            if (client != null && isInWorld) {
+            if (client != null && inWorld) {
                 client.send((Message) arg);
             }
         } else if (arg instanceof FieldNotification) {
             FieldNotification task = (FieldNotification) arg;
             if (task.can(this)) {
-                if (client != null && isInWorld) {
+                if (client != null && inWorld) {
                     client.send((Message) task.packet);
                 }
             }
@@ -774,7 +786,7 @@ public class Player extends IGameActor implements Observer {
             account.totalClear();
         }
         account = null;
-        isInWorld = false;
+        inWorld = false;
         myInitialized = false;
 
         myFight = null;

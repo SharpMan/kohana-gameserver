@@ -53,7 +53,7 @@ public class EffectCast {
     public boolean IsReflect, IsPoison, IsCAC, IsTrap, IsReturnedDamages;
     public double Chance;
     public SpellLevel SpellLevel;
-    public Fighter Caster;
+    public Fighter caster;
     public ArrayList<Fighter> Targets;
     public int Duration;
 
@@ -85,7 +85,7 @@ public class EffectCast {
             if (Target.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
                 return (short) num1;
             }
-            if (Caster.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
+            if (caster.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
                 return (short) num2;
             }
             return (short) RandomValue(num2, num1);
@@ -97,7 +97,7 @@ public class EffectCast {
         this.SpellId = SpellId;
         this.CellId = CellId;
         this.Chance = Chance;
-        this.Caster = Caster;
+        this.caster = Caster;
         this.Targets = Targets;
         this.Effect = Effect;
         this.SubEffect = StatsEnum.NONE;
@@ -112,7 +112,7 @@ public class EffectCast {
         this.SpellId = SpellId;
         this.CellId = CellId;
         this.Chance = Chance;
-        this.Caster = Caster;
+        this.caster = Caster;
         this.Targets = Targets;
         this.Effect = Effect;
         this.SubEffect = StatsEnum.NONE;
@@ -128,7 +128,7 @@ public class EffectCast {
         this.SpellId = SpellId;
         this.CellId = CellId;
         this.Chance = Chance;
-        this.Caster = Caster;
+        this.caster = Caster;
         this.Targets = Targets;
         this.Effect = Effect;
         this.SubEffect = SubEffect;
@@ -150,7 +150,7 @@ public class EffectCast {
         this.SpellId = SpellId;
         this.CellId = CellId;
         this.Chance = Chance;
-        this.Caster = Caster;
+        this.caster = Caster;
         this.Targets = Targets;
         this.Effect = Effect;
         this.SubEffect = SubEffect;
@@ -162,7 +162,7 @@ public class EffectCast {
     }
     
     public FightCell Cell(){
-        return this.Caster.fight.getCell(CellId);
+        return this.caster.fight.getCell(CellId);
     }
 
     public String toString() {

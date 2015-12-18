@@ -48,10 +48,10 @@ public class EffectPunishment extends EffectBase {
     public static int ApplyDamages(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
 
         if (Target.states.hasState(FightStateEnum.STATE_REFLECT_SPELL) && !CastInfos.IsPoison && ((BuffReflectSpell) Target.states.getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).reflectLevel >= CastInfos.SpellLevel.getGrade()) {
-            Target.fight.sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, Target.ID, CastInfos.Caster.ID));
-            Target = CastInfos.Caster;
+            Target.fight.sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, Target.getID(), CastInfos.caster.getID()));
+            Target = CastInfos.caster;
         }
-        Fighter Caster = CastInfos.Caster;
+        Fighter Caster = CastInfos.caster;
         // Perd l'invisibilité s'il inflige des dommages direct
         if (!CastInfos.IsPoison && !CastInfos.IsTrap && !CastInfos.IsReflect) {
             Caster.states.removeState(FightStateEnum.Invisible);
@@ -67,13 +67,13 @@ public class EffectPunishment extends EffectBase {
             }
         }
         double num1 = 0.0;
-        double num2 = (double) CastInfos.Caster.getLife() / (double) CastInfos.Caster.getMaxLife();
+        double num2 = (double) CastInfos.caster.getLife() / (double) CastInfos.caster.getMaxLife();
         if (num2 <= 0.5) {
             num1 = 2.0 * num2;
         } else if (num2 > 0.5) {
             num1 = 1.0 + (num2 - 0.5) * -2.0;
         }
-        DamageJet.setValue((double) CastInfos.Caster.getLife() * num1 * (double) CastInfos.RandomJet(Target) / 100.0);
+        DamageJet.setValue((double) CastInfos.caster.getLife() * num1 * (double) CastInfos.RandomJet(Target) / 100.0);
 
         // Calcul resistances
         Target.calculReduceDamages(Damage_Neutral, DamageJet);
@@ -87,7 +87,7 @@ public class EffectPunishment extends EffectBase {
                 if (Armor != 0) {
                     // XX Reduit les dommages de X
 
-                    Target.fight.sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, Target.ID, Target.ID, Armor));
+                    Target.fight.sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, Target.getID(), Target.getID(), Armor));
 
                     // On reduit
                     DamageJet.setValue(DamageJet.intValue() - Armor);
@@ -116,8 +116,8 @@ public class EffectPunishment extends EffectBase {
                 MutableInt ReflectDamage = new MutableInt(Target.getReflectedDamage());
 
                 // Si du renvoi
-                if (ReflectDamage.intValue() > 0 && Target.ID != Caster.ID) {
-                    Target.fight.sendToField(new GameActionFightReflectDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_REFLECTOR, Target.ID, Caster.ID));
+                if (ReflectDamage.intValue() > 0 && Target.getID() != Caster.getID()) {
+                    Target.fight.sendToField(new GameActionFightReflectDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_REFLECTOR, Target.getID(), Caster.getID()));
 
                     // Trop de renvois
                     if (ReflectDamage.getValue() > DamageJet.getValue()) {
@@ -152,9 +152,9 @@ public class EffectPunishment extends EffectBase {
 
         // Enois du packet combat subit des dommages
         if (DamageJet.intValue() != 0) {
-            Target.fight.sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.ID, Target.ID, DamageJet.intValue(), 0));
+            Target.fight.sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.getID(), Target.getID(), DamageJet.intValue(), 0));
         }
-        return Target.tryDie(Caster.ID);
+        return Target.tryDie(Caster.getID());
     }
 
 }

@@ -86,28 +86,28 @@ public class ChatHandler {
     }
 
     @HandlerAttribute(ID = 852)
-    public static void HandleChatClientPrivateWithObjectMessage(WorldClient Client, ChatClientPrivateWithObjectMessage Message) {
+    public static void HandleChatClientPrivateWithObjectMessage(WorldClient client, ChatClientPrivateWithObjectMessage Message) {
         if (Message.objects == null) {
-            HandleChatClientPrivateMessage(Client, Message);
+            HandleChatClientPrivateMessage(client, Message);
             return;
         }
         Player target = DAO.getPlayers().getCharacter(Message.Receiver);
         if (target == null || target.getClient() == null) {
-            Client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
+            client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
         } else {
-            Client.send(new ChatServerCopyWithObjectMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", target.ID, target.getNickName(), Message.objects));
-            target.send(new ChatServerWithObjectMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+            client.send(new ChatServerCopyWithObjectMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", target.getID(), target.getNickName(), Message.objects));
+            target.send(new ChatServerWithObjectMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id, Message.objects));
         }
     }
 
     @HandlerAttribute(ID = ChatClientPrivateMessage.MESSAGE_ID)
-    public static void HandleChatClientPrivateMessage(WorldClient Client, ChatClientPrivateMessage Message) {
+    public static void HandleChatClientPrivateMessage(WorldClient client, ChatClientPrivateMessage Message) {
         Player target = DAO.getPlayers().getCharacter(Message.Receiver);
         if (target == null || target.getClient() == null) {
-            Client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
+            client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
         } else {
-            Client.send(new ChatServerCopyMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", target.ID, target.getNickName()));
-            target.send(new ChatServerMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id));
+            client.send(new ChatServerCopyMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", target.getID(), target.getNickName()));
+            target.send(new ChatServerMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, Message.Content, (int) Instant.now().getEpochSecond(), "az", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id));
         }
     }
 
@@ -120,33 +120,33 @@ public class ChatHandler {
         switch (Message.channel) {
             case CHANNEL_TEAM:
                 if (Client.getCharacter().getFighter() != null) {
-                    Client.getCharacter().getFighter().team.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                    Client.getCharacter().getFighter().team.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 }
                 break;
             case CHANNEL_GLOBAL:
                 if (Client.getCharacter().getFighter() != null) {
-                    Client.getCharacter().getFight().sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                    Client.getCharacter().getFight().sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 } else {
-                    Client.getCharacter().currentMap.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                    Client.getCharacter().currentMap.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 }
                 break;
             case CHANNEL_ADMIN:
-                ChatChannel.CHANNELS.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                ChatChannel.CHANNELS.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
 
                 break;
             case CHANNEL_GUILD:
-                if (Client.getCharacter().guild == null) {
+                if (Client.getCharacter().getGuild() == null) {
                     PlayerController.sendServerMessage(Client, "Erreur : Vous ne faîtes pas partie d'une guilde.");
                     return;
                 }
-                Client.getCharacter().guild.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                Client.getCharacter().getGuild().sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 break;
             case CHANNEL_PARTY:
                 if (Client.getParty() == null) {
                     PlayerController.sendServerMessage(Client, "Erreur : Vous ne faîtes pas partie d'un groupe.");
                     return;
                 }
-                Client.getParty().sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                Client.getParty().sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 break;
             case CHANNEL_SEEK:
             case CHANNEL_SALES:
@@ -156,7 +156,7 @@ public class ChatHandler {
                     Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((Client.lastChannelMessage.get(Message.channel) + 60000L - System.currentTimeMillis()) / 1000) + ""}));
                     return;
                 }
-                ChatChannel.CHANNELS.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.ID, Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                ChatChannel.CHANNELS.get(Message.channel).sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "az", Client.character.getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 Client.lastChannelMessage.put(Message.channel, System.currentTimeMillis());
                 break;
             default:
@@ -170,14 +170,14 @@ public class ChatHandler {
         switch (message.channel) {
             case CHANNEL_TEAM:
                 if (Client.getCharacter().getFighter() != null) {
-                    Client.getCharacter().getFighter().team.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id));
+                    Client.getCharacter().getFighter().team.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
                 }
                 break;
             case CHANNEL_GLOBAL:
                 if (Client.getCharacter().getFighter() != null) {
-                    Client.getCharacter().getFight().sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id));
+                    Client.getCharacter().getFight().sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
                 } else {
-                    Client.getCharacter().currentMap.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id));
+                    Client.getCharacter().currentMap.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
 
                 }
                 break;
@@ -268,11 +268,11 @@ public class ChatHandler {
                 } else if (message.Content.startsWith("!clearitems")) {
                     Client.getCharacter().currentMap.clearDroppedItems();
                 } else if (message.Content.startsWith("!setpdvper")) {
-                    int Level = Integer.parseInt(message.Content.split(" ")[1]);
-                    if (Client.getCharacter().getFight() != null || Level > 100) {
+                    int level = Integer.parseInt(message.Content.split(" ")[1]);
+                    if (Client.getCharacter().getFight() != null || level > 100) {
                         return;
                     }
-                    Client.getCharacter().life = (int) (((float) Client.getCharacter().getMaxLife() * 100) / Level);
+                    Client.getCharacter().setLife((int) (((float) Client.getCharacter().getMaxLife() * 100) / level));
                     PlayerController.sendServerMessage(Client, "PdV Updated");
                     Client.getCharacter().refreshStats();
                 } else if (message.Content.startsWith("!spellpoint")) {
@@ -284,11 +284,11 @@ public class ChatHandler {
                 } else if (message.Content.startsWith("!level")) {
                     int Level = Integer.parseInt(message.Content.split(" ")[1]);
                     Player Target = message.Content.length() >= 2 ? Client.getCharacter() : DAO.getPlayers().getCharacter(message.Content.split(" ")[2]);
-                    if (Target == null || !Target.isInWorld) {
+                    if (Target == null || !Target.isInWorld()) {
                         PlayerController.sendServerMessage(Client, "player " + message.Content.split(" ")[2] + " Offline");
                         return;
                     }
-                    Target.addExperience((DAO.getExps().getPlayerMinExp(Level) + 1) - Target.experience);
+                    Target.addExperience((DAO.getExps().getPlayerMinExp(Level) + 1) - Target.getExperience());
                     PlayerController.sendServerMessage(Client, "level seted successfully");
                 } else if (message.Content.startsWith("!ange")) {
                     Client.getCharacter().changeAlignementSide(AlignmentSideEnum.ALIGNMENT_ANGEL);
@@ -298,7 +298,7 @@ public class ChatHandler {
                     Client.send(new ChatServerMessage(CHANNEL_GLOBAL, message.Content, (int) Instant.now().getEpochSecond(), "az", -1, "Pnj de Merde", Client.getAccount().id));
                 } else if (message.Content.startsWith("!set")) {
                     //client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(), 5));
-                    Client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean()), Client.getCharacter().ID));
+                    Client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean(), new Random().nextBoolean()), Client.getCharacter().getID()));
 
                 } else if (message.Content.startsWith("!kmar2")) {
                     int X = Integer.parseInt(message.Content.split(" ")[1]);
@@ -311,7 +311,7 @@ public class ChatHandler {
                     Client.getCharacter().refreshEntitie();
                 } else if (message.Content.startsWith("!learnspell")) {
                     short X = Short.parseShort(message.Content.split(" ")[1]);
-                    Client.getCharacter().mySpells.addSpell(X, (byte) 1, Client.getCharacter().mySpells.getFreeSlot(), Client);
+                    Client.getCharacter().getMySpells().addSpell(X, (byte) 1, Client.getCharacter().getMySpells().getFreeSlot(), Client);
                 } else if (message.Content.startsWith("!kmar")) {
                     short X = Short.parseShort(message.Content.split(" ")[1]);
                     Client.getCharacter().getEntityLook().skins.clear();
@@ -369,7 +369,7 @@ public class ChatHandler {
                         if (template.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
                             Qua = 1;
                         }
-                        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Id, 63, Client.getCharacter().ID, Qua, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), Type, template instanceof Weapon));
+                        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Id, 63, Client.getCharacter().getID(), Qua, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), Type, template instanceof Weapon));
 
                         if (Client.getCharacter().inventoryCache.add(Item, true)) {
                             Item.setNeedInsert(true);
@@ -381,22 +381,22 @@ public class ChatHandler {
                     }
                     break;
                 } else {
-                    ChatChannel.CHANNELS.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id));
+                    ChatChannel.CHANNELS.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
                 }
                 break;
             case CHANNEL_GUILD:
-                if (Client.getCharacter().guild == null) {
+                if (Client.getCharacter().getGuild() == null) {
                     PlayerController.sendServerMessage(Client, "Erreur : Vous ne faîtes pas partie d'une guilde.");
                     return;
                 }
-                Client.getCharacter().guild.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id));
+                Client.getCharacter().getGuild().sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
                 break;
             case CHANNEL_PARTY:
                 if (Client.getParty() == null) {
                     PlayerController.sendServerMessage(Client, "Erreur : Vous ne faîtes pas partie d'un groupe.");
                     return;
                 }
-                Client.getParty().sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, Client.getCharacter().getNickName(), Client.getAccount().id));
+                Client.getParty().sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
                 break;
             case CHANNEL_SEEK:
             case CHANNEL_SALES:
@@ -406,7 +406,7 @@ public class ChatHandler {
                     Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((Client.lastChannelMessage.get(message.channel) + 60000L - System.currentTimeMillis()) / 1000) + ""}));
                     return;
                 }
-                ChatChannel.CHANNELS.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().ID, .getCharacter().getNickName(), Client.getAccount().id));
+                ChatChannel.CHANNELS.get(message.channel).sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "az", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
                 Client.lastChannelMessage.put(message.channel, System.currentTimeMillis());
                 break;
             default:

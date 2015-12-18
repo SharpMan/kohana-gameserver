@@ -98,7 +98,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (this.myCell != null) {
             this.myCell.RemoveObject(this); // On vire le fighter de la cell:
             if (this.myCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-                ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).Enable(this, true);
+                ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).enable(this, true);
             }
             if (this.fight.fightState == FightState.STATE_PLACE) {
                 if (!ArrayUtils.contains(previousPositions, myCell.Id)) {
@@ -177,7 +177,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             //SendGameFightLeaveMessage
             this.fight.sendToField(new GameActionFightDeathMessage(GameActionTypeEnum.FIGHT_KILLFIGHTER.value, casterId, this.ID));
 
-            this.team.getAliveFighters().filter(x -> x.summoner != null && x.summoner.ID == this.ID).forEach(Fighter -> Fighter.tryDie(this.ID, true));
+            this.team.getAliveFighters().filter(x -> x.summoner != null && x.summoner.getID() == this.ID).forEach(Fighter -> Fighter.tryDie(this.ID, true));
 
             if (this.fight.m_activableObjects.containsKey(this)) {
                 this.fight.m_activableObjects.get(this).stream().forEach(y -> y.remove());
@@ -441,7 +441,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public int getCarriedActor() {
         Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).findFirst();
-        return Option.isPresent() ? Option.get().Caster.ID : 0;
+        return Option.isPresent() ? Option.get().caster.getID() : 0;
     }
 
     public boolean isVisibleFor(Player character) {
@@ -453,11 +453,11 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int getSummonerID() {
-        return this.summoner == null ? 0 : this.summoner.ID;
+        return this.summoner == null ? 0 : this.summoner.getID();
     }
 
     public byte getVisibleStateFor(Player character) {
-        if (this.team.getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner.ID == this.ID)) {
+        if (this.team.getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner.getID() == this.ID)) {
             return GameActionFightInvisibilityStateEnum.VISIBLE.value;
         } else if (character == null || character.getClient() == null || character.getFighter() == null || character.getFight() != this.fight) {
             return this.visibleState.value;
@@ -734,7 +734,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     /// <summary>
     /// Calcul des PA/PM perdus
     /// </summary>
-    /// <param name="Caster"></param> TODO: Supprimer les appel variable inutile qui occupent de la mémoire et referencer direct les var
+    /// <param name="caster"></param> TODO: Supprimer les appel variable inutile qui occupent de la mémoire et referencer direct les var
     /// <param name="LostPoint"></param>
     /// <param name="getMP"></param>
     /// <returns></returns>

@@ -102,7 +102,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
         this.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) actor.getGameContextActorInformations(null)));
 
-        this.myGameActors.put(actor.ID, actor);
+        this.myGameActors.put(actor.getID(), actor);
 
         //verify Todo
         /*if (this.cells.length <  actor.getCellId) {
@@ -151,9 +151,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             }
         }
 
-        this.myGameActors.remove(actor.ID);
-        this.sendToField(new GameContextRemoveElementMessage(actor.ID));
-        this.cells[actor.cell.getId()].delActor(actor);
+        this.myGameActors.remove(actor.getID());
+        this.sendToField(new GameContextRemoveElementMessage(actor.getID()));
+        this.cells[actor.getCell().getId()].delActor(actor);
     }
 
     public DofusCell getCell(short c) {
@@ -219,7 +219,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     public UpdateMapPlayersAgressableStatusMessage getAgressableActorsStatus(Player player) {
         synchronized (this.myGameActors) {
-            return new UpdateMapPlayersAgressableStatusMessage(this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> x.ID).toArray(), this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> ((Player) x).PvPEnabled).toArray());
+            return new UpdateMapPlayersAgressableStatusMessage(this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> x.getID()).toArray(), this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> ((Player) x).getPvPEnabled()).toArray());
         }
     }
 
@@ -269,8 +269,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         //throw un nullP mieux que referencer une liste on 111000 map object
         try {
             for (Npc npc : DAO.getNpcs().forMap(this.id)) {
-                    npc.ID = this.myNextActorId--;
-                    npc.cell = this.getCell(npc.getCellID());
+                    npc.setID(this.myNextActorId--);
+                    npc.setActorCell(this.getCell(npc.getCellID()));
                     this.spawnActor(npc);
             }
         } catch(NullPointerException ignored) {}
@@ -319,10 +319,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             return;
         }
         synchronized (droppedItems) {
-            if (droppedItems.containsKey(actor.cell.getId())) {
-                actor.getInventoryCache().add(droppedItems.get(actor.cell.getId()), true);
-                droppedItems.remove(actor.cell.getId());
-                this.sendToField(new ObjectGroundRemovedMessage(actor.cell.getId()));
+            if (droppedItems.containsKey(actor.getCell().getId())) {
+                actor.getInventoryCache().add(droppedItems.get(actor.getCell().getId()), true);
+                droppedItems.remove(actor.getCell().getId());
+                this.sendToField(new ObjectGroundRemovedMessage(actor.getCell().getId()));
                 if (droppedItems.isEmpty()) {
                     this.droppedItems = null;
                 }
@@ -365,7 +365,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public boolean hasActorOnCell(short cell) {
-        return this.myGameActors.values().stream().filter(x -> x.cell != null && x.cell.getId() == cell).count() > 0;
+        return this.myGameActors.values().stream().filter(x -> x.getCell() != null && x.getCell().getId() == cell).count() > 0;
     }
 
     public Npc getNpc(int contextualid) {

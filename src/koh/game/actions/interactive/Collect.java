@@ -52,18 +52,18 @@ public class Collect implements InteractiveAction {
             actor.getClient().delGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
             return;
         }
-        if (Actor.getCurrentMap().getStatedElementById(element).elementState == 2) {
+        if (actor.getCurrentMap().getStatedElementById(element).elementState == 2) {
             PlayerController.sendServerMessage(actor.getClient(), "Impossible de collecter un item déjà en recolte.");
             actor.getClient().delGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
             return;
         }
-        Actor.getCurrentMap().getStatedElementById(element).elementState = 2;
-        this.ageBonus = Actor.getCurrentMap().getInteractiveElementStruct(element).ageBonus;
-        Actor.getCurrentMap().getInteractiveElementStruct(element).ageBonus = -1;
+        actor.getCurrentMap().getStatedElementById(element).elementState = 2;
+        this.ageBonus = actor.getCurrentMap().getInteractiveElementStruct(element).ageBonus;
+        actor.getCurrentMap().getInteractiveElementStruct(element).ageBonus = -1;
 
-        Actor.getCurrentMap().sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(Actor.getCurrentMap().toInteractiveElement(Player, element))));
-        Actor.getCurrentMap().sendToField(new StatedElementUpdatedMessage(Actor.getCurrentMap().getStatedElementById(element)));
-        new CancellableScheduledRunnable(Actor.getCurrentMap().getArea().backGroundWorker, this.getDuration() * 100) {
+        actor.getCurrentMap().sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(actor.getCurrentMap().toInteractiveElement(Player, element))));
+        actor.getCurrentMap().sendToField(new StatedElementUpdatedMessage(actor.getCurrentMap().getStatedElementById(element)));
+        new CancellableScheduledRunnable(actor.getCurrentMap().getArea().backGroundWorker, this.getDuration() * 100) {
             @Override
             public void run() {
                 try {
@@ -91,7 +91,7 @@ public class Collect implements InteractiveAction {
         if (ageBonus > 0) {
             bonusQuantity += (int) ((float) bonusQuantity * ageBonus / 100);
         }
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.getGatheredRessourceItem(), 63, player.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.getGatheredRessourceItem()).getPossibleEffects(), EffectGenerationType.Normal, false));
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.getGatheredRessourceItem(), 63, player.getID(), bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.getGatheredRessourceItem()).getPossibleEffects(), EffectGenerationType.Normal, false));
         if (player.getInventoryCache().add(item, true)) {
             item.setNeedInsert(true);
         }

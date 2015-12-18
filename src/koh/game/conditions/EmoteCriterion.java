@@ -9,8 +9,8 @@ import koh.game.entities.actors.Player;
  */
 public class EmoteCriterion extends Criterion {
 
-    public static String Identifier = "PE";
-    public byte Emote;
+    public static final String IDENTIFIER = "PE";
+    public byte emote;
 
     @Override
     public String toString() {
@@ -19,7 +19,7 @@ public class EmoteCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Emote = Byte.parseByte(literal);;
+        this.emote = Byte.parseByte(literal);;
     }
 
     @Override
@@ -27,9 +27,9 @@ public class EmoteCriterion extends Criterion {
         //FIXME : See if another operator exist for this
         switch (this.Operator) {
             case INEQUALS:
-                return !Bytes.contains(character.emotes, Emote);
+                return !Bytes.contains(character.getEmotes(), emote);
             case EQUALS:
-                return Bytes.contains(character.emotes, Emote);
+                return Bytes.contains(character.getEmotes(), emote);
         }
         return true;
     }

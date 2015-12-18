@@ -210,7 +210,7 @@ public class ExchangeHandler {
             Client.setBaseRequest(Request);
             Target.setBaseRequest(Request);
 
-            Message Message2 = new ExchangeRequestedTradeMessage(ExchangeTypeEnum.PLAYER_TRADE, Client.character.ID, Target.character.ID);
+            Message Message2 = new ExchangeRequestedTradeMessage(ExchangeTypeEnum.PLAYER_TRADE, Client.character.getID(), Target.character.getID());
 
             Client.send(Message2);
             Target.send(Message2);

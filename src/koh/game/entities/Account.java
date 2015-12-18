@@ -51,7 +51,7 @@ public class Account {
     }
 
     public Player getPlayer(int id) {
-        return characters.stream().filter(x -> x.ID == id).findFirst().orElse(null);
+        return characters.stream().filter(x -> x.getID() == id).findFirst().orElse(null);
     }
 
     public String toString() {

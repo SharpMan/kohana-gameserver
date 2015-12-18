@@ -60,7 +60,7 @@ public class NpcHandler {
                 if (Client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
                     Client.myExchange = new NpcExchange(Client, PNJ);
                     Client.addGameAction(new GameExchange(Client.character, Client.myExchange));
-                    Client.send(new ExchangeStartOkNpcShopMessage(PNJ.ID, PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems$Array()));
+                    Client.send(new ExchangeStartOkNpcShopMessage(PNJ.getID(), PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems$Array()));
                 }
                 break;
             case ACTION_TALK:

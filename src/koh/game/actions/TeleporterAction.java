@@ -38,7 +38,7 @@ public class TeleporterAction extends GameAction {
             if (subway == null) {
                 return;
             }
-            if (((Player) actor).kamas < getCostTo(null)) {
+            if (((Player) actor).getKamas() < getCostTo(null)) {
                 actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
                 return;
             }

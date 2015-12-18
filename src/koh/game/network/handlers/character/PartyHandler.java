@@ -140,7 +140,7 @@ public class PartyHandler {
             return;
         }
         Client.getParty().leave(Client.getParty().getPlayerById(Message.playerId), true);
-        Client.getParty().sendToField(new PartyMemberEjectedMessage(Client.getParty().id, Message.playerId, Client.character.ID));
+        Client.getParty().sendToField(new PartyMemberEjectedMessage(Client.getParty().id, Message.playerId, Client.character.getID()));
 
     }
 
@@ -212,7 +212,7 @@ public class PartyHandler {
         if (GameParty == null) {
             return;
         }
-        Client.send(new PartyInvitationDetailsMessage(GameParty.id, GameParty.type, GameParty.partyName, Client.getPartyRequest(Message.partyId).requester.getCharacter().ID, Client.getPartyRequest(Message.partyId).requester.getCharacter().getNickName(), GameParty.chief.ID, GameParty.toPartyInvitationMemberInformations(), GameParty.toPartyGuestInformations()));
+        Client.send(new PartyInvitationDetailsMessage(GameParty.id, GameParty.type, GameParty.partyName, Client.getPartyRequest(Message.partyId).requester.getCharacter().getID(), Client.getPartyRequest(Message.partyId).requester.getCharacter().getNickName(), GameParty.chief.getID(), GameParty.toPartyInvitationMemberInformations(), GameParty.toPartyGuestInformations()));
     }
 
     @HandlerAttribute(ID = 5585)
@@ -223,7 +223,7 @@ public class PartyHandler {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_NOT_FOUND));
             return;
         }
-        if (target.getClient() == null || target.status == PlayerStatusEnum.PLAYER_STATUS_AFK) {
+        if (target.getClient() == null || target.getStatus() == PlayerStatusEnum.PLAYER_STATUS_AFK) {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_BUSY));
             return;
         }
@@ -269,7 +269,7 @@ public class PartyHandler {
             }
         }
 
-        target.send(new PartyInvitationMessage(Client.getParty().id, PartyTypeEnum.PARTY_TYPE_CLASSICAL, Client.getParty().partyName, Party.MAX_PARTICIPANTS, Client.getCharacter().ID, Client.getCharacter().getNickName(), target.ID));
+        target.send(new PartyInvitationMessage(Client.getParty().id, PartyTypeEnum.PARTY_TYPE_CLASSICAL, Client.getParty().partyName, Party.MAX_PARTICIPANTS, Client.getCharacter().getID(), Client.getCharacter().getNickName(), target.getID()));
 
     }
 

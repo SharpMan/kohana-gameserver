@@ -23,11 +23,11 @@ public class EffectDamageDropLife extends EffectBase {
             }
         } else // Dommage direct
         {
-            int effectBase = CastInfos.RandomJet(CastInfos.Caster);
-            MutableInt DamageValue = new MutableInt((CastInfos.Caster.currentLife / 100) * effectBase);
-            if (EffectDamage.ApplyDamages(CastInfos, CastInfos.Caster, DamageValue) == -3) {
+            int effectBase = CastInfos.RandomJet(CastInfos.caster);
+            MutableInt DamageValue = new MutableInt((CastInfos.caster.currentLife / 100) * effectBase);
+            if (EffectDamage.ApplyDamages(CastInfos, CastInfos.caster, DamageValue) == -3) {
                 for (Fighter Target : CastInfos.Targets) {
-                    if (Target.ID == CastInfos.Caster.ID) {
+                    if (Target.getID() == CastInfos.caster.getID()) {
                         continue;
                     }
                     if (EffectHeal.ApplyHeal(CastInfos, Target, DamageValue, false) == -3) {
@@ -37,7 +37,7 @@ public class EffectDamageDropLife extends EffectBase {
                 return -3;
             } else {
                 for (Fighter Target : CastInfos.Targets) {
-                    if (Target.ID == CastInfos.Caster.ID) {
+                    if (Target.getID() == CastInfos.caster.getID()) {
                         continue;
                     }
                     if (EffectHeal.ApplyHeal(CastInfos, Target, DamageValue, false) == -3) {

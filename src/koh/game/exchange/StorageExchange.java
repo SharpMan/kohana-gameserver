@@ -39,7 +39,7 @@ public class StorageExchange extends Exchange {
             }
         } else {
             for (InventoryItem Item : items) {
-                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, Client.character.ID, Item.getQuantity(), Item.getEffects());
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, Client.character.getID(), Item.getQuantity(), Item.getEffects());
                 if (Client.character.getInventoryCache().add(newItem, true)) {
                     newItem.setNeedInsert(true);
                 }
@@ -59,7 +59,7 @@ public class StorageExchange extends Exchange {
                 return false;
             }
             client.getAccount().accountData.updateObjectQuantity(client.character, BankItem, BankItem.getQuantity() + quantity);
-            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.getTemplateId(), 63, client.character.ID, -quantity, BankItem.getEffects());
+            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.getTemplateId(), 63, client.character.getID(), -quantity, BankItem.getEffects());
             if (client.character.getInventoryCache().add(Item, true)) {
                 Item.setNeedInsert(true);
             }

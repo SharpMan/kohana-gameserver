@@ -20,14 +20,14 @@ public class BuffPorteur extends BuffEffect {
     public BuffPorteur(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.Duration = -1;
-        CastInfos.Caster.states.fakeState(FightStateEnum.Porteur, true);
+        CastInfos.caster.states.fakeState(FightStateEnum.Porteur, true);
         this.CastInfos.EffectType = StatsEnum.Add_State;
-        this.Caster.fight.sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER,Caster.ID,Target.ID,Caster.getCellId()));
+        this.caster.fight.sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.Caster.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 2, this.CastInfos.ParentUID, (short) 1, (short) 3);
+        return new FightTemporaryBoostStateEffect(this.GetId(), this.caster.getID(), (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 2, this.CastInfos.ParentUID, (short) 1, (short) 3);
     }
 
     @Override
@@ -39,12 +39,12 @@ public class BuffPorteur extends BuffEffect {
         }
 
         // On affecte la meme cell pour la cible porté
-        return this.Target.setCell(this.Caster.myCell);
+        return this.Target.setCell(this.caster.myCell);
     }
 
     @Override
     public int removeEffect() {
-        CastInfos.Caster.states.fakeState(FightStateEnum.Porteur, false);
+        CastInfos.caster.states.fakeState(FightStateEnum.Porteur, false);
         this.Duration = 0;
         return super.removeEffect();
     }

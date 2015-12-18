@@ -18,7 +18,7 @@ public class EffectDispellEffectDuration extends EffectBase {
                 return -3;
             }
 
-            Target.fight.sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.Caster.ID, Target.ID, (short) -Jet));
+            Target.fight.sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.caster.getID(), Target.getID(), (short) -Jet));
         }
 
         return -1;

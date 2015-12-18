@@ -8,8 +8,8 @@ import koh.game.entities.actors.Player;
  */
 public class KamaCriterion extends Criterion {
 
-    public static String Identifier = "PK";
-    public Integer Kamas;
+    public static final String IDENTIFIER = "PK";
+    public Integer kamas;
 
     @Override
     public String toString() {
@@ -18,12 +18,12 @@ public class KamaCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Kamas = Integer.parseInt(literal);
+        this.kamas = Integer.parseInt(literal);
     }
 
     @Override
     public boolean eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.kamas, this.Kamas);
+        return this.Compare((Comparable<Integer>) character.getKamas(), this.kamas);
     }
 
 }

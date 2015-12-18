@@ -144,7 +144,7 @@ public class InventoryHandler {
             Client.character.getInventoryCache().addApparence(Item.getApparrance());
             Client.character.refreshEntitie();
         }
-        Client.character.send(new InventoryWeightMessage(Client.character.igetInventoryCache().getWeight(), Client.character.getInventoryCache().getTotalWeight()));
+        Client.character.send(new InventoryWeightMessage(Client.character.getInventoryCache().getWeight(), Client.character.getInventoryCache().getTotalWeight()));
         Client.send(new BasicNoOperationMessage());
     }
 

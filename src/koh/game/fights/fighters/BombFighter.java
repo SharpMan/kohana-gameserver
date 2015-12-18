@@ -96,7 +96,7 @@ public class BombFighter extends StaticFighter {
             if (FightCell != null) {
                 if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
                     for (Fighter Target : FightCell.GetObjectsAsFighter()) {
-                        if (Target.ID == this.ID) {
+                        if (Target.getID() == this.ID) {
                             continue;
                         }
                         if (Target instanceof BombFighter /*&& ((BombFighter) Target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).Boosted) {

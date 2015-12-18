@@ -43,7 +43,7 @@ public class RolePlayHandler {
 
     @HandlerAttribute(ID = EmotePlayRequestMessage.MESSAGE_ID)
     public static void EmotePlayRequestMessage(WorldClient Client, EmotePlayRequestMessage Message) {
-        Client.getCharacter().getCurrentMap().sendToField(new EmotePlayMessage(Message.emoteId, Instant.now().getEpochSecond(), Client.getCharacter().ID, Client.getAccount().id));
+        Client.getCharacter().getCurrentMap().sendToField(new EmotePlayMessage(Message.emoteId, Instant.now().getEpochSecond(), Client.getCharacter().getID(), Client.getAccount().id));
     }
 
     @HandlerAttribute(ID = StatsUpgradeRequestMessage.MESSAGE_ID)
@@ -61,9 +61,9 @@ public class RolePlayHandler {
         if (Message.boostPoint <= 0) {
             throw new Error("client given 0 as boostpoint. Forbidden value.");
         }
-        int base = Client.getCharacter().stats.getBase(Stat);
+        int base = Client.getCharacter().getStats().getBase(Stat);
         short num1 = (short) Message.boostPoint;
-        if ((int) num1 < 1 || (int) Message.boostPoint > Client.getCharacter().statPoints) {
+        if ((int) num1 < 1 || (int) Message.boostPoint > Client.getCharacter().getStatPoints()) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
@@ -88,34 +88,34 @@ public class RolePlayHandler {
             base += num2;
             num1 -= num3;
         }
-        Client.getCharacter().stats.getEffect(Stat).Base = base;
+        Client.getCharacter().getStats().getEffect(Stat).Base = base;
         switch ((int) Message.statId) {
             case StatsBoostEnum.Strength:
-                Client.getCharacter().strength = base;
+                Client.getCharacter().setStrength(base);
                 break;
 
             case StatsBoostEnum.Vitality:
-                Client.getCharacter().vitality = base;
-                Client.getCharacter().life += (base - oldbase); // on boost la life
+                Client.getCharacter().setVitality(base);
+                Client.getCharacter().addLife(base - oldbase); // on boost la life
                 break;
 
             case StatsBoostEnum.Wisdom:
-                Client.getCharacter().wisdom = base;
+                Client.getCharacter().setWisdom(base);
                 break;
 
             case StatsBoostEnum.Intelligence:
-                Client.getCharacter().intell = base;
+                Client.getCharacter().setIntell(base);
                 break;
 
             case StatsBoostEnum.Chance:
-                Client.getCharacter().chance = base;
+                Client.getCharacter().setChance(base);
                 break;
 
             case StatsBoostEnum.Agility:
-                Client.getCharacter().agility = base;
+                Client.getCharacter().setAgility(base);
                 break;
         }
-        Client.getCharacter().statPoints -= ((int) Message.boostPoint - num1);
+        Client.getCharacter().addStatPoints(- (int) Message.boostPoint - num1);
         Client.send(new StatsUpgradeResultMessage(StatsUpgradeResultEnum.SUCCESS, Message.boostPoint));
         Client.getCharacter().refreshStats();
     }
@@ -123,7 +123,7 @@ public class RolePlayHandler {
     @HandlerAttribute(ID = ChangeMapMessage.MESSAGE_ID)
     public static void HandleChangeMapMessage(WorldClient Client, ChangeMapMessage Message) {
 
-        if (Client.getCharacter().cell == null || !Client.getCharacter().cell.affectMapChange()) {
+        if (Client.getCharacter().getCell() == null || !Client.getCharacter().getCell().affectMapChange()) {
             System.out.println("undefinied cell");
             Client.send(new BasicNoOperationMessage());
             return;
@@ -133,13 +133,13 @@ public class RolePlayHandler {
 
         //System.out.println(cell.mapChangeData + "cell" + cell.id);
         if (Client.getCharacter().getCurrentMap().getTopNeighbourId() == Message.mapId) {
-            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[0].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[0].getCellid() : (Client.getCharacter().cell.getId() + 532));
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[0].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[0].getCellid() : (Client.getCharacter().getCell().getId() + 532));
         } else if (Client.getCharacter().getCurrentMap().getBottomNeighbourId() == Message.mapId) {
-            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[1].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[1].getCellid() : (Client.getCharacter().cell.getId() - 532));
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[1].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[1].getCellid() : (Client.getCharacter().getCell().getId() - 532));
         } else if (Client.getCharacter().getCurrentMap().getLeftNeighbourId() == Message.mapId) {
-            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[2].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[2].getCellid() : (Client.getCharacter().cell.getId() + 13));
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[2].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[2].getCellid() : (Client.getCharacter().getCell().getId() + 13));
         } else if (Client.getCharacter().getCurrentMap().getRightNeighbourId() == Message.mapId) {
-            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getCellid() : (Client.getCharacter().cell.getId() - 13));
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getCellid() : (Client.getCharacter().getCell().getId() - 13));
         } else {
             // Client.getCharacter().teleport(Message.mapId, -1);
             logger.error("client {} teleport from {} to {}" ,Client.getCharacter().getNickName(),Client.getCharacter().getCurrentMap().getId(), Message.mapId);

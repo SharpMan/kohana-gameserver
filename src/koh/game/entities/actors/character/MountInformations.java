@@ -113,11 +113,11 @@ public class MountInformations {
 
     public void enableStats(boolean enable) {
         if (enable) {
-            this.player.stats.merge(getStats());
-            this.player.life += getStats().getTotal(StatsEnum.Vitality);
+            this.player.getStats().merge(getStats());
+            this.player.addLife(getStats().getTotal(StatsEnum.Vitality));
         } else {
-            this.player.stats.unMerge(getStats());
-            this.player.life -= getStats().getTotal(StatsEnum.Vitality);
+            this.player.getStats().unMerge(getStats());
+            this.player.addLife(-getStats().getTotal(StatsEnum.Vitality));
         }
         this.player.refreshStats();
     }

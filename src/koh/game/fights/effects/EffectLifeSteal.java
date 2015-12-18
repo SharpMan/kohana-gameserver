@@ -23,7 +23,7 @@ public class EffectLifeSteal extends EffectBase {
             });
         } else {
             for (Fighter Target : CastInfos.Targets) {
-                if (CastInfos.SpellId == 450 && Target.team.Id != CastInfos.Caster.team.Id) { //Folie
+                if (CastInfos.SpellId == 450 && Target.team.Id != CastInfos.caster.team.Id) { //Folie
                     continue;
                 }
 
@@ -43,7 +43,7 @@ public class EffectLifeSteal extends EffectBase {
 
         MutableInt HealJet = new MutableInt(DamageJet.intValue() / 2);
 
-        if (EffectHeal.ApplyHeal(CastInfos, CastInfos.Caster, HealJet) == -3) {
+        if (EffectHeal.ApplyHeal(CastInfos, CastInfos.caster, HealJet) == -3) {
             return -3;
         }
         return -1;

@@ -27,12 +27,12 @@ public class BuffDamagePerPM extends BuffEffect {
         DamageValue.setValue(val * nbr);
         //Poison Paralysant
 
-        int inte = CastInfos.Caster.stats.getTotal(StatsEnum.Intelligence);
+        int inte = CastInfos.caster.stats.getTotal(StatsEnum.Intelligence);
         
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = CastInfos.Caster.stats.getTotal(StatsEnum.AddDamagePercent);
+        int pdom = CastInfos.caster.stats.getTotal(StatsEnum.AddDamagePercent);
         if (pdom < 0) {
             pdom = 0;
         }
@@ -46,7 +46,7 @@ public class BuffDamagePerPM extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.Target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
     }
 
 }

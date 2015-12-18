@@ -16,7 +16,7 @@ public class TinselHandler {
 
     @HandlerAttribute(ID = TitlesAndOrnamentsListRequestMessage.MESSAGE_ID)
     public static void HandleTitlesAndOrnamentsListRequestMessage(WorldClient Client, TitlesAndOrnamentsListRequestMessage Message) {
-        Client.send(new TitlesAndOrnamentsListMessage(Client.character.titles, Client.character.ornaments, Client.character.activableTitle, Client.character.activableOrnament));
+        Client.send(new TitlesAndOrnamentsListMessage(Client.character.getTitles(), Client.character.getOrnaments(), Client.character.getActivableTitle(), Client.character.getActivableOrnament()));
     }
 
     @HandlerAttribute(ID = TitleSelectRequestMessage.Message_ID)
@@ -27,7 +27,7 @@ public class TinselHandler {
             return;
         }
         if (ArrayUtils.contains(Client.character.titles, Message.titleId)) {
-            Client.character.activableTitle = (short) Message.titleId;
+            Client.character.setActivableTitle((short) Message.titleId);
             Client.character.refreshActor();
             Client.send(new TitleSelectedMessage(Message.titleId));
             
@@ -45,7 +45,7 @@ public class TinselHandler {
             return;
         }
         if (ArrayUtils.contains(Client.character.ornaments, Message.ornamentId)) {
-            Client.character.activableOrnament = (short) Message.ornamentId;
+            Client.character.setActivableOrnament((short) Message.ornamentId);
             Client.character.refreshActor();
             Client.send(new OrnamentSelectedMessage(Message.ornamentId));
         } else {

@@ -21,7 +21,7 @@ public class Kamas extends ItemAction {
     public boolean execute(Player p) {
         if(!super.execute(p))
             return false;
-        int curKamas = p.kamas;
+        int curKamas = p.getKamas();
         int newKamas = curKamas + count;
         if(newKamas <0) newKamas = 0;
         p.getInventoryCache().addKamas(newKamas);

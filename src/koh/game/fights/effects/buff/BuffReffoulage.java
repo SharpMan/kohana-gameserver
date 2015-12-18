@@ -22,14 +22,14 @@ public class BuffReffoulage extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (Target.getCellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(Target.fight.map, DamageInfos.Caster.getCellId(), Target.getCellId()) > 1) {
+        if (Target.getCellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(Target.fight.map, DamageInfos.caster.getCellId(), Target.getCellId()) > 1) {
             return -1;
         }
         
         DamageValue.setValue(0);
 
-        EffectCast SubInfos = new EffectCast(StatsEnum.Push_Back, 0, (short) 0, 0, null, DamageInfos.Caster, null, false, StatsEnum.NONE, 0, null);
-        byte Direction = Pathfinder.getDirection(Target.fight.map, DamageInfos.Caster.getCellId(), Target.getCellId());
+        EffectCast SubInfos = new EffectCast(StatsEnum.Push_Back, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
+        byte Direction = Pathfinder.getDirection(Target.fight.map, DamageInfos.caster.getCellId(), Target.getCellId());
 
         // Application du push
         return EffectPush.ApplyPush(SubInfos, this.Target, Direction, 1);
@@ -37,7 +37,7 @@ public class BuffReffoulage extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+        return new FightTriggeredEffect(this.GetId(), this.Target.getID(), (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
     }
 
 }

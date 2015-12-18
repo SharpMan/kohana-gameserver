@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.entities.actors.Player;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
@@ -12,10 +13,11 @@ import lombok.Getter;
 public class NpcReply {
 
     private String type;
-    @Getter
+    @Getter @Setter
     private int replyID;
+    @Setter
     private String criteria;
-    @Getter
+    @Getter @Setter
     private String[] parameters;
 
     private ConditionExpression m_criteriaExpression;

@@ -16,10 +16,10 @@ public class EffectTeleportSymetric extends EffectBase {
         int toReturn = -1;
         FightCell cell;
         for (Fighter Target : CastInfos.Targets) {
-            cell = CastInfos.Caster.fight.getCell(Target.getMapPoint().pointSymetry(CastInfos.Caster.getMapPoint()).get_cellId());
+            cell = CastInfos.caster.fight.getCell(Target.getMapPoint().pointSymetry(CastInfos.caster.getMapPoint()).get_cellId());
 
             if (cell != null && cell.IsWalkable()) {
-                Target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, Target.ID, cell.Id));
+                Target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), Target.getID(), cell.Id));
 
                 toReturn = Target.setCell(cell);
                 if (toReturn != -1) {

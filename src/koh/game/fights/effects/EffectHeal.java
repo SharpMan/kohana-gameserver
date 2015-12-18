@@ -1,6 +1,5 @@
 package koh.game.fights.effects;
 
-import koh.game.Main;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffHeal;
 import koh.protocol.client.enums.ActionIdEnum;
@@ -23,7 +22,7 @@ public class EffectHeal extends EffectBase {
     }
 
     public static int ApplyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal, boolean Calculate) {
-        Fighter Caster = CastInfos.Caster;
+        Fighter Caster = CastInfos.caster;
 
         // boost soin etc
         if (Calculate) {
@@ -46,10 +45,10 @@ public class EffectHeal extends EffectBase {
         Target.setLife(Target.getLife() + Heal.getValue());
 
         // Envoi du packet
-        Target.fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.ID, Target.ID, Math.abs(Heal.getValue())));
+        Target.fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Math.abs(Heal.getValue())));
 
         // Le soin entraine la fin du combat ?
-        return Target.tryDie(Caster.ID);
+        return Target.tryDie(Caster.getID());
     }
 
     @Override

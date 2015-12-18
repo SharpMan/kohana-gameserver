@@ -42,10 +42,10 @@ public class DofusCell {
     }
 
     public void addActor(IGameActor actor) {
-        this.myActors.put(actor.ID, actor);
+        this.myActors.put(actor.getID(), actor);
 
         // on affecte la cell
-        actor.cell = this;
+        actor.setActorCell(this);
 
         if (actor instanceof Player && myAction != null) {
             ((Player) actor).getClient().onMouvementConfirm = myAction;
@@ -53,7 +53,7 @@ public class DofusCell {
     }
 
     public void delActor(IGameActor actor) {
-        this.myActors.remove(actor.ID);
+        this.myActors.remove(actor.getID());
     }
     
     public Collection<IGameActor> getActors(){

@@ -27,7 +27,7 @@ public class BasicHandler {
         /*AlianceInfo GuildInfo */
         // TODO AreaID;
 
-        Client.send(new BasicWhoIsMessage(message.search.equals(victim.getNickName()), victim.getAccount().right, victim.getAccount().nickName, victim.getAccount().id, victim.getNickName(), victim.ID, (short) 0, new AbstractSocialGroupInfos[0], message.verbose, victim.getStatus().value()));
+        Client.send(new BasicWhoIsMessage(message.search.equals(victim.getNickName()), victim.getAccount().right, victim.getAccount().nickName, victim.getAccount().id, victim.getNickName(), victim.getID(), (short) 0, new AbstractSocialGroupInfos[0], message.verbose, victim.getStatus().value()));
     }
 
     @HandlerAttribute(ID = BasicLatencyStatsMessage.MESSAGE_ID)

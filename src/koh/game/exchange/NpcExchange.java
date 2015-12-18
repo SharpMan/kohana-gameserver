@@ -77,7 +77,7 @@ public class NpcExchange extends Exchange {
             if (playerItem == null || (double) playerItem.getQuantity() < amount1) {
                 return false;
             }
-        } else if ((double) this.myClient.character.kamas < amount1) {
+        } else if ((double) this.myClient.character.getKamas() < amount1) {
             Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }
@@ -90,7 +90,7 @@ public class NpcExchange extends Exchange {
             Client.character.getInventoryCache().substractKamas(amount1);
         }
 
-        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.character.ID, quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).getPossibleEffects(), npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
+        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.character.getID(), quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).getPossibleEffects(), npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
         if (this.myClient.character.getInventoryCache().add(Item, true)) {
             Item.setNeedInsert(true);
         }

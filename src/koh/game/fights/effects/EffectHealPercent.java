@@ -35,7 +35,7 @@ public class EffectHealPercent extends EffectBase {
     }
 
     public static int ApplyHealPercent(EffectCast CastInfos, Fighter Target, int Heal) {
-        Fighter Caster = CastInfos.Caster;
+        Fighter Caster = CastInfos.caster;
 
         // boost soin etc
         Heal = Heal * (Target.getLife() / 100);
@@ -54,11 +54,11 @@ public class EffectHealPercent extends EffectBase {
 
         // Envoi du packet
         if (Heal != 0) {
-            Target.fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.ID, Target.ID, Heal));
+            Target.fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Heal));
         }
 
         // Le soin entraine la fin du combat ?
-        return Target.tryDie(Caster.ID);
+        return Target.tryDie(Caster.getID());
     }
 
 }

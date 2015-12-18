@@ -24,7 +24,7 @@ public class AddBaseStat  extends ItemAction {
         if(!super.execute(p) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         //TODO : LOG it in db column
-        p.stats.addBase(StatsEnum.valueOf(statId),number);
+        p.getStats().addBase(StatsEnum.valueOf(statId),number);
         p.refreshStats();
         return true;
     }
