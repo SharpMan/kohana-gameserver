@@ -20,7 +20,7 @@ public class SpawnMonsterGroup  extends ItemAction {
 
     @Override
     public boolean execute(Player p) {
-        if(!super.execute(p) || p.client.isGameAction(GameActionTypeEnum.FIGHT))
+        if(!super.execute(p) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         //TODO: arena if(inArena && !World.isArenaMap(perso.get_curCarte().get_id()))return;
         //TODO2: Parse MonsterEffect

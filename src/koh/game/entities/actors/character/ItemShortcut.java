@@ -21,7 +21,7 @@ public class ItemShortcut extends PlayerShortcut {
 
     @Override
     public Shortcut toShortcut(Player p) {
-        return new ShortcutObjectItem(position, p.inventoryCache.find(this.itemID).getTemplateId(), itemID);
+        return new ShortcutObjectItem(position, p.getInventoryCache().find(this.itemID).getTemplateId(), itemID);
     }
 
     public ItemShortcut(IoBuffer buf) {

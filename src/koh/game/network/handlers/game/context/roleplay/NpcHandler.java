@@ -36,7 +36,7 @@ public class NpcHandler {
     /*LeaveDialogRequestMessage*/
     @HandlerAttribute(ID = NpcGenericActionRequestMessage.MESSAGE_ID)
     public static void HandleNpcGenericActionRequestMessage(WorldClient Client, NpcGenericActionRequestMessage Message) {
-        Npc PNJ = Client.character.currentMap.getNpc(Message.npcId);
+        Npc PNJ = Client.character.getCurrentMap().getNpc(Message.npcId);
         if (PNJ == null) {
             Client.send(new BasicNoOperationMessage());
             throw new Error("Le pnj " + Message.npcId + " est absent");
@@ -49,7 +49,7 @@ public class NpcHandler {
         }
         final NpcActionTypeEnum Action = NpcActionTypeEnum.valueOf(Message.npcActionId);
         if (Action == null) {
-            logger.error("Unknow action {} by character {}", Message.npcActionId, Client.character.nickName);
+            logger.error("Unknow action {} by character {}", Message.npcActionId, Client.getCharacter().getNickName());
             return;
         } else if (!ArrayUtils.contains(PNJ.getTemplate().getActions(), Message.npcActionId)) {
             PlayerController.sendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");

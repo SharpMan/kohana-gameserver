@@ -52,21 +52,21 @@ public class InteractiveUsage implements InteractiveAction {
             actor.send(new BasicNoOperationMessage());
             return;
         }
-        if (actor.currentMap.getDoor(element) == null) {
-            PlayerController.sendServerMessage(actor.client, "Door not implanted yet ..." + element);
+        if (actor.getCurrentMap().getDoor(element) == null) {
+            PlayerController.sendServerMessage(actor.getClient(), "Door not implanted yet ..." + element);
             return;
         }
-        switch (ActionType.valueOf(actor.currentMap.getDoor(element).getType())) {
+        switch (ActionType.valueOf(actor.getCurrentMap().getDoor(element).getType())) {
             case TELEPORT:
-                actor.teleport(Integer.parseInt(actor.currentMap.getDoor(element).getParameters().split(",")[0]), Integer.parseInt(actor.currentMap.getDoor(element).getParameters().split(",")[1]));
+                actor.teleport(Integer.parseInt(actor.getCurrentMap().getDoor(element).getParameters().split(",")[0]), Integer.parseInt(actor.getCurrentMap().getDoor(element).getParameters().split(",")[1]));
                 break;
             case CREATE_GUILDE:
                 //if (actor.client.canGameAction(GameActionTypeEnum.CREATE_GUILD)) {
-                actor.client.addGameAction(new GameGuildCreation(actor));
+                actor.getClient().addGameAction(new GameGuildCreation(actor));
                 //}
                 break;
             default:
-                PlayerController.sendServerMessage(actor.client, "Door not parametered ...");
+                PlayerController.sendServerMessage(actor.getClient(), "Door not parametered ...");
                 return;
         }
 

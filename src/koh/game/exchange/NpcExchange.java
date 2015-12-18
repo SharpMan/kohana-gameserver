@@ -59,7 +59,7 @@ public class NpcExchange extends Exchange {
             Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }
-        if((npcItem.getTemplate().getRealWeight() * quantity) + Client.character.inventoryCache.getWeight() > Client.character.inventoryCache.getTotalWeight()){
+        if((npcItem.getTemplate().getRealWeight() * quantity) + Client.character.getInventoryCache().getWeight() > Client.character.getInventoryCache().getTotalWeight()){
             PlayerController.SendServerErrorMessage(Client, "Erreur : Votre poids depasse les bornes...");
             return false;
         }
@@ -73,7 +73,7 @@ public class NpcExchange extends Exchange {
         InventoryItem playerItem = null;
         
         if (npcItem.getItemToken() != null) {
-            playerItem = Client.character.inventoryCache.getItemInTemplate(npcItem.getToken());
+            playerItem = Client.character.getInventoryCache().getItemInTemplate(npcItem.getToken());
             if (playerItem == null || (double) playerItem.getQuantity() < amount1) {
                 return false;
             }
@@ -85,13 +85,13 @@ public class NpcExchange extends Exchange {
         this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 21, new String[]{quantity + "", templateId + ""}));
 
         if (playerItem != null) {
-            Client.character.inventoryCache.updateObjectquantity(playerItem, playerItem.getQuantity() - amount1);
+            Client.character.getInventoryCache().updateObjectquantity(playerItem, playerItem.getQuantity() - amount1);
         } else {
-            Client.character.inventoryCache.substractKamas(amount1);
+            Client.character.getInventoryCache().substractKamas(amount1);
         }
 
         InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.character.ID, quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).getPossibleEffects(), npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
-        if (this.myClient.character.inventoryCache.add(Item, true)) {
+        if (this.myClient.character.getInventoryCache().add(Item, true)) {
             Item.setNeedInsert(true);
         }
 
@@ -115,14 +115,14 @@ public class NpcExchange extends Exchange {
 
         int Refund = npcItem == null ? (int) ((long) (int) Math.ceil((double) item.getTemplate().getPrice() / 10.0) * (long) quantity) : (int) ((long) (int) Math.ceil((double) npcItem.getPrice() / 10.0) * (long) quantity);
         if (quantity == item.getQuantity()) {
-            Client.character.inventoryCache.removeItem(item);
+            Client.character.getInventoryCache().removeItem(item);
         } else {
-            Client.character.inventoryCache.updateObjectquantity(item, item.getQuantity() - quantity);
+            Client.character.getInventoryCache().updateObjectquantity(item, item.getQuantity() - quantity);
         }
 
         this.myClient.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{quantity + "", item.getTemplateId() + ""}));
 
-        Client.character.inventoryCache.addKamas(Refund);
+        Client.character.getInventoryCache().addKamas(Refund);
 
         return true;
     }

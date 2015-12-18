@@ -62,8 +62,8 @@ public class PlayerExchange extends Exchange {
     }
 
     public void Open() {
-        this.myClient1.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient1.character.ID, this.myClient1.character.inventoryCache.getWeight(), this.myClient1.character.inventoryCache.getTotalWeight(), this.myClient2.character.ID, this.myClient2.character.inventoryCache.getWeight(), this.myClient2.character.inventoryCache.getTotalWeight()));
-        this.myClient2.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient2.character.ID, this.myClient2.character.inventoryCache.getWeight(), this.myClient2.character.inventoryCache.getTotalWeight(), this.myClient1.character.ID, this.myClient1.character.inventoryCache.getWeight(), this.myClient1.character.inventoryCache.getTotalWeight()));
+        this.myClient1.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient1.getCharacter().ID, this.myClient1.getCharacter().getInventoryCache().getWeight(), this.myClient1.getCharacter().getInventoryCache().getTotalWeight(), this.myClient2.getCharacter().ID, this.myClient2.getCharacter().getInventoryCache().getWeight(), this.myClient2.getCharacter().getInventoryCache().getTotalWeight()));
+        this.myClient2.send(new ExchangeStartedWithPodsMessage(ExchangeTypeEnum.PLAYER_TRADE, this.myClient2.getCharacter().ID, this.myClient2.getCharacter().getInventoryCache().getWeight(), this.myClient2.getCharacter().getInventoryCache().getTotalWeight(), this.myClient1.getCharacter().ID, this.myClient1.getCharacter().getInventoryCache().getWeight(), this.myClient1.getCharacter().getInventoryCache().getTotalWeight()));
     }
 
     @Override
@@ -71,37 +71,37 @@ public class PlayerExchange extends Exchange {
         if (items != null && items.length <= 0) {
             return false;
         }
-        this.UnValidateAll();
+        this.unValidateAll();
 
         if (add) {
-            List<InventoryItem> ModifiedObjects = null;
+            List<InventoryItem> modifiedObjects = null;
 
-            for (InventoryItem Item : items) {
-                if (this.myItemsToTrade.get(Client).containsKey(Item.getID())) {
-                    if (Item.getQuantity() == this.myItemsToTrade.get(Client).get(Item.getID())) {
-                        items = ArrayUtils.removeElement(items, Item);
+            for (InventoryItem item : items) {
+                if (this.myItemsToTrade.get(Client).containsKey(item.getID())) {
+                    if (item.getQuantity() == this.myItemsToTrade.get(Client).get(item.getID())) {
+                        items = ArrayUtils.removeElement(items, item);
                     } else {
-                        this.myItemsToTrade.get(Client).put(Item.getID(), Item.getQuantity());
-                        if (ModifiedObjects == null) {
-                            ModifiedObjects = new ArrayList<>();
+                        this.myItemsToTrade.get(Client).put(item.getID(), item.getQuantity());
+                        if (modifiedObjects == null) {
+                            modifiedObjects = new ArrayList<>();
                         }
-                        ModifiedObjects.add(Item);
-                        items = ArrayUtils.removeElement(items, Item);
+                        modifiedObjects.add(item);
+                        items = ArrayUtils.removeElement(items, item);
                     }
                 } else {
-                    this.myItemsToTrade.get(Client).put(Item.getID(), Item.getQuantity());
+                    this.myItemsToTrade.get(Client).put(item.getID(), item.getQuantity());
                 }
             }
-            if (ModifiedObjects != null) {
+            if (modifiedObjects != null) {
                 if (Client == this.myClient1) {
-                    this.myClient1.send(new ExchangeObjectsModifiedMessage(false, ModifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
-                    this.myClient2.send(new ExchangeObjectsModifiedMessage(true, ModifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
+                    this.myClient1.send(new ExchangeObjectsModifiedMessage(false, modifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
+                    this.myClient2.send(new ExchangeObjectsModifiedMessage(true, modifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
                 } else {
-                    this.myClient2.send(new ExchangeObjectsModifiedMessage(false, ModifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
-                    this.myClient1.send(new ExchangeObjectsModifiedMessage(true, ModifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
+                    this.myClient2.send(new ExchangeObjectsModifiedMessage(false, modifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
+                    this.myClient1.send(new ExchangeObjectsModifiedMessage(true, modifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
                 }
-                ModifiedObjects.clear();
-                ModifiedObjects = null;
+                modifiedObjects.clear();
+                modifiedObjects = null;
             }
 
             if (Client == this.myClient1) {
@@ -126,7 +126,7 @@ public class PlayerExchange extends Exchange {
 
     @Override
     public synchronized boolean moveItem(WorldClient Client, int itemID, int quantity) {
-        InventoryItem Item = Client.character.inventoryCache.find(itemID);
+        InventoryItem Item = Client.getCharacter().getInventoryCache().find(itemID);
         if (Item == null) {
             return false;
         }
@@ -134,7 +134,7 @@ public class PlayerExchange extends Exchange {
             Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{Item.getTemplateId() + "", Item.getID() + ""}));
             return false;
         }
-        this.UnValidateAll();
+        this.unValidateAll();
 
         if (!this.myItemsToTrade.get(Client).containsKey(Item.getID())) {  //add new item
             if (quantity <= 0) {
@@ -186,9 +186,9 @@ public class PlayerExchange extends Exchange {
 
     @Override
     public synchronized boolean moveKamas(WorldClient Client, int quantity) {
-        logger.debug("PlayerExchange({} - {})::moveKamas : player={}" ,this.myClient1.character.nickName,this.myClient2.character.nickName, Client.character.nickName);
+        logger.debug("PlayerExchange({} - {})::moveKamas : player={}" ,this.myClient1.getCharacter().getNickName(),this.myClient2.getCharacter().getNickName(), Client.getCharacter().getNickName());
 
-        this.UnValidateAll();
+        this.unValidateAll();
 
         if (quantity > Client.character.kamas || quantity < 0) {
             quantity = Client.character.kamas;
@@ -217,12 +217,12 @@ public class PlayerExchange extends Exchange {
         return false;
     }
 
-    public synchronized void UnValidateAll() {
+    public synchronized void unValidateAll() {
         this.myValidate.put(this.myClient1, false);
         this.myValidate.put(this.myClient2, false);
 
-        this.send(new ExchangeIsReadyMessage(this.myClient1.character.ID, false));
-        this.send(new ExchangeIsReadyMessage(this.myClient2.character.ID, false));
+        this.send(new ExchangeIsReadyMessage(this.myClient1.getCharacter().ID, false));
+        this.send(new ExchangeIsReadyMessage(this.myClient2.getCharacter().ID, false));
     }
 
     @Override
@@ -254,45 +254,45 @@ public class PlayerExchange extends Exchange {
             return false;
         }
 
-        logger.debug("PlayerExchange(" + this.myClient1.character.nickName + " - " + this.myClient1.character.nickName + ")::finish()"
+        logger.debug("PlayerExchange(" + this.myClient1.getCharacter().getNickName() + " - " + this.myClient1.getCharacter().getNickName() + ")::finish()"
                 + "\n          -- P1(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient1).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient1) + ")"
                 + "\n          -- P2(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient1).entrySet()) {
-            InventoryItem Item = this.myClient1.character.inventoryCache.find(ItemData.getKey());
+            InventoryItem Item = this.myClient1.find(ItemData.getKey());
             if (Item == null) {
-                logger.error(this.myClient1.character.nickName + " - " + this.myClient2.character.nickName + " " + ItemData.getKey() + " item not Found");
+                logger.error(this.myClient1.getCharacter().getNickName() + " - " + this.myClient2.getCharacter().getNickName() + " " + ItemData.getKey() + " item not Found");
                 continue;
             }
 
             if (ItemData.getValue() >= Item.getQuantity()) {
-                this.myClient1.character.inventoryCache.changeOwner(Item, this.myClient2.character);
+                this.myClient1.getCharacter().getInventoryCache().changeOwner(Item, this.myClient2.getCharacter());
             } else {
-                this.myClient1.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient2.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                this.myClient1.getCharacter().getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
+                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient2.getCharacter(), ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient2).entrySet()) {
-            InventoryItem Item = this.myClient2.character.inventoryCache.find(ItemData.getKey());
+            InventoryItem Item = this.myClient2.getCharacter().getInventoryCache().find(ItemData.getKey());
             if (Item == null) {
-                logger.error(this.myClient2.character.nickName + " - " + this.myClient1.character.nickName + " " + ItemData.getKey() + " item not Found");
+                logger.error(this.myClient2.getCharacter().getNickName() + " - " + this.myClient1.getCharacter().getNickName() + " " + ItemData.getKey() + " item not Found");
                 continue;
             }
 
             if (ItemData.getValue() >= Item.getQuantity()) {
-                this.myClient2.character.inventoryCache.changeOwner(Item, this.myClient1.character);
+                this.myClient2.getCharacter().getInventoryCache().changeOwner(Item, this.myClient1.getCharacter());
             } else {
-                this.myClient2.character.inventoryCache.updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient1.character, ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                this.myClient2.getCharacter().getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
+                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient1.getCharacter(), ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
             }
         }
 
-        this.myClient1.character.inventoryCache.substractKamas(this.myKamasToTrade.get(this.myClient1), false);
-        this.myClient2.character.inventoryCache.substractKamas(this.myKamasToTrade.get(this.myClient2), false);
+        this.myClient1.getCharacter().getInventoryCache().substractKamas(this.myKamasToTrade.get(this.myClient1), false);
+        this.myClient2.getCharacter().getInventoryCache().substractKamas(this.myKamasToTrade.get(this.myClient2), false);
 
-        this.myClient1.character.inventoryCache.addKamas(this.myKamasToTrade.get(this.myClient2), false);
-        this.myClient2.character.inventoryCache.addKamas(this.myKamasToTrade.get(this.myClient1), false);
+        this.myClient1.getCharacter().getInventoryCache().addKamas(this.myKamasToTrade.get(this.myClient2), false);
+        this.myClient2.getCharacter().getInventoryCache().addKamas(this.myKamasToTrade.get(this.myClient1), false);
 
         return true;
     }
@@ -336,7 +336,7 @@ public class PlayerExchange extends Exchange {
 
     @Override
     public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
-        return Client.myExchange.moveItems(Client, Exchange.getCharactersItems(Client.character), false);
+        return Client.myExchange.moveItems(Client, Exchange.getCharactersItems(Client.getCharacter()), false);
     }
 
 }

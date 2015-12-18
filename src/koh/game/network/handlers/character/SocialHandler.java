@@ -21,11 +21,11 @@ public class SocialHandler {
 
     @HandlerAttribute(ID = ContactLookRequestByIdMessage.MESSAGE_ID)
     public static void HandleContactLookRequestByIdMessage(WorldClient Client, ContactLookRequestByIdMessage Message) {
-        Player Target = DAO.getPlayers().getCharacter(Message.playerId);
-        if (Target == null || Target.getEntityLook() == null) {
+        Player target = DAO.getPlayers().getCharacter(Message.playerId);
+        if (target == null || target.getEntityLook() == null) {
             Client.send(new ContactLookErrorMessage(Message.requestId));
         } else {
-            Client.send(new ContactLookMessage(Message.requestId, Target.nickName, Message.playerId, Target.getEntityLook()));
+            Client.send(new ContactLookMessage(Message.requestId, target.getNickName(), Message.playerId, target.getEntityLook()));
         }
     }
 

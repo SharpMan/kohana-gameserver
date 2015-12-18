@@ -160,16 +160,16 @@ public class AccountData {
         List<FriendInformations> friends = new ArrayList<>();
         for (FriendContact friend : this.friends) {
             Player target = DAO.getPlayers().getCharacterByAccount(friend.accountID);
-            if (target == null || target.client == null) {
+            if (target == null || target.getClient() == null) {
                 friends.add(new FriendInformations(friend.accountID, friend.accountName, PlayerStateEnum.NOT_CONNECTED, (int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - friend.lastConnection), friend.achievementPoints));
             } else {
-                friend.achievementPoints = target.achievementPoints;
+                friend.achievementPoints = target.getAchievementPoints();
                 friend.lastConnection = System.currentTimeMillis();
                 this.notifyColumn("friends");
-                if (target.account.accountData != null && target.account.accountData.hasFriend(this.id)) {
-                    friends.add(new FriendOnlineInformations(target.account.id, target.account.nickName, target.getPlayerState(), -1, target.achievementPoints, target.ID, target.nickName, (byte) target.level, target.alignmentSide.value, target.breed, target.sexe == 1, target.getBasicGuildInformations(), target.moodSmiley, new PlayerStatus(target.status.value())));
+                if (target.getAccount().accountData != null && target.getAccount().accountData.hasFriend(this.id)) {
+                    friends.add(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) target.getLevel(), target.getAlignmentSide().value, target.getBreed(), target.hasSexe(), target.getBasicGuildInformations(), target.getMoodSmiley(), new PlayerStatus(target.getStatus().value())));
                 } else {
-                    friends.add(new FriendOnlineInformations(target.account.id, target.account.nickName, target.getPlayerState(), -1, target.achievementPoints, target.ID, target.nickName, (byte) 0, (byte) -1, target.breed, target.sexe == 1, new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(target.status.value())));
+                    friends.add(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) 0, (byte) -1, target.getBreed(), target.hasSexe(), new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(target.getStatus().value())));
                 }
             }
         }
@@ -179,11 +179,11 @@ public class AccountData {
     public List<IgnoredInformations> getIgnoredInformations() {
         List<IgnoredInformations> friends = new ArrayList<>();
         for (IgnoredContact Friend : this.ignored) {
-            Player Target = DAO.getPlayers().getCharacterByAccount(Friend.accountID);
-            if (Target == null || Target.client == null) {
+            Player target = DAO.getPlayers().getCharacterByAccount(Friend.accountID);
+            if (target == null || target.getClient() == null) {
                 friends.add(new IgnoredInformations(Friend.accountID, Friend.accountName));
             } else {
-                friends.add(new IgnoredOnlineInformations(Target.account.id, Target.account.nickName, Target.ID, Target.nickName, Target.breed, Target.sexe == 1));
+                friends.add(new IgnoredOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getID(), target.getNickName(), target.getBreed(), target.hasSexe()));
             }
         }
         return friends;

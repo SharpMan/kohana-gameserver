@@ -18,7 +18,7 @@ public class RankCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Rank = Integer.parseInt(Literal);
+        this.Rank = Integer.parseInt(literal);
     }
 
     @Override

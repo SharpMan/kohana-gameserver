@@ -151,7 +151,7 @@ public class ConditionParser {
                     if (Strings.isNullOrEmpty(str)) {
                         throw new Error(String.format("Cannot parse {0} : right Expression of comparaison operator index {1} is empty", this.str, length));
                     }
-                    criterionByName.Literal = str;
+                    criterionByName.literal = str;
                     criterionByName.Operator = operator;
                     criterionByName.Build();
                     return (ConditionExpression) criterionByName;

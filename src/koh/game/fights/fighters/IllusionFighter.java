@@ -69,12 +69,12 @@ public class IllusionFighter extends StaticFighter {
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.summoner).Character.nickName, ((CharacterFighter) this.summoner).Character.getPlayerStatus(), (byte) this.getLevel(), ((CharacterFighter) this.summoner).Character.getActorAlignmentInformations(), ((CharacterFighter) this.summoner).Character.breed, ((CharacterFighter) this.summoner).Character.hasSexe());
+        return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.summoner).character.getNickName(), ((CharacterFighter) this.summoner).character.getPlayerStatus(), (byte) this.getLevel(), ((CharacterFighter) this.summoner).character.getActorAlignmentInformations(), ((CharacterFighter) this.summoner).character.getBreed(), ((CharacterFighter) this.summoner).character.hasSexe());
     }
 
     @Override
     public FightTeamMemberInformations getFightTeamMemberInformations() {
-        return new FightTeamMemberCharacterInformations(this.ID, ((CharacterFighter) this.summoner).Character.nickName, (byte) this.getLevel());
+        return new FightTeamMemberCharacterInformations(this.ID, ((CharacterFighter) this.summoner).character.getNickName(), (byte) this.getLevel());
     }
 
     @Override

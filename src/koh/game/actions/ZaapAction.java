@@ -27,7 +27,7 @@ public class ZaapAction extends GameAction {
     @Override
     public void execute() {
         //Stream<Entry<Integer, DofusZaap>> zaaps = MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().mapid != ((player) actor).currentMap.id);
-        this.actor.send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), costs(), Enumerable.DuplicatedKey(DAO.getMaps().getZaapsLength() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) actor).currentMap.getId()));
+        this.actor.send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), costs(), Enumerable.DuplicatedKey(DAO.getMaps().getZaapsLength() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) actor).getCurrentMap().getId()));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class ZaapAction extends GameAction {
                 actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
                 return;
             }
-            ((Player) actor).inventoryCache.substractKamas(getCostTo(zaap.getMap()));
+            ((Player) actor).getInventoryCache().substractKamas(getCostTo(zaap.getMap()));
             ((Player) actor).teleport(map, zaap.getCell());
 
             this.endExecute();
@@ -58,17 +58,17 @@ public class ZaapAction extends GameAction {
     }
 
     public int[] subAreaIds() {
-        return DAO.getMaps().getZaapsNot(((Player) actor).currentMap.getId()).mapToInt(x -> x.getValue().getMap().getSubAreaId()).toArray();
+        return DAO.getMaps().getZaapsNot(((Player) actor).getCurrentMap().getId()).mapToInt(x -> x.getValue().getMap().getSubAreaId()).toArray();
     }
 
     public int[] mapIds() {
-        return DAO.getMaps().getZaapsNot(((Player) actor).currentMap.getId()).mapToInt(x -> x.getKey()).toArray();
+        return DAO.getMaps().getZaapsNot(((Player) actor).getCurrentMap().getId()).mapToInt(x -> x.getKey()).toArray();
     }
 
     public int[] costs() {
         int[] Cost = new int[DAO.getMaps().getZaapsLength() - 1];
         int i = 0;
-        for (DofusMap zaap : DAO.getMaps().getZaapsNot(((Player) actor).currentMap.getId()).map(x -> x.getValue().getMap()).toArray(DofusMap[]::new)) {
+        for (DofusMap zaap : DAO.getMaps().getZaapsNot(((Player) actor).getCurrentMap().getId()).map(x -> x.getValue().getMap()).toArray(DofusMap[]::new)) {
             Cost[i] = getCostTo(zaap);
             i++;
         }
@@ -77,7 +77,7 @@ public class ZaapAction extends GameAction {
 
     public short getCostTo(DofusMap map) {
         MapPosition position1 = map.getPosition();
-        MapPosition position2 = ((Player) actor).currentMap.getPosition();
+        MapPosition position2 = ((Player) actor).getCurrentMap().getPosition();
         return (short) Math.floor(Math.sqrt((double) ((position2.getPosX()- position1.getPosY()) * (position2.getPosX() - position1.getPosX()) + (position2.getPosY() - position1.getPosY()) * (position2.getPosY() - position1.getPosY()))) * 10.0);
     }
 

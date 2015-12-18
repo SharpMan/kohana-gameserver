@@ -83,19 +83,19 @@ public class GenericStats {
     }
 
     public GenericStats(Player character) {
-        this.myStats.put(StatsEnum.ActionPoints, new CharacterBaseCharacteristic(character.level >= 100 ? 7 : 6));
+        this.myStats.put(StatsEnum.ActionPoints, new CharacterBaseCharacteristic(character.getLevel() >= 100 ? 7 : 6));
         this.myStats.put(StatsEnum.MovementPoints, new CharacterBaseCharacteristic(3));
-        this.myStats.put(StatsEnum.Prospecting, new CharacterBaseCharacteristic((character.breed == BreedEnum.Enutrof ? 120 : 100)));
+        this.myStats.put(StatsEnum.Prospecting, new CharacterBaseCharacteristic((character.getBreed() == BreedEnum.Enutrof ? 120 : 100)));
         this.myStats.put(StatsEnum.AddPods, new CharacterBaseCharacteristic(1000));
         this.myStats.put(StatsEnum.AddSummonLimit, new CharacterBaseCharacteristic(1));
         this.myStats.put(StatsEnum.Initiative, new CharacterBaseCharacteristic(100));
 
-        this.myStats.put(StatsEnum.Vitality, new CharacterBaseCharacteristic(character.vitality));
-        this.myStats.put(StatsEnum.Wisdom, new CharacterBaseCharacteristic(character.wisdom));
-        this.myStats.put(StatsEnum.Strength, new CharacterBaseCharacteristic(character.strength));
-        this.myStats.put(StatsEnum.Intelligence, new CharacterBaseCharacteristic(character.intell));
-        this.myStats.put(StatsEnum.Agility, new CharacterBaseCharacteristic(character.agility));
-        this.myStats.put(StatsEnum.Chance, new CharacterBaseCharacteristic(character.chance));
+        this.myStats.put(StatsEnum.Vitality, new CharacterBaseCharacteristic(character.getVitality()));
+        this.myStats.put(StatsEnum.Wisdom, new CharacterBaseCharacteristic(character.getWisdom()));
+        this.myStats.put(StatsEnum.Strength, new CharacterBaseCharacteristic(character.getStrength()));
+        this.myStats.put(StatsEnum.Intelligence, new CharacterBaseCharacteristic(character.getIntell()));
+        this.myStats.put(StatsEnum.Agility, new CharacterBaseCharacteristic(character.getAgility()));
+        this.myStats.put(StatsEnum.Chance, new CharacterBaseCharacteristic(character.getChance()));
     }
 
     public Map<StatsEnum, CharacterBaseCharacteristic> getEffects() {

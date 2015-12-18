@@ -25,7 +25,7 @@ public class InteractiveHandler {
             Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
-        InteractiveElementStruct Element = Client.character.currentMap.getInteractiveElementStruct(Message.elemId);
+        InteractiveElementStruct Element = Client.character.getCurrentMap().getInteractiveElementStruct(Message.elemId);
         if (Element == null) {
             Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;

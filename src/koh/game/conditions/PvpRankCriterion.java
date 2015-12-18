@@ -20,7 +20,7 @@ public class PvpRankCriterion extends Criterion {
 
     @Override
     public void Build() {
-        Rank = Byte.parseByte(Literal);
+        Rank = Byte.parseByte(literal);
     }
 
     @Override

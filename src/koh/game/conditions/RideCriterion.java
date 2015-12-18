@@ -18,7 +18,7 @@ public class RideCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Mounted = Integer.parseInt(Literal) != 0;
+        this.Mounted = Integer.parseInt(literal) != 0;
     }
 
     @Override

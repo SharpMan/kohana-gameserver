@@ -107,7 +107,7 @@ public class PetsInventoryItem extends InventoryItem {
         } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
             return false;
         } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < pet.getMinDurationBeforeMeal()) {
-            PlayerController.sendServerMessage(p.client, "Veuillez patientez " + ((getAnimal().getMinDurationBeforeMeal()) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " heures pour le prochain repas");
+            PlayerController.sendServerMessage(p.getClient(), "Veuillez patientez " + ((getAnimal().getMinDurationBeforeMeal()) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " heures pour le prochain repas");
             return false;
         }
 

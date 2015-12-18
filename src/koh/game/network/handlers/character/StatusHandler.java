@@ -23,7 +23,7 @@ public class StatusHandler {
         if (Client.character.getFight() != null) {
             Client.character.getFight().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.ID, Message.status));
         } else {
-            Client.character.currentMap.sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.ID, Message.status));
+            Client.character.getCurrentMap().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.ID, Message.status));
         }
     }
 

@@ -36,7 +36,7 @@ public class Account {
     public int id;
     public String nickName;
     public byte right;
-    public String secretQuestion, secretAnswer, lastIP,CurrentIP;
+    public String secretQuestion, secretAnswer, lastIP, currentIP;
     public Timestamp last_login;
     public ArrayList<Player> characters;
     public AccountData accountData;

@@ -73,7 +73,7 @@ public class NpcDialog extends GameAction {
         }
         if (Stream.length == 0) {
             logger.debug("Undefined reponse ID {} ", rep);
-            PlayerController.sendServerMessage(((Player) actor).client, "Ce discours n'est pas encore parametré...");
+            PlayerController.sendServerMessage(actor.getClient(), "Ce discours n'est pas encore parametré...");
         }
 
     }

@@ -79,7 +79,7 @@ public class Party extends IWorldEventObserver {
     }
 
     public void addPlayer(Player character) {
-        character.client.addGameAction(new GameParty(character, this));
+        character.getClient().addGameAction(new GameParty(character, this));
         this.players.add(character);
         this.guests.remove(character);
         this.sendToField(new PartyNewMemberMessage(this.id, toMemberInformations(character)));
@@ -95,15 +95,15 @@ public class Party extends IWorldEventObserver {
     }
 
     public PartyMemberInformations toMemberInformations(Player x) {
-        return new PartyMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.life, x.getMaxLife(), x.getProspection(), x.regenRate, x.getInitiative(false), x.alignmentSide.value, x.currentMap.getPosition().getPosX(), x.currentMap.getPosition().getPosY(), x.currentMap.getId(), x.currentMap.getSubAreaId(), new PlayerStatus(x.status.value()), new PartyCompanionMemberInformations[0]);
+        return new PartyMemberInformations(x.getID(), (byte) x.getLevel(), x.getNickName(), x.getEntityLook(), x.getBreed(), x.hasSexe(), x.getLife(), x.getMaxLife(), x.getProspection(), x.getRegenRate(), x.getInitiative(false), x.getAlignmentSide().value, x.getCurrentMap().getPosition().getPosX(), x.getCurrentMap().getPosition().getPosY(), x.getCurrentMap().getId(), x.getCurrentMap().getSubAreaId(), new PlayerStatus(x.getStatus().value()), new PartyCompanionMemberInformations[0]);
     }
 
     public PartyMemberInformations[] toMemberInformations() {
-        return this.players.stream().map(x -> new PartyMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.life, x.getMaxLife(), x.getProspection(), x.regenRate, x.getInitiative(false), x.alignmentSide.value, x.currentMap.getPosition().getPosX(), x.currentMap.getPosition().getPosY(), x.currentMap.getId(), x.currentMap.getSubAreaId(), new PlayerStatus(x.status.value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformations[]::new);
+        return this.players.stream().map(x -> new PartyMemberInformations(x.getID(), (byte) x.getLevel(), x.getNickName(), x.getEntityLook(), x.getBreed(), x.hasSexe(), x.getLife(), x.getMaxLife(), x.getProspection(), x.getRegenRate(), x.getInitiative(false), x.getAlignmentSide().value, x.getCurrentMap().getPosition().getPosX(), x.getCurrentMap().getPosition().getPosY(), x.getCurrentMap().getId(), x.getCurrentMap().getSubAreaId(), new PlayerStatus(x.getStatus().value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformations[]::new);
     }
 
     public PartyInvitationMemberInformations[] toPartyInvitationMemberInformations() {
-        return this.players.stream().map(x -> new PartyInvitationMemberInformations(x.ID, (byte) x.level, x.nickName, x.getEntityLook(), x.breed, x.sexe == 1, x.currentMap.getPosition().getPosX(), x.currentMap.getPosition().getPosY(), x.currentMap.getId(), x.currentMap.getSubAreaId(), new PartyCompanionBaseInformations[0])).toArray(PartyInvitationMemberInformations[]::new);
+        return this.players.stream().map(x -> new PartyInvitationMemberInformations(x.getID(), (byte) x.getLevel(), x.getNickName(), x.getEntityLook(), x.getBreed(), x.hasSexe(), x.getCurrentMap().getPosition().getPosX(), x.getCurrentMap().getPosition().getPosY(), x.getCurrentMap().getId(), x.getCurrentMap().getSubAreaId(), new PartyCompanionBaseInformations[0])).toArray(PartyInvitationMemberInformations[]::new);
     }
 
     public void addGuest(Player p) {
@@ -113,7 +113,7 @@ public class Party extends IWorldEventObserver {
     }
 
     public PartyGuestInformations[] toPartyGuestInformations() {
-        return this.guests.stream().map(player -> new PartyGuestInformations(player.ID, this.chief.ID, player.nickName, player.getEntityLook(), player.breed, player.sexe == 1, player.status, new PartyCompanionBaseInformations[0])).toArray(PartyGuestInformations[]::new);
+        return this.guests.stream().map(player -> new PartyGuestInformations(player.getID(), this.chief.ID, player.getNickName(), player.getEntityLook(), player.getBreed(), player.hasSexe(), player.getStatus(), new PartyCompanionBaseInformations[0])).toArray(PartyGuestInformations[]::new);
     }
 
     public boolean isFull() {
@@ -129,13 +129,13 @@ public class Party extends IWorldEventObserver {
         }
         if (kicked) {
             player.send(new PartyKickedByMessage(this.id, this.chief.ID));
-            player.client.delGameAction(GameActionTypeEnum.GROUP);
+            player.getClient().delGameAction(GameActionTypeEnum.GROUP);
         }
-        if (player.followers != null) { //int partyId, boolean success, int followedId
-            player.followers.forEach(x -> {
+        if (player.getFollowers() != null) { //int partyId, boolean success, int followedId
+            player.getFollowers().forEach(x -> {
                 x.send(new PartyFollowStatusUpdateMessage(this.id, true, player.ID));
             });
-            player.followers.clear();
+            player.getFollowers().clear();
         }
         this.unregisterPlayer(player);
         players.remove(player);
@@ -160,10 +160,10 @@ public class Party extends IWorldEventObserver {
     public void abortRequest(WorldClient client, int guestId) {
         //TODO: send ChiefName if isn't the owner of invitation
         try {
-            WorldClient WC = this.players.stream().filter(x -> x.client.getPartyRequest(this.id, guestId) != null).findFirst().get().client;
-            PartyRequest Req = WC.getPartyRequest(this.id, guestId);
-            Req.Abort();
-            WC.removePartyRequest(Req);
+            WorldClient klient = this.players.stream().filter(x -> x.getClient().getPartyRequest(this.id, guestId) != null).findFirst().get().getClient();
+            PartyRequest req = klient.getPartyRequest(this.id, guestId);
+            req.abort();
+            klient.removePartyRequest(req);
         } catch (Exception e) {
         }
     }
@@ -177,13 +177,13 @@ public class Party extends IWorldEventObserver {
     }
 
     public PartyGuestInformations toPartyGuestInformations(Player player) {
-        return new PartyGuestInformations(player.ID, this.chief.ID, player.nickName, player.getEntityLook(), player.breed, player.sexe == 1, player.status, new PartyCompanionBaseInformations[0]);
+        return new PartyGuestInformations(player.getID(), this.chief.ID, player.getNickName(), player.getEntityLook(), player.getBreed(), player.hasSexe(), player.getStatus(), new PartyCompanionBaseInformations[0]);
     }
 
     public void clear() {
         try {
             for (Player p : this.players) {
-                p.client.endGameAction(GameActionTypeEnum.GROUP);
+                p.getClient().endGameAction(GameActionTypeEnum.GROUP);
             }
             this.sendToField(new PartyDeletedMessage(this.id));
             this.chief = null;

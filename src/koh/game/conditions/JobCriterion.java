@@ -21,12 +21,12 @@ public class JobCriterion extends Criterion {
 
     @Override
     public void Build() {
-        if (this.Literal.contains(",")) {
-            System.out.println(Literal);
-            this.Id = Integer.parseInt(Literal.split(",")[0]);
-            this.Level = Integer.parseInt(Literal.split(",")[1]);
+        if (this.literal.contains(",")) {
+            System.out.println(literal);
+            this.Id = Integer.parseInt(literal.split(",")[0]);
+            this.Level = Integer.parseInt(literal.split(",")[1]);
         } else {
-            this.Id = Integer.parseInt(Literal);
+            this.Id = Integer.parseInt(literal);
             this.Level = -1;
         }
     }

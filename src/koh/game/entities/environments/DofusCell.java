@@ -48,7 +48,7 @@ public class DofusCell {
         actor.cell = this;
 
         if (actor instanceof Player && myAction != null) {
-            ((Player) actor).client.onMouvementConfirm = myAction;
+            ((Player) actor).getClient().onMouvementConfirm = myAction;
         }
     }
 

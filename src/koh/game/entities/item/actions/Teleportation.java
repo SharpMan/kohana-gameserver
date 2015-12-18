@@ -21,7 +21,7 @@ public class Teleportation extends ItemAction {
 
     @Override
     public boolean execute(Player p) {
-        if(!super.execute(p) || !p.client.canGameAction(GameActionTypeEnum.CHANGE_MAP))
+        if(!super.execute(p) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         p.teleport(map, cell);
         return true;

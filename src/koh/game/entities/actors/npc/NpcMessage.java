@@ -56,7 +56,7 @@ public class NpcMessage {
     public String[] getParameters(Player req) {
         for (int i = 0; i < parameters.length; i++) {
             if (parameters[i].contains("BK")) {
-                parameters[i] = String.valueOf(req.account.accountData.itemscache.size()); //TODO : kamas Bank
+                parameters[i] = String.valueOf(req.getAccount().accountData.itemscache.size()); //TODO : Compute kamas Bank
             }
         }
         return parameters;

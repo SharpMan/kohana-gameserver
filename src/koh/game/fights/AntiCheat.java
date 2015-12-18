@@ -22,16 +22,16 @@ public class AntiCheat {
         if (win) {
             for (Fighter Target : (Iterable<Fighter>) versus::iterator) {
                 int bestScore = 0;
-                if (!PProperties.get(fighter.ID).myVictimIPS.containsKey(((CharacterFighter) Target).Character.account.CurrentIP)) {
-                    PProperties.get(fighter.ID).myVictimIPS.put(((CharacterFighter) Target).Character.account.CurrentIP, new Couple<>(System.currentTimeMillis(), 1));
+                if (!PProperties.get(fighter.ID).myVictimIPS.containsKey(((CharacterFighter) Target).character.getAccount().currentIP)) {
+                    PProperties.get(fighter.ID).myVictimIPS.put(((CharacterFighter) Target).character.getAccount().currentIP, new Couple<>(System.currentTimeMillis(), 1));
                 } else {
-                    long time = PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).first;
+                    long time = PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).first;
                     if ((System.currentTimeMillis() - time) < AGGRO_PER_MIN * 60 * 1000) {
-                        bestScore += PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).second;
-                        PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).second++;
+                        bestScore += PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).second;
+                        PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).second++;
                     } else {
-                        PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).first = System.currentTimeMillis();
-                        PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).second = 1;
+                        PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).first = System.currentTimeMillis();
+                        PProperties.get(fighter.ID).myVictimIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).second = 1;
                     }
                 }
                 if (!PProperties.get(fighter.ID).myVictims.containsKey(Target.ID)) {
@@ -51,16 +51,16 @@ public class AntiCheat {
         } else {
             for (Fighter Target : (Iterable<Fighter>) versus::iterator) {
                 int bestScore = 0;
-                if (!PProperties.get(fighter.ID).VictimByIPS.containsKey(((CharacterFighter) Target).Character.account.CurrentIP)) {
-                    PProperties.get(fighter.ID).VictimByIPS.put(((CharacterFighter) Target).Character.account.CurrentIP, new Couple<>(System.currentTimeMillis(), 1));
+                if (!PProperties.get(fighter.ID).VictimByIPS.containsKey(((CharacterFighter) Target).character.getAccount().currentIP)) {
+                    PProperties.get(fighter.ID).VictimByIPS.put(((CharacterFighter) Target).character.getAccount().currentIP, new Couple<>(System.currentTimeMillis(), 1));
                 } else {
-                    long time = PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).first;
+                    long time = PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).first;
                     if ((System.currentTimeMillis() - time) < AGGRO_PER_MIN * 60 * 1000) {
-                        bestScore += PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).second;
-                        PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).second++;
+                        bestScore += PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).second;
+                        PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).second++;
                     } else {
-                        PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).first = System.currentTimeMillis();
-                        PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.account.CurrentIP).second = 1;
+                        PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).first = System.currentTimeMillis();
+                        PProperties.get(fighter.ID).VictimByIPS.get(((CharacterFighter) Target).character.getAccount().currentIP).second = 1;
                     }
                 }
                 if (!PProperties.get(fighter.ID).VictimsBy.containsKey(Target.ID)) {

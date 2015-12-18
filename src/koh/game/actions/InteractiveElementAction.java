@@ -58,11 +58,11 @@ public class InteractiveElementAction extends GameAction {
     public void execute() {
         if (action == null || !HANDLERS.containsKey(action)) {
             logger.debug("Action {} id not implanted",action);
-            PlayerController.sendServerMessage(((Player) actor).client, "L'utilisation de cet object intéractif est indisponnible pour le moment ...");
+            PlayerController.sendServerMessage(actor.getClient(), "L'utilisation de cet object intéractif est indisponnible pour le moment ...");
             actor.send(new BasicNoOperationMessage());
             return;
         }
-        ((Player) this.actor).currentMap.sendToField(new InteractiveUsedMessage(actor.ID, elementID, skill.skillId, HANDLERS.get(action).getDuration()));
+        ((Player) this.actor).getCurrentMap().sendToField(new InteractiveUsedMessage(actor.ID, elementID, skill.skillId, HANDLERS.get(action).getDuration()));
         HANDLERS.get(action).execute((Player) this.actor, elementID);
 
         super.execute();

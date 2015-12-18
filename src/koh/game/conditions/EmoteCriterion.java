@@ -19,7 +19,7 @@ public class EmoteCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Emote = Byte.parseByte(Literal);;
+        this.Emote = Byte.parseByte(literal);;
     }
 
     @Override

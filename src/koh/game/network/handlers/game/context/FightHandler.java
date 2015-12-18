@@ -188,7 +188,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = GameFightJoinRequestMessage.M_ID)
     public static void HandleGameFightJoinRequestMessage(WorldClient Client, GameFightJoinRequestMessage Message) {
-        Fight Fight = Client.character.currentMap.getFight(Message.fightId);
+        Fight Fight = Client.character.getCurrentMap().getFight(Message.fightId);
         if (Fight == null) {
             Client.send(new BasicNoOperationMessage());
         } else if (Fight.fightState != FightState.STATE_PLACE) {
@@ -241,43 +241,43 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = GameRolePlayPlayerFightRequestMessage.M_ID)
-    public static void HandleGameRolePlayPlayerFightRequestMessage(WorldClient Client, GameRolePlayPlayerFightRequestMessage Message) {
-        Player Target = Client.character.currentMap.getPlayer(Message.targetId);
-        if (Target == null) {
-            Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
-        } else if (Target == Client.character) {
-            Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.FIGHT_MYSELF));
-        } else if (Target.currentMap.getId() != Client.character.currentMap.getId()) {
-            Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.WRONG_MAP));
+    public static void HandleGameRolePlayPlayerFightRequestMessage(WorldClient client, GameRolePlayPlayerFightRequestMessage Message) {
+        Player target = client.character.getCurrentMap().getPlayer(Message.targetId);
+        if (target == null) {
+            client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
+        } else if (target == client.character) {
+            client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.FIGHT_MYSELF));
+        } else if (target.getCurrentMap().getId() != client.character.getCurrentMap().getId()) {
+            client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.WRONG_MAP));
         } else if (Message.friendly) {
-            if (!Target.client.canGameAction(GameActionTypeEnum.BASIC_REQUEST) || !Target.isInWorld) {
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
-            } else if (!Client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.IM_OCCUPIED));
+            if (!target.getClient().canGameAction(GameActionTypeEnum.BASIC_REQUEST) || !target.isInWorld) {
+                client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
+            } else if (!client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+                client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.IM_OCCUPIED));
             } else {
-                ChallengeFightRequest Request = new ChallengeFightRequest(Client, Target.client);
-                GameRequest RequestAction = new GameRequest(Client.character, Request);
+                ChallengeFightRequest Request = new ChallengeFightRequest(client, target.getClient());
+                GameRequest RequestAction = new GameRequest(client.character, Request);
 
-                Client.addGameAction(RequestAction);
-                Target.client.addGameAction(RequestAction);
+                client.addGameAction(RequestAction);
+                target.getClient().addGameAction(RequestAction);
 
-                Client.setBaseRequest(Request);
-                Target.client.setBaseRequest(Request);
+                client.setBaseRequest(Request);
+                target.getClient().setBaseRequest(Request);
 
             }
         } else {
-            if (Target.PvPEnabled == NON_AGGRESSABLE || Client.character.PvPEnabled == NON_AGGRESSABLE || Client.character.alignmentSide == Target.alignmentSide) {
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.WRONG_ALIGNMENT));
-            } else if (!Target.isInWorld || Target.client.isGameAction(GameActionTypeEnum.FIGHT)) {
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.OPPONENT_OCCUPIED));
-            } else if (!Client.character.isInWorld || Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.IM_OCCUPIED));
-            } else if (Client.character.alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL || Target.alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.character.ID, FighterRefusedReasonEnum.WRONG_ALIGNMENT));
+            if (target.PvPEnabled == NON_AGGRESSABLE || client.character.PvPEnabled == NON_AGGRESSABLE || client.character.alignmentSide == target.alignmentSide) {
+                client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.WRONG_ALIGNMENT));
+            } else if (!target.isInWorld || target.getClient().isGameAction(GameActionTypeEnum.FIGHT)) {
+                client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.OPPONENT_OCCUPIED));
+            } else if (!client.character.isInWorld || client.isGameAction(GameActionTypeEnum.FIGHT)) {
+                client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.IM_OCCUPIED));
+            } else if (client.character.alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL || target.alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
+                client.send(new ChallengeFightJoinRefusedMessage(client.character.ID, FighterRefusedReasonEnum.WRONG_ALIGNMENT));
             } else {
-                Target.client.abortGameActions();
-                Fight Fight = new AgressionFight(Client.character.currentMap, Client, Target.client);
-                Target.currentMap.addFight(Fight);
+                target.getClient().abortGameActions();
+                Fight Fight = new AgressionFight(client.character.getCurrentMap(), client, target.getClient());
+                target.getCurrentMap().addFight(Fight);
             }
         }
     }

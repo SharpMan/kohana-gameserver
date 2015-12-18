@@ -177,7 +177,7 @@ public class ExchangeHandler {
     @HandlerAttribute(ID = ExchangePlayerRequestMessage.M_ID)
     public static void HandleExchangePlayerRequestMessage(WorldClient Client, ExchangePlayerRequestMessage Message) {
         if (Message.exchangeType == ExchangeTypeEnum.PLAYER_TRADE) {
-            if (Client.character.currentMap.getActor(Message.target) == null) {
+            if (Client.character.getCurrentMap().getActor(Message.target) == null) {
                 Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_TOOL_TOO_FAR));
                 return;
             }
@@ -185,11 +185,11 @@ public class ExchangeHandler {
                 Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_IMPOSSIBLE));
                 return;
             }
-            if (!(Client.character.currentMap.getActor(Message.target) instanceof Player)) {
+            if (!(Client.character.getCurrentMap().getActor(Message.target) instanceof Player)) {
                 Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_IMPOSSIBLE));
                 return;
             }
-            WorldClient Target = ((Player) Client.character.currentMap.getActor(Message.target)).client;
+            WorldClient Target = ((Player) Client.character.getCurrentMap().getActor(Message.target)).getClient();
             if (!Target.canGameAction(GameActionTypeEnum.BASIC_REQUEST) /*||
                      Target.character.HasRestriction(RestrictionEnum.RESTRICTION_CANT_EXCHANGE) ||
                      client.character.HasRestriction(RestrictionEnum.RESTRICTION_CANT_EXCHANGE)*/) {
@@ -234,7 +234,7 @@ public class ExchangeHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.myExchange.sellItem(Client, Client.character.inventoryCache.find(Message.objectToSellId), SecureParser.ItemQuantity(Message.quantity));
+        Client.myExchange.sellItem(Client, Client.character.getInventoryCache().find(Message.objectToSellId), SecureParser.ItemQuantity(Message.quantity));
     }
 
 }

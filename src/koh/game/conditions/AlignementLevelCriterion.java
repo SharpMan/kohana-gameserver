@@ -21,9 +21,9 @@ public class AlignementLevelCriterion extends Criterion {
     public void Build() {
         int result;
         try {
-            result = Integer.parseInt(Literal);
+            result = Integer.parseInt(literal);
         } catch (Exception e) {
-            throw new Error(String.format("Cannot build AlignementLevelCriterion, {0} is not a valid alignement level", this.Literal));
+            throw new Error(String.format("Cannot build AlignementLevelCriterion, {0} is not a valid alignement level", this.literal));
         }
         this.Level = result;
     }

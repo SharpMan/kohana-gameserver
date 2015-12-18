@@ -181,7 +181,7 @@ public class Guild extends IWorldEventObserver {
         this.sendToField(new FieldNotification(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 224, new String[]{member.name})) {
             @Override
             public boolean can(Player perso) {
-                return perso.account != null && perso.account.accountData != null && perso.account.accountData.guild_warn_on_login;
+                return perso.getAccount() != null && perso.getAccount().accountData != null && perso.getAccount().accountData.guild_warn_on_login;
             }
         });
         this.sendToField(new GuildMemberOnlineStatusMessage(member.characterID, true));

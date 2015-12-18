@@ -19,7 +19,7 @@ public class FriendListCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Friend = Integer.parseInt(Literal);
+        this.Friend = Integer.parseInt(literal);
     }
 
     @Override

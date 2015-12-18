@@ -28,8 +28,8 @@ public class Access implements InteractiveAction {
             return;
         }
 
-        actor.client.myExchange = new MountExchange(actor.client);
-        actor.client.addGameAction(new GameExchange(actor, actor.client.myExchange));
+        actor.getClient().myExchange = new MountExchange(actor.getClient());
+        actor.getClient().addGameAction(new GameExchange(actor, actor.getClient().myExchange));
 
     }
 

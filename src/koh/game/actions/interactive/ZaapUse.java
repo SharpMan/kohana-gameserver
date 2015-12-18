@@ -26,7 +26,7 @@ public class ZaapUse implements InteractiveAction {
             actor.send(new BasicNoOperationMessage());
             return;
         }
-        actor.client.addGameAction(new ZaapAction(actor));
+        actor.getClient().addGameAction(new ZaapAction(actor));
         //actor.client.endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
     }
 

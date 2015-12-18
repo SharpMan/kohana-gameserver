@@ -27,30 +27,30 @@ public class GuildJoinRequest extends GameBaseRequest {
         }
 
         try {
-            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_OK));
+            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.getCharacter().getNickName(), GuildInvitationStateEnum.GUILD_INVITATION_OK));
             this.requested.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_OK));
 
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            if (this.requester.character.guild != null) {
-                this.requester.character.guild.addMember(new GuildMember(this.requester.character.guild.entity.guildID) {
+            if (this.requester.getCharacter().getGuild() != null) {
+                this.requester.getCharacter().getGuild().addMember(new GuildMember(this.requester.getCharacter().getGuild().entity.guildID) {
                     {
                         this.accountID = requested.getAccount().id;
-                        this.breed = requested.character.breed;
-                        this.characterID = requested.character.ID;
+                        this.breed = requested.getCharacter().getBreed();
+                        this.characterID = requested.getCharacter().ID;
                         this.lastConnection = System.currentTimeMillis() + "";
-                        this.level = requested.character.level;
-                        this.name = requested.character.nickName;
+                        this.level = requested.getCharacter().getLevel();
+                        this.name = requested.getCharacter().getNickName();
                         this.rank = 0;
                         this.experience = "0";
                         this.rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
-                        this.sex = requested.character.sexe == 1;
-                        this.achievementPoints = requested.character.achievementPoints;
-                        this.alignmentSide = requested.character.alignmentSide.value;
+                        this.sex = requested.getCharacter().hasSexe();
+                        this.achievementPoints = requested.getCharacter().getAchievementPoints();
+                        this.alignmentSide = requested.getCharacter().getAlignmentSide().value;
                         DAO.getGuildMembers().insert(this);
                     }
-                }, this.requested.character);
-                this.requester.character.guild.registerPlayer(requested.character);
+                }, this.requested.getCharacter());
+                this.requester.getCharacter().getGuild().registerPlayer(requested.getCharacter());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,7 +68,7 @@ public class GuildJoinRequest extends GameBaseRequest {
         }
 
         try {
-            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.character.nickName, GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
+            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.getCharacter().getNickName(), GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
             this.requested.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
 
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);

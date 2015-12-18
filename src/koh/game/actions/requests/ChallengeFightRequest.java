@@ -31,8 +31,8 @@ public class ChallengeFightRequest extends GameBaseRequest {
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
 
-            Fight Fight = new ChallengeFight(this.requested.character.currentMap, requester, requested);
-            this.requester.character.currentMap.addFight(Fight);
+            Fight Fight = new ChallengeFight(this.requested.getCharacter().getCurrentMap(), requester, requested);
+            this.requester.character.getCurrentMap().addFight(Fight);
 
         } catch (Exception e) {
             e.printStackTrace();

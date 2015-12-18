@@ -19,7 +19,7 @@ public class MonthCriterion extends Criterion {
 
     @Override
     public void Build() {
-         this.Month = Integer.parseInt(Literal);
+         this.Month = Integer.parseInt(literal);
     }
 
     @Override

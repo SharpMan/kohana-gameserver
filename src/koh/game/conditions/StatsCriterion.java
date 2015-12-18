@@ -87,14 +87,14 @@ public class StatsCriterion extends Criterion {
         } else if (StatsCriterion.CriterionsStatsBaseBinds.containsKey(this.Identifier)) {
             this.Field = StatsCriterion.CriterionsStatsBaseBinds.get(this.Identifier);
             this.Base = true;
-        } else if (!Arrays.stream(StatsCriterion.ExtraCriterions).anyMatch(x -> x.equalsIgnoreCase(this.Identifier))) //else if (!Enumerable.Any<string>((IEnumerable<string>) StatsCriterion.ExtraCriterions, (Func<string, bool>) (entry => entry == this.Identifier)))
+        } else if (!Arrays.stream(StatsCriterion.ExtraCriterions).anyMatch(x -> x.equalsIgnoreCase(this.Identifier))) //else if (!Enumerable.Any<string>((IEnumerable<string>) StatsCriterion.ExtraCriterions, (Func<string, bool>) (entry => entry == this.IDENTIFIER)))
         {
             throw new Error(String.format("Cannot build StatsCriterion, {0} is not a stats identifier", this.Identifier));
         }
         try {
-            this.Comparand = Integer.parseInt(Literal);
+            this.Comparand = Integer.parseInt(literal);
         } catch (Exception e) {
-            throw new Error(String.format("Cannot build StatsCriterion, {0} is not a valid integer", this.Literal));
+            throw new Error(String.format("Cannot build StatsCriterion, {0} is not a valid integer", this.literal));
         }
     }
 

@@ -95,7 +95,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
 
         if (actor instanceof Player) {
-            if (((Player) actor).client != null) {
+            if (((Player) actor).getClient() != null) {
                 this.registerPlayer((Player) actor);
                 this.onPlayerSpawned((Player) actor);
             }
@@ -146,7 +146,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public void destroyActor(IGameActor actor) {
 
         if (actor instanceof Player) {
-            if (((Player) actor).client != null) {
+            if (((Player) actor).getClient() != null) {
                 this.unregisterPlayer((Player) actor);
             }
         }
@@ -310,19 +310,19 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public void onMouvementConfirmed(Player Actor) {
-        if (Actor.client.onMouvementConfirm != null) {
-            Actor.client.onMouvementConfirm.apply(Actor);
-            Actor.client.onMouvementConfirm = null;
+    public void onMouvementConfirmed(Player actor) {
+        if (actor.getClient().onMouvementConfirm != null) {
+            actor.getClient().onMouvementConfirm.apply(actor);
+            actor.getClient().onMouvementConfirm = null;
         }
         if (droppedItems == null || droppedItems.isEmpty()) {
             return;
         }
         synchronized (droppedItems) {
-            if (droppedItems.containsKey(Actor.cell.getId())) {
-                Actor.inventoryCache.add(droppedItems.get(Actor.cell.getId()), true);
-                droppedItems.remove(Actor.cell.getId());
-                this.sendToField(new ObjectGroundRemovedMessage(Actor.cell.getId()));
+            if (droppedItems.containsKey(actor.cell.getId())) {
+                actor.getInventoryCache().add(droppedItems.get(actor.cell.getId()), true);
+                droppedItems.remove(actor.cell.getId());
+                this.sendToField(new ObjectGroundRemovedMessage(actor.cell.getId()));
                 if (droppedItems.isEmpty()) {
                     this.droppedItems = null;
                 }
@@ -478,7 +478,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
         client.send(getAgressableActorsStatus(client.character));
         // client.send(new UpdateSelfAgressableStatusMessage(client.character.PvPEnabled,(int)System.currentTimeMillis() + 360000));
-        Message Items = client.character.currentMap.objectsGround();
+        Message Items = client.character.getCurrentMap().objectsGround();
         if (Items != null) {
             client.send(Items);
         }

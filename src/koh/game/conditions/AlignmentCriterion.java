@@ -14,9 +14,9 @@ public class AlignmentCriterion extends Criterion {
     public void Build() {
         int result;
         try {
-            result = Integer.parseInt(Literal);
+            result = Integer.parseInt(literal);
         } catch (Exception e) {
-            throw new Error(String.format("Cannot build AdminRightsCriterion, {0} is not a valid role", this.Literal));
+            throw new Error(String.format("Cannot build AdminRightsCriterion, {0} is not a valid role", this.literal));
         }
         this.AlignmentSide = (byte) result;
     }

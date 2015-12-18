@@ -9,18 +9,15 @@ import koh.game.entities.item.ItemAction;
  */
 public class ReturnToSavePos  extends ItemAction {
 
-    private int map;
-    private short cell;
-
     public ReturnToSavePos(String[] args, String criteria) {
         super(args, criteria);
     }
 
     @Override
     public boolean execute(Player p) {
-        if(!super.execute(p) || !p.client.canGameAction(GameActionTypeEnum.CHANGE_MAP))
+        if(!super.execute(p) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
-        p.teleport(p.savedMap, p.savedCell);
+        p.teleport(p.getSavedMap(), p.getSavedCell());
         return true;
     }
 }

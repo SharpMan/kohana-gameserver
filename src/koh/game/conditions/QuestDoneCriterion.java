@@ -23,7 +23,7 @@ public class QuestDoneCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.QuestId = Integer.parseInt(Literal);
+        this.QuestId = Integer.parseInt(literal);
     }
 
     @Override

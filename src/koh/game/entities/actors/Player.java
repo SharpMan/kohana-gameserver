@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
-import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 
-import koh.game.dao.api.AccountDataDAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
@@ -76,58 +74,89 @@ public class Player extends IGameActor implements Observer {
 
     private static final Logger logger = LogManager.getLogger(Player.class);
 
+    @Getter @Setter
     public int owner;
+    @Getter @Setter
     public String nickName;
+    @Getter @Setter
     public int sexe;
+    @Getter @Setter
     public byte breed;
+    @Getter @Setter
     public ArrayList<Short> skins;
+    @Getter @Setter
     public ArrayList<Integer> indexedColors = new ArrayList<>(5);
+    @Getter @Setter
     public ArrayList<Short> scales;
+    @Getter @Setter
     public Account account;
-    public int achievementPoints;
-    public int level;
+    @Getter @Setter
+    public int achievementPoints,level;
+    @Getter @Setter
     public WorldClient client;
-    public long regenStartTime;
+    private long regenStartTime;
+    @Getter @Setter
     public volatile DofusMap currentMap;
-    public ArrayList<Byte> ennabledChannels = new ArrayList<>(20), DisabledChannels;
+    @Getter @Setter
+    public ArrayList<Byte> ennabledChannels = new ArrayList<>(20), disabledChannels;
+    @Getter @Setter
     public ShortcutBook shortcuts;
+    @Getter @Setter
     public volatile MountInformations mountInfo;
+    @Getter @Setter
     public int savedMap;
+    @Getter @Setter
     public short savedCell;
+    @Getter @Setter
     public volatile SpellBook mySpells;
+    @Getter @Setter
     public volatile JobBook myJobs;
+    @Getter @Setter
     public CharacterInventory inventoryCache;
+    @Getter @Setter
     public PlayerStatusEnum status = PlayerStatusEnum.PLAYER_STATUS_AVAILABLE;
+    @Getter @Setter
     public HashMap<ScoreType, Integer> scores = new HashMap<>(7);
     //GenericStats
     /*public int getAP;
      public int getMP;*/
     @Setter @Getter
     public int chance, life, vitality,wisdom, strength, intell, agility;
+    @Getter @Setter
     public short activableTitle, activableOrnament;
+    @Getter @Setter
     public byte regenRate;
+    @Getter @Setter
     public byte[] emotes;
+    @Getter @Setter
     public int[] ornaments, titles;
-
+    @Getter @Setter
     public GenericStats stats;
 
     //stats
+    @Getter @Setter
     public long experience;
     @Getter @Setter
     public int kamas, statPoints, spellPoints;
+    @Getter @Setter
     public byte alignmentValue, alignmentGrade, PvPEnabled;
+    @Getter @Setter
     public AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_NEUTRAL;
     @Getter @Setter
     public int honor, dishonor, energy;
 
+    @Getter @Setter
     public CopyOnWriteArrayList<Player> followers;
 
+    @Getter @Setter
     public boolean isInWorld;
     protected boolean myInitialized = false;
     private HumanInformations cachedHumanInformations = null;
 
     //Other
+    @Getter @Setter
     public byte moodSmiley = -1;
+    @Getter @Setter
     public Guild guild;
 
     private Fight myFight;
@@ -138,10 +167,10 @@ public class Player extends IGameActor implements Observer {
             return;
         }
 
-        this.DisabledChannels = new ArrayList<>(14);
+        this.disabledChannels = new ArrayList<>(14);
         for (byte i = 0; i < 14; i++) {
             if (!this.ennabledChannels.contains(i)) {
-                this.DisabledChannels.add(i);
+                this.disabledChannels.add(i);
             }
         }
         if (this.mySpells == null || this.mySpells.haventSpell()) {
@@ -210,7 +239,7 @@ public class Player extends IGameActor implements Observer {
                 Options = ArrayUtils.add(Options, new HumanOptionGuild(this.guild.toGuildInformations()));
             }
             // Options = ArrayUtils.add(Options, new HumanOptionAlliance(this.PvPEnabled, new AllianceInformations(1191, "a", "ta race", this.guild.getGuildEmblem())));
-            this.cachedHumanInformations = new HumanInformations(new ActorRestrictionsInformations(), this.sexe == 1, Options);
+            this.cachedHumanInformations = new HumanInformations(new ActorRestrictionsInformations(), this.hasSexe(), Options);
         }
         return this.cachedHumanInformations;
     }
@@ -271,7 +300,7 @@ public class Player extends IGameActor implements Observer {
         try {
             if (!this.isInWorld) {
                 this.isInWorld = true;
-                this.account.CurrentIP = client.getIP();
+                this.account.currentIP = client.getIP();
                 if (this.getFighter() == null) {
                     this.spawnToMap();
                     client.send(this.currentMap.getAgressableActorsStatus(this));
@@ -696,10 +725,10 @@ public class Player extends IGameActor implements Observer {
             ennabledChannels.clear();
         }
         ennabledChannels = null;
-        if (DisabledChannels != null) {
-            DisabledChannels.clear();
+        if (disabledChannels != null) {
+            disabledChannels.clear();
         }
-        DisabledChannels = null;
+        disabledChannels = null;
         if (shortcuts != null) {
             shortcuts.totalClear();
         }

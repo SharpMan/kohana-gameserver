@@ -180,8 +180,8 @@ public class SpellBook {
         }
         if (this.mySpells.get(id).level > 1) {
             owner.spellPoints += this.mySpells.get(id).level - 1;
-            if (owner.client != null) {
-                owner.client.send(new SpellUpgradeSuccessMessage(id, (byte) 0));
+            if (owner.getClient() != null) {
+                owner.getClient().send(new SpellUpgradeSuccessMessage(id, (byte) 0));
             }
         }
     }
@@ -261,7 +261,7 @@ public class SpellBook {
         } else if (client.character.spellPoints < (int) spell.level) {
             return false;
         } else {
-            return spell.getSpellLevel((byte) (spell.level + 1)).getMinPlayerLevel() <= client.character.level;
+            return spell.getSpellLevel((byte) (spell.level + 1)).getMinPlayerLevel() <= client.character.getLevel();
         }
     }
 

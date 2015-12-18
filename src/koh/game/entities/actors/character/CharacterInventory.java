@@ -223,7 +223,7 @@ public class CharacterInventory {
         ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972);
         ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808), exchangeTime = (ObjectEffectDate) Item.getEffect(983);
         if (exItem.getEffect(970) != null) {
-            PlayerController.sendServerMessage(player.client, "action Impossible : cet objet est déjà associé à un objet d'apparance.");
+            PlayerController.sendServerMessage(player.getClient(), "action Impossible : cet objet est déjà associé à un objet d'apparance.");
             return;
         }
         if (obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
@@ -231,7 +231,7 @@ public class CharacterInventory {
         }
         if (exItem.getEffect(983) != null || exItem.getQuantity() != 1) {
 
-            PlayerController.sendServerMessage(player.client, "action Impossible : cet objet ne peut pas être associé." + exItem.getEffect(983).toString());
+            PlayerController.sendServerMessage(player.getClient(), "action Impossible : cet objet ne peut pas être associé." + exItem.getEffect(983).toString());
             return;
         }
         if (exItem.getApparrance() != 0) {
@@ -284,7 +284,7 @@ public class CharacterInventory {
             this.unEquipItem(this.getItemInSlot(slot));
             this.unEquipedDouble(item);
 
-            if (item.getTemplate().getLevel() > player.level) {
+            if (item.getTemplate().getLevel() > player.getLevel()) {
                 player.send(new ObjectErrorMessage(ObjectErrorEnum.LEVEL_TOO_LOW));
                 return;
             }
@@ -319,8 +319,8 @@ public class CharacterInventory {
                 player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
                 if (item.getApparrance() != 0) {
                     if (slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) {
-                        if (this.player.mountInfo.isToogled) {
-                            this.player.mountInfo.onGettingOff();
+                        if (this.player.getMountInfo().isToogled) {
+                            this.player.getMountInfo().onGettingOff();
                         }
                         //TODO:  clean Code + clear old ArrayList from  memory
                         if (item.getTemplate().getTypeId() == 121) { //Montelier
@@ -456,7 +456,7 @@ public class CharacterInventory {
         item.setNeedInsert(true);
         item.getStats();
         if (character != null) {
-            character.inventoryCache.add(item, Merge);
+            character.getInventoryCache().add(item, Merge);
         }
 
         return item;
@@ -532,7 +532,7 @@ public class CharacterInventory {
         this.removeFromDic(item.getID());
         player.send(new ObjectDeletedMessage(item.getID()));
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
-        trader.inventoryCache.add(item, true);
+        trader.getInventoryCache().add(item, true);
     }
 
     public void removeItemFromInventory(InventoryItem item) {
@@ -546,8 +546,8 @@ public class CharacterInventory {
     public void removeFromDic(int id) {
         itemsCache.remove(id);
         try {
-            this.player.shortcuts.myShortcuts.entrySet().stream().filter(x -> x.getValue() instanceof ItemShortcut && ((ItemShortcut) x.getValue()).itemID == id).map(x -> x.getKey()).forEach(y -> {
-                this.player.shortcuts.myShortcuts.remove(y);
+            this.player.getShortcuts().myShortcuts.entrySet().stream().filter(x -> x.getValue() instanceof ItemShortcut && ((ItemShortcut) x.getValue()).itemID == id).map(x -> x.getKey()).forEach(y -> {
+                this.player.getShortcuts().myShortcuts.remove(y);
                 this.player.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, y));
             });
         } catch (Exception e) {

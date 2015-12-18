@@ -37,11 +37,11 @@ public class ShortcutHandler {
     public static void HandleShortcutBarRemoveRequestMessage(WorldClient Client, ShortcutBarRemoveRequestMessage Message) {
         switch (Message.barType) {
             case ShortcutBarEnum.SPELL_SHORTCUT_BAR:
-                Client.character.mySpells.removeSpellSlot(Client , Message.slot);
+                Client.character.getMySpells().removeSpellSlot(Client , Message.slot);
                 break;
             default:
-                if (Client.character.shortcuts.myShortcuts.containsKey(Message.slot)) {
-                    Client.character.shortcuts.myShortcuts.remove(Message.slot);
+                if (Client.character.getShortcuts().myShortcuts.containsKey(Message.slot)) {
+                    Client.character.getShortcuts().myShortcuts.remove(Message.slot);
                     Client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Message.slot));
                 } else {
                     //Todo ShortcutErrorMessage
@@ -56,10 +56,10 @@ public class ShortcutHandler {
     public static void HandleShortcutBarSwapRequestMessage(WorldClient Client, ShortcutBarSwapRequestMessage Message) {
         switch (Message.barType) {
             case ShortcutBarEnum.SPELL_SHORTCUT_BAR:
-                Client.character.mySpells.SwapShortcuts(Client, Message.firstSlot, Message.secondSlot);
+                Client.character.getMySpells().SwapShortcuts(Client, Message.firstSlot, Message.secondSlot);
                 break;
             default:
-                Client.character.shortcuts.swapShortcuts(Client, Message.firstSlot, Message.secondSlot);
+                Client.character.getShortcuts().swapShortcuts(Client, Message.firstSlot, Message.secondSlot);
                 break;
         }
     }
@@ -73,7 +73,7 @@ public class ShortcutHandler {
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }
-                Client.character.mySpells.moveSpell(Client, ((ShortcutSpell) Message.shortcut).spellId, ((ShortcutSpell) Message.shortcut).Slot);
+                Client.character.getMySpells().moveSpell(Client, ((ShortcutSpell) Message.shortcut).spellId, ((ShortcutSpell) Message.shortcut).Slot);
                 break;
             case ShortcutBarEnum.GENERAL_SHORTCUT_BAR:
                 if (!(Message.shortcut instanceof ShortcutObjectItem)) {
@@ -81,17 +81,17 @@ public class ShortcutHandler {
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }
-                if (!Client.character.shortcuts.canAddShortcutItem((ShortcutObjectItem) Message.shortcut)) {
+                if (!Client.character.getShortcuts().canAddShortcutItem((ShortcutObjectItem) Message.shortcut)) {
                     PlayerController.sendServerMessage(Client, "Vous ne pouvez pas dupliquez le même item ^^' ...");
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }
-                if (Client.character.shortcuts.myShortcuts.containsKey(Message.shortcut.Slot)) {
-                    Client.character.shortcuts.myShortcuts.remove(Message.shortcut.Slot);
+                if (Client.character.getShortcuts().myShortcuts.containsKey(Message.shortcut.Slot)) {
+                    Client.character.getShortcuts().myShortcuts.remove(Message.shortcut.Slot);
                     Client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Message.shortcut.Slot));
                 }
-                Client.character.shortcuts.add(new ItemShortcut(Message.shortcut.Slot, ((ShortcutObjectItem) Message.shortcut).itemUID));
-                Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Client.character.shortcuts.myShortcuts.get(Message.shortcut.Slot).toShortcut(Client.character))); //getshortcut slto
+                Client.character.getShortcuts().add(new ItemShortcut(Message.shortcut.Slot, ((ShortcutObjectItem) Message.shortcut).itemUID));
+                Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Client.character.getShortcuts().myShortcuts.get(Message.shortcut.Slot).toShortcut(Client.character))); //getshortcut slto
 
                 break;
             default:

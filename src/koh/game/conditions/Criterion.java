@@ -1,6 +1,5 @@
 package koh.game.conditions;
 
-import static javafx.scene.input.KeyCode.T;
 import org.apache.commons.lang3.NotImplementedException;
 
 /**
@@ -11,7 +10,7 @@ public abstract class Criterion extends ConditionExpression {
 
     public ComparaisonOperatorEnum Operator;
 
-    public String Literal;
+    public String literal;
 
     public static ComparaisonOperatorEnum TryGetOperator(char c) {
         switch (c) {
@@ -199,7 +198,7 @@ public abstract class Criterion extends ConditionExpression {
     }
 
     protected String FormatToString(String identifier) {
-        return String.format("{0}{1}{2}", identifier, Criterion.GetOperatorChar(this.Operator), this.Literal);
+        return String.format("{0}{1}{2}", identifier, Criterion.GetOperatorChar(this.Operator), this.literal);
     }
 
 }

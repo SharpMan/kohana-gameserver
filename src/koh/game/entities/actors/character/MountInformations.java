@@ -46,9 +46,9 @@ public class MountInformations {
 
     public void onRiding() {
         if (this.isToogled) {
-            throw new Error("player" + player.nickName + " try to ride a rided mount");
-        } else if (this.player.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null) {
-            this.player.inventoryCache.unEquipItem(this.player.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS));
+            throw new Error("player" + player.getNickName() + " try to ride a rided mount");
+        } else if (this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null) {
+            this.player.getInventoryCache().unEquipItem(this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS));
         }
         this.isToogled = true;
         this.enableStats(true);

@@ -44,11 +44,11 @@ public abstract class Exchange {
     public abstract void send(Message Packet);
 
     public static InventoryItem[] getCharactersItems(Player Character) {
-        return Character.inventoryCache.getItems().filter(x -> !x.isLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
+        return Character.getInventoryCache().getItems().filter(x -> !x.isLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
     }
 
     public static InventoryItem[] getCharactersItems(Player Character, int[] ids) {
-        return Character.inventoryCache.getItems().filter(x -> ArrayUtils.contains(ids, x.getID()) && !x.isLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
+        return Character.getInventoryCache().getItems().filter(x -> ArrayUtils.contains(ids, x.getID()) && !x.isLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
     }
 
 }

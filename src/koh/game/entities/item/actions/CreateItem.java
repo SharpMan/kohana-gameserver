@@ -34,12 +34,12 @@ public class CreateItem  extends ItemAction {
         }
         InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), template.getId(), 63, p.ID, count, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.Normal, template instanceof Weapon));
 
-        if (p.inventoryCache.add(item, true)) {
+        if (p.getInventoryCache().add(item, true)) {
             item.setNeedInsert(true);
         }
 
-        if(send && p.client != null){
-            p.client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, count >0 ? 21 : 22, new String[]{String.valueOf(count >0 ? count : -count),String.valueOf(template.getId())} ));
+        if(send){
+            p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, count >0 ? 21 : 22, new String[]{String.valueOf(count >0 ? count : -count),String.valueOf(template.getId())} ));
         }
 
         return true;

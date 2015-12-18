@@ -32,7 +32,7 @@ public class PartyRequest extends GameBaseRequest {
         return super.accept();
     }
 
-    public void Abort() {
+    public void abort() {
         if (!super.declin()) {
             return;
         }

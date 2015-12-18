@@ -5,7 +5,6 @@ import koh.game.actions.GameParty;
 import koh.game.actions.requests.PartyRequest;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.Party;
 import koh.game.network.WorldClient;
@@ -180,7 +179,7 @@ public class PartyHandler {
     public static void HandlePartyCancelInvitationMessage(WorldClient Client, PartyCancelInvitationMessage Message) {
         PartyRequest Req = Client.getPartyRequest(Message.partyId, Message.guestId);
         if (Req != null) {
-            Req.Abort();
+            Req.abort();
             Client.removePartyRequest(Req);
         } else if (Client.getParty() != null && Client.getParty().isChief(Client.character)) {
             Client.getParty().abortRequest(Client, Message.guestId);
@@ -213,23 +212,23 @@ public class PartyHandler {
         if (GameParty == null) {
             return;
         }
-        Client.send(new PartyInvitationDetailsMessage(GameParty.id, GameParty.type, GameParty.partyName, Client.getPartyRequest(Message.partyId).requester.character.ID, Client.getPartyRequest(Message.partyId).requester.character.nickName, GameParty.chief.ID, GameParty.toPartyInvitationMemberInformations(), GameParty.toPartyGuestInformations()));
+        Client.send(new PartyInvitationDetailsMessage(GameParty.id, GameParty.type, GameParty.partyName, Client.getPartyRequest(Message.partyId).requester.getCharacter().ID, Client.getPartyRequest(Message.partyId).requester.getCharacter().getNickName(), GameParty.chief.ID, GameParty.toPartyInvitationMemberInformations(), GameParty.toPartyGuestInformations()));
     }
 
     @HandlerAttribute(ID = 5585)
     public static void HandlePartyInvitationRequestMessage(WorldClient Client, Message Message) {
 
-        Player Target = DAO.getPlayers().getCharacter(((PartyInvitationRequestMessage) Message).name);
-        if (Target == null) {
+        Player target = DAO.getPlayers().getCharacter(((PartyInvitationRequestMessage) Message).name);
+        if (target == null) {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_NOT_FOUND));
             return;
         }
-        if (Target.client == null || Target.status == PlayerStatusEnum.PLAYER_STATUS_AFK) {
+        if (target.getClient() == null || target.status == PlayerStatusEnum.PLAYER_STATUS_AFK) {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_BUSY));
             return;
         }
 
-        if (!Target.client.canGameAction(GameActionTypeEnum.GROUP)) {
+        if (!target.getClient().canGameAction(GameActionTypeEnum.GROUP)) {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_ALREADY_INVITED));
             return;
         }
@@ -239,7 +238,7 @@ public class PartyHandler {
             return;
         }
 
-        if (!Target.client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+        if (!target.getClient().canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_ALREADY_INVITED));
             return;
         }
@@ -249,28 +248,28 @@ public class PartyHandler {
             Client.send(new PartyCannotJoinErrorMessage(((GameParty) Client.getGameAction(GameActionTypeEnum.GROUP)).party.id, PartyJoinErrorEnum.PARTY_JOIN_ERROR_NOT_ENOUGH_ROOM));
             return;
         }
-        if (Target.account.accountData.ignore(Client.getAccount().id)) {
+        if (target.getAccount().accountData.ignore(Client.getAccount().id)) {
             Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_BUSY));
             return;
         }
 
-        PartyRequest Request = new PartyRequest(Client, Target.client);
+        PartyRequest Request = new PartyRequest(Client, target.getClient());
 
         Client.addPartyRequest(Request);
-        Target.client.addPartyRequest(Request);
+        target.getClient().addPartyRequest(Request);
 
         if (Client.getParty() == null) {
-            new Party(Client.character, Target);
+            new Party(Client.character, target);
         } else {
             if (Client.getParty().restricted && !Client.getParty().isChief(Client.character)) {
                 PlayerController.sendServerMessage(Client, "Impossible d'inviter ce joueur, le groupe ne peut pas être modifié actuellement.");
                 return;
             } else {
-                Client.getParty().addGuest(Target);
+                Client.getParty().addGuest(target);
             }
         }
 
-        Target.send(new PartyInvitationMessage(Client.getParty().id, PartyTypeEnum.PARTY_TYPE_CLASSICAL, Client.getParty().partyName, Party.MAX_PARTICIPANTS, Client.character.ID, Client.character.nickName, Target.ID));
+        target.send(new PartyInvitationMessage(Client.getParty().id, PartyTypeEnum.PARTY_TYPE_CLASSICAL, Client.getParty().partyName, Party.MAX_PARTICIPANTS, Client.getCharacter().ID, Client.getCharacter().getNickName(), target.ID));
 
     }
 

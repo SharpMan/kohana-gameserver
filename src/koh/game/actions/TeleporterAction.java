@@ -34,7 +34,7 @@ public class TeleporterAction extends GameAction {
     public void abort(Object[] Args) {
         try {
             int map = (int) Args[0];
-            DofusZaap subway = DAO.getMaps().findSubWay(((Player) actor).currentMap.getSubArea().getArea().getId(), map);
+            DofusZaap subway = DAO.getMaps().findSubWay(((Player) actor).getCurrentMap().getSubArea().getArea().getId(), map);
             if (subway == null) {
                 return;
             }
@@ -42,7 +42,7 @@ public class TeleporterAction extends GameAction {
                 actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
                 return;
             }
-            ((Player) actor).inventoryCache.substractKamas(getCostTo(null));
+            ((Player) actor).getInventoryCache().substractKamas(getCostTo(null));
             ((Player) actor).teleport(map, subway.getCell());
 
             this.endExecute();
@@ -58,7 +58,7 @@ public class TeleporterAction extends GameAction {
     }
 
     public int[] subAreaIds() {
-        ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).currentMap.getSubArea().getArea().getId());
+        ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).getCurrentMap().getSubArea().getArea().getId());
         if (zaaps == null) {
             return Enumerable.DuplicatedKeyInt(39, ((Player) actor).mapid);
         }
@@ -66,7 +66,7 @@ public class TeleporterAction extends GameAction {
     }
 
     public int[] mapIds() {
-        ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).currentMap.getSubArea().getArea().getId());
+        ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).getCurrentMap().getSubArea().getArea().getId());
         if (zaaps == null) {
             return Enumerable.DuplicatedKeyInt(39, ((Player) actor).mapid);
         }

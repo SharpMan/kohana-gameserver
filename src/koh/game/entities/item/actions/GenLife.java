@@ -22,7 +22,7 @@ public class GenLife  extends ItemAction {
 
     @Override
     public boolean execute(Player p) {
-        if(!super.execute(p) || p.client.isGameAction(GameActionTypeEnum.FIGHT))
+        if(!super.execute(p) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         int val = EffectHelper.randomValue(min,max);
         if(p.getLife() + val > p.getMaxLife())val = p.getMaxLife() - p.getLife();

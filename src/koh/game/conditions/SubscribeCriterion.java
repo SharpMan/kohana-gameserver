@@ -18,7 +18,7 @@ public class SubscribeCriterion extends Criterion {
 
     @Override
     public void Build() {
-        SubscriptionState = Integer.parseInt(Literal) != 0;
+        SubscriptionState = Integer.parseInt(literal) != 0;
     }
 
     @Override

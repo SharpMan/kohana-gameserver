@@ -18,7 +18,7 @@ public class KamaCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Kamas = Integer.parseInt(Literal);
+        this.Kamas = Integer.parseInt(literal);
     }
 
     @Override

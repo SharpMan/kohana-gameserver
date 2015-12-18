@@ -9,7 +9,7 @@ import koh.game.entities.actors.Player;
 public class LevelCriterion extends Criterion {
 
     public static String Identifier = "PL";
-    public Integer Level;
+    public Integer level;
 
     @Override
     public String toString() {
@@ -18,12 +18,12 @@ public class LevelCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Level = Integer.parseInt(Literal);
+        this.level = Integer.parseInt(literal);
     }
 
     @Override
     public boolean eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.level, this.Level);
+        return this.Compare((Comparable<Integer>) character.getLevel(), this.level);
     }
 
 }

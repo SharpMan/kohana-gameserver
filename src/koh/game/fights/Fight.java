@@ -267,7 +267,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     };
 
     public void disconnect(CharacterFighter Fighter) {
-        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 182, new String[]{Fighter.Character.nickName, Integer.toString(Fighter.turnRunning)}));
+        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 182, new String[]{Fighter.character.getNickName(), Integer.toString(Fighter.turnRunning)}));
         if (this.currentFighter.ID == Fighter.ID) {
             this.fightLoopState = fightLoopState.STATE_END_TURN;
         }
@@ -343,7 +343,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
         short oldCell = cellId;
-        if (spellLevel.getId() == 10461 && fighter instanceof CharacterFighter && ((CharacterFighter) fighter).Character.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
+        if (spellLevel.getId() == 10461 && fighter instanceof CharacterFighter && ((CharacterFighter) fighter).character.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
             this.launchWeapon(((CharacterFighter) fighter), cellId);
             return;
         }
@@ -518,7 +518,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (fighter != this.currentFighter) {
             return;
         }
-        InventoryItem Weapon = fighter.Character.inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
+        InventoryItem Weapon = fighter.character.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
         if (Weapon.getTemplate().getTypeId() == 83) { //Pière d'Ame
             return;
         }
@@ -748,7 +748,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         this.middleTurn();
                         this.beginTurn();
                     } else if (this.myLoopTimeOut + 5000 < System.currentTimeMillis()) {
-                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.turnReady && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).Character.nickName).toArray(String[]::new), ", ")}));
+                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.turnReady && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).character.getNickName()).toArray(String[]::new), ", ")}));
                         this.middleTurn();
                         this.beginTurn();
                     }
@@ -829,7 +829,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.myLoopTimeOut = System.currentTimeMillis() + this.getTurnTime();
 
         // status en attente de fin de tour
-        if ((this.currentFighter instanceof CharacterFighter && ((CharacterFighter) currentFighter).Character.client == null && this.currentFighter.team.getAliveFighters().count() > 1L) || this.currentFighter.buff.getAllBuffs().anyMatch(x-> x instanceof BuffEndTurn)) {
+        if ((this.currentFighter instanceof CharacterFighter && ((CharacterFighter) currentFighter).character.getClient() == null && this.currentFighter.team.getAliveFighters().count() > 1L) || this.currentFighter.buff.getAllBuffs().anyMatch(x-> x instanceof BuffEndTurn)) {
             this.fightLoopState = fightLoopState.STATE_END_TURN;
         } else {
             this.fightLoopState = fightLoopState.STATE_WAIT_TURN;
@@ -1049,7 +1049,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     private void setAllUnReady() {
-        this.Fighters().filter(x -> x instanceof CharacterFighter && ((CharacterFighter) x).Character.client != null).forEach(x -> x.turnReady = false);
+        this.Fighters().filter(x -> x instanceof CharacterFighter && ((CharacterFighter) x).character.getClient() != null).forEach(x -> x.turnReady = false);
         /*foreach (var Fighter in this.fighters.Where(Fighter => Fighter is DoubleFighter))
          Fighter.turnReady = true;*/
     }
@@ -1191,7 +1191,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         fighter.send(new GameFightPlacementPossiblePositionsMessage(this.myFightCells.get(myTeam1).keySet().stream().mapToInt(x -> x.intValue()).toArray(), this.myFightCells.get(myTeam2).keySet().stream().mapToInt(x -> x.intValue()).toArray(), fighter.team.Id));
 
         if (!update) {
-            CharacterHandler.SendCharacterStatsListMessage(fighter.Character.client);
+            CharacterHandler.SendCharacterStatsListMessage(fighter.character.getClient());
         }
         this.Fighters().forEach((Actor) -> {
             fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(null)));
@@ -1212,7 +1212,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public void onReconnect(CharacterFighter fighter) {
-        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 184, new String[]{fighter.Character.nickName}));
+        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 184, new String[]{fighter.character.getNickName()}));
 
         if (this.fightState == fightState.STATE_PLACE) {
             this.sendPlacementInformation(fighter, false);
@@ -1220,16 +1220,16 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             fighter.send(new GameFightStartingMessage(fightType.value, getTeam1().LeaderId, getTeam2().LeaderId));
             this.sendGameFightJoinMessage(fighter);
             this.Fighters().forEach((Actor) -> {
-                fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(fighter.Character)));
+                fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(fighter.character)));
             });
             fighter.send(new GameEntitiesDispositionMessage(this.getAliveFighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
             fighter.send(new GameFightResumeMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.myWorker.fightTurn, (int) (System.currentTimeMillis() - this.fightTime), getIdols(), fighter.spellsController.myinitialCooldown.entrySet().stream().map(x -> new GameFightSpellCooldown(x.getKey(), x.getValue().initialCooldown)).toArray(GameFightSpellCooldown[]::new), (byte) fighter.team.getAliveFighters().filter(x -> x.getSummonerID() == fighter.ID && !(x instanceof BombFighter)).count(), (byte) fighter.team.getAliveFighters().filter(x -> x.getSummonerID() == fighter.ID && (x instanceof BombFighter)).count()));
             fighter.send(getFightTurnListMessage());
-            fighter.send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations(fighter.Character)).toArray(GameFightFighterInformations[]::new)));
+            fighter.send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations(fighter.character)).toArray(GameFightFighterInformations[]::new)));
 
             /*/213.248.126.93 ChallengeInfoMessage Second8 paket
              /213.248.126.93 ChallengeResultMessage Second9 paket*/
-            CharacterHandler.SendCharacterStatsListMessage(fighter.Character.client);
+            CharacterHandler.SendCharacterStatsListMessage(fighter.character.getClient());
             if (this.currentFighter.ID == fighter.ID) {
                 fighter.send(((CharacterFighter) this.currentFighter).FighterStatsListMessagePacket());
             }
@@ -1471,8 +1471,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
      }*/
     public synchronized void addNamedParty(Fighter Fighter, int Outcome) {
         if (Fighter instanceof CharacterFighter) {
-            if (((CharacterFighter) Fighter).Character.client != null && ((CharacterFighter) Fighter).Character.client.getParty() != null && !((CharacterFighter) Fighter).Character.client.getParty().partyName.isEmpty() && !Arrays.stream(this.myResult.namedPartyTeamsOutcomes).anyMatch(x -> x.team.partyName.equalsIgnoreCase(((CharacterFighter) Fighter).Character.client.getParty().partyName))) {
-                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(Fighter.team.Id, ((CharacterFighter) Fighter).Character.client.getParty().partyName), Outcome));
+            if (((CharacterFighter) Fighter).character.getClient() != null && ((CharacterFighter) Fighter).character.getClient().getParty() != null && !((CharacterFighter) Fighter).character.getClient().getParty().partyName.isEmpty() && !Arrays.stream(this.myResult.namedPartyTeamsOutcomes).anyMatch(x -> x.team.partyName.equalsIgnoreCase(((CharacterFighter) Fighter).character.getClient().getParty().partyName))) {
+                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(Fighter.team.Id, ((CharacterFighter) Fighter).character.getClient().getParty().partyName), Outcome));
             }
         }
     }

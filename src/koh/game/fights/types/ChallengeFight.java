@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.entities.environments.DofusMap;
 import koh.game.fights.Fight;
 import koh.game.fights.FightFormulas;
@@ -58,10 +57,10 @@ public class ChallengeFight extends Fight {
             AtomicReference<Long> xpTotal = new AtomicReference<>();
             xpTotal.set(FightFormulas.XPDefie(Fighter, Winners.getFighters(), Loosers.getFighters()));
             long GuildXp = FightFormulas.guildXpEarned((CharacterFighter) Fighter, xpTotal), MountXp = FightFormulas.mountXpEarned((CharacterFighter) Fighter, xpTotal);
-            ((CharacterFighter) Fighter).Character.addExperience(xpTotal.get(), false);
+            ((CharacterFighter) Fighter).character.addExperience(xpTotal.get(), false);
             this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
-                    this.experience = ((CharacterFighter) Fighter).Character.experience;
+                    this.experience = ((CharacterFighter) Fighter).character.experience;
                     this.showExperience = true;
                     this.experienceLevelFloor = DAO.getExps().getPlayerMinExp(Fighter.getLevel());
                     this.showExperienceLevelFloor = true;

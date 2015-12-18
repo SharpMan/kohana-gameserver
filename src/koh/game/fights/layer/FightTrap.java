@@ -36,7 +36,7 @@ public class FightTrap extends FightActivableObject {
         this.m_fight.sendToField(new FieldNotification(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, getHiddenGameActionMark())) {
             @Override
             public boolean can(Player perso) {
-                return !(perso.client != null && perso.getFighter() != null && perso.getFighter().team.Id == dispatcher.Id);
+                return !(perso.getClient() != null && perso.getFighter() != null && perso.getFighter().team.Id == dispatcher.Id);
             }
         });
         dispatcher.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.m_caster.ID, getGameActionMark()));

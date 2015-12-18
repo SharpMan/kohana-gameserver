@@ -37,7 +37,7 @@ public class ConditionParser_Old {
             req = havePO(req, perso, "Qa");
         }*/
         req = req.replace("&", "&&").replace("=", "==").replace("|", "||").replace("!", "!=");
-        try {
+        /*try {
             jep.addVariable("CI", perso.stats.getTotal(StatsEnum.Intelligence));
             jep.addVariable("CV", perso.stats.getTotal(StatsEnum.Vitality));
             jep.addVariable("CA", perso.stats.getTotal(StatsEnum.Agility));
@@ -73,7 +73,7 @@ public class ConditionParser_Old {
         } catch (JepException e) {
             logger.error("An error occurred: {} ", e.getMessage());
         }
-        return true;
+       */ return true;
     }
 
     public static String havePO(String cond, Player perso, String toReplace) {
@@ -89,7 +89,7 @@ public class ConditionParser_Old {
                 logger.error("False .. Condition " + cond);
                 continue;
             }
-            if (perso != null && perso.inventoryCache.hasItemId(Integer.parseInt(cur.split("[=]")[1]))) {
+            if (perso != null && perso.getInventoryCache().hasItemId(Integer.parseInt(cur.split("[=]")[1]))) {
                 value.add(Integer.valueOf(Integer.parseInt(cur.split("[=]")[1])));
             } else {
                 value.add(Integer.valueOf(-1));

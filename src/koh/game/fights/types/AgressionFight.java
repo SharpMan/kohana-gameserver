@@ -3,7 +3,6 @@ package koh.game.fights.types;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ExpDAOImpl;
 import koh.game.entities.environments.DofusMap;
 import koh.game.fights.AntiCheat;
 import koh.game.fights.Fight;
@@ -81,17 +80,17 @@ public class AgressionFight extends Fight {
         for (Fighter Fighter : (Iterable<Fighter>) Loosers.getFighters()::iterator) {
             super.addNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
             final short LossedHonor = (short) (FightFormulas.honorPoint(Fighter, Winners.getFighters(), Loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters(), Fighter, false));
-            ((CharacterFighter) Fighter).Character.addHonor(LossedHonor, true);
-            ((CharacterFighter) Fighter).Character.dishonor += FightFormulas.calculateEarnedDishonor(Fighter);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).Character.alignmentGrade, DAO.getExps().getLevel(((CharacterFighter) Fighter).Character.alignmentGrade).getPvP(), DAO.getExps().getLevel(((CharacterFighter) Fighter).Character.alignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).Character.alignmentGrade + 1).getPvP(), ((CharacterFighter) Fighter).Character.honor, LossedHonor)}));
+            ((CharacterFighter) Fighter).character.addHonor(LossedHonor, true);
+            ((CharacterFighter) Fighter).character.dishonor += FightFormulas.calculateEarnedDishonor(Fighter);
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).character.alignmentGrade, DAO.getExps().getLevel(((CharacterFighter) Fighter).character.alignmentGrade).getPvP(), DAO.getExps().getLevel(((CharacterFighter) Fighter).character.alignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).character.alignmentGrade + 1).getPvP(), ((CharacterFighter) Fighter).character.honor, LossedHonor)}));
         }
 
         for (Fighter Fighter : (Iterable<Fighter>) Winners.getFighters()::iterator) {
             super.addNamedParty(Fighter, FightOutcomeEnum.RESULT_VICTORY);
             final short LossedHonor = (short) (FightFormulas.honorPoint(Fighter, Winners.getFighters(), Loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters(), Fighter, true));
-            ((CharacterFighter) Fighter).Character.addHonor(LossedHonor, true);
-            ((CharacterFighter) Fighter).Character.dishonor += FightFormulas.calculateEarnedDishonor(Fighter);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).Character.alignmentGrade, DAO.getExps().getLevel(((CharacterFighter) Fighter).Character.alignmentGrade).getPvP(), DAO.getExps().getLevel(((CharacterFighter) Fighter).Character.alignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).Character.alignmentGrade + 1).getPvP(), ((CharacterFighter) Fighter).Character.honor, LossedHonor)}));
+            ((CharacterFighter) Fighter).character.addHonor(LossedHonor, true);
+            ((CharacterFighter) Fighter).character.dishonor += FightFormulas.calculateEarnedDishonor(Fighter);
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, Fighter.wave, new FightLoot(new int[0], 0), Fighter.ID, Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) Fighter).character.alignmentGrade, DAO.getExps().getLevel(((CharacterFighter) Fighter).character.alignmentGrade).getPvP(), DAO.getExps().getLevel(((CharacterFighter) Fighter).character.alignmentGrade == 10 ? 10 : ((CharacterFighter) Fighter).character.alignmentGrade + 1).getPvP(), ((CharacterFighter) Fighter).character.honor, LossedHonor)}));
         }
         super.endFight();
     }
@@ -115,9 +114,9 @@ public class AgressionFight extends Fight {
     @Override
     public GameFightEndMessage leftEndMessage(Fighter Leaver) { //Fixme je ai le call des classes implement comme ça faut trouver une solution
         short LossedHonor = FightFormulas.honorPoint(Leaver, this.getEnnemyTeam(Leaver.team).getFighters().filter(x -> x.summoner == null), Leaver.team.getFighters().filter(x -> x.summoner == null), true, false);
-        ((CharacterFighter) Leaver).Character.addHonor(LossedHonor, true);
-        ((CharacterFighter) Leaver).Character.dishonor += FightFormulas.calculateEarnedDishonor(Leaver);
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.summoner == null).map(x -> new FightResultPlayerListEntry(x.team.Id == Leaver.team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.isAlive(), (byte) x.getLevel(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) x).Character.alignmentGrade, DAO.getExps().getLevel(((CharacterFighter) x).Character.alignmentGrade).getPvP(), DAO.getExps().getLevel(((CharacterFighter) x).Character.alignmentGrade == 10 ? 10 : ((CharacterFighter) x).Character.alignmentGrade + 1).getPvP(), ((CharacterFighter) x).Character.honor, x.ID == Leaver.ID ? LossedHonor : 0)})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+        ((CharacterFighter) Leaver).character.addHonor(LossedHonor, true);
+        ((CharacterFighter) Leaver).character.dishonor += FightFormulas.calculateEarnedDishonor(Leaver);
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.AgeBonus, (short) 0, this.Fighters().filter(x -> x.summoner == null).map(x -> new FightResultPlayerListEntry(x.team.Id == Leaver.team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.ID, x.isAlive(), (byte) x.getLevel(), new FightResultPvpData[]{new FightResultPvpData(((CharacterFighter) x).character.alignmentGrade, DAO.getExps().getLevel(((CharacterFighter) x).character.alignmentGrade).getPvP(), DAO.getExps().getLevel(((CharacterFighter) x).character.alignmentGrade == 10 ? 10 : ((CharacterFighter) x).character.alignmentGrade + 1).getPvP(), ((CharacterFighter) x).character.honor, x.ID == Leaver.ID ? LossedHonor : 0)})).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
 }

@@ -18,7 +18,7 @@ public class AddSpellPoint extends ItemAction {
 
     @Override
     public boolean execute(Player p) {
-        if(!super.execute(p) || !p.client.canGameAction(GameActionTypeEnum.CHANGE_MAP))
+        if(!super.execute(p) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         p.setSpellPoints(p.getSpellPoints() + spellPoints);
         p.refreshStats();

@@ -106,31 +106,31 @@ public class CharacterHandler {
     public static void CharacterSelectionMessage(WorldClient Client, int id) {
         try {
 
-            Player Character = Client.getAccount().getPlayer(id);
-            if (Character == null) {
+            Player character = Client.getAccount().getPlayer(id);
+            if (character == null) {
                 Client.send(new CharacterSelectedErrorMessage());
             } else {
-                Client.character = Character;
-                Character.client = Client;
-                Character.initialize();
-                Client.getAccount().currentCharacter = Character;
+                Client.character = character;
+                character.setClient(Client);
+                character.initialize();
+                Client.getAccount().currentCharacter = character;
                 Client.sequenceMessage();
                 //client.send(new ComicReadingBeginMessage(79));
-                Client.send(new EnabledChannelsMessage(Character.ennabledChannels, Character.DisabledChannels));
+                Client.send(new EnabledChannelsMessage(character.getEnnabledChannels(), character.getDisabledChannels()));
                 Client.send(new NotificationListMessage(new int[]{2147483647}));
-                Client.send(new CharacterSelectedSuccessMessage(Character.toBaseInformations(), false));
+                Client.send(new CharacterSelectedSuccessMessage(character.toBaseInformations(), false));
                 Client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
-                Client.send(new InventoryContentMessage(Character.inventoryCache.toObjectsItem(), Character.kamas));
-                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Character.shortcuts.toShortcuts(Character)));
-                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, Character.mySpells.toShortcuts()));
-                Client.send(new EmoteListMessage(Character.emotes));
-                Client.send(new JobDescriptionMessage(Character.myJobs.getDescriptions()));
-                Client.send(new JobExperienceMultiUpdateMessage(Character.myJobs.getExperiences()));
-                Client.send(new JobCrafterDirectorySettingsMessage(Character.myJobs.getSettings()));
+                Client.send(new InventoryContentMessage(character.getInventoryCache().toObjectsItem(), character.getKamas()));
+                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, character.getShortcuts().toShortcuts(character)));
+                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, character.getMySpells().toShortcuts()));
+                Client.send(new EmoteListMessage(character.getEmotes()));
+                Client.send(new JobDescriptionMessage(character.getMyJobs().getDescriptions()));
+                Client.send(new JobExperienceMultiUpdateMessage(character.getMyJobs().getExperiences()));
+                Client.send(new JobCrafterDirectorySettingsMessage(character.getMyJobs().getSettings()));
 
-                Client.send(new SpellListMessage(true, Character.mySpells.toSpellItems()));
-                Client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false), Character.ID));
-                Client.send(new InventoryWeightMessage(Character.inventoryCache.getWeight(), Character.inventoryCache.getTotalWeight()));
+                Client.send(new SpellListMessage(true, character.getMySpells().toSpellItems()));
+                Client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false), character.ID));
+                Client.send(new InventoryWeightMessage(character.getInventoryCache().getWeight(), character.getInventoryCache().getTotalWeight()));
                 //GuilMember =! null
                 Client.send(new FriendWarnOnConnectionStateMessage(Client.getAccount().accountData.friend_warn_on_login));
                 Client.send(new FriendWarnOnLevelGainStateMessage(Client.getAccount().accountData.friend_warn_on_level_gain));
@@ -154,9 +154,9 @@ public class CharacterHandler {
 
                 //client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
                 Client.send(new CharacterCapabilitiesMessage(4095));
-                if (Client.character.mountInfo.mount != null) {
-                    Client.send(new MountSetMessage(Client.character.mountInfo.mount));
-                    Client.send(new MountXpRatioMessage(Client.character.mountInfo.ratio));
+                if (Client.character.getMountInfo().mount != null) {
+                    Client.send(new MountSetMessage(Client.character.getMountInfo().mount));
+                    Client.send(new MountXpRatioMessage(Client.character.getMountInfo().ratio));
                     Client.send(new MountRidingMessage(true));
                 }
                 Client.getAccount().last_login = new Timestamp(System.currentTimeMillis());
@@ -170,14 +170,14 @@ public class CharacterHandler {
     }
 
     public static void SendCharacterStatsListMessage(WorldClient client) {
-        client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.character.experience, (double) DAO.getExps().getPlayerMinExp(client.character.level), (double) DAO.getExps().getPlayerMaxExp(client.character.level), client.character.kamas, client.character.statPoints, 0, client.character.spellPoints, client.character.getActorAlignmentExtendInformations(),
+        client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.character.experience, (double) DAO.getExps().getPlayerMinExp(client.character.getLevel()), (double) DAO.getExps().getPlayerMaxExp(client.character.getLevel()), client.character.getKamas(), client.character.statPoints, 0, client.character.spellPoints, client.character.getActorAlignmentExtendInformations(),
                 client.character.life, client.character.getMaxLife(), client.character.energy, PlayerEnum.MaxEnergy,
                 (short) client.character.stats.getTotal(StatsEnum.ActionPoints), (short) client.character.stats.getTotal(StatsEnum.MovementPoints),
                 new CharacterBaseCharacteristic(client.character.getInitiative(true), 0, client.character.stats.getItem(StatsEnum.Initiative), 0, 0), client.character.stats.getEffect(StatsEnum.Prospecting), client.character.stats.getEffect(StatsEnum.ActionPoints),
                 client.character.stats.getEffect(StatsEnum.MovementPoints), client.character.stats.getEffect(StatsEnum.Strength), client.character.stats.getEffect(StatsEnum.Vitality),
                 client.character.stats.getEffect(StatsEnum.Wisdom), client.character.stats.getEffect(StatsEnum.Chance), client.character.stats.getEffect(StatsEnum.Agility),
                 client.character.stats.getEffect(StatsEnum.Intelligence), client.character.stats.getEffect(StatsEnum.Add_Range), client.character.stats.getEffect(StatsEnum.AddSummonLimit),
-                client.character.stats.getEffect(StatsEnum.DamageReflection), client.character.stats.getEffect(StatsEnum.Add_CriticalHit), (short) client.character.inventoryCache.weaponCriticalHit(),
+                client.character.stats.getEffect(StatsEnum.DamageReflection), client.character.stats.getEffect(StatsEnum.Add_CriticalHit), (short) client.character.getInventoryCache().weaponCriticalHit(),
                 client.character.stats.getEffect(StatsEnum.CriticalMiss), client.character.stats.getEffect(StatsEnum.Add_Heal_Bonus), client.character.stats.getEffect(StatsEnum.AllDamagesBonus),
                 client.character.stats.getEffect(StatsEnum.WeaponDamagesBonusPercent), client.character.stats.getEffect(StatsEnum.AddDamagePercent), client.character.stats.getEffect(StatsEnum.TrapBonus),
                 client.character.stats.getEffect(StatsEnum.Trap_Damage_Percent), client.character.stats.getEffect(StatsEnum.GlyphBonusPercent), client.character.stats.getEffect(StatsEnum.PermanentDamagePercent), client.character.stats.getEffect(StatsEnum.Add_TackleBlock),

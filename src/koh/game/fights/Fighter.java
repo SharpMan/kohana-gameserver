@@ -459,7 +459,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public byte getVisibleStateFor(Player character) {
         if (this.team.getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner.ID == this.ID)) {
             return GameActionFightInvisibilityStateEnum.VISIBLE.value;
-        } else if (character == null || character.client == null || character.getFighter() == null || character.getFight() != this.fight) {
+        } else if (character == null || character.getClient() == null || character.getFighter() == null || character.getFight() != this.fight) {
             return this.visibleState.value;
         } else {
             return !character.getFighter().isFriendlyWith(this) || this.visibleState == GameActionFightInvisibilityStateEnum.VISIBLE ? this.visibleState.value : GameActionFightInvisibilityStateEnum.DETECTED.value;
@@ -467,7 +467,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public boolean isMyFriend(Player character) {
-        if (character == null || character.client == null || character.getFighter() == null || character.getFight() != this.fight) {
+        if (character == null || character.getClient() == null || character.getFighter() == null || character.getFight() != this.fight) {
             return false;
         }
         return character.getFighter().isFriendlyWith(this);

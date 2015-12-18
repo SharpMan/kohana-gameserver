@@ -44,49 +44,49 @@ import koh.protocol.types.game.friend.IgnoredOnlineInformations;
 public class FriendHandler {
 
     @HandlerAttribute(ID = IgnoredAddRequestMessage.M_ID)
-    public static void HandleIgnoredAddRequestMessage(WorldClient Client, IgnoredAddRequestMessage Message) {
-        Player Target = DAO.getPlayers().getCharacter(Message.name);
-        if (Target == null || Target.client == null) {
+    public static void HandleIgnoredAddRequestMessage(WorldClient Client, IgnoredAddRequestMessage message) {
+        Player target = DAO.getPlayers().getCharacter(message.name);
+        if (target == null || target.getClient() == null) {
             Client.send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
-        } else if (Client.getAccount().accountData.ignore(Target.account.id)) {
+        } else if (Client.getAccount().accountData.ignore(target.getAccount().id)) {
             Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_IS_DOUBLE));
         } else if (Client.getAccount().accountData.ignored.length >= ListAddFailureEnum.MAX_QUOTA) {
             Client.send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_OVER_QUOTA));
         } else {
             Client.getAccount().accountData.addIgnored(new IgnoredContact() {
                 {
-                    accountID = Target.account.id;
-                    accountName = Target.account.nickName;
+                    accountID = target.getAccount().id;
+                    accountName = target.getAccount().nickName;
                 }
             });
-            Client.send(new IgnoredAddedMessage(new IgnoredOnlineInformations(Target.account.id, Target.account.nickName, Target.ID, Target.nickName, Target.breed, Target.sexe == 1), Message.session));
+            Client.send(new IgnoredAddedMessage(new IgnoredOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.ID, target.getNickName(), target.getBreed(), target.hasSexe()), message.session));
         }
     }
 
     @HandlerAttribute(ID = FriendAddRequestMessage.ID)
     public static void HandleFriendAddRequestMessage(WorldClient Client, FriendAddRequestMessage Message) {
-        Player Target = DAO.getPlayers().getCharacter(Message.Name);
-        if (Target == null || Target.client == null) {
+        Player target = DAO.getPlayers().getCharacter(Message.Name);
+        if (target == null || target.getClient() == null) {
             Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
-        } else if (Target.account == null || Target.account.accountData == null) {
+        } else if (target.getAccount() == null || target.getAccount().accountData == null) {
             Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
-        } else if (Client.getAccount().accountData.hasFriend(Target.account.id)) {
+        } else if (Client.getAccount().accountData.hasFriend(target.getAccount().id)) {
             Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_IS_DOUBLE));
         } else if (Client.getAccount().accountData.friends.length >= ListAddFailureEnum.MAX_QUOTA) {
             Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_OVER_QUOTA));
         } else {
             Client.getAccount().accountData.addFriend(new FriendContact() {
                 {
-                    accountID = Target.account.id;
-                    accountName = Target.account.nickName;
+                    accountID = target.getAccount().id;
+                    accountName = target.getAccount().nickName;
                     lastConnection = System.currentTimeMillis();
-                    achievementPoints = Target.achievementPoints;
+                    achievementPoints = target.getAchievementPoints();
                 }
             });
-            if (Target.account.accountData.hasFriend(Client.getAccount().id)) {
-                Client.send(new FriendAddedMessage(new FriendOnlineInformations(Target.account.id, Target.account.nickName, Target.getPlayerState(), -1, Target.achievementPoints, Target.ID, Target.nickName, (byte) Target.level, Target.alignmentSide.value, Target.breed, Target.sexe == 1, Target.getBasicGuildInformations(), Target.moodSmiley, new PlayerStatus(Target.status.value()))));
+            if (target.getAccount().accountData.hasFriend(Client.getAccount().id)) {
+                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.ID, target.getNickName(), (byte) target.getLevel(), target.getAlignmentSide().value, target.getBreed(), target.hasSexe(), target.getBasicGuildInformations(), target.getMoodSmiley(), new PlayerStatus(target.getStatus().value()))));
             } else {
-                Client.send(new FriendAddedMessage(new FriendOnlineInformations(Target.account.id, Target.account.nickName, PlayerStateEnum.UNKNOWN_STATE, -1, Target.achievementPoints, Target.ID, Target.nickName, (byte) 0, (byte) -1, Target.breed, Target.sexe == 1, new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(Target.status.value()))));
+                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, PlayerStateEnum.UNKNOWN_STATE, -1, target.getAchievementPoints(), target.ID, target.getNickName(), (byte) 0, (byte) -1, target.getBreed(), target.hasSexe(), new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(target.getStatus().value()))));
             }
         }
     }

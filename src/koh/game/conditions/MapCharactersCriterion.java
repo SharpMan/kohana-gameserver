@@ -8,10 +8,10 @@ import koh.game.entities.actors.Player;
  */
 public class MapCharactersCriterion extends Criterion {
 
-    public static String Identifier = "MK";
+    public static final String IDENTIFIER = "MK";
 
-    public int MapId;
-    public int CharactersCount;
+    public int mapId;
+    public int charactersCount;
 
     @Override
     public String toString() {
@@ -20,22 +20,22 @@ public class MapCharactersCriterion extends Criterion {
 
     @Override
     public void Build() {
-        if (this.Literal.contains(",")) {
-            this.CharactersCount = Integer.parseInt(Literal.split(",")[0]);
-            this.MapId = Integer.parseInt(Literal.split(",")[1]);
+        if (this.literal.contains(",")) {
+            this.charactersCount = Integer.parseInt(literal.split(",")[0]);
+            this.mapId = Integer.parseInt(literal.split(",")[1]);
         } else {
-            this.CharactersCount = Integer.parseInt(Literal);
-            this.MapId = -1;
+            this.charactersCount = Integer.parseInt(literal);
+            this.mapId = -1;
         }
     }
 
     @Override
     public boolean eval(Player character) {
-        int count = character.currentMap.playersCount();
-        if (this.MapId != -1) {
-            return this.Compare((Comparable<Integer>) character.currentMap.getId(), this.MapId) && this.Compare((Comparable<Integer>) count, this.CharactersCount);
+        int count = character.getCurrentMap().playersCount();
+        if (this.mapId != -1) {
+            return this.Compare((Comparable<Integer>) character.getCurrentMap().getId(), this.mapId) && this.Compare((Comparable<Integer>) count, this.charactersCount);
         } else {
-            return this.Compare((Comparable<Integer>) count, this.CharactersCount);
+            return this.Compare((Comparable<Integer>) count, this.charactersCount);
         }
     }
 

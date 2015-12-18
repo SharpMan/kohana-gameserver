@@ -24,7 +24,7 @@ public class Kamas extends ItemAction {
         int curKamas = p.kamas;
         int newKamas = curKamas + count;
         if(newKamas <0) newKamas = 0;
-        p.inventoryCache.addKamas(newKamas);
+        p.getInventoryCache().addKamas(newKamas);
         return true;
     }
 }

@@ -27,7 +27,7 @@ public class SmileyHandler {
             Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((Client.lastChannelMessage.get(SMILEY_CHANNEL) + 5000L - System.currentTimeMillis()) / 1000) + ""}));
             return;
         }
-        Client.character.currentMap.sendToField(new ChatSmileyMessage(Client.character.ID, Message.smileyId, 0));
+        Client.character.getCurrentMap().sendToField(new ChatSmileyMessage(Client.character.ID, Message.smileyId, 0));
         Client.lastChannelMessage.put(SMILEY_CHANNEL, System.currentTimeMillis());
     }
 

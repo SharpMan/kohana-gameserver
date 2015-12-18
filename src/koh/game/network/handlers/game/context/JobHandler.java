@@ -14,8 +14,8 @@ public class JobHandler {
 
     @HandlerAttribute(ID = JobCrafterDirectoryDefineSettingsMessage.M_ID)
     public static void HandleJobCrafterDirectoryDefineSettingsMessage(WorldClient Client, JobCrafterDirectoryDefineSettingsMessage Message) {
-        Client.character.myJobs.getJob(Message.settings.jobId).minLevel = Message.settings.minLevel;
-        Client.character.myJobs.getJob(Message.settings.jobId).free = Message.settings.free;
+        Client.character.getMyJobs().getJob(Message.settings.jobId).minLevel = Message.settings.minLevel;
+        Client.character.getMyJobs()s.getJob(Message.settings.jobId).free = Message.settings.free;
         Client.send(new JobCrafterDirectorySettingsMessage(new JobCrafterDirectorySettings[] { Message.settings }));
 
     }

@@ -9,8 +9,6 @@ import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.MonsterFighter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.stream.Stream;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
@@ -79,7 +77,7 @@ public class FightTeam {
             return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
         }
         if (this.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)) {
-            if (!(((CharacterFighter) this.Leader).Character.client.getParty() != null && ((CharacterFighter) this.Leader).Character.client.getParty().containsPlayer(Character))) {
+            if (!(((CharacterFighter) this.Leader).character.getClient().getParty() != null && ((CharacterFighter) this.Leader).character.getClient().getParty().containsPlayer(Character))) {
                 return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
             }
         }
@@ -154,7 +152,7 @@ public class FightTeam {
         this.Fight.sendToField(new FieldNotification(Message) {
             @Override
             public boolean can(Player perso) {
-                return perso.client != null && perso.getFighter() != null && perso.getFighter().team.Id == Id;
+                return perso.getClient() != null && perso.getFighter() != null && perso.getFighter().team.Id == Id;
             }
         });
     }

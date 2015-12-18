@@ -22,7 +22,7 @@ public class AddJobExperience extends ItemAction {
     public boolean execute(Player p) {
         if(!super.execute(p))
             return false;
-        p.myJobs.addExperience(p,jobID,xpValue);
+        p.getMyJobs().addExperience(p,jobID,xpValue);
         return true;
     }
 }

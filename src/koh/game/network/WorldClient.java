@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
-import koh.game.Main;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameParty;
@@ -38,6 +37,8 @@ import koh.protocol.messages.game.basic.BasicAckMessage;
 import koh.protocol.messages.game.basic.BasicLatencyStatsMessage;
 import koh.protocol.messages.game.basic.BasicTimeMessage;
 import koh.protocol.messages.secure.TrustStatusMessage;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
@@ -51,6 +52,7 @@ public class WorldClient {
     private final IoSession session;
     public AccountTicket tempTicket;
     public boolean showQueue;
+    @Getter @Setter
     public Player character;
     public String clientKey;
     private final Map<GameActionTypeEnum, GameAction> myActions = Collections.synchronizedMap(new HashMap<GameActionTypeEnum, GameAction>());
@@ -291,7 +293,7 @@ public class WorldClient {
         if (this.partyRequests != null) {
             for (PartyRequest req : this.partyRequests) {
                 if (req.requester == this) {
-                    req.Abort();
+                    req.abort();
                 } else {
                     req.declin();
                 }
@@ -306,7 +308,7 @@ public class WorldClient {
 
         this.showQueue = false;
         if (this.character != null) {
-            logger.debug("Player {} disconnected",this.character.nickName);
+            logger.debug("Player {} disconnected",this.character.getNickName());
             ChatChannel.unRegister(this);
             this.character.onDisconnect();
             this.character = null;

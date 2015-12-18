@@ -21,7 +21,7 @@ public class AddBaseStat  extends ItemAction {
 
     @Override
     public boolean execute(Player p) {
-        if(!super.execute(p) || p.client.isGameAction(GameActionTypeEnum.FIGHT))
+        if(!super.execute(p) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         //TODO : LOG it in db column
         p.stats.addBase(StatsEnum.valueOf(statId),number);

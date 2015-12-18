@@ -26,7 +26,7 @@ public class TeleporterUse implements InteractiveAction {
             actor.send(new BasicNoOperationMessage());
             return;
         }
-        actor.client.addGameAction(new TeleporterAction(actor));
+        actor.getClient().addGameAction(new TeleporterAction(actor));
     }
 
     @Override

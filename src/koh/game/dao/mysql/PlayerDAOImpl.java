@@ -69,7 +69,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             delCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
                             accountInUnload.add(ref.second.account.id);
                             cleanMap(ref.second);
-                            logger.debug("player " + ref.second.nickName + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
+                            logger.debug("player " + ref.second.getNickName() + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
                             ref.second.save(true);
                             MySQL.needCommit = true;
                         }
@@ -225,30 +225,30 @@ public class PlayerDAOImpl extends PlayerDAO {
     public boolean update(Player character, boolean clear) {
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `character` set breed = ?,skins = ?,scales = ?,sex = ?,level = ?,colors = ?,map = ?,cell = ?,chat_channels = ?,stat_points = ?,spell_points = ?,stats = ?,spells = ?,kamas = ?,shortcuts = ?,savedpos = ? ,entity_look = ?,emotes = ?,tinsel = ?,mount_informations = ?,job_informations = ?,honor_points = ?, alignment_informations = ?, scores = ? WHERE id = ?;")) {
             PreparedStatement pStatement = conn.getStatement();
-            pStatement.setInt(1, character.breed);
-            pStatement.setString(2, StringUtils.join(character.skins, ','));
-            pStatement.setString(3, StringUtils.join(character.scales, ','));
-            pStatement.setInt(4, character.sexe);
-            pStatement.setInt(5, character.level);
-            pStatement.setString(6, StringUtils.join(character.indexedColors, ','));
-            pStatement.setInt(7, character.currentMap.getId());
+            pStatement.setInt(1, character.getBreed());
+            pStatement.setString(2, StringUtils.join(character.getSkins(), ','));
+            pStatement.setString(3, StringUtils.join(character.getScales(), ','));
+            pStatement.setInt(4, character.getSexe());
+            pStatement.setInt(5, character.getLevel());
+            pStatement.setString(6, StringUtils.join(character.getIndexedColors(), ','));
+            pStatement.setInt(7, character.getCurrentMap().getId());
             pStatement.setInt(8, character.cell.getId());
-            pStatement.setString(9, StringUtils.join(character.ennabledChannels, ','));
-            pStatement.setInt(10, character.statPoints);
-            pStatement.setInt(11, character.spellPoints);
+            pStatement.setString(9, StringUtils.join(character.getEnnabledChannels(), ','));
+            pStatement.setInt(10, character.getStatPoints());
+            pStatement.setInt(11, character.getSpellPoints());
             pStatement.setString(12, character.vitality + "," + character.wisdom + "," + character.strength + "," + character.intell + "," + character.agility + "," + character.chance + "," + character.life + "," + character.experience + "," + character.activableTitle + "," + character.activableOrnament);
             pStatement.setBytes(13, character.mySpells.serialize());
-            pStatement.setLong(14, character.kamas);
-            pStatement.setBytes(15, character.shortcuts.serialize());
-            pStatement.setString(16, character.savedMap + "," + character.savedCell);
+            pStatement.setLong(14, character.getKamas());
+            pStatement.setBytes(15, character.getShortcuts().serialize());
+            pStatement.setString(16, character.getSavedMap() + "," + character.getSavedCell());
             pStatement.setString(17, EntityLookParser.ConvertToString(character.getEntityLook()));
-            pStatement.setString(18, Enumerable.Join(character.emotes, ','));
-            pStatement.setString(19, Enumerable.Join(character.ornaments, ',') + ";" + Enumerable.Join(character.titles, ','));
-            pStatement.setBytes(20, character.mountInfo.serialize());
-            pStatement.setBytes(21, character.myJobs.serialize());
-            pStatement.setInt(22, character.honor);
-            pStatement.setString(23, character.alignmentValue + "," + character.PvPEnabled + "," + character.alignmentSide.value + "," + character.dishonor);
-            pStatement.setString(24, StringUtils.join(character.scores.values(), ','));
+            pStatement.setString(18, Enumerable.Join(character.getEmotes(), ','));
+            pStatement.setString(19, Enumerable.Join(character.getOrnaments(), ',') + ";" + Enumerable.Join(character.getTitles(), ','));
+            pStatement.setBytes(20, character.getMountInfo().serialize());
+            pStatement.setBytes(21, character.getMyJobs().serialize());
+            pStatement.setInt(22, character.getHonor());
+            pStatement.setString(23, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor();
+            pStatement.setString(24, StringUtils.join(character.getScores().values(), ','));
             pStatement.setInt(25, character.ID);
 
             pStatement.executeUpdate();
@@ -270,30 +270,30 @@ public class PlayerDAOImpl extends PlayerDAO {
             PreparedStatement pStatement = conn.getStatement();
 
             pStatement.setInt(1, character.ID);
-            pStatement.setInt(2, character.owner);
-            pStatement.setString(3, character.nickName);
-            pStatement.setInt(4, character.breed);
-            pStatement.setString(5, StringUtils.join(character.skins, ','));
-            pStatement.setString(6, StringUtils.join(character.scales, ','));
-            pStatement.setInt(7, character.sexe);
-            pStatement.setInt(8, character.level);
-            pStatement.setString(9, StringUtils.join(character.indexedColors, ','));
-            pStatement.setInt(10, character.mapid);
-            pStatement.setInt(11, character.cell.getId());
-            pStatement.setString(12, StringUtils.join(character.ennabledChannels, ','));
-            pStatement.setInt(13, character.statPoints);
-            pStatement.setInt(14, character.spellPoints);
-            pStatement.setString(15, character.vitality + "," + character.wisdom + "," + character.strength + "," + character.intell + "," + character.agility + "," + character.chance + "," + character.life + "," + character.experience + "," + character.activableTitle + "," + character.activableOrnament);
-            pStatement.setBytes(16, character.mySpells.serialize());
-            pStatement.setBytes(17, character.shortcuts.serialize());
-            pStatement.setString(18, character.savedMap + "," + character.savedCell);
+            pStatement.setInt(2, character.getOwner());
+            pStatement.setString(3, character.getNickName());
+            pStatement.setInt(4, character.getBreed());
+            pStatement.setString(5, StringUtils.join(character.getSkins(), ','));
+            pStatement.setString(6, StringUtils.join(character.getScales(), ','));
+            pStatement.setInt(7, character.getSexe());
+            pStatement.setInt(8, character.getLevel());
+            pStatement.setString(9, StringUtils.join(character.getIndexedColors(), ','));
+            pStatement.setInt(10, character.getMapid());
+            pStatement.setInt(11, character.getCell().getId());
+            pStatement.setString(12, StringUtils.join(character.getEnnabledChannels(), ','));
+            pStatement.setInt(13, character.getStatPoints());
+            pStatement.setInt(14, character.getSpellPoints());
+            pStatement.setString(15, character.getVitality()+ "," + character.getWisdom() + "," + character.getStrength() + "," + character.getIntell() + "," + character.getAgility() + "," + character.getChance() + "," + character.getLife() + "," + character.getExperience() + "," + character.getActivableTitle() + "," + character.getActivableOrnament());
+            pStatement.setBytes(16, character.getMySpells().serialize());
+            pStatement.setBytes(17, character.getShortcuts().serialize());
+            pStatement.setString(18, character.getSavedMap() + "," + character.getSavedCell());
             pStatement.setString(19, EntityLookParser.ConvertToString(character.getEntityLook()));
-            pStatement.setString(20, Enumerable.Join(character.emotes, ','));
-            pStatement.setString(21, Enumerable.Join(character.ornaments, ',') + ";" + Enumerable.Join(character.titles, ','));
-            pStatement.setBytes(22, character.myJobs.serialize());
-            pStatement.setInt(23, character.honor);
-            pStatement.setString(24, character.alignmentValue + "," + character.PvPEnabled + "," + character.alignmentSide.value + "," + character.dishonor);
-            pStatement.setString(25, StringUtils.join(character.scores.values(), ','));
+            pStatement.setString(20, Enumerable.Join(character.getEmotes(), ','));
+            pStatement.setString(21, Enumerable.Join(character.getOrnaments(), ',') + ";" + Enumerable.Join(character.getTitles(), ','));
+            pStatement.setBytes(22, character.getMyJobs().serialize());
+            pStatement.setInt(23, character.getHonor());
+            pStatement.setString(24, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor());
+            pStatement.setString(25, StringUtils.join(character.getScores().values(), ','));
             pStatement.execute();
             ResultSet resultSet = pStatement.getGeneratedKeys();
             if(!resultSet.first())//character not created ?
@@ -329,19 +329,19 @@ public class PlayerDAOImpl extends PlayerDAO {
     @Override
     public void addCharacter(Player character) {
         myCharacterById.put(character.ID, character);
-        myCharacterByName.put(character.nickName.toLowerCase(), character);
+        myCharacterByName.put(character.getNickName().toLowerCase(), character);
     }
 
     @Override
     public Player getCharacterByAccount(int id) {
-       return myCharacterById.values().stream().filter(x -> x.client != null && x.account != null && x.account.id == id).findFirst().orElse(null);
+       return myCharacterById.values().stream().filter(x -> x.getClient() != null && x.getAccount() != null && x.getAccount().id == id).findFirst().orElse(null);
 
     }
 
     @Override
     public void delCharacter(Player character) {
         myCharacterById.remove(character.ID);
-        myCharacterByName.remove(character.nickName.toLowerCase());
+        myCharacterByName.remove(character.getNickName().toLowerCase());
     }
 
     @Override

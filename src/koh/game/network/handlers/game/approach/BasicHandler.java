@@ -17,17 +17,17 @@ import koh.protocol.types.game.social.AbstractSocialGroupInfos;
 public class BasicHandler {
 
     @HandlerAttribute(ID = BasicWhoIsRequestMessage.MESSAGE_ID)
-    public static void HandleBasicWhoIsRequestMessage(WorldClient Client, BasicWhoIsRequestMessage Message) {
+    public static void HandleBasicWhoIsRequestMessage(WorldClient Client, BasicWhoIsRequestMessage message) {
         //TODO: Maybe anti flood
-        Player Shearch = DAO.getPlayers().getCharacter(Message.search.toLowerCase());
-        if (Shearch == null) {
-            Client.send(new BasicWhoIsNoMatchMessage(Message.search));
+        Player victim = DAO.getPlayers().getCharacter(message.search.toLowerCase());
+        if (victim == null) {
+            Client.send(new BasicWhoIsNoMatchMessage(message.search));
             return;
         }
         /*AlianceInfo GuildInfo */
         // TODO AreaID;
 
-        Client.send(new BasicWhoIsMessage(Message.search.equals(Shearch.nickName), Shearch.account.right, Shearch.account.nickName, Shearch.account.id, Shearch.nickName, Shearch.ID, (short) 0, new AbstractSocialGroupInfos[0], Message.verbose, Shearch.status.value()));
+        Client.send(new BasicWhoIsMessage(message.search.equals(victim.getNickName()), victim.getAccount().right, victim.getAccount().nickName, victim.getAccount().id, victim.getNickName(), victim.ID, (short) 0, new AbstractSocialGroupInfos[0], message.verbose, victim.getStatus().value()));
     }
 
     @HandlerAttribute(ID = BasicLatencyStatsMessage.MESSAGE_ID)

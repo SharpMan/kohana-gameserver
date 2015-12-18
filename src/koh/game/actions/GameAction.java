@@ -30,7 +30,7 @@ public abstract class GameAction {
     
     public WorldClient getClient(){
         try{
-            return ((Player) actor).client;
+            return ((Player) actor).getClient();
         }
         catch(Exception e){
             return null;

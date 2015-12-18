@@ -16,7 +16,7 @@ public class CloseReply extends NpcReply {
             return false;
         }
         try {
-            p.client.endGameAction(GameActionTypeEnum.NPC_DAILOG);
+            p.getClient().endGameAction(GameActionTypeEnum.NPC_DAILOG);
         } catch (Exception e) {
         }
         return true;

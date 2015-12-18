@@ -2,13 +2,12 @@ package koh.game.fights;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
-import koh.game.Main;
+
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
 import koh.game.fights.fighters.CharacterFighter;
-import koh.game.utils.Settings;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.mount.MountSetMessage;
@@ -38,7 +37,7 @@ public class FightFormulas {
         }
 
         if (System.currentTimeMillis() - Fighter.fight.fightTime > 2 * 60 * 1000) {
-            ((CharacterFighter) Fighter).Character.addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
+            ((CharacterFighter) Fighter).character.addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
         }
 
         if (End && Fighter.fight.getWinners().getFighters().count() == 1L && Fighter.fight.getWinners().getFighters().count() == Fighter.fight.getEnnemyTeam(Fighter.fight.getWinners()).getFighters().count()) {
@@ -49,8 +48,8 @@ public class FightFormulas {
         double num2 = (double) Lossers.mapToInt(x -> x.getLevel()).sum();
         double num3 = Math.floor(Math.sqrt((double) Fighter.getLevel()) * 10.0 * (num2 / num1));
         if (isLosser) {
-            if (num3 > ((CharacterFighter) Fighter).Character.honor) {
-                num3 = -(short) ((CharacterFighter) Fighter).Character.honor;
+            if (num3 > ((CharacterFighter) Fighter).character.honor) {
+                num3 = -(short) ((CharacterFighter) Fighter).character.honor;
             } else {
                 num3 = -num3;
             }
@@ -84,16 +83,16 @@ public class FightFormulas {
     }
 
     public static long guildXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
-        if (Fighter.Character == null) {
+        if (Fighter.character == null) {
             return 0;
         }
-        if (Fighter.Character.guild == null) {
+        if (Fighter.character.guild == null) {
             return 0;
         }
 
-        GuildMember gm = Fighter.Character.getGuildMember();
+        GuildMember gm = Fighter.character.getGuildMember();
 
-        double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.Character.guild.entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
+        double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.character.guild.entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
         double maxP = xp * pXpGive * 0.10;	//Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
         double diff = Math.abs(Lvl - LvlGuild);	//Calcul l'écart entre le niveau du personnage et le niveau de la guilde
@@ -110,7 +109,7 @@ public class FightFormulas {
         }
         xpWin.set((long) (xp - xp * pXpGive));
 
-        Fighter.Character.guild.onFighterAddedExperience(gm, (long) Math.round(toGuild));
+        Fighter.character.guild.onFighterAddedExperience(gm, (long) Math.round(toGuild));
 
         return (long) Math.round(toGuild);
     }
@@ -119,18 +118,18 @@ public class FightFormulas {
         if (Fighter == null) {
             return 0;
         }
-        if (Fighter.Character.mountInfo == null) {
-            logger.error("mountInfo Null {} ", Fighter.Character.toString());
+        if (Fighter.character.getMountInfo() == null) {
+            logger.error("mountInfo Null {} ", Fighter.character.toString());
         }
-        if (!Fighter.Character.mountInfo.isToogled) {
+        if (!Fighter.character.getMountInfo().isToogled) {
             return 0;
         }
 
-        int diff = Math.abs(Fighter.getLevel() - Fighter.Character.mountInfo.mount.level);
+        int diff = Math.abs(Fighter.getLevel() - Fighter.character.getMountInfo().mount.level);
 
         double coeff = 0;
         double xp = (double) xpWin.get();
-        double pToMount = (double) Fighter.Character.mountInfo.ratio / 100 + 0.2;
+        double pToMount = (double) Fighter.character.getMountInfo().ratio / 100 + 0.2;
 
         if (diff >= 0 && diff <= 9) {
             coeff = 0.1;
@@ -154,10 +153,10 @@ public class FightFormulas {
             xpWin.set((long) (xp - (xp * (pToMount - 0.2))));
         }
 
-        Fighter.Character.mountInfo.addExperience((long) Math.round(xp * pToMount * coeff));
+        Fighter.character.getMountInfo().addExperience((long) Math.round(xp * pToMount * coeff));
 
         if (xp > 0) {
-            Fighter.Character.send(new MountSetMessage(Fighter.Character.mountInfo.mount));
+            Fighter.character.send(new MountSetMessage(Fighter.character.getMountInfo().mount));
         }
 
         return (long) Math.round(xp * pToMount * coeff);
@@ -174,7 +173,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeWinner += ((CharacterFighter) fighter).Character.alignmentGrade;
+                    TotalGradeWinner += ((CharacterFighter) fighter).character.alignmentGrade;
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
@@ -186,7 +185,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeLooser += ((CharacterFighter) fighter).Character.alignmentGrade;
+                    TotalGradeLooser += ((CharacterFighter) fighter).character.alignmentGrade;
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
@@ -214,7 +213,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeWinner += ((CharacterFighter) fighter).Character.alignmentGrade;
+                    TotalGradeWinner += ((CharacterFighter) fighter).character.alignmentGrade;
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
@@ -226,7 +225,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeLooser += ((CharacterFighter) fighter).Character.alignmentGrade;
+                    TotalGradeLooser += ((CharacterFighter) fighter).character.alignmentGrade;
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
