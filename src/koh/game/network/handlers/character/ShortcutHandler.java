@@ -65,33 +65,33 @@ public class ShortcutHandler {
     }
 
     @HandlerAttribute(ID = 6225)
-    public static void HandleShortcutBarAddRequestMessage(WorldClient Client, ShortcutBarAddRequestMessage Message) {
-        switch (Message.barType) {
+    public static void HandleShortcutBarAddRequestMessage(WorldClient Client, ShortcutBarAddRequestMessage message) {
+        switch (message.barType) {
             case ShortcutBarEnum.SPELL_SHORTCUT_BAR:
-                if (!(Message.shortcut instanceof ShortcutSpell)) {
-                    logger.error("Trying to parse SpellShortcut with {}" , Message.shortcut.getTypeId());
+                if (!(message.shortcut instanceof ShortcutSpell)) {
+                    logger.error("Trying to parse SpellShortcut with {}" , message.shortcut.getTypeId());
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }
-                Client.character.getMySpells().moveSpell(Client, ((ShortcutSpell) Message.shortcut).spellId, ((ShortcutSpell) Message.shortcut).Slot);
+                Client.character.getMySpells().moveSpell(Client, ((ShortcutSpell) message.shortcut).spellId, ((ShortcutSpell) message.shortcut).Slot);
                 break;
             case ShortcutBarEnum.GENERAL_SHORTCUT_BAR:
-                if (!(Message.shortcut instanceof ShortcutObjectItem)) {
-                    logger.error("Trying to parse SpellShortcut with  {}" , Message.shortcut.getTypeId());
+                if (!(message.shortcut instanceof ShortcutObjectItem)) {
+                    logger.error("Trying to parse SpellShortcut with  {}" , message.shortcut.getTypeId());
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }
-                if (!Client.character.getShortcuts().canAddShortcutItem((ShortcutObjectItem) Message.shortcut)) {
+                if (!Client.character.getShortcuts().canAddShortcutItem((ShortcutObjectItem) message.shortcut)) {
                     PlayerController.sendServerMessage(Client, "Vous ne pouvez pas dupliquez le même item ^^' ...");
                     Client.send(new BasicNoOperationMessage());
                     break;
                 }
-                if (Client.character.getShortcuts().myShortcuts.containsKey(Message.shortcut.Slot)) {
-                    Client.character.getShortcuts().myShortcuts.remove(Message.shortcut.Slot);
-                    Client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Message.shortcut.Slot));
+                if (Client.character.getShortcuts().myShortcuts.containsKey(message.shortcut.Slot)) {
+                    Client.character.getShortcuts().myShortcuts.remove(message.shortcut.Slot);
+                    Client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, message.shortcut.Slot));
                 }
-                Client.character.getShortcuts().add(new ItemShortcut(Message.shortcut.Slot, ((ShortcutObjectItem) Message.shortcut).itemUID));
-                Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Client.character.getShortcuts().myShortcuts.get(Message.shortcut.Slot).toShortcut(Client.character))); //getshortcut slto
+                Client.character.getShortcuts().add(new ItemShortcut(message.shortcut.Slot, ((ShortcutObjectItem) message.shortcut).itemUID));
+                Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, Client.character.getShortcuts().myShortcuts.get(message.shortcut.Slot).toShortcut(Client.character))); //getshortcut slto
 
                 break;
             default:
