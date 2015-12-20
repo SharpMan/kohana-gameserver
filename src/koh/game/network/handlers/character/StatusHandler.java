@@ -19,7 +19,7 @@ public class StatusHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.character.status = PlayerStatusEnum.valueOf(Message.status.statusId);
+        Client.character.setStatus(PlayerStatusEnum.valueOf(Message.status.statusId));
         if (Client.character.getFight() != null) {
             Client.character.getFight().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.getID(), Message.status));
         } else {

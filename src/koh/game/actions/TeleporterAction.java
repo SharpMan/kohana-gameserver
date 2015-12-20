@@ -60,7 +60,7 @@ public class TeleporterAction extends GameAction {
     public int[] subAreaIds() {
         ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).getCurrentMap().getSubArea().getArea().getId());
         if (zaaps == null) {
-            return Enumerable.DuplicatedKeyInt(39, ((Player) actor).mapid);
+            return Enumerable.DuplicatedKeyInt(39, ((Player) actor).getMapid());
         }
         return zaaps.stream().mapToInt(x -> x.getSubArea()).toArray();
     }
@@ -68,7 +68,7 @@ public class TeleporterAction extends GameAction {
     public int[] mapIds() {
         ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).getCurrentMap().getSubArea().getArea().getId());
         if (zaaps == null) {
-            return Enumerable.DuplicatedKeyInt(39, ((Player) actor).mapid);
+            return Enumerable.DuplicatedKeyInt(39, ((Player) actor).getMapid());
         }
         return zaaps.stream().mapToInt(x -> x.getMapid()).toArray();
     }

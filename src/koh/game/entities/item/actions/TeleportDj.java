@@ -32,7 +32,7 @@ public class TeleportDj  extends ItemAction {
         {
             p.teleport(newMapID,newCellID);
         }else if(mapNeeded > 0){
-            if(p.getInventoryCache().hasItemId(objetNeed) && p.mapid == mapNeeded){
+            if(p.getInventoryCache().hasItemId(objetNeed) && p.getMapid() == mapNeeded){
                 p.teleport(newMapID,newCellID);
                 p.getInventoryCache().safeDelete(p.getInventoryCache().findTemplate(objetNeed),1);
             }

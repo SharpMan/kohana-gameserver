@@ -49,8 +49,8 @@ public class ContextHandler {
     @HandlerAttribute(ID = GameMapChangeOrientationRequestMessage.M_ID)
     public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client, GameMapChangeOrientationRequestMessage Message) {
         if (Client.character.getFight() == null) {
-            Client.character.direction = Message.direction;
-            Client.character.getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.character.getID(), Client.character.direction)));
+            Client.character.setDirection(Message.direction);
+            Client.character.getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.character.getID(), Client.character.getDirection())));
             logger.debug("New direction for actor {}~{}" , Client.character.getID() , Message.direction);
         }
     }
@@ -177,7 +177,7 @@ public class ContextHandler {
         }
 
         if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            MovementPath Path = Pathfinder.isValidPath(Client.character.getFight(), Client.character.getFighter(), Client.character.getFighter().getCellId(), Client.character.getFighter().direction, Message.keyMovements);
+            MovementPath Path = Pathfinder.isValidPath(Client.character.getFight(), Client.character.getFighter(), Client.character.getFighter().getCellId(), Client.character.getFighter().getDirection(), Message.keyMovements);
             if (Path != null) {
                 if (Client.character.getFighter().isDead()) {
                     Client.send(new BasicNoOperationMessage());

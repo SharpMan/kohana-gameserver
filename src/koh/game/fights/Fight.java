@@ -434,13 +434,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                 } else if (Effect.targetMask.equals("a,A") && fighter.getCarriedActor() != 0 & fighter.getID() == Target.getID()) {
                                     continue;
                                 }
-                                /*if (Fighter instanceof BombFighter && Target.states.hasState(FightStateEnum.Kaboom)) {
+                                /*if (Fighter instanceof BombFighter && target.states.hasState(FightStateEnum.Kaboom)) {
                                  continue;
                                  }*/
                                 if (!imTargeted && Target.getID() == fighter.getID()) {
                                     continue;
                                 }
-                                /*if(Effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, Target, Effect)){
+                                /*if(Effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, target, Effect)){
                                  continue;
                                  }*/
                                 logger.debug("Targeet Aded!");
@@ -480,10 +480,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, fighter.getID(), new FightTriggeredEffect(Target.nextBuffUid.incrementAndGet(), Target.getID(), (short) Effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
                 });
 
-                /*for (Fighter Target : targets.get(Effect)) {
-                 Target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), getSpellLevel.spellId, getCellId, num1, Effect, Fighter, new ArrayList<Fighter>() {
+                /*for (Fighter target : targets.get(Effect)) {
+                 target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), getSpellLevel.spellId, getCellId, num1, Effect, Fighter, new ArrayList<Fighter>() {
                  {
-                 add(Target);
+                 add(target);
                  }
                  }, false, StatsEnum.NONE, 0, getSpellLevel), Effect.delay));
                  }*/
@@ -695,7 +695,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.stopTimer("startTimer");
         this.fightTime = System.currentTimeMillis();
 
-        // Init des tours
+        // initialize des tours
         this.myWorker.initTurns();
 
         this.sendToField(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
@@ -1013,7 +1013,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         }
         if (bestPos == null) {
-            return fighter.direction;
+            return fighter.getDirection();
         } else {
             return fighter.getMapPoint().advancedOrientationTo(MapPoint.fromCellId(bestPos.first), false);
         }
@@ -1024,7 +1024,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         FightCell cell2 = fighterTarget.myCell;
         fighter.setCell(cell2);
         fighterTarget.setCell(cell);
-        this.Fighters().forEach(x -> x.direction = this.findPlacementDirection(x));
+        this.Fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
         this.sendToField(new GameFightPlacementSwapPositionsMessage(new IdentifiedEntityDispositionInformations[]{fighter.GetIdentifiedEntityDispositionInformations(), fighterTarget.GetIdentifiedEntityDispositionInformations()}));
     }
 
@@ -1068,7 +1068,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (Cell.CanWalk()) {
                 // Affectation
                 fighter.setCell(Cell);
-                this.Fighters().forEach(x -> x.direction = this.findPlacementDirection(x));
+                this.Fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
                 this.sendToField(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
             }
         }
@@ -1464,7 +1464,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     /// <summary>
-    ///  Init des tours
+    ///  initialize des tours
     /// </summary>
     /*public void RemakeTurns() {
      this.myWorker.RemakeTurns(this.fighters());
@@ -1575,7 +1575,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     @Override
     public void actorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection) {
         //((Fighter) actor).setCell(myCells.get(newCell));
-        Actor.direction = newDirection;
+        Actor.setDirection(newDirection);
     }
 
     public void stopTimer(String Name) {

@@ -2,6 +2,7 @@ package koh.game.entities.actors;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
 import koh.game.controllers.PlayerController;
@@ -59,6 +60,7 @@ import koh.protocol.types.game.context.roleplay.HumanOptionGuild;
 import koh.protocol.types.game.context.roleplay.HumanOptionOrnament;
 import koh.protocol.types.game.context.roleplay.HumanOptionTitle;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -70,94 +72,95 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Neo-Craft
  */
+@Builder
 public class Player extends IGameActor implements Observer {
 
     private static final Logger logger = LogManager.getLogger(Player.class);
 
     @Getter @Setter
-    public int owner;
+    private int owner;
     @Getter @Setter
-    public String nickName;
+    private String nickName;
     @Getter @Setter
-    public int sexe;
+    private int sexe;
     @Getter @Setter
-    public byte breed;
+    private byte breed;
     @Getter @Setter
-    public ArrayList<Short> skins;
+    private ArrayList<Short> skins;
     @Getter @Setter
-    public ArrayList<Integer> indexedColors = new ArrayList<>(5);
+    private ArrayList<Integer> indexedColors = new ArrayList<>(5);
     @Getter @Setter
-    public ArrayList<Short> scales;
+    private ArrayList<Short> scales;
     @Getter @Setter
-    public Account account;
+    private Account account;
     @Getter @Setter
-    public int achievementPoints,level;
+    private int achievementPoints,level;
     @Getter @Setter
-    public WorldClient client;
+    private WorldClient client;
     private long regenStartTime;
     @Getter @Setter
-    public volatile DofusMap currentMap;
+    private volatile DofusMap currentMap;
     @Getter @Setter
-    public ArrayList<Byte> ennabledChannels = new ArrayList<>(20), disabledChannels;
+    private List<Byte> enabledChannels = new ArrayList<>(20), disabledChannels;
     @Getter @Setter
-    public ShortcutBook shortcuts;
+    private ShortcutBook shortcuts;
     @Getter @Setter
-    public volatile MountInformations mountInfo;
+    private volatile MountInformations mountInfo;
     @Getter @Setter
-    public int savedMap;
+    private int savedMap;
     @Getter @Setter
-    public short savedCell;
+    private short savedCell;
     @Getter @Setter
-    public volatile SpellBook mySpells;
+    private volatile SpellBook mySpells;
     @Getter @Setter
-    public volatile JobBook myJobs;
+    private volatile JobBook myJobs;
     @Getter @Setter
-    public CharacterInventory inventoryCache;
+    private CharacterInventory inventoryCache;
     @Getter @Setter
-    public PlayerStatusEnum status = PlayerStatusEnum.PLAYER_STATUS_AVAILABLE;
+    private PlayerStatusEnum status = PlayerStatusEnum.PLAYER_STATUS_AVAILABLE;
     @Getter @Setter
-    public HashMap<ScoreType, Integer> scores = new HashMap<>(7);
+    private HashMap<ScoreType, Integer> scores = new HashMap<>(7);
     //GenericStats
     /*public int getAP;
      public int getMP;*/
     @Setter @Getter
-    public int chance, life, vitality,wisdom, strength, intell, agility;
+    private int chance, life, vitality,wisdom, strength, intell, agility;
     @Getter @Setter
-    public short activableTitle, activableOrnament;
+    private short activableTitle, activableOrnament;
     @Getter @Setter
-    public byte regenRate;
+    private byte regenRate;
     @Getter @Setter
-    public byte[] emotes;
+    private byte[] emotes;
     @Getter @Setter
-    public int[] ornaments, titles;
+    private int[] ornaments, titles;
     @Getter @Setter
-    public GenericStats stats;
+    private GenericStats stats;
 
     //stats
     @Getter @Setter
-    public long experience;
+    private long experience;
     @Getter @Setter
-    public int kamas, statPoints, spellPoints;
+    private int kamas, statPoints, spellPoints;
     @Getter @Setter
-    public byte alignmentValue, alignmentGrade, PvPEnabled;
+    private byte alignmentValue, alignmentGrade, PvPEnabled;
     @Getter @Setter
-    public AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_NEUTRAL;
+    private AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_NEUTRAL;
     @Getter @Setter
-    public int honor, dishonor, energy;
+    private int honor, dishonor, energy;
 
     @Getter @Setter
-    public CopyOnWriteArrayList<Player> followers;
+    private CopyOnWriteArrayList<Player> followers;
 
     @Getter @Setter
-    public boolean inWorld;
+    private boolean inWorld;
     protected boolean myInitialized = false;
     private HumanInformations cachedHumanInformations = null;
 
     //Other
     @Getter @Setter
-    public byte moodSmiley = -1;
+    private byte moodSmiley = -1;
     @Getter @Setter
-    public Guild guild;
+    private Guild guild;
 
     private Fight myFight;
     private Fighter myFighter;
@@ -169,7 +172,7 @@ public class Player extends IGameActor implements Observer {
 
         this.disabledChannels = new ArrayList<>(14);
         for (byte i = 0; i < 14; i++) {
-            if (!this.ennabledChannels.contains(i)) {
+            if (!this.enabledChannels.contains(i)) {
                 this.disabledChannels.add(i);
             }
         }
@@ -275,7 +278,7 @@ public class Player extends IGameActor implements Observer {
             //client.sendPacket(new ErrorMapNotFoundMessage());
             return;
         }
-        NextMap.Init();
+        NextMap.initialize();
 
         client.sequenceMessage();
         this.currentMap.destroyActor(this);
@@ -691,6 +694,27 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
+    public void initScore(String result){
+        this.scores.put(ScoreType.PVP_WIN, Integer.parseInt(result.split(",")[0]));
+        this.scores.put(ScoreType.PVP_LOOSE, Integer.parseInt(result.split(",")[1]));
+        this.scores.put(ScoreType.ARENA_WIN, Integer.parseInt(result.split(",")[2]));
+        this.scores.put(ScoreType.ARENA_LOOSE, Integer.parseInt(result.split(",")[3]));
+        this.scores.put(ScoreType.PVM_WIN, Integer.parseInt(result.split(",")[4]));
+        this.scores.put(ScoreType.PVM_LOOSE, Integer.parseInt(result.split(",")[5]));
+        this.scores.put(ScoreType.PVP_TOURNAMENT, Integer.parseInt(result.split(",")[6]));
+
+    }
+
+    public void initScore(){
+        this.scores.put(ScoreType.PVP_WIN, 0);
+        this.scores.put(ScoreType.PVP_LOOSE, 0);
+        this.scores.put(ScoreType.ARENA_WIN, 0);
+        this.scores.put(ScoreType.ARENA_LOOSE, 0);
+        this.scores.put(ScoreType.PVM_WIN, 0);
+        this.scores.put(ScoreType.PVM_LOOSE, 0);
+        this.scores.put(ScoreType.PVP_TOURNAMENT, 0);
+    }
+
     public Object $FighterLook = new Object();
 
     public void setFight(Fight Fight) {
@@ -733,10 +757,10 @@ public class Player extends IGameActor implements Observer {
         regenStartTime = 0;
         currentMap = null;
         $FighterLook = null;
-        if (ennabledChannels != null) {
-            ennabledChannels.clear();
+        if (enabledChannels != null) {
+            enabledChannels.clear();
         }
-        ennabledChannels = null;
+        enabledChannels = null;
         if (disabledChannels != null) {
             disabledChannels.clear();
         }

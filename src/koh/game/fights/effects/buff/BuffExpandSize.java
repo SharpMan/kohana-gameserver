@@ -24,9 +24,9 @@ public class BuffExpandSize extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        this.Target.entityLook.scales.clear();
-        this.Target.entityLook.scales.add((short) (OldScale + (((double) this.OldScale * CastInfos.Effect.diceNum) / 100)));
-        this.caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.Target.getID(), this.Target.getEntityLook()));
+        this.target.getEntityLook().scales.clear();
+        this.target.getEntityLook().scales.add((short) (OldScale + (((double) this.OldScale * CastInfos.Effect.diceNum) / 100)));
+        this.caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
@@ -37,7 +37,7 @@ public class BuffExpandSize extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) this.CastInfos.Effect.diceNum);
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) this.CastInfos.Effect.diceNum);
     }
 
 }

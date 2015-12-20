@@ -67,7 +67,7 @@ public class StatsCriterion extends Criterion {
         //return this.Compare<Integer>((Comparable<Integer>) (this.Base ? character.stats.getBase(Field) : character.stats.getTotal(Field)), this.Comparand);
         switch (this.Identifier) {
             case "Ce":
-                return this.Compare((Comparable<Integer>) character.energy, this.Comparand);
+                return this.Compare((Comparable<Integer>) character.getEnergy(), this.Comparand);
             case "CE":
                 //return this.Compare((Comparable<Integer>) character.EnergyMax, (Short) this.Comparand);
                 return true;

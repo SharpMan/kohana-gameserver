@@ -179,7 +179,7 @@ public class SpellBook {
             return;
         }
         if (this.mySpells.get(id).level > 1) {
-            owner.spellPoints += this.mySpells.get(id).level - 1;
+            owner.setStatPoints(owner.getSpellPoints() + this.mySpells.get(id).level - 1);
             if (owner.getClient() != null) {
                 owner.getClient().send(new SpellUpgradeSuccessMessage(id, (byte) 0));
             }

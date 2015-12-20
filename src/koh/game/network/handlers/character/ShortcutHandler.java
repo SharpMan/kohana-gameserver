@@ -29,7 +29,7 @@ public class ShortcutHandler {
     public static void HandleSpellUpgradeRequestMessage(WorldClient Client, SpellUpgradeRequestMessage Message) {
 
         //IsInFight
-        Client.character.mySpells.BoostSpell(Client, Message.spellId, Message.spellLevel);
+        Client.character.getMySpells().BoostSpell(Client, Message.spellId, Message.spellLevel);
         Client.character.refreshStats();
     }
 

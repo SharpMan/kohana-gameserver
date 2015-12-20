@@ -91,7 +91,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     public void spawnActor(IGameActor actor) {
         if (!this.myInitialized) {
-            this.Init();
+            this.initialize();
         }
 
         if (actor instanceof Player) {
@@ -114,7 +114,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
          this.myCells[actor.getCellId].addActor(actor);
          }
          }*/
-        this.cells[actor.cell.getId()].addActor(actor);
+        this.cells[actor.getCell().getId()].addActor(actor);
 
     }
 
@@ -233,7 +233,13 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     
     private boolean isUsingNewMovementSystem = false;
 
-    public synchronized void Init() {
+    
+    public DofusMap init$Return(){
+        this.initialize();
+        return this;
+    }
+
+    public synchronized void initialize() {
         if (this.myInitialized) {
             return;
         }
@@ -303,10 +309,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     @Override
     public void actorMoved(Path path, IGameActor actor, short newCell, byte newDirection) {
-        this.cells[actor.cell.getId()].delActor(actor);
+        this.cells[actor.getCell().getId()].delActor(actor);
         this.cells[newCell].addActor(actor);
         if (newDirection != -1) {
-            actor.direction = newDirection;
+            actor.setDirection(newDirection);
         }
     }
 
@@ -380,7 +386,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public synchronized DofusCell getAnyCellWalakable() {
-        this.Init();
+        this.initialize();
         return Arrays.stream(this.cells).filter(x -> x.mov()).findAny().orElse(this.cells[0]);
     }
 

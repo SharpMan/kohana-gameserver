@@ -3,9 +3,6 @@ package koh.game.fights.effects.buff;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectHealPercent;
-import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.effects.buff.BuffDecrementType;
-import koh.game.fights.effects.buff.BuffEffect;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
@@ -29,7 +26,7 @@ public class BuffHealPercent extends BuffEffect {
      */
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (EffectHealPercent.ApplyHealPercent(CastInfos, Target, CastInfos.RandomJet(Target)) == -3) {
+        if (EffectHealPercent.ApplyHealPercent(CastInfos, target, CastInfos.RandomJet(target)) == -3) {
             return -3;
         }
         return -1;
@@ -37,7 +34,7 @@ public class BuffHealPercent extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) Math.abs(CastInfos.RandomJet(Target)));
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) Math.abs(CastInfos.RandomJet(target)));
     }
 
 }

@@ -68,8 +68,8 @@ public class RolePlayHandler {
             return;
         }
         int oldbase = base;
-        List<List<Integer>> thresholds = DAO.getD2oTemplates().getBreed(Client.getCharacter().breed).GetThresholds((int) Message.statId);
-        for (int thresholdIndex = DAO.getD2oTemplates().getBreed(Client.getCharacter().breed).GetThresholdIndex((int) base, thresholds); (long) num1 >= (long) thresholds.get(thresholdIndex).get(1); thresholdIndex = DAO.getD2oTemplates().getBreed(Client.getCharacter().breed).GetThresholdIndex((int) base, thresholds)) {
+        List<List<Integer>> thresholds = DAO.getD2oTemplates().getBreed(Client.getCharacter().getBreed()).GetThresholds((int) Message.statId);
+        for (int thresholdIndex = DAO.getD2oTemplates().getBreed(Client.getCharacter().getBreed()).GetThresholdIndex((int) base, thresholds); (long) num1 >= (long) thresholds.get(thresholdIndex).get(1); thresholdIndex = DAO.getD2oTemplates().getBreed(Client.getCharacter().getBreed()).GetThresholdIndex((int) base, thresholds)) {
             short num2;
             short num3;
             if (thresholdIndex < thresholds.size() - 1 && (double) num1 / (double) thresholds.get(thresholdIndex).get(1) > (double) ((long) thresholds.get(thresholdIndex + 1).get(0) - (long) base)) {

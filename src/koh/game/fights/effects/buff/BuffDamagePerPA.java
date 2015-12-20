@@ -23,7 +23,7 @@ public class BuffDamagePerPA extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         int pas = this.CastInfos.Effect.diceNum;
         int val = this.CastInfos.Effect.diceSide;
-        int nbr = (int) Math.floor((double) Target.usedAP / (double) pas);
+        int nbr = (int) Math.floor((double) target.usedAP / (double) pas);
         DamageValue.setValue(val * nbr);
         //Poison Paralysant
 
@@ -45,12 +45,12 @@ public class BuffDamagePerPA extends BuffEffect {
         // dgt);
         DamageValue.setValue((((100 + inte + pdom) / 100) * DamageValue.getValue() * 1.5));
 
-        return EffectDamage.ApplyDamages(this.CastInfos, this.Target, DamageValue);
+        return EffectDamage.ApplyDamages(this.CastInfos, this.target, DamageValue);
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
     }
 
 }

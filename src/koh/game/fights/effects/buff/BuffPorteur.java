@@ -33,13 +33,13 @@ public class BuffPorteur extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         // Si effet finis
-        if (!this.Target.states.hasState(FightStateEnum.Porté)) {
+        if (!this.target.states.hasState(FightStateEnum.Porté)) {
             this.Duration = 0;
             return -1;
         }
 
         // On affecte la meme cell pour la cible porté
-        return this.Target.setCell(this.caster.myCell);
+        return this.target.setCell(this.caster.myCell);
     }
 
     @Override

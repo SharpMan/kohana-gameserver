@@ -61,20 +61,20 @@ public class ChatHandler {
         if (message.channel < CHANNEL_GLOBAL || message.channel > CHANNEL_ARENA) {
 
             Client.send(new BasicNoOperationMessage());
-        } else if (message.enable && !Client.getCharacter().ennabledChannels.contains(message.channel)) {
-            Client.getCharacter().ennabledChannels.add(message.channel);
-            Client.getCharacter().disabledChannels.remove(Client.getCharacter().disabledChannels.indexOf(message.channel));
-        } else if (!message.enable && !Client.getCharacter().disabledChannels.contains(message.channel)) {
-            Client.getCharacter().disabledChannels.add(message.channel);
-            Client.getCharacter().ennabledChannels.remove(Client.getCharacter().ennabledChannels.indexOf(message.channel));
+        } else if (message.enable && !Client.getCharacter().getEnabledChannels().contains(message.channel)) {
+            Client.getCharacter().getEnabledChannels().add(message.channel);
+            Client.getCharacter().getDisabledChannels().remove(Client.getCharacter().getDisabledChannels().indexOf(message.channel));
+        } else if (!message.enable && !Client.getCharacter().getDisabledChannels().contains(message.channel)) {
+            Client.getCharacter().getDisabledChannels().add(message.channel);
+            Client.getCharacter().getEnabledChannels().remove(Client.getCharacter().getEnabledChannels().indexOf(message.channel));
         } else {
             //TODO: Fix this stupid flood message
             if (DAO.getSettings().getBoolElement("Logging.Debug")) {
                 System.out.println("Eroror " + message.enable + " " + message.channel);
-                for (byte b : Client.getCharacter().ennabledChannels) {
+                for (byte b : Client.getCharacter().getEnabledChannels()) {
                     System.out.println("enabled " + b);
                 }
-                for (byte b : Client.getCharacter().disabledChannels) {
+                for (byte b : Client.getCharacter().getDisabledChannels()) {
                     System.out.println("Disabled " + b);
                 }
             }
@@ -82,7 +82,7 @@ public class ChatHandler {
              return;*/
         }
 
-        Client.send(new EnabledChannelsMessage(Client.getCharacter().ennabledChannels, Client.getCharacter().disabledChannels));
+        Client.send(new EnabledChannelsMessage(Client.getCharacter().getEnabledChannels(), Client.getCharacter().getDisabledChannels()));
     }
 
     @HandlerAttribute(ID = 852)
@@ -127,7 +127,7 @@ public class ChatHandler {
                 if (Client.getCharacter().getFighter() != null) {
                     Client.getCharacter().getFight().sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 } else {
-                    Client.getCharacter().currentMap.sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
+                    Client.getCharacter().getCurrentMap().sendToField(new ChatServerWithObjectMessage(Message.channel, Message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id, Message.objects));
                 }
                 break;
             case CHANNEL_ADMIN:
@@ -177,7 +177,7 @@ public class ChatHandler {
                 if (Client.getCharacter().getFighter() != null) {
                     Client.getCharacter().getFight().sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
                 } else {
-                    Client.getCharacter().currentMap.sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
+                    Client.getCharacter().getCurrentMap().sendToField(new ChatServerMessage(message.channel, message.Content, (int) Instant.now().getEpochSecond(), "", Client.getCharacter().getID(), Client.getCharacter().getNickName(), Client.getAccount().id));
 
                 }
                 break;
@@ -199,7 +199,7 @@ public class ChatHandler {
                             break;
                         }*/
                         int cellid = Integer.parseInt(message.Content.split(" ")[1]);
-                        DAO.getPaddocks().find(Client.getCharacter().currentMap.getId()).removePaddockItem(cellid);
+                        DAO.getPaddocks().find(Client.getCharacter().getCurrentMap().getId()).removePaddockItem(cellid);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -218,7 +218,7 @@ public class ChatHandler {
                         int object = Integer.parseInt(message.Content.split(" ")[2]);
                         short durability = Short.parseShort(message.Content.split(" ")[3]);
                         short durabilityMax = Short.parseShort(message.Content.split(" ")[4]);
-                        DAO.getPaddocks().find(Client.getCharacter().currentMap.getId()).addPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
+                        DAO.getPaddocks().find(Client.getCharacter().getCurrentMap().getId()).addPaddockItem(new PaddockItem(cellid, object, new ItemDurability(durability, durabilityMax)));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -277,7 +277,7 @@ public class ChatHandler {
                     Client.getCharacter().refreshStats();
                 } else if (message.Content.startsWith("!spellpoint")) {
                     int Level = Integer.parseInt(message.Content.split(" ")[1]);
-                    Client.getCharacter().spellPoints = +Level;
+                    Client.getCharacter().setSpellPoints(Client.getCharacter().getSpellPoints()  +Level);
                     PlayerController.sendServerMessage(Client, "spellPoints added");
                     Client.getCharacter().refreshStats();
                     return;
@@ -315,24 +315,24 @@ public class ChatHandler {
                 } else if (message.Content.startsWith("!kmar")) {
                     short X = Short.parseShort(message.Content.split(" ")[1]);
                     Client.getCharacter().getEntityLook().skins.clear();
-                    Client.getCharacter().getEntityLook().skins.addAll(Client.getCharacter().skins);
+                    Client.getCharacter().getEntityLook().skins.addAll(Client.getCharacter().getSkins());
                     Client.getCharacter().getEntityLook().skins.add(X);
                     Client.getCharacter().refreshEntitie();
                 } else if (message.Content.startsWith("!title")) {
                     short X = Short.parseShort(message.Content.split(" ")[1]);
-                    if (ArrayUtils.contains(Client.getCharacter().titles, X)) {
+                    if (ArrayUtils.contains(Client.getCharacter().getTitles(), X)) {
                         PlayerController.sendServerMessage(Client, "Erreur : vous le possez déjà .");
                         return;
                     }
-                    Client.getCharacter().titles = ArrayUtils.add(Client.getCharacter().titles, X);
+                    Client.getCharacter().setTitles(ArrayUtils.add(Client.getCharacter().getTitles(), X));
                     Client.send(new TitleGainedMessage(X));
                 } else if (message.Content.startsWith("!ornament")) {
                     short X = Short.parseShort(message.Content.split(" ")[1]);
-                    if (ArrayUtils.contains(Client.getCharacter().ornaments, X)) {
+                    if (ArrayUtils.contains(Client.getCharacter().getOrnaments(), X)) {
                         PlayerController.sendServerMessage(Client, "Erreur : vous le possez déjà .");
                         return;
                     }
-                    Client.getCharacter().ornaments = ArrayUtils.add(Client.getCharacter().ornaments, X);
+                    Client.getCharacter().setOrnaments( ArrayUtils.add(Client.getCharacter().getOrnaments(), X));
                     Client.send(new OrnamentGainedMessage(X));
                 } else if (message.Content.startsWith("!entity")) {
                     /*test  EntityLook en = new EntityLook((short)3,  new ArrayList<Short>() { { add((short)1); add((short) 3); }},new ArrayList<Integer>() { { add(14); add(47); }},new ArrayList<Short>() { { add((short)8); add((short) 9); }},new ArrayList<SubEntity>() {{ add(new SubEntity(17,10, new EntityLook((short)3,  new ArrayList<Short>() { { add((short)1); add((short) 3); }},new ArrayList<Integer>() { { add(14); add(47); }},new ArrayList<Short>() { { add((short)8); add((short) 9); }},new ArrayList<SubEntity>()))); 
@@ -371,7 +371,7 @@ public class ChatHandler {
                         }
                         InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Id, 63, Client.getCharacter().getID(), Qua, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), Type, template instanceof Weapon));
 
-                        if (Client.getCharacter().inventoryCache.add(Item, true)) {
+                        if (Client.getCharacter().getInventoryCache().add(Item, true)) {
                             Item.setNeedInsert(true);
                         }
                         PlayerController.sendServerMessage(Client, String.format("%s  added to your inventory with %s stats", template.getNameId(), Type.toString()));

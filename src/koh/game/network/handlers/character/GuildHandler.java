@@ -252,7 +252,7 @@ public class GuildHandler {
     public static void HandleGuildCreationValidMessage(WorldClient client, GuildCreationValidMessage message) {
         if (client.getCharacter().getGuild() != null) {
             client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_ALREADY_IN_GROUP));
-        } else if (!client.getCharacter().inventoryCache.hasItemId(1575)) {
+        } else if (!client.getCharacter().getInventoryCache().hasItemId(1575)) {
             client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_REQUIREMENT_UNMET));
             PlayerController.sendServerMessage(client, "La crétion d'une guilde nécessite une guildalogemme qui est commerciable en <b>Boutique</b>");
         } else if (DAO.getGuilds().alreadyTakenEmblem(message.guildEmblem)) {
@@ -305,7 +305,7 @@ public class GuildHandler {
 
             client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_OK));
 
-            client.getCharacter().inventoryCache.updateObjectquantity(client.getCharacter().inventoryCache.getItemInTemplate(1575), client.getCharacter().inventoryCache.getItemInTemplate(1575).getQuantity() - 1);
+            client.getCharacter().getInventoryCache().updateObjectquantity(client.getCharacter().getInventoryCache().getItemInTemplate(1575), client.getCharacter().getInventoryCache().getItemInTemplate(1575).getQuantity() - 1);
             client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{1 + "", 1575 + ""}));
 
             client.endGameAction(GameActionTypeEnum.CREATE_GUILD);

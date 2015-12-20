@@ -129,7 +129,7 @@ public class MapDAOImpl extends MapDAO {
 
             while (result.next()) {
                 try {
-                    dofusMaps.get(result.getInt("old_map")).Init();
+                    dofusMaps.get(result.getInt("old_map")).initialize();
                     dofusMaps.get(result.getInt("old_map")).getCell(result.getShort("old_cell")).myAction = new DofusTrigger(result);
                 } catch (Exception e) {
                     logger.warn("map {} trigger null", result.getInt("map"));

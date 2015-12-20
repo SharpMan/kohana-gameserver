@@ -25,7 +25,7 @@ public class BuffSacrifice extends BuffEffect {
         }
         // mort
         if (caster.isDead()) {
-            //Target.buff.RemoveBuff(this);
+            //target.buff.RemoveBuff(this);
             return -1;
         }
 
@@ -39,7 +39,7 @@ public class BuffSacrifice extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.getID(), (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
     }
 
 }

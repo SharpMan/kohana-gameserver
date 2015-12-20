@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.inject.Singleton;
+import koh.game.dao.DAO;
+import lombok.Getter;
 
 /**
  *
@@ -28,6 +30,11 @@ public class Settings {
         this.path = path;
         elements.clear();
         readSettings();
+        DAO.getSettings().getStringElement("Register.Channels").split(",");
+        this.registredChannels = new Byte[getStringElement("Register.Channels").split(",").length];
+        for(int i =0; i < registredChannels.length; i++){
+            registredChannels[i] = Byte.parseByte(getStringElement("Register.Channels").split(",")[i]);
+        }
     }
 
     public Map<String, String> getGroup(String group) {
@@ -37,6 +44,10 @@ public class Settings {
     public String getStringElement(String e) {
         return fastElement(e);
     }
+
+    @Getter
+    private Byte[] registredChannels;
+
 
     public int getIntElement(String e) {
         return Integer.parseInt(fastElement(e));

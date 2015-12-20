@@ -191,7 +191,7 @@ public class ExchangeHandler {
             }
             WorldClient Target = ((Player) Client.character.getCurrentMap().getActor(Message.target)).getClient();
             if (!Target.canGameAction(GameActionTypeEnum.BASIC_REQUEST) /*||
-                     Target.character.HasRestriction(RestrictionEnum.RESTRICTION_CANT_EXCHANGE) ||
+                     target.character.HasRestriction(RestrictionEnum.RESTRICTION_CANT_EXCHANGE) ||
                      client.character.HasRestriction(RestrictionEnum.RESTRICTION_CANT_EXCHANGE)*/) {
                 Client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_OCCUPIED));
                 return;

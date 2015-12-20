@@ -26,7 +26,7 @@ public class TinselHandler {
             Client.send(new TitleSelectErrorMessage((byte) 0));
             return;
         }
-        if (ArrayUtils.contains(Client.character.titles, Message.titleId)) {
+        if (ArrayUtils.contains(Client.character.getTitles(), Message.titleId)) {
             Client.character.setActivableTitle((short) Message.titleId);
             Client.character.refreshActor();
             Client.send(new TitleSelectedMessage(Message.titleId));
@@ -44,7 +44,7 @@ public class TinselHandler {
             Client.send(new OrnamentSelectErrorMessage((byte) 0));
             return;
         }
-        if (ArrayUtils.contains(Client.character.ornaments, Message.ornamentId)) {
+        if (ArrayUtils.contains(Client.character.getOrnaments(), Message.ornamentId)) {
             Client.character.setActivableOrnament((short) Message.ornamentId);
             Client.character.refreshActor();
             Client.send(new OrnamentSelectedMessage(Message.ornamentId));

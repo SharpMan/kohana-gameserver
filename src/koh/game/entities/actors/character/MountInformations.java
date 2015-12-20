@@ -33,6 +33,8 @@ public class MountInformations {
     public Player player;
     private GenericStats myStats;
 
+    public MountInformations() {}
+
     public MountInformations(Player P) {
         this.player = P;
     }
@@ -165,14 +167,21 @@ public class MountInformations {
         }
     }
 
-    public void deserialize(byte[] binary) {
-        if (binary.length <= 0) {
-            return;
+
+    public void setPlayer(Player p){
+        this.player = p;
+    }
+
+
+    public MountInformations deserialize(byte[] binary) {
+        if (binary == null || binary.length <= 0) {
+            return this;
         }
         IoBuffer buf = IoBuffer.wrap(binary);
         this.initialize(buf.getInt());
         this.ratio = buf.get();
         this.isToogled = BufUtils.readBoolean(buf);
+        return this;
     }
 
     public void totalClear() {

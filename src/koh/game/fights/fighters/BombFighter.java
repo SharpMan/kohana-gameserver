@@ -99,7 +99,7 @@ public class BombFighter extends StaticFighter {
                         if (Target.getID() == this.ID) {
                             continue;
                         }
-                        if (Target instanceof BombFighter /*&& ((BombFighter) Target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).Boosted) {
+                        if (Target instanceof BombFighter /*&& ((BombFighter) target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).Boosted) {
                             Targets.add((BombFighter) Target);
                             TotalCombo += 40;
                         }

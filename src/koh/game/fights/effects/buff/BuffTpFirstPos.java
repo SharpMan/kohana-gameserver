@@ -23,15 +23,15 @@ public class BuffTpFirstPos extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (Target.previousFirstCellPos.isEmpty()) {
+        if (target.previousFirstCellPos.isEmpty()) {
             return -1;
         }
-        FightCell cell = Target.fight.getCell(Target.previousFirstCellPos.get(Target.previousFirstCellPos.size() - 1));
+        FightCell cell = target.fight.getCell(target.previousFirstCellPos.get(target.previousFirstCellPos.size() - 1));
 
         if (cell != null) {
-            Target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), Target.getID(), cell.Id));
+            target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), target.getID(), cell.Id));
 
-            return Target.setCell(cell);
+            return target.setCell(cell);
         }
 
         return -1;
@@ -40,6 +40,6 @@ public class BuffTpFirstPos extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.getID(), (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
     }
 }

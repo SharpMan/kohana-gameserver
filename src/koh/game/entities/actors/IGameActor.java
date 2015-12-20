@@ -25,13 +25,15 @@ public abstract class IGameActor {
     protected volatile DofusCell cell;
     @Getter
     @Setter
-    public int mapid;
+    protected int mapid;
 
-    public EntityLook entityLook;
+    @Setter
+    protected EntityLook entityLook;
 
-    public abstract EntityLook getEntityLook();
+    protected abstract EntityLook getEntityLook();
 
-    public byte direction = 1;
+    @Getter @Setter
+    protected byte direction = 1;
 
     public void setActorCell(DofusCell cell){
         this.cell = cell;

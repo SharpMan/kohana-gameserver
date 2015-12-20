@@ -75,7 +75,7 @@ public class FighterBuff {
         }
         this.buffsAct.get(buff.ActiveType).add(buff);
         this.buffsDec.get(buff.DecrementType).add(buff);
-        buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.Effect.effectId*/buff.CastInfos.EffectType.value(), buff.caster.getID(), buff.getAbstractFightDispellableEffect()));
+        buff.target.fight.sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.Effect.effectId*/buff.CastInfos.EffectType.value(), buff.caster.getID(), buff.getAbstractFightDispellableEffect()));
         logger.debug("Buff {} added",buff,getClass().getName());
     }
 
@@ -102,7 +102,7 @@ public class FighterBuff {
          }
          this.buffsAct.get(Buff.ActiveType).add(Buff);
          this.buffsDec.get(Buff.DecrementType).add(Buff);
-         Buff.Target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.CastInfos.EffectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect()));
+         Buff.target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.CastInfos.EffectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect()));
 
          }
          }*/
