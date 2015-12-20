@@ -15,7 +15,7 @@ public class EffectAlterJet extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         if (CastInfos.Duration > 0) {
             for (Fighter Target : CastInfos.Targets) {
-                Target.buff.addBuff(CastInfos.EffectType == MaximizeEffects ? new BuffMaximiseEffects(CastInfos, Target) : new BuffMinimizeEffects(CastInfos, Target));
+                Target.getBuff().addBuff(CastInfos.EffectType == MaximizeEffects ? new BuffMaximiseEffects(CastInfos, Target) : new BuffMinimizeEffects(CastInfos, Target));
             }
         }
 

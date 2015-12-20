@@ -21,7 +21,7 @@ public class EffectLostPdvPercent extends EffectBase {
                 return -3;
             }
 
-            Target.buff.addBuff(BuffStats);
+            Target.getBuff().addBuff(BuffStats);
         }
 
         return -1;

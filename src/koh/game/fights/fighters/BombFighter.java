@@ -91,7 +91,7 @@ public class BombFighter extends StaticFighter {
         }
         int TotalCombo = 0;
         ArrayList<BombFighter> Targets = new ArrayList<>(6);
-        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.getCellId()).advancedOrientationTo(MapPoint.fromCellId(this.getCellId()), true), this.fight.map)).getCells(this.getCellId())) {
+        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.getCellId()).advancedOrientationTo(MapPoint.fromCellId(this.getCellId()), true), this.fight.getMap())).getCells(this.getCellId())) {
             FightCell FightCell = fight.getCell(aCell);
             if (FightCell != null) {
                 if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
@@ -113,8 +113,8 @@ public class BombFighter extends StaticFighter {
         fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
         stats.addBoost(StatsEnum.Combo_Dammages, TotalCombo);
         this.Boosted = true;
-        for (Fighter Bomb : Targets) {
-            Bomb.stats.addBoost(StatsEnum.Combo_Dammages, TotalCombo);
+        for (Fighter bomb : Targets) {
+            bomb.getStats().addBoost(StatsEnum.Combo_Dammages, TotalCombo);
             Boosted = true;
         }
         Targets.forEach(Bomb -> Bomb.tryDie(Caster, true));
@@ -164,7 +164,7 @@ public class BombFighter extends StaticFighter {
                 Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
             Short[] Cells;
-            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.summoner == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
+            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
                 int Distance = Pathfinder.getGoalDistance(null, getCellId(), Friend.getCellId());
                 logger.debug("Bomb Distance = {}" , Distance);
                 if (Distance >= 2 && Distance <= 7) {
@@ -201,7 +201,7 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightMonsterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.grade.getMonsterId(), this.grade.getGrade());
+        return new GameFightMonsterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.grade.getMonsterId(), this.grade.getGrade());
     }
 
     @Override

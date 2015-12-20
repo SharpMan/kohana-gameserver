@@ -11,8 +11,8 @@ public class EffectDisablePortal extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        if (CastInfos.Cell().HasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
-            ((FightPortal) (CastInfos.Cell().GetObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).disable(CastInfos.caster);
+        if (CastInfos.getCell().HasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
+            ((FightPortal) (CastInfos.getCell().GetObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).disable(CastInfos.caster);
         }
         return -1;
     }

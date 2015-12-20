@@ -17,7 +17,7 @@ public class DialogHandler {
     public static void HandleLeaveDialogRequestMessage(WorldClient Client, LeaveDialogRequestMessage Message) {
         try {
             if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-                if (!Client.myExchange.closeExchange()) {
+                if (!Client.getMyExchange().closeExchange()) {
                     Client.endGameAction(GameActionTypeEnum.EXCHANGE);
                 }
             } else if (Client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {

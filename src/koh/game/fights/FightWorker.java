@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import koh.game.Main;
 import koh.protocol.messages.game.context.fight.GameFightNewRoundMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +32,7 @@ public class FightWorker {
     }
 
     public void summonFighter(Fighter fighter) {
-        int index = myFightersTurn.indexOf(fighter.summoner) + 1;
+        int index = myFightersTurn.indexOf(fighter.getSummoner()) + 1;
         if (index == 0) {
             index = myFightersTurn.size();
         }
@@ -43,8 +42,8 @@ public class FightWorker {
     public void initTurns() {
         this.myFightersTurn.clear();
 
-        List<Fighter> Team1 = fight.Fighters().filter(x -> x.team.Id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
-        List<Fighter> Team2 = fight.Fighters().filter(x -> x.team.Id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
+        List<Fighter> Team1 = fight.Fighters().filter(x -> x.getTeam().id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
+        List<Fighter> Team2 = fight.Fighters().filter(x -> x.getTeam().id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
 
         for (Fighter Fighter : Team1) {
             int FIndex = Team1.indexOf(Fighter);

@@ -41,10 +41,10 @@ public class CharacterFighter extends Fighter {
     public Player character;
     public EntityLook Look;
 
-    public CharacterFighter(Fight Fight, WorldClient Client) {
+    public CharacterFighter(Fight Fight, WorldClient client) {
         super(Fight, null);
         this.turnReady = false;
-        this.character = Client.character;
+        this.character = client.getCharacter();
 
         this.character.setFight(Fight);
         this.character.setFighter(this);
@@ -62,7 +62,7 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public GameFightMinimalStats getGameFightMinimalStats(Player character) {
-        if (this.fight.fightState == FightState.STATE_PLACE) {
+        if (this.fight.getFightState() == FightState.STATE_PLACE) {
             return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), this.character.getMaxLife(), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
         }
         return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), this.character.getMaxLife(), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
@@ -72,7 +72,7 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(((fakeContextualId != -1000 && !this.isMyFriend(character)) ? this.fakeContextualId : this.ID), this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.character.getNickName(), this.character.getPlayerStatus(), (byte) this.getLevel(), this.character.getActorAlignmentInformations(), this.character.getBreed(), this.character.hasSexe());
+        return new GameFightCharacterInformations(((fakeContextualId != -1000 && !this.isMyFriend(character)) ? this.fakeContextualId : this.ID), this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.character.getNickName(), this.character.getPlayerStatus(), (byte) this.getLevel(), this.character.getActorAlignmentInformations(), this.character.getBreed(), this.character.hasSexe());
     }
 
     @Override
@@ -104,7 +104,7 @@ public class CharacterFighter extends Fighter {
 
     public void CleanClone() {
         boolean updated = false;
-        for (Fighter Clone : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner == this)::iterator) {
+        for (Fighter Clone : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.getSummoner() == this)::iterator) {
             Clone.tryDie(this.ID);
             updated = true;
         }
@@ -155,7 +155,7 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public void EndFight() {
-        if (fight.fightType != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
+        if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
             if (super.getLife() <= 0) {
                 this.character.setLife(1);
             } else {
@@ -171,7 +171,7 @@ public class CharacterFighter extends Fighter {
             this.character.send(new GameContextCreateMessage((byte) 1));
             //this.character.send(new LifePointsRegenBeginMessage());
             this.character.refreshStats(false);
-            if (!(this.fight instanceof ChallengeFight) && this.team.Id == this.fight.getLoosers().Id) {
+            if (!(this.fight instanceof ChallengeFight) && this.team.id == this.fight.getLoosers().id) {
                 this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
             } else {
                 this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));

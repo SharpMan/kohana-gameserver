@@ -190,8 +190,8 @@ public class PlayerExchange extends Exchange {
 
         this.unValidateAll();
 
-        if (quantity > Client.character.getKamas() || quantity < 0) {
-            quantity = Client.character.getKamas();
+        if (quantity > Client.getCharacter().getKamas() || quantity < 0) {
+            quantity = Client.getCharacter().getKamas();
         }
 
         this.myKamasToTrade.put(Client, quantity);
@@ -229,7 +229,7 @@ public class PlayerExchange extends Exchange {
     public synchronized boolean validate(WorldClient Client) {
         this.myValidate.put(Client, this.myValidate.get(Client) == false);
 
-        this.send(new ExchangeIsReadyMessage(Client.character.getID(), this.myValidate.get(Client)));
+        this.send(new ExchangeIsReadyMessage(Client.getCharacter().getID(), this.myValidate.get(Client)));
         if (this.myValidate.entrySet().stream().allMatch(x -> x.getValue())) {
             this.finish();
 
@@ -299,8 +299,8 @@ public class PlayerExchange extends Exchange {
 
     @Override
     public synchronized boolean closeExchange(boolean Success) {
-        this.myClient1.myExchange = null;
-        this.myClient2.myExchange = null;
+        this.myClient1.setMyExchange(null);
+        this.myClient2.setMyExchange(null);
 
         this.send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, Success));
 
@@ -336,7 +336,7 @@ public class PlayerExchange extends Exchange {
 
     @Override
     public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
-        return Client.myExchange.moveItems(Client, Exchange.getCharactersItems(Client.getCharacter()), false);
+        return Client.getMyExchange().moveItems(Client, Exchange.getCharactersItems(Client.getCharacter()), false);
     }
 
 }

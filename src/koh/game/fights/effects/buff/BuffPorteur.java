@@ -20,9 +20,9 @@ public class BuffPorteur extends BuffEffect {
     public BuffPorteur(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.Duration = -1;
-        CastInfos.caster.states.fakeState(FightStateEnum.Porteur, true);
+        CastInfos.caster.getStates().fakeState(FightStateEnum.Porteur, true);
         this.CastInfos.EffectType = StatsEnum.Add_State;
-        this.caster.fight.sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
+        this.caster.getFight().sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
     }
 
     @Override
@@ -33,18 +33,18 @@ public class BuffPorteur extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         // Si effet finis
-        if (!this.target.states.hasState(FightStateEnum.Porté)) {
+        if (!this.target.getStates().hasState(FightStateEnum.Porté)) {
             this.Duration = 0;
             return -1;
         }
 
         // On affecte la meme cell pour la cible porté
-        return this.target.setCell(this.caster.myCell);
+        return this.target.setCell(this.caster.getMyCell());
     }
 
     @Override
     public int removeEffect() {
-        CastInfos.caster.states.fakeState(FightStateEnum.Porteur, false);
+        CastInfos.caster.getStates().fakeState(FightStateEnum.Porteur, false);
         this.Duration = 0;
         return super.removeEffect();
     }

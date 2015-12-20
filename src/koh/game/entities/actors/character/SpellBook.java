@@ -218,7 +218,7 @@ public class SpellBook {
         client.sequenceMessage();
     }
 
-    public void SwapShortcuts(WorldClient client, byte slot, byte newSlot) {
+    public void swapShortcuts(WorldClient client, byte slot, byte newSlot) {
         SpellInfo shortcut1 = getByPos(slot);
         if (shortcut1 == null) {
             return;
@@ -234,17 +234,17 @@ public class SpellBook {
         client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, shortcut1.toShortcut()));
     }
 
-    public boolean BoostSpell(WorldClient client, int spellId, byte level) {
+    public boolean boostSpell(WorldClient client, int spellId, byte level) {
         if (this.mySpells.get(spellId) == null) {
             client.send(new SpellUpgradeFailureMessage());
             return false;
         } else {
-            if (!this.CanBoostSpell(client, this.mySpells.get(spellId))) {
+            if (!this.canBoostSpell(client, this.mySpells.get(spellId))) {
                 client.send(new SpellUpgradeFailureMessage());
                 return false;
             }
             while (level > this.mySpells.get(spellId).level) {
-                if (!this.CanBoostSpell(client, this.mySpells.get(spellId))) {
+                if (!this.canBoostSpell(client, this.mySpells.get(spellId))) {
                     break;
                 }
                 client.getCharacter().setSpellPoints(client.getCharacter().getSpellPoints() - this.mySpells.get(spellId).level);
@@ -255,13 +255,13 @@ public class SpellBook {
         }
     }
 
-    public boolean CanBoostSpell(WorldClient client, SpellInfo spell) {
+    public boolean canBoostSpell(WorldClient client, SpellInfo spell) {
         if (spell.level >= 6) {
             return false;
-        } else if (client.character.getSpellPoints() < (int) spell.level) {
+        } else if (client.getCharacter().getSpellPoints() < (int) spell.level) {
             return false;
         } else {
-            return spell.getSpellLevel((byte) (spell.level + 1)).getMinPlayerLevel() <= client.character.getLevel();
+            return spell.getSpellLevel((byte) (spell.level + 1)).getMinPlayerLevel() <= client.getCharacter().getLevel();
         }
     }
 

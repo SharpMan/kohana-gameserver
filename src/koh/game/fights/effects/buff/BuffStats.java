@@ -25,7 +25,7 @@ public class BuffStats extends BuffEffect {
 
         this.Value1 = CastInfos.RandomJet(target);
 
-        this.target.stats.addBoost(this.CastInfos.EffectType, this.Value1);
+        this.target.getStats().addBoost(this.CastInfos.EffectType, this.Value1);
 
         return super.applyEffect(DamageValue, DamageInfos);
     }
@@ -33,7 +33,7 @@ public class BuffStats extends BuffEffect {
     @Override
     public int removeEffect() {
         
-        this.target.stats.getEffect(this.CastInfos.EffectType).additionnal -= this.Value1;
+        this.target.getStats().getEffect(this.CastInfos.EffectType).additionnal -= this.Value1;
 
         return super.removeEffect();
     }

@@ -17,7 +17,7 @@ public class EffectSubPMEsquive extends EffectBase {
                 EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
                 BuffSubPMEsquive Buff = new BuffSubPMEsquive(SubInfos, Target);
                 Buff.applyEffect(null, null);
-                Target.buff.addBuff(Buff);
+                Target.getBuff().addBuff(Buff);
             }
         } else {
             for (Fighter Target : CastInfos.Targets) {
@@ -26,7 +26,7 @@ public class EffectSubPMEsquive extends EffectBase {
                 BuffSubPMEsquive Buff = new BuffSubPMEsquive(SubInfos, Target);
                 Buff.applyEffect(null, null);
 
-                Target.buff.addBuff(Buff);
+                Target.getBuff().addBuff(Buff);
             }
         }
 

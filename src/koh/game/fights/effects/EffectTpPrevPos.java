@@ -15,13 +15,13 @@ public class EffectTpPrevPos extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         int toReturn = -1;
         for (Fighter Target : CastInfos.Targets) {
-            if (Target.previousCellPos.isEmpty()) {
+            if (Target.getPreviousCellPos().isEmpty()) {
                 continue;
             }
-            FightCell cell = Target.fight.getCell(Target.previousCellPos.get(Target.previousCellPos.size() - 1));
+            FightCell cell = Target.getFight().getCell(Target.getPreviousCellPos().get(Target.getPreviousCellPos().size() - 1));
 
             if (cell != null) {
-                Target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), Target.getID(), cell.Id));
+                Target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), Target.getID(), cell.Id));
 
                 toReturn = Target.setCell(cell);
             }

@@ -12,7 +12,7 @@ public class EffectDodge extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            Target.buff.addBuff(new BuffDodge(CastInfos, Target));
+            Target.getBuff().addBuff(new BuffDodge(CastInfos, Target));
         }
 
         return -1;

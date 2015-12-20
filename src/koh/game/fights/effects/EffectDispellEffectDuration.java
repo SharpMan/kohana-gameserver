@@ -14,11 +14,11 @@ public class EffectDispellEffectDuration extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             short Jet = CastInfos.RandomJet(Target);
-            if (Target.buff.decrementEffectDuration(Jet) == -3) {
+            if (Target.getBuff().decrementEffectDuration(Jet) == -3) {
                 return -3;
             }
 
-            Target.fight.sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.caster.getID(), Target.getID(), (short) -Jet));
+            Target.getFight().sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.caster.getID(), Target.getID(), (short) -Jet));
         }
 
         return -1;

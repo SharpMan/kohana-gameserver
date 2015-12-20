@@ -15,8 +15,8 @@ public class EffectSpellDommage extends EffectBase {
         BuffEffect Buff = null;
         for (Fighter Target : CastInfos.Targets) {
             Buff = new BuffSpellDommage(CastInfos, Target);
-            if (!Target.buff.buffMaxStackReached(Buff)) {
-                Target.buff.addBuff(Buff);
+            if (!Target.getBuff().buffMaxStackReached(Buff)) {
+                Target.getBuff().addBuff(Buff);
                 if (Buff.applyEffect(null, null) == -3) {
                     return -3;
                 }

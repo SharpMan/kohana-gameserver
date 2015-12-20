@@ -26,21 +26,21 @@ public class BuffAddResistStats extends BuffEffect {
 
         this.Value1 = CastInfos.RandomJet(target);
 
-        this.target.stats.addBoost(StatsEnum.WaterElementResistPercent, this.Value1);
-        this.target.stats.addBoost(StatsEnum.FireElementResistPercent, this.Value1);
-        this.target.stats.addBoost(StatsEnum.AirElementResistPercent, this.Value1);
-        this.target.stats.addBoost(StatsEnum.EarthElementResistPercent, this.Value1);
-        this.target.stats.addBoost(StatsEnum.NeutralElementResistPercent, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.WaterElementResistPercent, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.FireElementResistPercent, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.AirElementResistPercent, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.EarthElementResistPercent, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.NeutralElementResistPercent, this.Value1);
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int removeEffect() {
-        this.target.stats.getEffect(StatsEnum.WaterElementResistPercent).additionnal -= this.Value1;
-        this.target.stats.getEffect(StatsEnum.FireElementResistPercent).additionnal -= this.Value1;
-        this.target.stats.getEffect(StatsEnum.AirElementResistPercent).additionnal -= this.Value1;
-        this.target.stats.getEffect(StatsEnum.EarthElementResistPercent).additionnal -= this.Value1;
-        this.target.stats.getEffect(StatsEnum.NeutralElementResistPercent).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.WaterElementResistPercent).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.FireElementResistPercent).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.AirElementResistPercent).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.EarthElementResistPercent).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.NeutralElementResistPercent).additionnal -= this.Value1;
 
         return super.removeEffect();
     }

@@ -18,8 +18,8 @@ public class BankReply extends NpcReply {
             return false;
         }
         if (player.getClient().canGameAction(GameActionTypeEnum.EXCHANGE)) {
-            player.getClient().myExchange = new StorageExchange(player.getClient());
-            player.getClient().addGameAction(new GameExchange(player, player.getClient().myExchange));
+            player.getClient().setMyExchange(new StorageExchange(player.getClient()));
+            player.getClient().addGameAction(new GameExchange(player, player.getClient().getMyExchange()));
         }
         return true;
     }

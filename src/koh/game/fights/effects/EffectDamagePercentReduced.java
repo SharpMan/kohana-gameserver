@@ -12,7 +12,7 @@ public class EffectDamagePercentReduced extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for(Fighter Target : CastInfos.Targets){
-            Target.buff.addBuff(new BuffDamagePercentReduced(CastInfos,Target));
+            Target.getBuff().addBuff(new BuffDamagePercentReduced(CastInfos,Target));
         }
          return -1;
     }

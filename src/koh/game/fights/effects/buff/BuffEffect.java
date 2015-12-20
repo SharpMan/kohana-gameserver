@@ -34,7 +34,7 @@ public abstract class BuffEffect {
 
     public int GetId() {
         if (this.Uid == -1) {
-            Uid = target.nextBuffUid.incrementAndGet();
+            Uid = target.getNextBuffUid().incrementAndGet();
         }
         return this.Uid;
     }
@@ -56,19 +56,19 @@ public abstract class BuffEffect {
         //return true;
     }
 
-    public BuffEffect(EffectCast CastInfos, Fighter Target, BuffActiveType ActiveType, BuffDecrementType DecrementType) {
+    public BuffEffect(EffectCast CastInfos, Fighter target, BuffActiveType ActiveType, BuffDecrementType DecrementType) {
         this.CastInfos = CastInfos;
 
         //this.Duration = (CastInfos.Duration == -1) ? -1 : (target.fight.currentFighter == target /*&& CastInfos.Duration == 0*/ ? CastInfos.Duration + 1 : CastInfos.Duration) - CastInfos.Delay();
         this.Duration = (CastInfos.Duration == -1) ? -1 : (DecrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.Duration : (CastInfos.Duration) - CastInfos.Delay());
         
         //System.out.println(target.fight.currentFighter == target);
-        if (DecrementType == BuffDecrementType.TYPE_ENDTURN && Target.getID() == CastInfos.caster.getID()) {
+        if (DecrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID()) {
             this.Duration++;
         }
         this.Delay = CastInfos.Delay();
         this.caster = CastInfos.caster;
-        this.target = Target;
+        this.target = target;
 
         this.ActiveType = ActiveType;
         this.DecrementType = DecrementType;

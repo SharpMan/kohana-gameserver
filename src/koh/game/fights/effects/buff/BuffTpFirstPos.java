@@ -23,13 +23,13 @@ public class BuffTpFirstPos extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (target.previousFirstCellPos.isEmpty()) {
+        if (target.getPreviousFirstCellPos().isEmpty()) {
             return -1;
         }
-        FightCell cell = target.fight.getCell(target.previousFirstCellPos.get(target.previousFirstCellPos.size() - 1));
+        FightCell cell = target.getFight().getCell(target.getPreviousFirstCellPos().get(target.getPreviousFirstCellPos().size() - 1));
 
         if (cell != null) {
-            target.fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), target.getID(), cell.Id));
+            target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), target.getID(), cell.Id));
 
             return target.setCell(cell);
         }

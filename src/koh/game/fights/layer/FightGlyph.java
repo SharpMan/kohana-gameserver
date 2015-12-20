@@ -19,12 +19,12 @@ import koh.protocol.types.game.actions.fight.GameActionMark;
 public class FightGlyph extends FightActivableObject {
 
     public FightGlyph(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum Shape) {
-        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.caster.fight, castInfos.caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
+        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
     }
 
     @Override
     public void AppearForAll() {
-        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.getID(), getGameActionMark()));
+        this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.caster.getID(), getGameActionMark()));
     }
 
     @Override
@@ -33,8 +33,8 @@ public class FightGlyph extends FightActivableObject {
     }
 
     @Override
-    public void DisappearForAll() {
-        this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.getID(), this.ID));
+    public void disappearForAll() {
+        this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.caster.getID(), this.ID));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class FightGlyph extends FightActivableObject {
 
     @Override
     public GameActionMark getGameActionMark() {
-        return new GameActionMark(this.m_caster.getID(), this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.getCellId(), this.getGameActionMarkedCell(), true);
+        return new GameActionMark(this.caster.getID(), this.caster.getTeam().id, this.m_spellId, this.m_spell_level, this.ID, getGameActionMarkType().value(), this.getCellId(), this.getGameActionMarkedCell(), true);
     }
 
     @Override

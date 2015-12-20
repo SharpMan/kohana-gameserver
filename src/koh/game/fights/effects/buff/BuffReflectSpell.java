@@ -15,12 +15,12 @@ public class BuffReflectSpell extends BuffEffect {
     public BuffReflectSpell(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
         this.reflectLevel = CastInfos.SpellLevel.getGrade();
-        this.target.states.addState(this);
+        this.target.getStates().addState(this);
     }
 
     @Override
     public int removeEffect() {
-        this.target.states.delState(this);
+        this.target.getStates().delState(this);
 
         return super.removeEffect();
     }

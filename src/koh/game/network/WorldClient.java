@@ -50,23 +50,30 @@ import org.apache.mina.core.session.IoSession;
 public class WorldClient {
 
     private final IoSession session;
-    public AccountTicket tempTicket;
-    public boolean showQueue;
     @Getter @Setter
-    public Player character;
-    public String clientKey;
+    private AccountTicket tempTicket;
+    @Getter @Setter
+    private boolean showQueue;
+    @Getter @Setter
+    private Player character;
+    @Setter
+    private String clientKey;
     private final Map<GameActionTypeEnum, GameAction> myActions = Collections.synchronizedMap(new HashMap<GameActionTypeEnum, GameAction>());
-    public int lastPacketId, Seq = 0;
-    public boolean firstCheck = true;
-    public BasicLatencyStatsMessage latency;
-    public volatile Couple<IWorldEventObserver, Message> callBacks;
-    public volatile DofusTrigger onMouvementConfirm = null;
+    private int lastPacketId, sequenceMessage = 0;
+    //public boolean firstCheck = true;
+    @Setter
+    private BasicLatencyStatsMessage latency;
+    @Getter @Setter
+    private volatile Couple<IWorldEventObserver, Message> callBacks;
+    @Getter @Setter
+    private volatile DofusTrigger onMouvementConfirm = null;
+    @Getter @Setter
     public Exchange myExchange = null;
     private GameBaseRequest myBaseRequest = null;
     private CopyOnWriteArrayList<PartyRequest> partyRequests;
     private static final Logger logger = LogManager.getLogger(WorldClient.class);
 
-
+    @Getter
     public Map<Byte, Long> lastChannelMessage = new HashMap<Byte, Long>() {
         {
             put(CHANNEL_SALES, 0L);
@@ -215,7 +222,7 @@ public class WorldClient {
             }
 
             this.lastPacketId = message.getMessageId();
-            this.Seq++;
+            this.sequenceMessage++;
             Method MessageIdentifier = Handler.getMethodByMessage(message.getMessageId());
             if (MessageIdentifier != null) {
                 MessageIdentifier.invoke(null, this, message);
@@ -241,12 +248,12 @@ public class WorldClient {
 
     public void sequenceMessage() {
         //TODO : Right seq and lastPacketId value
-        this.send(new BasicAckMessage(Seq, lastPacketId));
+        this.send(new BasicAckMessage(sequenceMessage, lastPacketId));
     }
 
     public void sequenceMessage(Message Dofus) {
         //TODO: SequenceMessage BASIC + Dofus blinded
-        //this.send(new BasicAckMessage(Seq, lastPacketId, Dofus));
+        //this.send(new BasicAckMessage(sequenceMessage, lastPacketId, Dofus));
     }
 
     public void timeOut() {

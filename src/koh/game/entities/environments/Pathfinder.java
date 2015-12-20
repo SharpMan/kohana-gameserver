@@ -48,7 +48,7 @@ public class Pathfinder {
     }
 
     public static MovementPath isValidPath(Fight fight, Fighter fighter, short currentCell, byte currentDirection, short[] encodedPath) {
-        MovementPath DecodedPath = Pathfinder.DecodePath(fight.map, currentCell, currentDirection, encodedPath);
+        MovementPath DecodedPath = Pathfinder.DecodePath(fight.getMap(), currentCell, currentDirection, encodedPath);
         MovementPath FinalPath = new MovementPath();
 
         int Index = 0;
@@ -74,11 +74,11 @@ public class Pathfinder {
         int length = -1;
         Short ActualCell = beginCell;
 
-        if (!Pathfinder.inLine(fight.map, beginCell, endCell)) {
+        if (!Pathfinder.inLine(fight.getMap(), beginCell, endCell)) {
             return length;
         }
 
-        length = (int) getGoalDistanceEstimate(fight.map, beginCell, endCell);
+        length = (int) getGoalDistanceEstimate(fight.getMap(), beginCell, endCell);
 
         path.addCell(ActualCell, direction);
 
@@ -86,7 +86,7 @@ public class Pathfinder {
 
             ActualCell = (short) Pathfinder.nextCell(ActualCell, direction);
 
-            if (!fight.map.getCell(ActualCell).walakable()) {
+            if (!fight.getMap().getCell(ActualCell).walakable()) {
                 return -2;
             }
 
@@ -101,7 +101,7 @@ public class Pathfinder {
 
             path.movementLength++;
 
-            if (Pathfinder.isStopCell(fighter.fight, fighter.team, ActualCell, fighter)) {
+            if (Pathfinder.isStopCell(fighter.getFight(), fighter.getTeam(), ActualCell, fighter)) {
                 return -2;
             }
         }
@@ -132,7 +132,7 @@ public class Pathfinder {
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
             Fighter Ennemy = fight.hasEnnemyInCell((short) Pathfinder.nextCell(cellId, Direction), team);
             if (Ennemy != null) {
-                if (!Ennemy.dead && !(notVisible && Ennemy.visibleState != GameActionFightInvisibilityStateEnum.INVISIBLE)) {
+                if (!Ennemy.isDead() && !(notVisible && Ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE)) {
                     ennemies.add(Ennemy);
                 }
             }
@@ -147,7 +147,7 @@ public class Pathfinder {
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
             Fighter Ennemy = Fight.hasEnnemyInCell((short) Pathfinder.nextCell(CellId, Direction), Team);
             if (Ennemy != null) {
-                if (!Ennemy.isDead() && !Ennemy.states.hasState(FightStateEnum.Enraciné) && Ennemy.visibleState != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                if (!Ennemy.isDead() && !Ennemy.getStates().hasState(FightStateEnum.Enraciné) && Ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
                     Ennemies.add(Ennemy);
                 }
             }
@@ -215,11 +215,11 @@ public class Pathfinder {
         int length = -1;
         Short actualCell = beginCell;
 
-        if (!Pathfinder.inLine(fight.map, beginCell, endCell)) {
+        if (!Pathfinder.inLine(fight.getMap(), beginCell, endCell)) {
             return null;
         }
 
-        length = (int) getGoalDistanceEstimate(fight.map, beginCell, endCell) - 1;
+        length = (int) getGoalDistanceEstimate(fight.getMap(), beginCell, endCell) - 1;
         Short[] cells = new Short[length];
 
         for (int i = 0; i < length; i++) {
@@ -245,18 +245,18 @@ public class Pathfinder {
         int length = -1;
         Short actualCell = beginCell;
 
-        if (!Pathfinder.inLine(fight.map, beginCell, endCell)) {
+        if (!Pathfinder.inLine(fight.getMap(), beginCell, endCell)) {
             return null;
         }
 
-        length = (int) getGoalDistanceEstimate(fight.map, beginCell, endCell) - 1;
+        length = (int) getGoalDistanceEstimate(fight.getMap(), beginCell, endCell) - 1;
         Short[] Cells = new Short[length];
 
         for (int i = 0; i < length; i++) {
 
             actualCell = (short) Pathfinder.nextCell(actualCell, direction);
 
-            if (!fight.map.getCell(actualCell).walakable()) {
+            if (!fight.getMap().getCell(actualCell).walakable()) {
                 return null;
             }
 

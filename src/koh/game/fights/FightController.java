@@ -17,7 +17,7 @@ public class FightController {
         if (this.myFights.isEmpty()) {
             return 1;
         }
-        return this.myFights.stream().mapToInt(x -> x.fightId).max().getAsInt() + 1;
+        return this.myFights.stream().mapToInt(x -> x.getFightId()).max().getAsInt() + 1;
     }
 
     public int fightCount() {
@@ -31,7 +31,7 @@ public class FightController {
     public Fight getFight(int FightId) {
         synchronized (this.myFights) {
             for (Fight Fight : this.myFights) {
-                if (Fight.fightId == FightId) {
+                if (Fight.getFightId() == FightId) {
                     return Fight;
                 }
             }
@@ -40,7 +40,7 @@ public class FightController {
     }
 
     public void sendFightInfos(WorldClient Client) {
-        this.myFights.stream().filter((Fight) -> (Fight.fightState == FightState.STATE_PLACE)).forEach((Fight) -> {
+        this.myFights.stream().filter((Fight) -> (Fight.getFightState() == FightState.STATE_PLACE)).forEach((Fight) -> {
             Fight.sendFightFlagInfos(Client);
         });
         Client.send(new MapFightCountMessage(this.myFights.size()));

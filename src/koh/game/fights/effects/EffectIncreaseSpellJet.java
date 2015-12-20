@@ -13,7 +13,7 @@ public class EffectIncreaseSpellJet extends EffectBase {
         if (CastInfos.caster == null) {
             return -1;
         }
-        CastInfos.caster.buff.addBuff(new BuffIncreaseSpellJet(CastInfos, CastInfos.caster));
+        CastInfos.caster.getBuff().addBuff(new BuffIncreaseSpellJet(CastInfos, CastInfos.caster));
 
         return -1;
     }

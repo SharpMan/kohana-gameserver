@@ -15,35 +15,35 @@ public class EffectTranspose extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.states.hasState(FightStateEnum.Porté) && !target.states.hasState(FightStateEnum.Inébranlable) && !target.states.hasState(FightStateEnum.Enraciné) && !target.states.hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.Porté) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             if (CastInfos.SpellId == 445) {
-                if (Target.team == CastInfos.caster.team) {
+                if (target.getTeam() == CastInfos.caster.getTeam()) {
                     continue;
                 }
             } else if (CastInfos.SpellId == 438) {
-                if (Target.team != CastInfos.caster.team) {
+                if (target.getTeam() != CastInfos.caster.getTeam()) {
                     continue;
                 }
             }
-            FightCell CasterCell = CastInfos.caster.myCell, TargetCell = Target.myCell;
-            CastInfos.caster.fight.sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, CastInfos.caster.getID(), Target.getID(), Target.getCellId(), CastInfos.caster.getCellId()));
+            FightCell CasterCell = CastInfos.caster.getMyCell(), TargetCell = target.getMyCell();
+            CastInfos.caster.getFight().sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, CastInfos.caster.getID(), target.getID(), target.getCellId(), CastInfos.caster.getCellId()));
             CastInfos.caster.setCell(null);
-            Target.setCell(null);
+            target.setCell(null);
 
-            if (CastInfos.caster.setCell(TargetCell, false) == -3 || Target.setCell(CasterCell, false) == -3) {
+            if (CastInfos.caster.setCell(TargetCell, false) == -3 || target.setCell(CasterCell, false) == -3) {
                 return -3;
             }
 
             //Separated for false Sync wih piège call pushBackEffect
-            if (CastInfos.caster.onCellChanged() == -3 || Target.onCellChanged() == -3) {
+            if (CastInfos.caster.onCellChanged() == -3 || target.onCellChanged() == -3) {
                 return -3;
             }
 
-            int Result = CastInfos.caster.myCell.onObjectAdded(CastInfos.caster);
+            int Result = CastInfos.caster.getMyCell().onObjectAdded(CastInfos.caster);
             if (Result == -3) {
                 return Result;
             }
-            Result = Target.myCell.onObjectAdded(Target);
+            Result = target.getMyCell().onObjectAdded(target);
             if (Result == -3) {
                 return Result;
             }

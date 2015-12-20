@@ -19,7 +19,7 @@ public class EffectDamageDropLife extends EffectBase {
 
             // Ajout du buff
             for (Fighter Target : CastInfos.Targets) {
-                Target.buff.addBuff(new BuffDamageDropLife(CastInfos, Target));
+                Target.getBuff().addBuff(new BuffDamageDropLife(CastInfos, Target));
             }
         } else // Dommage direct
         {

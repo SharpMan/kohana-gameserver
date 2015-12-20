@@ -26,7 +26,7 @@ public class Waiter implements Runnable {
     @Override
     public void run() {
         if (PlayerDAOImpl.accountInUnload.contains(this.waitingList.getAccount().id)
-                || this.waitingList.getAccount().characters.stream().anyMatch(Player -> Player.getFighter() != null && Player.getFight() != null && Player.getFight().fightType == FightTypeEnum.FIGHT_TYPE_CHALLENGE)) {
+                || this.waitingList.getAccount().characters.stream().anyMatch(Player -> Player.getFighter() != null && Player.getFight() != null && Player.getFight().getFightType() == FightTypeEnum.FIGHT_TYPE_CHALLENGE)) {
             waitingList.send(new LoginQueueStatusMessage((short) 1, (short) 50));
             //Wait to comit....
             return;

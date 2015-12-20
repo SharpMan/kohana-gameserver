@@ -47,7 +47,7 @@ public class PartyHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.character)) {
+        if (!Client.getParty().isChief(Client.getCharacter())) {
             Client.send(new PartyNameSetErrorMessage(Client.getParty().id, PartyNameErrorEnum.PARTY_NAME_UNALLOWED_RIGHTS));
             return;
         }
@@ -65,7 +65,7 @@ public class PartyHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.character)) {
+        if (!Client.getParty().isChief(Client.getCharacter())) {
             PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
@@ -79,7 +79,7 @@ public class PartyHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.character)) {
+        if (!Client.getParty().isChief(Client.getCharacter())) {
             PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
@@ -105,7 +105,7 @@ public class PartyHandler {
             PlayerController.sendServerMessage(Client, "Erreur : Ce joueur ne fait pas partie du groupe");
             return;
         }
-        Client.getParty().getPlayerById(Message.playerId).addFollower(Client.character);
+        Client.getParty().getPlayerById(Message.playerId).addFollower(Client.getCharacter());
     }
 
     @HandlerAttribute(ID = PartyAbdicateThroneMessage.M_ID)
@@ -114,7 +114,7 @@ public class PartyHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.character)) {
+        if (!Client.getParty().isChief(Client.getCharacter())) {
             PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
@@ -131,7 +131,7 @@ public class PartyHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.character)) {
+        if (!Client.getParty().isChief(Client.getCharacter())) {
             PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
@@ -140,7 +140,7 @@ public class PartyHandler {
             return;
         }
         Client.getParty().leave(Client.getParty().getPlayerById(Message.playerId), true);
-        Client.getParty().sendToField(new PartyMemberEjectedMessage(Client.getParty().id, Message.playerId, Client.character.getID()));
+        Client.getParty().sendToField(new PartyMemberEjectedMessage(Client.getParty().id, Message.playerId, Client.getCharacter().getID()));
 
     }
 
@@ -181,7 +181,7 @@ public class PartyHandler {
         if (Req != null) {
             Req.abort();
             Client.removePartyRequest(Req);
-        } else if (Client.getParty() != null && Client.getParty().isChief(Client.character)) {
+        } else if (Client.getParty() != null && Client.getParty().isChief(Client.getCharacter())) {
             Client.getParty().abortRequest(Client, Message.guestId);
         } else {
             Client.send(new BasicNoOperationMessage());
@@ -259,9 +259,9 @@ public class PartyHandler {
         target.getClient().addPartyRequest(Request);
 
         if (Client.getParty() == null) {
-            new Party(Client.character, target);
+            new Party(Client.getCharacter(), target);
         } else {
-            if (Client.getParty().restricted && !Client.getParty().isChief(Client.character)) {
+            if (Client.getParty().restricted && !Client.getParty().isChief(Client.getCharacter())) {
                 PlayerController.sendServerMessage(Client, "Impossible d'inviter ce joueur, le groupe ne peut pas être modifié actuellement.");
                 return;
             } else {

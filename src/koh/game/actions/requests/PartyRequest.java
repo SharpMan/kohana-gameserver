@@ -24,7 +24,7 @@ public class PartyRequest extends GameBaseRequest {
             return false;
         }
         
-        this.requester.getParty().addPlayer(this.requested.character);
+        this.requester.getParty().addPlayer(this.requested.getCharacter());
 
         this.requested.removePartyRequest(this);
         this.requester.removePartyRequest(this);
@@ -37,9 +37,9 @@ public class PartyRequest extends GameBaseRequest {
             return;
         }
         try {
-            this.requester.getParty().sendToField(new PartyCancelInvitationNotificationMessage(this.requester.getParty().id, this.requester.character.getID(), this.requested.character.getID()));
-            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requester.character.getID()));
-            this.requester.getParty().removeGuest(this.requested.character);
+            this.requester.getParty().sendToField(new PartyCancelInvitationNotificationMessage(this.requester.getParty().id, this.requester.getCharacter().getID(), this.requested.getCharacter().getID()));
+            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requester.getCharacter().getID()));
+            this.requester.getParty().removeGuest(this.requested.getCharacter());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,11 +53,11 @@ public class PartyRequest extends GameBaseRequest {
             return false;
         }
         try {
-            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requested.character.getID()));
+            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requested.getCharacter().getID()));
 
-            this.requester.getParty().sendToField(new PartyRefuseInvitationNotificationMessage(this.requester.getParty().id, this.requested.character.getID()));
+            this.requester.getParty().sendToField(new PartyRefuseInvitationNotificationMessage(this.requester.getParty().id, this.requested.getCharacter().getID()));
 
-            this.requester.getParty().removeGuest(this.requested.character);
+            this.requester.getParty().removeGuest(this.requested.getCharacter());
         } catch (Exception e) {
             e.printStackTrace();
         }

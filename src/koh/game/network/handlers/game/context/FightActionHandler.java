@@ -21,10 +21,10 @@ public class FightActionHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        SpellLevel Spell = Client.character.getMySpells().getSpellLevel(Message.spellId);
-        Fighter Fighter = Client.character.getFight().getFighter(Message.targetId);
+        SpellLevel Spell = Client.getCharacter().getMySpells().getSpellLevel(Message.spellId);
+        Fighter Fighter = Client.getCharacter().getFight().getFighter(Message.targetId);
         if (Spell != null && Fighter != null) {
-            Client.character.getFight().launchSpell(Client.character.getFighter(), Spell, Fighter.getCellId(), false);
+            Client.getCharacter().getFight().launchSpell(Client.getCharacter().getFighter(), Spell, Fighter.getCellId(), false);
         }
     }
 
@@ -34,11 +34,11 @@ public class FightActionHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        SpellLevel Spell = Client.character.getMySpells().getSpellLevel(Message.spellId);
+        SpellLevel Spell = Client.getCharacter().getMySpells().getSpellLevel(Message.spellId);
 
         // Sort existant ?
         if (Spell != null) {
-            Client.character.getFight().launchSpell(Client.character.getFighter(), Spell, Message.cellId, false);
+            Client.getCharacter().getFight().launchSpell(Client.getCharacter().getFighter(), Spell, Message.cellId, false);
         }
 
     }

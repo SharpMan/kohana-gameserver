@@ -61,7 +61,7 @@ public class EffectStatsSteal extends EffectBase {
                 return -3;
             }
 
-            Target.buff.addBuff(BuffStats);
+            Target.getBuff().addBuff(BuffStats);
 
             // Bonus au lanceur
             BuffStats = new BuffStats(BonusInfos, CastInfos.caster);
@@ -69,7 +69,7 @@ public class EffectStatsSteal extends EffectBase {
                 return -3;
             }
 
-            CastInfos.caster.buff.addBuff(BuffStats);
+            CastInfos.caster.getBuff().addBuff(BuffStats);
         }
 
         return -1;

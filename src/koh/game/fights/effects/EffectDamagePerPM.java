@@ -12,7 +12,7 @@ public class EffectDamagePerPM extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            Target.buff.addBuff(new BuffDamagePerPM(CastInfos, Target));
+            Target.getBuff().addBuff(new BuffDamagePerPM(CastInfos, Target));
         }
 
         return -1;

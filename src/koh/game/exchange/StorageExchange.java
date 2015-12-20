@@ -32,18 +32,18 @@ public class StorageExchange extends Exchange {
         if (add) {
             for (InventoryItem Item : items) {
                 newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, Client.getAccount().id, Item.getQuantity(), Item.getEffects());
-                if (Client.getAccount().accountData.add(Client.character, newItem, true)) {
+                if (Client.getAccount().accountData.add(Client.getCharacter(), newItem, true)) {
                     newItem.setNeedInsert(true);
                 }
-                Client.character.getInventoryCache().updateObjectquantity(Item, 0);
+                Client.getCharacter().getInventoryCache().updateObjectquantity(Item, 0);
             }
         } else {
             for (InventoryItem Item : items) {
-                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, Client.character.getID(), Item.getQuantity(), Item.getEffects());
-                if (Client.character.getInventoryCache().add(newItem, true)) {
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, Client.getCharacter().getID(), Item.getQuantity(), Item.getEffects());
+                if (Client.getCharacter().getInventoryCache().add(newItem, true)) {
                     newItem.setNeedInsert(true);
                 }
-                Client.getAccount().accountData.updateObjectQuantity(Client.character, Item, 0);
+                Client.getAccount().accountData.updateObjectQuantity(Client.getCharacter(), Item, 0);
             }
         }
         return true;
@@ -58,19 +58,19 @@ public class StorageExchange extends Exchange {
             if (BankItem == null) {
                 return false;
             }
-            client.getAccount().accountData.updateObjectQuantity(client.character, BankItem, BankItem.getQuantity() + quantity);
-            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.getTemplateId(), 63, client.character.getID(), -quantity, BankItem.getEffects());
-            if (client.character.getInventoryCache().add(Item, true)) {
+            client.getAccount().accountData.updateObjectQuantity(client.getCharacter(), BankItem, BankItem.getQuantity() + quantity);
+            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.getTemplateId(), 63, client.getCharacter().getID(), -quantity, BankItem.getEffects());
+            if (client.getCharacter().getInventoryCache().add(Item, true)) {
                 Item.setNeedInsert(true);
             }
         } else { //add In bank
-            InventoryItem Item = client.character.getInventoryCache().find(itemID);
+            InventoryItem Item = client.getCharacter().getInventoryCache().find(itemID);
             if (Item == null) {
                 return false;
             }
-            client.character.getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - quantity);
+            client.getCharacter().getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - quantity);
             InventoryItem NewItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, client.getAccount().id, quantity, Item.getEffects());
-            if (client.getAccount().accountData.add(client.character, NewItem, true)) {
+            if (client.getAccount().accountData.add(client.getCharacter(), NewItem, true)) {
                 NewItem.setNeedInsert(true);
             }
         }
@@ -87,14 +87,14 @@ public class StorageExchange extends Exchange {
             }
             Client.getAccount().accountData.setBankKamas(Client.getAccount().accountData.kamas + quantity);
             Client.send(new StorageKamasUpdateMessage(Client.getAccount().accountData.kamas));
-            Client.character.getInventoryCache().substractKamas(quantity, false);
+            Client.getCharacter().getInventoryCache().substractKamas(quantity, false);
         } else {
-            if (Client.character.getKamas() - quantity < 0) {
+            if (Client.getCharacter().getKamas() - quantity < 0) {
                 return false;
             }
             Client.getAccount().accountData.setBankKamas(Client.getAccount().accountData.kamas + quantity);
             Client.send(new StorageKamasUpdateMessage(Client.getAccount().accountData.kamas));
-            Client.character.getInventoryCache().substractKamas(quantity, false);
+            Client.getCharacter().getInventoryCache().substractKamas(quantity, false);
         }
         return true;
     }
@@ -124,7 +124,7 @@ public class StorageExchange extends Exchange {
     @Override
     public boolean closeExchange(boolean Success) {
         this.finish();
-        this.myClient.myExchange = null;
+        this.myClient.setMyExchange(null);
         this.myClient.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
         this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 
@@ -138,7 +138,7 @@ public class StorageExchange extends Exchange {
 
     @Override
     public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
-        return Client.myExchange.moveItems(Client, Client.getAccount().accountData.itemscache.values().toArray(new InventoryItem[Client.getAccount().accountData.itemscache.size()]), false);
+        return Client.getMyExchange().moveItems(Client, Client.getAccount().accountData.itemscache.values().toArray(new InventoryItem[Client.getAccount().accountData.itemscache.size()]), false);
     }
 
 }

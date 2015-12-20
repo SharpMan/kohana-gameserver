@@ -32,11 +32,11 @@ public class BasicHandler {
 
     @HandlerAttribute(ID = BasicLatencyStatsMessage.MESSAGE_ID)
     public static void HandleBasicLatencyStatsMessage(WorldClient Client, BasicLatencyStatsMessage Message) {
-        Client.latency = Message;
-        if (Client.callBacks != null) {
-            Client.callBacks.first.sendToField(Client.callBacks.second);
-            Client.callBacks.Clear();
-            Client.callBacks = null;
+        Client.setLatency(Message);
+        if (Client.getCallBacks() != null) {
+            Client.getCallBacks().first.sendToField(Client.getCallBacks().second);
+            Client.getCallBacks().Clear();
+            Client.setCallBacks(null);
         }
         Client.sequenceMessage();
     }

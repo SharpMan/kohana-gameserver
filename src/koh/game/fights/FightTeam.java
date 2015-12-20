@@ -39,14 +39,14 @@ public class FightTeam {
     public AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_WITHOUT;
 
     private ArrayList<Fighter> myFighters = new ArrayList<>(8);
-    public byte Id;
+    public byte id;
     public int LeaderId;
     public Fighter leader;
     public Fight Fight;
     public ArrayList<SwapPositionRequest> swapRequests = new ArrayList<>();
 
     public FightTeam(byte Id, Fight f) {
-        this.Id = Id;
+        this.id = Id;
         this.Fight = f;
     }
 
@@ -66,7 +66,7 @@ public class FightTeam {
         if (this.leader instanceof MonsterFighter) {
             return FighterRefusedReasonEnum.WRONG_ALIGNMENT;
         }
-        if (this.Fight.fightState != FightState.STATE_PLACE) {
+        if (this.Fight.getFightState() != FightState.STATE_PLACE) {
             return FighterRefusedReasonEnum.TOO_LATE;
         }
         if (this.myFighters.size() >= 8) {
@@ -97,7 +97,7 @@ public class FightTeam {
     }
 
     public FightTeamInformations getFightTeamInformations() {
-        return new FightTeamInformations(this.Id, this.leader != null ? this.leader.getID() : 0, this.alignmentSide.value, this.getTeamType(), (byte) 0, this.getFighters().map(x -> x.getFightTeamMemberInformations()).toArray(FightTeamMemberInformations[]::new));
+        return new FightTeamInformations(this.id, this.leader != null ? this.leader.getID() : 0, this.alignmentSide.value, this.getTeamType(), (byte) 0, this.getFighters().map(x -> x.getFightTeamMemberInformations()).toArray(FightTeamMemberInformations[]::new));
     }
 
     public FightOptionsInformations getFightOptionsInformations() {
@@ -107,7 +107,7 @@ public class FightTeam {
     public short bladePosition = -1;
 
     public void fighterJoin(Fighter Fighter) {
-        Fighter.team = this;
+        Fighter.setTeam(this);
 
         this.myFighters.add(Fighter);
     }
@@ -133,7 +133,7 @@ public class FightTeam {
     }
 
     public void endFight() {
-        this.myFighters.removeIf(x -> x.summoner != null); // On delete les invocations
+        this.myFighters.removeIf(x -> x.getSummoner() != null); // On delete les invocations
         //this.myFighters.RemoveAll(x =  > x is DoubleFighter);  // On delete les doubles
     }
 
@@ -145,14 +145,14 @@ public class FightTeam {
     }
 
     public boolean isFriendly(Fighter fighter) {
-        return fighter.team.Id == this.Id;
+        return fighter.getTeam().id == this.id;
     }
 
     public void sendToField(Message Message) { //TODO : clean this fucking code
         this.Fight.sendToField(new FieldNotification(Message) {
             @Override
             public boolean can(Player perso) {
-                return perso.getClient() != null && perso.getFighter() != null && perso.getFighter().team.Id == Id;
+                return perso.getClient() != null && perso.getFighter() != null && perso.getFighter().getTeam().id == id;
             }
         });
     }

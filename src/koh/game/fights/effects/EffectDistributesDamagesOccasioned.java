@@ -29,7 +29,7 @@ public class EffectDistributesDamagesOccasioned extends EffectBase {
 
             // Enois du packet combat subit des dommages
             if (DamageJet != 0) {
-                Target.fight.sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, CastInfos.caster.getID(), Target.getID(), DamageJet, 0));
+                Target.getFight().sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, CastInfos.caster.getID(), Target.getID(), DamageJet, 0));
             }
             int newValue = Target.tryDie(CastInfos.caster.getID());
             if (newValue < Apply) {

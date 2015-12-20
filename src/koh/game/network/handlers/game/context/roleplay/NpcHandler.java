@@ -36,7 +36,7 @@ public class NpcHandler {
     /*LeaveDialogRequestMessage*/
     @HandlerAttribute(ID = NpcGenericActionRequestMessage.MESSAGE_ID)
     public static void HandleNpcGenericActionRequestMessage(WorldClient Client, NpcGenericActionRequestMessage Message) {
-        Npc PNJ = Client.character.getCurrentMap().getNpc(Message.npcId);
+        Npc PNJ = Client.getCharacter().getCurrentMap().getNpc(Message.npcId);
         if (PNJ == null) {
             Client.send(new BasicNoOperationMessage());
             throw new Error("Le pnj " + Message.npcId + " est absent");
@@ -58,14 +58,14 @@ public class NpcHandler {
         switch (Action) {
             case ACTION_BUY_SELL:
                 if (Client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
-                    Client.myExchange = new NpcExchange(Client, PNJ);
-                    Client.addGameAction(new GameExchange(Client.character, Client.myExchange));
+                    Client.setMyExchange(new NpcExchange(Client, PNJ));
+                    Client.addGameAction(new GameExchange(Client.getCharacter(), Client.getMyExchange()));
                     Client.send(new ExchangeStartOkNpcShopMessage(PNJ.getID(), PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems$Array()));
                 }
                 break;
             case ACTION_TALK:
                 if (Client.canGameAction(GameActionTypeEnum.NPC_DAILOG)) {
-                    Client.addGameAction(new NpcDialog(PNJ, Client.character));
+                    Client.addGameAction(new NpcDialog(PNJ, Client.getCharacter()));
                 }
                 break;
             default:

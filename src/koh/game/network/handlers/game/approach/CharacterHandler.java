@@ -71,7 +71,7 @@ public class CharacterHandler {
 
     @HandlerAttribute(ID = SetEnablePVPRequestMessage.M_ID)
     public static void HandleSetEnablePVPRequestMessage(WorldClient Client, SetEnablePVPRequestMessage Message) {
-        Client.character.setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
+        Client.getCharacter().setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
     }
 
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)
@@ -105,7 +105,7 @@ public class CharacterHandler {
             if (character == null) {
                 Client.send(new CharacterSelectedErrorMessage());
             } else {
-                Client.character = character;
+                Client.setCharacter(character);
                 character.setClient(Client);
                 character.initialize();
                 Client.getAccount().currentCharacter = character;
@@ -149,9 +149,9 @@ public class CharacterHandler {
 
                 //client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
                 Client.send(new CharacterCapabilitiesMessage(4095));
-                if (Client.character.getMountInfo().mount != null) {
-                    Client.send(new MountSetMessage(Client.character.getMountInfo().mount));
-                    Client.send(new MountXpRatioMessage(Client.character.getMountInfo().ratio));
+                if (Client.getCharacter().getMountInfo().mount != null) {
+                    Client.send(new MountSetMessage(Client.getCharacter().getMountInfo().mount));
+                    Client.send(new MountXpRatioMessage(Client.getCharacter().getMountInfo().ratio));
                     Client.send(new MountRidingMessage(true));
                 }
                 Client.getAccount().last_login = new Timestamp(System.currentTimeMillis());
@@ -165,28 +165,28 @@ public class CharacterHandler {
     }
 
     public static void SendCharacterStatsListMessage(WorldClient client) {
-        client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.character.getExperience(), (double) DAO.getExps().getPlayerMinExp(client.character.getLevel()), (double) DAO.getExps().getPlayerMaxExp(client.character.getLevel()), client.character.getKamas(), client.character.getStatPoints(), 0, client.character.getSpellPoints(), client.character.getActorAlignmentExtendInformations(),
-                client.character.getLife(), client.character.getMaxLife(), client.character.getEnergy(), PlayerEnum.MaxEnergy,
-                (short) client.character.getStats().getTotal(StatsEnum.ActionPoints), (short) client.character.getStats().getTotal(StatsEnum.MovementPoints),
-                new CharacterBaseCharacteristic(client.character.getInitiative(true), 0, client.character.getStats().getItem(StatsEnum.Initiative), 0, 0), client.character.getStats().getEffect(StatsEnum.Prospecting), client.character.getStats().getEffect(StatsEnum.ActionPoints),
-                client.character.getStats().getEffect(StatsEnum.MovementPoints), client.character.getStats().getEffect(StatsEnum.Strength), client.character.getStats().getEffect(StatsEnum.Vitality),
-                client.character.getStats().getEffect(StatsEnum.Wisdom), client.character.getStats().getEffect(StatsEnum.Chance), client.character.getStats().getEffect(StatsEnum.Agility),
-                client.character.getStats().getEffect(StatsEnum.Intelligence), client.character.getStats().getEffect(StatsEnum.Add_Range), client.character.getStats().getEffect(StatsEnum.AddSummonLimit),
-                client.character.getStats().getEffect(StatsEnum.DamageReflection), client.character.getStats().getEffect(StatsEnum.Add_CriticalHit), (short) client.character.getInventoryCache().weaponCriticalHit(),
-                client.character.getStats().getEffect(StatsEnum.CriticalMiss), client.character.getStats().getEffect(StatsEnum.Add_Heal_Bonus), client.character.getStats().getEffect(StatsEnum.AllDamagesBonus),
-                client.character.getStats().getEffect(StatsEnum.WeaponDamagesBonusPercent), client.character.getStats().getEffect(StatsEnum.AddDamagePercent), client.character.getStats().getEffect(StatsEnum.TrapBonus),
-                client.character.getStats().getEffect(StatsEnum.Trap_Damage_Percent), client.character.getStats().getEffect(StatsEnum.GlyphBonusPercent), client.character.getStats().getEffect(StatsEnum.PermanentDamagePercent), client.character.getStats().getEffect(StatsEnum.Add_TackleBlock),
-                client.character.getStats().getEffect(StatsEnum.Add_TackleEvade), client.character.getStats().getEffect(StatsEnum.Add_RETRAIT_PA), client.character.getStats().getEffect(StatsEnum.Add_RETRAIT_PM), client.character.getStats().getEffect(StatsEnum.Add_Push_Damages_Bonus),
-                client.character.getStats().getEffect(StatsEnum.Add_Critical_Damages), client.character.getStats().getEffect(StatsEnum.Add_Neutral_Damages_Bonus), client.character.getStats().getEffect(StatsEnum.Add_Earth_Damages_Bonus),
-                client.character.getStats().getEffect(StatsEnum.Add_Water_Damages_Bonus), client.character.getStats().getEffect(StatsEnum.Add_Air_Damages_Bonus), client.character.getStats().getEffect(StatsEnum.Add_Fire_Damages_Bonus),
-                client.character.getStats().getEffect(StatsEnum.DodgePALostProbability), client.character.getStats().getEffect(StatsEnum.DodgePMLostProbability), client.character.getStats().getEffect(StatsEnum.NeutralElementResistPercent),
-                client.character.getStats().getEffect(StatsEnum.EarthElementResistPercent), client.character.getStats().getEffect(StatsEnum.WaterElementResistPercent), client.character.getStats().getEffect(StatsEnum.AirElementResistPercent),
-                client.character.getStats().getEffect(StatsEnum.FireElementResistPercent), client.character.getStats().getEffect(StatsEnum.NeutralElementReduction), client.character.getStats().getEffect(StatsEnum.EarthElementReduction),
-                client.character.getStats().getEffect(StatsEnum.WaterElementReduction), client.character.getStats().getEffect(StatsEnum.AirElementReduction), client.character.getStats().getEffect(StatsEnum.FireElementReduction),
-                client.character.getStats().getEffect(StatsEnum.Add_Push_Damages_Reduction), client.character.getStats().getEffect(StatsEnum.Add_Critical_Damages_Reduction), client.character.getStats().getEffect(StatsEnum.PvpNeutralElementResistPercent),
-                client.character.getStats().getEffect(StatsEnum.PvpEarthElementResistPercent), client.character.getStats().getEffect(StatsEnum.PvpWaterElementResistPercent), client.character.getStats().getEffect(StatsEnum.PvpAirElementResistPercent),
-                client.character.getStats().getEffect(StatsEnum.PvpFireElementResistPercent), client.character.getStats().getEffect(StatsEnum.PvpNeutralElementReduction), client.character.getStats().getEffect(StatsEnum.PvpEarthElementReduction),
-                client.character.getStats().getEffect(StatsEnum.PvpWaterElementReduction), client.character.getStats().getEffect(StatsEnum.PvpAirElementReduction), client.character.getStats().getEffect(StatsEnum.PvpFireElementReduction),
+        client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.getCharacter().getExperience(), (double) DAO.getExps().getPlayerMinExp(client.getCharacter().getLevel()), (double) DAO.getExps().getPlayerMaxExp(client.getCharacter().getLevel()), client.getCharacter().getKamas(), client.getCharacter().getStatPoints(), 0, client.getCharacter().getSpellPoints(), client.getCharacter().getActorAlignmentExtendInformations(),
+                client.getCharacter().getLife(), client.getCharacter().getMaxLife(), client.getCharacter().getEnergy(), PlayerEnum.MaxEnergy,
+                (short) client.getCharacter().getStats().getTotal(StatsEnum.ActionPoints), (short) client.getCharacter().getStats().getTotal(StatsEnum.MovementPoints),
+                new CharacterBaseCharacteristic(client.getCharacter().getInitiative(true), 0, client.getCharacter().getStats().getItem(StatsEnum.Initiative), 0, 0), client.getCharacter().getStats().getEffect(StatsEnum.Prospecting), client.getCharacter().getStats().getEffect(StatsEnum.ActionPoints),
+                client.getCharacter().getStats().getEffect(StatsEnum.MovementPoints), client.getCharacter().getStats().getEffect(StatsEnum.Strength), client.getCharacter().getStats().getEffect(StatsEnum.Vitality),
+                client.getCharacter().getStats().getEffect(StatsEnum.Wisdom), client.getCharacter().getStats().getEffect(StatsEnum.Chance), client.getCharacter().getStats().getEffect(StatsEnum.Agility),
+                client.getCharacter().getStats().getEffect(StatsEnum.Intelligence), client.getCharacter().getStats().getEffect(StatsEnum.Add_Range), client.getCharacter().getStats().getEffect(StatsEnum.AddSummonLimit),
+                client.getCharacter().getStats().getEffect(StatsEnum.DamageReflection), client.getCharacter().getStats().getEffect(StatsEnum.Add_CriticalHit), (short) client.getCharacter().getInventoryCache().weaponCriticalHit(),
+                client.getCharacter().getStats().getEffect(StatsEnum.CriticalMiss), client.getCharacter().getStats().getEffect(StatsEnum.Add_Heal_Bonus), client.getCharacter().getStats().getEffect(StatsEnum.AllDamagesBonus),
+                client.getCharacter().getStats().getEffect(StatsEnum.WeaponDamagesBonusPercent), client.getCharacter().getStats().getEffect(StatsEnum.AddDamagePercent), client.getCharacter().getStats().getEffect(StatsEnum.TrapBonus),
+                client.getCharacter().getStats().getEffect(StatsEnum.Trap_Damage_Percent), client.getCharacter().getStats().getEffect(StatsEnum.GlyphBonusPercent), client.getCharacter().getStats().getEffect(StatsEnum.PermanentDamagePercent), client.getCharacter().getStats().getEffect(StatsEnum.Add_TackleBlock),
+                client.getCharacter().getStats().getEffect(StatsEnum.Add_TackleEvade), client.getCharacter().getStats().getEffect(StatsEnum.Add_RETRAIT_PA), client.getCharacter().getStats().getEffect(StatsEnum.Add_RETRAIT_PM), client.getCharacter().getStats().getEffect(StatsEnum.Add_Push_Damages_Bonus),
+                client.getCharacter().getStats().getEffect(StatsEnum.Add_Critical_Damages), client.getCharacter().getStats().getEffect(StatsEnum.Add_Neutral_Damages_Bonus), client.getCharacter().getStats().getEffect(StatsEnum.Add_Earth_Damages_Bonus),
+                client.getCharacter().getStats().getEffect(StatsEnum.Add_Water_Damages_Bonus), client.getCharacter().getStats().getEffect(StatsEnum.Add_Air_Damages_Bonus), client.getCharacter().getStats().getEffect(StatsEnum.Add_Fire_Damages_Bonus),
+                client.getCharacter().getStats().getEffect(StatsEnum.DodgePALostProbability), client.getCharacter().getStats().getEffect(StatsEnum.DodgePMLostProbability), client.getCharacter().getStats().getEffect(StatsEnum.NeutralElementResistPercent),
+                client.getCharacter().getStats().getEffect(StatsEnum.EarthElementResistPercent), client.getCharacter().getStats().getEffect(StatsEnum.WaterElementResistPercent), client.getCharacter().getStats().getEffect(StatsEnum.AirElementResistPercent),
+                client.getCharacter().getStats().getEffect(StatsEnum.FireElementResistPercent), client.getCharacter().getStats().getEffect(StatsEnum.NeutralElementReduction), client.getCharacter().getStats().getEffect(StatsEnum.EarthElementReduction),
+                client.getCharacter().getStats().getEffect(StatsEnum.WaterElementReduction), client.getCharacter().getStats().getEffect(StatsEnum.AirElementReduction), client.getCharacter().getStats().getEffect(StatsEnum.FireElementReduction),
+                client.getCharacter().getStats().getEffect(StatsEnum.Add_Push_Damages_Reduction), client.getCharacter().getStats().getEffect(StatsEnum.Add_Critical_Damages_Reduction), client.getCharacter().getStats().getEffect(StatsEnum.PvpNeutralElementResistPercent),
+                client.getCharacter().getStats().getEffect(StatsEnum.PvpEarthElementResistPercent), client.getCharacter().getStats().getEffect(StatsEnum.PvpWaterElementResistPercent), client.getCharacter().getStats().getEffect(StatsEnum.PvpAirElementResistPercent),
+                client.getCharacter().getStats().getEffect(StatsEnum.PvpFireElementResistPercent), client.getCharacter().getStats().getEffect(StatsEnum.PvpNeutralElementReduction), client.getCharacter().getStats().getEffect(StatsEnum.PvpEarthElementReduction),
+                client.getCharacter().getStats().getEffect(StatsEnum.PvpWaterElementReduction), client.getCharacter().getStats().getEffect(StatsEnum.PvpAirElementReduction), client.getCharacter().getStats().getEffect(StatsEnum.PvpFireElementReduction),
                 new CharacterSpellModification[0], (short) 0)));
     }
 

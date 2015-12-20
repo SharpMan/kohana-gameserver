@@ -14,16 +14,16 @@ import koh.protocol.messages.game.character.status.PlayerStatusUpdateRequestMess
 public class StatusHandler {
 
     @HandlerAttribute(ID = PlayerStatusUpdateRequestMessage.MESSAGE_ID)
-    public static void HandlePlayerStatusUpdateRequestMessage(WorldClient Client, PlayerStatusUpdateRequestMessage Message) {
+    public static void HandlePlayerStatusUpdateRequestMessage(WorldClient client, PlayerStatusUpdateRequestMessage Message) {
         if (PlayerStatusEnum.valueOf(Message.status.statusId) == null) {
-            Client.send(new BasicNoOperationMessage());
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.character.setStatus(PlayerStatusEnum.valueOf(Message.status.statusId));
-        if (Client.character.getFight() != null) {
-            Client.character.getFight().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.getID(), Message.status));
+        client.getCharacter().setStatus(PlayerStatusEnum.valueOf(Message.status.statusId));
+        if (client.getCharacter().getFight() != null) {
+            client.getCharacter().getFight().sendToField(new PlayerStatusUpdateMessage(client.getAccount().id, client.getCharacter().getID(), Message.status));
         } else {
-            Client.character.getCurrentMap().sendToField(new PlayerStatusUpdateMessage(Client.getAccount().id, Client.character.getID(), Message.status));
+            client.getCharacter().getCurrentMap().sendToField(new PlayerStatusUpdateMessage(client.getAccount().id, client.getCharacter().getID(), Message.status));
         }
     }
 

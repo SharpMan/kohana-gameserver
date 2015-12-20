@@ -20,13 +20,13 @@ public class BuffState extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        this.target.states.addState(this);
+        this.target.getStates().addState(this);
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int removeEffect() {
-        this.target.states.delState(this);
+        this.target.getStates().delState(this);
 
         return super.removeEffect();
     }

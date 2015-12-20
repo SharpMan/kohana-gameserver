@@ -23,7 +23,7 @@ public class FightFormulas {
     private static final Logger logger = LogManager.getLogger(FightFormulas.class);
 
     public static short calculateEarnedDishonor(Fighter Character) {
-        return Character.fight.getEnnemyTeam(Character.team).alignmentSide != AlignmentSideEnum.ALIGNMENT_NEUTRAL ? (short) 0 : (short) 1;
+        return Character.getFight().getEnnemyTeam(Character.getTeam()).alignmentSide != AlignmentSideEnum.ALIGNMENT_NEUTRAL ? (short) 0 : (short) 1;
     }
 
     public static short honorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser) {
@@ -32,15 +32,15 @@ public class FightFormulas {
 
     public static short honorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser, boolean End) {
 
-        if (Fighter.fight.getEnnemyTeam(Fighter.team).alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
+        if (Fighter.getFight().getEnnemyTeam(Fighter.getTeam()).alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
             return (short) 0;
         }
 
-        if (System.currentTimeMillis() - Fighter.fight.fightTime > 2 * 60 * 1000) {
+        if (System.currentTimeMillis() - Fighter.getFight().getFightTime() > 2 * 60 * 1000) {
             ((CharacterFighter) Fighter).character.addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
         }
 
-        if (End && Fighter.fight.getWinners().getFighters().count() == 1L && Fighter.fight.getWinners().getFighters().count() == Fighter.fight.getEnnemyTeam(Fighter.fight.getWinners()).getFighters().count()) {
+        if (End && Fighter.getFight().getWinners().getFighters().count() == 1L && Fighter.getFight().getWinners().getFighters().count() == Fighter.getFight().getEnnemyTeam(Fighter.getFight().getWinners()).getFighters().count()) {
             return isLosser ? calculLooseHonor(Winners, Lossers) : calculWinHonor(Winners, Lossers);
         }
 
@@ -57,7 +57,7 @@ public class FightFormulas {
         return (short) num3;
     }
 
-    public static long XPDefie(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers) {
+    public static long XPDefie(Fighter fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers) {
 
         int lvlLoosers = Lossers.mapToInt(x -> x.getLevel()).sum();
         int lvlWinners = Winners.mapToInt(x -> x.getLevel()).sum();
@@ -71,9 +71,9 @@ public class FightFormulas {
         if (rapport >= 1.0F) {
             malus = 1;
         }
-        long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(Fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (Fighter.stats.getTotal(StatsEnum.Wisdom) * 0.01)));
+        long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
         if (xpWin < 0) {
-            logger.error("xpWin <0 on lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(Fighter.getLevel())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (Fighter.stats.getTotal(StatsEnum.Wisdom) * 0.01)));
+            logger.error("xpWin <0 on lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
         }
         return xpWin;
     }

@@ -15,8 +15,8 @@ public class EffectDamageBecomeHeal extends EffectBase {
         BuffEffect Buf = null;
         for (Fighter Target : CastInfos.Targets) {
             Buf = new BuffDamageBecomeHeal(CastInfos, Target);
-            if (!Target.buff.buffMaxStackReached(Buf)) {
-                Target.buff.addBuff(Buf);
+            if (!Target.getBuff().buffMaxStackReached(Buf)) {
+                Target.getBuff().addBuff(Buf);
             }
         }
         return -1;

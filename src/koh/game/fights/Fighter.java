@@ -44,6 +44,8 @@ import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import koh.protocol.types.game.context.fight.GameFightMinimalStats;
 import koh.protocol.types.game.context.fight.GameFightMinimalStatsPreparation;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -62,22 +64,38 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     private static final Random RANDOM = new Random();
-    public boolean dead, left;
-    public FightTeam team;
-    public Fight fight;
-    public FightCell myCell;
-    public int usedAP, usedMP, turnRunning = 19;
-    public GenericStats stats;
-    public Fighter summoner;
-    public GameActionFightInvisibilityStateEnum visibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
-    public int[] previousPositions = new int[0];
-    public CopyOnWriteArrayList<Short> previousCellPos = new CopyOnWriteArrayList<>(), previousFirstCellPos = new CopyOnWriteArrayList<>();
+
+    protected boolean dead;
+    @Setter @Getter
+    protected boolean left;
+    @Getter @Setter
+    protected FightTeam team;
+    @Getter @Setter
+    protected Fight fight;
+    @Getter @Setter
+    protected FightCell myCell;
+    @Getter @Setter
+    protected int usedAP, usedMP, turnRunning = 19;
+    @Getter
+    protected GenericStats stats;
+    @Getter
+    protected Fighter summoner;
+    @Getter @Setter
+    protected GameActionFightInvisibilityStateEnum visibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
+    protected int[] previousPositions = new int[0];
+    @Getter
+    protected CopyOnWriteArrayList<Short> previousCellPos = new CopyOnWriteArrayList<>(), previousFirstCellPos = new CopyOnWriteArrayList<>();
     private final MapPoint mapPointCache = MapPoint.fromCellId(0);
-    public byte wave = 0;
-    public FighterSpell spellsController;
-    public FighterBuff buff;
-    public FighterState states;
-    public AtomicInteger nextBuffUid = new AtomicInteger();
+    @Getter
+    protected final byte wave = 0; //Dimension obscure
+    @Getter
+    protected FighterSpell spellsController;
+    @Getter
+    protected FighterBuff buff;
+    @Getter
+    protected FighterState states;
+    @Getter
+    protected AtomicInteger nextBuffUid = new AtomicInteger();
 
     /**
      * Virtual Method
@@ -100,7 +118,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             if (this.myCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
                 ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).enable(this, true);
             }
-            if (this.fight.fightState == FightState.STATE_PLACE) {
+            if (this.fight.getFightState() == FightState.STATE_PLACE) {
                 if (!ArrayUtils.contains(previousPositions, myCell.Id)) {
                     this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
                 }
@@ -142,6 +160,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         this.ID = ID;
     }
 
+    public boolean isMarkedDead(){
+        return this.isDead(); //TODO delete above dead function
+    }
+
     /*public int GetFighterOutcome() {
      if(this.left)
      return FightOutcomeEnum.RESULT_LOST;
@@ -153,7 +175,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
      return flag1 && !flag2 ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_DRAW;
      }*/
     public void leaveFight() {
-        if (this.fight.fightState == FightState.STATE_PLACE) {
+        if (this.fight.getFightState() == FightState.STATE_PLACE) {
             // On le vire de l'equipe
             team.fighterLeave(this);
         }
@@ -179,8 +201,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
             this.team.getAliveFighters().filter(x -> x.summoner != null && x.summoner.getID() == this.ID).forEach(Fighter -> Fighter.tryDie(this.ID, true));
 
-            if (this.fight.m_activableObjects.containsKey(this)) {
-                this.fight.m_activableObjects.get(this).stream().forEach(y -> y.remove());
+            if (this.fight.getActivableObjects().containsKey(this)) {
+                this.fight.getActivableObjects().get(this).stream().forEach(y -> y.remove());
 
             }
 
@@ -191,7 +213,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             if (this.fight.tryEndFight()) {
                 return -3;
             }
-            if (this.fight.currentFighter == this) {
+            if (this.fight.getCurrentFighter() == this) {
                 this.fight.fightLoopState = FightLoopState.STATE_END_TURN;
             }
             return -2;
@@ -200,8 +222,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int beginTurn() {
-        if (this.fight.m_activableObjects.containsKey(this)) {
-            this.fight.m_activableObjects.get(this).stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
+        if (this.fight.getActivableObjects().containsKey(this)) {
+            this.fight.getActivableObjects().get(this).stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
                 ((FightPortal) Object).ForceEnable(this);
             });
         }
@@ -220,7 +242,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int endTurn() {
-        this.fight.m_activableObjects.values().stream().forEach((Objects) -> {
+        this.fight.getActivableObjects().values().stream().forEach((Objects) -> {
             Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
                 ((FightPortal) Object).enable(this);
             });
@@ -235,7 +257,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public Stream<FightActivableObject> getActivableObjects() {
         try {
-            return this.fight.m_activableObjects.get(this).stream();
+            return this.fight.getActivableObjects().get(this).stream();
         } catch (Exception e) {
             return Stream.empty();
         }
@@ -316,7 +338,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightFighterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions);
+        return new GameFightFighterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions);
     }
 
     /*public EntityDispositionInformations getEntityDispositionInformations(player character) {
@@ -391,7 +413,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 }
             };
         } else {
-            shape = new Lozenge((byte) spellLevel.getMinRange(), (byte) num, this.fight.map);
+            shape = new Lozenge((byte) spellLevel.getMinRange(), (byte) num, this.fight.getMap());
         }
         return shape.getCells(this.getCellId());
     }
@@ -478,7 +500,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public GameFightMinimalStats getGameFightMinimalStats(Player character) {
-        if (this.fight.fightState == FightState.STATE_PLACE) {
+        if (this.fight.getFightState() == FightState.STATE_PLACE) {
             return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.Vitality), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
         }
         return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.Vitality), this.stats.getTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NeutralElementResistPercent), this.stats.getTotal(StatsEnum.EarthElementResistPercent), this.stats.getTotal(StatsEnum.WaterElementResistPercent), this.stats.getTotal(StatsEnum.AirElementResistPercent), this.stats.getTotal(StatsEnum.FireElementResistPercent), this.stats.getTotal(StatsEnum.NeutralElementReduction), this.stats.getTotal(StatsEnum.EarthElementReduction), this.stats.getTotal(StatsEnum.WaterElementReduction), this.stats.getTotal(StatsEnum.AirElementReduction), this.stats.getTotal(StatsEnum.FireElementReduction), this.stats.getTotal(StatsEnum.Add_Push_Damages_Reduction), this.stats.getTotal(StatsEnum.Add_Critical_Damages_Reduction), this.stats.getTotal(StatsEnum.DodgePALostProbability), this.stats.getTotal(StatsEnum.DodgePMLostProbability), this.stats.getTotal(StatsEnum.Add_TackleBlock), this.stats.getTotal(StatsEnum.Add_TackleEvade), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
@@ -519,7 +541,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public boolean isFriendlyWith(Fighter actor) {
-        return actor.team.Id == this.team.Id;
+        return actor.team.id == this.team.id;
     }
 
     public boolean isEnnemyWith(Fighter actor) {
@@ -588,7 +610,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public static final byte EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY = 4;
 
-    public double getPortalsSpellEfficiencyBonus(short param1, Fight Fight) {
+    public double getPortalsSpellEfficiencyBonus(short param1, Fight fight) {
         boolean _loc3_ = false;
         FightPortal[] _loc8_ = new FightPortal[0];
         int _loc9_ = 0;
@@ -598,7 +620,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         double _loc13_ = 0;
         double _loc2_ = 1;
 
-        for (CopyOnWriteArrayList<FightActivableObject> Objects : Fight.m_activableObjects.values()) {
+        for (CopyOnWriteArrayList<FightActivableObject> Objects : fight.getActivableObjects().values()) {
             for (FightActivableObject Object : Objects) {
                 if (Object instanceof FightPortal && ((FightPortal) Object).Enabled) {
                     _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
@@ -746,7 +768,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             int dodgeAPTarget = this.getAPDodge() + 1;
 
             for (int i = 0; i < lostPoint; i++) {
-                int ActualAP = (isBuff && this.ID == this.fight.currentFighter.ID ? this.getMaxAP() : this.getAP()) - realLostPoint;
+                int ActualAP = (isBuff && this.ID == this.fight.getCurrentFighter().ID ? this.getMaxAP() : this.getAP()) - realLostPoint;
                 int realAP = getAP();
                 if (realAP == 0) {
                     realAP = 1;
@@ -771,7 +793,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             int dodgeMPTarget = this.getMPDodge() + 1;
 
             for (int i = 0; i < lostPoint; i++) {
-                int ActualMP = (isBuff && this.ID == this.fight.currentFighter.ID ? this.getMaxMP() : this.getMP()) - realLostPoint;
+                int ActualMP = (isBuff && this.ID == this.fight.getCurrentFighter().ID ? this.getMaxMP() : this.getMP()) - realLostPoint;
                 int realMP = getMP();
                 if (realMP == 0) {
                     realMP = 1;

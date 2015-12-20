@@ -19,7 +19,7 @@ public class TeleportCommand implements PlayerCommand {
     public void apply(WorldClient client, String args) {
         int mapid = Integer.parseInt(args.split(" ")[0]);
         int cellid = args.split(" ").length < 1 ? -1 : Integer.parseInt(args.split(" ")[1]);
-        client.character.teleport(mapid, cellid);
+        client.getCharacter().teleport(mapid, cellid);
     }
 
     @Override

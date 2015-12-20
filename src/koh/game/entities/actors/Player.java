@@ -258,7 +258,7 @@ public class Player extends IGameActor implements Observer {
     public void refreshActor() {
         this.cachedHumanInformations = null;
         if (this.client != null) {
-            currentMap.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) client.character.getGameContextActorInformations(null)));
+            currentMap.sendToField(klient -> new GameRolePlayShowActorMessage((GameRolePlayActorInformations) client.getCharacter().getGameContextActorInformations(klient)));
         }
     }
 
@@ -381,9 +381,9 @@ public class Player extends IGameActor implements Observer {
             if (client.getParty() != null) {
                 client.getParty().updateMember(this);
             }
-            if (Logged && getFighter() != null && getFight().fightState == FightState.STATE_PLACE) {
-                getFighter().stats.reset();
-                getFighter().stats.merge(this.stats);
+            if (Logged && getFighter() != null && getFight().getFightState() == FightState.STATE_PLACE) {
+                this.myFighter.getStats().reset();
+                this.myFighter.getStats().merge(this.stats);
                 client.send(((CharacterFighter) getFighter()).FighterStatsListMessagePacket());
             } else {
                 CharacterHandler.SendCharacterStatsListMessage(this.client);

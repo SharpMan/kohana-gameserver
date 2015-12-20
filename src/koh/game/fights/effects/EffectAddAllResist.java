@@ -18,14 +18,14 @@ public class EffectAddAllResist extends EffectBase {
             }
             EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.caster, CastInfos.Targets, CastInfos.SpellLevel);
             BuffAddResistStats BuffStats = new BuffAddResistStats(SubInfos, Target);
-            if (Target.buff.buffMaxStackReached(BuffStats)) {
+            if (Target.getBuff().buffMaxStackReached(BuffStats)) {
                 return -1;
             }
             if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 
-            Target.buff.addBuff(BuffStats);
+            Target.getBuff().addBuff(BuffStats);
         }
 
         return -1;

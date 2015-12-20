@@ -19,7 +19,7 @@ public class EffectSubAllResist extends EffectBase {
             EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.caster, CastInfos.Targets, CastInfos.SpellLevel);
             BuffSubResistStats BuffStats = new BuffSubResistStats(SubInfos, Target);
 
-            if (Target.buff.buffMaxStackReached(BuffStats)) {
+            if (Target.getBuff().buffMaxStackReached(BuffStats)) {
                 return -1;
             }
 
@@ -27,7 +27,7 @@ public class EffectSubAllResist extends EffectBase {
                 return -3;
             }
 
-            Target.buff.addBuff(BuffStats);
+            Target.getBuff().addBuff(BuffStats);
         }
 
         return -1;

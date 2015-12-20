@@ -18,12 +18,12 @@ public class BuffArmor extends BuffEffect {
     public BuffArmor(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
         this.Jet = CastInfos.RandomJet(Target);
-        Target.stats.addBoost(StatsEnum.AddArmor, (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100));
+        Target.getStats().addBoost(StatsEnum.AddArmor, (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100));
     }
 
     @Override
     public int removeEffect() {
-        target.stats.getEffect(StatsEnum.AddArmor).additionnal -= (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100);
+        target.getStats().getEffect(StatsEnum.AddArmor).additionnal -= (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100);
         return super.removeEffect();
     }
 

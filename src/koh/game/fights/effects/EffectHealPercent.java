@@ -20,7 +20,7 @@ public class EffectHealPercent extends EffectBase {
 
             // Ajout du buff
             for (Fighter Target : CastInfos.Targets) {
-                Target.buff.addBuff(new BuffHealPercent(CastInfos, Target));
+                Target.getBuff().addBuff(new BuffHealPercent(CastInfos, Target));
             }
         } else // Heal direct
         {
@@ -54,7 +54,7 @@ public class EffectHealPercent extends EffectBase {
 
         // Envoi du packet
         if (Heal != 0) {
-            Target.fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Heal));
+            Target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Heal));
         }
 
         // Le soin entraine la fin du combat ?

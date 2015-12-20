@@ -317,9 +317,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public void onMouvementConfirmed(Player actor) {
-        if (actor.getClient().onMouvementConfirm != null) {
-            actor.getClient().onMouvementConfirm.apply(actor);
-            actor.getClient().onMouvementConfirm = null;
+        if (actor.getClient().getOnMouvementConfirm() != null) {
+            actor.getClient().getOnMouvementConfirm().apply(actor);
+            actor.getClient().setOnMouvementConfirm(null);
         }
         if (droppedItems == null || droppedItems.isEmpty()) {
             return;
@@ -482,11 +482,11 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
                 client.send(new GameDataPaddockObjectListAddMessage(paddock.getItems()));
             }
         }
-        client.send(getAgressableActorsStatus(client.character));
+        client.send(getAgressableActorsStatus(client.getCharacter()));
         // client.send(new UpdateSelfAgressableStatusMessage(client.character.PvPEnabled,(int)System.currentTimeMillis() + 360000));
-        Message Items = client.character.getCurrentMap().objectsGround();
-        if (Items != null) {
-            client.send(Items);
+        Message objectsGround = client.getCharacter().getCurrentMap().objectsGround();
+        if (objectsGround != null) {
+            client.send(objectsGround);
         }
     }
 

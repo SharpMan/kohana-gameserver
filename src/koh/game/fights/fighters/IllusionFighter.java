@@ -3,6 +3,7 @@ package koh.game.fights.fighters;
 import java.util.Arrays;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
+import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
@@ -22,7 +23,7 @@ public class IllusionFighter extends StaticFighter {
     public IllusionFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
         super(Fight, Summoner);
         this.stats = new GenericStats();
-        this.stats.merge(Summoner.stats);
+        this.stats.merge(Summoner.getStats());
         super.initFighter(this.stats, Fight.getNextContextualId());
         this.entityLook = EntityLookParser.Copy(Summoner.getEntityLook());
         super.setLife(Summoner.getLife());
@@ -38,8 +39,8 @@ public class IllusionFighter extends StaticFighter {
 
         this.fight.sendToField(new GameActionFightVanishMessage(1029, this.getSummonerID(), ID));
 
-        if (this.fight.m_activableObjects.containsKey(this)) {
-            this.fight.m_activableObjects.get(this).stream().forEach(y -> y.remove());
+        if (this.fight.getActivableObjects().containsKey(this)) {
+            this.fight.getActivableObjects().get(this).stream().forEach(y -> y.remove());
         }
 
         myCell.RemoveObject(this);
@@ -51,8 +52,8 @@ public class IllusionFighter extends StaticFighter {
         if (this.fight.tryEndFight()) {
             return -3;
         }
-        if (this.fight.currentFighter == this) {
-            this.fight.fightLoopState = fight.fightLoopState.STATE_END_TURN;
+        if (this.fight.getCurrentFighter() == this) {
+            this.fight.setFightLoopState(Fight.FightLoopState.STATE_END_TURN);
         }
         return -2;
     }
@@ -69,7 +70,7 @@ public class IllusionFighter extends StaticFighter {
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.Id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.summoner).character.getNickName(), ((CharacterFighter) this.summoner).character.getPlayerStatus(), (byte) this.getLevel(), ((CharacterFighter) this.summoner).character.getActorAlignmentInformations(), ((CharacterFighter) this.summoner).character.getBreed(), ((CharacterFighter) this.summoner).character.hasSexe());
+        return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, ((CharacterFighter) this.summoner).character.getNickName(), ((CharacterFighter) this.summoner).character.getPlayerStatus(), (byte) this.getLevel(), ((CharacterFighter) this.summoner).character.getActorAlignmentInformations(), ((CharacterFighter) this.summoner).character.getBreed(), ((CharacterFighter) this.summoner).character.hasSexe());
     }
 
     @Override

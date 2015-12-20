@@ -70,7 +70,7 @@ public class MountExchange extends Exchange {
     @Override
     public boolean closeExchange(boolean Success) {
         this.finish();
-        this.myClient.myExchange = null;
+        this.myClient.setMyExchange(null);
         this.send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, Success));
         this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 

@@ -82,10 +82,10 @@ public class EffectCast {
         if ((int) num2 == 0) {
             return (short) num1;
         } else {
-            if (Target.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
+            if (Target.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
                 return (short) num1;
             }
-            if (caster.buff.getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
+            if (caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
                 return (short) num2;
             }
             return (short) RandomValue(num2, num1);
@@ -161,8 +161,8 @@ public class EffectCast {
         this.ParentUID = ParentUID;
     }
     
-    public FightCell Cell(){
-        return this.caster.fight.getCell(CellId);
+    public FightCell getCell(){
+        return this.caster.getFight().getCell(CellId);
     }
 
     public String toString() {

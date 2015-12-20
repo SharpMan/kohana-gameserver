@@ -68,7 +68,7 @@ public class BuffSkin extends BuffEffect {
         }
 
         //this.target.getEntityLook().bonesId = (short) Math.abs((this.CastInfos.Effect.value * 44) / 666);
-        this.caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
+        this.caster.getFight().sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
@@ -82,7 +82,7 @@ public class BuffSkin extends BuffEffect {
         if (this.skinToRemove != 0) {
             this.target.getEntityLook().skins.remove(this.target.getEntityLook().skins.indexOf(this.skinToRemove));
         }
-        this.caster.fight.sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
+        this.caster.getFight().sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
         return super.removeEffect();
     }
 

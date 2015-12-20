@@ -29,7 +29,7 @@ public class EffectHeal extends EffectBase {
             Caster.calculheal(Heal);
         }
         
-        if (Target.buff.onHealPostJet(CastInfos, Heal) == -3) {
+        if (Target.getBuff().onHealPostJet(CastInfos, Heal) == -3) {
             return -3; // Fin du combat
         }
 
@@ -45,7 +45,7 @@ public class EffectHeal extends EffectBase {
         Target.setLife(Target.getLife() + Heal.getValue());
 
         // Envoi du packet
-        Target.fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Math.abs(Heal.getValue())));
+        Target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Math.abs(Heal.getValue())));
 
         // Le soin entraine la fin du combat ?
         return Target.tryDie(Caster.getID());
@@ -60,7 +60,7 @@ public class EffectHeal extends EffectBase {
 
             // Ajout du buff
             for (Fighter Target : CastInfos.Targets) {
-                Target.buff.addBuff(new BuffHeal(CastInfos, Target));
+                Target.getBuff().addBuff(new BuffHeal(CastInfos, Target));
             }
         } else // Heal direct
         {

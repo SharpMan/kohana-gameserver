@@ -11,12 +11,12 @@ public class EffectSacrifice extends EffectBase {
 
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            if (Target.team != CastInfos.caster.team || Target == CastInfos.caster) {
+        for (Fighter target : CastInfos.Targets) {
+            if (target.getTeam() != CastInfos.caster.getTeam() || target == CastInfos.caster) {
                 continue;
             }
 
-            Target.buff.addBuff(new BuffSacrifice(CastInfos, Target));
+            target.getBuff().addBuff(new BuffSacrifice(CastInfos, target));
         }
 
         return -1;

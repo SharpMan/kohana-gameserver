@@ -33,19 +33,19 @@ public class InventoryHandler {
             client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem item = client.character.getInventoryCache().find(message.objectUID);
-        if(item.getQuantity() < message.quantity || item == null || !item.areConditionFilled(client.character)){
+        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        if(item.getQuantity() < message.quantity || item == null || !item.areConditionFilled(client.getCharacter())){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
         int i = 0;
         for(i = 0; message.quantity > i ; i++){
-            if(!item.getTemplate().use(client.character)){
+            if(!item.getTemplate().use(client.getCharacter())){
                 client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
                 break;
             }
         }
-        client.character.getInventoryCache().safeDelete(item, i);
+        client.getCharacter().getInventoryCache().safeDelete(item, i);
     }
 
     @HandlerAttribute(ID = ObjectUseOnCharacterMessage.MESSAGE_ID)
@@ -54,14 +54,14 @@ public class InventoryHandler {
             client.send(new BasicNoOperationMessage());
             return;
         }
-        Player target = client.character.getCurrentMap().getPlayer(message.characterId);
-        InventoryItem item = client.character.getInventoryCache().find(message.objectUID);
+        Player target = client.getCharacter().getCurrentMap().getPlayer(message.characterId);
+        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
 
         if(target == null || item == null || !item.areConditionFilled(target) || item.getTemplate().use(target)){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
-        client.character.getInventoryCache().safeDelete(item,1);
+        client.getCharacter().getInventoryCache().safeDelete(item,1);
 
     }
 
@@ -71,12 +71,12 @@ public class InventoryHandler {
             client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem item = client.character.getInventoryCache().find(message.objectUID);
-        if(!client.character.getInventoryCache().hasItemId(message.objectUID) || item == null || !item.areConditionFilled(client.character) || item.getTemplate().use(client.character)){
+        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        if(!client.getCharacter().getInventoryCache().hasItemId(message.objectUID) || item == null || !item.areConditionFilled(client.getCharacter()) || item.getTemplate().use(client.getCharacter())){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
-        client.character.getInventoryCache().safeDelete(item,1);
+        client.getCharacter().getInventoryCache().safeDelete(item,1);
     }
 
     @HandlerAttribute(ID = ObjectDeleteMessage.MESSAGE_ID)
@@ -85,7 +85,7 @@ public class InventoryHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.character.getInventoryCache().safeDelete(Client.character.getInventoryCache().find(Message.objectUID), Message.quantity);
+        Client.getCharacter().getInventoryCache().safeDelete(Client.getCharacter().getInventoryCache().find(Message.objectUID), Message.quantity);
 
     }
 
@@ -95,7 +95,7 @@ public class InventoryHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.character.getInventoryCache().moveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
+        Client.getCharacter().getInventoryCache().moveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
     }
 
     @HandlerAttribute(ID = LivingObjectMessageRequestMessage.MESSAGE_ID)
@@ -104,7 +104,7 @@ public class InventoryHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem item = Client.character.getInventoryCache().find(Message.livingObject);
+        InventoryItem item = Client.getCharacter().getInventoryCache().find(Message.livingObject);
         if (item == null) {
             Client.send(new BasicNoOperationMessage());
             return;
@@ -120,7 +120,7 @@ public class InventoryHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem Item = Client.character.getInventoryCache().find(Message.livingUID);
+        InventoryItem Item = Client.getCharacter().getInventoryCache().find(Message.livingUID);
         if (Item == null) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
@@ -135,16 +135,16 @@ public class InventoryHandler {
             return;
         }
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getApparrance() != 0) {
-            Client.character.getInventoryCache().removeApparence(Item.getApparrance());
+            Client.getCharacter().getInventoryCache().removeApparence(Item.getApparrance());
         }
         Item.removeEffect(972);
         Item.getEffects$Notify().add(((ObjectEffectInteger) obviSkin.Clone()).SetValue(Message.skinId));
         Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getApparrance() != 0) {
-            Client.character.getInventoryCache().addApparence(Item.getApparrance());
-            Client.character.refreshEntitie();
+            Client.getCharacter().getInventoryCache().addApparence(Item.getApparrance());
+            Client.getCharacter().refreshEntitie();
         }
-        Client.character.send(new InventoryWeightMessage(Client.character.getInventoryCache().getWeight(), Client.character.getInventoryCache().getTotalWeight()));
+        Client.getCharacter().send(new InventoryWeightMessage(Client.getCharacter().getInventoryCache().getWeight(), Client.getCharacter().getInventoryCache().getTotalWeight()));
         Client.send(new BasicNoOperationMessage());
     }
 
@@ -154,20 +154,20 @@ public class InventoryHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem Item = Client.character.getInventoryCache().find(Message.objectUID), Food = Client.character.getInventoryCache().find(Message.foodUID);
+        InventoryItem Item = Client.getCharacter().getInventoryCache().find(Message.objectUID), Food = Client.getCharacter().getInventoryCache().find(Message.foodUID);
         if (Item == null || Food == null || Food.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
         if (Item instanceof PetsInventoryItem) {
-            if (!((PetsInventoryItem) Item).eat(Client.character, Food)) {
+            if (!((PetsInventoryItem) Item).eat(Client.getCharacter(), Food)) {
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 53, new String[0]));
             } else {
                 int newQua = Food.getQuantity() - 1;
                 if (newQua <= 0) {
-                    Client.character.getInventoryCache().removeItem(Food);
+                    Client.getCharacter().getInventoryCache().removeItem(Food);
                 } else {
-                    Client.character.getInventoryCache().updateObjectquantity(Food, newQua);
+                    Client.getCharacter().getInventoryCache().updateObjectquantity(Food, newQua);
                 }
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 32, new String[0]));
             }
@@ -189,9 +189,9 @@ public class InventoryHandler {
                     oldxp = obviXp.value,
                     state = obviState.value;
             if (newqua == 0) {
-                Client.character.getInventoryCache().removeItem(Food);
+                Client.getCharacter().getInventoryCache().removeItem(Food);
             } else {
-                Client.character.getInventoryCache().updateObjectquantity(Food, newqua);
+                Client.getCharacter().getInventoryCache().updateObjectquantity(Food, newqua);
             }
             Item.removeEffect(974);
             Item.getEffects$Notify().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
@@ -204,7 +204,7 @@ public class InventoryHandler {
             Item.getEffects$Notify().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
 
             Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
-            Client.character.send(new InventoryWeightMessage(Client.character.getInventoryCache().getWeight(), Client.character.getInventoryCache().getTotalWeight()));
+            Client.getCharacter().send(new InventoryWeightMessage(Client.getCharacter().getInventoryCache().getWeight(), Client.getCharacter().getInventoryCache().getTotalWeight()));
         } else {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
         }
@@ -217,7 +217,7 @@ public class InventoryHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem Item = Client.character.getInventoryCache().find(Message.livingUID);
+        InventoryItem Item = Client.getCharacter().getInventoryCache().find(Message.livingUID);
         if (Item == null) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
@@ -229,9 +229,9 @@ public class InventoryHandler {
             return;
         }
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED/* && item.getTemplate().appearanceId != 0*/) {
-            Client.character.getInventoryCache().removeApparence(Item.getApparrance());
+            Client.getCharacter().getInventoryCache().removeApparence(Item.getApparrance());
         }
-        Client.character.getInventoryCache().tryCreateItem(obviTemplate.value, Client.character, 1, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), new ArrayList<ObjectEffect>() {
+        Client.getCharacter().getInventoryCache().tryCreateItem(obviTemplate.value, Client.getCharacter(), 1, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), new ArrayList<ObjectEffect>() {
             {
                 add(obviTemplate.Clone());
                 add(obviXp.Clone());
@@ -255,10 +255,10 @@ public class InventoryHandler {
 
         Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED && Item.getTemplate().getAppearanceId() != 0) {
-            Client.character.getInventoryCache().addApparence(Item.getApparrance());
-            Client.character.refreshEntitie();
+            Client.getCharacter().getInventoryCache().addApparence(Item.getApparrance());
+            Client.getCharacter().refreshEntitie();
         }
-        Client.character.send(new InventoryWeightMessage(Client.character.getInventoryCache().getWeight(), Client.character.getInventoryCache().getTotalWeight()));
+        Client.getCharacter().send(new InventoryWeightMessage(Client.getCharacter().getInventoryCache().getWeight(), Client.getCharacter().getInventoryCache().getTotalWeight()));
     }
 
 }

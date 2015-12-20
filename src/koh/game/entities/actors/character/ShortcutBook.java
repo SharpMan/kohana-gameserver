@@ -42,13 +42,13 @@ public class ShortcutBook {
             myShortcuts.remove(newSlot);
             shortcut2.position = slot;
             this.add(shortcut2);
-            Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut2.toShortcut(Client.character)));
+            Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut2.toShortcut(Client.getCharacter())));
         } else {
             Client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, (byte) slot));
         }
         shortcut1.position = newSlot;
         this.add(shortcut1);
-        Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut1.toShortcut(Client.character)));
+        Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut1.toShortcut(Client.getCharacter())));
     }
 
     public Shortcut[] toShortcuts(Player p) { //FIXME : Collectors.Arrays

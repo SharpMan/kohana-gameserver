@@ -22,14 +22,14 @@ public class BuffReffoulage extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (target.getCellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(target.fight.map, DamageInfos.caster.getCellId(), target.getCellId()) > 1) {
+        if (target.getCellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId()) > 1) {
             return -1;
         }
         
         DamageValue.setValue(0);
 
         EffectCast SubInfos = new EffectCast(StatsEnum.Push_Back, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
-        byte Direction = Pathfinder.getDirection(target.fight.map, DamageInfos.caster.getCellId(), target.getCellId());
+        byte Direction = Pathfinder.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
 
         // Application du push
         return EffectPush.ApplyPush(SubInfos, this.target, Direction, 1);

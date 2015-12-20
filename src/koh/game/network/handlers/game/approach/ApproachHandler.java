@@ -27,13 +27,13 @@ public class ApproachHandler {
     @HandlerAttribute(ID = AuthenticationTicketMessage.MESSAGE_ID)
     public static void AuthenticationTicketMessage(WorldClient Client, Message message) {
 
-        Client.tempTicket = AccountTicketDAO.getWaitingCompte(((AuthenticationTicketMessage) message).Ticket);
+        Client.setTempTicket(AccountTicketDAO.getWaitingCompte(((AuthenticationTicketMessage) message).Ticket));
 
-        if (Client.tempTicket != null && Client.tempTicket.isCorrect(Client.getIP(), ((AuthenticationTicketMessage) message).Ticket)) {
+        if (Client.getTempTicket() != null && Client.getTempTicket().isCorrect(Client.getIP(), ((AuthenticationTicketMessage) message).Ticket)) {
             WorldServer.Loader.addClient(Client);
             if (WorldServer.Loader.getPosition(Client) != 1) {
                 Client.send(new LoginQueueStatusMessage((short) WorldServer.Loader.getPosition(Client), (short) WorldServer.Loader.getTotal()));
-                Client.showQueue = true;
+                Client.setShowQueue(true);
             }
         } else {
             Client.send(new AuthenticationTicketRefusedMessage());
@@ -44,8 +44,8 @@ public class ApproachHandler {
     
     
     @HandlerAttribute(ID = ClientKeyMessage.MESSAGE_ID)
-    public static void HandleClientKeyMessage(WorldClient Client, Message message) {
-        Client.clientKey = (((ClientKeyMessage) message).key);
+    public static void HandleClientKeyMessage(WorldClient Client, ClientKeyMessage message) {
+        Client.setClientKey(message.key);
        //client.sendPacket(new CharacterLoadingCompleteMessage());
         
         

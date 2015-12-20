@@ -12,7 +12,7 @@ public class EffectEndTurn extends EffectBase {
     @Override
     public int ApplyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            Target.buff.addBuff(new BuffEndTurn(CastInfos, Target));
+            Target.getBuff().addBuff(new BuffEndTurn(CastInfos, Target));
         }
 
         return -1;

@@ -30,16 +30,16 @@ import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
 public class FightBomb extends FightActivableObject {
 
     public HashMap<Short, Short> Cells = new HashMap<>();
-    public BombFighter[] Owner = new BombFighter[2];
+    public BombFighter[] owner = new BombFighter[2];
     
     public Stream<FightCell> FightCells(){
         return this.Cells.keySet().stream().map(C -> this.m_fight.getCell(C));
     }
 
     public FightBomb(Fighter Caster, SpellLevel Spell, Color color, Short[] Cells, BombFighter[] Members) {
-        m_fight = Caster.fight;
-        ID = (short) m_fight.NextTriggerUid.incrementAndGet();
-        m_caster = Caster;
+        m_fight = Caster.getFight();
+        ID = (short) m_fight.getNextTriggerUid().incrementAndGet();
+        caster = Caster;
         m_spellId = Spell.getSpellId();
         m_spell_level = Spell.getGrade();
         m_actionEffect = Spell;
@@ -66,12 +66,12 @@ public class FightBomb extends FightActivableObject {
         for (short cellId : affectedCells) {
             if(!this.m_fight.getCell(cellId).IsWalkable())
                 continue;
-            this.Cells.put(cellId, (short) m_fight.NextTriggerUid.incrementAndGet());
+            this.Cells.put(cellId, (short) m_fight.getNextTriggerUid().incrementAndGet());
             if (m_fight.getCell(cellId) != null) {
                 m_fight.getCell(cellId).AddObject(this);
             }
         }
-        this.Owner = Members;
+        this.owner = Members;
         Arrays.stream(Members).forEach(x -> x.addBomb(this));
 
         AppearForAll();
@@ -81,7 +81,7 @@ public class FightBomb extends FightActivableObject {
     @Override
     public void AppearForAll() {
         this.Cells.keySet().stream().forEach((cell) -> {
-            this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.m_caster.getID(), GetGameActionMark(cell)));
+            this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.caster.getID(), GetGameActionMark(cell)));
         });
     }
 
@@ -91,10 +91,10 @@ public class FightBomb extends FightActivableObject {
     }
 
     @Override
-    public void DisappearForAll() {
+    public void disappearForAll() {
         //m_fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         this.Cells.keySet().stream().forEach((cell) -> {
-            this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.m_caster.getID(), this.Cells.get(cell)));
+            this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.caster.getID(), this.Cells.get(cell)));
         });
         //m_fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
     }
@@ -124,7 +124,7 @@ public class FightBomb extends FightActivableObject {
     }
 
     public GameActionMark GetGameActionMark(short cell) {
-        return new GameActionMark(this.m_caster.getID(), this.m_caster.team.Id, this.m_spellId, this.m_spell_level, this.Cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
+        return new GameActionMark(this.caster.getID(), this.caster.getTeam().id, this.m_spellId, this.m_spell_level, this.Cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
     }
 
     @Override

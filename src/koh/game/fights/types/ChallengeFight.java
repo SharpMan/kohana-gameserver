@@ -58,7 +58,7 @@ public class ChallengeFight extends Fight {
             xpTotal.set(FightFormulas.XPDefie(fighter, Winners.getFighters(), Loosers.getFighters()));
             long GuildXp = FightFormulas.guildXpEarned((CharacterFighter) fighter, xpTotal), MountXp = FightFormulas.mountXpEarned((CharacterFighter) fighter, xpTotal);
             ((CharacterFighter) fighter).character.addExperience(xpTotal.get(), false);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.wave, new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
                     this.experience = ((CharacterFighter) fighter).character.getExperience();
                     this.showExperience = true;
@@ -79,7 +79,7 @@ public class ChallengeFight extends Fight {
 
         for (Fighter Fighter : (Iterable<Fighter>) Loosers.getFighters()::iterator) {
             super.addNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.wave, new FightLoot(new int[0], 0), Fighter.getID(), Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultExperienceData[0]));
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.getWave(), new FightLoot(new int[0], 0), Fighter.getID(), Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultExperienceData[0]));
         }
 
        
@@ -89,7 +89,7 @@ public class ChallengeFight extends Fight {
 
     @Override
     public GameFightEndMessage leftEndMessage(Fighter f) {
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.AgeBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.summoner == null).map(x -> new FightResultPlayerListEntry(x.team.Id == f.team.Id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.getID(), fightTime == -1 ? true : x.isAlive(), (byte) x.getLevel(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.AgeBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.getSummoner() == null).map(x -> new FightResultPlayerListEntry(x.getTeam().id == f.getTeam().id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.getID(), fightTime == -1 ? true : x.isAlive(), (byte) x.getLevel(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
     @Override
@@ -97,14 +97,14 @@ public class ChallengeFight extends Fight {
         // Un persos quitte le combat
         switch (this.fightState) {
             case STATE_PLACE:
-                if (Fighter == Fighter.team.leader) {
-                    Fighter.team.getFighters().forEach(TeamFighter -> TeamFighter.setLife(0));
-                    Fighter.left = true;
-                    this.endFight(this.getEnnemyTeam(Fighter.team), Fighter.team);
+                if (Fighter == Fighter.getTeam().leader) {
+                    Fighter.getTeam().getFighters().forEach(TeamFighter -> TeamFighter.setLife(0));
+                    Fighter.setLeft(true);
+                    this.endFight(this.getEnnemyTeam(Fighter.getTeam()), Fighter.getTeam());
                 } else {
-                    this.map.sendToField(new GameFightUpdateTeamMessage(this.fightId, Fighter.team.getFightTeamInformations()));
+                    this.map.sendToField(new GameFightUpdateTeamMessage(this.fightId, Fighter.getTeam().getFightTeamInformations()));
 
-                    this.sendToField(new GameFightRemoveTeamMemberMessage(this.fightId, Fighter.team.Id, Fighter.getID()));
+                    this.sendToField(new GameFightRemoveTeamMemberMessage(this.fightId, Fighter.getTeam().id, Fighter.getID()));
 
                     Fighter.leaveFight();
 

@@ -30,7 +30,7 @@ public class Algo {
         /*
          * BaseCells
          */
-        Couple<Short, Short> baseCells = getRandomBaseCellPlaces(fight.map);
+        Couple<Short, Short> baseCells = getRandomBaseCellPlaces(fight.getMap());
         team1.add(fight.getCell(baseCells.first));
         team2.add(fight.getCell(baseCells.second));
 
@@ -43,7 +43,7 @@ public class Algo {
                 break;
             }
             if (boucles > 25) {
-                short randomCellId = fight.map.getRandomCell();
+                short randomCellId = fight.getMap().getRandomCell();
                 FightCell cell = fight.getCell(randomCellId);
                 if (cell != null && cell.IsWalkable()) {
                     if (!team1.contains(cell)) {
@@ -58,7 +58,7 @@ public class Algo {
             if (toDir == null) {
                 continue;
             }
-            FightCell randomCell = fight.getCell(fight.map.getRandomAdjacentFreeCell(toDir.Id).getId());
+            FightCell randomCell = fight.getCell(fight.getMap().getRandomAdjacentFreeCell(toDir.Id).getId());
             if (randomCell != null) {
                 if (!team1.contains(randomCell) && randomCell.IsWalkable()) {
                     team1.add(randomCell);
@@ -72,7 +72,7 @@ public class Algo {
                 break;
             }
             if (boucles > 25) {
-                short randomCellId = fight.map.getRandomCell();
+                short randomCellId = fight.getMap().getRandomCell();
                 FightCell cell = fight.getCell(randomCellId);
                 if (cell != null && cell.IsWalkable()) {
                     if (!team1.contains(cell) && !team2.contains(cell)) {
@@ -87,7 +87,7 @@ public class Algo {
             if (toDir == null) {
                 continue;
             }
-            FightCell randomCell = fight.getCell(fight.map.getRandomAdjacentFreeCell(toDir.Id).getId());
+            FightCell randomCell = fight.getCell(fight.getMap().getRandomAdjacentFreeCell(toDir.Id).getId());
             if (randomCell != null) {
                 if (!team1.contains(randomCell) && !team2.contains(randomCell) && randomCell.IsWalkable()) {
                     team2.add(randomCell);

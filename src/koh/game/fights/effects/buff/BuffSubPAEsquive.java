@@ -28,15 +28,15 @@ public class BuffSubPAEsquive extends BuffEffect {
         CastInfos.DamageValue = target.calculDodgeAPMP(CastInfos.caster, LostAP.intValue(), false,CastInfos.Duration > 0);
 
         if (CastInfos.DamageValue != LostAP.intValue()) {
-            target.fight.sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, caster.getID(), target.getID(), LostAP.getValue() - CastInfos.DamageValue));
+            target.getFight().sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, caster.getID(), target.getID(), LostAP.getValue() - CastInfos.DamageValue));
         }
 
         if (CastInfos.DamageValue > 0) {
             BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PA, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, Duration, 0), this.target);
             BuffStats.applyEffect(LostAP, null);
-            this.target.buff.addBuff(BuffStats);
-            if (target.getID() == target.fight.currentFighter.getID()) {
-                target.fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, this.caster.getID(), target.getID(), (short) CastInfos.DamageValue));
+            this.target.getBuff().addBuff(BuffStats);
+            if (target.getID() == target.getFight().getCurrentFighter().getID()) {
+                target.getFight().sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, this.caster.getID(), target.getID(), (short) CastInfos.DamageValue));
             }
         }
 

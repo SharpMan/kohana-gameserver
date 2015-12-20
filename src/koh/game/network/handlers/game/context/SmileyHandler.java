@@ -17,18 +17,18 @@ public class SmileyHandler {
     public static void HandleMoodSmileyRequestMessage(WorldClient Client, MoodSmileyRequestMessage message) {
         //1 Error
         //2 FloodMod
-        Client.character.setMoodSmiley(message.smileyId);
+        Client.getCharacter().setMoodSmiley(message.smileyId);
         Client.send(new MoodSmileyResultMessage((byte) 0, message.smileyId));
     }
 
     @HandlerAttribute(ID = ChatSmileyRequestMessage.MESSAGE_ID)
     public static void HandleChatSmileyRequestMessage(WorldClient Client, ChatSmileyRequestMessage Message) {
-        if (Client.lastChannelMessage.get(SMILEY_CHANNEL) + 5000L > System.currentTimeMillis()) {
-            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((Client.lastChannelMessage.get(SMILEY_CHANNEL) + 5000L - System.currentTimeMillis()) / 1000) + ""}));
+        if (Client.getLastChannelMessage().get(SMILEY_CHANNEL) + 5000L > System.currentTimeMillis()) {
+            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((Client.getLastChannelMessage().get(SMILEY_CHANNEL) + 5000L - System.currentTimeMillis()) / 1000) + ""}));
             return;
         }
-        Client.character.getCurrentMap().sendToField(new ChatSmileyMessage(Client.character.getID(), Message.smileyId, 0));
-        Client.lastChannelMessage.put(SMILEY_CHANNEL, System.currentTimeMillis());
+        Client.getCharacter().getCurrentMap().sendToField(new ChatSmileyMessage(Client.getCharacter().getID(), Message.smileyId, 0));
+        Client.getLastChannelMessage().put(SMILEY_CHANNEL, System.currentTimeMillis());
     }
 
 }

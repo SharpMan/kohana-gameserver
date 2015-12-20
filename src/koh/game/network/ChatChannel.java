@@ -26,10 +26,10 @@ public class ChatChannel extends IWorldEventObserver {
             {
                 if (k == CHANNEL_ADMIN) {
                     if (client.getAccount().right > 0) {
-                        v.registerPlayer(client.character);
+                        v.registerPlayer(client.getCharacter());
                     }
                 } else {
-                    v.registerPlayer(client.character);
+                    v.registerPlayer(client.getCharacter());
                 }
             }
         });
@@ -40,10 +40,10 @@ public class ChatChannel extends IWorldEventObserver {
             {
                 if (k == CHANNEL_ADMIN) {
                     if (client.getAccount().right > 0) {
-                        v.unregisterPlayer(client.character);
+                        v.unregisterPlayer(client.getCharacter());
                     }
                 } else {
-                    v.unregisterPlayer(client.character);
+                    v.unregisterPlayer(client.getCharacter());
                 }
             }
         });

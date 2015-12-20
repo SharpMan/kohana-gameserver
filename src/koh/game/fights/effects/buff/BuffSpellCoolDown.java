@@ -33,7 +33,7 @@ public class BuffSpellCoolDown extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        FighterSpell.SpellinitialCooldown CurrentCooldown = this.target.spellsController.myinitialCooldown.get(Spell);
+        FighterSpell.SpellinitialCooldown CurrentCooldown = this.target.getSpellsController().myinitialCooldown.get(Spell);
         if (CurrentCooldown != null) {
             this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), Spell, CurrentCooldown.initialCooldown + 1));
         }

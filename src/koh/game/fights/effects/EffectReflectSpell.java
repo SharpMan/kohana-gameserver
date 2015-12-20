@@ -13,7 +13,7 @@ public class EffectReflectSpell extends EffectBase {
     public int ApplyEffect(EffectCast CastInfos) {
         if (CastInfos.Duration > 0) {
             for (Fighter Target : CastInfos.Targets) {
-                Target.buff.addBuff(new BuffReflectSpell(CastInfos, Target));
+                Target.getBuff().addBuff(new BuffReflectSpell(CastInfos, Target));
             }
         }
 

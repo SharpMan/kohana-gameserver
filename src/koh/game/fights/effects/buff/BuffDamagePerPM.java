@@ -23,16 +23,16 @@ public class BuffDamagePerPM extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         int pas = this.CastInfos.Effect.diceNum;
         int val = this.CastInfos.Effect.diceSide;
-        int nbr = (int) Math.floor((double) target.usedMP / (double) pas);
+        int nbr = (int) Math.floor((double) target.getUsedMP() / (double) pas);
         DamageValue.setValue(val * nbr);
         //Poison Paralysant
 
-        int inte = CastInfos.caster.stats.getTotal(StatsEnum.Intelligence);
+        int inte = CastInfos.caster.getStats().getTotal(StatsEnum.Intelligence);
         
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = CastInfos.caster.stats.getTotal(StatsEnum.AddDamagePercent);
+        int pdom = CastInfos.caster.getStats().getTotal(StatsEnum.AddDamagePercent);
         if (pdom < 0) {
             pdom = 0;
         }

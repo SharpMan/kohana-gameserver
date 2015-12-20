@@ -20,27 +20,27 @@ import koh.protocol.messages.game.interactive.zaap.TeleportRequestMessage;
 public class InteractiveHandler {
 
     @HandlerAttribute(ID = InteractiveUseRequestMessage.MESSAGE_ID)
-    public static void HandleInteractiveUseRequestMessage(WorldClient Client, InteractiveUseRequestMessage Message) {
-        if (!Client.canGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT)) {
-            Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
+    public static void HandleInteractiveUseRequestMessage(WorldClient client, InteractiveUseRequestMessage Message) {
+        if (!client.canGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT)) {
+            client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
-        InteractiveElementStruct Element = Client.character.getCurrentMap().getInteractiveElementStruct(Message.elemId);
+        InteractiveElementStruct Element = client.getCharacter().getCurrentMap().getInteractiveElementStruct(Message.elemId);
         if (Element == null) {
-            Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
+            client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
         InteractiveElementSkill Skill = Element.getSkill(Message.skillInstanceUid);
         if (Skill == null) {
-            Client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
+            client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
 
-        Client.addGameAction(new InteractiveElementAction(Client.character, Skill, Message.elemId));
+        client.addGameAction(new InteractiveElementAction(client.getCharacter(), Skill, Message.elemId));
 
         try {
             if (InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(Skill.skillId)) != null && InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(Skill.skillId)).getDuration() == 0) {
-                Client.endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
+                client.endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
