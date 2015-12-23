@@ -7,7 +7,6 @@ import koh.game.actions.GameRequest;
 import koh.game.actions.requests.GuildJoinRequest;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildEntity;

@@ -1,7 +1,6 @@
 package koh.game.network.handlers.game.approach;
 
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;

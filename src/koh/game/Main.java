@@ -5,7 +5,6 @@ import koh.game.inter.InterClient;
 import koh.game.inter.TransfererTimeOut;
 import koh.game.network.WorldServer;
 import koh.game.network.handlers.Handler;
-import koh.game.utils.Settings;
 
 /**
  *
@@ -51,8 +50,8 @@ public class Main {
             $Logs = new Logs();
             MySQL.ConnectDatabase();
             MySQL.LoadCache();
-            $Logs.writeInfo(Handler.Initialize() + " HANDLERS Readed");
-            $Logs.writeInfo(Handler.InitializeMessage() + " messages Readed");
+            $Logs.writeInfo(Handler.initialize() + " HANDLERS Readed");
+            $Logs.writeInfo(Handler.initializeMessage() + " messages Readed");
             $TransfererTimeOut = new TransfererTimeOut();
             $InterClient = new InterClient();
             $InterClient.bind();

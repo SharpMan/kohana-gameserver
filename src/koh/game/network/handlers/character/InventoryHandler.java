@@ -90,12 +90,14 @@ public class InventoryHandler {
     }
 
     @HandlerAttribute(ID = ObjectSetPositionMessage.MESSAGE_ID)
-    public synchronized static void HandleObjectSetPositionMessage(WorldClient Client, ObjectSetPositionMessage Message) {
-        if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.send(new BasicNoOperationMessage());
-            return;
+    public static void HandleObjectSetPositionMessage(WorldClient client, ObjectSetPositionMessage Message) {
+        synchronized (client.get$mutex()) {
+            if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+                client.send(new BasicNoOperationMessage());
+                return;
+            }
+            client.getCharacter().getInventoryCache().moveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
         }
-        Client.getCharacter().getInventoryCache().moveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
     }
 
     @HandlerAttribute(ID = LivingObjectMessageRequestMessage.MESSAGE_ID)
@@ -149,7 +151,7 @@ public class InventoryHandler {
     }
 
     @HandlerAttribute(ID = ObjectFeedMessage.MESSAGE_ID)
-    public static void HandleObjectFeedMessage(WorldClient Client, ObjectFeedMessage Message) {
+    public static void handleObjectFeedMessage(WorldClient Client, ObjectFeedMessage Message) {
         if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
             Client.send(new BasicNoOperationMessage());
             return;

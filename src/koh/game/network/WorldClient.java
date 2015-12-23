@@ -56,6 +56,8 @@ public class WorldClient {
     private boolean showQueue;
     @Getter @Setter
     private Player character;
+    @Getter
+    private Object $mutex = new Object();
     @Setter
     private String clientKey;
     private final Map<GameActionTypeEnum, GameAction> myActions = Collections.synchronizedMap(new HashMap<GameActionTypeEnum, GameAction>());

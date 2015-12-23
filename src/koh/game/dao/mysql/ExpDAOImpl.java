@@ -9,16 +9,15 @@ import koh.game.dao.api.ExpDAO;
 import koh.game.entities.ExpLevel;
 import koh.game.utils.sql.ConnectionResult;
 import koh.utils.TabMap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 /**
  *
  * @author Neo-Craft
  */
+@Log4j2
 public class ExpDAOImpl extends ExpDAO {
 
-    private static final Logger logger = LogManager.getLogger(ExpDAO.class);
 
     @Inject
     private DatabaseSource dbSource;
@@ -40,8 +39,8 @@ public class ExpDAOImpl extends ExpDAO {
                 levels.add(new ExpLevel(result.getInt("level"), result.getLong("player"), result.getLong("job"), result.getLong("mount"), result.getLong("guild"), result.getInt("guild_members"), result.getInt("living_object"), result.getInt("pvp_alignement"), result.getLong("tourmentors"), result.getLong("bandits")));
             }
         } catch (Exception e) {
-            logger.error(e);
-            logger.warn(e.getMessage());
+            log.error(e);
+            log.warn(e.getMessage());
         }
         return levels;
     }

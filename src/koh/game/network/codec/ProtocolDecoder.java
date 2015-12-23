@@ -1,12 +1,11 @@
 package koh.game.network.codec;
 
 import java.nio.BufferUnderflowException;
-import koh.game.Main;
+
 import koh.game.network.handlers.Handler;
 import koh.protocol.MessageEnum;
 import koh.protocol.client.Message;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
-import koh.protocol.messages.game.basic.BasicAckMessage;
 import org.apache.logging.log4j.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
@@ -68,7 +67,7 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         Message message;
 
         try {
-            message = (Message) Handler.Messages.get(getMessageId(header)).newInstance();
+            message = (Message) Handler.messages.get(getMessageId(header)).newInstance();
         } catch (Exception e) {
             logger.error("[ERROR] Unknown Message Header Handler {} {}" , (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) , session.getRemoteAddress().toString());
             session.write(new BasicNoOperationMessage());

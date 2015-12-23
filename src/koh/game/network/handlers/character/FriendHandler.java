@@ -1,7 +1,6 @@
 package koh.game.network.handlers.character;
 
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.AccountData.FriendContact;
 import koh.game.entities.AccountData.IgnoredContact;
 import koh.game.entities.actors.Player;
