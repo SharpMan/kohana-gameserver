@@ -9,11 +9,16 @@ import koh.protocol.client.enums.PlayerEnum;
  */
 public class AddExperience extends ItemAction {
 
-    private int exp;
+    private  int exp;
 
     public AddExperience(String[] args, String criteria) {
         super(args, criteria);
-        this.exp = Integer.parseInt(args[0]);
+        try{
+            this.exp = Integer.parseInt(args[0]);
+        }
+        catch(NumberFormatException e){
+            this.exp = 0;
+        }
     }
 
     @Override

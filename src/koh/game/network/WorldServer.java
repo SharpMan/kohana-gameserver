@@ -20,8 +20,8 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 public class WorldServer {
 
     private final NioSocketAcceptor acceptor;
-    private final InetSocketAddress adress;
-    public static GameLoader Loader = new GameLoader();
+    private final InetSocketAddress address;
+    public static GameLoader gameLoader = new GameLoader();
 
     /**
      * 2 * estimated client optimal size (64)
@@ -35,7 +35,7 @@ public class WorldServer {
 
     public WorldServer(int port) {
         this.acceptor = new NioSocketAcceptor(Runtime.getRuntime().availableProcessors() * 4);
-        this.adress = new InetSocketAddress(DAO.getSettings().getStringElement("World.Host"), port);
+        this.address = new InetSocketAddress(DAO.getSettings().getStringElement("World.Host"), port);
     }
 
     public WorldServer configure() {
@@ -58,7 +58,7 @@ public class WorldServer {
     public WorldServer launch() {
         try {
             //Connect the acceptor with the HostAdress
-            this.acceptor.bind(adress);
+            this.acceptor.bind(address);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

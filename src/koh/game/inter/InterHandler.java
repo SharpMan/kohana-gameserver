@@ -4,7 +4,6 @@ import koh.game.Main;
 import koh.game.dao.DAO;
 import koh.game.dao.mysql.AccountTicketDAO;
 import koh.game.entities.Account;
-import koh.game.utils.Settings;
 import koh.inter.messages.ExpulseAccountMessage;
 import koh.inter.messages.HelloMessage;
 import koh.inter.messages.PlayerComingMessage;
@@ -51,7 +50,7 @@ class InterHandler extends IoHandlerAdapter {
         }
         if (object instanceof ExpulseAccountMessage) {
             try {
-                Main.WorldServer().getClient(((ExpulseAccountMessage) object).accountId).close();
+                Main.worldServer().getClient(((ExpulseAccountMessage) object).accountId).close();
             } catch (NullPointerException e) {
             }
         }

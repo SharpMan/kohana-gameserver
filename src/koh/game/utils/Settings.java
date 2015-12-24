@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,12 +29,12 @@ public class Settings {
     private final String path;
     public Settings(String path) {
         this.path = path;
-        elements.clear();
-        readSettings();
-        DAO.getSettings().getStringElement("Register.Channels").split(",");
+        this.elements.clear();
+        this.readSettings();
+        this.getStringElement("Register.Channels").split(",");
         this.registredChannels = new Byte[getStringElement("Register.Channels").split(",").length];
         for(int i =0; i < registredChannels.length; i++){
-            registredChannels[i] = Byte.parseByte(getStringElement("Register.Channels").split(",")[i]);
+            this.registredChannels[i] = Byte.parseByte(getStringElement("Register.Channels").split(",")[i]);
         }
     }
 
@@ -70,7 +71,7 @@ public class Settings {
     private void readSettings() {
         Map<String, String> currentGroup = null;
         try {
-            BufferedReader config = new BufferedReader(new FileReader(path));
+            BufferedReader config = new BufferedReader(new FileReader(System.getProperty("user.dir")+path));
             String line = "";
             while ((line = config.readLine()) != null) {
                 if (!line.isEmpty() && !line.startsWith(";")) {

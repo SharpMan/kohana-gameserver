@@ -193,7 +193,7 @@ public class CharacterHandler {
     @HandlerAttribute(ID = CharacterCreationRequestMessage.MESSAGE_ID)
     public static void HandleCharacterCreationRequestMessage(WorldClient client, CharacterCreationRequestMessage message) {
         try {
-            if (client.getAccount().characters.size() >= PlayerDAOImpl.MaxCharacterSlot) {
+            if (client.getAccount().characters.size() >= PlayerDAOImpl.MAX_CHARACTER_SLOT) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_TOO_MANY_CHARACTERS.value()));
             } else if (!PlayerController.isValidName(((CharacterCreationRequestMessage) message).Name)) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
@@ -258,7 +258,7 @@ public class CharacterHandler {
                 character.initialize();
 
                 client.getAccount().characters.add(0, character);
-                Main.InterClient().Send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
+                Main.interClient().Send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.OK.value()));
                 client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
             }

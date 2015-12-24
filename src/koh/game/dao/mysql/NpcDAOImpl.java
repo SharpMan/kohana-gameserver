@@ -189,7 +189,7 @@ public class NpcDAOImpl extends NpcDAO {
                         .dialogReplies(Enumerable.StringToMultiArray(result.getString("dialog_replies")))
                         .actions(Enumerable.StringToIntArray(result.getString("actions")))
                         .gender(result.getInt("gender"))
-                        .look(result.getString("entityLook"))
+                        .look(result.getString("look"))
                         .fastAnimsFun(result.getBoolean("fast_anims_fun"))
                         .orderItemsByLevel(result.getBoolean("order_items_level"))
                         .orderItemsByPrice(result.getBoolean("order_items_price"))

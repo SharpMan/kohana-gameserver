@@ -27,7 +27,7 @@ public class MountTemplate {
     public MountTemplate(ResultSet result) throws SQLException {
         this.Id = result.getInt("id");
         this.scroolId =result.getInt("scroll_id");
-        this.entityLook = EntityLookParser.fromString(result.getString("entityLook"));
+        this.entityLook = EntityLookParser.fromString(result.getString("look"));
         if (!result.getString("stats").isEmpty()) {
             for (String stat : result.getString("stats").split("\\|")) {
                 String[] infos = stat.split("=");

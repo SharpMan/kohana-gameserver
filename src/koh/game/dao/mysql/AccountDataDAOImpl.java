@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.google.inject.Inject;
 
-import static koh.game.MySQL.executeQuery;
 import static koh.game.entities.item.InventoryItem.deserializeEffects;
 
 import koh.game.dao.DatabaseSource;

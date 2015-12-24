@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" shutdownHook="disable">
+
+  <Properties>
+    <Property name="logsFolder">logs</Property>
+  </Properties>
+
+  <Appenders>
+
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{3} - %notEmpty{[%marker]} %notEmpty{(%X{clientAddress})} %notEmpty{[accId:%X{accountId}]} %notEmpty{[accName:%X{accountName}]} %msg%n"/>
+    </Console>
+
+    <RollingRandomAccessFile name="FILE_ERR" immediateFlush="false" fileName="${logsFolder}/global/${date:yyyy-MM-dd}/error.log" filePattern="${logsFolder}/global/%d{yyyy-MM-dd}/error.log.gz">
+      <PatternLayout>
+        <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{3} - %notEmpty{[%marker]} %notEmpty{(%X{clientAddress})} %notEmpty{[accId:%X{accountId}]} %notEmpty{[accName:%X{accountName}]} %msg%n</pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingRandomAccessFile>
+
+    <RollingRandomAccessFile name="FILE_INFO" immediateFlush="false" fileName="${logsFolder}/global/${date:yyyy-MM-dd}/info.log" filePattern="${logsFolder}/global/%d{yyyy-MM-dd}/info.log.gz">
+      <PatternLayout>
+        <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{3} - %notEmpty{[%marker]} %notEmpty{(%X{clientAddress})} %notEmpty{[accId:%X{accountId}]} %notEmpty{[accName:%X{accountName}]} %msg%n</pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingRandomAccessFile>
+
+    <Routing name="Routing_GameServer">
+      <Routes pattern="$${ctx:clientAddress}">
+        <Route key="$${ctx:clientAddress}">
+            <RandomAccessFile name="Rolling-default" fileName="${logsFolder}/game/trace.log" immediateFlush="false">
+                <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{3} - %notEmpty{[%marker]} %notEmpty{(%X{clientAddress})} %msg%n"/>
+            </RandomAccessFile>
+        </Route>
+        <Route>
+          <RollingRandomAccessFile name="Rolling-${ctx:clientAddress}" immediateFlush="false" fileName="${logsFolder}/game/${date:yyyy-MM-dd}/${ctx:clientAddress}.log" filePattern="${logsFolder}/game/%d{yyyy-MM-dd}/${ctx:clientAddress}.log.gz">
+            <PatternLayout>
+              <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %logger{3} - %notEmpty{[accId:%X{accountId}]} %notEmpty{[accName:%X{accountName}]} %notEmpty{[%marker]} %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+              <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+          </RollingRandomAccessFile>
+        </Route>
+      </Routes>
+    </Routing>
+
+  </Appenders>
+  <Loggers>
+    <AsyncLogger name="com.zaxxer.hikari" level="info" additivity="false">
+      <AppenderRef ref="Console" level="info" />
+      <AppenderRef ref="FILE_INFO" level="info" />
+    </AsyncLogger>
+
+    <AsyncLogger name="GameServer" level="trace" additivity="false">
+      <AppenderRef ref="Routing_GameServer" level="info"/>
+    </AsyncLogger>
+
+    <AsyncRoot level="trace">
+        <AppenderRef ref="Console" level="info" />
+        <AppenderRef ref="FILE_INFO" level="info" />
+        <AppenderRef ref="FILE_ERR" level="error" />
+    </AsyncRoot>
+
+  </Loggers>
+</Configuration>

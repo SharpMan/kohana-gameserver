@@ -46,7 +46,7 @@ public class MonsterTemplate {
         Id = result.getInt("id");
         gfxId = result.getInt("gfx_id");
         race = result.getInt("race");
-        look = result.getString("entityLook");
+        look = result.getString("look");
         useSummonSlot = result.getBoolean("use_summon_slot");
         useBombSlot = result.getBoolean("use_bomb_slot");
         canPlay = result.getBoolean("can_play");

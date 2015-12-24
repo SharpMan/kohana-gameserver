@@ -18,7 +18,7 @@ public class PetInventoryDAOImpl extends PetInventoryDAO {
 
     public PetInventoryDAOImpl() {
         try {
-            this.dataSource = DaoManager.createDao(new JdbcConnectionSource("jdbc:sqlite:databases/pet_inventories.db",
+            this.dataSource = DaoManager.createDao(new JdbcConnectionSource("jdbc:sqlite:data/pet_inventories.db",
                     null, null), PetsInventoryItemEntity.class);
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -320,7 +320,7 @@ public class WorldClient {
             this.character = null;
         }
         if (tempTicket != null) {
-            WorldServer.Loader.onClientDisconnect(this);
+            WorldServer.gameLoader.onClientDisconnect(this);
             tempTicket.clear();
             tempTicket = null;
         }

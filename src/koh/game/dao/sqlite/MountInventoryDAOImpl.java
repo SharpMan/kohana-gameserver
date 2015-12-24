@@ -18,7 +18,7 @@ public class MountInventoryDAOImpl extends MountInventoryDAO {
 
     public MountInventoryDAOImpl() {
         try {
-            this.dataSource = DaoManager.createDao(new JdbcConnectionSource("jdbc:sqlite:databases/mount_inventories.db",
+            this.dataSource = DaoManager.createDao(new JdbcConnectionSource("jdbc:sqlite:data/mount_inventories.db",
                     null, null), MountInventoryItemEntity.class);
         } catch (SQLException e) {
             throw new RuntimeException(e);

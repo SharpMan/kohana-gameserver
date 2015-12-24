@@ -26,25 +26,26 @@ import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Neo-Craft
  */
 public class PlayerDAOImpl extends PlayerDAO {
 
-    public static final int MaxCharacterSlot = 5;
+    public static final int MAX_CHARACTER_SLOT = 5;
     private static final Logger logger = LogManager.getLogger(PlayerDAO.class);
 
-    static { //Je le supprime pas juste pour te montrer a quoi sa refert
+
+    private final void scheduleLoader(){
         Timer thread = new Timer();
         thread.schedule(new TimerTask() {
 
             @Override
             public void run() {
                 List<Couple<Long, Player>> copy = new ArrayList<>();
-                synchronized (myCharacterByTime) {
-                    copy.addAll(myCharacterByTime);
+                synchronized (characterUnloadQueue) {
+                    copy.addAll(characterUnloadQueue);
                 }
                 for (Couple<Long, Player> ref : copy) {
                     if (System.currentTimeMillis() > ref.first && !(ref.second.getAccount().characters != null && ref.second.getAccount().characters.stream().anyMatch(Character -> Character.getFighter() != null))) { //On décharge pas les combattants.
@@ -67,14 +68,31 @@ public class PlayerDAOImpl extends PlayerDAO {
     public final List<Integer> accountInUnload = Collections.synchronizedList(new ArrayList<Integer>()); //TO : CopyOnWriteArrayList ?
     private final Map<Integer, Player> myCharacterById = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, Player> myCharacterByName = Collections.synchronizedMap(new HashMap<>());
-    private final ConcurrentLinkedQueue<Couple<Long, Player>> myCharacterByTime = new ConcurrentLinkedQueue();
+    private final ConcurrentLinkedQueue<Couple<Long, Player>> characterUnloadQueue = new ConcurrentLinkedQueue();
+
     @Inject
     private DatabaseSource dbSource;
 
+    @Override
+    public Stream<Couple<Long, Player>> getQueueAsSteam(){
+        return this.characterUnloadQueue.stream();
+    }
+
+    @Override
+    public void addCharacterInQueue(Couple<Long, Player> charr){
+        this.characterUnloadQueue.add(charr);
+    }
+
+    @Override
+    public boolean isCurrentlyOnProcess(int accountId){
+        return accountInUnload.contains(accountId);
+    }
+
+
     private void cleanMap(Player p) {
-        for (Couple<Long, Player> cp : myCharacterByTime) {
+        for (Couple<Long, Player> cp : characterUnloadQueue) {
             if (cp.second == p) {
-                myCharacterByTime.remove(cp);
+                characterUnloadQueue.remove(cp);
             }
         }
     }
@@ -91,7 +109,7 @@ public class PlayerDAOImpl extends PlayerDAO {
 
     @Override
     public void getByAccount(Account account) throws Exception {
-        synchronized (myCharacterByTime) {
+        synchronized (characterUnloadQueue) {
             account.characters = new ArrayList<>(5);
             try (ConnectionResult conn = dbSource.executeQuery("SELECT * FROM `character` WHERE owner = '" + account.id + "';", 0)) {
                 ResultSet result = conn.getResult();
@@ -152,6 +170,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .emotes(Enumerable.StringToByteArray(result.getString("emotes")))
                             .mountInfo(new MountInformations().deserialize(result.getBytes("mount_informations")))
                             .build();
+                    System.out.println(p.getIndexedColors());
                     Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
                     p.setMapid(result.getInt("map"));
                     p.setHonor(result.getInt("honor_points"), false);
@@ -179,6 +198,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                     addCharacter(p);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.error(e);
                 logger.warn(e.getMessage());
                 throw new Exception(); //FIXME: something refeer
@@ -321,6 +341,7 @@ public class PlayerDAOImpl extends PlayerDAO {
 
     @Override
     public void start() {
+        this.scheduleLoader();
     }
 
     @Override

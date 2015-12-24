@@ -30,9 +30,9 @@ public class ApproachHandler {
         Client.setTempTicket(AccountTicketDAO.getWaitingCompte(((AuthenticationTicketMessage) message).Ticket));
 
         if (Client.getTempTicket() != null && Client.getTempTicket().isCorrect(Client.getIP(), ((AuthenticationTicketMessage) message).Ticket)) {
-            WorldServer.Loader.addClient(Client);
-            if (WorldServer.Loader.getPosition(Client) != 1) {
-                Client.send(new LoginQueueStatusMessage((short) WorldServer.Loader.getPosition(Client), (short) WorldServer.Loader.getTotal()));
+            WorldServer.gameLoader.addClient(Client);
+            if (WorldServer.gameLoader.getPosition(Client) != 1) {
+                Client.send(new LoginQueueStatusMessage((short) WorldServer.gameLoader.getPosition(Client), (short) WorldServer.gameLoader.getTotal()));
                 Client.setShowQueue(true);
             }
         } else {

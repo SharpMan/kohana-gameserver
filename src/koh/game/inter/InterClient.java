@@ -6,6 +6,7 @@ import koh.game.dao.DAO;
 import koh.inter.InterMessage;
 import koh.inter.IntercomDecoder;
 import koh.inter.IntercomEncoder;
+import lombok.extern.log4j.Log4j2;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -15,6 +16,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
  *
  * @author Neo-Craft
  */
+@Log4j2
 public class InterClient {
 
     private IoConnector connector = new NioSocketConnector();
@@ -27,9 +29,10 @@ public class InterClient {
         connector.getSessionConfig().setReadBufferSize(65536);
     }
 
-    public void bind() {
-        Main.TransfererTimeOut().addTimeOut(this);
+    public InterClient bind() {
+        Main.transfererTimeOut().addTimeOut(this);
         connector.connect(address);
+        return this;
     }
 
     public void RetryConnect(int port) {
@@ -38,7 +41,7 @@ public class InterClient {
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new IntercomEncoder(), new IntercomDecoder()));
         connector.setHandler(new InterHandler(this));
         connector.getSessionConfig().setReadBufferSize(65536);
-        System.out.println("Retry to connect to the InterServer ...");
+        log.info("Retry to connect to the InterServer ...");
         connector.connect(address);
     }
 

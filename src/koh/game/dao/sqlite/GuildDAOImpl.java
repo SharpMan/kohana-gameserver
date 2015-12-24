@@ -31,7 +31,7 @@ public class GuildDAOImpl extends GuildDAO {
 
     public GuildDAOImpl() {
         try {
-            this.dataSource = DaoManager.createDao(new JdbcConnectionSource("jdbc:sqlite:databases/guilds.db",
+            this.dataSource = DaoManager.createDao(new JdbcConnectionSource("jdbc:sqlite:data/guilds.db",
                     null, null), GuildEntity.class);
         }catch(Exception e) {
             throw new RuntimeException(e);

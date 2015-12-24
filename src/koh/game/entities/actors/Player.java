@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 import koh.d2o.Couple;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
@@ -100,7 +101,7 @@ public class Player extends IGameActor implements Observer {
     private long regenStartTime;
     @Getter @Setter
     private volatile DofusMap currentMap;
-    @Getter @Setter
+    @Getter @Setter @NotNull
     private List<Byte> enabledChannels = new ArrayList<>(20), disabledChannels;
     @Getter @Setter
     private ShortcutBook shortcuts;
@@ -352,14 +353,14 @@ public class Player extends IGameActor implements Observer {
                     logger.error(this.toString());
                 }
                 for (Player p : this.account.characters) { //TODO: ALleos
-                    if(PlayerDAOImpl.myCharacterByTime.stream().anyMatch(x -> x.second.nickName.equalsIgnoreCase(p.nickName))){
+                    if(DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x.second.nickName.equalsIgnoreCase(p.nickName))){
                         logger.debug(p.nickName + " already aded");
                     }
-                    PlayerDAOImpl.myCharacterByTime.add(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("account.DeleteMemoryTime") * 60 * 1000, p));
-                    logger.debug(p.nickName + " aded" + this.account.characters.size());
+                    DAO.getPlayers().addCharacterInQueue(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("account.DeleteMemoryTime") * 60 * 1000, p));
+                    logger.debug(p.nickName + " added" + this.account.characters.size());
                 }
             } else {
-                logger.error(nickName + " Nulled account on disconnection");
+                logger.error(nickName + " nulled account on disconnection");
             }
 
         } catch (Exception e) {

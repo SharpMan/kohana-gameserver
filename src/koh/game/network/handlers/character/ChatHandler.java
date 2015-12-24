@@ -207,7 +207,7 @@ public class ChatHandler {
                     break;
                 } else if (message.Content.startsWith("!alterte")) {
                     byte duration = Byte.parseByte(message.Content.split(" ")[1]);
-                    Main.WorldServer().SendPacket(new PopupWarningMessage(duration, Client.getCharacter().getNickName(), message.Content.split(" ")[2]));
+                    Main.worldServer().SendPacket(new PopupWarningMessage(duration, Client.getCharacter().getNickName(), message.Content.split(" ")[2]));
                     break;
                 } else if (message.Content.startsWith("!item_paddock")) {
                     try {

@@ -94,6 +94,7 @@ public class PetTemplate {
     }
 
     public void verify() {
+        if(this.Id == 15110 || this.Id == 15254) return;
         int[] MonsterEffect = new int[0];
         for (MonsterBooster b : this.monsterBoosts) {
             for (int i : b.stats) {

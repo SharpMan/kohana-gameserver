@@ -59,19 +59,19 @@ public class MySQL {
                 Connection = DriverManager.getConnection("jdbc:mysql://" + DAO.getSettings().getStringElement("Database.Host") + "/" + DAO.getSettings().getStringElement("Database.name"), DAO.getSettings().getStringElement("Database.User"), DAO.getSettings().getStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(1000)) || (!Connection.isValid(1000))) {
-                    Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
+                   // Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
                     return false;
                 }
                 needCommit = false;
             } finally {
                 myLocker.unlock();
             }
-            Main.Logs().writeInfo("MySQL Database Connected");
+            //Main.Logs().writeInfo("MySQL Database Connected");
             TIMER(true);
 
             return true;
         } catch (SQLException e) {
-            Main.Logs().writeError("SQL ERROR: " + e.getMessage());
+            //Main.Logs().writeError("SQL ERROR: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -114,7 +114,7 @@ public class MySQL {
                 Connection = DriverManager.getConnection("jdbc:mysql://" + DAO.getSettings().getStringElement("Database.Host") + "/" + DAO.getSettings().getStringElement("Database.name"), DAO.getSettings().getStringElement("Database.User"), DAO.getSettings().getStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(60000))) {
-                    Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
+                    //Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
                     return false;
                 }
                 needCommit = false;
@@ -125,7 +125,7 @@ public class MySQL {
             }
             return true;
         } catch (SQLException e) {
-            Main.Logs().writeError("SQL ERROR: " + e.getMessage());
+            //Main.Logs().writeError("SQL ERROR: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -243,7 +243,7 @@ public class MySQL {
                     myLocker.unlock();
                 }
             } catch (SQLException e) {
-                Main.Logs().writeError("SQL ERROR:" + e.getMessage());
+                //Main.Logs().writeError("SQL ERROR:" + e.getMessage());
                 e.printStackTrace();
             }
         } else {
@@ -256,11 +256,11 @@ public class MySQL {
         try {
             Connection dbCon = Connection();
             dbCon.commit();
-            synchronized (AccountInUnload) {
+            /*synchronized (AccountInUnload) {
                 AccountInUnload.clear();
-            }
+            }*/
         } catch (SQLException ex) {
-            Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
+            //Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -276,7 +276,7 @@ public class MySQL {
                 myLocker.unlock();
             }
         } catch (SQLException ex) {
-            Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
+            //Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -293,7 +293,7 @@ public class MySQL {
                 myLocker.unlock();
             }
         } catch (Exception e) {
-            Main.Logs().writeError("Erreur a la fermeture des connexions SQL:" + e.getMessage());
+            //Main.Logs().writeError("Erreur a la fermeture des connexions SQL:" + e.getMessage());
             e.printStackTrace();
         }
     }

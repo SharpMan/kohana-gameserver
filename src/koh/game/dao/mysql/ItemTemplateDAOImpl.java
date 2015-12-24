@@ -1,6 +1,5 @@
 package koh.game.dao.mysql;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.ItemTemplateDAO;
@@ -26,23 +25,26 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
     private final Map<Integer, ItemSet> itemSets = new HashMap<>(377);
     private final Map<Integer, PetTemplate> pets = new HashMap<>(114);
     private final Map<Integer, ItemType> itemTypes = new HashMap<>(171);
-    private final ImmutableMap<Integer, Class<? extends ItemAction>> itemActions = ImmutableMap
-            .of(0, Teleportation.class)
-            .of(4, Kamas.class)
-            .of(5, CreateItem.class)
-            .of(6, LearnJob.class)
-            .of(7, ReturnToSavePos.class)
-            .of(8, AddBaseStat.class)
-            .of(9, LearnSpell.class)
-            .of(10, GenLife.class)
-            .of(11, SetAlign.class)
-            .of(12, SpawnMonsterGroup.class)
-            .of(13, Restat.class)
-            .of(14, ForgetSpell.class)
-            .of(15, TeleportDj.class)
-            .of(20, AddSpellPoint.class)
-            .of(21, AddEnergy.class)
-            .of(22, AddExperience.class);
+    private final Map<Integer, Class<? extends ItemAction>> itemActions = new HashMap<Integer, Class<? extends ItemAction>>() {
+        {
+            put(0, Teleportation.class);
+            put(4, Kamas.class);
+            put(5, CreateItem.class);
+            put(6, LearnJob.class);
+            put(7, ReturnToSavePos.class);
+            put(8, AddBaseStat.class);
+            put(9, LearnSpell.class);
+            put(10, GenLife.class);
+            put(11, SetAlign.class);
+            put(12, SpawnMonsterGroup.class);
+            put(13, Restat.class);
+            put(14, ForgetSpell.class);
+            put(15, TeleportDj.class);
+            put(20, AddSpellPoint.class);
+            put(21, AddEnergy.class);
+            put(22, AddExperience.class);
+        }
+    };
     //.of(24,morph)
     //.of(25,demorph)
     //.of(26,guildEnnclos)

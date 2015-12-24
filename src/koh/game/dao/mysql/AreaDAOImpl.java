@@ -24,7 +24,7 @@ public class AreaDAOImpl extends AreaDAO {
     private static final Logger logger = LogManager.getLogger(AreaDAO.class);
 
     private final HashMap<Integer, SuperArea> superAreas = new HashMap<>(5);
-    private final HashMap<Integer, Area> areas = new HashMap<>(56);
+    private final HashMap<Integer, Area> areas = new HashMap<>(900);
     private final HashMap<Integer, SubArea> subAreas = new HashMap<>(855);
 
     @Inject
@@ -32,8 +32,10 @@ public class AreaDAOImpl extends AreaDAO {
 
     private int loadAll() {
         int i = 0;
+
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from areas", 0)) {
             ResultSet result = conn.getResult();
+
             Area myArea = null;
             while (result.next()) {
                 myArea = Area.builder()
@@ -51,15 +53,14 @@ public class AreaDAOImpl extends AreaDAO {
                 ++i;
             }
         } catch (Exception e) {
-                logger.error(e);
-                logger.warn(e.getMessage());
+                e.printStackTrace();
         }
         return i;
     }
 
     private int loadAllSubAreas() {
         int i = 0;
-        try (ConnectionResult conn = dbSource.executeQuery("SELECT * from sub_area", 0)) {
+        try (ConnectionResult conn = dbSource.executeQuery("SELECT * from sub_areas", 0)) {
             ResultSet result = conn.getResult();
             SubArea mySubarea = null;
             while (result.next()) {
@@ -79,12 +80,14 @@ public class AreaDAOImpl extends AreaDAO {
                         .exitMapIds(Enumerable.StringToIntArray(result.getString("exit_map_ids")))
                         .capturable(result.getBoolean("capturable"))
                         .build();
+
                 mySubarea.getArea().getSubAreas().add(mySubarea);
                 subAreas.put(result.getInt("id"), mySubarea);
 
                 ++i;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

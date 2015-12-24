@@ -23,7 +23,7 @@ public class Area {
     @Getter
     private int id;
     @Getter
-    private ArrayList<SubArea> subAreas = new ArrayList<>();
+    private final ArrayList<SubArea> subAreas = new ArrayList<>();
     @Getter
     private SuperArea superArea;
     @Getter
@@ -32,7 +32,7 @@ public class Area {
     private int worldmapId;
 
     public void onBuilt() {
-        new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("job.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("job.AgeBonusTime") * 60) * 1000) {
+        new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Job.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Job.AgeBonusTime") * 60) * 1000) {
             @Override
             public void run() {
                 subAreas.forEach(Sub -> Arrays.stream(Sub.getMapIds())
@@ -51,7 +51,7 @@ public class Area {
                                 })));
             }
         };
-        new CancellableScheduledRunnable(backGroundWorker, (DAO.getSettings().getIntElement("job.Spawn") + this.id) * 60 * 1000, DAO.getSettings().getIntElement("job.Spawn") * 60 * 1000) {
+        new CancellableScheduledRunnable(backGroundWorker, (DAO.getSettings().getIntElement("Job.Spawn") + this.id) * 60 * 1000, DAO.getSettings().getIntElement("Job.Spawn") * 60 * 1000) {
             @Override
             public void run() {
                 subAreas
