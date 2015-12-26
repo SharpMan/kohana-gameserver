@@ -56,7 +56,7 @@ public class ItemDAOImpl extends ItemDAO {
             if (!result.first())
                 nextId = 0;
             else
-                nextId = result.getInt("id");
+                nextId = result.getInt("id") +1;
 
             try(Statement statement = conn.getConnection().createStatement()) {
                 ResultSet storageResult = statement.executeQuery("SELECT id FROM `storage_items` ORDER BY id DESC LIMIT 1;");
@@ -64,7 +64,7 @@ public class ItemDAOImpl extends ItemDAO {
                 if (!storageResult.first())
                     nextStorageId = 0;
                 else
-                    nextStorageId = storageResult.getInt("id");
+                    nextStorageId = storageResult.getInt("id") +1;
             }
         } catch (Exception e) {
             logger.error(e);

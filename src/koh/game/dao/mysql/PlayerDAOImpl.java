@@ -59,6 +59,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                         }
                     }
                 }
+                accountInUnload.clear(); //Should be done after commit
                 copy.clear();
                 copy = null;
             }
@@ -169,6 +170,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .savedCell(Short.parseShort(result.getString("savedpos").split(",")[1]))
                             .emotes(Enumerable.StringToByteArray(result.getString("emotes")))
                             .mountInfo(new MountInformations().deserialize(result.getBytes("mount_informations")))
+                            .moodSmiley((byte)-1)
                             .build();
                     System.out.println(p.getIndexedColors());
                     Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
@@ -197,7 +199,11 @@ public class PlayerDAOImpl extends PlayerDAO {
                     account.characters.add(p);
                     addCharacter(p);
                 }
-            } catch (Exception e) {
+            }
+            catch(AccountOccupedException ex){
+                throw new AccountOccupedException(ex.getMessage());
+            }
+            catch (Exception e) {
                 e.printStackTrace();
                 logger.error(e);
                 logger.warn(e.getMessage());

@@ -213,7 +213,7 @@ public class WorldClient {
         return tempTicket.valid();
     }
 
-    public void parsePacket(Message message) { //Synchronized ?
+    public void parsePacket(Message message) {
         try {
             if (message == null) {
                 return;
@@ -225,9 +225,9 @@ public class WorldClient {
 
             this.lastPacketId = message.getMessageId();
             this.sequenceMessage++;
-            Method MessageIdentifier = Handler.getMethodByMessage(message.getMessageId());
-            if (MessageIdentifier != null) {
-                MessageIdentifier.invoke(null, this, message);
+            Method messageIdentifier = Handler.getMethodByMessage(message.getMessageId());
+            if (messageIdentifier != null) {
+                messageIdentifier.invoke(null, this, message);
             } else {
                 logger.error("Packet not handled {}" , message.getMessageId());
             }

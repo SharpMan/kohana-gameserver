@@ -11,14 +11,14 @@ public class LearnJob extends ItemAction {
 
     private int id;
 
-    public LearnJob(String[] args, String criteria) {
-        super(args, criteria);
+    public LearnJob(String[] args, String criteria, int template) {
+        super(args, criteria, template);
         this.id = Integer.parseInt(args[0]);
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p) )
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell) )
             return false;
         //all job is auto learned
         return true;

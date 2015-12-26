@@ -19,7 +19,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class Area {
 
     @Getter
-    public final ScheduledExecutorService backGroundWorker = Executors.newScheduledThreadPool(50);
+    private final ScheduledExecutorService backGroundWorker = Executors.newScheduledThreadPool(50);
     @Getter
     private int id;
     @Getter

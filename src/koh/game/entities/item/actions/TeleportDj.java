@@ -13,8 +13,8 @@ public class TeleportDj  extends ItemAction {
     private short newMapID;
     private int newCellID,objetNeed, mapNeeded;
 
-    public TeleportDj(String[] args, String criteria) {
-        super(args, criteria);
+    public TeleportDj(String[] args, String criteria, int template) {
+        super(args, criteria, template);
         short newMapID = Short.parseShort(args[0]);
         int newCellID = Integer.parseInt(args[1]);
         int objetNeed = Integer.parseInt(args[2]);
@@ -22,8 +22,8 @@ public class TeleportDj  extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         if(true){
             return false; //need to chance all mapid

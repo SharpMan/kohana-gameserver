@@ -11,8 +11,8 @@ public class AddExperience extends ItemAction {
 
     private  int exp;
 
-    public AddExperience(String[] args, String criteria) {
-        super(args, criteria);
+    public AddExperience(String[] args, String criteria, int template) {
+        super(args, criteria, template);
         try{
             this.exp = Integer.parseInt(args[0]);
         }
@@ -22,8 +22,8 @@ public class AddExperience extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell))
             return false;
         p.addExperience(exp);
         return true;

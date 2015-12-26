@@ -88,8 +88,7 @@ public class Player extends IGameActor implements Observer {
     private byte breed;
     @Getter @Setter
     private ArrayList<Short> skins;
-    @Getter @Setter
-    private ArrayList<Integer> indexedColors = new ArrayList<>(5);
+    private ArrayList<Integer> indexedColors;
     @Getter @Setter
     private ArrayList<Short> scales;
     @Getter @Setter
@@ -101,8 +100,9 @@ public class Player extends IGameActor implements Observer {
     private long regenStartTime;
     @Getter @Setter
     private volatile DofusMap currentMap;
-    @Getter @Setter @NotNull
-    private List<Byte> enabledChannels = new ArrayList<>(20), disabledChannels;
+    private List<Byte> enabledChannels;
+    @Getter
+    private List<Byte> disabledChannels;
     @Getter @Setter
     private ShortcutBook shortcuts;
     @Getter @Setter
@@ -117,10 +117,10 @@ public class Player extends IGameActor implements Observer {
     private volatile JobBook myJobs;
     @Getter @Setter
     private CharacterInventory inventoryCache;
-    @Getter @Setter
-    private PlayerStatusEnum status = PlayerStatusEnum.PLAYER_STATUS_AVAILABLE;
-    @Getter @Setter
-    private HashMap<ScoreType, Integer> scores = new HashMap<>(7);
+    @Setter
+    private PlayerStatusEnum status;
+    @Setter
+    private HashMap<ScoreType, Integer> scores;
     //GenericStats
     /*public int getAP;
      public int getMP;*/
@@ -145,7 +145,7 @@ public class Player extends IGameActor implements Observer {
     @Getter @Setter
     private byte alignmentValue, alignmentGrade, PvPEnabled;
     @Getter @Setter
-    private AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_NEUTRAL;
+    private AlignmentSideEnum alignmentSide;
     @Getter @Setter
     private int honor, dishonor, energy;
 
@@ -155,11 +155,11 @@ public class Player extends IGameActor implements Observer {
     @Getter @Setter
     private boolean inWorld;
     protected boolean myInitialized = false;
-    private HumanInformations cachedHumanInformations = null;
+    private HumanInformations cachedHumanInformations;
 
     //Other
     @Getter @Setter
-    private byte moodSmiley = -1;
+    private byte moodSmiley;
     @Getter @Setter
     private Guild guild;
 
@@ -256,11 +256,35 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
+    public List<Integer> getIndexedColors(){
+        if(this.indexedColors == null)
+            this.indexedColors = new ArrayList<>(5);
+        return this.indexedColors;
+    }
+
+    public List<Byte> getEnabledChannels(){
+        if(this.enabledChannels == null)
+            this.enabledChannels = new ArrayList<>(20);
+        return this.enabledChannels;
+    }
+
     public void refreshActor() {
         this.cachedHumanInformations = null;
         if (this.client != null) {
             currentMap.sendToField(klient -> new GameRolePlayShowActorMessage((GameRolePlayActorInformations) client.getCharacter().getGameContextActorInformations(klient)));
         }
+    }
+
+    public HashMap<ScoreType, Integer> getScores(){
+        if(this.scores == null)
+            this.scores = new HashMap<>(7);
+        return this.scores;
+    }
+
+    public PlayerStatusEnum getStatus(){
+        if(this.status == null)
+            this.status = PlayerStatusEnum.PLAYER_STATUS_AVAILABLE;
+        return this.status;
     }
 
     public GuildMember getGuildMember() {
@@ -273,21 +297,22 @@ public class Player extends IGameActor implements Observer {
             this.currentMap.sendToField(new TeleportOnSameMapMessage(ID, cell.getId()));
             return;
         }
-        DofusMap NextMap = DAO.getMaps().findTemplate(newMapID);
-        if (NextMap == null) {
+        DofusMap nextMap = DAO.getMaps().findTemplate(newMapID);
+        if (nextMap == null) {
+            logger.error("Nulled map on {}", newMapID);
             PlayerController.sendServerMessage(client, "Signal on the bugTracker nulled map -> " + newMapID);
             //client.sendPacket(new ErrorMapNotFoundMessage());
             return;
         }
-        NextMap.initialize();
+        nextMap.initialize();
 
         client.sequenceMessage();
         this.currentMap.destroyActor(this);
-        this.currentMap = NextMap;
-        if (NextMap.getCell((short) newCellID) == null || newCellID < 0 || newCellID > 559) {
-            this.cell = NextMap.getAnyCellWalakable();
+        this.currentMap = nextMap;
+        if (nextMap.getCell((short) newCellID) == null || newCellID < 0 || newCellID > 559) {
+            this.cell = nextMap.getAnyCellWalakable();
         } else {
-            this.cell = NextMap.getCell((short) newCellID);
+            this.cell = nextMap.getCell((short) newCellID);
         }
         this.currentMap.spawnActor(this);
         client.send(new CurrentMapMessage(currentMap.getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
@@ -356,7 +381,7 @@ public class Player extends IGameActor implements Observer {
                     if(DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x.second.nickName.equalsIgnoreCase(p.nickName))){
                         logger.debug(p.nickName + " already aded");
                     }
-                    DAO.getPlayers().addCharacterInQueue(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("account.DeleteMemoryTime") * 60 * 1000, p));
+                    DAO.getPlayers().addCharacterInQueue(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
                     logger.debug(p.nickName + " added" + this.account.characters.size());
                 }
             } else {
@@ -393,7 +418,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void stopRegen() {
-        //TODo
+        //TODO:
     }
 
     public void addLife(int val){
@@ -696,7 +721,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void initScore(String result){
-        this.scores.put(ScoreType.PVP_WIN, Integer.parseInt(result.split(",")[0]));
+        this.getScores().put(ScoreType.PVP_WIN, Integer.parseInt(result.split(",")[0]));
         this.scores.put(ScoreType.PVP_LOOSE, Integer.parseInt(result.split(",")[1]));
         this.scores.put(ScoreType.ARENA_WIN, Integer.parseInt(result.split(",")[2]));
         this.scores.put(ScoreType.ARENA_LOOSE, Integer.parseInt(result.split(",")[3]));
@@ -707,7 +732,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void initScore(){
-        this.scores.put(ScoreType.PVP_WIN, 0);
+        this.getScores().put(ScoreType.PVP_WIN, 0);
         this.scores.put(ScoreType.PVP_LOOSE, 0);
         this.scores.put(ScoreType.ARENA_WIN, 0);
         this.scores.put(ScoreType.ARENA_LOOSE, 0);
@@ -739,7 +764,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public PlayerStatus getPlayerStatus() {
-        return new PlayerStatus(this.status.value());
+        return new PlayerStatus(this.getStatus().value());
     }
 
     public void totalClear() {

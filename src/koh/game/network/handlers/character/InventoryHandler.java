@@ -15,6 +15,7 @@ import koh.protocol.client.enums.ObjectErrorEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
+import koh.protocol.messages.game.context.GameMapMovementMessage;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.items.*;
 import koh.protocol.types.game.data.items.ObjectEffect;
@@ -38,14 +39,27 @@ public class InventoryHandler {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
-        int i = 0;
-        for(i = 0; message.quantity > i ; i++){
-            if(!item.getTemplate().use(client.getCharacter())){
+        //int i = 0;
+        for(int i = 0; message.quantity > i ; i++){
+            if(!item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
                 client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
                 break;
             }
         }
-        client.getCharacter().getInventoryCache().safeDelete(item, i);
+        //client.getCharacter().getInventoryCache().safeDelete(item, i);
+    }
+
+    @HandlerAttribute(ID = ObjectUseOnCellMessage.MESSAGE_ID)
+    public static void handleObjectUseOnCellMessage(WorldClient client,ObjectUseOnCellMessage message){
+        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            client.send(new BasicNoOperationMessage());
+            return;
+        }
+        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        if(item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(),message.cell)){
+            client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
+            return;
+        }
     }
 
     @HandlerAttribute(ID = ObjectUseOnCharacterMessage.MESSAGE_ID)
@@ -57,11 +71,11 @@ public class InventoryHandler {
         Player target = client.getCharacter().getCurrentMap().getPlayer(message.characterId);
         InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
 
-        if(target == null || item == null || !item.areConditionFilled(target) || item.getTemplate().use(target)){
+        if(target == null || item == null || !item.areConditionFilled(target) || item.getTemplate().use(target,target.getCell().getId())){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
-        client.getCharacter().getInventoryCache().safeDelete(item,1);
+        //client.getCharacter().getInventoryCache().safeDelete(item,1);
 
     }
 
@@ -72,11 +86,12 @@ public class InventoryHandler {
             return;
         }
         InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
-        if(!client.getCharacter().getInventoryCache().hasItemId(message.objectUID) || item == null || !item.areConditionFilled(client.getCharacter()) || item.getTemplate().use(client.getCharacter())){
+        if(item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
-        client.getCharacter().getInventoryCache().safeDelete(item,1);
+
+        //client.getCharacter().getInventoryCache().safeDelete(item,1);
     }
 
     @HandlerAttribute(ID = ObjectDeleteMessage.MESSAGE_ID)

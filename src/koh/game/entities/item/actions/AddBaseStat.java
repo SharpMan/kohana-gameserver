@@ -13,15 +13,15 @@ public class AddBaseStat  extends ItemAction {
     private int statId;
     private short number;
 
-    public AddBaseStat(String[] args, String criteria) {
-        super(args, criteria);
+    public AddBaseStat(String[] args, String criteria, int template) {
+        super(args, criteria,  template);
         this.statId = Integer.parseInt(args[0]);
         this.number = Short.parseShort(args[1]);
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         //TODO : LOG it in db column
         p.getStats().addBase(StatsEnum.valueOf(statId),number);

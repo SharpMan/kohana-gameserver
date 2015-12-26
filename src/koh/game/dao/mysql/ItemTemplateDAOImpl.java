@@ -43,6 +43,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             put(20, AddSpellPoint.class);
             put(21, AddEnergy.class);
             put(22, AddExperience.class);
+            put(228, SpellAnimation.class);
         }
     };
     //.of(24,morph)
@@ -51,7 +52,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
     //.of(50,traque)
     //.of(51,localistraque)
 
-    private final Class[] actionArgs = new Class[]{String[].class, String.class};
+    private final Class[] actionArgs = new Class[]{String[].class, String.class, int.class};
 
     @Inject
     private DatabaseSource dbSource;
@@ -64,7 +65,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             while (result.next()) {
                 if (itemActions.get(result.getInt("action")) == null)
                     continue;
-                this.getTemplate(result.getInt("template")).addItemAction(itemActions.get(result.getInt("action")).getDeclaredConstructor(this.actionArgs).newInstance(result.getString("args").split(","), result.getString("criteria")));
+                this.getTemplate(result.getInt("template")).addItemAction(itemActions.get(result.getInt("action")).getDeclaredConstructor(this.actionArgs).newInstance(result.getString("args").split(","), result.getString("criteria"),result.getInt("template")));
                 ++i;
             }
         } catch (Exception e) {

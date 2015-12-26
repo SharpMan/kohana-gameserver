@@ -11,15 +11,15 @@ public class Kamas extends ItemAction {
 
     public int count;
 
-    public Kamas(String[] args, String criteria) {
-        super(args, criteria);
+    public Kamas(String[] args, String criteria, int template) {
+        super(args, criteria, template);
         this.count = Integer.parseInt(args[0]);
     }
 
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell))
             return false;
         int curKamas = p.getKamas();
         int newKamas = curKamas + count;

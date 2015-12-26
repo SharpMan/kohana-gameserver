@@ -9,13 +9,13 @@ import koh.game.entities.item.ItemAction;
  */
 public class ForgetSpell  extends ItemAction {
 
-    public ForgetSpell(String[] args, String criteria) {
-        super(args, criteria);
+    public ForgetSpell(String[] args, String criteria, int template) {
+        super(args, criteria, template);
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         //TODO: Open ForgetSpell GUi + write GameAction
         return true;

@@ -259,7 +259,12 @@ public class ChatHandler {
                     }
                 } else if (message.Content.startsWith("!save")) {
                     Client.getCharacter().save(false);
-                } else if (message.Content.startsWith("!bones")) {
+                }
+                else if (message.Content.startsWith("!kamas")) {
+                    short Id = Short.parseShort(message.Content.split(" ")[1]);
+                    Client.getCharacter().addKamas(Id);
+                }
+                else if (message.Content.startsWith("!bones")) {
                     short Id = Short.parseShort(message.Content.split(" ")[1]);
                     //client.getFighter().entityLook.bonesId = id;
                     //client.getFight().sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, client.getFighter().id, client.getFighter().id, client.getFighter().getEntityLook()));

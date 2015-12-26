@@ -11,14 +11,14 @@ public class AddSpellPoint extends ItemAction {
 
     private int spellPoints;
 
-    public AddSpellPoint(String[] args, String criteria) {
-        super(args, criteria);
+    public AddSpellPoint(String[] args, String criteria, int template) {
+        super(args, criteria, template);
         this.spellPoints = Integer.parseInt(args[0]);
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         p.setSpellPoints(p.getSpellPoints() + spellPoints);
         p.refreshStats();

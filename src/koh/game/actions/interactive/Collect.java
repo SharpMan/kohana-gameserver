@@ -63,7 +63,7 @@ public class Collect implements InteractiveAction {
 
         actor.getCurrentMap().sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(actor.getCurrentMap().toInteractiveElement(Player, element))));
         actor.getCurrentMap().sendToField(new StatedElementUpdatedMessage(actor.getCurrentMap().getStatedElementById(element)));
-        new CancellableScheduledRunnable(actor.getCurrentMap().getArea().backGroundWorker, this.getDuration() * 100) {
+        new CancellableScheduledRunnable(actor.getCurrentMap().getArea().getBackGroundWorker(), this.getDuration() * 100) {
             @Override
             public void run() {
                 try {

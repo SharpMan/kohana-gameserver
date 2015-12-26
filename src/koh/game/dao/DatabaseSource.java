@@ -99,8 +99,22 @@ public class DatabaseSource implements Service {
     @Override
     public void stop() {
 
+        Field[] fields = DAO.class.getDeclaredFields();
+        for(Field field : fields){
+            if(Modifier.isStatic(field.getModifiers()) && Service.class.isAssignableFrom(field.getType())){
+                try {
+                    field.setAccessible(true);
+                    ((Service)field.get(null)).stop();
+                } catch (Exception e) {
+                    log.error(e);
+                    log.warn(e.getMessage());
+                }
+            }
+        }
+
         if(dataSource != null)
             dataSource.close();
+
     }
 
     public Connection getConnectionOfPool() throws SQLException {

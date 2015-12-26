@@ -47,16 +47,16 @@ public class MountHandler {
 
     @HandlerAttribute(ID = MountFeedRequestMessage.M_ID)
     public static void HandleMountFeedRequestMessage(WorldClient Client, MountFeedRequestMessage Message) {
-        InventoryItem Food = Client.getCharacter().getInventoryCache().find(Message.mountFoodUid);
-        if (Food == null || Food.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+        InventoryItem food = Client.getCharacter().getInventoryCache().find(Message.mountFoodUid);
+        if (food == null || food.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        int newQua = Food.getQuantity() - Message.quantity;
+        int newQua = food.getQuantity() - Message.quantity;
         if (newQua <= 0) {
-            Client.getCharacter().getInventoryCache().removeItem(Food);
+            Client.getCharacter().getInventoryCache().removeItem(food);
         } else {
-            Client.getCharacter().getInventoryCache().updateObjectquantity(Food, newQua);
+            Client.getCharacter().getInventoryCache().updateObjectquantity(food, newQua);
         }
         Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 105, new String[0]));
     }

@@ -209,10 +209,11 @@ public class ItemTemplate {
         this.actions.add(action);
     }
 
-    public boolean use(Player plr){
-        if(this.actions == null)
+    public boolean use(Player plr,int cell){
+        if(this.actions == null) {
             return false;
-        return this.actions.stream().allMatch(x -> x.execute(plr));
+        }
+        return this.actions.stream().allMatch(x -> x.execute(plr,cell));
     }
 
 

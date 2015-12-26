@@ -14,32 +14,37 @@ import koh.protocol.messages.game.basic.TextInformationMessage;
 public class CreateItem  extends ItemAction {
 
     private final boolean send;
-    private final ItemTemplate template;
+    private final ItemTemplate templat;
     private final int count;
 
-    public CreateItem(String[] args, String criteria) {
-        super(args, criteria);
-        this.template = DAO.getItemTemplates().getTemplate(Integer.parseInt(args[0]));
-        this.count = template.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET ? 1 : Integer.parseInt(args[1]);
+    public CreateItem(String[] args, String criteria, int template) {
+        super(args, criteria, template);
+        this.templat = DAO.getItemTemplates().getTemplate(Integer.parseInt(args[0]));
+        this.count = templat.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET ? 1 : Integer.parseInt(args[1]);
         this.send = (args.length >2 && args[2].equals("1")) ? true : false;
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell))
             return false;
 
-        if (template == null) {
+        if (templat == null) {
             return false;
         }
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), template.getId(), 63, p.getID(), count, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.Normal, template instanceof Weapon));
 
-        if (p.getInventoryCache().add(item, true)) {
-            item.setNeedInsert(true);
+        if(count > 0) {
+            InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templat.getId(), 63, p.getID(), count, EffectHelper.generateIntegerEffect(templat.getPossibleEffects(), EffectGenerationType.Normal, templat instanceof Weapon));
+            if (p.getInventoryCache().add(item, true)) {
+                item.setNeedInsert(true);
+            }
+        }
+        else{
+            p.getInventoryCache().safeDelete(templat.getId(), -count);
         }
 
         if(send){
-            p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, count >0 ? 21 : 22, new String[]{String.valueOf(count >0 ? count : -count),String.valueOf(template.getId())} ));
+            p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, count > 0 ? 21 : 22, new String[]{String.valueOf(count >0 ? count : -count),String.valueOf(templat.getId())} ));
         }
 
         return true;

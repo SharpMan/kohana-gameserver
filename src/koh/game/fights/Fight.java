@@ -159,7 +159,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected FightTypeEnum fightType;
     protected Map<Short, FightCell> myCells = new HashMap<>();
     protected Map<FightTeam, Map<Short, FightCell>> myFightCells = new HashMap<>();
-    protected short AgeBonus = -1, lootShareLimitMalus = -1;
+    protected short ageBonus = -1, lootShareLimitMalus = -1;
 
     protected Map<String, CancellableScheduledRunnable> myTimers = new HashMap<>();
     @Getter

@@ -14,15 +14,15 @@ public class SetAlign  extends ItemAction {
     private boolean replace;
 
 
-    public SetAlign(String[] args, String criteria) {
-        super(args, criteria);
+    public SetAlign(String[] args, String criteria, int template) {
+        super(args, criteria, template);
         this.newAlign = Byte.parseByte(args[0]);
         this.replace = Integer.parseInt(args[1]) == 1;
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         if(p.getAlignmentSide() != AlignmentSideEnum.ALIGNMENT_NEUTRAL && !replace)
             return false;

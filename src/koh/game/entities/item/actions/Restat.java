@@ -9,13 +9,13 @@ import koh.game.entities.item.ItemAction;
  */
 public class Restat  extends ItemAction {
 
-    public Restat(String[] args, String criteria) {
-        super(args, criteria);
+    public Restat(String[] args, String criteria, int template) {
+        super(args, criteria, template);
     }
 
     @Override
-    public boolean execute(Player p) {
-        if(!super.execute(p) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
+    public boolean execute(Player p, int cell) {
+        if(!super.execute(p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         p.setLife(p.getLife() - p .getVitality());
         p.setVitality(0);

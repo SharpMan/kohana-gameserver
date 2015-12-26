@@ -1,8 +1,8 @@
 package koh.game.entities.actors.character;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import koh.game.entities.actors.Player;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.ShortcutBarEnum;
@@ -19,7 +19,7 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class ShortcutBook {
 
-    public Map<Byte, PlayerShortcut> myShortcuts = Collections.synchronizedMap(new HashMap<Byte, PlayerShortcut>());
+    public Map<Byte, PlayerShortcut> myShortcuts = new ConcurrentHashMap<Byte, PlayerShortcut>();
 
     public byte[] serialize() {
         IoBuffer buf = IoBuffer.allocate(1);
@@ -51,14 +51,20 @@ public class ShortcutBook {
         Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut1.toShortcut(Client.getCharacter())));
     }
 
-    public Shortcut[] toShortcuts(Player p) { //FIXME : Collectors.Arrays
+    public Shortcut[] toShortcuts(Player p) {
         Shortcut[] array = new Shortcut[this.myShortcuts.size()];
         int i = 0;
-        for (PlayerShortcut sp : this.myShortcuts.values()) {
-            if (sp.position == -1) {
+        for (Map.Entry<Byte,PlayerShortcut> sp : this.myShortcuts.entrySet()) {
+            if (sp.getValue().position == -1) {
                 continue;
             }
-            array[i] = sp.toShortcut(p);
+            try {
+                array[i] = sp.getValue().toShortcut(p);
+            }
+            catch(NullPointerException e){
+                this.myShortcuts.remove(sp.getKey());
+                continue;
+            }
             i++;
         }
         return array;

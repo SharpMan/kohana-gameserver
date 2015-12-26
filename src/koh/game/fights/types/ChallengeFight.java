@@ -29,13 +29,13 @@ import koh.protocol.types.game.context.roleplay.party.NamedPartyTeamWithOutcome;
  */
 public class ChallengeFight extends Fight {
 
-    public ChallengeFight(DofusMap Map, WorldClient Attacker, WorldClient Defender) {
+    public ChallengeFight(DofusMap Map, WorldClient attacker, WorldClient defender) {
         super(FightTypeEnum.FIGHT_TYPE_CHALLENGE, Map);
-        Fighter AttFighter = new CharacterFighter(this, Attacker);
-        Fighter DefFighter = new CharacterFighter(this, Defender);
+        Fighter AttFighter = new CharacterFighter(this, attacker);
+        Fighter DefFighter = new CharacterFighter(this, defender);
 
-        Attacker.addGameAction(new GameFight(AttFighter, this));
-        Defender.addGameAction(new GameFight(DefFighter, this));
+        attacker.addGameAction(new GameFight(AttFighter, this));
+        defender.addGameAction(new GameFight(DefFighter, this));
 
         super.initFight(AttFighter, DefFighter);
 
@@ -45,12 +45,12 @@ public class ChallengeFight extends Fight {
     public void endFight(FightTeam Winners, FightTeam Loosers) {
 
         if(this.fightTime == -1){
-            this.myResult = new GameFightEndMessage(0, this.AgeBonus, this.lootShareLimitMalus);
+            this.myResult = new GameFightEndMessage(0, this.ageBonus, this.lootShareLimitMalus);
             super.endFight();
             return;
         }
         
-        this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.AgeBonus, this.lootShareLimitMalus);
+        this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
         
          for (Fighter fighter : (Iterable<Fighter>) Winners.getFighters()::iterator) {
             super.addNamedParty(fighter, FightOutcomeEnum.RESULT_VICTORY);
@@ -89,7 +89,7 @@ public class ChallengeFight extends Fight {
 
     @Override
     public GameFightEndMessage leftEndMessage(Fighter f) {
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.AgeBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.getSummoner() == null).map(x -> new FightResultPlayerListEntry(x.getTeam().id == f.getTeam().id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.getID(), fightTime == -1 ? true : x.isAlive(), (byte) x.getLevel(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.ageBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.getSummoner() == null).map(x -> new FightResultPlayerListEntry(x.getTeam().id == f.getTeam().id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.getID(), fightTime == -1 ? true : x.isAlive(), (byte) x.getLevel(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
     @Override

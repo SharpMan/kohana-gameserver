@@ -7,6 +7,7 @@ import koh.game.fights.Fight;
 import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
+import koh.game.fights.fighters.BombFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
@@ -142,18 +143,18 @@ public class Pathfinder {
     }
 
     public static ArrayList<Fighter> getEnnemyNearToTakle(Fight Fight, FightTeam Team, short CellId) {
-        ArrayList<Fighter> Ennemies = new ArrayList<>();
+        ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
-            Fighter Ennemy = Fight.hasEnnemyInCell((short) Pathfinder.nextCell(CellId, Direction), Team);
-            if (Ennemy != null) {
-                if (!Ennemy.isDead() && !Ennemy.getStates().hasState(FightStateEnum.Enraciné) && Ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
-                    Ennemies.add(Ennemy);
+            Fighter ennemy = Fight.hasEnnemyInCell((short) Pathfinder.nextCell(CellId, Direction), Team);
+            if (ennemy != null) {
+                if (!ennemy.isDead() && !(ennemy instanceof BombFighter) && !ennemy.getStates().hasState(FightStateEnum.Enraciné) && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                    ennemies.add(ennemy);
                 }
             }
         }
 
-        return Ennemies;
+        return ennemies;
     }
 
     public static byte oppositeDirection(byte Direction) {

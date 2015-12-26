@@ -245,6 +245,8 @@ public class CharacterHandler {
                         .emotes(new byte[]{1, 8, 19})
                         .ornaments(new int[0])
                         .titles(new int[0])
+                        .moodSmiley((byte)-1)
+                        .alignmentSide(AlignmentSideEnum.ALIGNMENT_NEUTRAL)
                         .build();
                 character.setMountInfo(new MountInformations(character));
                 character.initScore();

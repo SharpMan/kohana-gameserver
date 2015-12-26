@@ -86,6 +86,26 @@ public class CharacterInventory {
         }
     }
 
+    public void safeDelete(int template, int quantity){
+        InventoryItem target;
+        for(int i = 0; quantity > i; i++){
+            target = this.getItemInTemplate(template);
+            if(target != null){
+                if(target.getQuantity() != 1){
+                    int toRemove = target.getQuantity() > quantity ? quantity : target.getQuantity();
+                    this.safeDelete(target, toRemove);
+                    if(toRemove > 1){
+                        i += toRemove -1;
+                    }
+                }else{
+                    this.safeDelete(target , 1);
+                }
+            }else{
+                break;
+            }
+        }
+    }
+
     public Stream<InventoryItem> getItems(){
         return this.itemsCache.values().stream();
     }
@@ -97,9 +117,7 @@ public class CharacterInventory {
 
     public void generalItemSetApply() {
         this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(set ->
-            {
-                this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false);
-            }
+            this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false)
         );
     }
 
