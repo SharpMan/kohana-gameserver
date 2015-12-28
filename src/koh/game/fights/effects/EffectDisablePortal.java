@@ -10,7 +10,7 @@ import koh.game.fights.layer.FightPortal;
 public class EffectDisablePortal extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         if (CastInfos.getCell().HasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
             ((FightPortal) (CastInfos.getCell().GetObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).disable(CastInfos.caster);
         }

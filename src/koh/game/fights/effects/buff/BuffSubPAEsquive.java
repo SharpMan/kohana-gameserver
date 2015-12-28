@@ -23,7 +23,7 @@ public class BuffSubPAEsquive extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        MutableInt LostAP = new MutableInt(CastInfos.RandomJet(target));
+        MutableInt LostAP = new MutableInt(CastInfos.randomJet(target));
         LostAP.setValue(LostAP.getValue() > target.getAP() ? target.getAP() : LostAP.getValue());
         CastInfos.DamageValue = target.calculDodgeAPMP(CastInfos.caster, LostAP.intValue(), false,CastInfos.Duration > 0);
 
@@ -32,7 +32,7 @@ public class BuffSubPAEsquive extends BuffEffect {
         }
 
         if (CastInfos.DamageValue > 0) {
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PA, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, Duration, 0), this.target);
+            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PA, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, duration, 0), this.target);
             BuffStats.applyEffect(LostAP, null);
             this.target.getBuff().addBuff(BuffStats);
             if (target.getID() == target.getFight().getCurrentFighter().getID()) {
@@ -45,7 +45,7 @@ public class BuffSubPAEsquive extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
     }
 
 }

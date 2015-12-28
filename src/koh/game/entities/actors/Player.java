@@ -1,6 +1,8 @@
 package koh.game.entities.actors;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -9,7 +11,6 @@ import koh.d2o.Couple;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 
-import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.character.CharacterInventory;
@@ -26,6 +27,8 @@ import koh.game.fights.FightState;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.ChatChannel;
+import koh.game.network.handlers.game.context.ContextHandler;
+import koh.protocol.messages.game.character.stats.*;
 import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
 import koh.game.utils.Observable;
 import koh.game.utils.Observer;
@@ -39,8 +42,6 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.atlas.compass.CompassUpdatePartyMemberMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.protocol.messages.game.character.stats.CharacterLevelUpInformationMessage;
-import koh.protocol.messages.game.character.stats.CharacterLevelUpMessage;
 import koh.protocol.messages.game.character.status.PlayerStatus;
 import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
 import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
@@ -52,14 +53,7 @@ import koh.protocol.types.game.character.ActorRestrictionsInformations;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
 import koh.protocol.types.game.character.alignment.ActorExtendedAlignmentInformations;
 import koh.protocol.types.game.choice.CharacterBaseInformations;
-import koh.protocol.types.game.context.roleplay.BasicGuildInformations;
-import koh.protocol.types.game.context.roleplay.GameRolePlayActorInformations;
-import koh.protocol.types.game.context.roleplay.GameRolePlayCharacterInformations;
-import koh.protocol.types.game.context.roleplay.HumanInformations;
-import koh.protocol.types.game.context.roleplay.HumanOption;
-import koh.protocol.types.game.context.roleplay.HumanOptionGuild;
-import koh.protocol.types.game.context.roleplay.HumanOptionOrnament;
-import koh.protocol.types.game.context.roleplay.HumanOptionTitle;
+import koh.protocol.types.game.context.roleplay.*;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Builder;
 import lombok.Getter;
@@ -68,6 +62,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sun.reflect.Reflection;
 
 /**
  *
@@ -97,6 +92,7 @@ public class Player extends IGameActor implements Observer {
     private int achievementPoints,level;
     @Getter @Setter
     private WorldClient client;
+    @Getter @Setter
     private long regenStartTime;
     @Getter @Setter
     private volatile DofusMap currentMap;
@@ -162,6 +158,7 @@ public class Player extends IGameActor implements Observer {
     private byte moodSmiley;
     @Getter @Setter
     private Guild guild;
+    private boolean wasSitted = false; //only for regen life
 
     private Fight myFight;
     private Fighter myFighter;
@@ -216,7 +213,7 @@ public class Player extends IGameActor implements Observer {
     @Override
     public boolean canBeSeen(IGameActor Actor) {
         if (this.account == null) {
-            logger.error("NulledGameContext {} {}",this.nickName,this.ID);
+            logger.error("NPE can be seen {} {}",this.nickName,this.ID);
             return false;
         }
         return true;
@@ -225,7 +222,7 @@ public class Player extends IGameActor implements Observer {
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
         if (this.account == null) {
-            logger.error("NulledGameContext {}" , this.nickName);
+            logger.error("NPE GameContext {}" , this.nickName);
         }
         return new GameRolePlayCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.nickName, this.getHumanInformations(), this.account.id, this.getActorAlignmentInformations());
     }
@@ -247,6 +244,15 @@ public class Player extends IGameActor implements Observer {
         }
         return this.cachedHumanInformations;
     }
+
+    public synchronized void removeHumanOption(Class<? extends HumanOption> klass){
+        Arrays.stream(this.getHumanInformations().options)
+                .filter(opt -> opt.getClass().isAssignableFrom(klass))
+                .findFirst()
+                .ifPresent(ho -> this.getHumanInformations().options = ArrayUtils.removeElement(this.getHumanInformations().options,ho));
+
+    }
+
 
     public void refreshEntitie() {
         if (getFighter() != null) {
@@ -305,7 +311,7 @@ public class Player extends IGameActor implements Observer {
             return;
         }
         nextMap.initialize();
-
+        stopSitEmote();
         client.sequenceMessage();
         this.currentMap.destroyActor(this);
         this.currentMap = nextMap;
@@ -396,13 +402,14 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void refreshStats() {
-        refreshStats(true);
+        refreshStats(true,true);
     }
 
-    public void refreshStats(boolean Logged) {
-        if (this.regenStartTime != 0) {
-            this.updateRegenedLife();
+    public void refreshStats(boolean Logged, boolean stopRegen) {
+        if(this.life > this.getMaxLife()){
+            this.setLife(this.getMaxLife());
         }
+        this.updateRegenedLife(stopRegen);
         if (client != null) {
             if (client.getParty() != null) {
                 client.getParty().updateMember(this);
@@ -417,8 +424,55 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public void stopRegen() {
-        //TODO:
+    public void updateRegenedLife(boolean stopRegen) {
+        if(this.getLife() == this.getMaxLife()){
+            if(this.regenStartTime != 0){
+                this.stopRegen(stopRegen);
+                this.regenStartTime = 0;
+            }
+            return;
+        }
+        if(this.regenStartTime == 0){
+            this.regenStartTime = Instant.now().toEpochMilli();
+            this.send(new LifePointsRegenBeginMessage(this.regenRate));
+        }else{
+            this.stopRegen(stopRegen);
+            if(this.getLife() >= this.getMaxLife()){
+                return;
+            }
+            this.regenStartTime = Instant.now().toEpochMilli();
+            this.send(new LifePointsRegenBeginMessage(this.regenRate));
+        }
+    }
+
+    public void stopRegen(){
+        stopRegen(true);
+    }
+
+    public void stopRegen(boolean stopRegen) {
+
+        if(this.regenStartTime != 0) {
+            int timeElapsed = (int) Instant.now().minusMillis(this.regenStartTime).getEpochSecond();
+            if (this.life + timeElapsed > this.getMaxLife()) {
+                timeElapsed = this.getMaxLife() - this.life;
+            }
+            logger.debug("Player {} regens {} lifepoints", this.nickName, timeElapsed);
+            this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,1, String.valueOf(timeElapsed)));
+
+            this.addLife(timeElapsed);
+            if(stopRegen)
+                this.send(new LifePointsRegenEndMessage(this.life, this.getMaxLife(), timeElapsed));
+        }
+        this.regenRate = 10;
+    }
+
+    public synchronized void stopSitEmote(){
+        if(client.getCharacter().getRegenRate() == 5){
+            client.getCharacter().removeHumanOption(HumanOptionEmote.class);
+            client.getCharacter().stopRegen();
+            client.getCharacter().updateRegenedLife(true);
+            client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(),client.getCharacter().getMaxLife()));
+        }
     }
 
     public void addLife(int val){
@@ -656,9 +710,6 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    private void updateRegenedLife() {
-        //Todo Pdv+=
-    }
 
     public void destroyFromMap() {
         if (this.currentMap != null) {

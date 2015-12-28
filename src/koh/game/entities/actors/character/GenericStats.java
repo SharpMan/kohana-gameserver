@@ -10,11 +10,13 @@ import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.BreedEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
+import lombok.ToString;
 
 /**
  *
  * @author Neo-Craft
  */
+@ToString
 public class GenericStats {
 
     private Map<StatsEnum, CharacterBaseCharacteristic> myStats = Collections.synchronizedMap(new HashMap<>());
@@ -102,23 +104,28 @@ public class GenericStats {
         return this.myStats;
     }
 
+    public void unMerge(StatsEnum key, CharacterBaseCharacteristic stat){
+        if (!this.myStats.containsKey(key)) {
+            this.myStats.get(key).unMerge(stat);
+        }
+    }
+
     public void merge(GenericStats stats) {
-        for (Entry<StatsEnum, CharacterBaseCharacteristic> Effect : stats.getEffects().entrySet()) {
-            if (!this.myStats.containsKey(Effect.getKey())) {
-                this.myStats.put(Effect.getKey(), new CharacterBaseCharacteristic());
+        for (Entry<StatsEnum, CharacterBaseCharacteristic> effect : stats.getEffects().entrySet()) {
+            if (!this.myStats.containsKey(effect.getKey())) {
+                this.myStats.put(effect.getKey(), new CharacterBaseCharacteristic());
             }
-            this.myStats.get(Effect.getKey()).Merge(Effect.getValue());
+            this.myStats.get(effect.getKey()).merge(effect.getValue());
         }
     }
 
     public void unMerge(GenericStats Stats) {
-        for (Entry<StatsEnum, CharacterBaseCharacteristic> Effect : Stats.getEffects().entrySet()) {
+        for (Entry<StatsEnum, CharacterBaseCharacteristic> effect : Stats.getEffects().entrySet()) {
             {
-                if (!this.myStats.containsKey(Effect.getKey())) {
-                    this.myStats.put(Effect.getKey(), new CharacterBaseCharacteristic());
+                if (!this.myStats.containsKey(effect.getKey())) {
+                    this.myStats.put(effect.getKey(), new CharacterBaseCharacteristic());
                 }
-
-                this.myStats.get(Effect.getKey()).UnMerge(Effect.getValue());
+                this.myStats.get(effect.getKey()).unMerge(effect.getValue());
             }
         }
     }
@@ -133,6 +140,12 @@ public class GenericStats {
                 x.objectsAndMountBonus = 0;
             }
         });
+    }
+
+    public GenericStats clone(){
+        GenericStats stats = new GenericStats();
+
+        return stats;
     }
 
     public int getTotal(StatsEnum effectType) {

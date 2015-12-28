@@ -11,7 +11,7 @@ import koh.protocol.client.enums.StatsEnum;
 public class EffectSubPMEsquive extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         if (CastInfos.Duration > 1) {
             for (Fighter Target : CastInfos.Targets) {
                 EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);

@@ -27,7 +27,7 @@ public class BuffPorter extends BuffEffect {
 
     public BuffPorter(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
-        this.Duration = -1;
+        this.duration = -1;
         Target.getStates().fakeState(FightStateEnum.Porté, true);
         this.CastInfos.EffectType = StatsEnum.Add_State;
         Target.setCell(this.caster.getMyCell());
@@ -40,23 +40,23 @@ public class BuffPorter extends BuffEffect {
                 this.caster.getFight().sendToField(new GameActionFightDropCharacterMessage(ACTION_CARRY_CHARACTER, this.caster.getID(), this.target.getID(), (short) this.target.getCellId()));
             }
             this.caster.getFight().sendToField(new GameActionFightDispellSpellMessage(406, this.caster.getID(), this.target.getID(), this.CastInfos.SpellId));
-            logger.debug("3bada " + this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).count());
-            logger.debug("3bada " + this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).count());
+            logger.debug("3bada " + this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).count());
+            logger.debug("3bada " + this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).count());
             logger.debug("3bada " + this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur).count());
             logger.debug("3bada " + this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter).count());
-            this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> {
+            this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> {
                 {
                     x.removeEffect();
                     this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.caster.getID(), x.GetId()));
                 }
             });
-            this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).forEach(x -> {
+            this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).forEach(x -> {
                 {
                     x.removeEffect();
                     this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.target.getID(), x.GetId()));
                 }
             });
-            this.Duration = 0;
+            this.duration = 0;
         }
         return -1;
     }
@@ -70,7 +70,7 @@ public class BuffPorter extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.target.getID(), (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 3, this.CastInfos.ParentUID, (short) 1, (short) 8);
+        return new FightTemporaryBoostStateEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 3, this.CastInfos.ParentUID, (short) 1, (short) 8);
     }
 
     public static boolean isCalledBy(String Comparant, int... indexes) { //Do not modif long story

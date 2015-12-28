@@ -20,7 +20,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectPunishment extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
         if (CastInfos.Duration > 0) {
             // L'effet est un poison
@@ -34,7 +34,7 @@ public class EffectPunishment extends EffectBase {
         {
             for (Fighter Target : CastInfos.Targets) {
                 //Eppe de iop ?
-                MutableInt DamageValue = new MutableInt(CastInfos.RandomJet(Target));
+                MutableInt DamageValue = new MutableInt(CastInfos.randomJet(Target));
 
                 if (ApplyDamages(CastInfos, Target, DamageValue) == -3) {
                     return -3;
@@ -73,7 +73,7 @@ public class EffectPunishment extends EffectBase {
         } else if (num2 > 0.5) {
             num1 = 1.0 + (num2 - 0.5) * -2.0;
         }
-        DamageJet.setValue((double) CastInfos.caster.getLife() * num1 * (double) CastInfos.RandomJet(Target) / 100.0);
+        DamageJet.setValue((double) CastInfos.caster.getLife() * num1 * (double) CastInfos.randomJet(Target) / 100.0);
 
         // Calcul resistances
         Target.calculReduceDamages(Damage_Neutral, DamageJet);

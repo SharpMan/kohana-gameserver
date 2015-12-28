@@ -11,7 +11,7 @@ import koh.game.fights.fighters.IllusionFighter;
 public class EffectSubAllResist extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             if (Target instanceof IllusionFighter) {
                 continue;//Roulette tue clone ...

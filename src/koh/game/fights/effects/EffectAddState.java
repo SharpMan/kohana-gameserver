@@ -12,7 +12,7 @@ import koh.protocol.client.enums.FightStateEnum;
 public class EffectAddState extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         BuffEffect Buff = null;
         for (Fighter Target : CastInfos.Targets) {
             Buff = new BuffState(CastInfos, Target);

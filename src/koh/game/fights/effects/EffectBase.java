@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
 import java.util.HashMap;
-import koh.game.Main;
+
 import koh.protocol.client.enums.StatsEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -295,16 +295,16 @@ public abstract class EffectBase {
             return -1;
         }
 
-        return EffectBase.Effects.get(CastInfos.EffectType).ApplyEffect(CastInfos);
+        return EffectBase.Effects.get(CastInfos.EffectType).applyEffect(CastInfos);
     }
 
     /// <summary>
     /// Application de l'effet
     /// </summary>
     /// <param name="Fighter"></param>
-    public abstract int ApplyEffect(EffectCast CastInfos);
+    public abstract int applyEffect(EffectCast CastInfos);
 
-    public boolean SilentCast() {
+    public boolean silentCast() {
         return false;
     }
 

@@ -42,7 +42,7 @@ public class EffectStatsSteal extends EffectBase {
     };
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         StatsEnum MalusType = TargetMalus.get(CastInfos.EffectType);
         StatsEnum BonusType = CasterBonus.get(CastInfos.EffectType);
 

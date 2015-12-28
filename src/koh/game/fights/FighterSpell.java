@@ -61,7 +61,7 @@ public class FighterSpell {
         if (Buff == null) {
             return 0;
         } else {
-            return ((BuffSpellCoolDown) Buff).Value - Buff.Duration;
+            return ((BuffSpellCoolDown) Buff).Value - Buff.duration;
         }
     }
 

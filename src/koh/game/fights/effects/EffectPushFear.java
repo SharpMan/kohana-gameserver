@@ -13,7 +13,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
 public class EffectPushFear extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) { //TODO : Prise compte etat
+    public int applyEffect(EffectCast CastInfos) { //TODO : Prise compte etat
         byte direction = Pathfinder.getDirection(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.CellId);
         short targetFighterCell = Pathfinder.nextCell(CastInfos.caster.getCellId(), direction);
 

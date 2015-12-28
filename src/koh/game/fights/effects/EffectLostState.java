@@ -10,7 +10,7 @@ import koh.protocol.client.enums.FightStateEnum;
 public class EffectLostState extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             Target.getStates().removeState(FightStateEnum.valueOf(CastInfos.Effect.value));
         }

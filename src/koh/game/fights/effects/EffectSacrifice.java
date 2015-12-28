@@ -10,7 +10,7 @@ import koh.game.fights.effects.buff.BuffSacrifice;
 public class EffectSacrifice extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter target : CastInfos.Targets) {
             if (target.getTeam() != CastInfos.caster.getTeam() || target == CastInfos.caster) {
                 continue;

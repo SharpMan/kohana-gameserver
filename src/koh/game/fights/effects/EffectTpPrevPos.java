@@ -12,7 +12,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 public class EffectTpPrevPos extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         int toReturn = -1;
         for (Fighter Target : CastInfos.Targets) {
             if (Target.getPreviousCellPos().isEmpty()) {

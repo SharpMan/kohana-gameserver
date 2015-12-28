@@ -30,6 +30,7 @@ import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
 import koh.protocol.types.game.context.fight.GameFightCharacterInformations;
 import koh.protocol.types.game.context.fight.GameFightMinimalStats;
 import koh.protocol.types.game.context.fight.GameFightMinimalStatsPreparation;
+import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import koh.protocol.types.game.look.EntityLook;
 
 /**
@@ -49,6 +50,7 @@ public class CharacterFighter extends Fighter {
         this.character.setFight(Fight);
         this.character.setFighter(this);
         this.character.stopRegen();
+        this.character.removeHumanOption(HumanOptionEmote.class);
         //this.character.currentMap.unregisterPlayer(character);
         this.fight.registerPlayer(character);
         super.initFighter(this.character.getStats(), this.character.getID());
@@ -170,7 +172,7 @@ public class CharacterFighter extends Fighter {
             this.character.send(new GameContextDestroyMessage());
             this.character.send(new GameContextCreateMessage((byte) 1));
             //this.character.send(new LifePointsRegenBeginMessage());
-            this.character.refreshStats(false);
+            this.character.refreshStats(false,true);
             if (!(this.fight instanceof ChallengeFight) && this.team.id == this.fight.getLoosers().id) {
                 this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
             } else {

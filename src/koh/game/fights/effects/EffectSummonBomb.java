@@ -17,7 +17,7 @@ import org.apache.commons.lang.ArrayUtils;
 public class EffectSummonBomb extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         // Possibilité de spawn une creature sur la case ?
 
         MonsterTemplate Monster = DAO.getMonsters().find(CastInfos.Effect.diceNum);

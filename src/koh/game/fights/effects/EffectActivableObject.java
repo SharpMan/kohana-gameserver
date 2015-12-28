@@ -16,7 +16,7 @@ import koh.protocol.client.enums.SpellShapeEnum;
 public class EffectActivableObject extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         FightActivableObject obj = null;
         switch (CastInfos.EffectType) {
             case LAYING_GLYPH_RANKED:

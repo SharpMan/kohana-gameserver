@@ -11,7 +11,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightDispellMessage;
 public class EffectDebuff extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             if (Target.getBuff().debuff() == -3) {
                 return -3;

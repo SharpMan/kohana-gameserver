@@ -45,7 +45,9 @@ public class BombFighter extends StaticFighter {
         this.grade = Monster;
         super.initFighter(this.grade.getStats(), Fight.getNextContextualId());
         this.entityLook = EntityLookParser.Copy(this.grade.getMonster().getEntityLook());
-        super.AdjustStats();
+        this.adjustStats();
+        this.stats.merge(this.summoner.getStats());
+        this.stats.unMerge(StatsEnum.Vitality,this.summoner.getStats().getEffect(StatsEnum.Vitality));
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());
     }
@@ -83,10 +85,10 @@ public class BombFighter extends StaticFighter {
         }
     }
 
-    public boolean Boosted = false;
+    public boolean boosted = false;
 
-    public synchronized void SlefMurder(int Caster) {
-        if (Boosted) {
+    public synchronized void selfMurder(int Caster) {
+        if (boosted) {
             return;
         }
         int TotalCombo = 0;
@@ -99,7 +101,7 @@ public class BombFighter extends StaticFighter {
                         if (Target.getID() == this.ID) {
                             continue;
                         }
-                        if (Target instanceof BombFighter /*&& ((BombFighter) target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).Boosted) {
+                        if (Target instanceof BombFighter /*&& ((BombFighter) target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).boosted) {
                             Targets.add((BombFighter) Target);
                             TotalCombo += 40;
                         }
@@ -112,10 +114,10 @@ public class BombFighter extends StaticFighter {
         }
         fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
         stats.addBoost(StatsEnum.Combo_Dammages, TotalCombo);
-        this.Boosted = true;
+        this.boosted = true;
         for (Fighter bomb : Targets) {
             bomb.getStats().addBoost(StatsEnum.Combo_Dammages, TotalCombo);
-            Boosted = true;
+            boosted = true;
         }
         Targets.forEach(Bomb -> Bomb.tryDie(Caster, true));
     }
@@ -133,7 +135,7 @@ public class BombFighter extends StaticFighter {
             }
         }
         if (this.getLife() <= 0 || force) {
-            SlefMurder(casterId);
+            selfMurder(casterId);
             fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false);
             if (this.FightBombs != null) {
                 this.FightBombs.forEach(Bomb -> Bomb.remove());
@@ -172,8 +174,8 @@ public class BombFighter extends StaticFighter {
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.getCellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.getCellId());
-                        FightBomb Bomb = new FightBomb(this.summoner, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.GetColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
-                        fight.addActivableObject(this.summoner, Bomb);
+                        FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.GetColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                        fight.addActivableObject(this, Bomb);
                     }
                 }
             }

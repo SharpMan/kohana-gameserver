@@ -277,7 +277,7 @@ public class ChatHandler {
                     if (Client.getCharacter().getFight() != null || level > 100) {
                         return;
                     }
-                    Client.getCharacter().setLife((int) (((float) Client.getCharacter().getMaxLife() * 100) / level));
+                    Client.getCharacter().setLife((int) (((float) Client.getCharacter().getMaxLife() * level) / 100));
                     PlayerController.sendServerMessage(Client, "PdV Updated");
                     Client.getCharacter().refreshStats();
                 } else if (message.Content.startsWith("!spellpoint")) {

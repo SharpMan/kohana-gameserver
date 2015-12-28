@@ -19,6 +19,7 @@ import koh.protocol.client.enums.ObjectErrorEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
+import koh.protocol.messages.game.character.stats.UpdateLifePointsMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextCreateRequestMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
@@ -80,7 +81,7 @@ public class ContextHandler {
             Client.sequenceMessage(new GameContextDestroyMessage());
 
             Client.send(new GameContextCreateMessage((byte) (Client.getCharacter().getFighter() == null ? 1 : 2)));
-            Client.getCharacter().refreshStats(false);
+            Client.getCharacter().refreshStats(false,false);
             Client.getCharacter().onLogged();
         }
     }
@@ -168,23 +169,23 @@ public class ContextHandler {
     }
 
     @HandlerAttribute(ID = GameMapMovementRequestMessage.MESSAGE_ID)
-    public static void HandleGameMapMovementRequestMessage(WorldClient Client, GameMapMovementRequestMessage Message) {
+    public static void HandleGameMapMovementRequestMessage(WorldClient client, GameMapMovementRequestMessage message) {
 
-        if (Message.keyMovements.length <= 0) {
-            logger.error("Empty Path{}" , Client.getIP());
-            Client.send(new BasicNoOperationMessage());
+        if (message.keyMovements.length <= 0) {
+            logger.error("Empty Path{}" , client.getIP());
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            MovementPath Path = Pathfinder.isValidPath(Client.getCharacter().getFight(), Client.getCharacter().getFighter(), Client.getCharacter().getFighter().getCellId(), Client.getCharacter().getFighter().getDirection(), Message.keyMovements);
+        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            MovementPath Path = Pathfinder.isValidPath(client.getCharacter().getFight(), client.getCharacter().getFighter(), client.getCharacter().getFighter().getCellId(), client.getCharacter().getFighter().getDirection(), message.keyMovements);
             if (Path != null) {
-                if (Client.getCharacter().getFighter().isDead()) {
-                    Client.send(new BasicNoOperationMessage());
-                    Client.getCharacter().getFight().endTurn();
+                if (client.getCharacter().getFighter().isDead()) {
+                    client.send(new BasicNoOperationMessage());
+                    client.getCharacter().getFight().endTurn();
                     return;
                 }
-                GameMapMovement GameMovement = Client.getCharacter().getFight().tryMove(Client.getCharacter().getFighter(), Path);
+                GameMapMovement GameMovement = client.getCharacter().getFight().tryMove(client.getCharacter().getFighter(), Path);
 
                 if (GameMovement != null) {
                     GameMovement.execute();
@@ -192,19 +193,20 @@ public class ContextHandler {
             }
             return;
         }
-        if (Client.getCharacter().getCurrentMap() == null) {
-            Client.send(new GameMapNoMovementMessage());
-            PlayerController.SendServerErrorMessage(Client, "Votre map est absente veuillez le signalez au staff ");
-            logger.error("Vacant map {} " , Client.getCharacter().toString());
+        if (client.getCharacter().getCurrentMap() == null) {
+            client.send(new GameMapNoMovementMessage());
+            PlayerController.SendServerErrorMessage(client, "Votre map est absente veuillez le signalez au staff ");
+            logger.error("Vacant map {} " , client.getCharacter().toString());
             return;
         }
-        if (!Client.canGameAction(GameActionTypeEnum.MAP_MOVEMENT)) {
-            Client.send(new GameMapNoMovementMessage());
-            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 12, new String[0]));
+        client.getCharacter().stopSitEmote();
+        if (!client.canGameAction(GameActionTypeEnum.MAP_MOVEMENT)) {
+            client.send(new GameMapNoMovementMessage());
+            client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 12, new String[0]));
             return;
         }
-        Client.addGameAction(new GameMapMovement(Client.getCharacter().getCurrentMap(), Client.getCharacter(), Message.keyMovements));
-        Client.getCharacter().getCurrentMap().sendToField(new GameMapMovementMessage(Message.keyMovements, Client.getCharacter().getID()));
+        client.addGameAction(new GameMapMovement(client.getCharacter().getCurrentMap(), client.getCharacter(), message.keyMovements));
+        client.getCharacter().getCurrentMap().sendToField(new GameMapMovementMessage(message.keyMovements, client.getCharacter().getID()));
     }
 
 }

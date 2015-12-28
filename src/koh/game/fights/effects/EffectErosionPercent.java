@@ -11,7 +11,7 @@ import koh.game.fights.effects.buff.BuffErosionPercent;
 public class EffectErosionPercent extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         BuffEffect Buf;
         for (Fighter Target : CastInfos.Targets) {
             Buf = new BuffErosionPercent(CastInfos, Target);

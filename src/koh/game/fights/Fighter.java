@@ -448,7 +448,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return (int) Math.ceil((double) this.getAP() * num2);
     }
 
-    private double getTacklePercent(Fighter tackler) {
+    protected double getTacklePercent(Fighter tackler) {
         if (tackler.stats.getTotal(StatsEnum.Add_TackleBlock) == -2) {
             return 0.0;
         } else {
@@ -462,7 +462,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int getCarriedActor() {
-        Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.Duration != 0).findFirst();
+        Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).findFirst();
         return Option.isPresent() ? Option.get().caster.getID() : 0;
     }
 

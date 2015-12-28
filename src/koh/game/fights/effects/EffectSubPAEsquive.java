@@ -12,7 +12,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectSubPAEsquive extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         MutableInt DamageValue = new MutableInt();
         if (CastInfos.Duration > 1) {
             for (Fighter Target : CastInfos.Targets) {

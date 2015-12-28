@@ -2,6 +2,7 @@ package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
+import koh.game.fights.fighters.BombFighter;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
@@ -29,7 +30,7 @@ public abstract class BuffEffect {
     public EffectCast CastInfos;
     public Fighter caster;
     public Fighter target;
-    public int Duration, Delay;
+    public int duration, Delay;
     private int Uid = -1;
 
     public int GetId() {
@@ -56,22 +57,22 @@ public abstract class BuffEffect {
         //return true;
     }
 
-    public BuffEffect(EffectCast CastInfos, Fighter target, BuffActiveType ActiveType, BuffDecrementType DecrementType) {
+    public BuffEffect(EffectCast CastInfos, Fighter target, BuffActiveType ActiveType, BuffDecrementType decrementType) {
         this.CastInfos = CastInfos;
 
-        //this.Duration = (CastInfos.Duration == -1) ? -1 : (target.fight.currentFighter == target /*&& CastInfos.Duration == 0*/ ? CastInfos.Duration + 1 : CastInfos.Duration) - CastInfos.Delay();
-        this.Duration = (CastInfos.Duration == -1) ? -1 : (DecrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.Duration : (CastInfos.Duration) - CastInfos.Delay());
-        
+        //this.duration = (CastInfos.duration == -1) ? -1 : (target.fight.currentFighter == target /*&& CastInfos.duration == 0*/ ? CastInfos.duration + 1 : CastInfos.duration) - CastInfos.Delay();
+        this.duration = (CastInfos.Duration == -1) ? -1 : (decrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.Duration : (CastInfos.Duration) - CastInfos.Delay());
+
         //System.out.println(target.fight.currentFighter == target);
-        if (DecrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID()) {
-            this.Duration++;
+        if (decrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID() && this.duration != -1) {
+            this.duration++;
         }
         this.Delay = CastInfos.Delay();
         this.caster = CastInfos.caster;
         this.target = target;
 
         this.ActiveType = ActiveType;
-        this.DecrementType = DecrementType;
+        this.DecrementType = decrementType;
     }
 
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
@@ -92,19 +93,19 @@ public abstract class BuffEffect {
     /// decrement le buff
     /// </summary>
     public int decrementDuration() {
-        this.Duration--;
+        this.duration--;
 
         this.CastInfos.FakeValue = 0;
 
-        return this.Duration;
+        return this.duration;
     }
 
     public int decrementDuration(int Duration) {
-        this.Duration -= Duration;
+        this.duration -= Duration;
 
         this.CastInfos.FakeValue = 0;
 
-        return this.Duration;
+        return this.duration;
     }
 
 }

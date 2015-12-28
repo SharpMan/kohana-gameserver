@@ -65,7 +65,7 @@ public class EffectCast {
     /* public short MaxEffect() {
      return (short) (this.Effect.diceNum >= (int) this.Effect.diceSide ? this.Effect.diceNum : this.Effect.diceSide);
      }*/
-    public short RandomJet(Fighter Target) {
+    public short randomJet(Fighter Target) {
         if (this.Effect == null) {
             return (short) this.DamageValue;
         }

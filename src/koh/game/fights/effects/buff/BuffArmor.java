@@ -17,7 +17,7 @@ public class BuffArmor extends BuffEffect {
 
     public BuffArmor(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
-        this.Jet = CastInfos.RandomJet(Target);
+        this.Jet = CastInfos.randomJet(Target);
         Target.getStats().addBoost(StatsEnum.AddArmor, (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100));
     }
 
@@ -29,7 +29,7 @@ public class BuffArmor extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
     }
 
 }

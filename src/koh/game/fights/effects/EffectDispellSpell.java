@@ -11,7 +11,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightDispellSpellMessa
 public class EffectDispellSpell extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             
             if (Target.getBuff().dispell(CastInfos.Effect.value) == -3) {

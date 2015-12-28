@@ -11,7 +11,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectLifeSteal extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
         if (CastInfos.Duration > 0) {
             // L'effet est un poison
@@ -27,7 +27,7 @@ public class EffectLifeSteal extends EffectBase {
                     continue;
                 }
 
-                if (ApplyLifeSteal(CastInfos, Target, new MutableInt(CastInfos.RandomJet(Target))) == -3) {
+                if (ApplyLifeSteal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
                     return -3;
                 }
             }

@@ -11,7 +11,7 @@ import koh.game.fights.layer.FightGlyph;
 public class EffectTriggersGlyph extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         FightCell Cell = CastInfos.caster.getFight().getCell(CastInfos.CellId);
         for (IFightObject Glyph : Cell.GetObjects(IFightObject.FightObjectType.OBJECT_GLYPHE)) {
             int Score = ((FightGlyph) Glyph).loadEnnemyTargetsAndActive(CastInfos.caster);

@@ -11,7 +11,7 @@ import koh.game.fights.effects.buff.BuffSkin;
 public class EffectSkin extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         BuffEffect Buff = null;
         for (Fighter Target : CastInfos.Targets) {
             Buff = new BuffSkin(CastInfos, Target);

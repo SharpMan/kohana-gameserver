@@ -11,10 +11,10 @@ import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMes
 public class EffectDistributesDamagesOccasioned extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         int Apply = -1;
         for (Fighter Target : CastInfos.Targets) {
-            int DamageJet = (CastInfos.DamageValue * CastInfos.RandomJet(Target)) / 100;
+            int DamageJet = (CastInfos.DamageValue * CastInfos.randomJet(Target)) / 100;
             if (DamageJet < 0) {
                 DamageJet = (0);
             }

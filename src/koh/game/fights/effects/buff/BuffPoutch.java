@@ -110,7 +110,7 @@ public class BuffPoutch extends BuffEffect {
          if (FightCell != null) {
          if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
          for (Fighter target : FightCell.GetObjectsAsFighter()) {
-         int newValue = EffectDamage.ApplyDamages(DamageInfos, target, new MutableInt((DamageInfos.RandomJet(target) * 20) / 100));
+         int newValue = EffectDamage.ApplyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100));
          if (newValue < apply) {
          apply = newValue;
          }
@@ -119,13 +119,13 @@ public class BuffPoutch extends BuffEffect {
          }
          }
          return apply;*/
-        //return EffectDamage.ApplyDamages(DamageInfos, target, new MutableInt((DamageInfos.RandomJet(target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
+        //return EffectDamage.ApplyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
     }
 
 }

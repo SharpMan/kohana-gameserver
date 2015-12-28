@@ -12,7 +12,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 public class EffectTeleportSymetricMySelf extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         FightCell cell;
         for (Fighter Target : CastInfos.Targets) {
             cell = CastInfos.caster.getFight().getCell(CastInfos.caster.getMapPoint().pointSymetry(Target.getMapPoint()).get_cellId());

@@ -11,9 +11,9 @@ import koh.protocol.messages.game.actions.fight.GameActionFightModifyEffectsDura
 public class EffectDispellEffectDuration extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
-            short Jet = CastInfos.RandomJet(Target);
+            short Jet = CastInfos.randomJet(Target);
             if (Target.getBuff().decrementEffectDuration(Jet) == -3) {
                 return -3;
             }

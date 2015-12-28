@@ -17,7 +17,7 @@ public abstract class StaticFighter extends Fighter {
         super(Fight, Summoner);
     }
     
-    public void AdjustStats() {
+    public void adjustStats() {
         this.stats.addBase(StatsEnum.Vitality, (short) ((double) this.stats.getEffect(StatsEnum.Vitality).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.Intelligence, (short) ((double) this.stats.getEffect(StatsEnum.Intelligence).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.Chance, (short) ((double) this.stats.getEffect(StatsEnum.Chance).Base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
@@ -54,6 +54,11 @@ public abstract class StaticFighter extends Fighter {
             this.fight.affectSpellTo(this, this, this.grade.getGrade(), this.grade.getMonster().getSpells());
             this.firstTurn = false;
         }
+    }
+
+    @Override
+    protected double getTacklePercent(Fighter tackler){
+        return 0;
     }
 
     @Override

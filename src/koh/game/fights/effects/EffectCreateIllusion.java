@@ -24,19 +24,19 @@ public class EffectCreateIllusion extends EffectBase {
     public static final byte[] TrueDirection = new byte[]{DirectionsEnum.DOWN_RIGHT, DirectionsEnum.DOWN_LEFT, DirectionsEnum.UP_LEFT, DirectionsEnum.UP_RIGHT};
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         int DistanceCharacterFromHidedPlace = Pathfinder.getGoalDistance(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.CellId);
         byte IgnoredDirection = Pathfinder.getDirection(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.CellId);
         short StartCell = CastInfos.caster.getCellId();
 
         BuffState Buff = new BuffState(new EffectCast(StatsEnum.Invisibility, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.caster, null), CastInfos.caster);
-        Buff.Duration = 1;
+        Buff.duration = 1;
         Buff.DecrementType = BuffDecrementType.TYPE_BEGINTURN;
         CastInfos.caster.getBuff().addBuff(Buff);
         if (Buff.applyEffect(null, null) == -3) {
             return -3;
         }
-        Buff.Duration = -1;
+        Buff.duration = -1;
 
         FightCell cell = CastInfos.caster.getFight().getCell(CastInfos.CellId);
         if (cell != null) {

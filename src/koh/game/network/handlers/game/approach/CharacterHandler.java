@@ -64,7 +64,7 @@ public class CharacterHandler {
     public static void HandleCharacterSelectedForceReadyMessage(WorldClient Client, CharacterSelectedForceReadyMessage Message) {
         Player inFight = Client.getAccount().getPlayerInFight();
         if (inFight != null) {
-            CharacterSelectionMessage(Client, inFight.getID());
+            characterSelectionMessage(Client, inFight.getID());
         }
         //Else le mec est sortie du combat osef
     }
@@ -95,10 +95,10 @@ public class CharacterHandler {
 
     @HandlerAttribute(ID = 152)
     public static void HandleCharacterSelectionMessage(WorldClient Client, CharacterSelectionMessage message) {
-        CharacterSelectionMessage(Client, message.id);
+        characterSelectionMessage(Client, message.id);
     }
 
-    public static void CharacterSelectionMessage(WorldClient Client, int id) {
+    public static void characterSelectionMessage(WorldClient Client, int id) {
         try {
 
             Player character = Client.getAccount().getPlayer(id);
@@ -213,6 +213,7 @@ public class CharacterHandler {
                 }
                 Player character = Player.builder()
                         .nickName(message.Name)
+                        .regenRate((byte)10)
                         .breed((byte) message.Breed)
                         .owner(client.getAccount().id)
                         .sexe(message.Sex ? 1 : 0)

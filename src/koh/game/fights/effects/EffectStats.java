@@ -9,6 +9,8 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffStats;
 import koh.game.fights.fighters.IllusionFighter;
 
+import java.awt.*;
+
 /**
  *
  * @author Neo-Craft
@@ -16,7 +18,7 @@ import koh.game.fights.fighters.IllusionFighter;
 public class EffectStats extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             if(Target instanceof IllusionFighter){
                 continue;//Roulette tue clone ...

@@ -52,7 +52,7 @@ public class EffectHeal extends EffectBase {
     }
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
         if (CastInfos.Duration > 0) {
             // L'effet est un poison
@@ -65,7 +65,7 @@ public class EffectHeal extends EffectBase {
         } else // Heal direct
         {
             for (Fighter Target : CastInfos.Targets) {
-                if (EffectHeal.ApplyHeal(CastInfos, Target, new MutableInt(CastInfos.RandomJet(Target))) == -3) {
+                if (EffectHeal.ApplyHeal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
                     return -3;
                 }
             }

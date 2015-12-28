@@ -19,7 +19,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectDamage extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
         if (CastInfos.Duration > 0) {
             // L'effet est un poison
@@ -33,7 +33,7 @@ public class EffectDamage extends EffectBase {
         {
             for (Fighter Target : CastInfos.Targets) {
                 //Eppe de iop ?
-                MutableInt DamageValue = new MutableInt(CastInfos.RandomJet(Target));
+                MutableInt DamageValue = new MutableInt(CastInfos.randomJet(Target));
 
                 if (EffectDamage.ApplyDamages(CastInfos, Target, DamageValue) == -3) {
                     return -3;

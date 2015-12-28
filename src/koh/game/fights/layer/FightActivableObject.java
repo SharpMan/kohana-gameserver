@@ -37,7 +37,7 @@ public abstract class FightActivableObject implements IFightObject {
     public BuffActiveType activationType;
     public Color Color;
     public int Duration;
-    public boolean Activated;
+    public boolean activated;
     public FightCell Cell;
     public ArrayList<Fighter> targets;
     protected Fight m_fight;
@@ -150,7 +150,7 @@ public abstract class FightActivableObject implements IFightObject {
     }
 
     public synchronized int activate(Fighter activator) {
-        Activated = true;
+        this.activated = true;
         if (this.getObjectType() == FightObjectType.OBJECT_TRAP) {
             remove();
         }

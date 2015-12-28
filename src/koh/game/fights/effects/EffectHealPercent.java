@@ -12,7 +12,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMes
 public class EffectHealPercent extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
         if (CastInfos.Duration > 0) {
             // L'effet est un poison
@@ -25,7 +25,7 @@ public class EffectHealPercent extends EffectBase {
         } else // Heal direct
         {
             for (Fighter Target : CastInfos.Targets) {
-                if (EffectHealPercent.ApplyHealPercent(CastInfos, Target, CastInfos.RandomJet(Target)) == -3) {
+                if (EffectHealPercent.ApplyHealPercent(CastInfos, Target, CastInfos.randomJet(Target)) == -3) {
                     return -3;
                 }
             }

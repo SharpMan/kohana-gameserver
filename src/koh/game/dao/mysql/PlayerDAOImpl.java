@@ -132,6 +132,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                     p = Player.builder()
                             .nickName(result.getString("nickname"))
                             .breed((byte) result.getInt("breed"))
+                            .regenRate((byte)10)
                             .sexe(result.getInt("sex"))
                             .skins(stringToShortArray(result.getString("skins")))
                             .scales(stringToShortArray(result.getString("scales")))
@@ -150,6 +151,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .experience(Long.parseLong(result.getString("stats").split(",")[7]))
                             .activableTitle(Short.parseShort(result.getString("stats").split(",")[8]))
                             .activableOrnament(Short.parseShort(result.getString("stats").split(",")[9]))
+                            .regenStartTime(Long.parseLong(result.getString("stats").split(",")[10]))
                             .alignmentValue(Byte.parseByte(result.getString("alignment_informations").split(",")[0]))
                             .PvPEnabled(Byte.parseByte(result.getString("alignment_informations").split(",")[1]))
                             .alignmentSide(AlignmentSideEnum.valueOf(Byte.parseByte(result.getString("alignment_informations").split(",")[2])))
@@ -172,7 +174,6 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .mountInfo(new MountInformations().deserialize(result.getBytes("mount_informations")))
                             .moodSmiley((byte)-1)
                             .build();
-                    System.out.println(p.getIndexedColors());
                     Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
                     p.setMapid(result.getInt("map"));
                     p.setHonor(result.getInt("honor_points"), false);
@@ -227,7 +228,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setString(9, StringUtils.join(character.getEnabledChannels(), ','));
             pStatement.setInt(10, character.getStatPoints());
             pStatement.setInt(11, character.getSpellPoints());
-            pStatement.setString(12, character.getVitality() + "," + character.getWisdom() + "," + character.getStrength() + "," + character.getIntell() + "," + character.getAgility() + "," + character.getChance() + "," + character.getLife() + "," + character.getExperience() + "," + character.getActivableTitle() + "," + character.getActivableOrnament());
+            pStatement.setString(12, character.getVitality() + "," + character.getWisdom() + "," + character.getStrength() + "," + character.getIntell() + "," + character.getAgility() + "," + character.getChance() + "," + character.getLife() + "," + character.getExperience() + "," + character.getActivableTitle() + "," + character.getActivableOrnament()+ "," + character.getRegenStartTime());
             pStatement.setBytes(13, character.getMySpells().serialize());
             pStatement.setLong(14, character.getKamas());
             pStatement.setBytes(15, character.getShortcuts().serialize());

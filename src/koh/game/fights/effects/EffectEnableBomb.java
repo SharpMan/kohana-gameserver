@@ -16,7 +16,7 @@ import org.apache.commons.lang.ArrayUtils;
 public class EffectEnableBomb extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.Targets) {
             if (Target instanceof BombFighter) {
                 if (CastInfos.Duration > 0) {

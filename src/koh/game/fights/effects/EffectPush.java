@@ -22,7 +22,7 @@ public class EffectPush extends EffectBase {
     private static final Random RANDOM_PUSHDAMAGE = new Random();
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast CastInfos) {
         byte Direction = 0;
         for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.Porté) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (CastInfos.EffectType) {
@@ -61,7 +61,7 @@ public class EffectPush extends EffectBase {
                     }
                     break;
             }
-            if (EffectPush.ApplyPush(CastInfos, Target, Direction, CastInfos.RandomJet(Target)) == -3) {
+            if (EffectPush.ApplyPush(CastInfos, Target, Direction, CastInfos.randomJet(Target)) == -3) {
                 return -3;
             }
         }
@@ -89,7 +89,7 @@ public class EffectPush extends EffectBase {
                 }
 
                 if (i != 0) {
-                    target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
+                    target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
                     target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
                 }
@@ -109,7 +109,7 @@ public class EffectPush extends EffectBase {
 
         target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect == null ? 5 : CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
-        target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.Duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
+        target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
 
         return result;
     }
