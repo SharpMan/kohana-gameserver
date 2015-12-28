@@ -1,6 +1,5 @@
 package koh.game.entities.item.actions;
 
-import koh.game.actions.GameActionTypeEnum;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.ItemAction;
 import koh.protocol.client.enums.PlayerEnum;
@@ -25,8 +24,8 @@ public class AddEnergy extends ItemAction {
             return false;
         int val = energy;
         p.setEnergy(p.getEnergy() + energy);
-        if(p.getEnergy() +val > PlayerEnum.MaxEnergy){
-            val = PlayerEnum.MaxEnergy - p.getEnergy();
+        if(p.getEnergy() +val > PlayerEnum.MAX_ENERGY){
+            val = PlayerEnum.MAX_ENERGY - p.getEnergy();
         }
         p.setEnergy(val);
         p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,7,String.valueOf(val)));

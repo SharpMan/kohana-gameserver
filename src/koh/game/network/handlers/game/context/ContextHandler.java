@@ -81,6 +81,7 @@ public class ContextHandler {
             Client.sequenceMessage(new GameContextDestroyMessage());
 
             Client.send(new GameContextCreateMessage((byte) (Client.getCharacter().getFighter() == null ? 1 : 2)));
+            Client.getCharacter().updateRegenedEnergy();
             Client.getCharacter().refreshStats(false,false);
             Client.getCharacter().onLogged();
         }

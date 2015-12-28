@@ -171,7 +171,6 @@ public class CharacterFighter extends Fighter {
             this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
             this.character.send(new GameContextDestroyMessage());
             this.character.send(new GameContextCreateMessage((byte) 1));
-            //this.character.send(new LifePointsRegenBeginMessage());
             this.character.refreshStats(false,true);
             if (!(this.fight instanceof ChallengeFight) && this.team.id == this.fight.getLoosers().id) {
                 this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
@@ -198,7 +197,7 @@ public class CharacterFighter extends Fighter {
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
         return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) character.getExperience(), (double) DAO.getExps().getPlayerMinExp(character.getLevel()), (double) DAO.getExps().getPlayerMaxExp(character.getLevel()), character.getKamas(), character.getStatPoints(), 0, character.getSpellPoints(), character.getActorAlignmentExtendInformations(),
-                getLife(), getMaxLife(), character.getEnergy(), PlayerEnum.MaxEnergy,
+                getLife(), getMaxLife(), character.getEnergy(), PlayerEnum.MAX_ENERGY,
                 (short) this.getAP(), (short) this.getMP(),
                 new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.Initiative), 0, 0), stats.getEffect(StatsEnum.Prospecting), stats.getEffect(StatsEnum.ActionPoints),
                 stats.getEffect(StatsEnum.MovementPoints), stats.getEffect(StatsEnum.Strength), stats.getEffect(StatsEnum.Vitality),

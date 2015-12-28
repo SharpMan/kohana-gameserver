@@ -55,7 +55,7 @@ public class RolePlayHandler {
             if(client.getCharacter().getRegenRate() != 5) {
                 client.getCharacter().stopRegen();
                 client.getCharacter().setRegenRate((byte) 5);
-                client.getCharacter().updateRegenedLife(true);
+                client.getCharacter().updateRegenedLife(false);
                 client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(),client.getCharacter().getMaxLife()));
             }
             client.getCharacter().removeHumanOption(HumanOptionEmote.class);

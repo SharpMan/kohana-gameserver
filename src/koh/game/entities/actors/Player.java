@@ -1,6 +1,7 @@
 package koh.game.entities.actors;
 
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,19 +28,12 @@ import koh.game.fights.FightState;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.ChatChannel;
-import koh.game.network.handlers.game.context.ContextHandler;
+import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.character.stats.*;
 import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
 import koh.game.utils.Observable;
 import koh.game.utils.Observer;
 import koh.protocol.client.Message;
-import koh.protocol.client.enums.AggressableStatusEnum;
-import koh.protocol.client.enums.AlignmentSideEnum;
-import koh.protocol.client.enums.CompassTypeEnum;
-import koh.protocol.client.enums.PlayerStateEnum;
-import koh.protocol.client.enums.PlayerStatusEnum;
-import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.atlas.compass.CompassUpdatePartyMemberMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.character.status.PlayerStatus;
@@ -58,11 +52,10 @@ import koh.protocol.types.game.look.EntityLook;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.reflect.Reflection;
 
 /**
  *
@@ -424,6 +417,22 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
+    public void updateRegenedEnergy(){
+        if(this.energy < PlayerEnum.MAX_ENERGY && this.regenStartTime != 0){
+            int timeElapsed = Instant.now().minusMillis(this.regenStartTime).get(ChronoField.HOUR_OF_DAY);
+            if(timeElapsed > 0){
+                timeElapsed *= 50;
+                //TODO Taverne *=2
+                if (this.energy + timeElapsed > PlayerEnum.MAX_ENERGY) {
+                    timeElapsed = PlayerEnum.MAX_ENERGY - this.energy;
+                }
+                this.energy += timeElapsed;
+                this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,7, String.valueOf(timeElapsed)));
+            }
+
+        }
+    }
+
     public void updateRegenedLife(boolean stopRegen) {
         if(this.getLife() == this.getMaxLife()){
             if(this.regenStartTime != 0){
@@ -438,6 +447,7 @@ public class Player extends IGameActor implements Observer {
         }else{
             this.stopRegen(stopRegen);
             if(this.getLife() >= this.getMaxLife()){
+                this.regenStartTime = 0;
                 return;
             }
             this.regenStartTime = Instant.now().toEpochMilli();
@@ -453,6 +463,9 @@ public class Player extends IGameActor implements Observer {
 
         if(this.regenStartTime != 0) {
             int timeElapsed = (int) Instant.now().minusMillis(this.regenStartTime).getEpochSecond();
+            if(this.regenRate == 5){
+                timeElapsed *= 2;
+            }
             if (this.life + timeElapsed > this.getMaxLife()) {
                 timeElapsed = this.getMaxLife() - this.life;
             }
@@ -463,7 +476,8 @@ public class Player extends IGameActor implements Observer {
             if(stopRegen)
                 this.send(new LifePointsRegenEndMessage(this.life, this.getMaxLife(), timeElapsed));
         }
-        this.regenRate = 10;
+        if(stopRegen)
+            this.regenRate = 10;
     }
 
     public synchronized void stopSitEmote(){
