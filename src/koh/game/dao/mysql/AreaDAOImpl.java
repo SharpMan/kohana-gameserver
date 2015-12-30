@@ -1,6 +1,7 @@
 package koh.game.dao.mysql;
 
 import java.sql.ResultSet;
+import java.util.Collection;
 import java.util.HashMap;
 
 import com.google.inject.Inject;
@@ -29,6 +30,11 @@ public class AreaDAOImpl extends AreaDAO {
 
     @Inject
     private DatabaseSource dbSource;
+
+    @Override
+    public Collection<SubArea> getSubAreas(){
+        return this.subAreas.values();
+    }
 
     private int loadAll() {
         int i = 0;
@@ -81,6 +87,7 @@ public class AreaDAOImpl extends AreaDAO {
                         .capturable(result.getBoolean("capturable"))
                         .build();
 
+                mySubarea.removeArchiMonster();
                 mySubarea.getArea().getSubAreas().add(mySubarea);
                 subAreas.put(result.getInt("id"), mySubarea);
 

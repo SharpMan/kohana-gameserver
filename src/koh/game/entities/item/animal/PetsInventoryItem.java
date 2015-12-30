@@ -101,7 +101,7 @@ public class PetsInventoryItem extends InventoryItem {
         PetTemplate pet = getAnimal();
         if (pet == null) {
             return false;
-        } else if (food.getTemplateId() == ItemsEnum.EneripsaPouder) {
+        } else if (food.getTemplateId() == ItemsEnum.ENERIPSA_POUDER) {
             //TODO : life
             return true;
         } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {

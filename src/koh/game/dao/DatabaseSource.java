@@ -59,6 +59,7 @@ public class DatabaseSource implements Service {
         binder.bind(PlayerCommandDAO.class).to(PlayerCommandDAOImpl.class).asEagerSingleton();
         binder.bind(PlayerDAO.class).to(PlayerDAOImpl.class).asEagerSingleton();
         binder.bind(SpellDAO.class).to(SpellDAOImpl.class).asEagerSingleton();
+        binder.bind(MapMonsterDAO.class).to(MapMonsterDAOImpl.class).asEagerSingleton();;
         binder.requestStaticInjection(DAO.class);
     }
 
@@ -83,7 +84,7 @@ public class DatabaseSource implements Service {
         this.dataSource = new HikariDataSource(config);
 
         Field[] fields = DAO.class.getDeclaredFields();
-        for(Field field : fields){
+        for(Field field : fields){ //J'ai eu la flemme de declarer tout les method la les injecter les start
            if(Modifier.isStatic(field.getModifiers()) && Service.class.isAssignableFrom(field.getType())){
                try {
                    field.setAccessible(true);

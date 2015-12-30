@@ -2,7 +2,6 @@ package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
-import koh.game.fights.fighters.BombFighter;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
@@ -43,10 +42,10 @@ public abstract class BuffEffect {
     //TODO: Create List in Setting
     public boolean isDebuffable() {
         switch (this.CastInfos.EffectType) {
-            case Damage_Armor_Reduction:
+            case DAMAGE_ARMOR_REDUCTION:
                 return CastInfos.SpellId != SpellIDEnum.TREVE;
-            case Add_State:
-            case Change_Appearance:
+            case ADD_STATE:
+            case CHANGE_APPEARANCE:
             case CHATIMENT:
             //Domage de sort
             case TRANSFORMATION:

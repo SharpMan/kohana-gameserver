@@ -29,7 +29,7 @@ public class BuffPorter extends BuffEffect {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
         Target.getStates().fakeState(FightStateEnum.Porté, true);
-        this.CastInfos.EffectType = StatsEnum.Add_State;
+        this.CastInfos.EffectType = StatsEnum.ADD_STATE;
         Target.setCell(this.caster.getMyCell());
     }
 

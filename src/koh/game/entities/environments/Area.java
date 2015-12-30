@@ -2,11 +2,14 @@ package koh.game.entities.environments;
 
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.dao.DAO;
+import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
+import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
 import koh.protocol.messages.game.interactive.StatedMapUpdateMessage;
 import koh.protocol.types.game.interactive.StatedElement;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -17,6 +20,9 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @Builder
 public class Area {
+
+    @Getter
+    private final SecureRandom RANDOM = new SecureRandom();
 
     @Getter
     private final ScheduledExecutorService backGroundWorker = Executors.newScheduledThreadPool(50);
@@ -32,6 +38,35 @@ public class Area {
     private int worldmapId;
 
     public void onBuilt() {
+        /*AUTO MOVE MONSTERS*/
+
+        /* STARS ON MONSTERS */
+        new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Monster.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Monster.AgeBonusTime") * 60) * 1000) {
+            @Override
+            public void run() {
+                subAreas.forEach(Sub -> Arrays.stream(Sub.getMapIds())
+                        .mapToObj(id -> DAO.getMaps().findTemplate(id))
+                        .filter(map -> map != null && !map.getMonsters().isEmpty())
+                        .forEach(map -> {
+                           map.getMonsters().forEach(mob -> {
+
+                               if (mob.getGameRolePlayGroupMonsterInformations().ageBonus == -1) {
+                                   mob.getGameRolePlayGroupMonsterInformations().ageBonus = 0;
+                               }
+                               else if (mob.getGameRolePlayGroupMonsterInformations().ageBonus != 200) {
+                                   mob.getGameRolePlayGroupMonsterInformations().ageBonus += 4;
+
+                               }
+                               else{
+                                   return;
+                               }
+                               if(map.isMyInitialized())
+                                   map.sendToField(new GameRolePlayShowActorMessage(mob.getGameRolePlayGroupMonsterInformations()));
+                            });
+                        }));
+            }
+        };
+        /* START ON INTERACTIF ELEMENTS */
         new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Job.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Job.AgeBonusTime") * 60) * 1000) {
             @Override
             public void run() {
@@ -51,6 +86,7 @@ public class Area {
                                 })));
             }
         };
+        /* RESPAWN INTERFACTIF ELEMENTS*/
         new CancellableScheduledRunnable(backGroundWorker, (DAO.getSettings().getIntElement("Job.Spawn") + this.id) * 60 * 1000, DAO.getSettings().getIntElement("Job.Spawn") * 60 * 1000) {
             @Override
             public void run() {

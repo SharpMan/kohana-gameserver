@@ -21,7 +21,7 @@ public class BuffPorteur extends BuffEffect {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
         CastInfos.caster.getStates().fakeState(FightStateEnum.Porteur, true);
-        this.CastInfos.EffectType = StatsEnum.Add_State;
+        this.CastInfos.EffectType = StatsEnum.ADD_STATE;
         this.caster.getFight().sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
     }
 

@@ -11,10 +11,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
+
+import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.InteractiveElementAction;
 import koh.game.controllers.MapController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.IGameActor;
+import koh.game.entities.actors.MonsterGroup;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
@@ -47,6 +50,7 @@ import koh.protocol.types.game.interactive.InteractiveElementSkill;
 import koh.protocol.types.game.interactive.InteractiveElementWithAgeBonus;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -70,17 +74,21 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private String compressedBlueCells, compressedRedCells;
     @Getter
     private boolean myInitialized = false;
+    @Getter
     private final Map<Integer, IGameActor> myGameActors = new ConcurrentHashMap<>();
     @Getter @Setter
     private StatedElement[] elementsStated = new StatedElement[0];
     @Getter
-    private List<InteractiveElementStruct> interactiveElements = new ArrayList<>();
+    private final List<InteractiveElementStruct> interactiveElements = new ArrayList<>();
     private Map<Short, InventoryItem> droppedItems;
     @Getter
-    private List<HouseInformations> houses = new ArrayList<>();
+    private final List<HouseInformations> houses = new ArrayList<>();
     @Getter @Setter
     public MapPosition position;
-    private int myNextActorId = -1;
+    @Getter
+    private final MutableInt myNextActorId = new MutableInt(0);
+    @Getter
+    private final ArrayList<MonsterGroup> monsters = new ArrayList<>(4);
     private Map<Integer, MapDoor> doors;
     private FightController myFightController;
     /*After loadAll */
@@ -90,9 +98,11 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private Layer[] layers;
 
     public void spawnActor(IGameActor actor) {
+
         if (!this.myInitialized) {
             this.initialize();
         }
+
 
         if (actor instanceof Player) {
             if (((Player) actor).getClient() != null) {
@@ -275,13 +285,55 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         //throw un nullP mieux que referencer une liste on 111000 map object
         try {
             for (Npc npc : DAO.getNpcs().forMap(this.id)) {
-                    npc.setID(this.myNextActorId--);
+                    npc.setID(getNextActorId());
                     npc.setActorCell(this.getCell(npc.getCellID()));
                     this.spawnActor(npc);
             }
         } catch(NullPointerException ignored) {}
+
+        this.monsters.stream()
+                .filter(gr -> !gr.isFix())
+                .forEach(gr -> {
+                    gr.getGameRolePlayGroupMonsterInformations().disposition.cellId = this.getRandomWalkableCell();
+                    gr.setActorCell(this.getCell(gr.getGameContextActorInformations(null).disposition.cellId));
+                });
+        this.monsters.stream()
+                .filter(gr -> gr.isFix())
+                .forEach(gr -> gr.setActorCell(this.getCell(gr.getFixedCell())));
+
+        this.monsters.forEach(this::spawnActor);
+
         this.myFightController = new FightController();
         //this.interactiveElements.forEach(x -> System.out.println(x.toString()));
+    }
+
+    public synchronized void removeSpawn(final MonsterGroup grp){
+        this.destroyActor(grp);
+        final int timeReq = grp.getGameRolePlayGroupMonsterInformations().staticInfos.underlings.length * 20; //To wait 20s * MonsterIngroup
+        if(!grp.isFix()){
+            this.monsters.remove(grp);
+            final MonsterGroup newGrp = DAO.getMapMonsters().genMonsterGroup(this.getSubArea(),this);
+            this.addMonster(grp);
+            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000){
+                @Override
+                public void run() {
+                    spawnActor(newGrp);
+                }
+            };
+        }
+        else{
+            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000){
+                @Override
+                public void run() {
+                    spawnActor(grp);
+                }
+            };
+        }
+    }
+
+    public synchronized int getNextActorId(){
+        this.myNextActorId.decrement();
+        return this.myNextActorId.intValue();
     }
 
     public DofusMap(int id, byte v, int r, byte m, int SubAreaId, int bn, int tn, int ln, int rn, int sb, boolean u, boolean ur, int pr, String cc, String sl, byte[] sbb, byte[] rc) {
@@ -471,6 +523,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.sendMapFightCountMessage();
     }
 
+    public void addMonster(MonsterGroup gr){
+        gr.setID(gr.getGameRolePlayGroupMonsterInformations().contextualId);
+        this.monsters.add(gr);
+    }
 
     public void sendMapInfo(WorldClient client) {
         this.myFightController.sendFightInfos(client);

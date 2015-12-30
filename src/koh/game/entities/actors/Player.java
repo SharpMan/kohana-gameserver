@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
 import koh.d2o.Couple;
 import koh.game.controllers.PlayerController;
@@ -419,7 +420,7 @@ public class Player extends IGameActor implements Observer {
 
     public void updateRegenedEnergy(){
         if(this.energy < PlayerEnum.MAX_ENERGY && this.regenStartTime != 0){
-            int timeElapsed = Instant.now().minusMillis(this.regenStartTime).get(ChronoField.HOUR_OF_DAY);
+            long timeElapsed = TimeUnit.MILLISECONDS.toHours(Instant.now().minusMillis(this.regenStartTime).toEpochMilli());
             if(timeElapsed > 0){
                 timeElapsed *= 50;
                 //TODO Taverne *=2

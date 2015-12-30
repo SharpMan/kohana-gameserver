@@ -15,6 +15,9 @@ public class DAO {
     private static AccountDataDAO accountDatas;
 
     @Inject @Getter
+    private static MonsterDAO monsters;
+
+    @Inject @Getter
     private static AreaDAO areas;
 
     @Inject @Getter
@@ -22,9 +25,6 @@ public class DAO {
 
     @Inject @Getter
     private static JobDAO jobTemplates;
-
-    @Inject @Getter
-    private static MonsterDAO monsters;
 
     @Inject @Getter
     private static MountDAO mounts;
@@ -64,5 +64,9 @@ public class DAO {
 
     @Inject @Getter
     private static MountInventoryDAO mountInventories;
+
+    @Inject @Getter
+    private static MapMonsterDAO mapMonsters;
+
 
 }

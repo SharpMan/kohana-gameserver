@@ -48,7 +48,6 @@ public abstract class IGameActor {
     }
 
     public boolean canBeSeen(IGameActor Actor) {
-        //Todo: player Invisibile ?
         return true;
     }
 
@@ -58,12 +57,6 @@ public abstract class IGameActor {
         }
     }
 
-    public WorldClient getClient(){
-        if(this instanceof Player){
-            return ((Player)this).getClient();
-        }
-        return null;
-    }
 
     public EntityDispositionInformations getEntityDispositionInformations(Player character) {
         return new EntityDispositionInformations(this.cell.getId(), direction);

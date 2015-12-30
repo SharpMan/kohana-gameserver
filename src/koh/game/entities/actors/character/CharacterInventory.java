@@ -345,7 +345,7 @@ public class CharacterInventory {
                             this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
                             this.player.getEntityLook().bonesId = item.getApparrance();
                             this.player.getEntityLook().skins.clear();
-                            if (item.getTemplateId() != ItemsEnum.Kramkram) {
+                            if (item.getTemplateId() != ItemsEnum.KRAMKRAM) {
                                 this.player.getEntityLook().indexedColors.clear();
                             }
                             this.player.getEntityLook().scales.clear();

@@ -65,7 +65,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.PA_USED_LOST_X_PDV, new EffectDamagePerPA());
             this.put(StatsEnum.PM_USED_LOST_X_PDV, new EffectDamagePerPM());
 
-            this.put(StatsEnum.Change_Appearance, new EffectSkin());
+            this.put(StatsEnum.CHANGE_APPEARANCE, new EffectSkin());
             this.put(StatsEnum.CHANGE_LOOK, new EffectSkin());
 
             //CoolDown
@@ -79,7 +79,7 @@ public abstract class EffectBase {
 
             // Ajout d'un etat / changement de skin
             this.put(StatsEnum.Invisibility, new EffectAddState());
-            this.put(StatsEnum.Add_State, new EffectAddState());
+            this.put(StatsEnum.ADD_STATE, new EffectAddState());
             this.put(StatsEnum.Removes_State_3, new EffectLostState());
 
             this.put(StatsEnum.Steal_Neutral, new EffectLifeSteal());
@@ -105,7 +105,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.Steal_Range, new EffectStatsSteal());
 
             // Armure et bouclié feca
-            this.put(StatsEnum.Damage_Armor_Reduction, new EffectArmor());
+            this.put(StatsEnum.DAMAGE_ARMOR_REDUCTION, new EffectArmor());
             this.put(StatsEnum.Damage_Reduction, new EffectArmor());
 
             //chance Eca

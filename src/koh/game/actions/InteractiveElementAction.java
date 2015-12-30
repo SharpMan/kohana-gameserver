@@ -58,7 +58,7 @@ public class InteractiveElementAction extends GameAction {
     public void execute() {
         if (action == null || !HANDLERS.containsKey(action)) {
             logger.debug("Action {} id not implanted",action);
-            PlayerController.sendServerMessage(actor.getClient(), "L'utilisation de cet object intéractif est indisponnible pour le moment ...");
+            PlayerController.sendServerMessage(((Player)actor).getClient(), "L'utilisation de cet object intéractif est indisponnible pour le moment ...");
             actor.send(new BasicNoOperationMessage());
             return;
         }

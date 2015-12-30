@@ -58,7 +58,7 @@ public class MountInformations {
         this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
         this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
         this.player.getEntityLook().skins.clear();
-        /*if (item.templateId != ItemsEnum.Kramkram) { //Todo KAMELEONE
+        /*if (item.templateId != ItemsEnum.KRAMKRAM) { //Todo KAMELEONE
          this.player.getEntityLook().indexedColors.clear();
          }*/
         this.player.getEntityLook().scales = DAO.getMounts().find(this.mount.model).getEntityLook().scales;

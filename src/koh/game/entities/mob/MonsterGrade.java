@@ -65,28 +65,28 @@ public class MonsterGrade {
         this.myStats.addBase(StatsEnum.Add_TackleBlock, this.tackleBlock);
 
         if (!this.getMonster().isUseBombSlot() && !this.getMonster().isUseSummonSlot() && this.strenght == 0 && this.chance == 0 && this.intelligence == 0 && this.agility == 0) {
-            int Bonus;
+            int bonus;
             switch (this.grade) {
                 case 1:
-                    Bonus = 80;
+                    bonus = 80;
                     break;
                 case 2:
-                    Bonus = 85;
+                    bonus = 85;
                     break;
                 case 3:
-                    Bonus = 90;
+                    bonus = 90;
                     break;
                 case 4:
-                    Bonus = 95;
+                    bonus = 95;
                     break;
                 case 5:
                 default:
-                    Bonus = 100;
+                    bonus = 100;
             }
-            this.myStats.addBase(StatsEnum.Strength, Bonus);
-            this.myStats.addBase(StatsEnum.Chance, Bonus);
-            this.myStats.addBase(StatsEnum.Intelligence, Bonus);
-            this.myStats.addBase(StatsEnum.Agility, this.getMonster().isCanTackle() ? Bonus : 0);
+            this.myStats.addBase(StatsEnum.Strength, bonus);
+            this.myStats.addBase(StatsEnum.Chance, bonus);
+            this.myStats.addBase(StatsEnum.Intelligence, bonus);
+            this.myStats.addBase(StatsEnum.Agility, this.getMonster().isCanTackle() ? bonus : 0);
         } else {
             this.myStats.addBase(StatsEnum.Strength, this.strenght);
             this.myStats.addBase(StatsEnum.Chance, this.chance);

@@ -5,6 +5,7 @@ import koh.protocol.types.game.look.EntityLook;
 import koh.utils.Enumerable;
 import lombok.Getter;
 
+import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -64,6 +65,12 @@ public class MonsterTemplate {
         fastAnimsFun = result.getBoolean("fast_anims_fun");
         canSwitchPos = result.getBoolean("can_switch_pos");
         incompatibleIdols = Enumerable.StringToIntArray(result.getString("incompatable_idols"));
+    }
+
+
+
+    public MonsterGrade getRandomGrade(SecureRandom rand){
+        return this.grades.get(rand.nextInt(this.grades.size()));
     }
 
     public MonsterGrade getLevelOrNear(int Level) {
