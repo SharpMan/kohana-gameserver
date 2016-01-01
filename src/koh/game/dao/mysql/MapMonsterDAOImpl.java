@@ -99,7 +99,7 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
             DofusMap map;
             while (result.next()) {
                 map = mapDAO.findTemplate(result.getInt("map"));
-                if (map == null) {
+                if (map == null || (map.getPosition() != null && map.getPosition().getWorldMap() == -1)) {
                     continue;
                 }
                 map.addMonster(MonsterGroup.builder()

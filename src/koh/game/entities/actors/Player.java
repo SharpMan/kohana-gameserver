@@ -1,7 +1,6 @@
 package koh.game.entities.actors;
 
 import java.time.Instant;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,7 +52,7 @@ import koh.protocol.types.game.look.EntityLook;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,6 +62,7 @@ import org.apache.logging.log4j.Logger;
  * @author Neo-Craft
  */
 @Builder
+@ToString
 public class Player extends IGameActor implements Observer {
 
     private static final Logger logger = LogManager.getLogger(Player.class);
@@ -807,6 +807,18 @@ public class Player extends IGameActor implements Observer {
         this.scores.put(ScoreType.PVP_TOURNAMENT, 0);
     }
 
+    public double getExpBonus() {
+        double bonusXp = 1;
+        for(Player cbi2 : this.account.characters)
+        {
+            if (((((!((cbi2.getID() == this.ID))) && ((cbi2.level > level)))) && ((bonusXp < 4))))
+            {
+                bonusXp = (bonusXp + 1);
+            };
+        };
+        return bonusXp * DAO.getSettings().getDoubleElement("Rate.PvM");
+    }
+
     public Object $FighterLook = new Object();
 
     public void setFight(Fight Fight) {
@@ -913,8 +925,5 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
 
 }

@@ -2,7 +2,7 @@ package koh.game.entities.environments;
 
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.dao.DAO;
-import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
+import koh.protocol.messages.game.context.GameContextMoveMultipleElementsMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
 import koh.protocol.messages.game.interactive.StatedMapUpdateMessage;
 import koh.protocol.types.game.interactive.StatedElement;
@@ -27,9 +27,9 @@ public class Area {
     @Getter
     private final ScheduledExecutorService backGroundWorker = Executors.newScheduledThreadPool(50);
     @Getter
-    private int id;
-    @Getter
     private final ArrayList<SubArea> subAreas = new ArrayList<>();
+    @Getter
+    private int id;
     @Getter
     private SuperArea superArea;
     @Getter
@@ -38,8 +38,24 @@ public class Area {
     private int worldmapId;
 
     public void onBuilt() {
-        /*AUTO MOVE MONSTERS*/
+        /*AUTO MOVE MONSTERS
+        @Alleos @Alleos13
+        new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Monster.MoveOnMap") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Monster.MoveOnMap") * 60) * 1000) {
+            @Override
+            public void run() {
+                subAreas.forEach(Sub -> Arrays.stream(Sub.getMapIds())
+                        .mapToObj(id -> DAO.getMaps().findTemplate(id))
+                        .filter(map -> map != null && !map.getMonsters().isEmpty() && map.isMyInitialized())
+                        .forEach(map -> {
+                            map.getMonsters().stream()
+                                    .filter(mob -> !mob.isFix())
+                                    .forEach(mob -> {
 
+                                    });
+                            map.sendToField(new GameContextMoveMultipleElementsMessage());
+                        }));
+            }
+        };*/
         /* STARS ON MONSTERS */
         new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Monster.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Monster.AgeBonusTime") * 60) * 1000) {
             @Override
@@ -48,20 +64,18 @@ public class Area {
                         .mapToObj(id -> DAO.getMaps().findTemplate(id))
                         .filter(map -> map != null && !map.getMonsters().isEmpty())
                         .forEach(map -> {
-                           map.getMonsters().forEach(mob -> {
+                            map.getMonsters().forEach(mob -> {
 
-                               if (mob.getGameRolePlayGroupMonsterInformations().ageBonus == -1) {
-                                   mob.getGameRolePlayGroupMonsterInformations().ageBonus = 0;
-                               }
-                               else if (mob.getGameRolePlayGroupMonsterInformations().ageBonus != 200) {
-                                   mob.getGameRolePlayGroupMonsterInformations().ageBonus += 4;
+                                if (mob.getGameRolePlayGroupMonsterInformations().ageBonus == -1) {
+                                    mob.getGameRolePlayGroupMonsterInformations().ageBonus = 0;
+                                } else if (mob.getGameRolePlayGroupMonsterInformations().ageBonus != 200) {
+                                    mob.getGameRolePlayGroupMonsterInformations().ageBonus += 4;
 
-                               }
-                               else{
-                                   return;
-                               }
-                               if(map.isMyInitialized())
-                                   map.sendToField(new GameRolePlayShowActorMessage(mob.getGameRolePlayGroupMonsterInformations()));
+                                } else {
+                                    return;
+                                }
+                                if (map.isMyInitialized())
+                                    map.sendToField(new GameRolePlayShowActorMessage(mob.getGameRolePlayGroupMonsterInformations()));
                             });
                         }));
             }

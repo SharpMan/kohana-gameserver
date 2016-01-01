@@ -17,7 +17,7 @@ public class SummonedFighter extends Fighter {
     }
 
     @Override
-    public void EndFight() {
+    public void endFight() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -42,7 +42,7 @@ public class SummonedFighter extends Fighter {
     }
 
     @Override
-    public void JoinFight() {
+    public void joinFight() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

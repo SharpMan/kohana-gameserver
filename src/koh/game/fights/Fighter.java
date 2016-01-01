@@ -100,7 +100,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     /**
      * Virtual Method
      */
-    public void EndFight() {
+    public void endFight() {
 
     }
 
@@ -153,9 +153,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return -1;
     }
 
-    protected void initFighter(GenericStats StatsToMerge, int ID) {
+    protected void initFighter(GenericStats statsToMerge, int ID) {
         this.stats = new GenericStats();
-        this.stats.merge(StatsToMerge);
+        this.stats.merge(statsToMerge);
 
         this.ID = ID;
     }
@@ -515,7 +515,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     @Override
     public abstract void send(Message Packet);
 
-    public abstract void JoinFight();
+    public abstract void joinFight();
 
     @Override
     public abstract EntityLook getEntityLook();

@@ -42,8 +42,8 @@ public class FightWorker {
     public void initTurns() {
         this.myFightersTurn.clear();
 
-        List<Fighter> Team1 = fight.Fighters().filter(x -> x.getTeam().id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
-        List<Fighter> Team2 = fight.Fighters().filter(x -> x.getTeam().id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
+        List<Fighter> Team1 = fight.fighters().filter(x -> x.getTeam().id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
+        List<Fighter> Team2 = fight.fighters().filter(x -> x.getTeam().id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
 
         for (Fighter Fighter : Team1) {
             int FIndex = Team1.indexOf(Fighter);

@@ -83,7 +83,7 @@ public class CharacterFighter extends Fighter {
     }
 
     @Override
-    public void JoinFight() {
+    public void joinFight() {
         this.character.destroyFromMap();
     }
 
@@ -142,7 +142,7 @@ public class CharacterFighter extends Fighter {
     @Override
     public void leaveFight() {
         super.leaveFight();
-        this.EndFight();
+        this.endFight();
     }
 
     @Override
@@ -156,7 +156,7 @@ public class CharacterFighter extends Fighter {
     }
 
     @Override
-    public void EndFight() {
+    public void endFight() {
         if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
             if (super.getLife() <= 0) {
                 this.character.setLife(1);

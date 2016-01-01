@@ -217,7 +217,7 @@ public class BombFighter extends StaticFighter {
     }
 
     @Override
-    public void JoinFight() {
+    public void joinFight() {
 
     }
 

@@ -1,5 +1,7 @@
 package koh.game.fights;
 
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -8,6 +10,7 @@ import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
 import koh.game.fights.fighters.CharacterFighter;
+import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.mount.MountSetMessage;
@@ -21,6 +24,64 @@ import org.apache.logging.log4j.Logger;
 public class FightFormulas {
 
     private static final Logger logger = LogManager.getLogger(FightFormulas.class);
+
+    private static final double[] GROUP_COEFFICIENTS = new double[]
+            {
+                    1.0,
+                    1.1,
+                    1.5,
+                    2.3,
+                    3.1,
+                    3.6,
+                    4.2,
+                    4.7
+            };
+
+    public static int computeXpWin(CharacterFighter fighter, MonsterFighter[] droppersResults)
+    {
+        int result;
+        if (droppersResults.length == 0)
+        {
+            result = 0;
+        }
+        else
+        {
+            int num = fighter.getTeam().getFighters(false).mapToInt(entry -> entry.getLevel()).sum();
+            byte maxPlayerLevel = (byte) fighter.getTeam().getFighters(false).mapToInt(entry -> entry.getLevel()).max().orElse(0);
+            int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr .getLevel()).sum();
+            byte b = (byte) Arrays.stream(droppersResults).mapToInt(dr -> dr .getLevel()).max().orElse(0);
+            int num3 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getGrade().getGradeXp()).sum();
+            double num4 = 1.0;
+            if (num - 5 > num2)
+            {
+                num4 = (double)num2 / (double)num;
+            }
+            else
+            {
+                if (num + 10 < num2)
+                {
+                    num4 = (double)(num + 10) / (double)num2;
+                }
+            }
+            double num5 = Math.min((double)fighter.getLevel(), truncate(2.5 * (double)b)) / (double)num * 100.0;
+            int num6 = Arrays.stream(droppersResults).
+                    filter(mob -> mob.getLevel() >=  maxPlayerLevel / 3)
+                    .mapToInt(x -> 1)
+                    .sum();
+            if (num6 <= 0)
+            {
+                num6 = 1;
+            }
+            double num7 = truncate(num5 / 100.0 * truncate((double)num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
+            double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double)fighter.getFight().ageBonus / 100.0);
+            result = (int)truncate(truncate(num7 * (double)(100 + fighter.getStats().getTotal(StatsEnum.Wisdom)) / 100.0) * num8 * fighter.character.getExpBonus());
+        }
+        return result;
+    }
+
+    private static double truncate(double value){
+        return value - value % 1;
+    }
 
     public static short calculateEarnedDishonor(Fighter Character) {
         return Character.getFight().getEnnemyTeam(Character.getTeam()).alignmentSide != AlignmentSideEnum.ALIGNMENT_NEUTRAL ? (short) 0 : (short) 1;
@@ -57,10 +118,10 @@ public class FightFormulas {
         return (short) num3;
     }
 
-    public static long XPDefie(Fighter fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers) {
+    public static int XPDefie(Fighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers) {
 
-        int lvlLoosers = Lossers.mapToInt(x -> x.getLevel()).sum();
-        int lvlWinners = Winners.mapToInt(x -> x.getLevel()).sum();
+        int lvlLoosers = lossers.mapToInt(x -> x.getLevel()).sum();
+        int lvlWinners = winners.mapToInt(x -> x.getLevel()).sum();
 
         int taux = DAO.getSettings().getIntElement("Rate.Challenge");
         float rapport = (float) lvlLoosers / (float) lvlWinners;
@@ -71,19 +132,19 @@ public class FightFormulas {
         if (rapport >= 1.0F) {
             malus = 1;
         }
-        long xpWin = (long) (((((rapport * (float) XpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
+        int xpWin = (int) (((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
         if (xpWin < 0) {
-            logger.error("xpWin <0 on lvlLoosers " + lvlLoosers + " lvlWinners" + lvlWinners + " rapport " + rapport + " Need" + ((((rapport * (float) XpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) + " sasa " + (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
+            logger.error("xpWin <0 on lvlLoosers {} lvlWinners {} rapport {} need {} sasa {}",lvlLoosers,lvlWinners,rapport,((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus),(1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
         }
         return xpWin;
     }
 
-    private static long XpNeededAtLevel(int lvl) {
+    private static long xpNeededAtLevel(int lvl) {
         return (DAO.getExps().getPlayerMaxExp(lvl) - DAO.getExps().getPlayerMinExp(lvl == 200 ? 199 : lvl));
     }
 
-    public static long guildXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
-        if (Fighter.character == null) {
+    public static int guildXpEarned(CharacterFighter Fighter, AtomicInteger xpWin) {
+        if (Fighter.character == null || xpWin.get() == 0) {
             return 0;
         }
         if (Fighter.character.getGuild() == null) {
@@ -107,29 +168,29 @@ public class FightFormulas {
         {
             toGuild = maxP;
         }
-        xpWin.set((long) (xp - xp * pXpGive));
+        xpWin.set((int) (xp - xp * pXpGive));
 
         Fighter.character.getGuild().onFighterAddedExperience(gm, (long) Math.round(toGuild));
 
-        return (long) Math.round(toGuild);
+        return (int) Math.round(toGuild);
     }
 
-    public static long mountXpEarned(CharacterFighter Fighter, AtomicReference<Long> xpWin) {
-        if (Fighter == null) {
+    public static int mountXpEarned(CharacterFighter fighter, AtomicInteger xpWin) {
+        if (fighter == null || xpWin.get() == 0) {
             return 0;
         }
-        if (Fighter.character.getMountInfo() == null) {
-            logger.error("mountInfo Null {} ", Fighter.character.toString());
+        if (fighter.character.getMountInfo() == null) {
+            logger.error("mountInfo Null {} ", fighter.character.toString());
         }
-        if (!Fighter.character.getMountInfo().isToogled) {
+        if (!fighter.character.getMountInfo().isToogled) {
             return 0;
         }
 
-        int diff = Math.abs(Fighter.getLevel() - Fighter.character.getMountInfo().mount.level);
+        int diff = Math.abs(fighter.getLevel() - fighter.character.getMountInfo().mount.level);
 
         double coeff = 0;
         double xp = (double) xpWin.get();
-        double pToMount = (double) Fighter.character.getMountInfo().ratio / 100 + 0.2;
+        double pToMount = (double) fighter.character.getMountInfo().ratio / 100 + 0.2;
 
         if (diff >= 0 && diff <= 9) {
             coeff = 0.1;
@@ -150,16 +211,16 @@ public class FightFormulas {
         }
 
         if (pToMount > 0.2) {
-            xpWin.set((long) (xp - (xp * (pToMount - 0.2))));
+            xpWin.set((int) (xp - (xp * (pToMount - 0.2))));
         }
 
-        Fighter.character.getMountInfo().addExperience((long) Math.round(xp * pToMount * coeff));
+        fighter.character.getMountInfo().addExperience((long) Math.round(xp * pToMount * coeff));
 
         if (xp > 0) {
-            Fighter.character.send(new MountSetMessage(Fighter.character.getMountInfo().mount));
+            fighter.character.send(new MountSetMessage(fighter.character.getMountInfo().mount));
         }
 
-        return (long) Math.round(xp * pToMount * coeff);
+        return (int) Math.round(xp * pToMount * coeff);
     }
 
     public static short calculWinHonor(Stream<Fighter> winners, Stream<Fighter> loosers) {

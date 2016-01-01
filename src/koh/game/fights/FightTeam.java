@@ -50,6 +50,10 @@ public class FightTeam {
         this.Fight = f;
     }
 
+    public Stream<Fighter> getFighters(boolean isSummoned) {
+        return this.myFighters.stream().filter(fighter -> fighter.getSummoner() == null);
+    }
+
     public Stream<Fighter> getFighters() {
         return this.myFighters.stream();
     }

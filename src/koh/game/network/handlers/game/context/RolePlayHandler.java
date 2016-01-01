@@ -8,6 +8,10 @@ import java.util.Map;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
+import koh.game.entities.actors.IGameActor;
+import koh.game.entities.actors.MonsterGroup;
+import koh.game.fights.Fight;
+import koh.game.fights.types.MonsterFight;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.StatsBoostEnum;
@@ -19,16 +23,17 @@ import koh.protocol.messages.game.character.stats.UpdateLifePointsMessage;
 import koh.protocol.messages.game.context.roleplay.ChangeMapMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayRequestMessage;
+import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayAttackMonsterRequestMessage;
 import koh.protocol.messages.game.context.roleplay.stats.StatsUpgradeResultMessage;
 import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
+@Log4j2
 public class RolePlayHandler {
 
     //TODO ImmutableMap
@@ -43,7 +48,22 @@ public class RolePlayHandler {
         }
     };
 
-    private static final Logger logger = LogManager.getLogger(RolePlayHandler.class);
+    @HandlerAttribute(ID = GameRolePlayAttackMonsterRequestMessage.M_ID)
+    public static void handleGameRolePlayAttackMonsterRequestMessage(WorldClient client , GameRolePlayAttackMonsterRequestMessage message){
+        if(client.isGameAction(GameActionTypeEnum.FIGHT) || !client.canGameAction(GameActionTypeEnum.FIGHT)){
+            PlayerController.sendServerMessage(client,"Impossible : Vous êtes occupé(e)");
+        }else {
+            final IGameActor target = client.getCharacter().getCurrentMap().getActor(message.monsterGroupId);
+            if(target == null || ! (target instanceof MonsterGroup)){
+                client.send(new BasicNoOperationMessage());
+                return;
+            }
+            client.abortGameActions();
+            final Fight fight = new MonsterFight(client.getCharacter().getCurrentMap(), client,(MonsterGroup) target);
+            client.getCharacter().getCurrentMap().addFight(fight);
+        }
+
+    }
 
     @HandlerAttribute(ID = EmotePlayRequestMessage.MESSAGE_ID)
     public static void EmotePlayRequestMessage(WorldClient client, EmotePlayRequestMessage message) {
@@ -82,7 +102,7 @@ public class RolePlayHandler {
         }
         StatsEnum Stat = BOOST_ID_TO_STATS.get(message.statId);
         if (Stat == null) {
-            logger.error("Wrong statsid {}", message.statId);
+            log.error("Wrong statsid {}", message.statId);
             return;
         }
         if (message.boostPoint <= 0) {
@@ -169,7 +189,7 @@ public class RolePlayHandler {
             Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getCellid() : (Client.getCharacter().getCell().getId() - 13));
         } else {
             // Client.getCharacter().teleport(Message.mapId, -1);
-            logger.error("client {} teleport from {} to {}" ,Client.getCharacter().getNickName(),Client.getCharacter().getCurrentMap().getId(), Message.mapId);
+            log.error("client {} teleport from {} to {}" ,Client.getCharacter().getNickName(),Client.getCharacter().getCurrentMap().getId(), Message.mapId);
             Client.send(new BasicNoOperationMessage());
             //System.out.println("undefinied map");
         }

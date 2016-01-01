@@ -27,7 +27,7 @@ public class EffectSummonBomb extends EffectBase {
             if (MonsterLevel != null) {
                 if (CastInfos.caster.getFight().isCellWalkable(CastInfos.CellId)) {
                     BombFighter Bomb = new BombFighter(CastInfos.caster.getFight(), CastInfos.caster, MonsterLevel);
-                    Bomb.JoinFight();
+                    Bomb.joinFight();
                     Bomb.getFight().joinFightTeam(Bomb, CastInfos.caster.getTeam(), false, CastInfos.CellId, true);
                     CastInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, CastInfos.caster.getID(), (GameFightFighterInformations) Bomb.getGameContextActorInformations(null)));
                     CastInfos.caster.getFight().getFightWorker().summonFighter(Bomb);

@@ -1,5 +1,6 @@
 package koh.game.fights.types;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
@@ -53,10 +54,10 @@ public class ChallengeFight extends Fight {
         this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
         
          for (Fighter fighter : (Iterable<Fighter>) Winners.getFighters()::iterator) {
-            super.addNamedParty(fighter, FightOutcomeEnum.RESULT_VICTORY);
-            AtomicReference<Long> xpTotal = new AtomicReference<>();
-            xpTotal.set(FightFormulas.XPDefie(fighter, Winners.getFighters(), Loosers.getFighters()));
-            long GuildXp = FightFormulas.guildXpEarned((CharacterFighter) fighter, xpTotal), MountXp = FightFormulas.mountXpEarned((CharacterFighter) fighter, xpTotal);
+             super.addNamedParty(fighter, FightOutcomeEnum.RESULT_VICTORY);
+             final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, Winners.getFighters(), Loosers.getFighters()));
+
+            int guildXp = FightFormulas.guildXpEarned((CharacterFighter) fighter, xpTotal), mountXpountXp = FightFormulas.mountXpEarned((CharacterFighter) fighter, xpTotal);
             ((CharacterFighter) fighter).character.addExperience(xpTotal.get(), false);
             this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
@@ -66,12 +67,12 @@ public class ChallengeFight extends Fight {
                     this.showExperienceLevelFloor = true;
                     this.experienceNextLevelFloor = DAO.getExps().getPlayerMaxExp(fighter.getLevel());
                     this.showExperienceNextLevelFloor = fighter.getLevel() < 200;
-                    this.experienceFightDelta = xpTotal.get().intValue();
+                    this.experienceFightDelta = xpTotal.get();
                     this.showExperienceFightDelta = true;
-                    this.experienceForGuild = (int) GuildXp;
-                    this.showExperienceForGuild = GuildXp > 0;
-                    this.experienceForMount = (int) MountXp;
-                    this.showExperienceForMount = MountXp > 0;
+                    this.experienceForGuild =  guildXp;
+                    this.showExperienceForGuild = guildXp > 0;
+                    this.experienceForMount = mountXpountXp;
+                    this.showExperienceForMount = mountXpountXp > 0;
 
                 }
             }}));
@@ -88,34 +89,34 @@ public class ChallengeFight extends Fight {
     }
 
     @Override
-    public GameFightEndMessage leftEndMessage(Fighter f) {
-        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.ageBonus, this.lootShareLimitMalus, this.Fighters().filter(x -> x.getSummoner() == null).map(x -> new FightResultPlayerListEntry(x.getTeam().id == f.getTeam().id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.getID(), fightTime == -1 ? true : x.isAlive(), (byte) x.getLevel(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
+    public GameFightEndMessage leftEndMessage(CharacterFighter f) {
+        return new GameFightEndMessage((int) (System.currentTimeMillis() - this.fightTime), this.ageBonus, this.lootShareLimitMalus, this.fighters().filter(x -> x.getSummoner() == null).map(x -> new FightResultPlayerListEntry(x.getTeam().id == f.getTeam().id ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_VICTORY, (byte) 0, new FightLoot(new int[0], 0), x.getID(), fightTime == -1 ? true : x.isAlive(), (byte) x.getLevel(), new FightResultExperienceData[0])).collect(Collectors.toList()), new NamedPartyTeamWithOutcome[0]);
     }
 
     @Override
-    public synchronized void leaveFight(Fighter Fighter) {
+    public synchronized void leaveFight(Fighter fighter) {
         // Un persos quitte le combat
         switch (this.fightState) {
             case STATE_PLACE:
-                if (Fighter == Fighter.getTeam().leader) {
-                    Fighter.getTeam().getFighters().forEach(TeamFighter -> TeamFighter.setLife(0));
-                    Fighter.setLeft(true);
-                    this.endFight(this.getEnnemyTeam(Fighter.getTeam()), Fighter.getTeam());
+                if (fighter == fighter.getTeam().leader) {
+                    fighter.getTeam().getFighters().forEach(TeamFighter -> TeamFighter.setLife(0));
+                    fighter.setLeft(true);
+                    this.endFight(this.getEnnemyTeam(fighter.getTeam()), fighter.getTeam());
                 } else {
-                    this.map.sendToField(new GameFightUpdateTeamMessage(this.fightId, Fighter.getTeam().getFightTeamInformations()));
+                    this.map.sendToField(new GameFightUpdateTeamMessage(this.fightId, fighter.getTeam().getFightTeamInformations()));
 
-                    this.sendToField(new GameFightRemoveTeamMemberMessage(this.fightId, Fighter.getTeam().id, Fighter.getID()));
+                    this.sendToField(new GameFightRemoveTeamMemberMessage(this.fightId, fighter.getTeam().id, fighter.getID()));
 
-                    Fighter.leaveFight();
+                    fighter.leaveFight();
 
                     //Fighter.send(new GameLeaveMessage());
                 }
                 break;
             case STATE_ACTIVE:
-                if (Fighter.tryDie(Fighter.getID(), true) != -3) {
-                    Fighter.send(leftEndMessage(Fighter));
-                    this.sendToField(new GameFightLeaveMessage(Fighter.getID()));
-                    Fighter.leaveFight();
+                if (fighter.tryDie(fighter.getID(), true) != -3) {
+                    fighter.send(leftEndMessage((CharacterFighter)fighter));
+                    this.sendToField(new GameFightLeaveMessage(fighter.getID()));
+                    fighter.leaveFight();
                 }
                 break;
         }

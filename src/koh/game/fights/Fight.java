@@ -125,7 +125,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     //public static final ImprovedCachedThreadPool BackGroundWorker2 = new ImprovedCachedThreadPool(5, 50, 2);
     public static final ScheduledExecutorService BackGroundWorker = Executors.newScheduledThreadPool(50);
-    private static final Logger logger = LogManager.getLogger(Fight.class);
+    protected static final Logger logger = LogManager.getLogger(Fight.class);
 
     public static final Random RANDOM = new Random();
     private static final HashMap<Integer, HashMap<Integer, Short[]>> MAP_FIGHTCELLS = new HashMap<>();
@@ -136,7 +136,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected long myLoopActionTimeOut;
     protected int myNextID = -1000;
     protected ArrayList<GameAction> myActions = new ArrayList<>();
-    protected GameFightEndMessage myResult;
+    protected volatile GameFightEndMessage myResult;
 
     public enum FightLoopState {
 
@@ -174,12 +174,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         return this.myNextID--;
     }
 
-    public Fight(FightTypeEnum Type, DofusMap Map) {
+    public Fight(FightTypeEnum type, DofusMap map) {
         this.fightState = fightState.STATE_PLACE;
         this.fightTime = -1;
         this.creationTime = Instant.now().getEpochSecond();
-        this.fightType = Type;
-        this.map = Map;
+        this.fightType = type;
+        this.map = map;
         this.fightId = this.map.nextFightId();
         this.initCells();
     }
@@ -710,12 +710,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         // initialize des tours
         this.fightWorker.initTurns();
 
-        this.sendToField(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
+        this.sendToField(new GameEntitiesDispositionMessage(this.fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
         this.sendToField(new GameFightStartMessage(new Idol[0]));
         // Liste des tours
         //this.sendToField(new GameFightTurnListMessage(this.fightWorker.fighters().stream().filter(x -> x.isAlive()).mapToInt(x -> x.id).toArray(), this.fightWorker.fighters().stream().filter(x -> !x.isAlive()).mapToInt(x -> x.id).toArray()));
         this.sendToField(getFightTurnListMessage());
-        this.sendToField(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations(null)).toArray(GameFightFighterInformations[]::new)));
+        this.sendToField(new GameFightSynchronizeMessage(this.fighters().map(x -> x.getGameContextActorInformations(null)).toArray(GameFightFighterInformations[]::new)));
 
         // reset du ready
         this.setAllUnReady();
@@ -831,8 +831,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.currentFighter.send(((CharacterFighter) this.currentFighter).FighterStatsListMessagePacket());
         }
 
-        this.observers.stream().forEach((o) -> {
-            ((Player) o).send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations((Player) o)).toArray(GameFightFighterInformations[]::new)));
+        this.sendToField((o) -> {
+            ((Player) o).send(new GameFightSynchronizeMessage(this.fighters().map(x -> x.getGameContextActorInformations((Player) o)).toArray(GameFightFighterInformations[]::new)));
         });
 
         this.currentFighter.send(new GameFightTurnStartPlayingMessage());
@@ -1036,7 +1036,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         FightCell cell2 = fighterTarget.getMyCell();
         fighter.setCell(cell2);
         fighterTarget.setCell(cell);
-        this.Fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
+        this.fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
         this.sendToField(new GameFightPlacementSwapPositionsMessage(new IdentifiedEntityDispositionInformations[]{fighter.GetIdentifiedEntityDispositionInformations(), fighterTarget.GetIdentifiedEntityDispositionInformations()}));
     }
 
@@ -1061,7 +1061,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     private void setAllUnReady() {
-        this.Fighters().filter(x -> x instanceof CharacterFighter && ((CharacterFighter) x).character.getClient() != null).forEach(x -> x.turnReady = false);
+        this.fighters().filter(x -> x instanceof CharacterFighter && ((CharacterFighter) x).character.getClient() != null).forEach(x -> x.turnReady = false);
         /*foreach (var Fighter in this.fighters.Where(Fighter => Fighter is DoubleFighter))
          Fighter.turnReady = true;*/
     }
@@ -1080,8 +1080,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (Cell.CanWalk()) {
                 // Affectation
                 fighter.setCell(Cell);
-                this.Fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
-                this.sendToField(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
+                this.fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
+                this.sendToField(new GameEntitiesDispositionMessage(this.fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
             }
         }
     }
@@ -1092,8 +1092,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.myTeam2.setLeader(defender);
 
         // On despawn avant la vue du flag de combat
-        attacker.JoinFight();
-        defender.JoinFight();
+        attacker.joinFight();
+        defender.joinFight();
 
         // Flags de combat
         this.sendFightFlagInfos();
@@ -1104,7 +1104,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         // Si un timer pour le lancement du combat
         if (this.getStartTimer() != -1) {
-            //FIXME remove Thread.sleep
+            //FIXME: remove Thread.sleep
             this.startTimer(new CancellableScheduledRunnable(BackGroundWorker, (getStartTimer() * 1000)) {
                 @Override
                 public void run() {
@@ -1157,7 +1157,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void joinFightTeam(Fighter fighter, FightTeam team, boolean leader, short cell, boolean sendInfos) {
         if (!leader) {
-            fighter.JoinFight();
+            fighter.joinFight();
         }
 
         // Ajout a la team
@@ -1205,11 +1205,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (!update) {
             CharacterHandler.SendCharacterStatsListMessage(fighter.character.getClient());
         }
-        this.Fighters().forEach((Actor) -> {
+        this.fighters().forEach((Actor) -> {
             fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(null)));
         });
 
-        fighter.send(new GameEntitiesDispositionMessage(this.Fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
+        fighter.send(new GameEntitiesDispositionMessage(this.fighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
         fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam1().getFightTeamInformations()));
         fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam2().getFightTeamInformations()));
         if (update) {
@@ -1220,7 +1220,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
             });
         }
-        this.Fighters().forEach(x -> fighter.send(new GameFightHumanReadyStateMessage(x.getID(), x.turnReady)));
+        this.fighters().forEach(x -> fighter.send(new GameFightHumanReadyStateMessage(x.getID(), x.turnReady)));
     }
 
     public void onReconnect(CharacterFighter fighter) {
@@ -1231,7 +1231,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         } else {
             fighter.send(new GameFightStartingMessage(fightType.value, getTeam1().LeaderId, getTeam2().LeaderId));
             this.sendGameFightJoinMessage(fighter);
-            this.Fighters().forEach((Actor) -> {
+            this.fighters().forEach((Actor) -> {
                 fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(fighter.character)));
             });
             fighter.send(new GameEntitiesDispositionMessage(this.getAliveFighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
@@ -1247,7 +1247,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                        .filter(x -> x.getSummonerID() == fighter.getID() && (x instanceof BombFighter))
                             .count()));
             fighter.send(getFightTurnListMessage());
-            fighter.send(new GameFightSynchronizeMessage(this.Fighters().map(x -> x.getGameContextActorInformations(fighter.character)).toArray(GameFightFighterInformations[]::new)));
+            fighter.send(new GameFightSynchronizeMessage(this.fighters().map(x -> x.getGameContextActorInformations(fighter.character)).toArray(GameFightFighterInformations[]::new)));
 
             /*/213.248.126.93 ChallengeInfoMessage Second8 paket
              /213.248.126.93 ChallengeResultMessage Second9 paket*/
@@ -1355,7 +1355,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public boolean anyFighterMatchId(final int id) {
-        return this.Fighters().anyMatch(Fighter -> Fighter.getID() == id);
+        return this.fighters().anyMatch(Fighter -> Fighter.getID() == id);
     }
 
     public boolean isSequence(SequenceTypeEnum sequenceType) {
@@ -1412,8 +1412,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         this.creationTime = 0;
         this.fightTime = 0;
+        this.ageBonus = 0;
         this.endAllSequences();
-        this.Fighters().forEach(x -> x.EndFight());
+        this.fighters().forEach(x -> x.endFight());
 
         this.kickSpectators(true);
 
@@ -1457,7 +1458,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     }
 
-    public abstract GameFightEndMessage leftEndMessage(Fighter fighter);
+    public abstract GameFightEndMessage leftEndMessage(CharacterFighter fighter);
 
     protected boolean isStarted() {
         return this.fightState != fightState.STATE_INIT && this.fightState != fightState.STATE_PLACE;
@@ -1507,7 +1508,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     //Dont rename vulnerble
-    public Stream<Fighter> Fighters() {
+    public Stream<Fighter> fighters() {
         return Stream.concat(this.myTeam1.getFighters(), this.myTeam2.getFighters());
     }
 
@@ -1529,7 +1530,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public Fighter getFighter(int FighterId) {
-        return this.Fighters().filter(x -> x.getID() == FighterId).findFirst().orElse(null);
+        return this.fighters().filter(x -> x.getID() == FighterId).findFirst().orElse(null);
     }
 
     public boolean hasObjectOnCell(FightObjectType type, short cell) {

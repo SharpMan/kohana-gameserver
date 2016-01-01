@@ -276,7 +276,7 @@ public class FightHandler {
                 client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.WRONG_ALIGNMENT));
             } else {
                 target.getClient().abortGameActions();
-                Fight Fight = new AgressionFight(client.getCharacter().getCurrentMap(), client, target.getClient());
+                final Fight Fight = new AgressionFight(client.getCharacter().getCurrentMap(), client, target.getClient());
                 target.getCurrentMap().addFight(Fight);
             }
         }

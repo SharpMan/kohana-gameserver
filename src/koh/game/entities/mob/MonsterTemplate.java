@@ -68,6 +68,9 @@ public class MonsterTemplate {
     }
 
 
+    public MonsterGrade getGrade(int gr){
+        return this.grades.get(gr -1);
+    }
 
     public MonsterGrade getRandomGrade(SecureRandom rand){
         return this.grades.get(rand.nextInt(this.grades.size()));

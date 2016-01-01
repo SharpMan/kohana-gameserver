@@ -4,6 +4,7 @@ import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.protocol.client.enums.StatsEnum;
+import lombok.Getter;
 
 /**
  *
@@ -11,7 +12,8 @@ import koh.protocol.client.enums.StatsEnum;
  */
 public abstract class StaticFighter extends Fighter {
 
-    public MonsterGrade grade;
+    @Getter
+    protected MonsterGrade grade;
 
     public StaticFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
         super(Fight, Summoner);

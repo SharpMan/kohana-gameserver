@@ -50,6 +50,10 @@ public class Settings {
     private Byte[] registredChannels;
 
 
+    public double getDoubleElement(String e) {
+        return Double.parseDouble(fastElement(e));
+    }
+
     public int getIntElement(String e) {
         return Integer.parseInt(fastElement(e));
     }
