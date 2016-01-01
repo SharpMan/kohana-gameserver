@@ -283,7 +283,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (this.currentFighter.getID() == Fighter.getID()) {
             this.fightLoopState = fightLoopState.STATE_END_TURN;
         }
-        Fighter.turnReady = true;
+        Fighter.setTurnReady(true);
     }
 
     public void launchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend) {
@@ -760,7 +760,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         this.middleTurn();
                         this.beginTurn();
                     } else if (this.myLoopTimeOut + 5000 < System.currentTimeMillis()) {
-                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.turnReady && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).character.getNickName()).toArray(String[]::new), ", ")}));
+                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.isTurnReady() && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).character.getNickName()).toArray(String[]::new), ", ")}));
                         this.middleTurn();
                         this.beginTurn();
                     }
@@ -856,7 +856,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
          }
          }*/
         // Monstre passe le tour
-        if (/*this.currentFighter instanceof VirtualFighter*/this.currentFighter instanceof StaticFighter) {
+        if (this.currentFighter instanceof VirtualFighter || this.currentFighter instanceof StaticFighter) {
             this.fightLoopState = fightLoopState.STATE_WAIT_AI;
         }
     }
@@ -1046,9 +1046,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
 
-        fighter.turnReady = fighter.turnReady == false;
+        fighter.setTurnReady(!fighter.isTurnReady());
 
-        this.sendToField(new GameFightHumanReadyStateMessage(fighter.getID(), fighter.turnReady));
+        this.sendToField(new GameFightHumanReadyStateMessage(fighter.getID(), fighter.isTurnReady()));
 
         // Debut du combat si tout le monde ready
         if (this.isAllTurnReady() && this.fightType != FightTypeEnum.FIGHT_TYPE_PvT) {
@@ -1057,18 +1057,20 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     private boolean isAllTurnReady() {
-        return this.getAliveFighters().allMatch(Fighter -> Fighter.turnReady);
+        return this.getAliveFighters().allMatch(Fighter -> Fighter.isTurnReady());
     }
 
     private void setAllUnReady() {
-        this.fighters().filter(x -> x instanceof CharacterFighter && ((CharacterFighter) x).character.getClient() != null).forEach(x -> x.turnReady = false);
+        this.fighters()
+                .filter(fr -> fr instanceof CharacterFighter && ((CharacterFighter) fr).character.getClient() != null)
+                .forEach(fr -> fr.setTurnReady(false));
         /*foreach (var Fighter in this.fighters.Where(Fighter => Fighter is DoubleFighter))
          Fighter.turnReady = true;*/
     }
 
     public void setFighterPlace(Fighter fighter, short cellId) {
         // Deja pret ?
-        if (fighter.turnReady) {
+        if (fighter.isTurnReady()) {
             return;
         }
 
@@ -1220,7 +1222,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
             });
         }
-        this.fighters().forEach(x -> fighter.send(new GameFightHumanReadyStateMessage(x.getID(), x.turnReady)));
+        this.fighters()
+                .filter(fr -> !(fr instanceof VirtualFighter))
+                .forEach(fr -> fighter.send(new GameFightHumanReadyStateMessage(fr.getID(), fr.isTurnReady())));
     }
 
     public void onReconnect(CharacterFighter fighter) {

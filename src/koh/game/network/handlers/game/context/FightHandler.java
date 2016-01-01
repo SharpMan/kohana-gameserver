@@ -92,7 +92,7 @@ public class FightHandler {
             return;
         }
 
-        Client.getCharacter().getFighter().turnReady = true;
+        Client.getCharacter().getFighter().setTurnReady(true);
     }
 
     @HandlerAttribute(ID = 255)

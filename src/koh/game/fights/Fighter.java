@@ -96,6 +96,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     protected FighterState states;
     @Getter
     protected AtomicInteger nextBuffUid = new AtomicInteger();
+    protected short nextCell;
+    protected byte nextDir;
+    @Getter @Setter
+    protected boolean turnReady = true;
 
     /**
      * Virtual Method
@@ -298,14 +302,11 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         }
     }
 
-    public short nextCell;
-    public byte nextDir;
-
     public abstract int getLevel();
 
     public abstract short getMapCell();
 
-    public boolean turnReady = true;
+
 
     public boolean canBeginTurn() {
         if (this.isDead()) {
