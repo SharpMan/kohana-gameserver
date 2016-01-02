@@ -1496,10 +1496,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     /*public void RemakeTurns() {
      this.fightWorker.RemakeTurns(this.fighters());
      }*/
-    public synchronized void addNamedParty(Fighter fighter, int Outcome) {
+    public synchronized void addNamedParty(CharacterFighter fighter, int outcome) {
         if (fighter instanceof CharacterFighter) {
-            if (((CharacterFighter) fighter).character.getClient() != null && ((CharacterFighter) fighter).character.getClient().getParty() != null && !((CharacterFighter) fighter).character.getClient().getParty().partyName.isEmpty() && !Arrays.stream(this.myResult.namedPartyTeamsOutcomes).anyMatch(x -> x.team.partyName.equalsIgnoreCase(((CharacterFighter) fighter).character.getClient().getParty().partyName))) {
-                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(fighter.getTeam().id, ((CharacterFighter) fighter).character.getClient().getParty().partyName), Outcome));
+            if (((CharacterFighter) fighter).character.getClient() != null && ((CharacterFighter) fighter).character.getClient().getParty() != null
+                    && !((CharacterFighter) fighter).character.getClient().getParty().partyName.isEmpty()
+                    && !Arrays.stream(this.myResult.namedPartyTeamsOutcomes)
+                              .anyMatch(x -> x.team.partyName.equalsIgnoreCase(((CharacterFighter) fighter).character.getClient().getParty().partyName))) {
+                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(fighter.getTeam().id, ((CharacterFighter) fighter).character.getClient().getParty().partyName), outcome));
             }
         }
     }

@@ -45,7 +45,7 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                     .forEach(sub -> {
                         Arrays.stream(sub.getMapIds())
                                 .mapToObj(id -> mapDAO.findTemplate(id))
-                                .filter(x -> x != null)
+                                .filter(map -> map != null && !(map.getPosition() != null && map.getPosition().getWorldMap() == -1)) // On ne spawn pas dans les maisons
                                 .forEach(map -> {
                                     final int monsterRemaining = MONSTER_GROUP_PER_MAP - map.getMonsters().size();
                                     if (monsterRemaining > 0) {
@@ -99,7 +99,7 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
             DofusMap map;
             while (result.next()) {
                 map = mapDAO.findTemplate(result.getInt("map"));
-                if (map == null || (map.getPosition() != null && map.getPosition().getWorldMap() == -1)) {
+                if (map == null) {
                     continue;
                 }
                 map.addMonster(MonsterGroup.builder()

@@ -1,15 +1,17 @@
 package koh.game.fights;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
+import koh.game.entities.mob.MonsterDrop;
+import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.fighters.CharacterFighter;
+import koh.game.fights.fighters.DroppedItem;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -46,8 +48,8 @@ public class FightFormulas {
         }
         else
         {
-            int num = fighter.getTeam().getFighters(false).mapToInt(entry -> entry.getLevel()).sum();
-            byte maxPlayerLevel = (byte) fighter.getTeam().getFighters(false).mapToInt(entry -> entry.getLevel()).max().orElse(0);
+            int num = fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).sum();
+            byte maxPlayerLevel = (byte) fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).max().orElse(0);
             int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr .getLevel()).sum();
             byte b = (byte) Arrays.stream(droppersResults).mapToInt(dr -> dr .getLevel()).max().orElse(0);
             int num3 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getGrade().getGradeXp()).sum();
@@ -294,43 +296,92 @@ public class FightFormulas {
                 TotalGradeLooserForEached++;
             }
             int EcartGrade = (TotalGradeWinner / TotalGradeWinnerForEached) - (TotalGradeLooser / TotalGradeLooserForEached);
-            int RandomPerte = 0;
+            int randomPerte = 0;
             switch (TotalGradeWinner) {
                 case 1:
-                    RandomPerte = EffectHelper.randomValue(40, 50);
+                    randomPerte = EffectHelper.randomValue(40, 50);
                     break;
                 case 2:
-                    RandomPerte = EffectHelper.randomValue(50, 60);
+                    randomPerte = EffectHelper.randomValue(50, 60);
                     break;
                 case 3:
-                    RandomPerte = EffectHelper.randomValue(60, 70);
+                    randomPerte = EffectHelper.randomValue(60, 70);
                     break;
                 case 4:
-                    RandomPerte = EffectHelper.randomValue(70, 80);
+                    randomPerte = EffectHelper.randomValue(70, 80);
                     break;
                 case 5:
-                    RandomPerte = EffectHelper.randomValue(80, 90);
+                    randomPerte = EffectHelper.randomValue(80, 90);
                     break;
                 case 6:
-                    RandomPerte = EffectHelper.randomValue(100, 200);
+                    randomPerte = EffectHelper.randomValue(100, 200);
                     break;
                 case 7:
-                    RandomPerte = EffectHelper.randomValue(200, 300);
+                    randomPerte = EffectHelper.randomValue(200, 300);
                     break;
                 case 8:
-                    RandomPerte = EffectHelper.randomValue(300, 400);
+                    randomPerte = EffectHelper.randomValue(300, 400);
                     break;
                 case 9:
-                    RandomPerte = EffectHelper.randomValue(400, 500);
+                    randomPerte = EffectHelper.randomValue(400, 500);
                     break;
                 case 10:
-                    RandomPerte = 500;
+                    randomPerte = 500;
                     break;
             }
-            return (short) -(TotalGradeWinner <= 5 ? (RandomPerte + (EcartGrade > 0 ? 10 * EcartGrade : 0)) : (RandomPerte + (EcartGrade > 0 ? 20 * EcartGrade : 0)));
+            return (short) -(TotalGradeWinner <= 5 ? (randomPerte + (EcartGrade > 0 ? 10 * EcartGrade : 0)) : (randomPerte + (EcartGrade > 0 ? 20 * EcartGrade : 0)));
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
         }
+    }
+
+
+    public static double adjustDropChance(Fighter looter, MonsterDrop item, MonsterGrade dropper, int monsterAgeBonus)
+    {
+       return item.getDropRate((int)dropper.getGrade()) * ((double)looter.getStats().getTotal(StatsEnum.Prospecting) / 100.0) * ((double)monsterAgeBonus / 100.0 + 1.0) *  DAO.getSettings().getDoubleElement("Rate.Kamas");
+     }
+
+
+    public static List<DroppedItem> rollLoot(Fighter looter, MonsterGrade mob, int prospectingSum, Map<MonsterDrop,Integer> droppedItems)
+    {
+            List<DroppedItem> list = new ArrayList<>(5);
+            mob.getMonster().getDrops()
+                    .stream()
+                    .filter(drop -> prospectingSum >= drop.getProspectingLock())
+                    .forEach(current -> {
+                        if((current.getDropLimit() <= 0 || !droppedItems.containsKey(current) || droppedItems.get(current) < current.getDropLimit()))
+                        {
+                            double num2 = (double) looter.getRANDOM().nextInt(100) + looter.getRANDOM().nextDouble();
+                            double num3 = adjustDropChance(looter, current, mob, (int)looter.getFight().ageBonus);
+                            if (num3 >= num2)
+                            {
+                                Optional<DroppedItem> item = list.stream()
+                                    .filter(dr -> dr.getItem() == current.getObjectId())
+                                    .findFirst();
+                                if(item.isPresent()){
+                                    item.get().accumulateQuantity();
+                                }
+                                else
+                                    list.add(new DroppedItem(current.getObjectId(), 1));
+
+                                if (!droppedItems.containsKey(current))
+                                {
+                                    droppedItems.put(current, 1);
+                                }
+                                else
+                                {
+                                    droppedItems.put(current, droppedItems.get(current)+ 1);
+                                }
+                            }
+                        }
+                    });
+        return list;
+    }
+
+
+    public static int computeKamas(Fighter fighter, int baseKamas, int teamPP) {
+        double num = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
+        return (int)((double)baseKamas * ((double) fighter.getStats().getTotal(StatsEnum.Prospecting) / (double)teamPP) * num *  DAO.getSettings().getDoubleElement("Rate.Kamas"));
     }
 }

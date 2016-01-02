@@ -43,7 +43,7 @@ public class ChallengeFight extends Fight {
     }
 
     @Override
-    public void endFight(FightTeam Winners, FightTeam Loosers) {
+    public void endFight(FightTeam winners, FightTeam loosers) {
 
         if(this.fightTime == -1){
             this.myResult = new GameFightEndMessage(0, this.ageBonus, this.lootShareLimitMalus);
@@ -53,9 +53,9 @@ public class ChallengeFight extends Fight {
         
         this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
         
-         for (Fighter fighter : (Iterable<Fighter>) Winners.getFighters()::iterator) {
-             super.addNamedParty(fighter, FightOutcomeEnum.RESULT_VICTORY);
-             final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, Winners.getFighters(), Loosers.getFighters()));
+         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
+             super.addNamedParty(((CharacterFighter) fighter), FightOutcomeEnum.RESULT_VICTORY);
+             final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, winners.getFighters(), loosers.getFighters()));
 
             int guildXp = FightFormulas.guildXpEarned((CharacterFighter) fighter, xpTotal), mountXpountXp = FightFormulas.mountXpEarned((CharacterFighter) fighter, xpTotal);
             ((CharacterFighter) fighter).character.addExperience(xpTotal.get(), false);
@@ -78,9 +78,9 @@ public class ChallengeFight extends Fight {
             }}));
         }
 
-        for (Fighter Fighter : (Iterable<Fighter>) Loosers.getFighters()::iterator) {
-            super.addNamedParty(Fighter, FightOutcomeEnum.RESULT_LOST);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, Fighter.getWave(), new FightLoot(new int[0], 0), Fighter.getID(), Fighter.isAlive(), (byte) Fighter.getLevel(), new FightResultExperienceData[0]));
+        for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
+            super.addNamedParty(((CharacterFighter) fighter), FightOutcomeEnum.RESULT_LOST);
+            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
         }
 
        

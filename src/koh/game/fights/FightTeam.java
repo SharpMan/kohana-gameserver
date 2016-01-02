@@ -50,10 +50,6 @@ public class FightTeam {
         this.Fight = f;
     }
 
-    public Stream<Fighter> getFighters(boolean isSummoned) {
-        return this.myFighters.stream().filter(fighter -> fighter.getSummoner() == null);
-    }
-
     public Stream<Fighter> getFighters() {
         return this.myFighters.stream();
     }
@@ -64,6 +60,12 @@ public class FightTeam {
 
     public Stream<Fighter> getDeadFighters() {
         return this.myFighters.stream().filter(x -> !x.isAlive());
+    }
+
+    public Stream<MonsterFighter> getAsMonster(){
+        return this.getFighters()
+                .filter(fr -> fr instanceof MonsterFighter)
+                .map(fr -> ((MonsterFighter)fr));
     }
 
     public FighterRefusedReasonEnum canJoin(Player Character) {

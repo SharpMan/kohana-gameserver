@@ -21,7 +21,7 @@ import lombok.Setter;
  * @author Neo-Craft
  */
 public class MonsterFighter extends VirtualFighter {
-    
+
     @Getter @Setter private MonsterGrade grade;
     @Getter @Setter private MonsterGroup monsterGroup;
 

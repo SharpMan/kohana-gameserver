@@ -63,6 +63,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         this.summoner = summoner;
     }
 
+    @Getter
     private static final Random RANDOM = new Random();
 
     protected boolean dead;

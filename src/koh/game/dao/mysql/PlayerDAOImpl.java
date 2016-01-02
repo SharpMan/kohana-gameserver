@@ -3,8 +3,8 @@ package koh.game.dao.mysql;
 import com.google.inject.Inject;
 import koh.d2o.Couple;
 import koh.game.MySQL;
-import koh.game.dao.DAO;
 import koh.game.dao.DatabaseSource;
+import koh.game.dao.api.MapDAO;
 import koh.game.dao.api.PlayerDAO;
 import koh.game.entities.Account;
 import koh.game.entities.actors.Player;
@@ -34,7 +34,11 @@ import java.util.stream.Stream;
 public class PlayerDAOImpl extends PlayerDAO {
 
     public static final int MAX_CHARACTER_SLOT = 5;
+
     private static final Logger logger = LogManager.getLogger(PlayerDAO.class);
+
+    @Inject
+    private MapDAO maps;
 
 
     private final void scheduleLoader(){
@@ -138,7 +142,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .scales(stringToShortArray(result.getString("scales")))
                             .level(result.getInt("level"))
                             .account(account)
-                            .currentMap(DAO.getMaps().findTemplate(result.getInt("map")).init$Return())
+                            .currentMap(maps.findTemplate(result.getInt("map")).init$Return())
                             .spellPoints(result.getInt("spell_points"))
                             .statPoints(result.getInt("stat_points"))
                             .vitality(Integer.parseInt(result.getString("stats").split(",")[0]))
@@ -306,8 +310,6 @@ public class PlayerDAOImpl extends PlayerDAO {
 
         try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("SELECT 1 FROM `character` WHERE LOWER(nickname) = LOWER(?);")) {
             PreparedStatement pStatement = conn.getStatement();
-
-            //FIXME SELECT 1 FROM characters WHERE name=@0
             pStatement.setString(1, name);
 
             return pStatement.executeQuery().first();

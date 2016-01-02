@@ -26,7 +26,7 @@ public class MonsterDrop {
     public MonsterDrop(ResultSet result) throws SQLException {
         dropId = result.getInt("drop_id");
         monsterId = result.getInt("monster_id");
-        objectId = result.getInt("monster_id");
+        objectId = result.getInt("object_id");
         percentDropForGrade1 = result.getDouble("percent_drop_for_grade1");
         percentDropForGrade2 = result.getDouble("percent_drop_for_grade2");
         percentDropForGrade3 = result.getDouble("percent_drop_for_grade3");
@@ -37,4 +37,40 @@ public class MonsterDrop {
         hasCriteria = result.getBoolean("has_criteria");
         criteria = result.getString("criteria");
     }
+
+    public double getDropRate(int grade)
+    {
+        double result;
+        if (grade <= 1)
+        {
+            result = this.percentDropForGrade1;
+        }
+        else
+        {
+            if (grade == 2)
+            {
+                result = this.percentDropForGrade2;
+            }
+            else
+            {
+                if (grade == 3)
+                {
+                    result = this.percentDropForGrade3;
+                }
+                else
+                {
+                    if (grade == 4)
+                    {
+                        result = this.percentDropForGrade4;
+                    }
+                    else
+                    {
+                        result = this.percentDropForGrade5;
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }
+
