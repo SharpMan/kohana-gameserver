@@ -54,6 +54,10 @@ public class FightTeam {
         return this.myFighters.stream();
     }
 
+    public Stream<Fighter> getFightersNotSummoned() {
+        return this.getFighters().filter(fr -> !fr.hasSummoner());
+    }
+
     public Stream<Fighter> getAliveFighters() {
         return this.myFighters.stream().filter(x -> x.isAlive());
     }
@@ -83,7 +87,7 @@ public class FightTeam {
             return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
         }
         if (this.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)) {
-            if (!(((CharacterFighter) this.leader).character.getClient().getParty() != null && ((CharacterFighter) this.leader).character.getClient().getParty().containsPlayer(Character))) {
+            if (!(((CharacterFighter) this.leader).getCharacter().getClient().getParty() != null && ((CharacterFighter) this.leader).getCharacter().getClient().getParty().containsPlayer(Character))) {
                 return FighterRefusedReasonEnum.TEAM_LIMITED_BY_MAINCHARACTER;
             }
         }

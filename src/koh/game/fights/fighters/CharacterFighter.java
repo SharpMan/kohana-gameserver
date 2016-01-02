@@ -41,8 +41,8 @@ import lombok.Getter;
 public class CharacterFighter extends Fighter {
 
     @Getter
-    public Player character;
-    public EntityLook Look;
+    private Player character;
+
 
     public CharacterFighter(Fight Fight, WorldClient client) {
         super(Fight, null);

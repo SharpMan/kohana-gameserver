@@ -278,12 +278,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         StatsEnum.DamageLifeNeutre, StatsEnum.DamageLifeEau, StatsEnum.DamageLifeTerre, StatsEnum.DamageLifeAir, StatsEnum.DamageLifeFeu, StatsEnum.DamageDropLife
     };
 
-    public void disconnect(CharacterFighter Fighter) {
-        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 182, new String[]{Fighter.character.getNickName(), Integer.toString(Fighter.getTurnRunning())}));
-        if (this.currentFighter.getID() == Fighter.getID()) {
+    public void disconnect(CharacterFighter fighter) {
+        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 182, new String[]{fighter.getCharacter().getNickName(), Integer.toString(fighter.getTurnRunning())}));
+        if (this.currentFighter.getID() == fighter.getID()) {
             this.fightLoopState = fightLoopState.STATE_END_TURN;
         }
-        Fighter.setTurnReady(true);
+        fighter.setTurnReady(true);
     }
 
     public void launchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend) {
@@ -760,7 +760,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         this.middleTurn();
                         this.beginTurn();
                     } else if (this.myLoopTimeOut + 5000 < System.currentTimeMillis()) {
-                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.isTurnReady() && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).character.getNickName()).toArray(String[]::new), ", ")}));
+                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.isTurnReady() && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).getCharacter().getNickName()).toArray(String[]::new), ", ")}));
                         this.middleTurn();
                         this.beginTurn();
                     }
@@ -841,7 +841,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.myLoopTimeOut = System.currentTimeMillis() + this.getTurnTime();
 
         // status en attente de fin de tour
-        if ((this.currentFighter instanceof CharacterFighter && ((CharacterFighter) currentFighter).character.getClient() == null && this.currentFighter.getTeam().getAliveFighters().count() > 1L) || this.currentFighter.getBuff().getAllBuffs().anyMatch(x-> x instanceof BuffEndTurn)) {
+        if ((this.currentFighter instanceof CharacterFighter && ((CharacterFighter) currentFighter).getCharacter().getClient() == null && this.currentFighter.getTeam().getAliveFighters().count() > 1L) || this.currentFighter.getBuff().getAllBuffs().anyMatch(x-> x instanceof BuffEndTurn)) {
             this.fightLoopState = fightLoopState.STATE_END_TURN;
         } else {
             this.fightLoopState = fightLoopState.STATE_WAIT_TURN;
@@ -1062,7 +1062,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     private void setAllUnReady() {
         this.fighters()
-                .filter(fr -> fr instanceof CharacterFighter && ((CharacterFighter) fr).character.getClient() != null)
+                .filter(fr -> fr instanceof CharacterFighter && ((CharacterFighter) fr).getCharacter().getClient() != null)
                 .forEach(fr -> fr.setTurnReady(false));
         /*foreach (var Fighter in this.fighters.Where(Fighter => Fighter is DoubleFighter))
          Fighter.turnReady = true;*/
@@ -1205,7 +1205,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         fighter.send(new GameFightPlacementPossiblePositionsMessage(this.myFightCells.get(myTeam1).keySet().stream().mapToInt(x -> x.intValue()).toArray(), this.myFightCells.get(myTeam2).keySet().stream().mapToInt(x -> x.intValue()).toArray(), fighter.getTeam().id));
 
         if (!update) {
-            CharacterHandler.SendCharacterStatsListMessage(fighter.character.getClient());
+            CharacterHandler.SendCharacterStatsListMessage(fighter.getCharacter().getClient());
         }
         this.fighters().forEach((Actor) -> {
             fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(null)));
@@ -1498,11 +1498,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
      }*/
     public synchronized void addNamedParty(CharacterFighter fighter, int outcome) {
         if (fighter instanceof CharacterFighter) {
-            if (((CharacterFighter) fighter).character.getClient() != null && ((CharacterFighter) fighter).character.getClient().getParty() != null
-                    && !((CharacterFighter) fighter).character.getClient().getParty().partyName.isEmpty()
+            if (((CharacterFighter) fighter).getCharacter().getClient() != null && ((CharacterFighter) fighter).getCharacter().getClient().getParty() != null
+                    && !((CharacterFighter) fighter).getCharacter().getClient().getParty().partyName.isEmpty()
                     && !Arrays.stream(this.myResult.namedPartyTeamsOutcomes)
-                              .anyMatch(x -> x.team.partyName.equalsIgnoreCase(((CharacterFighter) fighter).character.getClient().getParty().partyName))) {
-                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(fighter.getTeam().id, ((CharacterFighter) fighter).character.getClient().getParty().partyName), outcome));
+                              .anyMatch(x -> x.team.partyName.equalsIgnoreCase(((CharacterFighter) fighter).getCharacter().getClient().getParty().partyName))) {
+                this.myResult.namedPartyTeamsOutcomes = ArrayUtils.add(this.myResult.namedPartyTeamsOutcomes, new NamedPartyTeamWithOutcome(new NamedPartyTeam(fighter.getTeam().id, ((CharacterFighter) fighter).getCharacter().getClient().getParty().partyName), outcome));
             }
         }
     }

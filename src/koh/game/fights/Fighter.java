@@ -846,4 +846,18 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return false;
     }
 
+    public boolean isPlayer(){
+        return this instanceof  CharacterFighter;
+    }
+
+    public CharacterFighter asPlayer(){
+        return (CharacterFighter) this;
+    }
+
+    public Player getPlayer(){
+        return ((CharacterFighter) this).getCharacter();
+    }
+
+    public boolean hasSummoner() { return this.summoner !=null; }
+
 }

@@ -69,7 +69,7 @@ public class FightFormulas {
             }
             double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
             double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
-            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.Wisdom)) / 100.0) * num8 * fighter.character.getExpBonus());
+            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.Wisdom)) / 100.0) * num8 * fighter.getCharacter().getExpBonus());
         }
         return result;
     }
@@ -86,26 +86,26 @@ public class FightFormulas {
         return honorPoint(Fighter, Winners, Lossers, isLosser, true);
     }
 
-    public static short honorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser, boolean End) {
+    public static short honorPoint(Fighter fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser, boolean End) {
 
-        if (Fighter.getFight().getEnnemyTeam(Fighter.getTeam()).alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
+        if (fighter.getFight().getEnnemyTeam(fighter.getTeam()).alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
             return (short) 0;
         }
 
-        if (System.currentTimeMillis() - Fighter.getFight().getFightTime() > 2 * 60 * 1000) {
-            ((CharacterFighter) Fighter).character.addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
+        if (System.currentTimeMillis() - fighter.getFight().getFightTime() > 2 * 60 * 1000) {
+            ((CharacterFighter) fighter).getCharacter().addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
         }
 
-        if (End && Fighter.getFight().getWinners().getFighters().count() == 1L && Fighter.getFight().getWinners().getFighters().count() == Fighter.getFight().getEnnemyTeam(Fighter.getFight().getWinners()).getFighters().count()) {
+        if (End && fighter.getFight().getWinners().getFighters().count() == 1L && fighter.getFight().getWinners().getFighters().count() == fighter.getFight().getEnnemyTeam(fighter.getFight().getWinners()).getFighters().count()) {
             return isLosser ? calculLooseHonor(Winners, Lossers) : calculWinHonor(Winners, Lossers);
         }
 
         double num1 = (double) Winners.mapToInt(x -> x.getLevel()).sum();
         double num2 = (double) Lossers.mapToInt(x -> x.getLevel()).sum();
-        double num3 = Math.floor(Math.sqrt((double) Fighter.getLevel()) * 10.0 * (num2 / num1));
+        double num3 = Math.floor(Math.sqrt((double) fighter.getLevel()) * 10.0 * (num2 / num1));
         if (isLosser) {
-            if (num3 > ((CharacterFighter) Fighter).character.getHonor()) {
-                num3 = -(short) ((CharacterFighter) Fighter).character.getHonor();
+            if (num3 > fighter.getPlayer().getHonor()) {
+                num3 = -(short) fighter.getPlayer().getHonor();
             } else {
                 num3 = -num3;
             }
@@ -139,16 +139,16 @@ public class FightFormulas {
     }
 
     public static int guildXpEarned(CharacterFighter Fighter, AtomicInteger xpWin) {
-        if (Fighter.character == null || xpWin.get() == 0) {
+        if (Fighter.getCharacter() == null || xpWin.get() == 0) {
             return 0;
         }
-        if (Fighter.character.getGuild() == null) {
+        if (Fighter.getCharacter().getGuild() == null) {
             return 0;
         }
 
-        GuildMember gm = Fighter.character.getGuildMember();
+        GuildMember gm = Fighter.getCharacter().getGuildMember();
 
-        double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.character.getGuild().entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
+        double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.getCharacter().getGuild().entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
         double maxP = xp * pXpGive * 0.10;    //Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
         double diff = Math.abs(Lvl - LvlGuild);    //Calcul l'écart entre le niveau du personnage et le niveau de la guilde
@@ -165,7 +165,7 @@ public class FightFormulas {
         }
         xpWin.set((int) (xp - xp * pXpGive));
 
-        Fighter.character.getGuild().onFighterAddedExperience(gm, (long) Math.round(toGuild));
+        Fighter.getCharacter().getGuild().onFighterAddedExperience(gm, (long) Math.round(toGuild));
 
         return (int) Math.round(toGuild);
     }
@@ -174,18 +174,18 @@ public class FightFormulas {
         if (fighter == null || xpWin.get() == 0) {
             return 0;
         }
-        if (fighter.character.getMountInfo() == null) {
-            logger.error("mountInfo Null {} ", fighter.character.toString());
+        if (fighter.getCharacter().getMountInfo() == null) {
+            logger.error("mountInfo Null {} ", fighter.getCharacter().toString());
         }
-        if (!fighter.character.getMountInfo().isToogled) {
+        if (!fighter.getCharacter().getMountInfo().isToogled) {
             return 0;
         }
 
-        int diff = Math.abs(fighter.getLevel() - fighter.character.getMountInfo().mount.level);
+        int diff = Math.abs(fighter.getLevel() - fighter.getCharacter().getMountInfo().mount.level);
 
         double coeff = 0;
         double xp = (double) xpWin.get();
-        double pToMount = (double) fighter.character.getMountInfo().ratio / 100 + 0.2;
+        double pToMount = (double) fighter.getCharacter().getMountInfo().ratio / 100 + 0.2;
 
         if (diff >= 0 && diff <= 9) {
             coeff = 0.1;
@@ -209,10 +209,10 @@ public class FightFormulas {
             xpWin.set((int) (xp - (xp * (pToMount - 0.2))));
         }
 
-        fighter.character.getMountInfo().addExperience((long) Math.round(xp * pToMount * coeff));
+        fighter.getCharacter().getMountInfo().addExperience((long) Math.round(xp * pToMount * coeff));
 
         if (xp > 0) {
-            fighter.character.send(new MountSetMessage(fighter.character.getMountInfo().mount));
+            fighter.getCharacter().send(new MountSetMessage(fighter.getCharacter().getMountInfo().mount));
         }
 
         return (int) Math.round(xp * pToMount * coeff);
@@ -220,38 +220,38 @@ public class FightFormulas {
 
     public static short calculWinHonor(Stream<Fighter> winners, Stream<Fighter> loosers) {
         try {
-            int TotalGradeWinner = 0;
-            int TotalGradeLooser = 0;
-            int TotalGradeWinnerForEached = 0;
-            int TotalGradeLooserForEached = 0;
+            int totalGradeWinner = 0;
+            int totalGradeLooser = 0;
+            int totalGradeWinnerForEached = 0;
+            int totalGradeLooserForEached = 0;
             for (Fighter fighter : (Iterable<Fighter>) winners::iterator) {
                 if (!(fighter instanceof CharacterFighter) /*&& fighter.getPrisme() == null*/) {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeWinner += ((CharacterFighter) fighter).character.getAlignmentGrade();
+                    totalGradeWinner += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
 
-                TotalGradeWinnerForEached++;
+                totalGradeWinnerForEached++;
             }
             for (Fighter fighter : (Iterable<Fighter>) loosers::iterator) {
                 if (!(fighter instanceof CharacterFighter) /*&& fighter.getPrisme() == null*/) {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeLooser += ((CharacterFighter) fighter).character.getAlignmentGrade();
+                    totalGradeLooser += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
 
-                TotalGradeLooserForEached++;
+                totalGradeLooserForEached++;
             }
-            int EcartGrade = (TotalGradeWinner / TotalGradeWinnerForEached) - (TotalGradeLooser / TotalGradeLooserForEached);
-            int RandomGain = EffectHelper.randomValue(100, 120);
-            int RandomGain2 = EffectHelper.randomValue(140, 160);
-            return (short) (TotalGradeWinner <= 5 ? (RandomGain + (EcartGrade < 0 ? 10 * -EcartGrade : 0)) : (RandomGain2 + (EcartGrade < 0 ? 10 * -EcartGrade : 7 * -EcartGrade)));
+            int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
+            int randomGain = EffectHelper.randomValue(100, 120);
+            int randomValue = EffectHelper.randomValue(140, 160);
+            return (short) (totalGradeWinner <= 5 ? (randomGain + (ecartGrade < 0 ? 10 * -ecartGrade : 0)) : (randomValue + (ecartGrade < 0 ? 10 * -ecartGrade : 7 * -ecartGrade)));
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -260,37 +260,37 @@ public class FightFormulas {
 
     public static short calculLooseHonor(Stream<Fighter> loosers, Stream<Fighter> winners) {
         try {
-            int TotalGradeWinner = 0;
-            int TotalGradeLooser = 0;
-            int TotalGradeWinnerForEached = 0;
-            int TotalGradeLooserForEached = 0;
+            int totalGradeWinner = 0;
+            int totalGradeLooser = 0;
+            int totalGradeWinnerForEached = 0;
+            int totalGradeLooserForEached = 0;
             for (Fighter fighter : (Iterable<Fighter>) winners::iterator) {
                 if (!(fighter instanceof CharacterFighter) /*&& fighter.getPrisme() == null*/) {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeWinner += ((CharacterFighter) fighter).character.getAlignmentGrade();
+                    totalGradeWinner += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
 
-                TotalGradeWinnerForEached++;
+                totalGradeWinnerForEached++;
             }
             for (Fighter fighter : (Iterable<Fighter>) loosers::iterator) {
                 if (!(fighter instanceof CharacterFighter) /*&& fighter.getPrisme() == null*/) {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    TotalGradeLooser += ((CharacterFighter) fighter).character.getAlignmentGrade();
+                    totalGradeLooser += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
 
-                TotalGradeLooserForEached++;
+                totalGradeLooserForEached++;
             }
-            int EcartGrade = (TotalGradeWinner / TotalGradeWinnerForEached) - (TotalGradeLooser / TotalGradeLooserForEached);
+            int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
             int randomPerte = 0;
-            switch (TotalGradeWinner) {
+            switch (totalGradeWinner) {
                 case 1:
                     randomPerte = EffectHelper.randomValue(40, 50);
                     break;
@@ -322,7 +322,7 @@ public class FightFormulas {
                     randomPerte = 500;
                     break;
             }
-            return (short) -(TotalGradeWinner <= 5 ? (randomPerte + (EcartGrade > 0 ? 10 * EcartGrade : 0)) : (randomPerte + (EcartGrade > 0 ? 20 * EcartGrade : 0)));
+            return (short) -(totalGradeWinner <= 5 ? (randomPerte + (ecartGrade > 0 ? 10 * ecartGrade : 0)) : (randomPerte + (ecartGrade > 0 ? 20 * ecartGrade : 0)));
         } catch (Exception e) {
             e.printStackTrace();
             return 0;

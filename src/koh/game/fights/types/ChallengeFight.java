@@ -58,11 +58,11 @@ public class ChallengeFight extends Fight {
              final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, winners.getFighters(), loosers.getFighters()));
 
             int guildXp = FightFormulas.guildXpEarned((CharacterFighter) fighter, xpTotal), mountXpountXp = FightFormulas.mountXpEarned((CharacterFighter) fighter, xpTotal);
-            ((CharacterFighter) fighter).character.addExperience(xpTotal.get(), false);
+            ((CharacterFighter) fighter).getCharacter().addExperience(xpTotal.get(), false);
 
             this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
-                    this.experience = ((CharacterFighter) fighter).character.getExperience();
+                    this.experience = ((CharacterFighter) fighter).getCharacter().getExperience();
                     this.showExperience = true;
                     this.experienceLevelFloor = DAO.getExps().getPlayerMinExp(fighter.getLevel());
                     this.showExperienceLevelFloor = true;
