@@ -4,13 +4,16 @@ import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.MonsterGroup;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.item.EffectHelper;
+import koh.game.entities.item.InventoryItem;
+import koh.game.entities.item.Weapon;
 import koh.game.entities.mob.MonsterDrop;
-import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.*;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.DroppedItem;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.network.WorldClient;
+import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.fight.*;
 import koh.protocol.types.game.context.fight.FightLoot;
@@ -90,33 +93,35 @@ public class MonsterFight extends Fight {
             //On efface les anciens fakes results et on laisse celui des gens qui ont abondonnee maybe ils ont xp ?
         }
         final int teamPP = winners.getFighters().mapToInt(fr -> fr.getStats().getTotal(StatsEnum.Prospecting)).sum();
-        final int baseKamas = loosers.equals(this.myTeam2) ?  0 : 0;
-        final HashMap<MonsterDrop,Integer> droppedItems = new HashMap<>();
+        final int baseKamas = loosers.equals(this.myTeam2) ? 0 : 0;
+        final HashMap<MonsterDrop, Integer> droppedItems = new HashMap<>();
 
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) { //In stream.foreach you should use final var that suck
-            if(fighter instanceof CharacterFighter){
+            if (fighter instanceof CharacterFighter) {
                 super.addNamedParty(((CharacterFighter) fighter), FightOutcomeEnum.RESULT_VICTORY);
                 final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(((CharacterFighter) fighter), deadMobs));
                 final int guildXp = FightFormulas.guildXpEarned(((CharacterFighter) fighter), exp), mountXp = FightFormulas.mountXpEarned(((CharacterFighter) fighter), exp);
                 ((CharacterFighter) fighter).character.addExperience(exp.get(), false);
-                //TODO : Distinct Item
-                final List<DroppedItem> loots =  new ArrayList<>(10);
+                final List<DroppedItem> loots = new ArrayList<>(7);
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
-                    loots.addAll(FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems));
+                    loots = (FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots));
                 });
-                final int[] serializedLoots = new int[loots.size() *2];
-                for(int i = 0; i < serializedLoots.length; i+= 2){
-                    serializedLoots[i] = loots.get(i /2).getItem();
-                    System.out.println(loots.get(i /2).getItem());
-                    System.out.println(loots.get(i /2).getQuantity());
-                    serializedLoots[i +1] = loots.get(i /2).getQuantity();
+                final int[] serializedLoots = new int[loots.size() * 2];
+                for (int i = 0; i < serializedLoots.length; i += 2) {
+                    serializedLoots[i] = loots.get(i / 2).getItem();
+                    serializedLoots[i + 1] = loots.get(i / 2).getQuantity();
                 }
+                loots.forEach(lot -> {
+                    final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), lot.getItem(), 63, ((CharacterFighter) fighter).getCharacter().getID(), lot.getQuantity(), EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(lot.getItem()).getPossibleEffects(), EffectGenerationType.Normal, DAO.getItemTemplates().getTemplate(lot.getItem()) instanceof Weapon));
+                    if (((CharacterFighter) fighter).getCharacter().getInventoryCache().add(item, true)) {
+                        item.setNeedInsert(true);
+                    }
+                });
                 loots.clear();
 
-
-                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(serializedLoots, FightFormulas.computeKamas(fighter,baseKamas,teamPP)), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
+                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(serializedLoots, FightFormulas.computeKamas(fighter, baseKamas, teamPP)), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                     {
-                        this.experience =  ((CharacterFighter) fighter).character.getExperience();
+                        this.experience = ((CharacterFighter) fighter).character.getExperience();
                         this.showExperience = true;
                         this.experienceLevelFloor = DAO.getExps().getPlayerMinExp(fighter.getLevel());
                         this.showExperienceLevelFloor = true;
@@ -131,13 +136,13 @@ public class MonsterFight extends Fight {
                     }
                 }}));
 
-            } else{
+            } else {
                 this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
             }
         }
 
         for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
-            if(fighter instanceof CharacterFighter){
+            if (fighter instanceof CharacterFighter) {
                 super.addNamedParty(((CharacterFighter) fighter), FightOutcomeEnum.RESULT_LOST);
                 super.addNamedParty(((CharacterFighter) fighter), FightOutcomeEnum.RESULT_LOST);
                 final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(((CharacterFighter) fighter), deadMobs));
@@ -146,7 +151,7 @@ public class MonsterFight extends Fight {
 
                 this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                     {
-                        this.experience =  ((CharacterFighter) fighter).character.getExperience();
+                        this.experience = ((CharacterFighter) fighter).character.getExperience();
                         this.showExperience = true;
                         this.experienceLevelFloor = DAO.getExps().getPlayerMinExp(fighter.getLevel());
                         this.showExperienceLevelFloor = true;
@@ -160,8 +165,7 @@ public class MonsterFight extends Fight {
                         this.showExperienceForMount = mountXp > 0;
                     }
                 }}));
-            }
-            else{
+            } else {
                 this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
             }
         }

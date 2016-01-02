@@ -59,6 +59,7 @@ public class ChallengeFight extends Fight {
 
             int guildXp = FightFormulas.guildXpEarned((CharacterFighter) fighter, xpTotal), mountXpountXp = FightFormulas.mountXpEarned((CharacterFighter) fighter, xpTotal);
             ((CharacterFighter) fighter).character.addExperience(xpTotal.get(), false);
+
             this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                 {
                     this.experience = ((CharacterFighter) fighter).character.getExperience();

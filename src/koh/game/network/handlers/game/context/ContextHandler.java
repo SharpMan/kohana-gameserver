@@ -88,18 +88,18 @@ public class ContextHandler {
     }
 
     @HandlerAttribute(ID = ObjectDropMessage.MESSAGE_ID)
-    public static void HandleObjectDropMessage(WorldClient Client, ObjectDropMessage Message) {
-        InventoryItem Item = Client.getCharacter().getInventoryCache().find(Message.objectUID);
+    public static void HandleObjectDropMessage(WorldClient client, ObjectDropMessage Message) {
+        InventoryItem Item = client.getCharacter().getInventoryCache().find(Message.objectUID);
         if (Item == null || Item.getQuantity() < Message.quantity) {
-            Client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
+            client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
             return;
         } else if (Item.getEffect(983) != null) {
-            Client.send(new ObjectErrorMessage(ObjectErrorEnum.NOT_TRADABLE));
+            client.send(new ObjectErrorMessage(ObjectErrorEnum.NOT_TRADABLE));
             return;
         }
         if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            Client.getCharacter().getInventoryCache().unEquipItem(Item);
-            Client.getCharacter().refreshStats();
+            client.getCharacter().getInventoryCache().unEquipItem(Item);
+            client.getCharacter().refreshStats();
         }
 
         short cellID = -1;
@@ -107,40 +107,40 @@ public class ContextHandler {
         {
             switch (a) {
                 case 0:
-                    cellID = (short) (Client.getCharacter().getCell().getId() - 14);
+                    cellID = (short) (client.getCharacter().getCell().getId() - 14);
                     break;
                 case 1:
-                    cellID = (short) (Client.getCharacter().getCell().getId() - 14 + 1);
+                    cellID = (short) (client.getCharacter().getCell().getId() - 14 + 1);
                     break;
                 case 2:
-                    cellID = (short) (Client.getCharacter().getCell().getId() + 14 - 1);
+                    cellID = (short) (client.getCharacter().getCell().getId() + 14 - 1);
                     break;
                 case 3:
-                    cellID = (short) (Client.getCharacter().getCell().getId() + 14);
+                    cellID = (short) (client.getCharacter().getCell().getId() + 14);
                     break;
             }
-            DofusCell curcell = Client.getCharacter().getCurrentMap().getCell(cellID);
-            if (curcell.nonWalkableDuringRP() || Client.getCharacter().getCurrentMap().cellIsOccuped(cellID) || Client.getCharacter().getCurrentMap().hasActorOnCell(cellID)) {
+            DofusCell curcell = client.getCharacter().getCurrentMap().getCell(cellID);
+            if (curcell.nonWalkableDuringRP() || client.getCharacter().getCurrentMap().cellIsOccuped(cellID) || client.getCharacter().getCurrentMap().hasActorOnCell(cellID)) {
                 cellID = -1;
                 continue;
             }
             break;
         }
         if (cellID == -1 || Message.quantity <= 0) {
-            Client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP_NO_PLACE));
+            client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP_NO_PLACE));
             return;
         }
         int newQua = Item.getQuantity() - Message.quantity;
         if (newQua <= 0) {
-            Client.getCharacter().getInventoryCache().removeItemFromInventory(Item);
+            client.getCharacter().getInventoryCache().removeItemFromInventory(Item);
             DAO.getItems().save(Item, false, "character_items");
         } else {
-            Client.getCharacter().getInventoryCache().updateObjectquantity(Item, newQua);
+            client.getCharacter().getInventoryCache().updateObjectquantity(Item, newQua);
             Item = CharacterInventory.tryCreateItem(Item.getTemplateId(), null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
         }
 
-        Client.getCharacter().getCurrentMap().addItem(cellID, Item);
-        Client.send(new BasicNoOperationMessage());
+        client.getCharacter().getCurrentMap().addItem(cellID, Item);
+        client.send(new BasicNoOperationMessage());
     }
 
     @HandlerAttribute(ID = MapInformationsRequestMessage.MESSAGE_ID)

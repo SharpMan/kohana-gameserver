@@ -48,27 +48,27 @@ public class InventoryItem {
 
     private GenericStats myStats;
 
-    public static InventoryItem getInstance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
-        if (DAO.getItemTemplates().getTemplate(TemplateId).getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-            return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
-        } else if (DAO.getItemTemplates().getTemplate(TemplateId).getTypeId() == 97) {
-            return new MountInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
+    public static InventoryItem getInstance(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects1) {
+        if (DAO.getItemTemplates().getTemplate(templateId).getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
+            return new PetsInventoryItem(ID, templateId, position, owner, quantity, effects1, !effects1.stream().anyMatch(x -> x.actionId == 995));
+        } else if (DAO.getItemTemplates().getTemplate(templateId).getTypeId() == 97) {
+            return new MountInventoryItem(ID, templateId, position, owner, quantity, effects1, !effects1.stream().anyMatch(x -> x.actionId == 995));
         } else {
-            return new InventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects);
+            return new InventoryItem(ID, templateId, position, owner, quantity, effects1);
         }
     }
 
-    public InventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
+    public InventoryItem(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects) {
         this.ID = ID;
-        this.templateId = TemplateId;
-        this.position = Position;
-        this.owner = Owner;
-        this.quantity = Quantity;
-        this.effects = Effects;
+        this.templateId = templateId;
+        this.position = position;
+        this.owner = owner;
+        this.quantity = quantity;
+        this.effects = effects;
     }
 
-    public ObjectItem getObjectItem(int WithQuantity) {
-        return new ObjectItem(this.position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, WithQuantity);
+    public ObjectItem getObjectItem(int withQuantity) {
+        return new ObjectItem(this.position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, withQuantity);
     }
 
     public ObjectItem getObjectItem() {
@@ -257,7 +257,7 @@ public class InventoryItem {
             if (e instanceof ObjectEffectInteger) {
                 Stat = StatsEnum.valueOf(e.actionId);
                 if (Stat == null) {
-                    logger.error("Undefinied Stat id {}", e.actionId);
+                    logger.error("Undefined Stat id {}", e.actionId);
                     continue;
                 }
                 this.myStats.addItem(Stat, ((ObjectEffectInteger) e).value);

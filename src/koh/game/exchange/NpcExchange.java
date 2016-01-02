@@ -90,7 +90,7 @@ public class NpcExchange extends Exchange {
             Client.getCharacter().getInventoryCache().substractKamas(amount1);
         }
 
-        InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.getCharacter().getID(), quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).getPossibleEffects(), npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
+        final InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.getCharacter().getID(), quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).getPossibleEffects(), npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
         if (this.myClient.getCharacter().getInventoryCache().add(Item, true)) {
             Item.setNeedInsert(true);
         }

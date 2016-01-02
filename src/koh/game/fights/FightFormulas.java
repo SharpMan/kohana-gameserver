@@ -1,9 +1,5 @@
 package koh.game.fights;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
-
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
@@ -19,8 +15,14 @@ import koh.protocol.messages.game.context.mount.MountSetMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
 /**
- *
  * @author Neo-Craft
  */
 public class FightFormulas {
@@ -39,49 +41,40 @@ public class FightFormulas {
                     4.7
             };
 
-    public static int computeXpWin(CharacterFighter fighter, MonsterFighter[] droppersResults)
-    {
+    public static int computeXpWin(CharacterFighter fighter, MonsterFighter[] droppersResults) {
         int result;
-        if (droppersResults.length == 0)
-        {
+        if (droppersResults.length == 0) {
             result = 0;
-        }
-        else
-        {
+        } else {
             int num = fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).sum();
             byte maxPlayerLevel = (byte) fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).max().orElse(0);
-            int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr .getLevel()).sum();
-            byte b = (byte) Arrays.stream(droppersResults).mapToInt(dr -> dr .getLevel()).max().orElse(0);
+            int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).sum();
+            byte b = (byte) Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).max().orElse(0);
             int num3 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getGrade().getGradeXp()).sum();
             double num4 = 1.0;
-            if (num - 5 > num2)
-            {
-                num4 = (double)num2 / (double)num;
-            }
-            else
-            {
-                if (num + 10 < num2)
-                {
-                    num4 = (double)(num + 10) / (double)num2;
+            if (num - 5 > num2) {
+                num4 = (double) num2 / (double) num;
+            } else {
+                if (num + 10 < num2) {
+                    num4 = (double) (num + 10) / (double) num2;
                 }
             }
-            double num5 = Math.min((double)fighter.getLevel(), truncate(2.5 * (double)b)) / (double)num * 100.0;
+            double num5 = Math.min((double) fighter.getLevel(), truncate(2.5 * (double) b)) / (double) num * 100.0;
             int num6 = Arrays.stream(droppersResults).
-                    filter(mob -> mob.getLevel() >=  maxPlayerLevel / 3)
+                    filter(mob -> mob.getLevel() >= maxPlayerLevel / 3)
                     .mapToInt(x -> 1)
                     .sum();
-            if (num6 <= 0)
-            {
+            if (num6 <= 0) {
                 num6 = 1;
             }
-            double num7 = truncate(num5 / 100.0 * truncate((double)num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
-            double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double)fighter.getFight().ageBonus / 100.0);
-            result = (int)truncate(truncate(num7 * (double)(100 + fighter.getStats().getTotal(StatsEnum.Wisdom)) / 100.0) * num8 * fighter.character.getExpBonus());
+            double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
+            double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
+            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.Wisdom)) / 100.0) * num8 * fighter.character.getExpBonus());
         }
         return result;
     }
 
-    private static double truncate(double value){
+    private static double truncate(double value) {
         return value - value % 1;
     }
 
@@ -136,7 +129,7 @@ public class FightFormulas {
         }
         int xpWin = (int) (((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
         if (xpWin < 0) {
-            logger.error("xpWin <0 on lvlLoosers {} lvlWinners {} rapport {} need {} sasa {}",lvlLoosers,lvlWinners,rapport,((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus),(1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
+            logger.error("xpWin <0 on lvlLoosers {} lvlWinners {} rapport {} need {} sasa {}", lvlLoosers, lvlWinners, rapport, ((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus), (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
         }
         return xpWin;
     }
@@ -157,11 +150,11 @@ public class FightFormulas {
 
         double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.character.getGuild().entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
-        double maxP = xp * pXpGive * 0.10;	//Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
-        double diff = Math.abs(Lvl - LvlGuild);	//Calcul l'écart entre le niveau du personnage et le niveau de la guilde
+        double maxP = xp * pXpGive * 0.10;    //Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
+        double diff = Math.abs(Lvl - LvlGuild);    //Calcul l'écart entre le niveau du personnage et le niveau de la guilde
         double toGuild;
         if (diff >= 70) {
-            toGuild = maxP * 0.10;	//Si l'écart entre les deux level est de 70 ou plus, l'experience donnée a la guilde est de 10% la valeur maximum de don
+            toGuild = maxP * 0.10;    //Si l'écart entre les deux level est de 70 ou plus, l'experience donnée a la guilde est de 10% la valeur maximum de don
         } else if (diff >= 31 && diff <= 69) {
             toGuild = maxP - ((maxP * 0.10) * (Math.floor((diff + 30) / 10)));
         } else if (diff >= 10 && diff <= 30) {
@@ -337,51 +330,41 @@ public class FightFormulas {
     }
 
 
-    public static double adjustDropChance(Fighter looter, MonsterDrop item, MonsterGrade dropper, int monsterAgeBonus)
-    {
-       return item.getDropRate((int)dropper.getGrade()) * ((double)looter.getStats().getTotal(StatsEnum.Prospecting) / 100.0) * ((double)monsterAgeBonus / 100.0 + 1.0) *  DAO.getSettings().getDoubleElement("Rate.Kamas");
-     }
+    public static double adjustDropChance(Fighter looter, MonsterDrop item, MonsterGrade dropper, int monsterAgeBonus) {
+        return item.getDropRate((int) dropper.getGrade()) * ((double) looter.getStats().getTotal(StatsEnum.Prospecting) / 100.0) * ((double) monsterAgeBonus / 100.0 + 1.0) * DAO.getSettings().getDoubleElement("Rate.Kamas");
+    }
 
 
-    public static List<DroppedItem> rollLoot(Fighter looter, MonsterGrade mob, int prospectingSum, Map<MonsterDrop,Integer> droppedItems)
-    {
-            List<DroppedItem> list = new ArrayList<>(5);
-            mob.getMonster().getDrops()
-                    .stream()
-                    .filter(drop -> prospectingSum >= drop.getProspectingLock())
-                    .forEach(current -> {
-                        if((current.getDropLimit() <= 0 || !droppedItems.containsKey(current) || droppedItems.get(current) < current.getDropLimit()))
-                        {
-                            double num2 = (double) looter.getRANDOM().nextInt(100) + looter.getRANDOM().nextDouble();
-                            double num3 = adjustDropChance(looter, current, mob, (int)looter.getFight().ageBonus);
-                            if (num3 >= num2)
-                            {
-                                Optional<DroppedItem> item = list.stream()
+    public static void rollLoot(Fighter looter, MonsterGrade mob, int prospectingSum, Map<MonsterDrop, Integer> droppedItems, List<DroppedItem> list) {
+        mob.getMonster().getDrops()
+                .stream()
+                .filter(drop -> prospectingSum >= drop.getProspectingLock())
+                .forEach(current -> {
+                    if ((current.getDropLimit() <= 0 || !droppedItems.containsKey(current) || droppedItems.get(current) < current.getDropLimit())) {
+                        double num2 = (double) looter.getRANDOM().nextInt(100) + looter.getRANDOM().nextDouble();
+                        double num3 = adjustDropChance(looter, current, mob, (int) looter.getFight().ageBonus);
+                        if (num3 >= num2) {
+                            Optional<DroppedItem> item = list.stream()
                                     .filter(dr -> dr.getItem() == current.getObjectId())
                                     .findFirst();
-                                if(item.isPresent()){
-                                    item.get().accumulateQuantity();
-                                }
-                                else
-                                    list.add(new DroppedItem(current.getObjectId(), 1));
+                            if (item.isPresent()) {
+                                item.get().accumulateQuantity();
+                            } else
+                                list.add(new DroppedItem(current.getObjectId(), 1));
 
-                                if (!droppedItems.containsKey(current))
-                                {
-                                    droppedItems.put(current, 1);
-                                }
-                                else
-                                {
-                                    droppedItems.put(current, droppedItems.get(current)+ 1);
-                                }
+                            if (!droppedItems.containsKey(current)) {
+                                droppedItems.put(current, 1);
+                            } else {
+                                droppedItems.put(current, droppedItems.get(current) + 1);
                             }
                         }
-                    });
-        return list;
+                    }
+                });
     }
 
 
     public static int computeKamas(Fighter fighter, int baseKamas, int teamPP) {
         double num = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
-        return (int)((double)baseKamas * ((double) fighter.getStats().getTotal(StatsEnum.Prospecting) / (double)teamPP) * num *  DAO.getSettings().getDoubleElement("Rate.Kamas"));
+        return (int) ((double) baseKamas * ((double) fighter.getStats().getTotal(StatsEnum.Prospecting) / (double) teamPP) * num * DAO.getSettings().getDoubleElement("Rate.Kamas"));
     }
 }

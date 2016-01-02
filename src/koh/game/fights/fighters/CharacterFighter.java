@@ -32,6 +32,7 @@ import koh.protocol.types.game.context.fight.GameFightMinimalStats;
 import koh.protocol.types.game.context.fight.GameFightMinimalStatsPreparation;
 import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Getter;
 
 /**
  *
@@ -39,6 +40,7 @@ import koh.protocol.types.game.look.EntityLook;
  */
 public class CharacterFighter extends Fighter {
 
+    @Getter
     public Player character;
     public EntityLook Look;
 
