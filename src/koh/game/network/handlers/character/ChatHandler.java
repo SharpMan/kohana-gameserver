@@ -17,15 +17,10 @@ import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.look.EntityLookParser;
-import koh.protocol.client.enums.AlignmentSideEnum;
-import koh.protocol.client.enums.ChatActivableChannelsEnum;
+import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.chat.ChatClientMultiMessage;
 import static koh.protocol.client.enums.ChatActivableChannelsEnum.*;
-import koh.protocol.client.enums.ChatErrorEnum;
-import koh.protocol.client.enums.EffectGenerationType;
-import koh.protocol.client.enums.ItemSuperTypeEnum;
-import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
-import koh.protocol.client.enums.TextInformationTypeEnum;
+
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.chat.ChannelEnablingMessage;
@@ -261,8 +256,8 @@ public class ChatHandler {
                     Client.getCharacter().save(false);
                 }
                 else if (message.Content.startsWith("!kamas")) {
-                    short Id = Short.parseShort(message.Content.split(" ")[1]);
-                    Client.getCharacter().addKamas(Id);
+                    int Id = Integer.parseInt(message.Content.split(" ")[1]);
+                    Client.getCharacter().getInventoryCache().addKamas(Id);
                 }
                 else if (message.Content.startsWith("!bones")) {
                     short Id = Short.parseShort(message.Content.split(" ")[1]);
@@ -272,7 +267,17 @@ public class ChatHandler {
                     Client.getCharacter().refreshEntitie();
                 } else if (message.Content.startsWith("!clearitems")) {
                     Client.getCharacter().getCurrentMap().clearDroppedItems();
-                } else if (message.Content.startsWith("!setpdvper")) {
+                }else if (message.Content.startsWith("!kamas")) {
+                    short Id = Short.parseShort(message.Content.split(" ")[1]);
+                    Client.getCharacter().addKamas(Id);
+                }
+                else if (message.Content.startsWith("!stat")) {
+                    short Id = Short.parseShort(message.Content.split(" ")[1]);
+                    short nb = Short.parseShort(message.Content.split(" ")[2]);
+                    Client.getCharacter().getStats().addBase(StatsEnum.valueOf(Id),nb);
+                    Client.getCharacter().refreshStats();
+                }
+                else if (message.Content.startsWith("!setpdvper")) {
                     int level = Integer.parseInt(message.Content.split(" ")[1]);
                     if (Client.getCharacter().getFight() != null || level > 100) {
                         return;

@@ -128,7 +128,7 @@ public class EffectPunishment extends EffectBase {
                     SubInfos.IsReflect = true;
 
                     // Si le renvoi de dommage entraine la fin de combat on stop
-                    if (EffectDamage.ApplyDamages(SubInfos, Caster, ReflectDamage) == -3) {
+                    if (EffectDamage.applyDamages(SubInfos, Caster, ReflectDamage) == -3) {
                         return -3;
                     }
 

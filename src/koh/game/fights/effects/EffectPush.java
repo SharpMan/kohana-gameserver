@@ -134,7 +134,7 @@ public class EffectPush extends EffectBase {
 
         EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.SpellId, CastInfos.CellId, 0, null, Target, null, false, StatsEnum.NONE, 0, null);
 
-        return EffectDamage.ApplyDamages(SubInfos, Target, DamageValue);
+        return EffectDamage.applyDamages(SubInfos, Target, DamageValue);
     }
 
 }

@@ -22,7 +22,7 @@ public class BuffLifeSteal extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt Damage = new MutableInt(this.CastInfos.randomJet(target));
 
-        return EffectLifeSteal.ApplyLifeSteal(this.CastInfos, this.target, Damage);
+        return EffectLifeSteal.applyLifeSteal(this.CastInfos, this.target, Damage);
     }
 
     @Override

@@ -233,7 +233,7 @@ public class CharacterHandler {
                         .account(client.getAccount())
                         .level((byte) DAO.getSettings().getIntElement("Register.StartLevel"))
                         .savedMap(DAO.getSettings().getIntElement("Register.StartMap"))
-                        .savedCell(DAO.getSettings().getShortElement("Register.getStartCell"))
+                        .savedCell(DAO.getSettings().getShortElement("Register.StartCell"))
                         .currentMap(DAO.getMaps().findTemplate(DAO.getSettings().getIntElement("Register.StartMap")).init$Return())
 
                         .enabledChannels(Arrays.stream(DAO.getSettings().getRegistredChannels()).collect(Collectors.toList()))
@@ -252,13 +252,14 @@ public class CharacterHandler {
                 character.setMountInfo(new MountInformations(character));
                 character.initScore();
                 character.setMapid(DAO.getSettings().getIntElement("Register.StartMap")); //Abstract can not be called from builder
-                character.setActorCell(character.getCurrentMap().getCell(DAO.getSettings().getShortElement("Register.getStartCell")));
+                character.setActorCell(character.getCurrentMap().getCell(DAO.getSettings().getShortElement("Register.StartCell")));
+                character.initialize();
 
                 if (!DAO.getPlayers().add(character)) {
                     client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
                     return;
                 }
-                character.initialize();
+
 
                 client.getAccount().characters.add(0, character);
                 Main.interClient().Send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
@@ -266,6 +267,7 @@ public class CharacterHandler {
                 client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

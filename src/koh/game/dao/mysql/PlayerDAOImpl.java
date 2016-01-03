@@ -232,7 +232,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setString(9, StringUtils.join(character.getEnabledChannels(), ','));
             pStatement.setInt(10, character.getStatPoints());
             pStatement.setInt(11, character.getSpellPoints());
-            pStatement.setString(12, character.getVitality() + "," + character.getWisdom() + "," + character.getStrength() + "," + character.getIntell() + "," + character.getAgility() + "," + character.getChance() + "," + character.getLife() + "," + character.getExperience() + "," + character.getActivableTitle() + "," + character.getActivableOrnament()+ "," + character.getRegenStartTime());
+            pStatement.setString(12, character.serializeStats());
             pStatement.setBytes(13, character.getMySpells().serialize());
             pStatement.setLong(14, character.getKamas());
             pStatement.setBytes(15, character.getShortcuts().serialize());
@@ -279,7 +279,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setString(12, StringUtils.join(character.getEnabledChannels(), ','));
             pStatement.setInt(13, character.getStatPoints());
             pStatement.setInt(14, character.getSpellPoints());
-            pStatement.setString(15, character.getVitality() + "," + character.getWisdom() + "," + character.getStrength() + "," + character.getIntell() + "," + character.getAgility() + "," + character.getChance() + "," + character.getLife() + "," + character.getExperience() + "," + character.getActivableTitle() + "," + character.getActivableOrnament());
+            pStatement.setString(15, character.serializeStats());
             pStatement.setBytes(16, character.getMySpells().serialize());
             pStatement.setBytes(17, character.getShortcuts().serialize());
             pStatement.setString(18, character.getSavedMap() + "," + character.getSavedCell());
@@ -296,6 +296,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                 return false;
             character.setID(resultSet.getInt(1));
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
             return false;

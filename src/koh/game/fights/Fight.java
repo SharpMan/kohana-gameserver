@@ -355,7 +355,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
         short oldCell = cellId;
-        if (spellLevel.getId() == 10461 && fighter.isPlayer() && fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
+        if (spellLevel.getSpellId() == 0 && fighter.isPlayer() && fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
             this.launchWeapon(fighter.asPlayer(), cellId);
             return;
         }
@@ -522,6 +522,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
+    //TODO : Log number of cac launched in case if he reconnect and useBug
     public void launchWeapon(CharacterFighter fighter, short cellId) {
         // Combat encore en cour ?
         if (this.fightState != fightState.STATE_ACTIVE) {
@@ -530,8 +531,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (fighter != this.currentFighter) {
             return;
         }
-        InventoryItem Weapon = fighter.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
-        if (Weapon.getTemplate().getTypeId() == 83) { //Pière d'Ame
+        InventoryItem weapon = fighter.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
+        if (weapon.getTemplate().getTypeId() == 83) { //Pière d'Ame
             return;
         }
         // La cible si elle existe
@@ -539,20 +540,19 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (targetE == null) {
             targetE = this.hasFriendInCell(cellId, fighter.getTeam());
         }
-        int TargetId = targetE == null ? -1 : targetE.getID();
-
-        if (!(Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) <= Weapon.getWeaponTemplate().getRange() && Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) >= Weapon.getWeaponTemplate().getMinRange() && fighter.getAP() >= Weapon.getWeaponTemplate().getApCost())) {
+        int targetId = targetE == null ? -1 : targetE.getID();
+        if (!(Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) <= weapon.getWeaponTemplate().getRange() && Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) >= weapon.getWeaponTemplate().getMinRange() && fighter.getAP() >= weapon.getWeaponTemplate().getApCost())) {
             fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             return;
         }
 
         this.startSequence(SequenceTypeEnum.SEQUENCE_WEAPON);
 
-        fighter.setUsedAP(fighter.getUsedAP() + Weapon.getWeaponTemplate().getApCost());
+        fighter.setUsedAP(fighter.getUsedAP() + weapon.getWeaponTemplate().getApCost());
 
         boolean IsCc = false;
 
-        int TauxCC = Weapon.getWeaponTemplate().getCriticalHitProbability() - fighter.getStats().getTotal(StatsEnum.Add_CriticalHit);
+        int TauxCC = weapon.getWeaponTemplate().getCriticalHitProbability() - fighter.getStats().getTotal(StatsEnum.Add_CriticalHit);
         if (TauxCC < 2) {
             TauxCC = 2;
         }
@@ -562,9 +562,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         IsCc &= !fighter.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
 
-        ArrayList<Fighter> Targets = new ArrayList<>(4);
+        ArrayList<Fighter> Targets = new ArrayList<>(5);
 
-        for (short Cell : (new Zone(SpellShapeEnum.valueOf(Weapon.getItemType().zoneShape()), Weapon.getItemType().zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map)).getCells(cellId)) {
+        for (short Cell : (new Zone(SpellShapeEnum.valueOf(weapon.getItemType().zoneShape()), weapon.getItemType().zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map)).getCells(cellId)) {
             FightCell FightCell = this.getCell(Cell);
             if (FightCell != null) {
                 if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
@@ -575,22 +575,29 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         Targets.removeIf(F -> F.isDead());
         Targets.remove(fighter);
-        ObjectEffectDice[] Effects = Weapon.getEffects$Notify().stream().filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId)).map(x -> (ObjectEffectDice) x).toArray(ObjectEffectDice[]::new);
+        ObjectEffectDice[] Effects = weapon.getEffects$Notify()
+                .stream()
+                .filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId))
+                .map(x -> (ObjectEffectDice) x)
+                .toArray(ObjectEffectDice[]::new);
 
         double num1 = Fight.RANDOM.nextDouble();
 
-        double num2 = (double) Arrays.stream(Effects).mapToInt(Effect -> ((EffectInstanceDice) Weapon.getTemplate().getEffect(Effect.actionId)).random).sum();
+        double num2 = (double) Arrays.stream(Effects)
+                .mapToInt(Effect -> ((EffectInstanceDice) weapon.getTemplate().getEffect(Effect.actionId)).random)
+                .sum();
         boolean flag = false;
 
-        this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), TargetId, cellId, (byte) (IsCc ? 2 : 1), false, Weapon.getTemplate().getId()));
+        this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), targetId, cellId, (byte) (IsCc ? 2 : 1), false, weapon.getTemplate().getId()));
 
-        EffectInstanceDice EffectFather;
-        for (ObjectEffectDice Effect : Effects) {
-            EffectFather = (EffectInstanceDice) Weapon.getTemplate().getEffect(Effect.actionId);
-            if (EffectFather.random > 0) {
+        EffectInstanceDice effectParent;
+        for (ObjectEffectDice effect : Effects) {
+            effectParent = (EffectInstanceDice) weapon.getTemplate().getEffect(effect.actionId);
+            System.out.println(effectParent.toString());
+            if (effectParent.random > 0) {
                 if (!flag) {
-                    if (num1 > (double) EffectFather.random / num2) {
-                        num1 -= (double) EffectFather.random / num2;
+                    if (num1 > (double) effectParent.random / num2) {
+                        num1 -= (double) effectParent.random / num2;
                         continue;
                     } else {
                         flag = true;
@@ -599,14 +606,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     continue;
                 }
             }
-            EffectCast CastInfos = new EffectCast(StatsEnum.valueOf(Effect.actionId), 0, cellId, num1, EffectFather, fighter, Targets, true, StatsEnum.NONE, 0, null);
+            EffectCast CastInfos = new EffectCast(StatsEnum.valueOf(effect.actionId), 0, cellId, num1, effectParent, fighter, Targets, true, StatsEnum.NONE, 0, null);
             CastInfos.targetKnownCellId = cellId;
             if (EffectBase.TryApplyEffect(CastInfos) == -3) {
                 break;
             }
         }
 
-        this.sendToField(new GameActionFightPointsVariationMessage(!IsCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, fighter.getID(), fighter.getID(), (short) Weapon.getWeaponTemplate().getApCost()));
+        this.sendToField(new GameActionFightPointsVariationMessage(!IsCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, fighter.getID(), fighter.getID(), (short) weapon.getWeaponTemplate().getApCost()));
         this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
     }
 

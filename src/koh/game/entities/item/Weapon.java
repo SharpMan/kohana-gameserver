@@ -29,11 +29,11 @@ public class Weapon extends ItemTemplate {
     public Weapon(ResultSet result) throws SQLException {
         super(result);
         this.range = result.getInt("range");
-        this.criticalHitBonus = result.getInt("range");
-        this.minRange = result.getInt("range");
-        this.maxCastPerTurn = result.getInt("range");
-        this.criticalFailureProbability = result.getInt("range");
-        this.criticalHitProbability = result.getInt("range");
+        this.criticalHitBonus = result.getInt("critical_hit_bonus");
+        this.minRange = result.getInt("min_range");
+        this.maxCastPerTurn = result.getInt("max_cast_per_turn");
+        this.criticalFailureProbability = result.getInt("critical_failure_probability");
+        this.criticalHitProbability = result.getInt("critical_hit_probability");
         this.castInDiagonal = result.getBoolean("cast_in_diagonal");
         this.apCost = result.getInt("ap_cost");
         this.castInLine = result.getBoolean("cast_in_line");

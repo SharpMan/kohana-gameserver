@@ -23,15 +23,15 @@ public class BuffDamageDropLife extends BuffEffect {
     public int applyEffect(MutableInt DamageJet, EffectCast DamageInfos) {
             //var Damage = this.CastInfos.randomJet;
 
-        // return EffectDamage.ApplyDamages(this.CastInfos, this.target, ref Damage);
+        // return EffectDamage.applyDamages(this.CastInfos, this.target, ref Damage);
         int effectBase = DamageJet.getValue();
         //var DamageValuea = (target.currentLife / 100) * effectBase;
         MutableInt DamageValue = new MutableInt((CastInfos.caster.currentLife / 100) * effectBase);
-        if (EffectDamage.ApplyDamages(CastInfos, CastInfos.caster, DamageValue) == -3) {
-            EffectHeal.ApplyHeal(CastInfos, target, DamageValue);
+        if (EffectDamage.applyDamages(CastInfos, CastInfos.caster, DamageValue) == -3) {
+            EffectHeal.applyHeal(CastInfos, target, DamageValue);
             return -3;
         } else {
-            return EffectHeal.ApplyHeal(CastInfos, target, DamageValue);
+            return EffectHeal.applyHeal(CastInfos, target, DamageValue);
         }
 
         //DamageValuea = (-DamageValuea);

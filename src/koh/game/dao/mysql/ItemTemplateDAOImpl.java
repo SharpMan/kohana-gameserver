@@ -88,6 +88,9 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                         .rawZone(result.getString("raw_zone"))
                         .needUseConfirm(result.getBoolean("need_use_confirm"))
                         .mimickable(result.getBoolean("mimickable"))
+                        ._zoneMinSize(Integer.MAX_VALUE)
+                        ._zoneShape(Integer.MAX_VALUE)
+                        ._zoneSize(Integer.MAX_VALUE)
                         .build();
                 itemTypes.put(result.getInt("id"), type);
                 ++i;

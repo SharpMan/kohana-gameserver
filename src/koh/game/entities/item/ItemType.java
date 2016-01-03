@@ -26,9 +26,9 @@ public class ItemType {
 
     private static final Logger logger = LogManager.getLogger(ItemType.class);
 
-    private int _zoneSize = Integer.MAX_VALUE;
-    private int _zoneShape = Integer.MAX_VALUE;
-    private int _zoneMinSize = Integer.MAX_VALUE;
+    private int _zoneSize;
+    private int _zoneShape;
+    private int _zoneMinSize;
 
     public byte zoneSize() {
         if (this._zoneSize == Integer.MAX_VALUE) {
@@ -54,6 +54,7 @@ public class ItemType {
     private void parseZone() {
         try {
             String[] params;
+            System.out.println(this.rawZone);
             if (!StringUtils.isNullOrEmpty(this.rawZone)) {
                 this._zoneShape = this.rawZone.charAt(0);
                 if (!this.rawZone.contains(",")) {

@@ -55,7 +55,6 @@ public class MonsterDAOImpl extends MonsterDAO {
                  templates.get(result.getInt("monster_id")).getDrops().add(new MonsterDrop(result));
                 i++;
             }
-            System.out.println(this.templates.values().stream().filter(x -> x.getDrops().isEmpty()).count());
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());

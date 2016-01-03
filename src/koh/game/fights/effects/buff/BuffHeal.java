@@ -20,7 +20,7 @@ public class BuffHeal extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (EffectHeal.ApplyHeal(CastInfos, target, new MutableInt(CastInfos.randomJet(target))) == -3) {
+        if (EffectHeal.applyHeal(CastInfos, target, new MutableInt(CastInfos.randomJet(target))) == -3) {
             return -3;
         }
         return -1;

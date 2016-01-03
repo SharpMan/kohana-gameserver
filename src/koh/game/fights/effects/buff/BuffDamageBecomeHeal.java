@@ -31,7 +31,7 @@ public class BuffDamageBecomeHeal extends BuffEffect {
         
         DamageValue.setValue(DamageValue.getValue() * this.CastInfos.Effect.value);
 
-        if (EffectHeal.ApplyHeal(CastInfos, target, DamageValue, false) == -3) {
+        if (EffectHeal.applyHeal(CastInfos, target, DamageValue, false) == -3) {
             return -3;
         }
         DamageValue.setValue(0);

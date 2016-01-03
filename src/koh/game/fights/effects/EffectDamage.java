@@ -35,7 +35,7 @@ public class EffectDamage extends EffectBase {
                 //Eppe de iop ?
                 MutableInt DamageValue = new MutableInt(CastInfos.randomJet(Target));
 
-                if (EffectDamage.ApplyDamages(CastInfos, Target, DamageValue) == -3) {
+                if (EffectDamage.applyDamages(CastInfos, Target, DamageValue) == -3) {
                     return -3;
                 }
             }
@@ -44,119 +44,119 @@ public class EffectDamage extends EffectBase {
         return -1;
     }
 
-    public static int ApplyDamages(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
+    public static int applyDamages(EffectCast castInfos, Fighter target, MutableInt damageJet) {
 
-        if (Target.getStates().hasState(FightStateEnum.STATE_REFLECT_SPELL) && !CastInfos.IsPoison && ((BuffReflectSpell) Target.getStates().getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).reflectLevel >= CastInfos.SpellLevel.getGrade()) {
-            Target.getFight().sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, Target.getID(), CastInfos.caster.getID()));
-            Target = CastInfos.caster;
+        if (target.getStates().hasState(FightStateEnum.STATE_REFLECT_SPELL) && !castInfos.IsPoison && ((BuffReflectSpell) target.getStates().getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).reflectLevel >= castInfos.SpellLevel.getGrade()) {
+            target.getFight().sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, target.getID(), castInfos.caster.getID()));
+            target = castInfos.caster;
         }
-        Fighter Caster = CastInfos.caster;
+        Fighter Caster = castInfos.caster;
         // Perd l'invisibilité s'il inflige des dommages direct
-        if (!CastInfos.IsPoison && !CastInfos.IsTrap && !CastInfos.IsReflect) {
+        if (!castInfos.IsPoison && !castInfos.IsTrap && !castInfos.IsReflect) {
             Caster.getStates().removeState(FightStateEnum.Invisible);
         }
 
         // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat
-        if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
-            if (Caster.getBuff().onAttackPostJet(CastInfos, DamageJet) == -3) {
+        if (!castInfos.IsPoison && !castInfos.IsReflect) {
+            if (Caster.getBuff().onAttackPostJet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
-            if (Target.getBuff().onAttackedPostJet(CastInfos, DamageJet) == -3) {
+            if (target.getBuff().onAttackedPostJet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
-        if(!CastInfos.IsReflect && CastInfos.IsTrap){
-            if (Target.getBuff().onAttackedPostJetTrap(CastInfos, DamageJet) == -3) {
+        if(!castInfos.IsReflect && castInfos.IsTrap){
+            if (target.getBuff().onAttackedPostJetTrap(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
         // Calcul jet
-        Caster.computeDamages(CastInfos.EffectType, DamageJet);
+        Caster.computeDamages(castInfos.EffectType, damageJet);
         //Calcul Bonus Negatif Zone ect ...
-        if (CastInfos.Effect != null) {
-            Caster.calculBonusDamages(CastInfos.Effect, DamageJet,CastInfos.CellId , Target.getCellId(),CastInfos.oldCell);
+        if (castInfos.Effect != null) {
+            Caster.calculBonusDamages(castInfos.Effect, damageJet,castInfos.CellId , target.getCellId(),castInfos.oldCell);
         }
 
         // Calcul resistances
-        Target.calculReduceDamages(CastInfos.EffectType, DamageJet);
+        target.calculReduceDamages(castInfos.EffectType, damageJet);
         // Reduction des dommages grace a l'armure
-        if (DamageJet.intValue() > 0) {
+        if (damageJet.intValue() > 0) {
             // Si ce n'est pas des dommages direct on ne reduit pas
-            if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
+            if (!castInfos.IsPoison && !castInfos.IsReflect && castInfos.EffectType != StatsEnum.DamageBrut) {
                 // Calcul de l'armure par rapport a l'effet
-                int Armor = Target.calculArmor(CastInfos.EffectType);
+                int Armor = target.calculArmor(castInfos.EffectType);
                 // Si il reduit un minimum
                 if (Armor != 0) {
                     // XX Reduit les dommages de X
 
-                    Target.getFight().sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, Target.getID(), Target.getID(), Armor));
+                    target.getFight().sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, target.getID(), target.getID(), Armor));
 
                     // On reduit
-                    DamageJet.setValue(DamageJet.intValue() - Armor);
+                    damageJet.setValue(damageJet.intValue() - Armor);
 
                     // Si on suprimme totalement les dommages
-                    if (DamageJet.intValue() < 0) {
-                        DamageJet.setValue(0);
+                    if (damageJet.intValue() < 0) {
+                        damageJet.setValue(0);
                     }
                 }
             }
         }
         // Application des buffs apres le calcul totaux et l'armure
-        if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
-            if (Caster.getBuff().onAttackAfterJet(CastInfos, DamageJet) == -3) {
+        if (!castInfos.IsPoison && !castInfos.IsReflect) {
+            if (Caster.getBuff().onAttackAfterJet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
-            if (Target.getBuff().onattackedafterjet(CastInfos, DamageJet) == -3) {
+            if (target.getBuff().onattackedafterjet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
 
         // S'il subit des dommages
-        if (DamageJet.getValue() > 0) {
+        if (damageJet.getValue() > 0) {
             // Si c'est pas un poison ou un renvoi on applique le renvoie
-            if (!CastInfos.IsPoison && !CastInfos.IsReflect) {
-                MutableInt ReflectDamage = new MutableInt(Target.getReflectedDamage());
+            if (!castInfos.IsPoison && !castInfos.IsReflect) {
+                MutableInt ReflectDamage = new MutableInt(target.getReflectedDamage());
 
                 // Si du renvoi
-                if (ReflectDamage.intValue() > 0 && Target.getID() != Caster.getID()) {
-                    Target.getFight().sendToField(new GameActionFightReflectDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_REFLECTOR, Target.getID(), Caster.getID()));
+                if (ReflectDamage.intValue() > 0 && target.getID() != Caster.getID()) {
+                    target.getFight().sendToField(new GameActionFightReflectDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_REFLECTOR, target.getID(), Caster.getID()));
 
                     // Trop de renvois
-                    if (ReflectDamage.getValue() > DamageJet.getValue()) {
-                        ReflectDamage.setValue(DamageJet.getValue());
+                    if (ReflectDamage.getValue() > damageJet.getValue()) {
+                        ReflectDamage.setValue(damageJet.getValue());
                     }
 
-                    EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, Target, null, false, StatsEnum.NONE, 0, null);
+                    EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
                     SubInfos.IsReflect = true;
 
                     // Si le renvoi de dommage entraine la fin de combat on stop
-                    if (EffectDamage.ApplyDamages(SubInfos, Caster, ReflectDamage) == -3) {
+                    if (EffectDamage.applyDamages(SubInfos, Caster, ReflectDamage) == -3) {
                         return -3;
                     }
 
                     // Dommage renvoyé
-                    DamageJet.add(-ReflectDamage.intValue());
+                    damageJet.add(-ReflectDamage.intValue());
                 }
             }
         }
         // Peu pas etre en dessous de 0
-        if (DamageJet.getValue() < 0) {
-            DamageJet.setValue(0);
+        if (damageJet.getValue() < 0) {
+            damageJet.setValue(0);
         }
 
         // Dommages superieur a la vie de la cible
-        if (DamageJet.getValue() > Target.getLife()) {
-            DamageJet.setValue(Target.getLife());
+        if (damageJet.getValue() > target.getLife()) {
+            damageJet.setValue(target.getLife());
         }
 
         // Deduit la vie
-        Target.setLife(Target.getLife() - DamageJet.intValue());
+        target.setLife(target.getLife() - damageJet.intValue());
 
         // Enois du packet combat subit des dommages
-        if (DamageJet.intValue() != 0) {
-            Target.getFight().sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.getID(), Target.getID(), DamageJet.intValue(), 0));
+        if (damageJet.intValue() != 0) {
+            target.getFight().sendToField(new GameActionFightLifePointsLostMessage(castInfos.Effect != null ? castInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.getID(), target.getID(), damageJet.intValue(), 0));
         }
-        return Target.tryDie(Caster.getID());
+        return target.tryDie(Caster.getID());
     }
 
 }

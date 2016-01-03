@@ -845,6 +845,22 @@ public class Player extends IGameActor implements Observer {
         return new PlayerStatus(this.getStatus().value());
     }
 
+    public String serializeStats(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.vitality).append(',');
+        sb.append(this.wisdom).append(',');
+        sb.append(this.strength).append(',');
+        sb.append(this.intell).append(',');
+        sb.append(this.agility).append(',');
+        sb.append(this.chance).append(',');
+        sb.append(this.life).append(',');
+        sb.append(this.experience).append(',');
+        sb.append(this.activableTitle).append(',');
+        sb.append(this.activableOrnament).append(',');
+        sb.append(this.regenStartTime);
+        return sb.toString();
+    }
+
     public void totalClear() {
         owner = 0;
         nickName = null;

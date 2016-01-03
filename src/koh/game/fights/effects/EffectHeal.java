@@ -17,38 +17,39 @@ public class EffectHeal extends EffectBase {
 
     private static final Logger logger = LogManager.getLogger(EffectHeal.class);
 
-    public static int ApplyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal) {
-        return ApplyHeal(CastInfos, Target, Heal, true);
+    public static int applyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal) {
+        return applyHeal(CastInfos, Target, Heal, true);
     }
 
-    public static int ApplyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal, boolean Calculate) {
-        Fighter Caster = CastInfos.caster;
+    public static int applyHeal(EffectCast castInfos, Fighter target, MutableInt heal, boolean calculate) {
+        Fighter Caster = castInfos.caster;
 
         // boost soin etc
-        if (Calculate) {
-            Caster.calculheal(Heal);
+        if (calculate) {
+            Caster.calculheal(heal);
         }
         
-        if (Target.getBuff().onHealPostJet(CastInfos, Heal) == -3) {
+        if (target.getBuff().onHealPostJet(castInfos, heal) == -3) {
             return -3; // Fin du combat
         }
 
         // Si le soin est superieur a sa vie actuelle
-        if (Target.getLife() + Heal.getValue() > Target.getMaxLife()) {
-            Heal.setValue(Target.getMaxLife() - Target.getLife());
-            if (Heal.getValue() < 0) {
-                logger.error("TargetMaxlife {} TargettLife {}" ,Target.getMaxLife(), Target.getLife());
+        if (target.getLife() + heal.getValue() > target.getMaxLife()) {
+            heal.setValue(target.getMaxLife() - target.getLife());
+            if (heal.getValue() < 0) {
+                logger.error("TargetMaxlife {} TargettLife {}" ,target.getMaxLife(), target.getLife());
             }
         }
 
         // Affectation
-        Target.setLife(Target.getLife() + Heal.getValue());
+        target.setLife(target.getLife() + heal.getValue());
 
         // Envoi du packet
-        Target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Math.abs(Heal.getValue())));
+        if(heal.getValue() != 0)
+            target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), target.getID(), Math.abs(heal.getValue())));
 
         // Le soin entraine la fin du combat ?
-        return Target.tryDie(Caster.getID());
+        return target.tryDie(Caster.getID());
     }
 
     @Override
@@ -65,7 +66,7 @@ public class EffectHeal extends EffectBase {
         } else // Heal direct
         {
             for (Fighter Target : CastInfos.Targets) {
-                if (EffectHeal.ApplyHeal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
+                if (EffectHeal.applyHeal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
                     return -3;
                 }
             }

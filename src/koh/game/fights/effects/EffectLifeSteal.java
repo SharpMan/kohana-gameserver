@@ -2,6 +2,7 @@ package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffLifeSteal;
+import koh.protocol.client.enums.StatsEnum;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -27,7 +28,7 @@ public class EffectLifeSteal extends EffectBase {
                     continue;
                 }
 
-                if (ApplyLifeSteal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
+                if (applyLifeSteal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
                     return -3;
                 }
             }
@@ -36,14 +37,16 @@ public class EffectLifeSteal extends EffectBase {
         return -1;
     }
 
-    public static int ApplyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
-        if (EffectDamage.ApplyDamages(CastInfos, Target, DamageJet) == -3) {
+    public static int applyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
+        //CastInfos.EffectType = StatsEnum.DamageBrut;
+
+        if (EffectDamage.applyDamages(CastInfos, Target, DamageJet) == -3) {
             return -3;
         }
 
-        MutableInt HealJet = new MutableInt(DamageJet.intValue() / 2);
+        MutableInt healJet = new MutableInt(DamageJet.intValue() / 2);
 
-        if (EffectHeal.ApplyHeal(CastInfos, CastInfos.caster, HealJet) == -3) {
+        if (EffectHeal.applyHeal(CastInfos, CastInfos.caster, healJet,false) == -3) {
             return -3;
         }
         return -1;

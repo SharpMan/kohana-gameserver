@@ -27,7 +27,7 @@ public class EffectLifeDamage extends EffectBase {
                 int effectBase = CastInfos.randomJet(Target);
                 MutableInt DamageValue = new MutableInt((Target.currentLife / 100) * effectBase);
                 //DamageValue = (-DamageValue);
-                if (EffectDamage.ApplyDamages(CastInfos, Target, DamageValue) == -3) {
+                if (EffectDamage.applyDamages(CastInfos, Target, DamageValue) == -3) {
                     return -3;
                 }
             }

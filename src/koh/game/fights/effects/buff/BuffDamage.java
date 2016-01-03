@@ -23,7 +23,7 @@ public class BuffDamage extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt Damage = new MutableInt(this.CastInfos.randomJet(target));
 
-        return EffectDamage.ApplyDamages(this.CastInfos, this.target, Damage);
+        return EffectDamage.applyDamages(this.CastInfos, this.target, Damage);
     }
 
     @Override

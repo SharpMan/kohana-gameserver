@@ -33,7 +33,7 @@ public class BuffSacrifice extends BuffEffect {
 
         DamageInfos.IsReturnedDamages = true;
 
-        return EffectDamage.ApplyDamages(DamageInfos, CastInfos.caster, new MutableInt(DamageInfos.randomJet(caster)));
+        return EffectDamage.applyDamages(DamageInfos, CastInfos.caster, new MutableInt(DamageInfos.randomJet(caster)));
 
     }
 

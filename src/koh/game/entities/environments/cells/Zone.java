@@ -15,16 +15,16 @@ public class Zone implements IZone {
     private SpellShapeEnum m_shapeType;
     private byte m_radius;
     private byte m_direction;
-    private DofusMap Map;
+    private DofusMap map;
 
     public Zone(SpellShapeEnum shape, byte radius, DofusMap Map) {
-        this.Map = Map;
+        this.map = Map;
         this.setRadius(radius);
         this.setShapeType(shape);
     }
 
     public Zone(SpellShapeEnum shape, byte radius, byte direction, DofusMap Map) {
-        this.Map = Map;
+        this.map = Map;
         this.setRadius(radius);
         this.setDirection(direction);
         this.setShapeType(shape);
@@ -92,26 +92,26 @@ public class Zone implements IZone {
                 break;
             case a:
             case A:
-                this.m_shape = new Lozenge((byte) 0, (byte) 63, this.Map);
+                this.m_shape = new Lozenge((byte) 0, (byte) 63, this.map);
                 break;
             case C:
-                this.m_shape = new Lozenge((byte) 0, this.getRadius(), this.Map);
+                this.m_shape = new Lozenge((byte) 0, this.getRadius(), this.map);
                 break;
             case D:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius());
                 break;
             case I:
-                this.m_shape = new Lozenge(this.getRadius(), (byte) 63, this.Map);
+                this.m_shape = new Lozenge(this.getRadius(), (byte) 63, this.map);
                 break;
             case L:
                 this.m_shape = new Line(this.getRadius());
                 break;
             case O:
                 //this.m_shape = new CrossZone((byte) 1, this.getRadius());
-                this.m_shape =  new Lozenge(this.getRadius(),this.getRadius(),this.Map);
+                this.m_shape =  new Lozenge(this.getRadius(),this.getRadius(),this.map);
                 break;
             case G:
-                this.m_shape = new Square((byte) 0, this.getRadius(), this.Map);
+                this.m_shape = new Square((byte) 0, this.getRadius(), this.map);
 
                 break;
             case P:
@@ -134,7 +134,7 @@ public class Zone implements IZone {
                 this.m_shape = new Cone((byte) 0, this.getRadius());
                 break;
             case W:
-                this.m_shape = new Square((byte) 0, this.getRadius(), this.Map) {
+                this.m_shape = new Square((byte) 0, this.getRadius(), this.map) {
                     {
                         this.diagonalFree = true;
                     }

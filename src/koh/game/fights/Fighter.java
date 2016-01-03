@@ -576,12 +576,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             case Damage_Fire_Per_Pm_Percent:
                 jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
                         + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * ((((double) this.getMP() / (double) this.getMaxMP()))));
-                System.out.println((this.getMP() / this.getMaxMP()));
-                System.out.println(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))));
-                System.out.println(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Intelligence) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.AllDamagesBonus) + this.stats.getTotal(StatsEnum.Add_Fire_Damages_Bonus))) * (((this.getMP() / this.getMaxMP()))));
-                break;
+               break;
             case Damage_Air:
             case Steal_Air:
                 jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.Agility) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100

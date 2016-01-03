@@ -41,7 +41,7 @@ public class BuffDamagePerPM extends BuffEffect {
         // dgt);
         DamageValue.setValue((((100 + inte + pdom) / 100) * DamageValue.getValue() * 1.5));
 
-        return EffectDamage.ApplyDamages(this.CastInfos, this.target, DamageValue);
+        return EffectDamage.applyDamages(this.CastInfos, this.target, DamageValue);
     }
 
     @Override

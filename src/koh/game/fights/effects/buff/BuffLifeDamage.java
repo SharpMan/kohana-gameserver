@@ -22,11 +22,11 @@ public class BuffLifeDamage extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         //var Damage = this.CastInfos.randomJet;
 
-        // return EffectDamage.ApplyDamages(this.CastInfos, this.target, ref Damage);
+        // return EffectDamage.applyDamages(this.CastInfos, this.target, ref Damage);
         int effectBase = CastInfos.randomJet(target);
         MutableInt DamageValuea = new MutableInt((target.currentLife / 100) * effectBase);
         //DamageValuea = (-DamageValuea);
-        return EffectDamage.ApplyDamages(this.CastInfos, this.target, DamageValuea);
+        return EffectDamage.applyDamages(this.CastInfos, this.target, DamageValuea);
     }
 
     @Override

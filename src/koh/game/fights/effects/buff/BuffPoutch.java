@@ -110,7 +110,7 @@ public class BuffPoutch extends BuffEffect {
          if (FightCell != null) {
          if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
          for (Fighter target : FightCell.GetObjectsAsFighter()) {
-         int newValue = EffectDamage.ApplyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100));
+         int newValue = EffectDamage.applyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100));
          if (newValue < apply) {
          apply = newValue;
          }
@@ -119,7 +119,7 @@ public class BuffPoutch extends BuffEffect {
          }
          }
          return apply;*/
-        //return EffectDamage.ApplyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
+        //return EffectDamage.applyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
