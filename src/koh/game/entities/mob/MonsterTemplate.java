@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -35,7 +36,7 @@ public class MonsterTemplate {
     @Getter
     private boolean isMiniBoss, isQuestMonster;
     @Getter
-    private int correspondingMiniBossId, speedAdjust, creatureBoneId;
+    private int correspondingMiniBossId, speedAdjust, creatureBoneId, minKamas,maxKamas;
     @Getter
     private boolean canBePushed, fastAnimsFun, canSwitchPos;
     @Getter
@@ -65,6 +66,8 @@ public class MonsterTemplate {
         fastAnimsFun = result.getBoolean("fast_anims_fun");
         canSwitchPos = result.getBoolean("can_switch_pos");
         incompatibleIdols = Enumerable.StringToIntArray(result.getString("incompatable_idols"));
+        this.minKamas = result.getInt("min_kamas");
+        this.maxKamas = result.getInt("max_kamas");
     }
 
 
@@ -99,6 +102,10 @@ public class MonsterTemplate {
             myEntityLook = EntityLookParser.fromString(this.look);
         }
         return myEntityLook;
+    }
+
+    public int getKamasWin(final Random random){
+        return maxKamas - random.nextInt(this.minKamas);
     }
 
 }

@@ -93,7 +93,7 @@ public class MonsterFight extends Fight {
             //On efface les anciens fakes results et on laisse celui des gens qui ont abondonnee maybe ils ont xp ?
         }
         final int teamPP = winners.getFighters().mapToInt(fr -> fr.getStats().getTotal(StatsEnum.Prospecting)).sum();
-        final int baseKamas = loosers.equals(this.myTeam2) ? 0 : 0;
+        final int baseKamas = loosers.equals(this.myTeam2) ? Arrays.stream(deadMobs).mapToInt(mob -> mob.getGrade().getMonster().getKamasWin(Fight.RANDOM)).sum() : 0; //sum min max
         final HashMap<MonsterDrop, Integer> droppedItems = new HashMap<>();
 
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) { //In stream.foreach you should use final var that suck
@@ -104,7 +104,7 @@ public class MonsterFight extends Fight {
                 fighter.getPlayer().addExperience(exp.get(), false);
                 final List<DroppedItem> loots = new ArrayList<>(7);
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
-                    loots = (FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots));
+                    FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots);
                 });
                 final int[] serializedLoots = new int[loots.size() * 2];
                 for (int i = 0; i < serializedLoots.length; i += 2) {

@@ -355,8 +355,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
         short oldCell = cellId;
-        if (spellLevel.getId() == 10461 && fighter instanceof CharacterFighter && ((CharacterFighter) fighter).character.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
-            this.launchWeapon(((CharacterFighter) fighter), cellId);
+        if (spellLevel.getId() == 10461 && fighter.isPlayer() && fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) != null) {
+            this.launchWeapon(fighter.asPlayer(), cellId);
             return;
         }
 
@@ -530,7 +530,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (fighter != this.currentFighter) {
             return;
         }
-        InventoryItem Weapon = fighter.character.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
+        InventoryItem Weapon = fighter.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
         if (Weapon.getTemplate().getTypeId() == 83) { //Pière d'Ame
             return;
         }
@@ -1228,7 +1228,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public void onReconnect(CharacterFighter fighter) {
-        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 184, new String[]{fighter.character.getNickName()}));
+        this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 184, new String[]{fighter.getCharacter().getNickName()}));
 
         if (this.fightState == fightState.STATE_PLACE) {
             this.sendPlacementInformation(fighter, false);
@@ -1236,7 +1236,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             fighter.send(new GameFightStartingMessage(fightType.value, getTeam1().LeaderId, getTeam2().LeaderId));
             this.sendGameFightJoinMessage(fighter);
             this.fighters().forEach((Actor) -> {
-                fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(fighter.character)));
+                fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(fighter.getCharacter())));
             });
             fighter.send(new GameEntitiesDispositionMessage(this.getAliveFighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
             fighter.send(new GameFightResumeMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.fightWorker.fightTurn, (int) (System.currentTimeMillis() - this.fightTime), getIdols(),
@@ -1251,13 +1251,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                        .filter(x -> x.getSummonerID() == fighter.getID() && (x instanceof BombFighter))
                             .count()));
             fighter.send(getFightTurnListMessage());
-            fighter.send(new GameFightSynchronizeMessage(this.fighters().map(x -> x.getGameContextActorInformations(fighter.character)).toArray(GameFightFighterInformations[]::new)));
+            fighter.send(new GameFightSynchronizeMessage(this.fighters().map(x -> x.getGameContextActorInformations(fighter.getCharacter())).toArray(GameFightFighterInformations[]::new)));
 
             /*/213.248.126.93 ChallengeInfoMessage Second8 paket
              /213.248.126.93 ChallengeResultMessage Second9 paket*/
-            CharacterHandler.SendCharacterStatsListMessage(fighter.character.getClient());
+            CharacterHandler.SendCharacterStatsListMessage(fighter.getCharacter().getClient());
             if (this.currentFighter.getID() == fighter.getID()) {
-                fighter.send(((CharacterFighter) this.currentFighter).FighterStatsListMessagePacket());
+                fighter.send(this.currentFighter.asPlayer().FighterStatsListMessagePacket());
             }
             /*Fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam1().getFightTeamInformations()));
              Fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam2().getFightTeamInformations()));*/
