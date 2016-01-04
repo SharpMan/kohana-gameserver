@@ -42,7 +42,7 @@ public class EffectSummonBomb extends EffectBase {
                                                   }
                                               }));
                 } else {
-                    //CastInfos.caster.fight.affectSpellTo(CastInfos.caster, CastInfos.caster.fight.getCell(CastInfos.getCellId).GetObjectsAsFighter()[0] , CastInfos.effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.effect.diceNum).instantSpellId);
+                    //castInfos.caster.fight.affectSpellTo(castInfos.caster, castInfos.caster.fight.getCell(castInfos.getCellId).GetObjectsAsFighter()[0] , castInfos.effect.diceSide, SpellDAOImpl.bombs.get(castInfos.effect.diceNum).instantSpellId);
                     CastInfos.caster.getFight().launchSpell(CastInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(CastInfos.effect.diceNum).instantSpellId).getSpellLevel(CastInfos.effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
                 }
             }

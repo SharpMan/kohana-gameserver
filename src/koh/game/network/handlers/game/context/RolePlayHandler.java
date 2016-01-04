@@ -39,12 +39,12 @@ public class RolePlayHandler {
     //TODO ImmutableMap
     public static final Map<Integer, StatsEnum> BOOST_ID_TO_STATS = new HashMap<Integer, StatsEnum>(6) {
         {
-            put(StatsBoostEnum.Strength, StatsEnum.Strength);
-            put(StatsBoostEnum.Vitality, StatsEnum.Vitality);
-            put(StatsBoostEnum.Wisdom, StatsEnum.Wisdom);
-            put(StatsBoostEnum.Chance, StatsEnum.Chance);
-            put(StatsBoostEnum.Agility, StatsEnum.Agility);
-            put(StatsBoostEnum.Intelligence, StatsEnum.Intelligence);
+            put(StatsBoostEnum.Strength, StatsEnum.STRENGTH);
+            put(StatsBoostEnum.Vitality, StatsEnum.VITALITY);
+            put(StatsBoostEnum.Wisdom, StatsEnum.WISDOM);
+            put(StatsBoostEnum.Chance, StatsEnum.CHANCE);
+            put(StatsBoostEnum.Agility, StatsEnum.AGILITY);
+            put(StatsBoostEnum.Intelligence, StatsEnum.INTELLIGENCE);
         }
     };
 
@@ -135,7 +135,7 @@ public class RolePlayHandler {
             base += num2;
             num1 -= num3;
         }
-        client.getCharacter().getStats().getEffect(Stat).Base = base;
+        client.getCharacter().getStats().getEffect(Stat).base = base;
         switch ((int) message.statId) {
             case StatsBoostEnum.Strength:
                 client.getCharacter().setStrength(base);

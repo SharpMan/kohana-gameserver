@@ -94,15 +94,15 @@ public abstract class EffectBase {
             this.put(StatsEnum.Increase_Effect_Duration, new EffectDispellEffectDuration());
 
             // Vol de statistique
-            this.put(StatsEnum.Steal_Vitality, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_Strength, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_Intelligence, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_Agility, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_Wisdom, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_Chance, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_PA, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_PM, new EffectStatsSteal());
-            this.put(StatsEnum.Steal_Range, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_VITALITY, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_STRENGTH, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_INTELLIGENCE, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_AGILITY, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_WISDOM, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_CHANCE, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_PA, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_PM, new EffectStatsSteal());
+            this.put(StatsEnum.STEAL_RANGE, new EffectStatsSteal());
 
             // Armure et bouclié feca
             this.put(StatsEnum.DAMAGE_ARMOR_REDUCTION, new EffectArmor());
@@ -126,16 +126,16 @@ public abstract class EffectBase {
             this.put(StatsEnum.DamageDropLife, new EffectDamageDropLife());
 
             //Ajout ou reduction PA/PM/PO/Dommages
-            this.put(StatsEnum.ActionPoints, new EffectStats());
-            this.put(StatsEnum.MovementPoints, new EffectStats());
-            this.put(StatsEnum.Sub_PM, new EffectStats());
-            this.put(StatsEnum.Sub_PA, new EffectStats());
-            this.put(StatsEnum.Sub_Range, new EffectStats());
-            this.put(StatsEnum.Add_Range, new EffectStats());
-            this.put(StatsEnum.DodgePALostProbability, new EffectStats());
-            this.put(StatsEnum.DodgePMLostProbability, new EffectStats());
-            this.put(StatsEnum.Sub_Dodge_PA_Probability, new EffectStats());
-            this.put(StatsEnum.Sub_Dodge_PM_Probability, new EffectStats());
+            this.put(StatsEnum.ACTION_POINTS, new EffectStats());
+            this.put(StatsEnum.MOVEMENT_POINTS, new EffectStats());
+            this.put(StatsEnum.SUB_PM, new EffectStats());
+            this.put(StatsEnum.SUB_PA, new EffectStats());
+            this.put(StatsEnum.SUB_RANGE, new EffectStats());
+            this.put(StatsEnum.ADD_RANGE, new EffectStats());
+            this.put(StatsEnum.DODGE_PA_LOST_PROBABILITY, new EffectStats());
+            this.put(StatsEnum.DODGE_PM_LOST_PROBABILITY, new EffectStats());
+            this.put(StatsEnum.SUB_DODGE_PA_PROBABILITY, new EffectStats());
+            this.put(StatsEnum.SUB_DODGE_PM_PROBABILITY, new EffectStats());
             this.put(StatsEnum.AddDamagePhysic, new EffectStats());
             this.put(StatsEnum.SUB_PA_ESQUIVE_2, new EffectSubPAEsquive());
             this.put(StatsEnum.SubPAEsquive, new EffectSubPAEsquive());
@@ -157,86 +157,86 @@ public abstract class EffectBase {
             this.put(StatsEnum.Skip_Turn, new EffectEndTurn());
             
             //Caracteristiques Ajout/Reduction
-            this.put(StatsEnum.Strength, new EffectStats());
-            this.put(StatsEnum.Intelligence, new EffectStats());
-            this.put(StatsEnum.Chance, new EffectStats());
-            this.put(StatsEnum.Wisdom, new EffectStats());
-            this.put(StatsEnum.Agility, new EffectStats());
-            this.put(StatsEnum.Vitality, new EffectStats());
+            this.put(StatsEnum.STRENGTH, new EffectStats());
+            this.put(StatsEnum.INTELLIGENCE, new EffectStats());
+            this.put(StatsEnum.CHANCE, new EffectStats());
+            this.put(StatsEnum.WISDOM, new EffectStats());
+            this.put(StatsEnum.AGILITY, new EffectStats());
+            this.put(StatsEnum.VITALITY, new EffectStats());
             this.put(StatsEnum.AddVie, new EffectStats());
-            this.put(StatsEnum.Sub_Strength, new EffectStats());
-            this.put(StatsEnum.Sub_Intelligence, new EffectStats());
-            this.put(StatsEnum.Sub_Chance, new EffectStats());
-            this.put(StatsEnum.Sub_Agility, new EffectStats());
-            this.put(StatsEnum.Sub_Wisdom, new EffectStats());
-            this.put(StatsEnum.Sub_Vitality, new EffectStats());
-            this.put(StatsEnum.Prospecting, new EffectStats());
+            this.put(StatsEnum.SUB_STRENGTH, new EffectStats());
+            this.put(StatsEnum.SUB_INTELLIGENCE, new EffectStats());
+            this.put(StatsEnum.SUB_CHANCE, new EffectStats());
+            this.put(StatsEnum.SUB_AGILITY, new EffectStats());
+            this.put(StatsEnum.SUB_WISDOM, new EffectStats());
+            this.put(StatsEnum.SUB_VITALITY, new EffectStats());
+            this.put(StatsEnum.PROSPECTING, new EffectStats());
             this.put(StatsEnum.AddDamageMagic, new EffectStats());
             this.put(StatsEnum.Add_Damage_Final_Percent, new EffectStats());
-            this.put(StatsEnum.Add_Push_Damages_Bonus, new EffectStats());
-            this.put(StatsEnum.Add_Push_Damages_Reduction, new EffectStats());
-            this.put(StatsEnum.Add_Critical_Damages, new EffectStats());
-            this.put(StatsEnum.Add_Critical_Damages_Reduction, new EffectStats());
-            this.put(StatsEnum.Add_Push_Damages_Reduction, new EffectStats());
-            this.put(StatsEnum.Add_Critical_Damages, new EffectStats());
-            this.put(StatsEnum.Sub_Prospecting, new EffectStats());
-            this.put(StatsEnum.Sub_Damage, new EffectStats());
+            this.put(StatsEnum.ADD_PUSH_DAMAGES_BONUS, new EffectStats());
+            this.put(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION, new EffectStats());
+            this.put(StatsEnum.ADD_CRITICAL_DAMAGES, new EffectStats());
+            this.put(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION, new EffectStats());
+            this.put(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION, new EffectStats());
+            this.put(StatsEnum.ADD_CRITICAL_DAMAGES, new EffectStats());
+            this.put(StatsEnum.SUB_PROSPECTING, new EffectStats());
+            this.put(StatsEnum.SUB_DAMAGE, new EffectStats());
             this.put(StatsEnum.SubDamageBonusPercent, new EffectStats());
-            this.put(StatsEnum.Sub_Push_Damages_Bonus, new EffectStats());
-            this.put(StatsEnum.Sub_Push_Damages_Reduction, new EffectStats());
-            this.put(StatsEnum.Sub_Critical_Damages, new EffectStats());
-            this.put(StatsEnum.Sub_Critical_Damages_Reduction, new EffectStats());
-            this.put(StatsEnum.Sub_Push_Damages_Reduction, new EffectStats());
-            this.put(StatsEnum.Sub_Critical_Damages, new EffectStats());
-            this.put(StatsEnum.Sub_Critical_Damages_Reduction, new EffectStats());
-            this.put(StatsEnum.Add_RETRAIT_PA, new EffectStats());
-            this.put(StatsEnum.Add_RETRAIT_PM, new EffectStats());
-            this.put(StatsEnum.Sub_RETRAIT_PA, new EffectStats());
+            this.put(StatsEnum.SUB_PUSH_DAMAGES_BONUS, new EffectStats());
+            this.put(StatsEnum.SUB_PUSH_DAMAGES_REDUCTION, new EffectStats());
+            this.put(StatsEnum.SUB_CRITICAL_DAMAGES, new EffectStats());
+            this.put(StatsEnum.SUB_CRITICAL_DAMAGES_REDUCTION, new EffectStats());
+            this.put(StatsEnum.SUB_PUSH_DAMAGES_REDUCTION, new EffectStats());
+            this.put(StatsEnum.SUB_CRITICAL_DAMAGES, new EffectStats());
+            this.put(StatsEnum.SUB_CRITICAL_DAMAGES_REDUCTION, new EffectStats());
+            this.put(StatsEnum.ADD_RETRAIT_PA, new EffectStats());
+            this.put(StatsEnum.ADD_RETRAIT_PM, new EffectStats());
+            this.put(StatsEnum.SUB_RETRAIT_PA, new EffectStats());
             this.put(StatsEnum.SUB_RETRAIT_PM, new EffectStats());
 
             //Soins
-            this.put(StatsEnum.Add_Heal_Bonus, new EffectStats());
-            this.put(StatsEnum.Sub_Heal_Bonus, new EffectStats());
+            this.put(StatsEnum.ADD_HEAL_BONUS, new EffectStats());
+            this.put(StatsEnum.SUB_HEAL_BONUS, new EffectStats());
 
             //Resistances ajout/suppressions
-            this.put(StatsEnum.NeutralElementReduction, new EffectStats());
-            this.put(StatsEnum.EarthElementReduction, new EffectStats());
-            this.put(StatsEnum.WaterElementReduction, new EffectStats());
-            this.put(StatsEnum.AirElementReduction, new EffectStats());
-            this.put(StatsEnum.FireElementReduction, new EffectStats());
+            this.put(StatsEnum.NEUTRAL_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.EARTH_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.WATER_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.AIR_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.FIRE_ELEMENT_REDUCTION, new EffectStats());
 
-            this.put(StatsEnum.WaterElementResistPercent, new EffectStats());
-            this.put(StatsEnum.EarthElementResistPercent, new EffectStats());
-            this.put(StatsEnum.AirElementResistPercent, new EffectStats());
-            this.put(StatsEnum.FireElementResistPercent, new EffectStats());
-            this.put(StatsEnum.NeutralElementResistPercent, new EffectStats());
+            this.put(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.AIR_ELEMENT_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, new EffectStats());
 
-            this.put(StatsEnum.Sub_Fire_Element_Reduction, new EffectStats());
-            this.put(StatsEnum.Sub_Earth_Element_Reduction, new EffectStats());
-            this.put(StatsEnum.Sub_Water_Element_Reduction, new EffectStats());
-            this.put(StatsEnum.Sub_Air_Element_Reduction, new EffectStats());
-            this.put(StatsEnum.Sub_Neutral_Element_Reduction, new EffectStats());
+            this.put(StatsEnum.SUB_FIRE_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.SUB_EARTH_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.SUB_WATER_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.SUB_AIR_ELEMENT_REDUCTION, new EffectStats());
+            this.put(StatsEnum.SUB_NEUTRAL_ELEMENT_REDUCTION, new EffectStats());
 
             this.put(StatsEnum.Add_Magic_Reduction, new EffectStats());
             this.put(StatsEnum.Add_Physical_Reduction, new EffectStats());
 
-            this.put(StatsEnum.Sub_Water_Resist_Percent, new EffectStats());
-            this.put(StatsEnum.Sub_Earth_Resist_Percent, new EffectStats());
-            this.put(StatsEnum.Sub_Air_Resist_Percent, new EffectStats());
-            this.put(StatsEnum.Sub_Fire_Resist_Percent, new EffectStats());
-            this.put(StatsEnum.Sub_Neutral_Resist_Percent, new EffectStats());
+            this.put(StatsEnum.SUB_WATER_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.SUB_EARTH_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.SUB_AIR_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.SUB_FIRE_RESIST_PERCENT, new EffectStats());
+            this.put(StatsEnum.SUB_NEUTRAL_RESIST_PERCENT, new EffectStats());
 
             //Ajout ou reduction de dommage
-            this.put(StatsEnum.Add_CriticalHit, new EffectStats());
-            this.put(StatsEnum.AllDamagesBonus, new EffectStats());
+            this.put(StatsEnum.ADD_CRITICAL_HIT, new EffectStats());
+            this.put(StatsEnum.ALL_DAMAGES_BONUS, new EffectStats());
             this.put(StatsEnum.Critical_Miss, new EffectStats());
             this.put(StatsEnum.Damage_Return, new EffectStats());
-            this.put(StatsEnum.Sub_Critical_Hit, new EffectStats());
+            this.put(StatsEnum.SUB_CRITICAL_HIT, new EffectStats());
             this.put(StatsEnum.Add_Global_Damage_Reduction, new EffectStats());
             this.put(StatsEnum.Add_Damage_Final_Percent, new EffectStats());
             this.put(StatsEnum.SubDamageBonusPercent, new EffectStats());
             this.put(StatsEnum.AddDamagePercent, new EffectStats());
-            this.put(StatsEnum.AddSummonLimit, new EffectStats());
+            this.put(StatsEnum.ADD_SUMMON_LIMIT, new EffectStats());
             this.put(StatsEnum.AddDamageMagic, new EffectStats());
             this.put(StatsEnum.Add_Physical_Damage, new EffectStats());
             this.put(StatsEnum.ADD_TACKLE_BLOCK, new EffectStats());
@@ -271,7 +271,7 @@ public abstract class EffectBase {
             //Eliatrope
             this.put(StatsEnum.LOST_PDV_PERCENT, new EffectLostPdvPercent());
             this.put(StatsEnum.PORTAL_TELEPORTATION, new EffectPortalTeleportation());
-            this.put(StatsEnum.ADD_SPELL_PO, new EffectSpellDommage());
+            this.put(StatsEnum.ADD_SPELL_PO, new EffectAddSpellRange());
             this.put(StatsEnum.BACK_CELL, new EffectPush());
             this.put(StatsEnum.DISABLE_PORTAL, new EffectDisablePortal());
 

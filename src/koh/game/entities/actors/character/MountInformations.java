@@ -1,8 +1,6 @@
 package koh.game.entities.actors.character;
 
-import koh.game.Main;
 import koh.game.dao.DAO;
-import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.animal.MountInventoryItemEntity;
 import koh.protocol.client.BufUtils;
@@ -116,10 +114,10 @@ public class MountInformations {
     public void enableStats(boolean enable) {
         if (enable) {
             this.player.getStats().merge(getStats());
-            this.player.addLife(getStats().getTotal(StatsEnum.Vitality));
+            this.player.addLife(getStats().getTotal(StatsEnum.VITALITY));
         } else {
             this.player.getStats().unMerge(getStats());
-            this.player.addLife(-getStats().getTotal(StatsEnum.Vitality));
+            this.player.addLife(-getStats().getTotal(StatsEnum.VITALITY));
         }
         this.player.refreshStats();
     }

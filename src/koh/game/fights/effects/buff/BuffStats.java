@@ -23,9 +23,9 @@ public class BuffStats extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
 
-        this.value1 = CastInfos.randomJet(target);
+        this.value1 = castInfos.randomJet(target);
 
-        this.target.getStats().addBoost(this.CastInfos.EffectType, this.value1);
+        this.target.getStats().addBoost(this.castInfos.EffectType, this.value1);
 
         return super.applyEffect(DamageValue, DamageInfos);
     }
@@ -33,14 +33,14 @@ public class BuffStats extends BuffEffect {
     @Override
     public int removeEffect() {
         
-        this.target.getStats().getEffect(this.CastInfos.EffectType).additionnal -= this.value1;
+        this.target.getStats().getEffect(this.castInfos.EffectType).additionnal -= this.value1;
 
         return super.removeEffect();
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.value1));
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.SpellId, this.castInfos.GetEffectUID(), this.castInfos.ParentUID, (short) Math.abs(this.value1));
     }
 
 }

@@ -42,7 +42,7 @@ public class FighterState {
     }
 
     public void addState(BuffEffect Buff) {
-        switch (Buff.CastInfos.EffectType) {
+        switch (Buff.castInfos.EffectType) {
             case Invisibility:
                 myFighter.setVisibleState(GameActionFightInvisibilityStateEnum.INVISIBLE);
                 for (Player o : this.myFighter.getFight().Observable$stream()) {
@@ -56,15 +56,15 @@ public class FighterState {
                 return;
 
             default:
-                // Buff.target.fight.SendToFight(new GameActionMessage((int)EffectEnum.addState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.CastInfos.Value3 + ",1"));
+                // Buff.target.fight.SendToFight(new GameActionMessage((int)EffectEnum.addState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.castInfos.Value3 + ",1"));
                 break;
         }
 
-        this.myStates.put(FightStateEnum.valueOf(Buff.CastInfos.effect.value), Buff);
+        this.myStates.put(FightStateEnum.valueOf(Buff.castInfos.effect.value), Buff);
     }
 
     public void delState(BuffEffect Buff) {
-        switch (Buff.CastInfos.EffectType) {
+        switch (Buff.castInfos.EffectType) {
             case Invisibility:
                 this.myFighter.setVisibleState(GameActionFightInvisibilityStateEnum.VISIBLE);
                 this.myFighter.getFight().sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.caster.getID(), myFighter.getID(), myFighter.getVisibleStateFor(null)));
@@ -76,11 +76,11 @@ public class FighterState {
                 return;
 
             default:
-                // Buff.target.fight.SendToFight(new GameActionMessage((int) EffectEnum.addState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.CastInfos.Value3 + ",0"));
+                // Buff.target.fight.SendToFight(new GameActionMessage((int) EffectEnum.addState, this.myFighter.ActorId, this.myFighter.ActorId + "," + Buff.castInfos.Value3 + ",0"));
                 break;
         }
 
-        this.myStates.remove(FightStateEnum.valueOf(Buff.CastInfos.effect.value));
+        this.myStates.remove(FightStateEnum.valueOf(Buff.castInfos.effect.value));
     }
 
     public void removeState(FightStateEnum State) {

@@ -54,12 +54,12 @@ public class MonsterGrade {
     private void parseStats() {
         this.myStats = new GenericStats();
 
-        this.myStats.addBase(StatsEnum.Vitality, this.lifePoints);
-        this.myStats.addBase(StatsEnum.ActionPoints, this.actionPoints);
-        this.myStats.addBase(StatsEnum.MovementPoints, this.monsterId);
-        this.myStats.addBase(StatsEnum.DodgePALostProbability, this.paDodge);
-        this.myStats.addBase(StatsEnum.DodgePMLostProbability, this.pmDodge);
-        this.myStats.addBase(StatsEnum.Wisdom, this.wisdom);
+        this.myStats.addBase(StatsEnum.VITALITY, this.lifePoints);
+        this.myStats.addBase(StatsEnum.ACTION_POINTS, this.actionPoints);
+        this.myStats.addBase(StatsEnum.MOVEMENT_POINTS, this.monsterId);
+        this.myStats.addBase(StatsEnum.DODGE_PA_LOST_PROBABILITY, this.paDodge);
+        this.myStats.addBase(StatsEnum.DODGE_PM_LOST_PROBABILITY, this.pmDodge);
+        this.myStats.addBase(StatsEnum.WISDOM, this.wisdom);
 
         this.myStats.addBase(StatsEnum.ADD_TACKLE_EVADE, this.tackleEvade);
         this.myStats.addBase(StatsEnum.ADD_TACKLE_BLOCK, this.tackleBlock);
@@ -83,22 +83,22 @@ public class MonsterGrade {
                 default:
                     bonus = 100;
             }
-            this.myStats.addBase(StatsEnum.Strength, bonus);
-            this.myStats.addBase(StatsEnum.Chance, bonus);
-            this.myStats.addBase(StatsEnum.Intelligence, bonus);
-            this.myStats.addBase(StatsEnum.Agility, this.getMonster().isCanTackle() ? bonus : 0);
+            this.myStats.addBase(StatsEnum.STRENGTH, bonus);
+            this.myStats.addBase(StatsEnum.CHANCE, bonus);
+            this.myStats.addBase(StatsEnum.INTELLIGENCE, bonus);
+            this.myStats.addBase(StatsEnum.AGILITY, this.getMonster().isCanTackle() ? bonus : 0);
         } else {
-            this.myStats.addBase(StatsEnum.Strength, this.strenght);
-            this.myStats.addBase(StatsEnum.Chance, this.chance);
-            this.myStats.addBase(StatsEnum.Intelligence, this.intelligence);
-            this.myStats.addBase(StatsEnum.Agility, this.agility);
+            this.myStats.addBase(StatsEnum.STRENGTH, this.strenght);
+            this.myStats.addBase(StatsEnum.CHANCE, this.chance);
+            this.myStats.addBase(StatsEnum.INTELLIGENCE, this.intelligence);
+            this.myStats.addBase(StatsEnum.AGILITY, this.agility);
         }
 
-        this.myStats.addBase(StatsEnum.EarthElementResistPercent, this.earthResistance);
-        this.myStats.addBase(StatsEnum.AirElementResistPercent, this.airResistance);
-        this.myStats.addBase(StatsEnum.FireElementResistPercent, this.fireResistance);
-        this.myStats.addBase(StatsEnum.WaterElementResistPercent, this.waterResistance);
-        this.myStats.addBase(StatsEnum.NeutralElementResistPercent, this.neutralResistance);
+        this.myStats.addBase(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT, this.earthResistance);
+        this.myStats.addBase(StatsEnum.AIR_ELEMENT_RESIST_PERCENT, this.airResistance);
+        this.myStats.addBase(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT, this.fireResistance);
+        this.myStats.addBase(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, this.waterResistance);
+        this.myStats.addBase(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, this.neutralResistance);
         this.myStats.addBase(StatsEnum.DamageReflection, this.damageReflect);
 
     }

@@ -20,17 +20,17 @@ public class BuffLifeDamage extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        //var Damage = this.CastInfos.randomJet;
+        //var Damage = this.castInfos.randomJet;
 
-        // return EffectDamage.applyDamages(this.CastInfos, this.target, ref Damage);
-        int effectBase = CastInfos.randomJet(target);
+        // return EffectDamage.applyDamages(this.castInfos, this.target, ref Damage);
+        int effectBase = castInfos.randomJet(target);
         MutableInt DamageValuea = new MutableInt((target.currentLife / 100) * effectBase);
         //DamageValuea = (-DamageValuea);
-        return EffectDamage.applyDamages(this.CastInfos, this.target, DamageValuea);
+        return EffectDamage.applyDamages(this.castInfos, this.target, DamageValuea);
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.CastInfos.randomJet(target)));
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.SpellId, this.castInfos.GetEffectUID(), this.castInfos.ParentUID, (short) Math.abs(this.castInfos.randomJet(target)));
     }
 }

@@ -69,7 +69,7 @@ public class FightFormulas {
             }
             double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
             double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
-            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.Wisdom)) / 100.0) * num8 * fighter.getCharacter().getExpBonus());
+            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.WISDOM)) / 100.0) * num8 * fighter.getCharacter().getExpBonus());
         }
         return result;
     }
@@ -127,9 +127,9 @@ public class FightFormulas {
         if (rapport >= 1.0F) {
             malus = 1;
         }
-        int xpWin = (int) (((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
+        int xpWin = (int) (((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus) * (1 + (fighter.getStats().getTotal(StatsEnum.WISDOM) * 0.01)));
         if (xpWin < 0) {
-            logger.error("xpWin <0 on lvlLoosers {} lvlWinners {} rapport {} need {} sasa {}", lvlLoosers, lvlWinners, rapport, ((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus), (1 + (fighter.getStats().getTotal(StatsEnum.Wisdom) * 0.01)));
+            logger.error("xpWin <0 on lvlLoosers {} lvlWinners {} rapport {} need {} sasa {}", lvlLoosers, lvlWinners, rapport, ((((rapport * (float) xpNeededAtLevel(fighter.getLevel())) / 10F) * (float) taux) / (long) malus), (1 + (fighter.getStats().getTotal(StatsEnum.WISDOM) * 0.01)));
         }
         return xpWin;
     }
@@ -331,7 +331,7 @@ public class FightFormulas {
 
 
     public static double adjustDropChance(Fighter looter, MonsterDrop item, MonsterGrade dropper, int monsterAgeBonus) {
-        return item.getDropRate((int) dropper.getGrade()) * ((double) looter.getStats().getTotal(StatsEnum.Prospecting) / 100.0) * ((double) monsterAgeBonus / 100.0 + 1.0) * DAO.getSettings().getDoubleElement("Rate.Kamas");
+        return item.getDropRate((int) dropper.getGrade()) * ((double) looter.getStats().getTotal(StatsEnum.PROSPECTING) / 100.0) * ((double) monsterAgeBonus / 100.0 + 1.0) * DAO.getSettings().getDoubleElement("Rate.Kamas");
     }
 
 
@@ -365,6 +365,6 @@ public class FightFormulas {
 
     public static int computeKamas(Fighter fighter, int baseKamas, int teamPP) {
         double num = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
-        return (int) ((double) baseKamas * ((double) fighter.getStats().getTotal(StatsEnum.Prospecting) / (double) teamPP) * num * DAO.getSettings().getDoubleElement("Rate.Kamas"));
+        return (int) ((double) baseKamas * ((double) fighter.getStats().getTotal(StatsEnum.PROSPECTING) / (double) teamPP) * num * DAO.getSettings().getDoubleElement("Rate.Kamas"));
     }
 }

@@ -29,7 +29,7 @@ public class BuffPorter extends BuffEffect {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
         Target.getStates().fakeState(FightStateEnum.Porté, true);
-        this.CastInfos.EffectType = StatsEnum.ADD_STATE;
+        this.castInfos.EffectType = StatsEnum.ADD_STATE;
         Target.setCell(this.caster.getMyCell());
     }
 
@@ -39,7 +39,7 @@ public class BuffPorter extends BuffEffect {
             if (!isCalledBy("koh.game.fights.effects.EffectLancer", 6)) {
                 this.caster.getFight().sendToField(new GameActionFightDropCharacterMessage(ACTION_CARRY_CHARACTER, this.caster.getID(), this.target.getID(), (short) this.target.getCellId()));
             }
-            this.caster.getFight().sendToField(new GameActionFightDispellSpellMessage(406, this.caster.getID(), this.target.getID(), this.CastInfos.SpellId));
+            this.caster.getFight().sendToField(new GameActionFightDispellSpellMessage(406, this.caster.getID(), this.target.getID(), this.castInfos.SpellId));
             logger.debug("3bada " + this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).count());
             logger.debug("3bada " + this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).count());
             logger.debug("3bada " + this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur).count());
@@ -70,7 +70,7 @@ public class BuffPorter extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 3, this.CastInfos.ParentUID, (short) 1, (short) 8);
+        return new FightTemporaryBoostStateEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.SpellId, (short)/*this.castInfos.GetEffectUID()*/ 3, this.castInfos.ParentUID, (short) 1, (short) 8);
     }
 
     public static boolean isCalledBy(String Comparant, int... indexes) { //Do not modif long story

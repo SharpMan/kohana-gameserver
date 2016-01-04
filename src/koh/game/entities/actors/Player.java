@@ -500,11 +500,11 @@ public class Player extends IGameActor implements Observer {
 
     public int getInitiative(boolean Base) {
 
-        return 1 + (int) Math.floor((this.stats.getTotal(StatsEnum.Strength)
-                + this.stats.getTotal(StatsEnum.Chance)
-                + this.stats.getTotal(StatsEnum.Intelligence)
-                + this.stats.getTotal(StatsEnum.Agility)
-                + (Base ? this.stats.getTotal(StatsEnum.Initiative) : this.stats.getTotal(StatsEnum.Initiative)))
+        return 1 + (int) Math.floor((this.stats.getTotal(StatsEnum.STRENGTH)
+                + this.stats.getTotal(StatsEnum.CHANCE)
+                + this.stats.getTotal(StatsEnum.INTELLIGENCE)
+                + this.stats.getTotal(StatsEnum.AGILITY)
+                + (Base ? this.stats.getTotal(StatsEnum.INITIATIVE) : this.stats.getTotal(StatsEnum.INITIATIVE)))
                 * ((double) life / getMaxLife())
         );
 
@@ -544,7 +544,7 @@ public class Player extends IGameActor implements Observer {
      return init;
      }*/
     public int getProspection() {
-        return (int) Math.floor((double) (this.stats.getTotal(StatsEnum.Chance) / 10)) + this.stats.getTotal(StatsEnum.Prospecting);
+        return (int) Math.floor((double) (this.stats.getTotal(StatsEnum.CHANCE) / 10)) + this.stats.getTotal(StatsEnum.PROSPECTING);
 
     }
 
@@ -555,7 +555,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public int getMaxLife() {
-        return this.stats.getTotal(StatsEnum.Vitality) + ((int) level * 5) + DAO.getD2oTemplates().getBreed(this.breed).getHealPoint();
+        return this.stats.getTotal(StatsEnum.VITALITY) + ((int) level * 5) + DAO.getD2oTemplates().getBreed(this.breed).getHealPoint();
     }
 
     @Override
@@ -697,7 +697,7 @@ public class Player extends IGameActor implements Observer {
                     this.spellPoints++;
 
                     if (this.level == 100) {
-                        this.stats.addBase(StatsEnum.ActionPoints, 1);
+                        this.stats.addBase(StatsEnum.ACTION_POINTS, 1);
                     }
                     // Apprend des nouveaux sorts
                     for (LearnableSpell learnableSpell : DAO.getSpells().findLearnableSpell(this.breed)) {

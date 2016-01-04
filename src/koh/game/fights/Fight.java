@@ -286,8 +286,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         fighter.setTurnReady(true);
     }
 
-    public void launchSpell(Fighter Fighter, SpellLevel SpellLevel, short CellId, boolean friend) {
-        launchSpell(Fighter, SpellLevel, CellId, friend, false, true);
+    public void launchSpell(Fighter fighter, SpellLevel spelllevel, short cellId, boolean friend) {
+        launchSpell(fighter, spelllevel, cellId, friend, false, true);
     }
     //TODO ActionIdConverter.ACTION_FIGHT_DISABLE_PORTAL
 
@@ -382,7 +382,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         boolean IsCc = false;
         if (spellLevel.getCriticalHitProbability() != 0 && spellLevel.getCriticalEffect().length > 0) {
-            int TauxCC = spellLevel.getCriticalHitProbability() - fighter.getStats().getTotal(StatsEnum.Add_CriticalHit);
+            int TauxCC = spellLevel.getCriticalHitProbability() - fighter.getStats().getTotal(StatsEnum.ADD_CRITICAL_HIT);
             if (TauxCC < 2) {
                 TauxCC = 2;
             }
@@ -404,18 +404,19 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         boolean silentCast = Arrays.stream(Effects).allMatch(x -> !ArrayUtils.contains(EFFECT_NOT_SILENCED, x.EffectType()));
 
         if (!fakeLaunch) {
-            Three<Integer, int[], Integer> Informations = null;
-            if (this.getCell(cellId).HasGameObject(FightObjectType.OBJECT_PORTAL) && !Arrays.stream(Effects).anyMatch(Effect -> Effect.EffectType().equals(StatsEnum.DISABLE_PORTAL))) {
-                Informations = this.getTargetThroughPortal(fighter, cellId, true);
-                cellId = Informations.first.shortValue();
+            Three<Integer, int[], Integer> informations = null;
+            if (this.getCell(cellId).HasGameObject(FightObjectType.OBJECT_PORTAL)
+                    && !Arrays.stream(Effects).anyMatch(Effect -> Effect.EffectType().equals(StatsEnum.DISABLE_PORTAL))) {
+                informations = this.getTargetThroughPortal(fighter, cellId, true);
+                cellId = informations.first.shortValue();
                 //this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"DamagePercentBoosted Suite au portails = " + DamagePercentBoosted}));
 
             }
             for (Player player : this.Observable$stream()) {
-                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), TargetId, cellId, (byte) (IsCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) || silentCast), spellLevel.getSpellId(), spellLevel.getGrade(), Informations == null ? new int[0] : Informations.second));
+                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), TargetId, cellId, (byte) (IsCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) || silentCast), spellLevel.getSpellId(), spellLevel.getGrade(), informations == null ? new int[0] : informations.second));
             }
-            if (Informations != null) {
-                Informations.Clear();
+            if (informations != null) {
+                informations.Clear();
             }
         }
 
@@ -552,7 +553,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         boolean IsCc = false;
 
-        int TauxCC = weapon.getWeaponTemplate().getCriticalHitProbability() - fighter.getStats().getTotal(StatsEnum.Add_CriticalHit);
+        int TauxCC = weapon.getWeaponTemplate().getCriticalHitProbability() - fighter.getStats().getTotal(StatsEnum.ADD_CRITICAL_HIT);
         if (TauxCC < 2) {
             TauxCC = 2;
         }
@@ -638,8 +639,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return false;
         }
         //targetId == -1
+        logger.debug(!spell.isNeedFreeCell() || targetId == -1);
+        logger.debug( (!spell.isNeedTakenCell() || targetId != -1));
+        logger.debug(!Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x)));
+        logger.debug(!Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x)));
+        logger.debug( ArrayUtils.contains(fighter.getCastZone(spell), cellId));
+        logger.debug(fighter.getSpellsController().canLaunchSpell(spell, targetId));
+
+        //TODO return a message foreach issues
         return (!spell.isNeedFreeCell() || targetId == -1)
                 && (!spell.isNeedTakenCell() || targetId != -1)
+                && !(spell.isNeedFreeTrapCell() && this.myCells.get(cellId).HasGameObject(FightObjectType.OBJECT_TRAP))
                 && !Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x))
                 && !Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x))
                 && ArrayUtils.contains(fighter.getCastZone(spell), cellId)
@@ -1290,12 +1300,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         for (Stream<BuffEffect> Buffs : (Iterable<Stream<BuffEffect>>) this.getAliveFighters().map(x -> x.getBuff().getAllBuffs())::iterator) {
             for (BuffEffect Buff : (Iterable<BuffEffect>) Buffs::iterator) {
-                FightDispellableEffectExtendedInformations = ArrayUtils.add(FightDispellableEffectExtendedInformations, new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.caster.getID(), Buff.getAbstractFightDispellableEffect()));
+                FightDispellableEffectExtendedInformations = ArrayUtils.add(FightDispellableEffectExtendedInformations, new FightDispellableEffectExtendedInformations(Buff.castInfos.EffectType.value(), Buff.caster.getID(), Buff.getAbstractFightDispellableEffect()));
             }
         }
         /*return Stream.of(this.getAliveFighters()
          .map(x -> x.buff.getAllBuffs()
-         .map(Buff -> (new FightDispellableEffectExtendedInformations(Buff.CastInfos.EffectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect())))
+         .map(Buff -> (new FightDispellableEffectExtendedInformations(Buff.castInfos.EffectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect())))
          )).toArray(FightDispellableEffectExtendedInformations[]::new);*/
         return FightDispellableEffectExtendedInformations;
     }

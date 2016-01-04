@@ -57,11 +57,11 @@ public class FighterBuff {
     }
 
     public boolean buffMaxStackReached(BuffEffect Buff) { //CLEARCODE : Distinct state ?
-        return Buff.CastInfos.SpellLevel != null && Buff.CastInfos.SpellLevel.getMaxStack() > 0
-                && Buff.CastInfos.SpellLevel.getMaxStack()
+        return Buff.castInfos.SpellLevel != null && Buff.castInfos.SpellLevel.getMaxStack() > 0
+                && Buff.castInfos.SpellLevel.getMaxStack()
                 <= (Buff instanceof BuffState
-                        ? this.getAllBuffs().filter(x -> x.CastInfos.SpellId == Buff.CastInfos.SpellId && x instanceof BuffState && ((BuffState) x).CastInfos.effect.value == Buff.CastInfos.effect.value).count()
-                        : this.getAllBuffs().filter(x -> x.CastInfos.SpellId == Buff.CastInfos.SpellId && x.CastInfos.EffectType == Buff.CastInfos.EffectType).count());
+                        ? this.getAllBuffs().filter(x -> x.castInfos.SpellId == Buff.castInfos.SpellId && x instanceof BuffState && ((BuffState) x).castInfos.effect.value == Buff.castInfos.effect.value).count()
+                        : this.getAllBuffs().filter(x -> x.castInfos.SpellId == Buff.castInfos.SpellId && x.castInfos.EffectType == Buff.castInfos.EffectType).count());
     }
 
     public void addBuff(BuffEffect buff) {
@@ -75,7 +75,7 @@ public class FighterBuff {
         }
         this.buffsAct.get(buff.ActiveType).add(buff);
         this.buffsDec.get(buff.DecrementType).add(buff);
-        buff.target.getFight().sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.effect.effectId*/buff.CastInfos.EffectType.value(), buff.caster.getID(), buff.getAbstractFightDispellableEffect()));
+        buff.target.getFight().sendToField(new GameActionFightDispellableEffectMessage(/*Buff.castInfos.effect.effectId*/buff.castInfos.EffectType.value(), buff.caster.getID(), buff.getAbstractFightDispellableEffect()));
         logger.debug("Buff {} added",buff,getClass().getName());
     }
 
@@ -102,7 +102,7 @@ public class FighterBuff {
          }
          this.buffsAct.get(Buff.ActiveType).add(Buff);
          this.buffsDec.get(Buff.DecrementType).add(Buff);
-         Buff.target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.CastInfos.EffectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect()));
+         Buff.target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.castInfos.EffectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect()));
 
          }
          }*/
@@ -170,7 +170,7 @@ public class FighterBuff {
     /// <summary>
     /// Lance un soin, activation des buffs d'attaque avant le calcul du jet avec les statistiques
     /// </summary>
-    /// <param name="CastInfos"></param>
+    /// <param name="castInfos"></param>
     /// <param name="DamageValue"></param>
     public int onHealPostJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_HEAL_AFTER_JET)) {
@@ -185,7 +185,7 @@ public class FighterBuff {
     /// <summary>
     /// Lance une attaque, activation des buffs d'attaque avant le calcul du jet avec les statistiques
     /// </summary>
-    /// <param name="CastInfos"></param>
+    /// <param name="castInfos"></param>
     /// <param name="DamageValue"></param>
     public int onAttackPostJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACK_POST_JET)) {
@@ -200,7 +200,7 @@ public class FighterBuff {
     /// <summary>
     /// Lance une attaque, activation des buffs d'attaque apres le calcul du jet avec les statistiques
     /// </summary>
-    /// <param name="CastInfos"></param>
+    /// <param name="castInfos"></param>
     /// <param name="DamageValue"></param>
     public int onAttackAfterJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACK_AFTER_JET)) {
@@ -213,7 +213,7 @@ public class FighterBuff {
 
     /// Subit des dommages, activation des buffs de reduction, renvois, anihilation des dommages avant le calcul du jet
     /// </summary>
-    /// <param name="CastInfos"></param>
+    /// <param name="castInfos"></param>
     /// <param name="DamageValue"></param>
     public int onAttackedPostJet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_POST_JET)) {
@@ -226,7 +226,7 @@ public class FighterBuff {
     
      /// Subit des dommages, activation des buffs de reduction, renvois, anihilation des dommages avant le calcul du jet
     /// </summary>
-    /// <param name="CastInfos"></param>
+    /// <param name="castInfos"></param>
     /// <param name="DamageValue"></param>
     public int onAttackedPostJetTrap(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_POST_JET_TRAP)) {
@@ -239,7 +239,7 @@ public class FighterBuff {
 
     /// Subit des dommages, activation des buffs de reduction, renvois, anihilation des dommages apres le calcul du jet
     /// </summary>
-    /// <param name="CastInfos"></param>
+    /// <param name="castInfos"></param>
     /// <param name="DamageValue"></param>
     public int onattackedafterjet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET)) {
@@ -279,7 +279,7 @@ public class FighterBuff {
 
     public int dispell(int spell) {
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
-            if (Buff.CastInfos != null && Buff.CastInfos.SpellId == spell) {
+            if (Buff.castInfos != null && Buff.castInfos.SpellId == spell) {
                 if (Buff.removeEffect() == -3) {
                     return -3;
                 }
@@ -287,18 +287,18 @@ public class FighterBuff {
         }
 
         for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN)) {
-            if (Buff.CastInfos != null && Buff.CastInfos.SpellId == spell) {
+            if (Buff.castInfos != null && Buff.castInfos.SpellId == spell) {
                 if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
         }
 
-        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.CastInfos != null && x.CastInfos.SpellId == spell);
-        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.CastInfos != null && x.CastInfos.SpellId == spell);
+        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.castInfos != null && x.castInfos.SpellId == spell);
+        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.castInfos != null && x.castInfos.SpellId == spell);
 
         this.buffsAct.values().stream().forEach((BuffList) -> {
-            BuffList.removeIf(x -> x.CastInfos != null && x.CastInfos.SpellId == spell);
+            BuffList.removeIf(x -> x.castInfos != null && x.castInfos.SpellId == spell);
         });
 
         return -1;

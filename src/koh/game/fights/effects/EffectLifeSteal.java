@@ -37,7 +37,7 @@ public class EffectLifeSteal extends EffectBase {
     }
 
     public static int applyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
-        //CastInfos.EffectType = StatsEnum.DamageBrut;
+        //castInfos.EffectType = StatsEnum.DamageBrut;
 
         if (EffectDamage.applyDamages(CastInfos, Target, DamageJet) == -3) {
             return -3;

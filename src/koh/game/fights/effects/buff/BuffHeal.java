@@ -20,7 +20,7 @@ public class BuffHeal extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (EffectHeal.applyHeal(CastInfos, target, new MutableInt(CastInfos.randomJet(target))) == -3) {
+        if (EffectHeal.applyHeal(castInfos, target, new MutableInt(castInfos.randomJet(target))) == -3) {
             return -3;
         }
         return -1;
@@ -28,7 +28,7 @@ public class BuffHeal extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.effect.effectUid, 0, (short) this.CastInfos.effect.diceNum, (short) this.CastInfos.effect.diceSide, (short) this.CastInfos.effect.value, (short) 0/*(this.CastInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.SpellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

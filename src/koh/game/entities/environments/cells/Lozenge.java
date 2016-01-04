@@ -17,12 +17,12 @@ public class Lozenge implements IZone {
 
     public byte Radius;
 
-    public DofusMap Map;
+    public DofusMap map;
 
     public Lozenge(byte minRadius, byte radius,DofusMap Map) {
         this.MinRadius = minRadius;
         this.Radius = radius;
-        this.Map = Map;
+        this.map = Map;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Lozenge implements IZone {
     }
 
     private void addCell(int x, int y, List<Short> container) {
-        if (!this.Map.pointMov(x, y, true, -1, -1)) {
+        if (!this.map.pointMov(x, y, true, -1, -1)) {
             return;
         }
         container.add(MapPoint.coordToCellId(x, y));

@@ -1,5 +1,6 @@
 package koh.game.entities.spells;
 
+import koh.utils.Enumerable;
 import lombok.Getter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.core.buffer.IoBuffer;
@@ -58,23 +59,8 @@ public class SpellLevel {
         this.criticalFailureEndsTurn = result.getBoolean("critical_failure_ends_turn");
         this.hideEffects = result.getBoolean("hide_effects");
         this.hidden = result.getBoolean("hidden");
-
-        if (!result.getString("states_required").isEmpty()) {
-            this.statesRequired = new int[result.getString("states_required").split(",").length];
-            for (int i = 0; i < result.getString("states_required").split(",").length; i++) {
-                this.statesRequired[i] = Integer.parseInt(result.getString("states_required").split(",")[i]);
-            }
-        } else {
-            this.statesRequired = new int[0];
-        }
-        if (!result.getString("states_forbidden").isEmpty()) {
-            this.statesForbidden = new int[result.getString("states_forbidden").split(",").length];
-            for (int i = 0; i < result.getString("states_forbidden").split(",").length; i++) {
-                this.statesForbidden[i] = Integer.parseInt(result.getString("states_forbidden").split(",")[i]);
-            }
-        } else {
-            this.statesForbidden = new int[0];
-        }
+        this.statesRequired = Enumerable.StringToIntArray(result.getString("states_required"));
+        this.statesForbidden = Enumerable.StringToIntArray(result.getString("states_forbidden"));
 
         {
             IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));

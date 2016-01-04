@@ -22,11 +22,11 @@ public class BuffShieldLifePoint extends BuffEffect {
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
 
-        this.jet = CastInfos.randomJet(target);
+        this.jet = castInfos.randomJet(target);
         this.value1 = (jet * this.target.getLife()) / 100;
         this.target.setShieldPoints(target.getShieldPoints() + value1);
 
-        this.target.getStats().addBoost(this.CastInfos.EffectType, this.value1);
+        this.target.getStats().addBoost(this.castInfos.EffectType, this.value1);
 
         return super.applyEffect(damageValue, damageInfos);
     }
@@ -34,7 +34,7 @@ public class BuffShieldLifePoint extends BuffEffect {
     @Override
     public int removeEffect() {
 
-        this.target.getStats().getEffect(this.CastInfos.EffectType).additionnal -= this.value1;
+        this.target.getStats().getEffect(this.castInfos.EffectType).additionnal -= this.value1;
 
         this.target.setShieldPoints(target.getShieldPoints() < value1 ? 0 : target.getShieldPoints() - value1);
 
@@ -43,7 +43,7 @@ public class BuffShieldLifePoint extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.jet));
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.SpellId, this.castInfos.GetEffectUID(), this.castInfos.ParentUID, (short) Math.abs(this.jet));
     }
 }
 

@@ -41,7 +41,7 @@ public class EffectActivableObject extends EffectBase {
                         && CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
                     CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster).stream().findFirst().get().remove();
                 }
-                /*if (!CastInfos.caster.getFight().canPutObject(CastInfos.getCellId)) {
+                /*if (!castInfos.caster.getFight().canPutObject(castInfos.getCellId)) {
                  return -1;
                  }*/
                 obj = new FightPortal(CastInfos.caster.getFight(), CastInfos.caster, CastInfos, CastInfos.CellId);

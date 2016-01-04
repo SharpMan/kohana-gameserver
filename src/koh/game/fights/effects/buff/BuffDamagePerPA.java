@@ -21,22 +21,22 @@ public class BuffDamagePerPA extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        int pas = this.CastInfos.effect.diceNum;
-        int val = this.CastInfos.effect.diceSide;
+        int pas = this.castInfos.effect.diceNum;
+        int val = this.castInfos.effect.diceSide;
         int nbr = (int) Math.floor((double) target.getUsedAP() / (double) pas);
         DamageValue.setValue(val * nbr);
         //Poison Paralysant
 
         int inte = 0;
-        if (CastInfos.EffectType == StatsEnum.PA_USED_LOST_X_PDV) {
-            inte += CastInfos.caster.getStats().getTotal(StatsEnum.Agility);
-        } else /*if (CastInfos.EffectType == StatsEnum.Lose_PV_By_Using_PA)*/ {
-            inte += CastInfos.caster.getStats().getTotal(StatsEnum.Intelligence);
+        if (castInfos.EffectType == StatsEnum.PA_USED_LOST_X_PDV) {
+            inte += castInfos.caster.getStats().getTotal(StatsEnum.AGILITY);
+        } else /*if (castInfos.EffectType == StatsEnum.Lose_PV_By_Using_PA)*/ {
+            inte += castInfos.caster.getStats().getTotal(StatsEnum.INTELLIGENCE);
         }
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = CastInfos.caster.getStats().getTotal(StatsEnum.AddDamagePercent);
+        int pdom = castInfos.caster.getStats().getTotal(StatsEnum.AddDamagePercent);
         if (pdom < 0) {
             pdom = 0;
         }
@@ -45,12 +45,12 @@ public class BuffDamagePerPA extends BuffEffect {
         // dgt);
         DamageValue.setValue((((100 + inte + pdom) / 100) * DamageValue.getValue() * 1.5));
 
-        return EffectDamage.applyDamages(this.CastInfos, this.target, DamageValue);
+        return EffectDamage.applyDamages(this.castInfos, this.target, DamageValue);
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.effect.effectUid, 0, (short) this.CastInfos.effect.diceNum, (short) this.CastInfos.effect.diceSide, (short) this.CastInfos.effect.value, (short) 0/*(this.CastInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.SpellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

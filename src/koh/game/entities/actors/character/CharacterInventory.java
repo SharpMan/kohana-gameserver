@@ -142,7 +142,7 @@ public class CharacterInventory {
             }
             player.refreshEntitie();
             player.getStats().merge(item.getStats());
-            player.addLife(item.getStats().getTotal(StatsEnum.Vitality));
+            player.addLife(item.getStats().getTotal(StatsEnum.VITALITY));
             player.refreshStats();
         }
         return true;
@@ -332,7 +332,7 @@ public class CharacterInventory {
                 player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
             } else {
                 player.getStats().merge(item.getStats());
-                this.player.addLife(item.getStats().getTotal(StatsEnum.Vitality));
+                this.player.addLife(item.getStats().getTotal(StatsEnum.VITALITY));
                 item.setPosition(slot);
                 player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
                 if (item.getApparrance() != 0) {
@@ -365,7 +365,7 @@ public class CharacterInventory {
             if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
                 //Retire les stats
                 this.player.getStats().unMerge(item.getStats());
-                this.player.addLife(-item.getStats().getTotal(StatsEnum.Vitality));
+                this.player.addLife(-item.getStats().getTotal(StatsEnum.VITALITY));
                 if (player.getLife() <= 0) {
                     player.setLife(1);
                 }
@@ -445,10 +445,10 @@ public class CharacterInventory {
         try {
             if (apply) {
                 player.getStats().merge(itemSet.getStats(count));
-                this.player.addLife(itemSet.getStats(count).getTotal(StatsEnum.Vitality));
+                this.player.addLife(itemSet.getStats(count).getTotal(StatsEnum.VITALITY));
             } else {
                 player.getStats().unMerge(itemSet.getStats(count));
-                this.player.addLife(-itemSet.getStats(count).getTotal(StatsEnum.Vitality));
+                this.player.addLife(-itemSet.getStats(count).getTotal(StatsEnum.VITALITY));
             }
             if (send) {
                 this.player.refreshStats();;
@@ -610,7 +610,7 @@ public class CharacterInventory {
         this.beforeItemSet(equipedItem);
         //Deplacement dans l'inventaire
         player.getStats().unMerge(equipedItem.getStats());
-        this.player.addLife(-equipedItem.getStats().getTotal(StatsEnum.Vitality));
+        this.player.addLife(-equipedItem.getStats().getTotal(StatsEnum.VITALITY));
         if (equipedItem.getApparrance() != 0) {
             if (equipedItem.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
                 if (equipedItem.getTemplate().getTypeId() == 121) { //Montelier

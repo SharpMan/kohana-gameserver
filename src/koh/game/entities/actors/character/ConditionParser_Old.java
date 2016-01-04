@@ -38,19 +38,19 @@ public class ConditionParser_Old {
         }*/
         req = req.replace("&", "&&").replace("=", "==").replace("|", "||").replace("!", "!=");
         /*try {
-            jep.addVariable("CI", perso.stats.getTotal(StatsEnum.Intelligence));
-            jep.addVariable("CV", perso.stats.getTotal(StatsEnum.Vitality));
-            jep.addVariable("CA", perso.stats.getTotal(StatsEnum.Agility));
-            jep.addVariable("CW", perso.stats.getTotal(StatsEnum.Wisdom));
-            jep.addVariable("CC", perso.stats.getTotal(StatsEnum.Chance));
-            jep.addVariable("CS", perso.stats.getTotal(StatsEnum.Strength));
+            jep.addVariable("CI", perso.stats.getTotal(StatsEnum.INTELLIGENCE));
+            jep.addVariable("CV", perso.stats.getTotal(StatsEnum.VITALITY));
+            jep.addVariable("CA", perso.stats.getTotal(StatsEnum.AGILITY));
+            jep.addVariable("CW", perso.stats.getTotal(StatsEnum.WISDOM));
+            jep.addVariable("CC", perso.stats.getTotal(StatsEnum.CHANCE));
+            jep.addVariable("CS", perso.stats.getTotal(StatsEnum.STRENGTH));
 
-            jep.addVariable("Ci", perso.stats.getBase(StatsEnum.Intelligence));
-            jep.addVariable("Cs", perso.stats.getBase(StatsEnum.Strength));
-            jep.addVariable("Cv", perso.stats.getBase(StatsEnum.Vitality));
-            jep.addVariable("Ca", perso.stats.getBase(StatsEnum.Agility));
-            jep.addVariable("Cw", perso.stats.getBase(StatsEnum.Wisdom));
-            jep.addVariable("Cc", perso.stats.getBase(StatsEnum.Chance));
+            jep.addVariable("Ci", perso.stats.getBase(StatsEnum.INTELLIGENCE));
+            jep.addVariable("Cs", perso.stats.getBase(StatsEnum.STRENGTH));
+            jep.addVariable("Cv", perso.stats.getBase(StatsEnum.VITALITY));
+            jep.addVariable("Ca", perso.stats.getBase(StatsEnum.AGILITY));
+            jep.addVariable("Cw", perso.stats.getBase(StatsEnum.WISDOM));
+            jep.addVariable("Cc", perso.stats.getBase(StatsEnum.CHANCE));
 
             jep.addVariable("Ps", perso.alignmentSide);
             jep.addVariable("Pa", perso.alignmentValue);

@@ -33,7 +33,7 @@ public class BuffState extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE_BY_STRONG_DISPEL, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) (CastInfos.effect == null ? FightStateEnum.Invisible.value : Math.abs(this.CastInfos.randomJet(target))), (short) (CastInfos.effect == null ? FightStateEnum.Invisible.value : CastInfos.effect.value));
+        return new FightTemporaryBoostStateEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE_BY_STRONG_DISPEL, (short) this.castInfos.SpellId, this.castInfos.GetEffectUID(), this.castInfos.ParentUID, (short) (castInfos.effect == null ? FightStateEnum.Invisible.value : Math.abs(this.castInfos.randomJet(target))), (short) (castInfos.effect == null ? FightStateEnum.Invisible.value : castInfos.effect.value));
     }
 
 }

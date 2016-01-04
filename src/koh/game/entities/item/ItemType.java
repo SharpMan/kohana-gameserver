@@ -54,7 +54,6 @@ public class ItemType {
     private void parseZone() {
         try {
             String[] params;
-            System.out.println(this.rawZone);
             if (!StringUtils.isNullOrEmpty(this.rawZone)) {
                 this._zoneShape = this.rawZone.charAt(0);
                 if (!this.rawZone.contains(",")) {

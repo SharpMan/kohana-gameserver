@@ -123,7 +123,7 @@ public class Zone implements IZone {
             case T:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius()) {
                     {
-                        OnlyPerpendicular = true;
+                        onlyPerpendicular = true;
                     }
                 };
                 break;
@@ -157,29 +157,29 @@ public class Zone implements IZone {
             case sharp:
                 this.m_shape = new CrossZone((byte) 1, this.getRadius()) {
                     {
-                        Diagonal = true;
+                        diagonal = true;
                     }
                 };
                 break;
             case minus:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius()) {
                     {
-                        this.OnlyPerpendicular = true;
-                        this.Diagonal = true;
+                        this.onlyPerpendicular = true;
+                        this.diagonal = true;
                     }
                 };
                 break;
             case star:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius()) {
                     {
-                        AllDirections = true;
+                        allDirections = true;
                     }
                 };
                 break;
             case plus:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius()) {
                     {
-                        Diagonal = true;
+                        diagonal = true;
                     }
                 };
                 break;

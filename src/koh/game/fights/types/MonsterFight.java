@@ -92,7 +92,7 @@ public class MonsterFight extends Fight {
             this.myResult.results.removeIf(res -> ((FightResultPlayerListEntry) res).notOfficial);
             //On efface les anciens fakes results et on laisse celui des gens qui ont abondonnee maybe ils ont xp ?
         }
-        final int teamPP = winners.getFighters().mapToInt(fr -> fr.getStats().getTotal(StatsEnum.Prospecting)).sum();
+        final int teamPP = winners.getFighters().mapToInt(fr -> fr.getStats().getTotal(StatsEnum.PROSPECTING)).sum();
         final int baseKamas = loosers.equals(this.myTeam2) ? Arrays.stream(deadMobs).mapToInt(mob -> mob.getGrade().getMonster().getKamasWin(Fight.RANDOM)).sum() : 0; //sum min max
         final HashMap<MonsterDrop, Integer> droppedItems = new HashMap<>();
 

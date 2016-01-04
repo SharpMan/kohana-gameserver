@@ -152,7 +152,7 @@ public class MapDAOImpl extends MapDAO {
                 try {
                     dofusMaps.get(result.getInt("map")).addDoor(new MapDoor(result));
                 } catch (Exception e) {
-                   logger.debug("Map {} door nulled",result.getInt("map"));
+                   logger.debug("map {} door nulled",result.getInt("map"));
                 }
                 i++;
             }
@@ -201,7 +201,7 @@ public class MapDAOImpl extends MapDAO {
                 try {
                     dofusMaps.get(result.getInt("map")).setElementsStated(ArrayUtils.add(dofusMaps.get(result.getInt("map")).getElementsStated(), new StatedElement(result.getInt("element_id"), result.getShort("element_cell"), 0)));
                 } catch (Exception e) {
-                    logger.debug("Map {} stated nulled",result.getInt("map"));
+                    logger.debug("map {} stated nulled",result.getInt("map"));
                 }
                 i++;
             }

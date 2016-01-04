@@ -23,13 +23,13 @@ public class BuffArmor extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        target.getStats().getEffect(StatsEnum.AddArmor).additionnal -= (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100);
+        target.getStats().getEffect(StatsEnum.AddArmor).additionnal -= (Jet * (100 + (castInfos.caster.getLevel() * 5)) / 100);
         return super.removeEffect();
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.SpellId, this.castInfos.GetEffectUID(), this.castInfos.ParentUID, (short) Math.abs(this.Jet));
     }
 
 }

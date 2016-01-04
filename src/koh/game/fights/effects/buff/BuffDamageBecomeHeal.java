@@ -29,9 +29,9 @@ public class BuffDamageBecomeHeal extends BuffEffect {
             return -1;
         }
         
-        DamageValue.setValue(DamageValue.getValue() * this.CastInfos.effect.value);
+        DamageValue.setValue(DamageValue.getValue() * this.castInfos.effect.value);
 
-        if (EffectHeal.applyHeal(CastInfos, target, DamageValue, false) == -3) {
+        if (EffectHeal.applyHeal(castInfos, target, DamageValue, false) == -3) {
             return -3;
         }
         DamageValue.setValue(0);
@@ -40,7 +40,7 @@ public class BuffDamageBecomeHeal extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.effect.effectUid, 0, (short) this.CastInfos.effect.diceNum, (short) this.CastInfos.effect.diceSide, (short) this.CastInfos.effect.value, (short) 0/*(this.CastInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.SpellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

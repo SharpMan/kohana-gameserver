@@ -21,29 +21,29 @@ public class BuffChatiment extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt BuffValue = new MutableInt(DamageValue.getValue() / 2); // Divise par deux les stats a boost car c'est un personnage.
-        //var StatsType = (EffectEnum)this.CastInfos.value1 == EffectEnum.Heal ? EffectEnum.AddVitalite : (EffectEnum)this.CastInfos.value1;
-        int MaxValue = this.CastInfos.effect.diceSide;
-        int Duration = this.CastInfos.effect.value;
+        //var StatsType = (EffectEnum)this.castInfos.value1 == EffectEnum.Heal ? EffectEnum.AddVitalite : (EffectEnum)this.castInfos.value1;
+        int MaxValue = this.castInfos.effect.diceSide;
+        int Duration = this.castInfos.effect.value;
 
-        if (this.target.getFight().getCurrentFighter().getID() == this.CastInfos.FakeValue) {
-            if (this.CastInfos.DamageValue < MaxValue) {
-                if (this.CastInfos.DamageValue + BuffValue.getValue() > MaxValue) {
-                    BuffValue.setValue(MaxValue - this.CastInfos.DamageValue);
+        if (this.target.getFight().getCurrentFighter().getID() == this.castInfos.FakeValue) {
+            if (this.castInfos.DamageValue < MaxValue) {
+                if (this.castInfos.DamageValue + BuffValue.getValue() > MaxValue) {
+                    BuffValue.setValue(MaxValue - this.castInfos.DamageValue);
                 }
             } else {
                 BuffValue.setValue(0);
             }
         } else {
-            this.CastInfos.DamageValue = 0;
-            this.CastInfos.FakeValue = (int) this.target.getFight().getCurrentFighter().getID();
+            this.castInfos.DamageValue = 0;
+            this.castInfos.FakeValue = (int) this.target.getFight().getCurrentFighter().getID();
 
-            if (this.CastInfos.DamageValue + BuffValue.getValue() > MaxValue) {
+            if (this.castInfos.DamageValue + BuffValue.getValue() > MaxValue) {
                 BuffValue.setValue(MaxValue);
             }
         }
         if (BuffValue.getValue() > 0) {
-            this.CastInfos.DamageValue += BuffValue.getValue();
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.CastInfos.effect.diceNum), this.CastInfos.SpellId, this.CastInfos.CellId, 0, null, CastInfos.caster, null, false, this.CastInfos.EffectType, BuffValue.getValue(), null, Duration, this.GetId()), this.target);
+            this.castInfos.DamageValue += BuffValue.getValue();
+            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.castInfos.effect.diceNum), this.castInfos.SpellId, this.castInfos.CellId, 0, null, castInfos.caster, null, false, this.castInfos.EffectType, BuffValue.getValue(), null, Duration, this.GetId()), this.target);
 
             BuffStats.applyEffect(BuffValue, DamageInfos);
             this.target.getBuff().addBuff(BuffStats);
@@ -54,7 +54,7 @@ public class BuffChatiment extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.effect.effectUid, 0, (short) this.CastInfos.effect.diceNum, (short) this.CastInfos.effect.diceSide, (short) this.CastInfos.effect.value, (short) 0/*(this.CastInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.SpellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

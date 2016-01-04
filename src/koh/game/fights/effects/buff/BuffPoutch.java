@@ -46,14 +46,14 @@ public class BuffPoutch extends BuffEffect {
             return -1;
         }
 
-        if (CastInfos.SpellId == 2809) {
+        if (castInfos.SpellId == 2809) {
             if(Pathfinder.getGoalDistance(null, DamageInfos.caster.getCellId(), target.getCellId()) > 1){
                 return -1;
             }
             //target = DamageInfos.caster;
         }
 
-        SpellLevel SpellLevel = DAO.getSpells().findSpell(CastInfos.effect.diceNum).getSpellLevels()[CastInfos.effect.diceSide == 0 ? 0 : CastInfos.effect.diceSide - 1];
+        SpellLevel SpellLevel = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide == 0 ? 0 : castInfos.effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();
         double num2 = (double) Arrays.stream(SpellLevel.getEffects()).mapToInt(x -> x.random).sum();
         boolean flag = false;
@@ -65,7 +65,7 @@ public class BuffPoutch extends BuffEffect {
                 if (FightCell != null) {
                     if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
                         for (Fighter Target2 : FightCell.GetObjectsAsFighter()) {
-                            if (CastInfos.SpellId == 2809 && Target2 == target) {
+                            if (castInfos.SpellId == 2809 && Target2 == target) {
                                 continue;
                             }
                             if (Effect.isValidTarget(this.target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.target, Target2, Effect,Target2.getID())) {
@@ -81,7 +81,7 @@ public class BuffPoutch extends BuffEffect {
                     }
                 }
             }
-            if(CastInfos.SpellId == 94){
+            if(castInfos.SpellId == 94){
                 Targets.clear();
                 Targets.add(DamageInfos.caster);
             }
@@ -97,7 +97,7 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            EffectCast Cast2 = new EffectCast(Effect.EffectType(), SpellLevel.getSpellId(), (CastInfos.EffectType == StatsEnum.Refoullage) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            EffectCast Cast2 = new EffectCast(Effect.EffectType(), SpellLevel.getSpellId(), (castInfos.EffectType == StatsEnum.Refoullage) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
             Cast2.targetKnownCellId = target.getCellId();
             if (EffectBase.TryApplyEffect(Cast2) == -3) {
                 return -3;
@@ -125,7 +125,7 @@ public class BuffPoutch extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.effect.effectUid, 0, (short) this.CastInfos.effect.diceNum, (short) this.CastInfos.effect.diceSide, (short) this.CastInfos.effect.value, (short) 0/*(this.CastInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.SpellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }
