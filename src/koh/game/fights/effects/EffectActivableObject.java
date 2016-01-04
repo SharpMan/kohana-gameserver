@@ -25,14 +25,14 @@ public class EffectActivableObject extends EffectBase {
                 if (CastInfos.caster.getFight().hasObjectOnCell(FightObjectType.OBJECT_FIGHTER, CastInfos.CellId)) {
                     return -1;
                 }
-                obj = new FightGlyph(CastInfos, CastInfos.Duration, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), GetMarkType(CastInfos.Effect.ZoneShape()));
+                obj = new FightGlyph(CastInfos, CastInfos.Duration, GetColor(CastInfos.SpellId), CastInfos.effect.ZoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
                 break;
 
             case LAYING_TRAP_LEVEL:
                 if (!CastInfos.caster.getFight().canPutObject(CastInfos.CellId)) {
                     return -1;
                 }
-                obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.Effect.ZoneSize(), GetMarkType(CastInfos.Effect.ZoneShape()));
+                obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.effect.ZoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
                 break;
             case LAYING_PORTAIL:
                 if (CastInfos.getCell().HasGameObject(FightObjectType.OBJECT_PORTAL)) {

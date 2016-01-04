@@ -12,7 +12,7 @@ public class EffectPorter extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             CastInfos.caster.getBuff().addBuff(new BuffPorteur(CastInfos, Target));
             Target.getBuff().addBuff(new BuffPorter(CastInfos, Target));
         }

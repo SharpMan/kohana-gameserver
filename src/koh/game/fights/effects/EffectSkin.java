@@ -13,7 +13,7 @@ public class EffectSkin extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         BuffEffect Buff = null;
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             Buff = new BuffSkin(CastInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(Buff)) {
                 Target.getBuff().addBuff(Buff);

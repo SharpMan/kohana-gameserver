@@ -12,7 +12,7 @@ public class EffectDispellEffectDuration extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             short Jet = CastInfos.randomJet(Target);
             if (Target.getBuff().decrementEffectDuration(Jet) == -3) {
                 return -3;

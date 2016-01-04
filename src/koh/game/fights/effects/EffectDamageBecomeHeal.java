@@ -13,7 +13,7 @@ public class EffectDamageBecomeHeal extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         BuffEffect Buf = null;
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             Buf = new BuffDamageBecomeHeal(CastInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(Buf)) {
                 Target.getBuff().addBuff(Buf);

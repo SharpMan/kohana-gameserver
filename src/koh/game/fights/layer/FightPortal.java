@@ -35,7 +35,7 @@ public class FightPortal extends FightActivableObject {
 
     public FightPortal(Fight fight, Fighter caster, EffectCast castInfos, short cell) {
         super(BuffActiveType.ACTIVE_ENDMOVE, fight, caster, castInfos, cell, 0, javafx.scene.paint.Color.LIGHTBLUE, GameActionFightInvisibilityStateEnum.VISIBLE, (byte) 0, GameActionMarkCellsTypeEnum.CELLS_CIRCLE);
-        this.damageValue = castInfos.Effect.value;
+        this.damageValue = castInfos.effect.value;
         Priority += 50;
     }
 

@@ -11,7 +11,7 @@ public class EffectSacrifice extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter target : CastInfos.Targets) {
+        for (Fighter target : CastInfos.targets) {
             if (target.getTeam() != CastInfos.caster.getTeam() || target == CastInfos.caster) {
                 continue;
             }

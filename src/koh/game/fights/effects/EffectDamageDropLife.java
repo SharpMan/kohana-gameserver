@@ -18,7 +18,7 @@ public class EffectDamageDropLife extends EffectBase {
             CastInfos.IsPoison = true;
 
             // Ajout du buff
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 Target.getBuff().addBuff(new BuffDamageDropLife(CastInfos, Target));
             }
         } else // Dommage direct
@@ -26,7 +26,7 @@ public class EffectDamageDropLife extends EffectBase {
             int effectBase = CastInfos.randomJet(CastInfos.caster);
             MutableInt DamageValue = new MutableInt((CastInfos.caster.currentLife / 100) * effectBase);
             if (EffectDamage.applyDamages(CastInfos, CastInfos.caster, DamageValue) == -3) {
-                for (Fighter Target : CastInfos.Targets) {
+                for (Fighter Target : CastInfos.targets) {
                     if (Target.getID() == CastInfos.caster.getID()) {
                         continue;
                     }
@@ -36,7 +36,7 @@ public class EffectDamageDropLife extends EffectBase {
                 }
                 return -3;
             } else {
-                for (Fighter Target : CastInfos.Targets) {
+                for (Fighter Target : CastInfos.targets) {
                     if (Target.getID() == CastInfos.caster.getID()) {
                         continue;
                     }

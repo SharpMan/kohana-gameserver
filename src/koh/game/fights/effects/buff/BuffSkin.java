@@ -67,7 +67,7 @@ public class BuffSkin extends BuffEffect {
                 return -1;
         }
 
-        //this.target.getEntityLook().bonesId = (short) Math.abs((this.CastInfos.Effect.value * 44) / 666);
+        //this.target.getEntityLook().bonesId = (short) Math.abs((this.CastInfos.effect.value * 44) / 666);
         this.caster.getFight().sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
         return super.applyEffect(DamageValue, DamageInfos);
     }

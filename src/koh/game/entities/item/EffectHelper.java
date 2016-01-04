@@ -266,7 +266,7 @@ public class EffectHelper {
                     Effects[i] = (new EffectInstanceInteger(e, (short) randomValue((int) num2, (int) num1 /*+ 1*/)));
                 }
             } else if (e != null) {
-                throw new Error("Effect not suport" + e.serializationIdentifier());
+                throw new Error("effect not suport" + e.serializationIdentifier());
             }
             i++;
         }
@@ -320,7 +320,7 @@ public class EffectHelper {
                     Effects.add(new ObjectEffectInteger(e.effectId, (short) randomValue((int) num2, (int) num1)));
                 }
             } else {
-                throw new Error("Effect not suport" + e.toString());
+                throw new Error("effect not suport" + e.toString());
             }
         }
         return Effects;

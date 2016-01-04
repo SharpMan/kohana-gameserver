@@ -39,11 +39,11 @@ public class EffectCast {
 
     public StatsEnum EffectType;
     public StatsEnum SubEffect;
-    public EffectInstanceDice Effect;
+    public EffectInstanceDice effect;
 
     public int GetEffectUID() {
-        if (this.Effect != null) {
-            return this.Effect.effectUid;
+        if (this.effect != null) {
+            return this.effect.effectUid;
         }
         return 0;
     }
@@ -54,7 +54,7 @@ public class EffectCast {
     public double Chance;
     public SpellLevel SpellLevel;
     public Fighter caster;
-    public ArrayList<Fighter> Targets;
+    public ArrayList<Fighter> targets;
     public int Duration;
 
     public static int RandomValue(int i1, int i2) {
@@ -63,15 +63,15 @@ public class EffectCast {
     }
 
     /* public short MaxEffect() {
-     return (short) (this.Effect.diceNum >= (int) this.Effect.diceSide ? this.Effect.diceNum : this.Effect.diceSide);
+     return (short) (this.effect.diceNum >= (int) this.effect.diceSide ? this.effect.diceNum : this.effect.diceSide);
      }*/
     public short randomJet(Fighter Target) {
-        if (this.Effect == null) {
+        if (this.effect == null) {
             return (short) this.DamageValue;
         }
 
-        int num1 = this.Effect.diceNum >= (int) this.Effect.diceSide ? this.Effect.diceNum : this.Effect.diceSide;
-        int num2 = this.Effect.diceNum <= (int) this.Effect.diceSide ? this.Effect.diceNum : this.Effect.diceSide;
+        int num1 = this.effect.diceNum >= (int) this.effect.diceSide ? this.effect.diceNum : this.effect.diceSide;
+        int num2 = this.effect.diceNum <= (int) this.effect.diceSide ? this.effect.diceNum : this.effect.diceSide;
 
         /*if (type == EffectGenerationType.MaxEffects) {
          return  new EffectInteger(this.id, this.getTemplate.Operator != "-" ? num1 : num2, (EffectBase) this);
@@ -98,8 +98,8 @@ public class EffectCast {
         this.CellId = CellId;
         this.Chance = Chance;
         this.caster = Caster;
-        this.Targets = Targets;
-        this.Effect = Effect;
+        this.targets = Targets;
+        this.effect = Effect;
         this.SubEffect = StatsEnum.NONE;
         this.DamageValue = 0;
         this.IsCAC = false;
@@ -113,8 +113,8 @@ public class EffectCast {
         this.CellId = CellId;
         this.Chance = Chance;
         this.caster = Caster;
-        this.Targets = Targets;
-        this.Effect = Effect;
+        this.targets = Targets;
+        this.effect = Effect;
         this.SubEffect = StatsEnum.NONE;
         this.DamageValue = 0;
         this.IsCAC = false;
@@ -129,8 +129,8 @@ public class EffectCast {
         this.CellId = CellId;
         this.Chance = Chance;
         this.caster = Caster;
-        this.Targets = Targets;
-        this.Effect = Effect;
+        this.targets = Targets;
+        this.effect = Effect;
         this.SubEffect = SubEffect;
         this.DamageValue = DamageValue;
         this.IsCAC = IsCAC;
@@ -139,8 +139,8 @@ public class EffectCast {
     }
 
     public int Delay() {
-        if (this.Effect != null) {
-            return this.Effect.delay;
+        if (this.effect != null) {
+            return this.effect.delay;
         }
         return 0;
     }
@@ -151,8 +151,8 @@ public class EffectCast {
         this.CellId = CellId;
         this.Chance = Chance;
         this.caster = Caster;
-        this.Targets = Targets;
-        this.Effect = Effect;
+        this.targets = Targets;
+        this.effect = Effect;
         this.SubEffect = SubEffect;
         this.DamageValue = DamageValue;
         this.IsCAC = IsCAC;

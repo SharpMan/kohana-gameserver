@@ -20,10 +20,10 @@ public class EffectSummonBomb extends EffectBase {
     public int applyEffect(EffectCast CastInfos) {
         // Possibilité de spawn une creature sur la case ?
 
-        MonsterTemplate Monster = DAO.getMonsters().find(CastInfos.Effect.diceNum);
+        MonsterTemplate Monster = DAO.getMonsters().find(CastInfos.effect.diceNum);
         // getTemplate de monstre existante
         if (Monster != null) {
-            MonsterGrade MonsterLevel = Monster.getLevelOrNear(CastInfos.Effect.diceSide);
+            MonsterGrade MonsterLevel = Monster.getLevelOrNear(CastInfos.effect.diceSide);
             if (MonsterLevel != null) {
                 if (CastInfos.caster.getFight().isCellWalkable(CastInfos.CellId)) {
                     BombFighter Bomb = new BombFighter(CastInfos.caster.getFight(), CastInfos.caster, MonsterLevel);
@@ -42,8 +42,8 @@ public class EffectSummonBomb extends EffectBase {
                                                   }
                                               }));
                 } else {
-                    //CastInfos.caster.fight.affectSpellTo(CastInfos.caster, CastInfos.caster.fight.getCell(CastInfos.getCellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.Effect.diceNum).instantSpellId);
-                    CastInfos.caster.getFight().launchSpell(CastInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(CastInfos.Effect.diceNum).instantSpellId).getSpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
+                    //CastInfos.caster.fight.affectSpellTo(CastInfos.caster, CastInfos.caster.fight.getCell(CastInfos.getCellId).GetObjectsAsFighter()[0] , CastInfos.effect.diceSide, SpellDAOImpl.bombs.get(CastInfos.effect.diceNum).instantSpellId);
+                    CastInfos.caster.getFight().launchSpell(CastInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(CastInfos.effect.diceNum).instantSpellId).getSpellLevel(CastInfos.effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
                 }
             }
         }

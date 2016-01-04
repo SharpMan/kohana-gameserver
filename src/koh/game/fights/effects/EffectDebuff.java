@@ -12,7 +12,7 @@ public class EffectDebuff extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             if (Target.getBuff().debuff() == -3) {
                 return -3;
             }

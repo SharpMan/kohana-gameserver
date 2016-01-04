@@ -74,8 +74,8 @@ public class GenericStats {
             put(StatsEnum.Add_Push_Damages_Bonus, StatsEnum.Sub_Push_Damages_Bonus);
             put(StatsEnum.Add_CriticalHit, StatsEnum.Sub_Critical_Hit);
 
-            put(StatsEnum.Add_TackleBlock, StatsEnum.Sub_TackleBlock);
-            put(StatsEnum.Add_TackleEvade, StatsEnum.Sub_TackleEvade);
+            put(StatsEnum.ADD_TACKLE_BLOCK, StatsEnum.SUB_TACKLE_BLOCK);
+            put(StatsEnum.ADD_TACKLE_EVADE, StatsEnum.SUB_TACKLE_EVADE);
 
         }
     };

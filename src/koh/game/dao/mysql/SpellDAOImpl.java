@@ -1,10 +1,7 @@
 package koh.game.dao.mysql;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.google.inject.Inject;
 import koh.d2o.entities.SpellBomb;

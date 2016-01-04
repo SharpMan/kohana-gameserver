@@ -15,7 +15,7 @@ public class EffectTeleportSymetric extends EffectBase {
     public int applyEffect(EffectCast CastInfos) {
         int toReturn = -1;
         FightCell cell;
-        for (Fighter target : CastInfos.Targets) {
+        for (Fighter target : CastInfos.targets) {
             cell = CastInfos.caster.getFight().getCell(target.getMapPoint().pointSymetry(CastInfos.caster.getMapPoint()).get_cellId());
 
             if (cell != null && cell.IsWalkable()) {

@@ -13,7 +13,7 @@ public class EffectSpellCoolDown extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
 
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             BuffEffect Buff = new BuffSpellCoolDown(CastInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(Buff)) {
                 Target.getBuff().addBuff(Buff);

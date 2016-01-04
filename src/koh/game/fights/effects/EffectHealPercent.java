@@ -19,12 +19,12 @@ public class EffectHealPercent extends EffectBase {
             CastInfos.IsPoison = true;
 
             // Ajout du buff
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 Target.getBuff().addBuff(new BuffHealPercent(CastInfos, Target));
             }
         } else // Heal direct
         {
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 if (EffectHealPercent.ApplyHealPercent(CastInfos, Target, CastInfos.randomJet(Target)) == -3) {
                     return -3;
                 }

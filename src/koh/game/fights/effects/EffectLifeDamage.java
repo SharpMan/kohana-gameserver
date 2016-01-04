@@ -18,12 +18,12 @@ public class EffectLifeDamage extends EffectBase {
             CastInfos.IsPoison = true;
 
             // Ajout du buff
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 Target.getBuff().addBuff(new BuffLifeDamage(CastInfos, Target));
             }
         } else // Dommage direct
         {
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 int effectBase = CastInfos.randomJet(Target);
                 MutableInt DamageValue = new MutableInt((Target.currentLife / 100) * effectBase);
                 //DamageValue = (-DamageValue);

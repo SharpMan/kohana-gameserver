@@ -11,7 +11,7 @@ public class EffectChatiment extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             Target.getBuff().addBuff(new BuffChatiment(CastInfos, Target));
         }
 

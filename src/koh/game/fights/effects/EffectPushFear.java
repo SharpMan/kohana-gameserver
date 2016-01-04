@@ -30,13 +30,13 @@ public class EffectPushFear extends EffectBase {
 
             if (nextCell != null && nextCell.CanWalk()) {
                 if (nextCell.HasObject(IFightObject.FightObjectType.OBJECT_TRAP)) {
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
 
                     return target.setCell(nextCell);
                 }
             } else {
                 if (i != 0) {
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
                 }
 
                 return target.setCell(currentCell);
@@ -45,7 +45,7 @@ public class EffectPushFear extends EffectBase {
             currentCell = nextCell;
         }
 
-        target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+        target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
         return target.setCell(currentCell);
     }

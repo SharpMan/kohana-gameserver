@@ -60,7 +60,7 @@ public class FighterBuff {
         return Buff.CastInfos.SpellLevel != null && Buff.CastInfos.SpellLevel.getMaxStack() > 0
                 && Buff.CastInfos.SpellLevel.getMaxStack()
                 <= (Buff instanceof BuffState
-                        ? this.getAllBuffs().filter(x -> x.CastInfos.SpellId == Buff.CastInfos.SpellId && x instanceof BuffState && ((BuffState) x).CastInfos.Effect.value == Buff.CastInfos.Effect.value).count()
+                        ? this.getAllBuffs().filter(x -> x.CastInfos.SpellId == Buff.CastInfos.SpellId && x instanceof BuffState && ((BuffState) x).CastInfos.effect.value == Buff.CastInfos.effect.value).count()
                         : this.getAllBuffs().filter(x -> x.CastInfos.SpellId == Buff.CastInfos.SpellId && x.CastInfos.EffectType == Buff.CastInfos.EffectType).count());
     }
 
@@ -75,7 +75,7 @@ public class FighterBuff {
         }
         this.buffsAct.get(buff.ActiveType).add(buff);
         this.buffsDec.get(buff.DecrementType).add(buff);
-        buff.target.getFight().sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.Effect.effectId*/buff.CastInfos.EffectType.value(), buff.caster.getID(), buff.getAbstractFightDispellableEffect()));
+        buff.target.getFight().sendToField(new GameActionFightDispellableEffectMessage(/*Buff.CastInfos.effect.effectId*/buff.CastInfos.EffectType.value(), buff.caster.getID(), buff.getAbstractFightDispellableEffect()));
         logger.debug("Buff {} added",buff,getClass().getName());
     }
 
@@ -86,7 +86,7 @@ public class FighterBuff {
             EffectCast.second--;
             if (EffectCast.second <= 0) {
                 this.delayedEffects.remove(EffectCast);
-                EffectCast.first.Targets.removeIf(Fighter -> !Fighter.isAlive());
+                EffectCast.first.targets.removeIf(Fighter -> !Fighter.isAlive());
                 if (EffectBase.TryApplyEffect(EffectCast.first) == -3) {
                     return -3;
                 }

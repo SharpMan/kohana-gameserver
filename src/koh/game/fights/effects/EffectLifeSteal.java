@@ -2,7 +2,6 @@ package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffLifeSteal;
-import koh.protocol.client.enums.StatsEnum;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -19,11 +18,11 @@ public class EffectLifeSteal extends EffectBase {
             CastInfos.IsPoison = true;
 
             // Ajout du buff
-            CastInfos.Targets.stream().forEach((Target) -> {
+            CastInfos.targets.stream().forEach((Target) -> {
                 Target.getBuff().addBuff(new BuffLifeSteal(CastInfos, Target));
             });
         } else {
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 if (CastInfos.SpellId == 450 && Target.getTeam().id != CastInfos.caster.getTeam().id) { //Folie
                     continue;
                 }

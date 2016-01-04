@@ -57,7 +57,7 @@ public class FightBomb extends FightActivableObject {
             if (EffectCast.IsDamageEffect(effect.EffectType())) {
                 Priority--;
             }
-            if (effect.EffectType() == StatsEnum.PullForward || effect.EffectType() == StatsEnum.Push_Back) {
+            if (effect.EffectType() == StatsEnum.PULL_FORWARD || effect.EffectType() == StatsEnum.PUSH_BACK) {
                 Priority += 50;
             }
         }

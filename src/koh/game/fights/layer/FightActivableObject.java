@@ -70,14 +70,14 @@ public abstract class FightActivableObject implements IFightObject {
         m_spellId = castInfos.SpellId;
         m_spell_level = castInfos.SpellLevel.getGrade();
         try {
-            m_actionEffect = DAO.getSpells().findSpell(castInfos.Effect.diceNum).getSpellLevels()[castInfos.Effect.diceSide - 1];
+            m_actionEffect = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide - 1];
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
         }
         Cell = fight.getCell(cell);
         activationType = activeType;
         Color = color;
         targets = new ArrayList<>();
-        affectedCells = new Zone(castInfos.Effect.ZoneShape(), size,fight.getMap()).getCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).getCells(cell.id)*/;
+        affectedCells = new Zone(castInfos.effect.ZoneShape(), size,fight.getMap()).getCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).getCells(cell.id)*/;
         Duration = duration;
         this.visibileState = visibleState;
         this.size = size;
@@ -88,7 +88,7 @@ public abstract class FightActivableObject implements IFightObject {
                 if (EffectCast.IsDamageEffect(effect.EffectType())) {
                     Priority--;
                 }
-                if (effect.EffectType() == StatsEnum.PullForward || effect.EffectType() == StatsEnum.Push_Back) {
+                if (effect.EffectType() == StatsEnum.PULL_FORWARD || effect.EffectType() == StatsEnum.PUSH_BACK) {
                     Priority += 50;
                 }
             }

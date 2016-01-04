@@ -452,7 +452,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                 if (!imTargeted && Target.getID() == fighter.getID()) {
                                     continue;
                                 }
-                                /*if(Effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, target, Effect)){
+                                /*if(effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, target, effect)){
                                  continue;
                                  }*/
                                 logger.debug("Targeet Aded!");
@@ -492,12 +492,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, fighter.getID(), new FightTriggeredEffect(Target.getNextBuffUid().incrementAndGet(), Target.getID(), (short) Effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
                 });
 
-                /*for (Fighter target : targets.get(Effect)) {
-                 target.buff.delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), getSpellLevel.spellId, getCellId, num1, Effect, Fighter, new ArrayList<Fighter>() {
+                /*for (Fighter target : targets.get(effect)) {
+                 target.buff.delayedEffects.add(new Couple<>(new EffectCast(effect.EffectType(), getSpellLevel.spellId, getCellId, num1, effect, Fighter, new ArrayList<Fighter>() {
                  {
                  add(target);
                  }
-                 }, false, StatsEnum.NONE, 0, getSpellLevel), Effect.delay));
+                 }, false, StatsEnum.NONE, 0, getSpellLevel), effect.delay));
                  }*/
                 continue;
             }

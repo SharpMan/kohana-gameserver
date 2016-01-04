@@ -23,8 +23,8 @@ public class StatsCriterion extends Criterion {
             put("CL", StatsEnum.Vitality); //TODO: currentLife
             put("CM", StatsEnum.MovementPoints);
             put("CP", StatsEnum.ActionPoints);
-            put("Ct", StatsEnum.Add_TackleEvade);
-            put("CT", StatsEnum.Add_TackleBlock);
+            put("Ct", StatsEnum.ADD_TACKLE_EVADE);
+            put("CT", StatsEnum.ADD_TACKLE_BLOCK);
 
         }
     };

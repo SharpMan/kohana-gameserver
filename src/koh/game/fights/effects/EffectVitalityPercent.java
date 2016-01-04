@@ -12,8 +12,8 @@ public class EffectVitalityPercent extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            EffectCast SubInfos = new EffectCast(StatsEnum.Vitality, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.caster, CastInfos.Targets, CastInfos.SpellLevel);
+        for (Fighter Target : CastInfos.targets) {
+            EffectCast SubInfos = new EffectCast(StatsEnum.Vitality, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.caster, CastInfos.targets, CastInfos.SpellLevel);
             SubInfos.DamageValue = (int) (((double) Target.getLife() / 100) * CastInfos.randomJet(Target));
             SubInfos.Duration = CastInfos.Duration;
             BuffStats BuffStats = new BuffStats(SubInfos, Target);

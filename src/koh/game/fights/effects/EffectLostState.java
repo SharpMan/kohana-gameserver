@@ -11,8 +11,8 @@ public class EffectLostState extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            Target.getStates().removeState(FightStateEnum.valueOf(CastInfos.Effect.value));
+        for (Fighter Target : CastInfos.targets) {
+            Target.getStates().removeState(FightStateEnum.valueOf(CastInfos.effect.value));
         }
 
         return -1;

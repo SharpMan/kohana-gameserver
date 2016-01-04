@@ -31,7 +31,7 @@ public class EffectInstanceDice extends EffectInstanceInteger {
         this.diceSide = diceSide;
     }
 
-    public int[] GetValues() {
+    public int[] getValues() {
         return new int[]{
             this.diceNum,
             this.diceSide,

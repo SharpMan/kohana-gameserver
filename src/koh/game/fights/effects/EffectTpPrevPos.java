@@ -14,7 +14,7 @@ public class EffectTpPrevPos extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         int toReturn = -1;
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             if (Target.getPreviousCellPos().isEmpty()) {
                 continue;
             }

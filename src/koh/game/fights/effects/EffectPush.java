@@ -24,10 +24,10 @@ public class EffectPush extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         byte Direction = 0;
-        for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.Porté) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter Target : CastInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.Porté) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (CastInfos.EffectType) {
                 case PUSH_X_CELL:
-                case Push_Back:
+                case PUSH_BACK:
                     if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId()) && CastInfos.CellId != Target.getCellId()) {
                         Direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId());
                     } else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId())) {
@@ -40,10 +40,10 @@ public class EffectPush extends EffectBase {
                     Fighter pp = CastInfos.caster;
                     CastInfos.caster = Target;
                     Target = pp;
-                    CastInfos.Targets.remove(0);
+                    CastInfos.targets.remove(0);
                     Direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
                     break;
-                case PullForward:
+                case PULL_FORWARD:
                     Direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
                     if(CastInfos.SpellId == 5382 || CastInfos.SpellId == 5475){
                         Direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.targetKnownCellId);
@@ -53,7 +53,7 @@ public class EffectPush extends EffectBase {
                     Fighter p = CastInfos.caster;
                     CastInfos.caster = Target;
                     Target = p;
-                    CastInfos.Targets.remove(0);
+                    CastInfos.targets.remove(0);
                     if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId()) && CastInfos.CellId != Target.getCellId()) {
                         Direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId());
                     } else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId())) {
@@ -76,12 +76,12 @@ public class EffectPush extends EffectBase {
 
             if (nextCell != null && nextCell.CanWalk()) {
                 if (nextCell.HasObject(FightObjectType.OBJECT_TRAP)) {
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
                     return target.setCell(nextCell);
                 }
             } else {
                 int pushResult = -1;
-                if (CastInfos.EffectType == StatsEnum.Push_Back) {
+                if (CastInfos.EffectType == StatsEnum.PUSH_BACK) {
                     pushResult = EffectPush.ApplyPushBackDamages(CastInfos, target, length, i);
                     if (pushResult != -1) {
                         return pushResult;
@@ -90,7 +90,7 @@ public class EffectPush extends EffectBase {
 
                 if (i != 0) {
                     target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
                 }
 
@@ -107,7 +107,7 @@ public class EffectPush extends EffectBase {
 
         int result = target.setCell(currentCell);
 
-        target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.Effect == null ? 5 : CastInfos.Effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+        target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect == null ? 5 : CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
         target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
 
@@ -128,7 +128,7 @@ public class EffectPush extends EffectBase {
         if (LevelCoef < 0.1) {
             LevelCoef = 0.1;
         }
-        double pushDmg = (CastInfos.caster.getLevel() / 2 + (CastInfos.caster.getStats().getTotal(StatsEnum.Add_Push_Damages_Bonus) - Target.getStats().getTotal(StatsEnum.Add_Push_Damages_Bonus)) + 32) * CastInfos.Effect.diceNum / (4 * Math.pow(2, CurrentLength));
+        double pushDmg = (CastInfos.caster.getLevel() / 2 + (CastInfos.caster.getStats().getTotal(StatsEnum.Add_Push_Damages_Bonus) - Target.getStats().getTotal(StatsEnum.Add_Push_Damages_Bonus)) + 32) * CastInfos.effect.diceNum / (4 * Math.pow(2, CurrentLength));
         MutableInt DamageValue = new MutableInt(pushDmg);
         //MutableInt DamageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 

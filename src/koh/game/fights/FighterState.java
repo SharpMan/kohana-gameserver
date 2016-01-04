@@ -60,7 +60,7 @@ public class FighterState {
                 break;
         }
 
-        this.myStates.put(FightStateEnum.valueOf(Buff.CastInfos.Effect.value), Buff);
+        this.myStates.put(FightStateEnum.valueOf(Buff.CastInfos.effect.value), Buff);
     }
 
     public void delState(BuffEffect Buff) {
@@ -80,7 +80,7 @@ public class FighterState {
                 break;
         }
 
-        this.myStates.remove(FightStateEnum.valueOf(Buff.CastInfos.Effect.value));
+        this.myStates.remove(FightStateEnum.valueOf(Buff.CastInfos.effect.value));
     }
 
     public void removeState(FightStateEnum State) {

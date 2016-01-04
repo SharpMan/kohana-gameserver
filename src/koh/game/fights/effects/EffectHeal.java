@@ -60,12 +60,12 @@ public class EffectHeal extends EffectBase {
             CastInfos.IsPoison = true;
 
             // Ajout du buff
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 Target.getBuff().addBuff(new BuffHeal(CastInfos, Target));
             }
         } else // Heal direct
         {
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 if (EffectHeal.applyHeal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
                     return -3;
                 }

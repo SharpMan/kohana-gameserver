@@ -2,6 +2,7 @@ package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.ActionIdEnum;
+import koh.protocol.messages.game.actions.fight.GameActionFightLifeAndShieldPointsLostMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMessage;
 
 /**
@@ -11,27 +12,43 @@ import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMes
 public class EffectDistributesDamagesOccasioned extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         int Apply = -1;
-        for (Fighter Target : CastInfos.Targets) {
-            int DamageJet = (CastInfos.DamageValue * CastInfos.randomJet(Target)) / 100;
-            if (DamageJet < 0) {
-                DamageJet = (0);
+        for (Fighter target : castInfos.targets) {
+            int damageJet = (castInfos.DamageValue * castInfos.randomJet(target)) / 100;
+            if (damageJet < 0) {
+                damageJet = (0);
             }
 
             // Dommages superieur a la vie de la cible
-            if (DamageJet > Target.getLife()) {
-                DamageJet = (Target.getLife());
+            // Dommages superieur a la vie de la cible
+            if (damageJet  > target.getLife() + target.getShieldPoints()) {
+                damageJet = (target.getLife() + target.getShieldPoints());
             }
 
-            // Deduit la vie
-            Target.setLife(Target.getLife() - DamageJet);
-
-            // Enois du packet combat subit des dommages
-            if (DamageJet != 0) {
-                Target.getFight().sendToField(new GameActionFightLifePointsLostMessage(CastInfos.Effect != null ? CastInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, CastInfos.caster.getID(), Target.getID(), DamageJet, 0));
+            // On verifie les point bouclier d'abord
+            if(target.getShieldPoints() > 0){
+                if(target.getShieldPoints() > damageJet){
+                    target.setShieldPoints(target.getShieldPoints() - damageJet);
+                    target.getFight().sendToField(new GameActionFightLifeAndShieldPointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST,  castInfos.caster.getID(), target.getID(), 0, 0, damageJet));
+                }
+                else{
+                    int lifePointRemaining = damageJet - target.getShieldPoints();
+                    target.getFight().sendToField(new GameActionFightLifeAndShieldPointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, castInfos.caster.getID(), target.getID(), lifePointRemaining, 0, target.getShieldPoints()));
+                    target.setLife(target.getLife() - lifePointRemaining);
+                    target.setShieldPoints(0);
+                }
             }
-            int newValue = Target.tryDie(CastInfos.caster.getID());
+            else {
+                // Deduit la vie
+                target.setLife(target.getLife() - damageJet);
+
+                // Enois du packet combat subit des dommages
+                if (damageJet != 0) {
+                    target.getFight().sendToField(new GameActionFightLifePointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, castInfos.caster.getID(), target.getID(), damageJet, 0));
+                }
+            }
+            int newValue = target.tryDie(castInfos.caster.getID());
             if (newValue < Apply) {
                 Apply = newValue;
             }

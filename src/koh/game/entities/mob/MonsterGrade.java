@@ -61,8 +61,8 @@ public class MonsterGrade {
         this.myStats.addBase(StatsEnum.DodgePMLostProbability, this.pmDodge);
         this.myStats.addBase(StatsEnum.Wisdom, this.wisdom);
 
-        this.myStats.addBase(StatsEnum.Add_TackleEvade, this.tackleEvade);
-        this.myStats.addBase(StatsEnum.Add_TackleBlock, this.tackleBlock);
+        this.myStats.addBase(StatsEnum.ADD_TACKLE_EVADE, this.tackleEvade);
+        this.myStats.addBase(StatsEnum.ADD_TACKLE_BLOCK, this.tackleBlock);
 
         if (!this.getMonster().isUseBombSlot() && !this.getMonster().isUseSummonSlot() && this.strenght == 0 && this.chance == 0 && this.intelligence == 0 && this.agility == 0) {
             int bonus;

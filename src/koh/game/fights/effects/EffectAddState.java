@@ -14,9 +14,9 @@ public class EffectAddState extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         BuffEffect Buff = null;
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             Buff = new BuffState(CastInfos, Target);
-            if (Target.getStates().canState(FightStateEnum.valueOf(CastInfos.Effect.value)) && !Target.getBuff().buffMaxStackReached(Buff)) {
+            if (Target.getStates().canState(FightStateEnum.valueOf(CastInfos.effect.value)) && !Target.getBuff().buffMaxStackReached(Buff)) {
                 Target.getBuff().addBuff(Buff);
                 if (Buff.applyEffect(null, null) == -3) {
                     return -3;

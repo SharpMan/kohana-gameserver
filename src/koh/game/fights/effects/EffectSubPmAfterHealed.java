@@ -11,7 +11,7 @@ public class EffectSubPmAfterHealed extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             Target.getBuff().addBuff(new BuffSubPmAfterHealed(CastInfos, Target));
         }
         return -1;

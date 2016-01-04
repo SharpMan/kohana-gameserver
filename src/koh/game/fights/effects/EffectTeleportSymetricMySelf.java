@@ -14,7 +14,7 @@ public class EffectTeleportSymetricMySelf extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         FightCell cell;
-        for (Fighter Target : CastInfos.Targets) {
+        for (Fighter Target : CastInfos.targets) {
             cell = CastInfos.caster.getFight().getCell(CastInfos.caster.getMapPoint().pointSymetry(Target.getMapPoint()).get_cellId());
 
             if (cell != null && cell.IsWalkable()) {

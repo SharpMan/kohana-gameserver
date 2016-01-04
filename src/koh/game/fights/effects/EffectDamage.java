@@ -6,10 +6,7 @@ import koh.game.fights.effects.buff.BuffReflectSpell;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMessage;
-import koh.protocol.messages.game.actions.fight.GameActionFightReduceDamagesMessage;
-import koh.protocol.messages.game.actions.fight.GameActionFightReflectDamagesMessage;
-import koh.protocol.messages.game.actions.fight.GameActionFightReflectSpellMessage;
+import koh.protocol.messages.game.actions.fight.*;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -26,12 +23,12 @@ public class EffectDamage extends EffectBase {
             CastInfos.IsPoison = true;
 
             // Ajout du buff
-            CastInfos.Targets.stream().forEach((Target) -> {
+            CastInfos.targets.stream().forEach((Target) -> {
                 Target.getBuff().addBuff(new BuffDamage(CastInfos, Target));
             });
         } else // Dommage direct
         {
-            for (Fighter Target : CastInfos.Targets) {
+            for (Fighter Target : CastInfos.targets) {
                 //Eppe de iop ?
                 MutableInt DamageValue = new MutableInt(CastInfos.randomJet(Target));
 
@@ -73,8 +70,8 @@ public class EffectDamage extends EffectBase {
         // Calcul jet
         Caster.computeDamages(castInfos.EffectType, damageJet);
         //Calcul Bonus Negatif Zone ect ...
-        if (castInfos.Effect != null) {
-            Caster.calculBonusDamages(castInfos.Effect, damageJet,castInfos.CellId , target.getCellId(),castInfos.oldCell);
+        if (castInfos.effect != null) {
+            Caster.calculBonusDamages(castInfos.effect, damageJet,castInfos.CellId , target.getCellId(),castInfos.oldCell);
         }
 
         // Calcul resistances
@@ -145,8 +142,23 @@ public class EffectDamage extends EffectBase {
         }
 
         // Dommages superieur a la vie de la cible
-        if (damageJet.getValue() > target.getLife()) {
-            damageJet.setValue(target.getLife());
+        if (damageJet.getValue() > target.getLife() + target.getShieldPoints()) {
+            damageJet.setValue(target.getLife() + target.getShieldPoints());
+        }
+
+        // On verifie les point bouclier d'abord
+        if(target.getShieldPoints() > 0){
+            if(target.getShieldPoints() > damageJet.intValue()){
+                target.setShieldPoints(target.getShieldPoints() - damageJet.getValue());
+                target.getFight().sendToField(new GameActionFightLifeAndShieldPointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.getID(), target.getID(), 0, 0, damageJet.intValue()));
+            }
+            else{
+                int lifePointRemaining = damageJet.toInteger() - target.getShieldPoints();
+                target.getFight().sendToField(new GameActionFightLifeAndShieldPointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.getID(), target.getID(), lifePointRemaining, 0, target.getShieldPoints()));
+                target.setLife(target.getLife() - lifePointRemaining);
+                target.setShieldPoints(0);
+            }
+            return target.tryDie(Caster.getID());
         }
 
         // Deduit la vie
@@ -154,7 +166,7 @@ public class EffectDamage extends EffectBase {
 
         // Enois du packet combat subit des dommages
         if (damageJet.intValue() != 0) {
-            target.getFight().sendToField(new GameActionFightLifePointsLostMessage(castInfos.Effect != null ? castInfos.Effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.getID(), target.getID(), damageJet.intValue(), 0));
+            target.getFight().sendToField(new GameActionFightLifePointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, Caster.getID(), target.getID(), damageJet.intValue(), 0));
         }
         return target.tryDie(Caster.getID());
     }
