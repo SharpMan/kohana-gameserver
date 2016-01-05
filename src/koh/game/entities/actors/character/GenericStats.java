@@ -54,7 +54,7 @@ public class GenericStats {
             put(StatsEnum.SUB_WATER_ELEMENT_REDUCTION, StatsEnum.WATER_ELEMENT_REDUCTION);
             put(StatsEnum.SUB_PUSH_DAMAGES_BONUS, StatsEnum.ADD_PUSH_DAMAGES_BONUS);
             put(StatsEnum.SUB_RANGE, StatsEnum.ADD_RANGE);
-            put(StatsEnum.SUB_DAMAGE, StatsEnum.AddDamageMagic);
+            put(StatsEnum.SUB_DAMAGE, StatsEnum.ADD_DAMAGE_MAGIC);
             put(StatsEnum.SUB_AIR_ELEMENT_REDUCTION, StatsEnum.AIR_ELEMENT_REDUCTION);
             put(StatsEnum.SUB_AIR_DAMAGES_BONUS, StatsEnum.ADD_AIR_DAMAGES_BONUS);
             put(StatsEnum.SUB_FIRE_ELEMENT_REDUCTION, StatsEnum.FIRE_ELEMENT_REDUCTION);
@@ -66,7 +66,7 @@ public class GenericStats {
             put(StatsEnum.SUB_PVP_NEUTRAL_RESIST_PERCENT, StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT);
             put(StatsEnum.SUB_HEAL_BONUS, StatsEnum.ADD_HEAL_BONUS);
             put(StatsEnum.SUB_CHANCE, StatsEnum.CHANCE);
-            put(StatsEnum.SubDamageBonusPercent, StatsEnum.Add_Damage_Final_Percent);
+            put(StatsEnum.SUB_DAMAGE_BONUS_PERCENT, StatsEnum.ADD_DAMAGE_FINAL_PERCENT);
         }
     };
 
@@ -241,7 +241,7 @@ public class GenericStats {
         }
         switch (effectType) {
             /*case getInitiative:
-             return this.myStats.get(EffectType).base + getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
+             return this.myStats.get(effectType).base + getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
             default:
                 return this.myStats.get(effectType).base;
         }

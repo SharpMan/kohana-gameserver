@@ -40,13 +40,13 @@ public class FightPortal extends FightActivableObject {
     }
 
     @Override
-    public void AppearForAll() {
+    public void appearForAll() {
         this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.caster.getID(), getGameActionMark()));
         this.m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, this.caster.getID(), this.ID, true));
     }
 
     @Override
-    public void Appear(FightTeam dispatcher) {
+    public void appear(FightTeam dispatcher) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -67,19 +67,19 @@ public class FightPortal extends FightActivableObject {
         enable(fighter, false);
     }
 
-    public boolean DisabledByCaster = false;
+    public boolean disabledByCaster = false;
 
-    public void ForceEnable(Fighter fighter) {
-        if (DisabledByCaster) {
-            if (!this.Cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.Cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+    public void forceEnable(Fighter fighter) {
+        if (disabledByCaster) {
+            if (!this.cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
                 this.onEnable(fighter);
             }
-            this.DisabledByCaster = false;
+            this.disabledByCaster = false;
         }
     }
 
     public synchronized void enable(Fighter fighter, boolean check) {
-        if (DisabledByCaster || Enabled || (check && turnUsed == m_fight.getFightWorker().fightTurn) || this.Cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) || this.Cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+        if (disabledByCaster || Enabled || (check && turnUsed == m_fight.getFightWorker().fightTurn) || this.cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) || this.cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
             return;
         }
         this.onEnable(fighter);
@@ -97,7 +97,7 @@ public class FightPortal extends FightActivableObject {
             return;
         }
         this.Enabled = false;
-        this.DisabledByCaster = true;
+        this.disabledByCaster = true;
         m_fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, fighter.getID(), this.ID, false));
         m_fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
@@ -151,7 +151,7 @@ public class FightPortal extends FightActivableObject {
         targets.clear();
 
         activator.getFight().endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        return activator.setCell(lastPortal.Cell);
+        return activator.setCell(lastPortal.cell);
     }
 
     static void shuffle(FightPortal[] array) {

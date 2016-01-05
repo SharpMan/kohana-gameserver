@@ -11,7 +11,7 @@ public class EffectReflectSpell extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        if (CastInfos.Duration > 0) {
+        if (CastInfos.duration > 0) {
             for (Fighter Target : CastInfos.targets) {
                 Target.getBuff().addBuff(new BuffReflectSpell(CastInfos, Target));
             }

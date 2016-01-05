@@ -13,9 +13,9 @@ public class EffectLostPdvPercent extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.targets) {
-            EffectCast SubInfos = new EffectCast(StatsEnum.SUB_VITALITY, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.caster, CastInfos.targets, CastInfos.SpellLevel);
-            SubInfos.DamageValue = (int) (((double) Target.getLife() / 100) * CastInfos.randomJet(Target));
-            SubInfos.Duration = CastInfos.Duration;
+            EffectCast SubInfos = new EffectCast(StatsEnum.SUB_VITALITY, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, null, CastInfos.caster, CastInfos.targets, CastInfos.spellLevel);
+            SubInfos.damageValue = (int) (((double) Target.getLife() / 100) * CastInfos.randomJet(Target));
+            SubInfos.duration = CastInfos.duration;
             BuffStats BuffStats = new BuffStats(SubInfos, Target);
             if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;

@@ -20,7 +20,7 @@ public class BuffSacrifice extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (DamageInfos.IsReflect || DamageInfos.IsReturnedDamages || DamageInfos.IsPoison) {
+        if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
             return -1;
         }
         // mort
@@ -31,7 +31,7 @@ public class BuffSacrifice extends BuffEffect {
 
         DamageValue.setValue(0);
 
-        DamageInfos.IsReturnedDamages = true;
+        DamageInfos.isReturnedDamages = true;
 
         return EffectDamage.applyDamages(DamageInfos, castInfos.caster, new MutableInt(DamageInfos.randomJet(caster)));
 
@@ -39,7 +39,7 @@ public class BuffSacrifice extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.castInfos.effect.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.SpellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) this.castInfos.effect.delay);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.castInfos.effect.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) this.castInfos.effect.delay);
     }
 
 }

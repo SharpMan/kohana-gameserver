@@ -19,16 +19,16 @@ import koh.protocol.types.game.actions.fight.GameActionMark;
 public class FightGlyph extends FightActivableObject {
 
     public FightGlyph(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum Shape) {
-        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
+        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
     }
 
     @Override
-    public void AppearForAll() {
+    public void appearForAll() {
         this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.caster.getID(), getGameActionMark()));
     }
 
     @Override
-    public void Appear(FightTeam dispatcher) {
+    public void appear(FightTeam dispatcher) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

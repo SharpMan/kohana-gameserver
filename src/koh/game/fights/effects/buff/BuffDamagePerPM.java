@@ -32,7 +32,7 @@ public class BuffDamagePerPM extends BuffEffect {
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = castInfos.caster.getStats().getTotal(StatsEnum.AddDamagePercent);
+        int pdom = castInfos.caster.getStats().getTotal(StatsEnum.ADD_DAMAGE_PERCENT);
         if (pdom < 0) {
             pdom = 0;
         }
@@ -46,7 +46,7 @@ public class BuffDamagePerPM extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.SpellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

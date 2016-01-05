@@ -25,15 +25,15 @@ public class EffectSummonBomb extends EffectBase {
         if (Monster != null) {
             MonsterGrade MonsterLevel = Monster.getLevelOrNear(CastInfos.effect.diceSide);
             if (MonsterLevel != null) {
-                if (CastInfos.caster.getFight().isCellWalkable(CastInfos.CellId)) {
+                if (CastInfos.caster.getFight().isCellWalkable(CastInfos.cellId)) {
                     BombFighter Bomb = new BombFighter(CastInfos.caster.getFight(), CastInfos.caster, MonsterLevel);
                     Bomb.joinFight();
-                    Bomb.getFight().joinFightTeam(Bomb, CastInfos.caster.getTeam(), false, CastInfos.CellId, true);
+                    Bomb.getFight().joinFightTeam(Bomb, CastInfos.caster.getTeam(), false, CastInfos.cellId, true);
                     CastInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, CastInfos.caster.getID(), (GameFightFighterInformations) Bomb.getGameContextActorInformations(null)));
                     CastInfos.caster.getFight().getFightWorker().summonFighter(Bomb);
                     CastInfos.caster.getActivableObjects().filter(Object -> Object instanceof FightBomb)
                             .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).owner,Bomb))
-                            .forEach(Bombe -> ((FightBomb)Bombe).FightCells()
+                            .forEach(Bombe -> ((FightBomb)Bombe).getFightCells()
                                               .filter(Cell -> Cell.hasFighter())
                                               .forEach(C -> {
                                                   for(Fighter F : C.GetObjectsAsFighter()){

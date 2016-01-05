@@ -15,7 +15,7 @@ public class EffectDistributesDamagesOccasioned extends EffectBase {
     public int applyEffect(EffectCast castInfos) {
         int Apply = -1;
         for (Fighter target : castInfos.targets) {
-            int damageJet = (castInfos.DamageValue * castInfos.randomJet(target)) / 100;
+            int damageJet = (castInfos.damageValue * castInfos.randomJet(target)) / 100;
             if (damageJet < 0) {
                 damageJet = (0);
             }

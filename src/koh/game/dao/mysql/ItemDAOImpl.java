@@ -67,6 +67,7 @@ public class ItemDAOImpl extends ItemDAO {
                     nextStorageId = storageResult.getInt("id") +1;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

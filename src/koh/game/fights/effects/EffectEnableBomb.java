@@ -19,7 +19,7 @@ public class EffectEnableBomb extends EffectBase {
     public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.targets) {
             if (Target instanceof BombFighter) {
-                if (CastInfos.Duration > 0) {
+                if (CastInfos.duration > 0) {
                     Target.getBuff().addBuff(new BuffEnableBomb(CastInfos, Target));
                     continue;
                 }

@@ -12,7 +12,7 @@ public class EffectTriggersGlyph extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        FightCell Cell = CastInfos.caster.getFight().getCell(CastInfos.CellId);
+        FightCell Cell = CastInfos.caster.getFight().getCell(CastInfos.cellId);
         for (IFightObject Glyph : Cell.GetObjects(IFightObject.FightObjectType.OBJECT_GLYPHE)) {
             int Score = ((FightGlyph) Glyph).loadEnnemyTargetsAndActive(CastInfos.caster);
             if (Score == -3) {

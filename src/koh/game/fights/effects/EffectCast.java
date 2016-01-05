@@ -19,45 +19,45 @@ public class EffectCast {
 
     private static final Random EFFECT_RANDOM = new Random();
 
-    public static boolean IsDamageEffect(StatsEnum EffectType) {
+    public static boolean isDamageEffect(StatsEnum EffectType) {
         switch (EffectType) {
-            case Steal_Earth:
-            case Steal_Water:
-            case Steal_Air:
-            case Steal_Fire:
-            case Steal_Neutral:
-            case Damage_Water:
-            case Damage_Earth:
-            case Damage_Air:
-            case Damage_Fire:
-            case Damage_Neutral:
+            case STEAL_EARTH:
+            case STEAL_WATER:
+            case STEAL_AIR:
+            case STEAL_FIRE:
+            case STEAL_NEUTRAL:
+            case DAMAGE_WATER:
+            case DAMAGE_EARTH:
+            case DAMAGE_AIR:
+            case DAMAGE_FIRE:
+            case DAMAGE_NEUTRAL:
                 return true;
         }
 
         return false;
     }
 
-    public StatsEnum EffectType;
-    public StatsEnum SubEffect;
+    public StatsEnum effectType;
+    public StatsEnum subEffect;
     public EffectInstanceDice effect;
 
-    public int GetEffectUID() {
+    public int getEffectUID() {
         if (this.effect != null) {
             return this.effect.effectUid;
         }
         return 0;
     }
 
-    public int SpellId, FakeValue, DamageValue, ParentUID, targetKnownCellId;
-    public short CellId,oldCell;
-    public boolean IsReflect, IsPoison, IsCAC, IsTrap, IsReturnedDamages;
-    public double Chance;
-    public SpellLevel SpellLevel;
+    public int spellId, fakeValue, damageValue, parentUID, targetKnownCellId;
+    public short cellId,oldCell;
+    public boolean isReflect, isPoison, isCAC, isTrap, isReturnedDamages;
+    public double chance;
+    public SpellLevel spellLevel;
     public Fighter caster;
     public ArrayList<Fighter> targets;
-    public int Duration;
+    public int duration;
 
-    public static int RandomValue(int i1, int i2) {
+    public static int randomValue(int i1, int i2) {
         //random rand = new random();
         return EFFECT_RANDOM.nextInt(i2 - i1 + 1) + i1;
     }
@@ -67,7 +67,7 @@ public class EffectCast {
      }*/
     public short randomJet(Fighter Target) {
         if (this.effect == null) {
-            return (short) this.DamageValue;
+            return (short) this.damageValue;
         }
 
         int num1 = this.effect.diceNum >= (int) this.effect.diceSide ? this.effect.diceNum : this.effect.diceSide;
@@ -88,57 +88,57 @@ public class EffectCast {
             if (caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
                 return (short) num2;
             }
-            return (short) RandomValue(num2, num1);
+            return (short) randomValue(num2, num1);
         }
     }
 
     public EffectCast(StatsEnum EffectType, int SpellId, short CellId, double Chance, EffectInstanceDice Effect, Fighter Caster, ArrayList<Fighter> Targets) {
-        this.EffectType = EffectType;
-        this.SpellId = SpellId;
-        this.CellId = CellId;
-        this.Chance = Chance;
+        this.effectType = EffectType;
+        this.spellId = SpellId;
+        this.cellId = CellId;
+        this.chance = Chance;
         this.caster = Caster;
         this.targets = Targets;
         this.effect = Effect;
-        this.SubEffect = StatsEnum.NONE;
-        this.DamageValue = 0;
-        this.IsCAC = false;
-        this.SpellLevel = null;
-        this.Duration = Effect != null ? Effect.duration : 0;
+        this.subEffect = StatsEnum.NONE;
+        this.damageValue = 0;
+        this.isCAC = false;
+        this.spellLevel = null;
+        this.duration = Effect != null ? Effect.duration : 0;
     }
 
     public EffectCast(StatsEnum EffectType, int SpellId, short CellId, double Chance, EffectInstanceDice Effect, Fighter Caster, ArrayList<Fighter> Targets, SpellLevel sl) {
-        this.EffectType = EffectType;
-        this.SpellId = SpellId;
-        this.CellId = CellId;
-        this.Chance = Chance;
+        this.effectType = EffectType;
+        this.spellId = SpellId;
+        this.cellId = CellId;
+        this.chance = Chance;
         this.caster = Caster;
         this.targets = Targets;
         this.effect = Effect;
-        this.SubEffect = StatsEnum.NONE;
-        this.DamageValue = 0;
-        this.IsCAC = false;
-        this.SpellLevel = null;
-        this.Duration = Effect != null ? Effect.duration : 0;
-        this.SpellLevel = sl;
+        this.subEffect = StatsEnum.NONE;
+        this.damageValue = 0;
+        this.isCAC = false;
+        this.spellLevel = null;
+        this.duration = Effect != null ? Effect.duration : 0;
+        this.spellLevel = sl;
     }
 
     public EffectCast(StatsEnum EffectType, int SpellId, short CellId, double Chance, EffectInstanceDice Effect, Fighter Caster, ArrayList<Fighter> Targets, boolean IsCAC, StatsEnum SubEffect, int DamageValue, SpellLevel sl) {
-        this.EffectType = EffectType;
-        this.SpellId = SpellId;
-        this.CellId = CellId;
-        this.Chance = Chance;
+        this.effectType = EffectType;
+        this.spellId = SpellId;
+        this.cellId = CellId;
+        this.chance = Chance;
         this.caster = Caster;
         this.targets = Targets;
         this.effect = Effect;
-        this.SubEffect = SubEffect;
-        this.DamageValue = DamageValue;
-        this.IsCAC = IsCAC;
-        this.SpellLevel = sl;
-        this.Duration = Effect != null ? Effect.duration : 0;
+        this.subEffect = SubEffect;
+        this.damageValue = DamageValue;
+        this.isCAC = IsCAC;
+        this.spellLevel = sl;
+        this.duration = Effect != null ? Effect.duration : 0;
     }
 
-    public int Delay() {
+    public int getDelay() {
         if (this.effect != null) {
             return this.effect.delay;
         }
@@ -146,23 +146,23 @@ public class EffectCast {
     }
 
     public EffectCast(StatsEnum EffectType, int SpellId, short CellId, double Chance, EffectInstanceDice Effect, Fighter Caster, ArrayList<Fighter> Targets, boolean IsCAC, StatsEnum SubEffect, int DamageValue, SpellLevel sl, int Duration, int ParentUID) {
-        this.EffectType = EffectType;
-        this.SpellId = SpellId;
-        this.CellId = CellId;
-        this.Chance = Chance;
+        this.effectType = EffectType;
+        this.spellId = SpellId;
+        this.cellId = CellId;
+        this.chance = Chance;
         this.caster = Caster;
         this.targets = Targets;
         this.effect = Effect;
-        this.SubEffect = SubEffect;
-        this.DamageValue = DamageValue;
-        this.IsCAC = IsCAC;
-        this.SpellLevel = sl;
-        this.Duration = Duration;
-        this.ParentUID = ParentUID;
+        this.subEffect = SubEffect;
+        this.damageValue = DamageValue;
+        this.isCAC = IsCAC;
+        this.spellLevel = sl;
+        this.duration = Duration;
+        this.parentUID = ParentUID;
     }
     
     public FightCell getCell(){
-        return this.caster.getFight().getCell(CellId);
+        return this.caster.getFight().getCell(cellId);
     }
 
     public String toString() {

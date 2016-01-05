@@ -18,21 +18,22 @@ public class EffectActivableObject extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         FightActivableObject obj = null;
-        switch (CastInfos.EffectType) {
+        switch (CastInfos.effectType) {
             case LAYING_GLYPH_RANKED:
             case LAYING_GLYPH_RANKED_2:
             case LAYING_GLYPH:
-                if (CastInfos.caster.getFight().hasObjectOnCell(FightObjectType.OBJECT_FIGHTER, CastInfos.CellId)) {
+                if (CastInfos.caster.getFight().hasObjectOnCell(FightObjectType.OBJECT_FIGHTER, CastInfos.cellId)
+                        || CastInfos.caster.getFight().hasObjectOnCell(FightObjectType.OBJECT_STATIC, CastInfos.cellId)) {
                     return -1;
                 }
-                obj = new FightGlyph(CastInfos, CastInfos.Duration, GetColor(CastInfos.SpellId), CastInfos.effect.ZoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
+                obj = new FightGlyph(CastInfos, CastInfos.duration, GetColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
                 break;
 
             case LAYING_TRAP_LEVEL:
-                if (!CastInfos.caster.getFight().canPutObject(CastInfos.CellId)) {
+                if (!CastInfos.caster.getFight().canPutObject(CastInfos.cellId)) {
                     return -1;
                 }
-                obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.SpellId), CastInfos.effect.ZoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
+                obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
                 break;
             case LAYING_PORTAIL:
                 if (CastInfos.getCell().HasGameObject(FightObjectType.OBJECT_PORTAL)) {
@@ -44,7 +45,7 @@ public class EffectActivableObject extends EffectBase {
                 /*if (!castInfos.caster.getFight().canPutObject(castInfos.getCellId)) {
                  return -1;
                  }*/
-                obj = new FightPortal(CastInfos.caster.getFight(), CastInfos.caster, CastInfos, CastInfos.CellId);
+                obj = new FightPortal(CastInfos.caster.getFight(), CastInfos.caster, CastInfos, CastInfos.cellId);
                 break;
         }
 

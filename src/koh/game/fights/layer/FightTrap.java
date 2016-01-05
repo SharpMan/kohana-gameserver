@@ -23,20 +23,22 @@ import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
 public class FightTrap extends FightActivableObject {
 
     public FightTrap(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum shap) {
-        super(BuffActiveType.ACTIVE_ENDMOVE, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.CellId, duration, color, GameActionFightInvisibilityStateEnum.INVISIBLE, size, shap);
+        super(BuffActiveType.ACTIVE_ENDMOVE, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId, duration, color, GameActionFightInvisibilityStateEnum.INVISIBLE, size, shap);
     }
 
     @Override
-    public void AppearForAll() {
+    public void appearForAll() {
         this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.caster.getID(), getGameActionMark()));
     }
 
     @Override
-    public void Appear(FightTeam dispatcher) {
+    public void appear(FightTeam dispatcher) {
         this.m_fight.sendToField(new FieldNotification(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.caster.getID(), getHiddenGameActionMark())) {
             @Override
             public boolean can(Player perso) {
-                return !(perso.getClient() != null && perso.getFighter() != null && perso.getFighter().getTeam().id == dispatcher.id);
+                return !(perso.getClient() != null
+                        && perso.getFighter() != null
+                        && perso.getFighter().getTeam().id == dispatcher.id);
             }
         });
         dispatcher.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_TRAP_CASTING_SPELL, this.caster.getID(), getGameActionMark()));

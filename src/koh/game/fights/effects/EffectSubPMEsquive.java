@@ -15,19 +15,19 @@ public class EffectSubPMEsquive extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        if(castInfos.SpellLevel.getSpellId() == 112){
+        if(castInfos.spellLevel.getSpellId() == 112){
             return CAENGAL.applyEffect(castInfos);
         }
-        if (castInfos.Duration > 1) {
+        if (castInfos.duration > 1) {
             for (Fighter Target : castInfos.targets) {
-                EffectCast SubInfos = new EffectCast(castInfos.EffectType, castInfos.SpellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.SpellLevel, castInfos.Duration, 0);
+                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
                 BuffSubPMEsquive Buff = new BuffSubPMEsquive(SubInfos, Target);
                 Buff.applyEffect(null, null);
                 Target.getBuff().addBuff(Buff);
             }
         } else {
             for (Fighter Target : castInfos.targets) {
-                EffectCast SubInfos = new EffectCast(castInfos.EffectType, castInfos.SpellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.SpellLevel, 0, 0);
+                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, 0, 0);
 
                 BuffSubPMEsquive Buff = new BuffSubPMEsquive(SubInfos, Target);
                 Buff.applyEffect(null, null);

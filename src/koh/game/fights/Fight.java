@@ -239,7 +239,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         for (Short CellValue : this.map.getRedCells()) {
             FightCell Cell = this.myCells.get(CellValue);
-            if (Cell == null || !Cell.CanWalk()) {
+            if (Cell == null || !Cell.canWalk()) {
                 continue;
             }
             this.myFightCells.get(this.myTeam1).put(CellValue, Cell);
@@ -247,7 +247,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         for (Short CellValue : this.map.getBlueCells()) {
             FightCell Cell = this.myCells.get(CellValue);
-            if (Cell == null || !Cell.CanWalk()) {
+            if (Cell == null || !Cell.canWalk()) {
                 continue;
             }
             this.myFightCells.get(this.myTeam2).put(CellValue, Cell);
@@ -273,9 +273,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public static final StatsEnum[] EFFECT_NOT_SILENCED = new StatsEnum[]{
-        StatsEnum.Damage_Neutral, StatsEnum.Damage_Earth, StatsEnum.Damage_Air, StatsEnum.Damage_Fire, StatsEnum.Damage_Water,
-        StatsEnum.Steal_Neutral, StatsEnum.Steal_Earth, StatsEnum.Steal_Air, StatsEnum.Steal_Fire, StatsEnum.Steal_Water, StatsEnum.Steal_PV_Fix,
-        StatsEnum.DamageLifeNeutre, StatsEnum.DamageLifeEau, StatsEnum.DamageLifeTerre, StatsEnum.DamageLifeAir, StatsEnum.DamageLifeFeu, StatsEnum.DamageDropLife
+        StatsEnum.DAMAGE_NEUTRAL, StatsEnum.DAMAGE_EARTH, StatsEnum.DAMAGE_AIR, StatsEnum.DAMAGE_FIRE, StatsEnum.DAMAGE_WATER,
+        StatsEnum.STEAL_NEUTRAL, StatsEnum.STEAL_EARTH, StatsEnum.STEAL_AIR, StatsEnum.STEAL_FIRE, StatsEnum.STEAL_WATER, StatsEnum.STEAL_PV_FIX,
+        StatsEnum.DAMAGE_LIFE_NEUTRE, StatsEnum.DAMAGE_LIFE_WATER, StatsEnum.DAMAGE_LIFE_TERRE, StatsEnum.DAMAGE_LIFE_AIR, StatsEnum.DAMAGE_LIFE_FEU, StatsEnum.DAMAGE_DROP_LIFE
     };
 
     public void disconnect(CharacterFighter fighter) {
@@ -339,15 +339,15 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
          for (int i : _loc10_) {
          damagetoReturn += Arrays.stream(Portails).filter(y -> y.getCellId() == i).findFirst().get().damageValue;
          }*/
-        int[] PortailIds = new int[_loc10_.length];
+        int[] portailIds = new int[_loc10_.length];
         FightPortal Portal;
         for (int i = 0; i < _loc10_.length; i++) {
             final int ID = _loc10_[i];
             Portal = Arrays.stream(Portails).filter(y -> y.getCellId() == ID).findFirst().get();
             damagetoReturn += Portal.damageValue;
-            PortailIds[i] = Portal.ID;
+            portailIds[i] = Portal.ID;
         }
-        return new Three<>((int) _loc16_.get_cellId(), PortailIds, damagetoReturn);
+        return new Three<>((int) _loc16_.get_cellId(), portailIds, damagetoReturn);
     }
 
     public void launchSpell(Fighter fighter, SpellLevel spellLevel, short cellId, boolean friend, boolean fakeLaunch, boolean imTargeted) {
@@ -396,17 +396,25 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         }
 
-        EffectInstanceDice[] Effects = IsCc ? spellLevel.getCriticalEffect() : spellLevel.getEffects();
-        if (Effects == null) {
-            Effects = spellLevel.getCriticalEffect();
+        EffectInstanceDice[] spellEffects = IsCc ? spellLevel.getCriticalEffect() : spellLevel.getEffects();
+        if (spellEffects == null) {
+            spellEffects = spellLevel.getCriticalEffect();
+        }
+        final int maxGroup = Arrays.stream(spellEffects).mapToInt(ef -> ef.group).max().orElse(0);
+        if(maxGroup > 0){
+            Arrays.stream(spellEffects).forEach(e -> e.random = 0); //TODO check 3-4 monsters group spells
+            final int randGroup = RANDOM.nextInt(maxGroup);
+            spellEffects = Arrays.stream(spellEffects).filter(ef -> ef.group == randGroup).toArray(EffectInstanceDice[]::new);
+            Arrays.stream(spellEffects).forEach(x -> x.targetMask = "a,A");
+            //TODO: Ecaflip rekop make all c targetMask in db , ankama mistake ...
         }
 
-        boolean silentCast = Arrays.stream(Effects).allMatch(x -> !ArrayUtils.contains(EFFECT_NOT_SILENCED, x.EffectType()));
+        final boolean silentCast = Arrays.stream(spellEffects).allMatch(x -> !ArrayUtils.contains(EFFECT_NOT_SILENCED, x.getEffectType()));
 
         if (!fakeLaunch) {
             Three<Integer, int[], Integer> informations = null;
             if (this.getCell(cellId).HasGameObject(FightObjectType.OBJECT_PORTAL)
-                    && !Arrays.stream(Effects).anyMatch(Effect -> Effect.EffectType().equals(StatsEnum.DISABLE_PORTAL))) {
+                    && !Arrays.stream(spellEffects).anyMatch(Effect -> Effect.getEffectType().equals(StatsEnum.DISABLE_PORTAL))) {
                 informations = this.getTargetThroughPortal(fighter, cellId, true);
                 cellId = informations.first.shortValue();
                 //this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"DamagePercentBoosted Suite au portails = " + DamagePercentBoosted}));
@@ -420,58 +428,61 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         }
 
-        HashMap<EffectInstanceDice, ArrayList<Fighter>> Targets = new HashMap<>();
-        for (Iterator<EffectInstanceDice> EffectI = ((Arrays.stream(Effects).sorted((e2, e1) -> (e1.EffectType() == StatsEnum.DISPELL_SPELL ? 0 : (e2.EffectType() == StatsEnum.DISPELL_SPELL ? -1 : 1))).iterator())); EffectI.hasNext();) {
-            final EffectInstanceDice Effect = EffectI.next();
-            System.out.println(Effect.toString());
-            Targets.put(Effect, new ArrayList<>());
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map)).getCells(cellId)) {
-                FightCell FightCell = this.getCell(Cell);
-                if (FightCell != null && FightCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
+        HashMap<EffectInstanceDice, ArrayList<Fighter>> targets = new HashMap<>();
+        for (EffectInstanceDice effect : spellEffects) {
+            System.out.println(effect.toString());
+            targets.put(effect, new ArrayList<>());
+            //.
+            final Fighter[] targetsOnZone = Arrays.stream((new Zone(effect.ZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map))
+                    .getCells(cellId))
+                    .map(cell ->  this.getCell(cell))
+                    .filter(cell -> cell != null && cell.HasGameObject(FightObjectType.OBJECT_FIGHTER,FightObjectType.OBJECT_STATIC))
+                    .map(fightCell -> fightCell.GetObjectsAsFighter()[0])
+                    .toArray(Fighter[]::new);
 
+            /* Explanation about the bottom code
+               When a fighter cast spell in a cell where he is not on it .
+               Like Mot drainant , Corruption.. Some spell effect need to be applied on himself
+             */
+            if(effect.targetMask.equals("C")
+                    && effect.zoneShape() == 80
+                    && effect.zoneSize() == 1
+                    && Arrays.stream(targetsOnZone).noneMatch(fr -> fr.getID() == fighter.getID())){
+                if(effect.isValidTarget(fighter, fighter) && EffectInstanceDice.verifySpellEffectMask(fighter, fighter, effect)){
+                    targets.get(effect).add(fighter);
                 }
-                if (FightCell != null) {
-                    if (FightCell.HasGameObject(FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
-                        for (Fighter Target : FightCell.GetObjectsAsFighter()) {
-                            if (Effect.targetMask.equals("C") && (Effect.category() == 0)) {
-                                Targets.get(Effect).add(fighter);
-                                break;
-                            }
-                            logger.debug(EffectHelper.verifyEffectTrigger(fighter, Target, Effects, Effect, false, Effect.triggers, cellId));
-                            logger.debug(Effect.isValidTarget(fighter, Target));
-                            logger.debug(EffectInstanceDice.verifySpellEffectMask(fighter, Target, Effect));
+            }
+            for(Fighter target : targetsOnZone) {
+                logger.debug(EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId));
+                logger.debug(effect.isValidTarget(fighter, target));
+                logger.debug(EffectInstanceDice.verifySpellEffectMask(fighter, target, effect));
 
-                            if (EffectHelper.verifyEffectTrigger(fighter, Target, Effects, Effect, false, Effect.triggers, cellId) && Effect.isValidTarget(fighter, Target) && EffectInstanceDice.verifySpellEffectMask(fighter, Target, Effect)) {
-                                if (Effect.targetMask.equals("C") && fighter.getCarriedActor() == Target.getID()) {
-                                    continue;
-                                } else if (Effect.targetMask.equals("a,A") && fighter.getCarriedActor() != 0 & fighter.getID() == Target.getID()) {
-                                    continue;
-                                }
+                if (EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId) && effect.isValidTarget(fighter, target) && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)) {
+                    if (effect.targetMask.equals("C") && fighter.getCarriedActor() == target.getID()) {
+                        continue;
+                    } else if (effect.targetMask.equals("a,A") && fighter.getCarriedActor() != 0 & fighter.getID() == target.getID()) {
+                        continue;
+                    }
                                 /*if (Fighter instanceof BombFighter && target.states.hasState(FightStateEnum.Kaboom)) {
                                  continue;
                                  }*/
-                                if (!imTargeted && Target.getID() == fighter.getID()) {
-                                    continue;
-                                }
-                                /*if(effect.category() == EffectHelper.DAMAGE_EFFECT_CATEGORY && !EffectInstanceDice.verifySpellEffectMask(Fighter, target, effect)){
-                                 continue;
-                                 }*/
-                                logger.debug("Targeet Aded!");
-                                Targets.get(Effect).add(Target);
-                            }
-                        }
+                    if (!imTargeted && target.getID() == fighter.getID()) {
+                        continue;
                     }
+                    logger.debug("Targeet Aded!");
+                    targets.get(effect).add(target);
                 }
             }
         }
         double num1 = Fight.RANDOM.nextDouble();
-        double num2 = (double) Arrays.stream(Effects).mapToInt(x -> x.random).sum();
+        double num2 = (double) Arrays.stream(spellEffects).mapToInt(x -> x.random).sum();
         boolean flag = false;
-        for (EffectInstanceDice Effect : Effects) {
-            if (Effect.random > 0) {
+        for (Iterator<EffectInstanceDice> effectI = ((Arrays.stream(spellEffects).sorted((e2, e1) -> (e1.getEffectType() == StatsEnum.DISPELL_SPELL ? 0 : (e2.getEffectType() == StatsEnum.DISPELL_SPELL ? -1 : 1))).iterator())); effectI.hasNext();) {
+            final EffectInstanceDice effect = effectI.next();
+            if (effect.random > 0) {
                 if (!flag) {
-                    if (num1 > (double) Effect.random / num2) {
-                        num1 -= (double) Effect.random / num2;
+                    if (num1 > (double) effect.random / num2) {
+                        num1 -= (double) effect.random / num2;
                         continue;
                     } else {
                         flag = true;
@@ -481,31 +492,23 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
             }
             // Actualisation des morts
-            Targets.get(Effect).removeIf(F -> F.isDead());
-            if (Effect.EffectType() == ADD_BASE_DAMAGE_SPELL) {
-                Targets.get(Effect).clear();
-                Targets.get(Effect).add(fighter);
+            targets.get(effect).removeIf(fr -> fr.isDead());
+            if (effect.getEffectType() == ADD_BASE_DAMAGE_SPELL) {
+                targets.get(effect).clear();
+                targets.get(effect).add(fighter);
             }
-            if (Effect.delay > 0) {
+            if (effect.delay > 0) {
                 //TODO: Set ParentBoost UID
-                fighter.getBuff().delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), spellLevel.getSpellId(), cellId, num1, Effect, fighter, Targets.get(Effect), false, StatsEnum.NONE, 0, spellLevel), Effect.delay));
-                Targets.get(Effect).stream().forEach((Target) -> {
-                    this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, fighter.getID(), new FightTriggeredEffect(Target.getNextBuffUid().incrementAndGet(), Target.getID(), (short) Effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
+                fighter.getBuff().delayedEffects.add(new Couple<>(new EffectCast(effect.getEffectType(), spellLevel.getSpellId(), cellId, num1, effect, fighter, targets.get(effect), false, StatsEnum.NONE, 0, spellLevel), effect.delay));
+                targets.get(effect).stream().forEach((Target) -> {
+                    this.sendToField(new GameActionFightDispellableEffectMessage(effect.effectId, fighter.getID(), new FightTriggeredEffect(Target.getNextBuffUid().incrementAndGet(), Target.getID(), (short) effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), effect.effectUid, 0, (short) effect.diceNum, (short) effect.diceSide, (short) effect.value, (short) effect.delay)));
                 });
-
-                /*for (Fighter target : targets.get(effect)) {
-                 target.buff.delayedEffects.add(new Couple<>(new EffectCast(effect.EffectType(), getSpellLevel.spellId, getCellId, num1, effect, Fighter, new ArrayList<Fighter>() {
-                 {
-                 add(target);
-                 }
-                 }, false, StatsEnum.NONE, 0, getSpellLevel), effect.delay));
-                 }*/
                 continue;
             }
-            EffectCast CastInfos = new EffectCast(Effect.EffectType(), spellLevel.getSpellId(), cellId, num1, Effect, fighter, Targets.get(Effect), false, StatsEnum.NONE, 0, spellLevel);
+            EffectCast CastInfos = new EffectCast(effect.getEffectType(), spellLevel.getSpellId(), cellId, num1, effect, fighter, targets.get(effect), false, StatsEnum.NONE, 0, spellLevel);
             CastInfos.targetKnownCellId = cellId;
             CastInfos.oldCell = oldCell;
-            if (EffectBase.TryApplyEffect(CastInfos) == -3) {
+            if (EffectBase.tryApplyEffect(CastInfos) == -3) {
                 break;
             }
         }
@@ -514,7 +517,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, fighter.getID(), fighter.getID(), (short) -spellLevel.getApCost()));
         }
 
-        if (!fakeLaunch && fighter.getVisibleState() == GameActionFightInvisibilityStateEnum.INVISIBLE && silentCast && spellLevel.getSpellId() != 2763) {
+        if (!fakeLaunch
+                && fighter.getVisibleState() == GameActionFightInvisibilityStateEnum.INVISIBLE
+                && silentCast
+                && spellLevel.getSpellId() != 2763) {
             this.sendToField(new ShowCellMessage(fighter.getID(), fighter.getCellId()));
         }
 
@@ -609,7 +615,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
             EffectCast CastInfos = new EffectCast(StatsEnum.valueOf(effect.actionId), 0, cellId, num1, effectParent, fighter, Targets, true, StatsEnum.NONE, 0, null);
             CastInfos.targetKnownCellId = cellId;
-            if (EffectBase.TryApplyEffect(CastInfos) == -3) {
+            if (EffectBase.tryApplyEffect(CastInfos) == -3) {
                 break;
             }
         }
@@ -639,12 +645,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return false;
         }
         //targetId == -1
-        logger.debug(!spell.isNeedFreeCell() || targetId == -1);
-        logger.debug( (!spell.isNeedTakenCell() || targetId != -1));
-        logger.debug(!Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x)));
-        logger.debug(!Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x)));
-        logger.debug( ArrayUtils.contains(fighter.getCastZone(spell), cellId));
-        logger.debug(fighter.getSpellsController().canLaunchSpell(spell, targetId));
 
         //TODO return a message foreach issues
         return (!spell.isNeedFreeCell() || targetId == -1)
@@ -935,7 +935,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.sendToField(new GameActionFightTackledMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_TACKLED, fighter.getID(), tacklers.stream().mapToInt(x -> x.getID()).toArray()));
 
             fighter.setUsedAP(fighter.getUsedAP() + tackledAp);
-            fighter.setUsedMP(fighter.getUsedAP() + tackledMp);
+            fighter.setUsedMP(fighter.getUsedMP() + tackledMp);
 
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, fighter.getID(), fighter.getID(), (short) -tackledAp));
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -tackledMp));
@@ -943,7 +943,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (path.movementLength <= fighter.getMP()) {
                 return;
             }
-            path.cutPath(fighter.getMP() + 1);
         }
     }
 
@@ -973,13 +972,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     }
                 };
                 if (Effect.delay > 0) {
-                    target.getBuff().delayedEffects.add(new Couple<>(new EffectCast(Effect.EffectType(), spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell), Effect.delay));
+                    target.getBuff().delayedEffects.add(new Couple<>(new EffectCast(Effect.getEffectType(), spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell), Effect.delay));
                     this.sendToField(new GameActionFightDispellableEffectMessage(Effect.effectId, caster.getID(), new FightTriggeredEffect(target.getNextBuffUid().incrementAndGet(), target.getID(), (short) Effect.duration, FightDispellableEnum.DISPELLABLE, spellid, Effect.effectUid, 0, (short) Effect.diceNum, (short) Effect.diceSide, (short) Effect.value, (short) Effect.delay)));
                     continue;
                 }
-                EffectCast CastInfos = new EffectCast(Effect.EffectType(), spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell);
+                EffectCast CastInfos = new EffectCast(Effect.getEffectType(), spellid, target.getCellId(), num1, Effect, caster, targets, false, StatsEnum.NONE, 0, spell);
                 CastInfos.targetKnownCellId = target.getCellId();
-                if (EffectBase.TryApplyEffect(CastInfos) == -3) {
+                if (EffectBase.tryApplyEffect(CastInfos) == -3) {
                     break;
                 }
             }
@@ -1096,7 +1095,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         // Existante ?
         if (Cell != null) {
             // Aucun persos dessus ?
-            if (Cell.CanWalk()) {
+            if (Cell.canWalk()) {
                 // Affectation
                 fighter.setCell(Cell);
                 this.fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
@@ -1300,12 +1299,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         for (Stream<BuffEffect> Buffs : (Iterable<Stream<BuffEffect>>) this.getAliveFighters().map(x -> x.getBuff().getAllBuffs())::iterator) {
             for (BuffEffect Buff : (Iterable<BuffEffect>) Buffs::iterator) {
-                FightDispellableEffectExtendedInformations = ArrayUtils.add(FightDispellableEffectExtendedInformations, new FightDispellableEffectExtendedInformations(Buff.castInfos.EffectType.value(), Buff.caster.getID(), Buff.getAbstractFightDispellableEffect()));
+                FightDispellableEffectExtendedInformations = ArrayUtils.add(FightDispellableEffectExtendedInformations, new FightDispellableEffectExtendedInformations(Buff.castInfos.effectType.value(), Buff.caster.getID(), Buff.getAbstractFightDispellableEffect()));
             }
         }
         /*return Stream.of(this.getAliveFighters()
          .map(x -> x.buff.getAllBuffs()
-         .map(Buff -> (new FightDispellableEffectExtendedInformations(Buff.castInfos.EffectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect())))
+         .map(Buff -> (new FightDispellableEffectExtendedInformations(Buff.castInfos.effectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect())))
          )).toArray(FightDispellableEffectExtendedInformations[]::new);*/
         return FightDispellableEffectExtendedInformations;
     }
@@ -1576,7 +1575,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return false;
         }
 
-        return this.myCells.get(CellId).CanWalk();
+        return this.myCells.get(CellId).canWalk();
     }
 
     public FightCell getCell(short CellId) {
@@ -1609,7 +1608,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     private synchronized FightCell getFreeSpawnCell(FightTeam Team) {
         for (FightCell Cell : this.myFightCells.get(Team).values()) {
-            if (Cell.CanWalk()) {
+            if (Cell.canWalk()) {
                 return Cell;
             }
         }

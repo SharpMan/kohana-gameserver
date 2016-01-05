@@ -13,14 +13,17 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffErosion extends BuffEffect {
 
+    private final int JET;
+
     public BuffErosion(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+        JET = this.castInfos.randomJet(target);
     }
 
     
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        float pdamage = this.castInfos.randomJet(target) / 100.00f;
+        float pdamage = JET / 100.00f;
         int BuffValue = this.target.getMaxLife() - (int) (DamageValue.getValue() * pdamage);
         if (BuffValue < 0) {
             BuffValue = 0;
@@ -32,6 +35,6 @@ public class BuffErosion extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.SpellId, this.castInfos.GetEffectUID(), this.castInfos.ParentUID, (short) Math.abs(this.castInfos.randomJet(target)));
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(JET));
     }
 }

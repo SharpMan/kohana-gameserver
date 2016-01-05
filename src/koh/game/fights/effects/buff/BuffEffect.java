@@ -41,9 +41,9 @@ public abstract class BuffEffect {
 
     //TODO: Create List in Setting
     public boolean isDebuffable() {
-        switch (this.castInfos.EffectType) {
+        switch (this.castInfos.effectType) {
             case DAMAGE_ARMOR_REDUCTION:
-                return castInfos.SpellId != SpellIDEnum.TREVE;
+                return castInfos.spellId != SpellIDEnum.TREVE;
             case ADD_STATE:
             case CHANGE_APPEARANCE:
             case CHATIMENT:
@@ -51,7 +51,7 @@ public abstract class BuffEffect {
             case TRANSFORMATION:
                 return false;
         }
-        return this.castInfos.SubEffect != StatsEnum.NOT_DISPELLABLE;
+        return this.castInfos.subEffect != StatsEnum.NOT_DISPELLABLE;
 
         //return true;
     }
@@ -59,14 +59,14 @@ public abstract class BuffEffect {
     public BuffEffect(EffectCast CastInfos, Fighter target, BuffActiveType ActiveType, BuffDecrementType decrementType) {
         this.castInfos = CastInfos;
 
-        //this.duration = (castInfos.duration == -1) ? -1 : (target.fight.currentFighter == target /*&& castInfos.duration == 0*/ ? castInfos.duration + 1 : castInfos.duration) - castInfos.Delay();
-        this.duration = (CastInfos.Duration == -1) ? -1 : (decrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.Duration : (CastInfos.Duration) - CastInfos.Delay());
+        //this.duration = (castInfos.duration == -1) ? -1 : (target.fight.currentFighter == target /*&& castInfos.duration == 0*/ ? castInfos.duration + 1 : castInfos.duration) - castInfos.getDelay();
+        this.duration = (CastInfos.duration == -1) ? -1 : (decrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.duration : (CastInfos.duration) - CastInfos.getDelay());
 
         //System.out.println(target.fight.currentFighter == target);
         if (decrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID() && this.duration != -1) {
             this.duration++;
         }
-        this.Delay = CastInfos.Delay();
+        this.Delay = CastInfos.getDelay();
         this.caster = CastInfos.caster;
         this.target = target;
 
@@ -94,7 +94,7 @@ public abstract class BuffEffect {
     public int decrementDuration() {
         this.duration--;
 
-        this.castInfos.FakeValue = 0;
+        this.castInfos.fakeValue = 0;
 
         return this.duration;
     }
@@ -102,7 +102,7 @@ public abstract class BuffEffect {
     public int decrementDuration(int Duration) {
         this.duration -= Duration;
 
-        this.castInfos.FakeValue = 0;
+        this.castInfos.fakeValue = 0;
 
         return this.duration;
     }

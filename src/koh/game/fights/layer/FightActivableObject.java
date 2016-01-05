@@ -38,7 +38,7 @@ public abstract class FightActivableObject implements IFightObject {
     public Color Color;
     public int Duration;
     public boolean activated;
-    public FightCell Cell;
+    public FightCell cell;
     public ArrayList<Fighter> targets;
     protected Fight m_fight;
     public Fighter caster;
@@ -53,9 +53,9 @@ public abstract class FightActivableObject implements IFightObject {
 
     protected MapPoint CachedMapPoints;
 
-    public abstract void AppearForAll();
+    public abstract void appearForAll();
 
-    public abstract void Appear(FightTeam dispatcher);
+    public abstract void appear(FightTeam dispatcher);
 
     public abstract void disappearForAll();
 
@@ -67,17 +67,17 @@ public abstract class FightActivableObject implements IFightObject {
         ID = (short) fight.getNextTriggerUid().incrementAndGet();
         m_fight = fight;
         this.caster = caster;
-        m_spellId = castInfos.SpellId;
-        m_spell_level = castInfos.SpellLevel.getGrade();
+        m_spellId = castInfos.spellId;
+        m_spell_level = castInfos.spellLevel.getGrade();
         try {
             m_actionEffect = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide - 1];
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
         }
-        Cell = fight.getCell(cell);
+        this.cell = fight.getCell(cell);
         activationType = activeType;
         Color = color;
         targets = new ArrayList<>();
-        affectedCells = new Zone(castInfos.effect.ZoneShape(), size,fight.getMap()).getCells(Cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).getCells(cell.id)*/;
+        affectedCells = new Zone(castInfos.effect.ZoneShape(), size,fight.getMap()).getCells(this.cell.Id) /*shap == GameActionMarkCellsTypeEnum.CELLS_CROSS ? new Zone(SpellShapeEnum.Q, size) : (shap == GameActionMarkCellsTypeEnum.CELLS_CIRCLE ? new Zone(SpellShapeEnum.C, size) : new Zone(SpellShapeEnum.G, size))).getCells(cell.id)*/;
         Duration = duration;
         this.visibileState = visibleState;
         this.size = size;
@@ -85,10 +85,10 @@ public abstract class FightActivableObject implements IFightObject {
 
         if (m_actionEffect != null) {
             for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
-                if (EffectCast.IsDamageEffect(effect.EffectType())) {
+                if (EffectCast.isDamageEffect(effect.getEffectType())) {
                     Priority--;
                 }
-                if (effect.EffectType() == StatsEnum.PULL_FORWARD || effect.EffectType() == StatsEnum.PUSH_BACK) {
+                if (effect.getEffectType() == StatsEnum.PULL_FORWARD || effect.getEffectType() == StatsEnum.PUSH_BACK) {
                     Priority += 50;
                 }
             }
@@ -102,9 +102,9 @@ public abstract class FightActivableObject implements IFightObject {
         }
 
         if (visibleState == GameActionFightInvisibilityStateEnum.INVISIBLE) {
-            Appear(caster.getTeam());
+            appear(caster.getTeam());
         } else {
-            AppearForAll();
+            appearForAll();
         }
     }
 
@@ -115,11 +115,11 @@ public abstract class FightActivableObject implements IFightObject {
 
         switch (activationType) {
             case ACTIVE_ENDMOVE:
-                FightCell Cell = null;
+                FightCell fCell = null;
                 for (short cell : affectedCells) {
-                    Cell = m_fight.getCell(cell);
-                    if (Cell != null) {
-                        targets.addAll(Cell.GetObjectsAsFighterList(x -> x.getObjectType() == FightObjectType.OBJECT_FIGHTER && !targets.contains(x)));
+                    fCell = m_fight.getCell(cell);
+                    if (fCell != null) {
+                        targets.addAll(fCell.GetObjectsAsFighterList(obj -> (obj.getObjectType() == FightObjectType.OBJECT_FIGHTER || obj.getObjectType() == FightObjectType.OBJECT_STATIC) && !targets.contains(obj)));
                         //targets.AddRange(cell.FightObjects.OfType < FighterBase > ().Where(fighter =  > !targets.Contains(fighter)));
                     }
                 }
@@ -136,7 +136,7 @@ public abstract class FightActivableObject implements IFightObject {
         for (short cell : affectedCells) {
             Cell = m_fight.getCell(cell);
             if (Cell != null) {
-                targets.addAll(Cell.GetObjectsAsFighterList(x -> x.getObjectType() == FightObjectType.OBJECT_FIGHTER && !targets.contains(x) && ((Fighter) x).isEnnemyWith(target)));
+                targets.addAll(Cell.GetObjectsAsFighterList(obj ->  (obj.getObjectType() == FightObjectType.OBJECT_FIGHTER || obj.getObjectType() == FightObjectType.OBJECT_STATIC)  && !targets.contains(obj) && ((Fighter) obj).isEnnemyWith(target)));
             }
         }
         return this.activate(target);
@@ -159,9 +159,9 @@ public abstract class FightActivableObject implements IFightObject {
         activator.getFight().startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         for (EffectInstanceDice Effect : m_actionEffect.getEffects()) {
             //TODO : MASK
-            EffectCast CastInfos = new EffectCast(Effect.EffectType(), this.m_actionEffect.getSpellId(), Cell.Id, 100, Effect, caster, targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
-            CastInfos.IsTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;
-            if (EffectBase.TryApplyEffect(CastInfos) == -3) {
+            EffectCast CastInfos = new EffectCast(Effect.getEffectType(), this.m_actionEffect.getSpellId(), cell.Id, 100, Effect, caster, targets, false, StatsEnum.NONE, 0, this.m_actionEffect);
+            CastInfos.isTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;
+            if (EffectBase.tryApplyEffect(CastInfos) == -3) {
                 targets.clear();
                 activator.getFight().endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
                 return -3;
@@ -210,7 +210,7 @@ public abstract class FightActivableObject implements IFightObject {
 
     @Override
     public short getCellId() {
-        return this.Cell.Id;
+        return this.cell.Id;
     }
 
     public static int getRGB(Color col) {

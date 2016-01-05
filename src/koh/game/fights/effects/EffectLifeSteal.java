@@ -13,9 +13,9 @@ public class EffectLifeSteal extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (CastInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            CastInfos.isPoison = true;
 
             // Ajout du buff
             CastInfos.targets.stream().forEach((Target) -> {
@@ -23,7 +23,7 @@ public class EffectLifeSteal extends EffectBase {
             });
         } else {
             for (Fighter Target : CastInfos.targets) {
-                if (CastInfos.SpellId == 450 && Target.getTeam().id != CastInfos.caster.getTeam().id) { //Folie
+                if (CastInfos.spellId == 450 && Target.getTeam().id != CastInfos.caster.getTeam().id) { //Folie
                     continue;
                 }
 
@@ -37,7 +37,7 @@ public class EffectLifeSteal extends EffectBase {
     }
 
     public static int applyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
-        //castInfos.EffectType = StatsEnum.DamageBrut;
+        //castInfos.effectType = StatsEnum.DamageBrut;
 
         if (EffectDamage.applyDamages(CastInfos, Target, DamageJet) == -3) {
             return -3;

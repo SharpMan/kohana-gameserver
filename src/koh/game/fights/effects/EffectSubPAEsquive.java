@@ -14,9 +14,9 @@ public class EffectSubPAEsquive extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         MutableInt DamageValue = new MutableInt();
-        if (CastInfos.Duration > 1) {
+        if (CastInfos.duration > 1) {
             for (Fighter Target : CastInfos.targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
+                EffectCast SubInfos = new EffectCast(CastInfos.effectType, CastInfos.spellId, (short) 0, 0, CastInfos.effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.spellLevel, CastInfos.duration, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
                 Buff.applyEffect(DamageValue, null);
@@ -24,7 +24,7 @@ public class EffectSubPAEsquive extends EffectBase {
             }
         } else {
             for (Fighter Target : CastInfos.targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, 0, 0);
+                EffectCast SubInfos = new EffectCast(CastInfos.effectType, CastInfos.spellId, (short) 0, 0, CastInfos.effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.spellLevel, 0, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
                 Buff.applyEffect(DamageValue, null);

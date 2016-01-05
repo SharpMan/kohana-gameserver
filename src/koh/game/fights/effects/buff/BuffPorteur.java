@@ -21,13 +21,13 @@ public class BuffPorteur extends BuffEffect {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
         CastInfos.caster.getStates().fakeState(FightStateEnum.Porteur, true);
-        this.castInfos.EffectType = StatsEnum.ADD_STATE;
+        this.castInfos.effectType = StatsEnum.ADD_STATE;
         this.caster.getFight().sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.caster.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.SpellId, (short)/*this.castInfos.GetEffectUID()*/ 2, this.castInfos.ParentUID, (short) 1, (short) 3);
+        return new FightTemporaryBoostStateEffect(this.GetId(), this.caster.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, (short)/*this.castInfos.getEffectUID()*/ 2, this.castInfos.parentUID, (short) 1, (short) 3);
     }
 
     @Override

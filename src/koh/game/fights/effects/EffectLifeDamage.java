@@ -13,9 +13,9 @@ public class EffectLifeDamage extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (CastInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            CastInfos.isPoison = true;
 
             // Ajout du buff
             for (Fighter Target : CastInfos.targets) {
@@ -26,7 +26,7 @@ public class EffectLifeDamage extends EffectBase {
             for (Fighter Target : CastInfos.targets) {
                 int effectBase = CastInfos.randomJet(Target);
                 MutableInt DamageValue = new MutableInt((Target.currentLife / 100) * effectBase);
-                //DamageValue = (-DamageValue);
+                //damageValue = (-damageValue);
                 if (EffectDamage.applyDamages(CastInfos, Target, DamageValue) == -3) {
                     return -3;
                 }

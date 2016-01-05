@@ -87,13 +87,17 @@ public class FightCell {
         return this.myFightObjects;
     }
 
-    public boolean CanWalk() {
+    public boolean canWalk() {
         //return this.myWalkable && !this.HasGameObject(FightObjectType.OBJECT_CAWOTTE) && !this.HasGameObject(FightObjectType.OBJECT_FIGHTER);
         return this.myWalkable && this.myFightObjects.stream().allMatch(obj -> obj.canGoThrough());
     }
 
-    public boolean HasGameObject(FightObjectType ObjectType) {
-        return myFightObjects.stream().anyMatch(x -> x.getObjectType() == ObjectType);
+    public boolean HasGameObject(FightObjectType objectType) {
+        return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType);
+    }
+
+    public boolean HasGameObject(FightObjectType objectType,FightObjectType objectTyp2) {
+        return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType || x.getObjectType() == objectTyp2);
     }
 
     public IFightObject[] GetObjects(FightObjectType ObjectType) {

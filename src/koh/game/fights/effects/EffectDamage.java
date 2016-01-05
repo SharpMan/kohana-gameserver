@@ -18,9 +18,9 @@ public class EffectDamage extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (CastInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            CastInfos.isPoison = true;
 
             // Ajout du buff
             CastInfos.targets.stream().forEach((Target) -> {
@@ -43,18 +43,18 @@ public class EffectDamage extends EffectBase {
 
     public static int applyDamages(EffectCast castInfos, Fighter target, MutableInt damageJet) {
 
-        if (target.getStates().hasState(FightStateEnum.STATE_REFLECT_SPELL) && !castInfos.IsPoison && ((BuffReflectSpell) target.getStates().getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).reflectLevel >= castInfos.SpellLevel.getGrade()) {
+        if (target.getStates().hasState(FightStateEnum.STATE_REFLECT_SPELL) && !castInfos.isPoison && ((BuffReflectSpell) target.getStates().getBuffByState(FightStateEnum.STATE_REFLECT_SPELL)).reflectLevel >= castInfos.spellLevel.getGrade()) {
             target.getFight().sendToField(new GameActionFightReflectSpellMessage(ActionIdEnum.ACTION_CHARACTER_SPELL_REFLECTOR, target.getID(), castInfos.caster.getID()));
             target = castInfos.caster;
         }
         Fighter Caster = castInfos.caster;
         // Perd l'invisibilité s'il inflige des dommages direct
-        if (!castInfos.IsPoison && !castInfos.IsTrap && !castInfos.IsReflect) {
+        if (!castInfos.isPoison && !castInfos.isTrap && !castInfos.isReflect) {
             Caster.getStates().removeState(FightStateEnum.Invisible);
         }
 
         // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat
-        if (!castInfos.IsPoison && !castInfos.IsReflect) {
+        if (!castInfos.isPoison && !castInfos.isReflect) {
             if (Caster.getBuff().onAttackPostJet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
@@ -62,26 +62,26 @@ public class EffectDamage extends EffectBase {
                 return -3; // Fin du combat
             }
         }
-        if(!castInfos.IsReflect && castInfos.IsTrap){
+        if(!castInfos.isReflect && castInfos.isTrap){
             if (target.getBuff().onAttackedPostJetTrap(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
         // Calcul jet
-        Caster.computeDamages(castInfos.EffectType, damageJet);
+        Caster.computeDamages(castInfos.effectType, damageJet);
         //Calcul Bonus Negatif Zone ect ...
         if (castInfos.effect != null) {
-            Caster.calculBonusDamages(castInfos.effect, damageJet,castInfos.CellId , target.getCellId(),castInfos.oldCell);
+            Caster.calculBonusDamages(castInfos.effect, damageJet,castInfos.cellId, target.getCellId(),castInfos.oldCell);
         }
 
         // Calcul resistances
-        target.calculReduceDamages(castInfos.EffectType, damageJet);
+        target.calculReduceDamages(castInfos.effectType, damageJet);
         // Reduction des dommages grace a l'armure
         if (damageJet.intValue() > 0) {
             // Si ce n'est pas des dommages direct on ne reduit pas
-            if (!castInfos.IsPoison && !castInfos.IsReflect && castInfos.EffectType != StatsEnum.DamageBrut) {
+            if (!castInfos.isPoison && !castInfos.isReflect && castInfos.effectType != StatsEnum.DamageBrut) {
                 // Calcul de l'armure par rapport a l'effet
-                int Armor = target.calculArmor(castInfos.EffectType);
+                int Armor = target.calculArmor(castInfos.effectType);
                 // Si il reduit un minimum
                 if (Armor != 0) {
                     // XX Reduit les dommages de X
@@ -99,7 +99,7 @@ public class EffectDamage extends EffectBase {
             }
         }
         // Application des buffs apres le calcul totaux et l'armure
-        if (!castInfos.IsPoison && !castInfos.IsReflect) {
+        if (!castInfos.isPoison && !castInfos.isReflect) {
             if (Caster.getBuff().onAttackAfterJet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
@@ -111,7 +111,7 @@ public class EffectDamage extends EffectBase {
         // S'il subit des dommages
         if (damageJet.getValue() > 0) {
             // Si c'est pas un poison ou un renvoi on applique le renvoie
-            if (!castInfos.IsPoison && !castInfos.IsReflect) {
+            if (!castInfos.isPoison && !castInfos.isReflect) {
                 MutableInt ReflectDamage = new MutableInt(target.getReflectedDamage());
 
                 // Si du renvoi
@@ -124,7 +124,7 @@ public class EffectDamage extends EffectBase {
                     }
 
                     EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
-                    SubInfos.IsReflect = true;
+                    SubInfos.isReflect = true;
 
                     // Si le renvoi de dommage entraine la fin de combat on stop
                     if (EffectDamage.applyDamages(SubInfos, Caster, ReflectDamage) == -3) {

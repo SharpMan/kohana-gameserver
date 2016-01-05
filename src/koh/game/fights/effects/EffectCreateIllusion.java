@@ -25,11 +25,11 @@ public class EffectCreateIllusion extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        int DistanceCharacterFromHidedPlace = Pathfinder.getGoalDistance(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.CellId);
-        byte IgnoredDirection = Pathfinder.getDirection(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.CellId);
+        int DistanceCharacterFromHidedPlace = Pathfinder.getGoalDistance(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.cellId);
+        byte IgnoredDirection = Pathfinder.getDirection(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.cellId);
         short StartCell = CastInfos.caster.getCellId();
 
-        BuffState Buff = new BuffState(new EffectCast(StatsEnum.Invisibility, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, null, CastInfos.caster, null), CastInfos.caster);
+        BuffState Buff = new BuffState(new EffectCast(StatsEnum.INVISIBILITY, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, null, CastInfos.caster, null), CastInfos.caster);
         Buff.duration = 1;
         Buff.DecrementType = BuffDecrementType.TYPE_BEGINTURN;
         CastInfos.caster.getBuff().addBuff(Buff);
@@ -38,7 +38,7 @@ public class EffectCreateIllusion extends EffectBase {
         }
         Buff.duration = -1;
 
-        FightCell cell = CastInfos.caster.getFight().getCell(CastInfos.CellId);
+        FightCell cell = CastInfos.caster.getFight().getCell(CastInfos.cellId);
         if (cell != null) {
             int Result = CastInfos.caster.setCell(cell);
             ((CharacterFighter) CastInfos.caster).fakeContextualId = CastInfos.caster.getFight().getNextContextualId();
@@ -55,7 +55,7 @@ public class EffectCreateIllusion extends EffectBase {
                 continue;
             }
             FightCell Cell = CastInfos.caster.getFight().getCell(Pathfinder.nextCell(StartCell, Direction, DistanceCharacterFromHidedPlace));
-            if (Cell != null && Cell.CanWalk()) {
+            if (Cell != null && Cell.canWalk()) {
                 IllusionFighter Clone = new IllusionFighter(CastInfos.caster.getFight(), CastInfos.caster);
                 Clone.getFight().joinFightTeam(Clone, CastInfos.caster.getTeam(), false, Cell.Id, true);
                 CastInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1097, CastInfos.caster.getID(), (GameFightFighterInformations) Clone.getGameContextActorInformations(null)));
@@ -64,7 +64,7 @@ public class EffectCreateIllusion extends EffectBase {
         }
         CastInfos.caster.getFight().observers.stream().forEach((o) -> {
             if (CastInfos.caster.isMyFriend((Player) o)) {
-                ((Player) o).send(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), CastInfos.caster.getID(), CastInfos.CellId));
+                ((Player) o).send(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), CastInfos.caster.getID(), CastInfos.cellId));
             } else {
                 ((Player) o).send(new GameFightShowFighterMessage(CastInfos.caster.getGameContextActorInformations((Player) o)));
                 ((Player) o).send(new GameActionFightSummonMessage(1097, CastInfos.caster.getID(), (GameFightFighterInformations) CastInfos.caster.getGameContextActorInformations((Player) o)));

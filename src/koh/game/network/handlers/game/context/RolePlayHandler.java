@@ -39,12 +39,12 @@ public class RolePlayHandler {
     //TODO ImmutableMap
     public static final Map<Integer, StatsEnum> BOOST_ID_TO_STATS = new HashMap<Integer, StatsEnum>(6) {
         {
-            put(StatsBoostEnum.Strength, StatsEnum.STRENGTH);
-            put(StatsBoostEnum.Vitality, StatsEnum.VITALITY);
-            put(StatsBoostEnum.Wisdom, StatsEnum.WISDOM);
-            put(StatsBoostEnum.Chance, StatsEnum.CHANCE);
-            put(StatsBoostEnum.Agility, StatsEnum.AGILITY);
-            put(StatsBoostEnum.Intelligence, StatsEnum.INTELLIGENCE);
+            put(StatsBoostEnum.STRENGTH, StatsEnum.STRENGTH);
+            put(StatsBoostEnum.VITALITY, StatsEnum.VITALITY);
+            put(StatsBoostEnum.WISDOM, StatsEnum.WISDOM);
+            put(StatsBoostEnum.CHANCE, StatsEnum.CHANCE);
+            put(StatsBoostEnum.AGILITY, StatsEnum.AGILITY);
+            put(StatsBoostEnum.INTELLIGENCE, StatsEnum.INTELLIGENCE);
         }
     };
 
@@ -100,7 +100,7 @@ public class RolePlayHandler {
             PlayerController.sendServerMessage(client, "Not implanted yet");
             return;
         }
-        StatsEnum Stat = BOOST_ID_TO_STATS.get(message.statId);
+        StatsEnum Stat = BOOST_ID_TO_STATS.get((int)message.statId);
         if (Stat == null) {
             log.error("Wrong statsid {}", message.statId);
             return;
@@ -137,28 +137,28 @@ public class RolePlayHandler {
         }
         client.getCharacter().getStats().getEffect(Stat).base = base;
         switch ((int) message.statId) {
-            case StatsBoostEnum.Strength:
+            case StatsBoostEnum.STRENGTH:
                 client.getCharacter().setStrength(base);
                 break;
 
-            case StatsBoostEnum.Vitality:
+            case StatsBoostEnum.VITALITY:
                 client.getCharacter().setVitality(base);
                 client.getCharacter().addLife(base - oldbase); // on boost la life
                 break;
 
-            case StatsBoostEnum.Wisdom:
+            case StatsBoostEnum.WISDOM:
                 client.getCharacter().setWisdom(base);
                 break;
 
-            case StatsBoostEnum.Intelligence:
+            case StatsBoostEnum.INTELLIGENCE:
                 client.getCharacter().setIntell(base);
                 break;
 
-            case StatsBoostEnum.Chance:
+            case StatsBoostEnum.CHANCE:
                 client.getCharacter().setChance(base);
                 break;
 
-            case StatsBoostEnum.Agility:
+            case StatsBoostEnum.AGILITY:
                 client.getCharacter().setAgility(base);
                 break;
         }

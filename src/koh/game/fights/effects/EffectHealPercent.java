@@ -14,15 +14,15 @@ public class EffectHealPercent extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (CastInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            CastInfos.isPoison = true;
 
             // Ajout du buff
             for (Fighter Target : CastInfos.targets) {
                 Target.getBuff().addBuff(new BuffHealPercent(CastInfos, Target));
             }
-        } else // Heal direct
+        } else // HEAL direct
         {
             for (Fighter Target : CastInfos.targets) {
                 if (EffectHealPercent.ApplyHealPercent(CastInfos, Target, CastInfos.randomJet(Target)) == -3) {

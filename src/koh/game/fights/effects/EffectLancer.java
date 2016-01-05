@@ -16,9 +16,9 @@ public class EffectLancer extends EffectBase {
         if (CastInfos.caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffPorteur)) {
             Fighter Target = CastInfos.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).findFirst().get().target;
             if (Target != null) {
-                Target.getFight().sendToField(new GameActionFightThrowCharacterMessage(ACTION_THROW_CARRIED_CHARACTER, CastInfos.caster.getID(), Target.getID(), CastInfos.CellId));
+                Target.getFight().sendToField(new GameActionFightThrowCharacterMessage(ACTION_THROW_CARRIED_CHARACTER, CastInfos.caster.getID(), Target.getID(), CastInfos.cellId));
 
-                return Target.setCell(Target.getFight().getCell(CastInfos.CellId));
+                return Target.setCell(Target.getFight().getCell(CastInfos.cellId));
             }
         }
 

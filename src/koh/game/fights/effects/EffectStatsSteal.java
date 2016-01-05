@@ -43,11 +43,11 @@ public class EffectStatsSteal extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        StatsEnum MalusType = TARGET_MALUS.get(CastInfos.EffectType);
-        StatsEnum BonusType = CASTER_BONUS.get(CastInfos.EffectType);
+        StatsEnum MalusType = TARGET_MALUS.get(CastInfos.effectType);
+        StatsEnum BonusType = CASTER_BONUS.get(CastInfos.effectType);
 
-        EffectCast MalusInfos = new EffectCast(MalusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.effect, CastInfos.caster, CastInfos.targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
-        EffectCast BonusInfos = new EffectCast(BonusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.effect, CastInfos.caster, CastInfos.targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration - 1, 0);
+        EffectCast MalusInfos = new EffectCast(MalusType, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, CastInfos.effect, CastInfos.caster, CastInfos.targets, false, StatsEnum.NONE, 0, CastInfos.spellLevel, CastInfos.duration, 0);
+        EffectCast BonusInfos = new EffectCast(BonusType, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, CastInfos.effect, CastInfos.caster, CastInfos.targets, false, StatsEnum.NONE, 0, CastInfos.spellLevel, CastInfos.duration - 1, 0);
         MutableInt DamageValue = new MutableInt();
 
         for (Fighter Target : CastInfos.targets) {

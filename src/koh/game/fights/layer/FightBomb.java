@@ -29,11 +29,11 @@ import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
  */
 public class FightBomb extends FightActivableObject {
 
-    public HashMap<Short, Short> Cells = new HashMap<>();
+    public HashMap<Short, Short> cells = new HashMap<>();
     public BombFighter[] owner = new BombFighter[2];
     
-    public Stream<FightCell> FightCells(){
-        return this.Cells.keySet().stream().map(C -> this.m_fight.getCell(C));
+    public Stream<FightCell> getFightCells(){
+        return this.cells.keySet().stream().map(cellid -> this.m_fight.getCell(cellid));
     }
 
     public FightBomb(Fighter Caster, SpellLevel Spell, Color color, Short[] Cells, BombFighter[] Members) {
@@ -54,19 +54,19 @@ public class FightBomb extends FightActivableObject {
         this.shape = GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
 
         for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
-            if (EffectCast.IsDamageEffect(effect.EffectType())) {
+            if (EffectCast.isDamageEffect(effect.getEffectType())) {
                 Priority--;
             }
-            if (effect.EffectType() == StatsEnum.PULL_FORWARD || effect.EffectType() == StatsEnum.PUSH_BACK) {
+            if (effect.getEffectType() == StatsEnum.PULL_FORWARD || effect.getEffectType() == StatsEnum.PUSH_BACK) {
                 Priority += 50;
             }
         }
-        Cell = m_fight.getCell(affectedCells[0]);
+        cell = m_fight.getCell(affectedCells[0]);
         // On ajout l'objet a toutes les cells qu'il affecte
         for (short cellId : affectedCells) {
             if(!this.m_fight.getCell(cellId).IsWalkable())
                 continue;
-            this.Cells.put(cellId, (short) m_fight.getNextTriggerUid().incrementAndGet());
+            this.cells.put(cellId, (short) m_fight.getNextTriggerUid().incrementAndGet());
             if (m_fight.getCell(cellId) != null) {
                 m_fight.getCell(cellId).AddObject(this);
             }
@@ -74,27 +74,27 @@ public class FightBomb extends FightActivableObject {
         this.owner = Members;
         Arrays.stream(Members).forEach(x -> x.addBomb(this));
 
-        AppearForAll();
+        appearForAll();
 
     }
 
     @Override
-    public void AppearForAll() {
-        this.Cells.keySet().stream().forEach((cell) -> {
+    public void appearForAll() {
+        this.cells.keySet().stream().forEach((cell) -> {
             this.m_fight.sendToField(new GameActionFightMarkCellsMessage(ActionIdEnum.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL, this.caster.getID(), GetGameActionMark(cell)));
         });
     }
 
     @Override
-    public void Appear(FightTeam dispatcher) {
+    public void appear(FightTeam dispatcher) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void disappearForAll() {
         //m_fight.startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        this.Cells.keySet().stream().forEach((cell) -> {
-            this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.caster.getID(), this.Cells.get(cell)));
+        this.cells.keySet().stream().forEach((cell) -> {
+            this.m_fight.sendToField(new GameActionFightUnmarkCellsMessage((short) 310, this.caster.getID(), this.cells.get(cell)));
         });
         //m_fight.endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
     }
@@ -124,7 +124,7 @@ public class FightBomb extends FightActivableObject {
     }
 
     public GameActionMark GetGameActionMark(short cell) {
-        return new GameActionMark(this.caster.getID(), this.caster.getTeam().id, this.m_spellId, this.m_spell_level, this.Cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
+        return new GameActionMark(this.caster.getID(), this.caster.getTeam().id, this.m_spellId, this.m_spell_level, this.cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
     }
 
     @Override

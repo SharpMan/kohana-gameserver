@@ -22,13 +22,13 @@ public class EffectPerception extends EffectBase {
     //TODO dofusMaps AffectedCell in castInfos et nettoyer ce code
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (short Cell : (new Zone(CastInfos.effect.ZoneShape(), CastInfos.effect.ZoneSize(), MapPoint.fromCellId(CastInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.CellId), true),CastInfos.caster.getFight().getMap())).getCells(CastInfos.CellId)) {
+        for (short Cell : (new Zone(CastInfos.effect.ZoneShape(), CastInfos.effect.zoneSize(), MapPoint.fromCellId(CastInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.cellId), true),CastInfos.caster.getFight().getMap())).getCells(CastInfos.cellId)) {
             FightCell fightCell = CastInfos.caster.getFight().getCell(Cell);
             if (fightCell != null) {
                 fightCell.GetObjects().stream().filter((fightObject) -> (fightObject.getCellId() == Cell)).forEach((fightObject) -> {
                     if (fightObject.getObjectType() == FightObjectType.OBJECT_TRAP && ((FightTrap) fightObject).visibileState == GameActionFightInvisibilityStateEnum.INVISIBLE && ((FightTrap) fightObject).caster.isEnnemyWith(CastInfos.caster)) {
                         ((FightTrap) fightObject).visibileState = GameActionFightInvisibilityStateEnum.DETECTED;
-                        ((FightTrap) fightObject).AppearForAll();
+                        ((FightTrap) fightObject).appearForAll();
                     } else if (fightObject instanceof IllusionFighter) {
                         ((IllusionFighter) fightObject).tryDie(CastInfos.caster.getID());
                     } else if (fightObject.getObjectType() == FightObjectType.OBJECT_FIGHTER) {

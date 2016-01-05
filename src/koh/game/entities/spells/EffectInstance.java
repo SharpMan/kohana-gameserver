@@ -8,9 +8,7 @@ import java.util.regex.Matcher;
 import jregex.Pattern;
 import jregex.REFlags;
 import koh.d2o.entities.Effect;
-import koh.game.Main;
 import koh.game.dao.DAO;
-import koh.game.dao.api.AccountDataDAO;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;
@@ -70,7 +68,7 @@ public class EffectInstance implements Serializable {
         return this.zoneMinSize;
     }
 
-    public byte ZoneSize() {
+    public byte zoneSize() {
         this.parseZone();
         return (byte) zoneSize;
     }
@@ -80,18 +78,18 @@ public class EffectInstance implements Serializable {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    public StatsEnum EffectType() {
+    public StatsEnum getEffectType() {
         return StatsEnum.valueOf(this.effectId);
     }
 
     
 
     public boolean isValidTarget(Fighter Caster, Fighter actor) {
-        return Targets() == SpellTargetType.NONE
-                || Targets() == SpellTargetType.ALL
-                || Caster == actor && Targets().HasFlag(SpellTargetType.SELF)
-                || (!Targets().HasFlag(SpellTargetType.ONLY_SELF) || actor == Caster)
-                && (Caster.isFriendlyWith(actor) && Caster != actor && ((Targets().HasFlag(SpellTargetType.ALLY_1) || Targets().HasFlag(SpellTargetType.ALLY_2) || (Targets().HasFlag(SpellTargetType.ALLY_3) || Targets().HasFlag(SpellTargetType.ALLY_4)) || Targets().HasFlag(SpellTargetType.ALLY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ALLY_SUMMONS) || Targets().HasFlag(SpellTargetType.ALLY_STATIC_SUMMONS)) && actor instanceof SummonedFighter) || Caster.isEnnemyWith(actor) && ((Targets().HasFlag(SpellTargetType.ENNEMY_1) || Targets().HasFlag(SpellTargetType.ENNEMY_2) || (Targets().HasFlag(SpellTargetType.ENNEMY_3) || Targets().HasFlag(SpellTargetType.ENNEMY_4)) || Targets().HasFlag(SpellTargetType.ENNEMY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ENNEMY_SUMMONS) || Targets().HasFlag(SpellTargetType.ENNEMY_STATIC_SUMMONS)) && actor instanceof SummonedFighter));
+        return targets() == SpellTargetType.NONE
+                || targets() == SpellTargetType.ALL
+                || Caster == actor && targets().HasFlag(SpellTargetType.SELF)
+                || (!targets().HasFlag(SpellTargetType.ONLY_SELF) || actor == Caster)
+                && (Caster.isFriendlyWith(actor) && Caster != actor && ((targets().HasFlag(SpellTargetType.ALLY_1) || targets().HasFlag(SpellTargetType.ALLY_2) || (targets().HasFlag(SpellTargetType.ALLY_3) || targets().HasFlag(SpellTargetType.ALLY_4)) || targets().HasFlag(SpellTargetType.ALLY_5)) && !(actor instanceof SummonedFighter) || (targets().HasFlag(SpellTargetType.ALLY_SUMMONS) || targets().HasFlag(SpellTargetType.ALLY_STATIC_SUMMONS)) && actor instanceof SummonedFighter) || Caster.isEnnemyWith(actor) && ((targets().HasFlag(SpellTargetType.ENNEMY_1) || targets().HasFlag(SpellTargetType.ENNEMY_2) || (targets().HasFlag(SpellTargetType.ENNEMY_3) || targets().HasFlag(SpellTargetType.ENNEMY_4)) || targets().HasFlag(SpellTargetType.ENNEMY_5)) && !(actor instanceof SummonedFighter) || (targets().HasFlag(SpellTargetType.ENNEMY_SUMMONS) || targets().HasFlag(SpellTargetType.ENNEMY_STATIC_SUMMONS)) && actor instanceof SummonedFighter));
     }
 
     public int zoneShape() {
@@ -104,7 +102,7 @@ public class EffectInstance implements Serializable {
         return SpellShapeEnum.valueOf(zoneShape);
     }
 
-    public SpellTargetType Targets() {
+    public SpellTargetType targets() {
         return SpellTargetType.valueOf(this.targetId);
     }
 

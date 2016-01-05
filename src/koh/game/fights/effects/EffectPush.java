@@ -9,6 +9,7 @@ import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.effects.buff.BuffPorteur;
 import koh.protocol.client.enums.FightStateEnum;
+import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -23,15 +24,18 @@ public class EffectPush extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        byte Direction = 0;
+        byte direction = 0;
         for (Fighter Target : CastInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.Porté) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
-            switch (CastInfos.EffectType) {
+            switch (CastInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
-                    if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId()) && CastInfos.CellId != Target.getCellId()) {
-                        Direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId());
+                    if(CastInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfinder.inLine(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId())){
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
+                    }
+                    else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId()) && CastInfos.cellId != Target.getCellId()) {
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId());
                     } else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId())) {
-                        Direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
                     } else {
                         return -1;
                     }
@@ -41,12 +45,12 @@ public class EffectPush extends EffectBase {
                     CastInfos.caster = Target;
                     Target = pp;
                     CastInfos.targets.remove(0);
-                    Direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
+                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
                     break;
                 case PULL_FORWARD:
-                    Direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
-                    if(CastInfos.SpellId == 5382 || CastInfos.SpellId == 5475){
-                        Direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.targetKnownCellId);
+                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
+                    if(CastInfos.spellId == 5382 || CastInfos.spellId == 5475){
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.targetKnownCellId);
                     }
                     break;
                 case BACK_CELL:
@@ -54,14 +58,14 @@ public class EffectPush extends EffectBase {
                     CastInfos.caster = Target;
                     Target = p;
                     CastInfos.targets.remove(0);
-                    if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId()) && CastInfos.CellId != Target.getCellId()) {
-                        Direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.CellId, Target.getCellId());
+                    if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId()) && CastInfos.cellId != Target.getCellId()) {
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId());
                     } else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId())) {
-                        Direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
                     }
                     break;
             }
-            if (EffectPush.ApplyPush(CastInfos, Target, Direction, CastInfos.randomJet(Target)) == -3) {
+            if (EffectPush.ApplyPush(CastInfos, Target, direction, CastInfos.randomJet(Target)) == -3) {
                 return -3;
             }
         }
@@ -74,14 +78,14 @@ public class EffectPush extends EffectBase {
         for (int i = 0; i < length; i++) {
             FightCell nextCell = target.getFight().getCell(Pathfinder.nextCell(currentCell.Id, direction));
 
-            if (nextCell != null && nextCell.CanWalk()) {
+            if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.HasObject(FightObjectType.OBJECT_TRAP)) {
                     target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
                     return target.setCell(nextCell);
                 }
             } else {
                 int pushResult = -1;
-                if (CastInfos.EffectType == StatsEnum.PUSH_BACK) {
+                if (CastInfos.effectType == StatsEnum.PUSH_BACK) {
                     pushResult = EffectPush.ApplyPushBackDamages(CastInfos, target, length, i);
                     if (pushResult != -1) {
                         return pushResult;
@@ -130,9 +134,9 @@ public class EffectPush extends EffectBase {
         }
         double pushDmg = (CastInfos.caster.getLevel() / 2 + (CastInfos.caster.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS) - Target.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS)) + 32) * CastInfos.effect.diceNum / (4 * Math.pow(2, CurrentLength));
         MutableInt DamageValue = new MutableInt(pushDmg);
-        //MutableInt DamageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
+        //MutableInt damageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 
-        EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.SpellId, CastInfos.CellId, 0, null, Target, null, false, StatsEnum.NONE, 0, null);
+        EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.spellId, CastInfos.cellId, 0, null, Target, null, false, StatsEnum.NONE, 0, null);
 
         return EffectDamage.applyDamages(SubInfos, Target, DamageValue);
     }

@@ -35,7 +35,7 @@ public class BuffSkin extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.oldBonesID = target.getEntityLook().bonesId;
         this.oldScales = target.getEntityLook().scales;
-        switch (this.castInfos.SpellId) {
+        switch (this.castInfos.spellId) {
             case 2879: //Masque pleutre
                 this.target.getEntityLook().bonesId = 1576;
                 break;
@@ -88,7 +88,7 @@ public class BuffSkin extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.castInfos.SpellId, this.castInfos.GetEffectUID(), this.castInfos.ParentUID, (short) 0);
+        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) 0);
     }
 
 }

@@ -55,32 +55,32 @@ public class BombFighter extends StaticFighter {
     @Override
     public void computeDamages(StatsEnum effect, MutableInt jet) {
         switch (effect) {
-            case Damage_Earth:
-            case Steal_Earth:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100 + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
+            case DAMAGE_EARTH:
+            case STEAL_EARTH:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
                 break;
-            case Damage_Neutral:
-            case Steal_Neutral:
+            case DAMAGE_NEUTRAL:
+            case STEAL_NEUTRAL:
                 jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)));
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)));
                 break;
 
-            case Damage_Fire:
-            case Steal_Fire:
+            case DAMAGE_FIRE:
+            case STEAL_FIRE:
                 jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)));
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)));
                 break;
 
-            case Damage_Air:
-            case Steal_Air:
+            case DAMAGE_AIR:
+            case STEAL_AIR:
                 jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)));
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)));
                 break;
 
-            case Damage_Water:
-            case Steal_Water:
+            case DAMAGE_WATER:
+            case STEAL_WATER:
                 jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
                 break;
         }
     }

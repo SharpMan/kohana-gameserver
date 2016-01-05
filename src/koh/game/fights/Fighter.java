@@ -229,7 +229,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int beginTurn() {
         if (this.fight.getActivableObjects().containsKey(this)) {
             this.fight.getActivableObjects().get(this).stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
-                ((FightPortal) Object).ForceEnable(this);
+                ((FightPortal) Object).forceEnable(this);
             });
         }
 
@@ -275,19 +275,19 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int currentLife, currentLifeMax;
 
     public void setLife(int value) {
-        this.currentLife = value - (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.Heal)) /*+ this.stats.getTotal(StatsEnum.AddVie)*/;
+        this.currentLife = value - (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.HEAL)) /*+ this.stats.getTotal(StatsEnum.AddVie)*/;
     }
 
     public int getLife() {
-        return this.currentLife + (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.Heal));
+        return this.currentLife + (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.HEAL));
     }
 
     public void setLifeMax(int value) {
-        this.currentLifeMax = value - (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.Heal));
+        this.currentLifeMax = value - (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.HEAL));
     }
 
     public int getMaxLife() {
-        return this.currentLifeMax + this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.Heal);
+        return this.currentLifeMax + this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.HEAL);
     }
 
     public int getLifePercentage() {
@@ -393,16 +393,12 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 .mapToInt(buff -> buff.castInfos.effect.value)
                 .sum();
 
-        System.out.println(spellLevel.getRange());
-        System.out.println(this.stats.getTotal(StatsEnum.ADD_RANGE));
         if (spellLevel.isRangeCanBeBoosted()) {
             int val1 = num + this.stats.getTotal(StatsEnum.ADD_RANGE);
             if (val1 < spellLevel.getMinRange()) {
                 val1 = spellLevel.getMinRange();
             }
             num = Math.min(val1, 280);
-            System.out.println(num);
-
         }
         IZone shape;
         if (spellLevel.isCastInDiagonal() && spellLevel.isCastInLine()) {
@@ -422,8 +418,6 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         } else {
             shape = new Lozenge((byte) spellLevel.getMinRange(), (byte) num, this.fight.getMap());
         }
-        Arrays.stream(shape.getCells(this.getCellId()))
-                .forEach(x -> this.fight.sendToField(new ShowCellMessage(this.ID,x)));
         return shape.getCells(this.getCellId());
     }
 
@@ -557,48 +551,48 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public void computeDamages(StatsEnum effect, MutableInt jet) {
         switch (effect) {
-            case Damage_Earth:
-            case Steal_Earth:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
+            case DAMAGE_EARTH:
+            case STEAL_EARTH:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
                 break;
             case DAMAGE_EARTH_PER_PM_PERCENT:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)) * (((double) (this.getMP() / this.getMaxMP())) * 100));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
-            case Damage_Neutral:
-            case Steal_Neutral:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)));
+            case DAMAGE_NEUTRAL:
+            case STEAL_NEUTRAL:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)));
                 break;
             case DAMAGE_NEUTRAL_PER_PM_PERCENT:
-                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamagePhysic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)) * (((double) (this.getMP() / this.getMaxMP())) * 100)));
+                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)) * (((double) (this.getMP() / this.getMaxMP())) * 100)));
                 break;
-            case Damage_Fire:
-            case Steal_Fire:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)));
+            case DAMAGE_FIRE:
+            case STEAL_FIRE:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)));
                 break;
             case DAMAGE_FIRE_PER_PM_PERCENT:
-                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS))) * ((((double) this.getMP() / (double) this.getMaxMP()))));
+                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS))) * ((((double) this.getMP() / (double) this.getMaxMP()))));
                break;
-            case Damage_Air:
-            case Steal_Air:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)));
+            case DAMAGE_AIR:
+            case STEAL_AIR:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)));
                 break;
             case DAMAGE_AIR_PER_PM_PERCENT:
-                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
+                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
-            case Damage_Water:
-            case Steal_Water:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
+            case DAMAGE_WATER:
+            case STEAL_WATER:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
                 break;
             case DAMAGE_WATER_PER_PM_PERCENT:
-                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.AddDamagePercent) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
-                        + this.stats.getTotal(StatsEnum.AddDamageMagic) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
+                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
         }
 
@@ -655,9 +649,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public void calculBonusDamages(EffectInstanceDice effect, MutableInt jet, short castCell, short targetCell, short truedCell) {
 
-        double bonus = this.stats.getTotal(StatsEnum.Add_Damage_Final_Percent);
+        double bonus = this.stats.getTotal(StatsEnum.ADD_DAMAGE_FINAL_PERCENT);
 
-        bonus += getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.ZoneSize() != -100000 ? effect.ZoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
+        bonus += getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.zoneSize() != -100000 ? effect.zoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
         bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
 
@@ -723,34 +717,34 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public void calculReduceDamages(StatsEnum effect, MutableInt damages) {
         switch (effect) {
-            case Damage_Neutral:
-            case Steal_Neutral:
+            case DAMAGE_NEUTRAL:
+            case STEAL_NEUTRAL:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0)) / 100
-                        - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                        - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
-            case Damage_Earth:
-            case Steal_Earth:
+            case DAMAGE_EARTH:
+            case STEAL_EARTH:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0)) / 100
-                        - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                        - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
-            case Damage_Fire:
-            case Steal_Fire:
+            case DAMAGE_FIRE:
+            case STEAL_FIRE:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0)) / 100
-                        - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                        - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
-            case Damage_Air:
-            case Steal_Air:
+            case DAMAGE_AIR:
+            case STEAL_AIR:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0)) / 100
-                        - this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                        - this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
-            case Damage_Water:
-            case Steal_Water:
+            case DAMAGE_WATER:
+            case STEAL_WATER:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0)) / 100
-                        - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.Add_Magic_Reduction));
+                        - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
         }
     }
@@ -833,7 +827,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int getReflectedDamage() {
-        return ((1 + (this.stats.getTotal(StatsEnum.WISDOM) / 100)) * this.stats.getTotal(StatsEnum.Damage_Return)) + this.stats.getTotal(StatsEnum.DamageReflection);
+        return ((1 + (this.stats.getTotal(StatsEnum.WISDOM) / 100)) * this.stats.getTotal(StatsEnum.DAMAGE_RETURN)) + this.stats.getTotal(StatsEnum.DamageReflection);
     }
 
     @Override

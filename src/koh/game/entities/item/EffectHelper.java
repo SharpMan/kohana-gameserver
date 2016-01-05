@@ -71,7 +71,7 @@ public class EffectHelper {
         94,//Effect_StealHPFire
         95,//Effect_StealHPNeutral
         101,//Effect_RemoveAP
-        108//Heal
+        108//HEAL
     };
 
     public static IoBuffer serializeEffectInstanceDice(EffectInstance[] Effects) {
