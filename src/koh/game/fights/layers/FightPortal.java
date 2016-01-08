@@ -1,4 +1,4 @@
-package koh.game.fights.layer;
+package koh.game.fights.layers;
 
 import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -36,7 +36,7 @@ public class FightPortal extends FightActivableObject {
     public FightPortal(Fight fight, Fighter caster, EffectCast castInfos, short cell) {
         super(BuffActiveType.ACTIVE_ENDMOVE, fight, caster, castInfos, cell, 0, javafx.scene.paint.Color.LIGHTBLUE, GameActionFightInvisibilityStateEnum.VISIBLE, (byte) 0, GameActionMarkCellsTypeEnum.CELLS_CIRCLE);
         this.damageValue = castInfos.effect.value;
-        Priority += 50;
+        priority += 50;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class FightPortal extends FightActivableObject {
 
     public void forceEnable(Fighter fighter) {
         if (disabledByCaster) {
-            if (!this.cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+            if (!this.cell.hasGameObject(FightObjectType.OBJECT_FIGHTER) && !this.cell.hasGameObject(FightObjectType.OBJECT_STATIC)) {
                 this.onEnable(fighter);
             }
             this.disabledByCaster = false;
@@ -79,7 +79,7 @@ public class FightPortal extends FightActivableObject {
     }
 
     public synchronized void enable(Fighter fighter, boolean check) {
-        if (disabledByCaster || Enabled || (check && turnUsed == m_fight.getFightWorker().fightTurn) || this.cell.HasGameObject(FightObjectType.OBJECT_FIGHTER) || this.cell.HasGameObject(FightObjectType.OBJECT_STATIC)) {
+        if (disabledByCaster || Enabled || (check && turnUsed == m_fight.getFightWorker().fightTurn) || this.cell.hasGameObject(FightObjectType.OBJECT_FIGHTER) || this.cell.hasGameObject(FightObjectType.OBJECT_STATIC)) {
             return;
         }
         this.onEnable(fighter);

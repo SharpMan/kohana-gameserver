@@ -31,7 +31,7 @@ public class EffectCreateIllusion extends EffectBase {
 
         BuffState Buff = new BuffState(new EffectCast(StatsEnum.INVISIBILITY, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, null, CastInfos.caster, null), CastInfos.caster);
         Buff.duration = 1;
-        Buff.DecrementType = BuffDecrementType.TYPE_BEGINTURN;
+        Buff.decrementType = BuffDecrementType.TYPE_BEGINTURN;
         CastInfos.caster.getBuff().addBuff(Buff);
         if (Buff.applyEffect(null, null) == -3) {
             return -3;

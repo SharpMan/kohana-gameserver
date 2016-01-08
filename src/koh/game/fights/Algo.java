@@ -45,7 +45,7 @@ public class Algo {
             if (boucles > 25) {
                 short randomCellId = fight.getMap().getRandomCell();
                 FightCell cell = fight.getCell(randomCellId);
-                if (cell != null && cell.IsWalkable()) {
+                if (cell != null && cell.isWalkable()) {
                     if (!team1.contains(cell)) {
                         team1.add(cell);
                     }
@@ -60,7 +60,7 @@ public class Algo {
             }
             FightCell randomCell = fight.getCell(fight.getMap().getRandomAdjacentFreeCell(toDir.Id).getId());
             if (randomCell != null) {
-                if (!team1.contains(randomCell) && randomCell.IsWalkable()) {
+                if (!team1.contains(randomCell) && randomCell.isWalkable()) {
                     team1.add(randomCell);
                 }
             }
@@ -74,7 +74,7 @@ public class Algo {
             if (boucles > 25) {
                 short randomCellId = fight.getMap().getRandomCell();
                 FightCell cell = fight.getCell(randomCellId);
-                if (cell != null && cell.IsWalkable()) {
+                if (cell != null && cell.isWalkable()) {
                     if (!team1.contains(cell) && !team2.contains(cell)) {
                         team2.add(cell);
                     }
@@ -89,7 +89,7 @@ public class Algo {
             }
             FightCell randomCell = fight.getCell(fight.getMap().getRandomAdjacentFreeCell(toDir.Id).getId());
             if (randomCell != null) {
-                if (!team1.contains(randomCell) && !team2.contains(randomCell) && randomCell.IsWalkable()) {
+                if (!team1.contains(randomCell) && !team2.contains(randomCell) && randomCell.isWalkable()) {
                     team2.add(randomCell);
                 }
             }

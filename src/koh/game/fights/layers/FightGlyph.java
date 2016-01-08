@@ -1,4 +1,4 @@
-package koh.game.fights.layer;
+package koh.game.fights.layers;
 
 import javafx.scene.paint.Color;
 import koh.game.fights.FightTeam;
@@ -11,12 +11,18 @@ import koh.protocol.client.enums.GameActionMarkTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightMarkCellsMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightUnmarkCellsMessage;
 import koh.protocol.types.game.actions.fight.GameActionMark;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author Neo-Craft
  */
 public class FightGlyph extends FightActivableObject {
+
+    @Getter
+    @Setter
+    private int lastTurnActivated;
 
     public FightGlyph(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum Shape) {
         super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);

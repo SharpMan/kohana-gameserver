@@ -29,7 +29,7 @@ public class EffectPushFear extends EffectBase {
             FightCell nextCell = CastInfos.caster.getFight().getCell(Pathfinder.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.canWalk()) {
-                if (nextCell.HasObject(IFightObject.FightObjectType.OBJECT_TRAP)) {
+                if (nextCell.hasObject(IFightObject.FightObjectType.OBJECT_TRAP)) {
                     target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
 
                     return target.setCell(nextCell);

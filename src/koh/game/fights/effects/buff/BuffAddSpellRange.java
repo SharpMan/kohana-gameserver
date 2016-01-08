@@ -18,7 +18,7 @@ public class BuffAddSpellRange extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporarySpellBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) this.castInfos.effect.value, (short) this.castInfos.effect.diceNum);
+        return new FightTemporarySpellBoostEffect(this.getId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) this.castInfos.effect.value, (short) this.castInfos.effect.diceNum);
     }
 
 }

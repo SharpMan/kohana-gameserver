@@ -25,7 +25,7 @@ public class EffectPush extends EffectBase {
     @Override
     public int applyEffect(EffectCast CastInfos) {
         byte direction = 0;
-        for (Fighter Target : CastInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.Porté) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter Target : CastInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.PORTÉ) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (CastInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
@@ -79,7 +79,7 @@ public class EffectPush extends EffectBase {
             FightCell nextCell = target.getFight().getCell(Pathfinder.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.canWalk()) {
-                if (nextCell.HasObject(FightObjectType.OBJECT_TRAP)) {
+                if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {
                     target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
                     return target.setCell(nextCell);
                 }

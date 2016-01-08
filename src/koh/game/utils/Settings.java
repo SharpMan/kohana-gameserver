@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 
 import com.google.inject.Singleton;
 import koh.game.dao.DAO;
+import koh.utils.Enumerable;
 import lombok.Getter;
 
 /**
@@ -119,4 +120,7 @@ public class Settings {
         }
     }
 
+    public int[] getIntArray(String e) {
+        return Enumerable.StringToIntArray(getStringElement(e));
+    }
 }

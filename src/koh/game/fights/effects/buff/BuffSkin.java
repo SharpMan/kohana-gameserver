@@ -88,7 +88,7 @@ public class BuffSkin extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) 0);
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE_BY_DEATH, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) 0);
     }
 
 }

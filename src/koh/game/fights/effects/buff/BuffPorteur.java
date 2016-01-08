@@ -20,20 +20,20 @@ public class BuffPorteur extends BuffEffect {
     public BuffPorteur(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
-        CastInfos.caster.getStates().fakeState(FightStateEnum.Porteur, true);
+        CastInfos.caster.getStates().fakeState(FightStateEnum.PORTEUR, true);
         this.castInfos.effectType = StatsEnum.ADD_STATE;
         this.caster.getFight().sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.caster.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, (short)/*this.castInfos.getEffectUID()*/ 2, this.castInfos.parentUID, (short) 1, (short) 3);
+        return new FightTemporaryBoostStateEffect(this.getId(), this.caster.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, (short)/*this.castInfos.getEffectUID()*/ 2, this.castInfos.parentUID, (short) 1, (short) 3);
     }
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         // Si effet finis
-        if (!this.target.getStates().hasState(FightStateEnum.Porté)) {
+        if (!this.target.getStates().hasState(FightStateEnum.PORTÉ)) {
             this.duration = 0;
             return -1;
         }
@@ -44,7 +44,7 @@ public class BuffPorteur extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        castInfos.caster.getStates().fakeState(FightStateEnum.Porteur, false);
+        castInfos.caster.getStates().fakeState(FightStateEnum.PORTEUR, false);
         this.duration = 0;
         return super.removeEffect();
     }

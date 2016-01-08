@@ -8,8 +8,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.layer.FightActivableObject;
-import koh.game.fights.layer.FightBomb;
+import koh.game.fights.layers.FightActivableObject;
+import koh.game.fights.layers.FightBomb;
 
 /**
  *
@@ -30,6 +30,7 @@ public class FightCell {
     private boolean myLineOfSight;
 
     private AbstractQueue<IFightObject> myFightObjects = new PriorityBlockingQueue<>(20, new FightCellComparator());
+    //Never change this is the heart of trap network
 
     public FightCell(short Id, boolean walk, boolean los) {
         this.Id = Id;
@@ -37,7 +38,7 @@ public class FightCell {
         this.myLineOfSight = los;
     }
 
-    public int BeginTurn(Fighter fighter) {
+    public int beginTurn(Fighter fighter) {
         for (IFightObject Object : myFightObjects) {
             if (Object instanceof FightActivableObject) {
                 FightActivableObject activableObject = (FightActivableObject) Object;
@@ -54,7 +55,7 @@ public class FightCell {
         return -1;
     }
     
-    public int EndTurn(Fighter fighter){
+    public int endTurn(Fighter fighter){
         for (IFightObject Object : myFightObjects) {
             if (Object instanceof FightActivableObject) {
                 FightActivableObject activableObject = (FightActivableObject) Object;
@@ -71,40 +72,50 @@ public class FightCell {
         return -1;
     }
 
-    public boolean IsWalkable() {
+    public boolean isWalkable() {
         return this.myWalkable;
     }
 
-    public boolean HasObject(FightObjectType type) {
+    public boolean hasObject(FightObjectType type) {
         return this.myFightObjects.stream().anyMatch(obj -> obj.getObjectType() == type);
     }
 
-    public boolean CanPutObject() {
+    public boolean canPutObject() {
         return myWalkable && myFightObjects.stream().filter(obj -> obj.getCellId() == Id).allMatch(obj -> obj.canStack());
     }
 
-    public AbstractQueue<IFightObject> GetObjects() {
+    public AbstractQueue<IFightObject> getObjects() {
         return this.myFightObjects;
     }
 
     public boolean canWalk() {
-        //return this.myWalkable && !this.HasGameObject(FightObjectType.OBJECT_CAWOTTE) && !this.HasGameObject(FightObjectType.OBJECT_FIGHTER);
+        //return this.myWalkable && !this.hasGameObject(FightObjectType.OBJECT_CAWOTTE) && !this.hasGameObject(FightObjectType.OBJECT_FIGHTER);
         return this.myWalkable && this.myFightObjects.stream().allMatch(obj -> obj.canGoThrough());
     }
 
-    public boolean HasGameObject(FightObjectType objectType) {
+    public boolean hasGameObject(FightObjectType objectType) {
         return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType);
     }
 
-    public boolean HasGameObject(FightObjectType objectType,FightObjectType objectTyp2) {
+
+
+    public boolean hasGameObject(FightObjectType objectType, FightObjectType objectTyp2) {
         return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType || x.getObjectType() == objectTyp2);
     }
 
-    public IFightObject[] GetObjects(FightObjectType ObjectType) {
+    public <T extends IFightObject> T[] getObjecs(FightObjectType ObjectType) { //TODO use this shit
+        return (T[]) this.myFightObjects.stream().filter(x -> x.getObjectType() == ObjectType).map(e -> (T)e).toArray();
+    }
+
+    public boolean hasGameObject(IFightObject objectType) {
+        return myFightObjects.contains(objectType);
+    }
+
+    public IFightObject[] getObjects(FightObjectType ObjectType) {
         return this.myFightObjects.stream().filter(x -> x.getObjectType() == ObjectType).toArray(IFightObject[]::new);
     }
 
-    public List<IFightObject> GetObjectsAsList(FightObjectType ObjectType) {
+    public List<IFightObject> getObjectsAsList(FightObjectType ObjectType) {
         return this.myFightObjects.stream().filter(x -> x.getObjectType() == ObjectType).collect(Collectors.toList());
     }
     
@@ -112,37 +123,37 @@ public class FightCell {
         return myFightObjects.stream().anyMatch(x -> x instanceof Fighter);
     }
 
-    public Fighter[] GetObjectsAsFighter() {
+    public Fighter[] getObjectsAsFighter() {
         return this.myFightObjects.stream().filter(x -> x instanceof Fighter).map(x -> (Fighter) x).toArray(Fighter[]::new);
     }
 
-    public List<Fighter> GetObjectsAsFighterList() {
+    public List<Fighter> getObjectsAsFighterList() {
         return this.myFightObjects.stream().filter(x -> x instanceof Fighter).map(x -> (Fighter) x).collect(Collectors.toList());
     }
     
-    public List<Fighter> GetObjectsAsFighterList(Predicate<? super IFightObject> prdct) {
+    public List<Fighter> getObjectsAsFighterList(Predicate<? super IFightObject> prdct) {
         return this.myFightObjects.stream().filter(prdct).map(x -> (Fighter) x).collect(Collectors.toList());
     }
 
-    public Fighter HasEnnemy(FightTeam Team) {
+    public Fighter hasEnnemy(FightTeam Team) {
       if (!this.hasFighter()) {
             return null;
         }
-        return (this.GetObjectsAsFighter()[0].getTeam().id != Team.id && !this.GetObjectsAsFighter()[0].isMarkedDead()) ? this.GetObjectsAsFighter()[0] : null; //Class not id ...
+        return (this.getObjectsAsFighter()[0].getTeam().id != Team.id && !this.getObjectsAsFighter()[0].isMarkedDead()) ? this.getObjectsAsFighter()[0] : null; //Class not id ...
     }
 
-    public Fighter HasFriend(FightTeam Team) {
+    public Fighter hasFriend(FightTeam Team) {
         if (!this.hasFighter()) {
             return null;
         }
-        return (this.GetObjectsAsFighter()[0].getTeam().id == Team.id && !this.GetObjectsAsFighter()[0].isMarkedDead()) ? this.GetObjectsAsFighter()[0] : null; //Class not id ...
+        return (this.getObjectsAsFighter()[0].getTeam().id == Team.id && !this.getObjectsAsFighter()[0].isMarkedDead()) ? this.getObjectsAsFighter()[0] : null; //Class not id ...
     }
 
-    public synchronized int AddObject(IFightObject fightObject) {
-        return AddObject(fightObject, true);
+    public synchronized int addObject(IFightObject fightObject) {
+        return addObject(fightObject, true);
     }
 
-    public synchronized int AddObject(IFightObject fightObject, boolean runEvent) {
+    public synchronized int addObject(IFightObject fightObject, boolean runEvent) {
         if (!this.myFightObjects.contains(fightObject)) {
             this.myFightObjects.add(fightObject);
         }
@@ -174,11 +185,11 @@ public class FightCell {
         return -1;
     }
 
-    public void RemoveObject(IFightObject Object) {
+    public void removeObject(IFightObject Object) {
         this.myFightObjects.remove(Object);
     }
 
-    public void Clear() {
+    public void clear() {
         try {
             Id = 0;
             myWalkable = false;

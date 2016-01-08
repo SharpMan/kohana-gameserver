@@ -34,7 +34,7 @@ public class BuffHealPercent extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) Math.abs(castInfos.randomJet(target)));
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) Math.abs(castInfos.randomJet(target)));
     }
 
 }

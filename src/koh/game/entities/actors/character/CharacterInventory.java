@@ -464,13 +464,13 @@ public class CharacterInventory {
     public static InventoryItem tryCreateItem(int templateId, Player character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
 
         // Recup template
-        ItemTemplate Template = DAO.getItemTemplates().getTemplate(templateId);
+        ItemTemplate template = DAO.getItemTemplates().getTemplate(templateId);
 
-        if(Template == null)
+        if(template == null)
             return null;
 
         // Creation
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(Template.getPossibleEffects(), EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.Normal, template instanceof Weapon) : Stats));
         item.setNeedInsert(true);
         item.getStats();
         if (character != null) {

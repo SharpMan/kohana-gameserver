@@ -73,8 +73,8 @@ public class FighterBuff {
             logger.debug("Buff {} canceled due to stack",buff.getClass().getName());
             return;
         }
-        this.buffsAct.get(buff.ActiveType).add(buff);
-        this.buffsDec.get(buff.DecrementType).add(buff);
+        this.buffsAct.get(buff.activeType).add(buff);
+        this.buffsDec.get(buff.decrementType).add(buff);
         buff.target.getFight().sendToField(new GameActionFightDispellableEffectMessage(/*Buff.castInfos.effect.effectId*/buff.castInfos.effectType.value(), buff.caster.getID(), buff.getAbstractFightDispellableEffect()));
         logger.debug("Buff {} added",buff,getClass().getName());
     }
@@ -100,8 +100,8 @@ public class FighterBuff {
          if (buffMaxStackReached(Buff)) {
          continue;
          }
-         this.buffsAct.get(Buff.ActiveType).add(Buff);
-         this.buffsDec.get(Buff.DecrementType).add(Buff);
+         this.buffsAct.get(Buff.activeType).add(Buff);
+         this.buffsDec.get(Buff.decrementType).add(Buff);
          Buff.target.fight.sendToField(new GameActionFightDispellableEffectMessage(Buff.castInfos.effectType.value(), Buff.caster.id, Buff.getAbstractFightDispellableEffect()));
 
          }
@@ -123,7 +123,7 @@ public class FighterBuff {
         this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.duration <= 0 && x.duration != -1);
 
         this.buffsAct.values().stream().forEach((BuffList) -> {
-            BuffList.removeIf(Buff -> Buff.DecrementType == BuffDecrementType.TYPE_BEGINTURN && Buff.duration <= 0);
+            BuffList.removeIf(Buff -> Buff.decrementType == BuffDecrementType.TYPE_BEGINTURN && Buff.duration <= 0);
         });
 
         return -1;
@@ -148,7 +148,7 @@ public class FighterBuff {
         this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.duration <= 0 && x.duration != -1);
 
         for (ArrayList<BuffEffect> BuffList : this.buffsAct.values()) {
-            BuffList.removeIf(Buff -> Buff.DecrementType == BuffDecrementType.TYPE_ENDTURN && Buff.duration <= 0);
+            BuffList.removeIf(Buff -> Buff.decrementType == BuffDecrementType.TYPE_ENDTURN && Buff.duration <= 0);
         }
 
         return -1;
@@ -162,7 +162,7 @@ public class FighterBuff {
             }
         }
 
-        this.buffsAct.get(BuffActiveType.ACTIVE_ENDMOVE).removeIf(x -> x.DecrementType == BuffDecrementType.TYPE_ENDMOVE && x.duration == 0);
+        this.buffsAct.get(BuffActiveType.ACTIVE_ENDMOVE).removeIf(x -> x.decrementType == BuffDecrementType.TYPE_ENDMOVE && x.duration == 0);
 
         return -1;
     }

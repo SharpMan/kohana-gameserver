@@ -7,7 +7,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
-import koh.game.fights.layer.FightTrap;
+import koh.game.fights.layers.FightTrap;
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_MAKE_INVISIBLE;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightInvisibleDetectedMessage;
@@ -25,7 +25,7 @@ public class EffectPerception extends EffectBase {
         for (short Cell : (new Zone(CastInfos.effect.ZoneShape(), CastInfos.effect.zoneSize(), MapPoint.fromCellId(CastInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(CastInfos.cellId), true),CastInfos.caster.getFight().getMap())).getCells(CastInfos.cellId)) {
             FightCell fightCell = CastInfos.caster.getFight().getCell(Cell);
             if (fightCell != null) {
-                fightCell.GetObjects().stream().filter((fightObject) -> (fightObject.getCellId() == Cell)).forEach((fightObject) -> {
+                fightCell.getObjects().stream().filter((fightObject) -> (fightObject.getCellId() == Cell)).forEach((fightObject) -> {
                     if (fightObject.getObjectType() == FightObjectType.OBJECT_TRAP && ((FightTrap) fightObject).visibileState == GameActionFightInvisibilityStateEnum.INVISIBLE && ((FightTrap) fightObject).caster.isEnnemyWith(CastInfos.caster)) {
                         ((FightTrap) fightObject).visibileState = GameActionFightInvisibilityStateEnum.DETECTED;
                         ((FightTrap) fightObject).appearForAll();

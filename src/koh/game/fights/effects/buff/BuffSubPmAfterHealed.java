@@ -26,7 +26,7 @@ public class BuffSubPmAfterHealed extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, (byte) 0, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, (byte) 0, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

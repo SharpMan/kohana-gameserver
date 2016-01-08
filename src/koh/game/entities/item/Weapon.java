@@ -43,7 +43,9 @@ public class Weapon extends ItemTemplate {
     public void initialize() {
         if(this.initialized)
             return;
-        Arrays.stream(this.possibleEffects).filter(e -> ArrayUtils.contains(unRandomablesEffects, e.effectId)).forEach(Effect -> Effect.rawZone = this.getItemType().getRawZone());
+        Arrays.stream(this.possibleEffects)
+                .filter(e -> ArrayUtils.contains(unRandomablesEffects, e.effectId))
+                .forEach(effect -> effect.rawZone = this.getItemType().getRawZone());
         this.initialized = true;
     }
 

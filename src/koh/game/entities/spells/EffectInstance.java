@@ -63,9 +63,9 @@ public class EffectInstance implements Serializable {
         return this.zoneMaxEfficiency;
     }
 
-    public int zoneMinSize() {
+    public byte zoneMinSize() {
         this.parseZone();
-        return this.zoneMinSize;
+        return (byte)this.zoneMinSize;
     }
 
     public byte zoneSize() {

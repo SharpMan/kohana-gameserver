@@ -13,7 +13,7 @@ public class Zone implements IZone {
 
     private IZone m_shape;
     private SpellShapeEnum m_shapeType;
-    private byte m_radius;
+    private byte m_radius , m_minRadius;
     private byte m_direction;
     private DofusMap map;
 
@@ -28,8 +28,14 @@ public class Zone implements IZone {
         this.setRadius(radius);
         this.setDirection(direction);
         this.setShapeType(shape);
-        
-        
+    }
+
+    public Zone(SpellShapeEnum shape, byte radius, byte direction, DofusMap map,byte minZise) {
+        this.map = map;
+        this.setRadius(radius);
+        this.setDirection(direction);
+        this.m_minRadius = minZise;
+        this.setShapeType(shape);
     }
 
     public SpellShapeEnum getShapeType() {
@@ -95,7 +101,7 @@ public class Zone implements IZone {
                 this.m_shape = new Lozenge((byte) 0, (byte) 63, this.map);
                 break;
             case C:
-                this.m_shape = new Lozenge((byte) 0, this.getRadius(), this.map);
+                this.m_shape = new Lozenge(m_minRadius, this.getRadius(), this.map);
                 break;
             case D:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius());
@@ -118,7 +124,7 @@ public class Zone implements IZone {
                 this.m_shape = new Single();
                 break;
             case Q:
-                this.m_shape = new CrossZone((byte) 1, this.getRadius());
+                this.m_shape = new CrossZone(m_minRadius != 0 ? m_minRadius : (byte) 1, this.getRadius());
                 break;
             case T:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius()) {
@@ -141,7 +147,7 @@ public class Zone implements IZone {
                 };
                 break;
             case X:
-                this.m_shape = new CrossZone((byte) 0, this.getRadius());
+                this.m_shape = new CrossZone(m_minRadius, this.getRadius());
                 break;
             case Hammer:
                 this.m_shape = new CrossZone((byte) 0, this.getRadius()) {
@@ -155,7 +161,7 @@ public class Zone implements IZone {
                 ((CrossZone) this.m_shape).disabledDirection.add((byte) (this.getDirection() - 4 > DirectionsEnum.RIGHT ? this.getDirection() - 4 : this.getDirection() + 4));
                 break;
             case sharp:
-                this.m_shape = new CrossZone((byte) 1, this.getRadius()) {
+                this.m_shape = new CrossZone((byte) 1, this.getRadius()) { //TODO m_minRadius
                     {
                         diagonal = true;
                     }

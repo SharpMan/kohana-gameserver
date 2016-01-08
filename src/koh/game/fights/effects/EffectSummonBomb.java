@@ -5,7 +5,7 @@ import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
-import koh.game.fights.layer.FightBomb;
+import koh.game.fights.layers.FightBomb;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
 import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import org.apache.commons.lang.ArrayUtils;
@@ -36,13 +36,13 @@ public class EffectSummonBomb extends EffectBase {
                             .forEach(Bombe -> ((FightBomb)Bombe).getFightCells()
                                               .filter(Cell -> Cell.hasFighter())
                                               .forEach(C -> {
-                                                  for(Fighter F : C.GetObjectsAsFighter()){
+                                                  for(Fighter F : C.getObjectsAsFighter()){
                                                       ((FightBomb)Bombe).loadTargets(F);
                                                       ((FightBomb)Bombe).activate(F);
                                                   }
                                               }));
                 } else {
-                    //castInfos.caster.fight.affectSpellTo(castInfos.caster, castInfos.caster.fight.getCell(castInfos.getCellId).GetObjectsAsFighter()[0] , castInfos.effect.diceSide, SpellDAOImpl.bombs.get(castInfos.effect.diceNum).instantSpellId);
+                    //castInfos.caster.fight.affectSpellTo(castInfos.caster, castInfos.caster.fight.getCell(castInfos.getCellId).getObjectsAsFighter()[0] , castInfos.effect.diceSide, SpellDAOImpl.bombs.get(castInfos.effect.diceNum).instantSpellId);
                     CastInfos.caster.getFight().launchSpell(CastInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(CastInfos.effect.diceNum).instantSpellId).getSpellLevel(CastInfos.effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
                 }
             }

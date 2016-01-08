@@ -2,10 +2,10 @@ package koh.game.fights.effects;
 
 import javafx.scene.paint.Color;
 import koh.game.fights.IFightObject.FightObjectType;
-import koh.game.fights.layer.FightActivableObject;
-import koh.game.fights.layer.FightGlyph;
-import koh.game.fights.layer.FightPortal;
-import koh.game.fights.layer.FightTrap;
+import koh.game.fights.layers.FightActivableObject;
+import koh.game.fights.layers.FightGlyph;
+import koh.game.fights.layers.FightPortal;
+import koh.game.fights.layers.FightTrap;
 import koh.protocol.client.enums.GameActionMarkCellsTypeEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
 
@@ -22,22 +22,18 @@ public class EffectActivableObject extends EffectBase {
             case LAYING_GLYPH_RANKED:
             case LAYING_GLYPH_RANKED_2:
             case LAYING_GLYPH:
-                if (CastInfos.caster.getFight().hasObjectOnCell(FightObjectType.OBJECT_FIGHTER, CastInfos.cellId)
-                        || CastInfos.caster.getFight().hasObjectOnCell(FightObjectType.OBJECT_STATIC, CastInfos.cellId)) {
-                    return -1;
-                }
-                obj = new FightGlyph(CastInfos, CastInfos.duration, GetColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
+                obj = new FightGlyph(CastInfos, CastInfos.duration, getColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
                 break;
 
             case LAYING_TRAP_LEVEL:
                 if (!CastInfos.caster.getFight().canPutObject(CastInfos.cellId)) {
                     return -1;
                 }
-                obj = new FightTrap(CastInfos, 0, GetColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
+                obj = new FightTrap(CastInfos, 0, getColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
                 break;
             case LAYING_PORTAIL:
-                if (CastInfos.getCell().HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-                    ((FightPortal) CastInfos.getCell().GetObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
+                if (CastInfos.getCell().hasGameObject(FightObjectType.OBJECT_PORTAL)) {
+                    ((FightPortal) CastInfos.getCell().getObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
                 } else if (CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster) != null
                         && CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
                     CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster).stream().findFirst().get().remove();
@@ -56,19 +52,22 @@ public class EffectActivableObject extends EffectBase {
     }
 
     public static GameActionMarkCellsTypeEnum GetMarkType(SpellShapeEnum Shape) {
+        System.out.println(Shape);
         switch (Shape) {
+            case C:
+            case Q:
+            case star:
             case P:
             case G:
                 return GameActionMarkCellsTypeEnum.CELLS_SQUARE;
-            case Q:
-                return GameActionMarkCellsTypeEnum.CELLS_CROSS;
 
+                //return GameActionMarkCellsTypeEnum.CELLS_CROSS;
             default:
                 return GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
         }
     }
 
-    public static Color GetColor(int Spell) {
+    public static final Color getColor(int Spell) {
         switch (Spell) {
             case 77:
             case 13:

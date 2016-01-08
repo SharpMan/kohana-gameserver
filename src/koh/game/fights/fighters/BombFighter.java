@@ -15,7 +15,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectActivableObject;
 import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.layer.FightBomb;
+import koh.game.fights.layers.FightBomb;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.SpellShapeEnum;
@@ -96,8 +96,8 @@ public class BombFighter extends StaticFighter {
         for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.getCellId()).advancedOrientationTo(MapPoint.fromCellId(this.getCellId()), true), this.fight.getMap())).getCells(this.getCellId())) {
             FightCell FightCell = fight.getCell(aCell);
             if (FightCell != null) {
-                if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
-                    for (Fighter Target : FightCell.GetObjectsAsFighter()) {
+                if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
+                    for (Fighter Target : FightCell.getObjectsAsFighter()) {
                         if (Target.getID() == this.ID) {
                             continue;
                         }
@@ -125,8 +125,8 @@ public class BombFighter extends StaticFighter {
     @Override
     public int tryDie(int casterId, boolean force) {
         if (this.getLife() <= 0 && !force) {
-            if (this.buff.getAllBuffs().anyMatch(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE)) {
-                return this.buff.getAllBuffs().filter(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().applyEffect(null, null);
+            if (this.buff.getAllBuffs().anyMatch(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE)) {
+                return this.buff.getAllBuffs().filter(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().applyEffect(null, null);
             } else {
                 if (this.FightBombs != null) {
                     this.FightBombs.forEach(Bomb -> Bomb.remove());
@@ -162,8 +162,8 @@ public class BombFighter extends StaticFighter {
             if (this.FightBombs != null) {
                 this.FightBombs.forEach(Bomb -> Bomb.remove());
             }
-            if (this.myCell.HasGameObject(FightObjectType.OBJECT_BOMB)) {
-                Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
+            if (this.myCell.hasGameObject(FightObjectType.OBJECT_BOMB)) {
+                Arrays.stream(this.myCell.getObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
             Short[] Cells;
             for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
@@ -174,7 +174,7 @@ public class BombFighter extends StaticFighter {
                     if (Cells != null) {
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, this.getCellId());
                         Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.getCellId());
-                        FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.GetColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                        FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
                         fight.addActivableObject(this, Bomb);
                     }
                 }

@@ -23,8 +23,9 @@ import koh.game.fights.effects.buff.BuffPorter;
 import koh.game.fights.effects.buff.BuffAddSpellRange;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
-import koh.game.fights.layer.FightActivableObject;
-import koh.game.fights.layer.FightPortal;
+import koh.game.fights.layers.FightActivableObject;
+import koh.game.fights.layers.FightGlyph;
+import koh.game.fights.layers.FightPortal;
 import koh.game.fights.types.AgressionFight;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.FightStateEnum;
@@ -119,9 +120,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public int setCell(FightCell cell, boolean runEvent) {
         if (this.myCell != null) {
-            this.myCell.RemoveObject(this); // On vire le fighter de la cell:
-            if (this.myCell.HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-                ((FightPortal) this.myCell.GetObjects(FightObjectType.OBJECT_PORTAL)[0]).enable(this, true);
+            this.myCell.removeObject(this); // On vire le fighter de la cell:
+            if (this.myCell.hasGameObject(FightObjectType.OBJECT_PORTAL)) {
+                ((FightPortal) this.myCell.getObjects(FightObjectType.OBJECT_PORTAL)[0]).enable(this, true);
             }
             if (this.fight.getFightState() == FightState.STATE_PLACE) {
                 if (!ArrayUtils.contains(previousPositions, myCell.Id)) {
@@ -130,15 +131,31 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             } else {
                 this.previousCellPos.add(this.myCell.Id);
             }
+
         }
+        int addResult;
         this.myCell = cell;
+        if(cell.hasObject(FightObjectType.OBJECT_GLYPHE)){
+            for (IFightObject Glyph : cell.getObjects(IFightObject.FightObjectType.OBJECT_GLYPHE)) {
+                if((!previousCellPos.isEmpty() &&
+                        !this.fight.getCell(previousCellPos.get(previousCellPos.size() -1)).hasGameObject(Glyph))
+                        || ((FightGlyph) Glyph).getLastTurnActivated() == this.fight.getFightWorker().fightTurn){
+                    continue;
+                }
+                ((FightGlyph) Glyph).setLastTurnActivated(this.fight.getFightWorker().fightTurn);
+                addResult = ((FightGlyph) Glyph).loadEnnemyTargetsAndActive(this);
+                if (addResult == -3 || addResult == -2) {
+                    return addResult;
+                }
+            }
+        }
 
         if (this.myCell != null) {
             this.mapPointCache.set_cellId(myCell.Id);
-            int AddResult = this.myCell.AddObject(this, runEvent);
+            addResult = this.myCell.addObject(this, runEvent);
 
-            if (AddResult == -3 || AddResult == -2) {
-                return AddResult;
+            if (addResult == -3 || addResult == -2) {
+                return addResult;
             }
         }
 
@@ -188,7 +205,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         this.left = true;
 
         // On le vire de la cell
-        myCell.RemoveObject(this);
+        myCell.removeObject(this);
     }
 
     public int tryDie(int casterId) {
@@ -211,7 +228,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
             }
 
-            myCell.RemoveObject(this);
+            myCell.removeObject(this);
 
             this.fight.endSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH, false);
 
@@ -228,9 +245,14 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public int beginTurn() {
         if (this.fight.getActivableObjects().containsKey(this)) {
-            this.fight.getActivableObjects().get(this).stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
-                ((FightPortal) Object).forceEnable(this);
-            });
+            this.fight.getActivableObjects().get(this).stream()
+                    .filter((objs) -> (objs instanceof FightPortal))
+                    .forEach((obj) -> {
+                        ((FightPortal) obj).forceEnable(this);
+                    });
+            this.fight.getActivableObjects().get(this).stream().filter(obj -> obj instanceof FightGlyph).forEach(y -> y.decrementDuration());
+            this.fight.getActivableObjects().get(this).removeIf(fightObject -> fightObject.getObjectType() == FightObjectType.OBJECT_GLYPHE && fightObject.duration <= 0);
+
         }
 
         int buffResult = this.buff.beginTurn();
@@ -238,7 +260,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return buffResult;
         }
         this.previousFirstCellPos.add(this.myCell.Id);
-        return myCell.BeginTurn(this);
+        return myCell.beginTurn(this);
     }
 
     public void middleTurn() {
@@ -257,7 +279,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (buffResult != -1) {
             return buffResult;
         }
-        return myCell.EndTurn(this);
+        return myCell.endTurn(this);
     }
 
     public Stream<FightActivableObject> getActivableObjects() {

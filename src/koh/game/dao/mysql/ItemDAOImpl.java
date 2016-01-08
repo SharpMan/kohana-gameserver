@@ -51,20 +51,20 @@ public class ItemDAOImpl extends ItemDAO {
     }
 
     private void initNextId() {
-        try (ConnectionResult conn = dbSource.executeQuery("SELECT id FROM `character_items` ORDER BY id DESC LIMIT 1;")) {
+        try (ConnectionResult conn = dbSource.executeQuery("SELECT max(id) FROM `character_items`;")) {
             ResultSet result = conn.getResult();
             if (!result.first())
                 nextId = 0;
             else
-                nextId = result.getInt("id") +1;
+                nextId = result.getInt(1) +1;
 
             try(Statement statement = conn.getConnection().createStatement()) {
-                ResultSet storageResult = statement.executeQuery("SELECT id FROM `storage_items` ORDER BY id DESC LIMIT 1;");
+                ResultSet storageResult = statement.executeQuery("SELECT max(id) FROM `storage_items`;");
 
                 if (!storageResult.first())
                     nextStorageId = 0;
                 else
-                    nextStorageId = storageResult.getInt("id") +1;
+                    nextStorageId = storageResult.getInt(1) +1;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class ItemDAOImpl extends ItemDAO {
             pStatement.setInt(5, item.getQuantity());
             pStatement.setBytes(6, item.serializeEffectInstanceDice().array());
 
-            item.setNeedInsert(false);;
+            item.setNeedInsert(false);
             item.columsToUpdate = null;
 
             pStatement.execute();

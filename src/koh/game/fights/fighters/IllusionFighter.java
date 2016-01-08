@@ -43,7 +43,7 @@ public class IllusionFighter extends StaticFighter {
             this.fight.getActivableObjects().get(this).stream().forEach(y -> y.remove());
         }
 
-        myCell.RemoveObject(this);
+        myCell.removeObject(this);
 
         if (!this.team.getAliveFighters().anyMatch(teamMate -> teamMate instanceof IllusionFighter && teamMate.getSummonerID() == this.getSummonerID())) {
             summoner.asPlayer().onCloneCleared();

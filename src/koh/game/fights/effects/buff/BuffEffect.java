@@ -24,15 +24,15 @@ public abstract class BuffEffect {
     public static final int[] TRIGGERED_EFFECTS_IDS = new int[]{138, 1040};
     public static final int[] NO_BOOST_EFFECTS_IDS = new int[]{144, 82};
 
-    public BuffDecrementType DecrementType;
-    public BuffActiveType ActiveType;
+    public BuffDecrementType decrementType;
+    public BuffActiveType activeType;
     public EffectCast castInfos;
     public Fighter caster;
     public Fighter target;
-    public int duration, Delay;
+    public int duration, delay;
     private int Uid = -1;
 
-    public int GetId() {
+    public int getId() {
         if (this.Uid == -1) {
             Uid = target.getNextBuffUid().incrementAndGet();
         }
@@ -62,16 +62,16 @@ public abstract class BuffEffect {
         //this.duration = (castInfos.duration == -1) ? -1 : (target.fight.currentFighter == target /*&& castInfos.duration == 0*/ ? castInfos.duration + 1 : castInfos.duration) - castInfos.getDelay();
         this.duration = (CastInfos.duration == -1) ? -1 : (decrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.duration : (CastInfos.duration) - CastInfos.getDelay());
 
-        //System.out.println(target.fight.currentFighter == target);
-        if (decrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID() && this.duration != -1) {
+        //Why do i use this
+       /* if (decrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID() && this.duration != -1) {
             this.duration++;
-        }
-        this.Delay = CastInfos.getDelay();
+        }*/
+        this.delay = CastInfos.getDelay();
         this.caster = CastInfos.caster;
         this.target = target;
 
-        this.ActiveType = ActiveType;
-        this.DecrementType = decrementType;
+        this.activeType = ActiveType;
+        this.decrementType = decrementType;
     }
 
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {

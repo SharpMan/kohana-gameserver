@@ -43,7 +43,7 @@ public class BuffChatiment extends BuffEffect {
         }
         if (BuffValue.getValue() > 0) {
             this.castInfos.damageValue += BuffValue.getValue();
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.castInfos.effect.diceNum), this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, BuffValue.getValue(), null, Duration, this.GetId()), this.target);
+            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.castInfos.effect.diceNum), this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, BuffValue.getValue(), null, Duration, this.getId()), this.target);
 
             BuffStats.applyEffect(BuffValue, DamageInfos);
             this.target.getBuff().addBuff(BuffStats);
@@ -54,7 +54,7 @@ public class BuffChatiment extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

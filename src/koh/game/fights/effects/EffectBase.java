@@ -106,7 +106,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.STEAL_RANGE, new EffectStatsSteal());
 
             // Armure et bouclié feca
-            this.put(StatsEnum.DAMAGE_ARMOR_REDUCTION, new EffectArmor());
+            this.put(StatsEnum.DAMAGE_ARMOR_REDUCTION, new EffectReduceDamage());
             this.put(StatsEnum.DAMAGE_REDUCTION, new EffectArmor());
 
             //chance Eca

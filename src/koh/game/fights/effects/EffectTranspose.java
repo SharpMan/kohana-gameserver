@@ -2,20 +2,26 @@ package koh.game.fights.effects;
 
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
-
-import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
+import koh.game.fights.fighters.StaticFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
 
+import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
+
 /**
- *
  * @author Neo-Craft
  */
 public class EffectTranspose extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        for (Fighter target : CastInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.Porté) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter target : CastInfos.targets.stream()
+                .filter(fr -> !(fr instanceof StaticFighter)
+                        && !fr.getStates().hasState(FightStateEnum.PORTÉ)
+                        && !fr.getStates().hasState(FightStateEnum.Inébranlable)
+                        && !fr.getStates().hasState(FightStateEnum.Enraciné)
+                        && !fr.getStates().hasState(FightStateEnum.Indéplaçable))
+                .toArray(Fighter[]::new)) {
             if (CastInfos.spellId == 445) {
                 if (target.getTeam() == CastInfos.caster.getTeam()) {
                     continue;

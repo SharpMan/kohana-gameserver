@@ -13,12 +13,12 @@ public class EffectAddState extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast CastInfos) {
-        BuffEffect Buff = null;
-        for (Fighter Target : CastInfos.targets) {
-            Buff = new BuffState(CastInfos, Target);
-            if (Target.getStates().canState(FightStateEnum.valueOf(CastInfos.effect.value)) && !Target.getBuff().buffMaxStackReached(Buff)) {
-                Target.getBuff().addBuff(Buff);
-                if (Buff.applyEffect(null, null) == -3) {
+        BuffEffect buff;
+        for (Fighter target : CastInfos.targets) {
+            buff = new BuffState(CastInfos, target);
+            if (target.getStates().canState(FightStateEnum.valueOf(CastInfos.effect.value)) && !target.getBuff().buffMaxStackReached(buff)) {
+                target.getBuff().addBuff(buff);
+                if (buff.applyEffect(null, null) == -3) {
                     return -3;
                 }
             }

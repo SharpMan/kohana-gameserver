@@ -112,8 +112,8 @@ public class Pathfinder {
 
     public static boolean isStopCell(Fight fight, FightTeam team, short cellId, Fighter fighter) {
         // Un piege etc ?
-        if (fight.getCell(cellId).HasGameObject(FightObjectType.OBJECT_TRAP) || fight.getCell(cellId).HasGameObject(FightObjectType.OBJECT_BOMB) || fight.getCell(cellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-            //fight.getCell(getCellId).GetObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
+        if (fight.getCell(cellId).hasGameObject(FightObjectType.OBJECT_TRAP) || fight.getCell(cellId).hasGameObject(FightObjectType.OBJECT_BOMB) || fight.getCell(cellId).hasGameObject(FightObjectType.OBJECT_PORTAL)) {
+            //fight.getCell(getCellId).getObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
             return true;
         }
         if (team != null) {

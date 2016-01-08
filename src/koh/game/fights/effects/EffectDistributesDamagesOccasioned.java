@@ -2,6 +2,7 @@ package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.ActionIdEnum;
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifeAndShieldPointsLostMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMessage;
 
@@ -16,9 +17,10 @@ public class EffectDistributesDamagesOccasioned extends EffectBase {
         int Apply = -1;
         for (Fighter target : castInfos.targets) {
             int damageJet = (castInfos.damageValue * castInfos.randomJet(target)) / 100;
-            if (damageJet < 0) {
+            if (damageJet < 0 || (castInfos.caster.hasState(FightStateEnum.Pacifiste.value) && !castInfos.isGlyph)) {
                 damageJet = (0);
             }
+
 
             // Dommages superieur a la vie de la cible
             // Dommages superieur a la vie de la cible

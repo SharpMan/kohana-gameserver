@@ -1,4 +1,4 @@
-package koh.game.fights.layer;
+package koh.game.fights.layers;
 
 import javafx.scene.paint.Color;
 import koh.game.entities.actors.Player;

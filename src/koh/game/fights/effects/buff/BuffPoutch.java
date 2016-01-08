@@ -63,8 +63,8 @@ public class BuffPoutch extends BuffEffect {
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.zoneSize(), MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true), this.caster.getFight().getMap())).getCells(target.getCellId())) {
                 FightCell FightCell = target.getFight().getCell(Cell);
                 if (FightCell != null) {
-                    if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
-                        for (Fighter Target2 : FightCell.GetObjectsAsFighter()) {
+                    if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
+                        for (Fighter Target2 : FightCell.getObjectsAsFighter()) {
                             if (castInfos.spellId == 2809 && Target2 == target) {
                                 continue;
                             }
@@ -108,8 +108,8 @@ public class BuffPoutch extends BuffEffect {
          for (short cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true))).getCells(target.getCellId())) {
          FightCell FightCell = this.target.fight.getCell(cell);
          if (FightCell != null) {
-         if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
-         for (Fighter target : FightCell.GetObjectsAsFighter()) {
+         if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
+         for (Fighter target : FightCell.getObjectsAsFighter()) {
          int newValue = EffectDamage.applyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100));
          if (newValue < apply) {
          apply = newValue;
@@ -125,7 +125,7 @@ public class BuffPoutch extends BuffEffect {
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

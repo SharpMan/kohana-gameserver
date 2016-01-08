@@ -28,7 +28,7 @@ public class BuffPorter extends BuffEffect {
     public BuffPorter(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
-        Target.getStates().fakeState(FightStateEnum.Porté, true);
+        Target.getStates().fakeState(FightStateEnum.PORTÉ, true);
         this.castInfos.effectType = StatsEnum.ADD_STATE;
         Target.setCell(this.caster.getMyCell());
     }
@@ -47,13 +47,13 @@ public class BuffPorter extends BuffEffect {
             this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> {
                 {
                     x.removeEffect();
-                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.caster.getID(), x.GetId()));
+                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.caster.getID(), x.getId()));
                 }
             });
             this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).forEach(x -> {
                 {
                     x.removeEffect();
-                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.target.getID(), x.GetId()));
+                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.target.getID(), x.getId()));
                 }
             });
             this.duration = 0;
@@ -63,14 +63,14 @@ public class BuffPorter extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        target.getStates().fakeState(FightStateEnum.Porté, false);
+        target.getStates().fakeState(FightStateEnum.PORTÉ, false);
 
         return super.removeEffect();
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, (short)/*this.castInfos.getEffectUID()*/ 3, this.castInfos.parentUID, (short) 1, (short) 8);
+        return new FightTemporaryBoostStateEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, (short)/*this.castInfos.getEffectUID()*/ 3, this.castInfos.parentUID, (short) 1, (short) 8);
     }
 
     public static boolean isCalledBy(String Comparant, int... indexes) { //Do not modif long story

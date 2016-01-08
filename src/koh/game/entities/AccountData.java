@@ -108,7 +108,7 @@ public class AccountData {
                 if (Item.getTemplateId() == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.getID() == Item.getID()) && Item.Equals(stats) ) {
                     if (removeItem != null) {
                         this.removeFromDic(removeItem.getID());
-                        removeItem.setNeedInsert(false);;
+                        removeItem.setNeedInsert(false);
                         DAO.getItems().delete(removeItem, "storage_items");
                         removeItem.columsToUpdate = null;
                     }

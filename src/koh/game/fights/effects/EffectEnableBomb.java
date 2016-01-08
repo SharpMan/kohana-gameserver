@@ -3,7 +3,7 @@ package koh.game.fights.effects;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffEnableBomb;
 import koh.game.fights.fighters.BombFighter;
-import koh.game.fights.layer.FightBomb;
+import koh.game.fights.layers.FightBomb;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;

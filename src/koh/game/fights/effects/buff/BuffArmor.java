@@ -13,23 +13,23 @@ import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
  */
 public class BuffArmor extends BuffEffect {
 
-    private int Jet;
+    private final int JET;
 
     public BuffArmor(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
-        this.Jet = CastInfos.randomJet(Target);
-        Target.getStats().addBoost(StatsEnum.AddArmor, (Jet * (100 + (CastInfos.caster.getLevel() * 5)) / 100));
+        this.JET = CastInfos.randomJet(Target);
+        Target.getStats().addBoost(StatsEnum.AddArmor, (JET * (100 + (CastInfos.caster.getLevel() * 5)) / 100));
     }
 
     @Override
     public int removeEffect() {
-        target.getStats().getEffect(StatsEnum.AddArmor).additionnal -= (Jet * (100 + (castInfos.caster.getLevel() * 5)) / 100);
+        target.getStats().getEffect(StatsEnum.AddArmor).additionnal -= (JET * (100 + (castInfos.caster.getLevel() * 5)) / 100);
         return super.removeEffect();
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.Jet));
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.JET));
     }
 
 }

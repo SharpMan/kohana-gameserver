@@ -1,4 +1,4 @@
-package koh.game.fights.layer;
+package koh.game.fights.layers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,30 +45,30 @@ public class FightBomb extends FightActivableObject {
         m_actionEffect = Spell;
         activationType = BuffActiveType.ACTIVE_ENDMOVE;
 
-        Color = color;
+        this.color = color;
         targets = new ArrayList<>();
         affectedCells = Cells;
-        Duration = 0;
+        duration = 0;
         this.visibileState = GameActionFightInvisibilityStateEnum.VISIBLE;
         size = 0;
         this.shape = GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
 
         for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
             if (EffectCast.isDamageEffect(effect.getEffectType())) {
-                Priority--;
+                priority--;
             }
             if (effect.getEffectType() == StatsEnum.PULL_FORWARD || effect.getEffectType() == StatsEnum.PUSH_BACK) {
-                Priority += 50;
+                priority += 50;
             }
         }
         cell = m_fight.getCell(affectedCells[0]);
         // On ajout l'objet a toutes les cells qu'il affecte
         for (short cellId : affectedCells) {
-            if(!this.m_fight.getCell(cellId).IsWalkable())
+            if(!this.m_fight.getCell(cellId).isWalkable())
                 continue;
             this.cells.put(cellId, (short) m_fight.getNextTriggerUid().incrementAndGet());
             if (m_fight.getCell(cellId) != null) {
-                m_fight.getCell(cellId).AddObject(this);
+                m_fight.getCell(cellId).addObject(this);
             }
         }
         this.owner = Members;
@@ -124,7 +124,7 @@ public class FightBomb extends FightActivableObject {
     }
 
     public GameActionMark GetGameActionMark(short cell) {
-        return new GameActionMark(this.caster.getID(), this.caster.getTeam().id, this.m_spellId, this.m_spell_level, this.cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(Color), this.shape.value)}, true);
+        return new GameActionMark(this.caster.getID(), this.caster.getTeam().id, this.m_spellId, this.m_spell_level, this.cells.get(cell), getGameActionMarkType().value(), cell, new GameActionMarkedCell[]{new GameActionMarkedCell(cell, this.size, getRGB(color), this.shape.value)}, true);
     }
 
     @Override

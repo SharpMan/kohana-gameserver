@@ -50,7 +50,7 @@ public class EffectCast {
 
     public int spellId, fakeValue, damageValue, parentUID, targetKnownCellId;
     public short cellId,oldCell;
-    public boolean isReflect, isPoison, isCAC, isTrap, isReturnedDamages;
+    public boolean isReflect, isPoison, isCAC, isTrap, isGlyph, isReturnedDamages;
     public double chance;
     public SpellLevel spellLevel;
     public Fighter caster;

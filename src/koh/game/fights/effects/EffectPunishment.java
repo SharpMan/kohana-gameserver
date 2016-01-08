@@ -83,6 +83,10 @@ public class EffectPunishment extends EffectBase {
         }
         damageJet.setValue((double) castInfos.caster.getLife() * num1 * (double) castInfos.randomJet(target) / 100.0);
 
+        if(castInfos.caster.hasState(FightStateEnum.Pacifiste.value) && !castInfos.isGlyph){
+            damageJet.setValue(0);
+        }
+
         // Calcul resistances
         target.calculReduceDamages(DAMAGE_NEUTRAL, damageJet);
         // Reduction des dommages grace a l'armure

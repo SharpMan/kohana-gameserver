@@ -5,9 +5,12 @@
  */
 package koh.game.fights.effects;
 
+import koh.game.dao.DAO;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffStats;
+import koh.game.fights.effects.buff.BuffStatsByHit;
 import koh.game.fights.fighters.IllusionFighter;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  *
@@ -15,14 +18,22 @@ import koh.game.fights.fighters.IllusionFighter;
  */
 public class EffectStats extends EffectBase {
 
+    private static final int[] BLACKLISTED_EFFECTS = DAO.getSettings().getIntArray("Effect.BlacklistedByTriggers");
+
     @Override
     public int applyEffect(EffectCast CastInfos) {
         for (Fighter Target : CastInfos.targets) {
             if(Target instanceof IllusionFighter){
                 continue;//Roulette tue clone ...
             }
-            EffectCast SubInfos = new EffectCast(CastInfos.effectType, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, CastInfos.effect, CastInfos.caster, CastInfos.targets,CastInfos.spellLevel);
-            BuffStats BuffStats = new BuffStats(SubInfos, Target);
+            EffectCast subInfos = new EffectCast(CastInfos.effectType, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, CastInfos.effect, CastInfos.caster, CastInfos.targets,CastInfos.spellLevel);
+
+            if(ArrayUtils.contains(BLACKLISTED_EFFECTS,CastInfos.effect.effectUid)){ //Feca special spell
+                Target.getBuff().addBuff(new BuffStatsByHit(subInfos, Target));
+                return -1;
+            }
+
+            BuffStats BuffStats = new BuffStats(subInfos, Target);
             if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
