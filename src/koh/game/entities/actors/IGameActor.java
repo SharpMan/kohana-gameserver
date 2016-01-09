@@ -1,54 +1,66 @@
 package koh.game.entities.actors;
 
-import koh.game.dao.MapDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.DofusMap;
+import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
 import koh.protocol.types.game.context.EntityDispositionInformations;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayActorInformations;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author Neo-Craft
- */
+ * No refactor for the moment to many problems */
 public abstract class IGameActor {
 
-    public int ID;
+    @Getter
+    @Setter
+    protected int ID;
+    @Getter
+    protected volatile DofusCell cell;
+    @Getter
+    @Setter
+    protected int mapid;
 
-    public volatile DofusCell Cell;
+    @Setter
+    protected EntityLook entityLook;
 
-    public int Mapid;
+    protected abstract EntityLook getEntityLook();
 
-    public EntityLook entityLook;
+    @Getter @Setter
+    protected byte direction = 1;
 
-    public abstract EntityLook GetEntityLook();
-
-    public byte Direction = 1;
+    public void setActorCell(DofusCell cell){
+        this.cell = cell;
+    }
 
     public DofusMap getDofusMap() {
-        return MapDAO.Cache.get(this.Mapid);
+        return DAO.getMaps().findTemplate(this.mapid);
     }
 
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameRolePlayActorInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character));
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameRolePlayActorInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character));
     }
 
-    public boolean CanBeSee(IGameActor Actor) {
-        //Todo: Player Invisibile ?
+    public boolean canBeSeen(IGameActor Actor) {
         return true;
     }
 
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
         if (this instanceof Player) {
-            ((Player) this).Send(Packet);
+            ((Player) this).send(Packet);
         }
     }
 
-    public EntityDispositionInformations GetEntityDispositionInformations(Player character) {
-        return new EntityDispositionInformations(this.Cell.Id, Direction);
+
+    public EntityDispositionInformations getEntityDispositionInformations(Player character) {
+        return new EntityDispositionInformations(this.cell.getId(), direction);
     }
 
-    //public DirectionsEnum Direction;
+    //public DirectionsEnum direction;
 }

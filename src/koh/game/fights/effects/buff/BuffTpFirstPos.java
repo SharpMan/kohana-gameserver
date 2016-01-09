@@ -1,13 +1,11 @@
 package koh.game.fights.effects.buff;
 
-import koh.game.entities.environments.Pathfinder;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
-import koh.game.fights.effects.EffectPush;
+
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_TELEPORT_ON_SAME_MAP;
 import koh.protocol.client.enums.FightDispellableEnum;
-import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMapMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
@@ -24,16 +22,16 @@ public class BuffTpFirstPos extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (Target.previousFirstCellPos.isEmpty()) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        if (target.getPreviousFirstCellPos().isEmpty()) {
             return -1;
         }
-        FightCell cell = Target.Fight.GetCell(Target.previousFirstCellPos.get(Target.previousFirstCellPos.size() - 1));
+        FightCell cell = target.getFight().getCell(target.getPreviousFirstCellPos().get(target.getPreviousFirstCellPos().size() - 1));
 
-        if (cell != null) {
-            Target.Fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, Target.ID, cell.Id));
+        if (cell != null && cell.canWalk()) {
+            target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), target.getID(), cell.Id));
 
-            return Target.SetCell(cell);
+            return target.setCell(cell);
         }
 
         return -1;
@@ -41,7 +39,7 @@ public class BuffTpFirstPos extends BuffEffect {
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.castInfos.effect.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) this.castInfos.effect.delay);
     }
 }

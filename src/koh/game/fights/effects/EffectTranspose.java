@@ -3,47 +3,53 @@ package koh.game.fights.effects;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.StaticFighter;
-import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
 
+import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
+
 /**
- *
  * @author Neo-Craft
  */
 public class EffectTranspose extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.States.HasState(FightStateEnum.Porté) && !target.States.HasState(FightStateEnum.Inébranlable) && !target.States.HasState(FightStateEnum.Enraciné) && !target.States.HasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
-            if (CastInfos.SpellId == 445) {
-                if (Target.Team == CastInfos.Caster.Team) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter target : castInfos.targets.stream()
+                .filter(fr -> !(fr instanceof StaticFighter)
+                        && !fr.getStates().hasState(FightStateEnum.PORTÉ)
+                        && !fr.getStates().hasState(FightStateEnum.Inébranlable)
+                        && !fr.getStates().hasState(FightStateEnum.Enraciné)
+                        && !fr.getStates().hasState(FightStateEnum.Indéplaçable))
+                .toArray(Fighter[]::new)) {
+            if (castInfos.spellId == 445) {
+                if (target.getTeam() == castInfos.caster.getTeam()) {
                     continue;
                 }
-            } else if (CastInfos.SpellId == 438) {
-                if (Target.Team != CastInfos.Caster.Team) {
+            } else if (castInfos.spellId == 438) {
+                if (target.getTeam() != castInfos.caster.getTeam()) {
                     continue;
                 }
             }
-            FightCell CasterCell = CastInfos.Caster.myCell, TargetCell = Target.myCell;
-            CastInfos.Caster.Fight.sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, CastInfos.Caster.ID, Target.ID, Target.CellId(), CastInfos.Caster.CellId()));
-            CastInfos.Caster.SetCell(null);
-            Target.SetCell(null);
+            FightCell CasterCell = castInfos.caster.getMyCell(), TargetCell = target.getMyCell();
+            castInfos.caster.getFight().sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, castInfos.caster.getID(), target.getID(), target.getCellId(), castInfos.caster.getCellId()));
+            castInfos.caster.setCell(null);
+            target.setCell(null);
 
-            if (CastInfos.Caster.SetCell(TargetCell, false) == -3 || Target.SetCell(CasterCell, false) == -3) {
+            if (castInfos.caster.setCell(TargetCell, false) == -3 || target.setCell(CasterCell, false) == -3) {
                 return -3;
             }
 
             //Separated for false Sync wih piège call pushBackEffect
-            if (CastInfos.Caster.OnCellChanged() == -3 || Target.OnCellChanged() == -3) {
+            if (castInfos.caster.onCellChanged() == -3 || target.onCellChanged() == -3) {
                 return -3;
             }
 
-            int Result = CastInfos.Caster.myCell.onObjectAdded(CastInfos.Caster);
+            int Result = castInfos.caster.getMyCell().onObjectAdded(castInfos.caster);
             if (Result == -3) {
                 return Result;
             }
-            Result = Target.myCell.onObjectAdded(Target);
+            Result = target.getMyCell().onObjectAdded(target);
             if (Result == -3) {
                 return Result;
             }

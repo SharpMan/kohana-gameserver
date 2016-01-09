@@ -11,24 +11,24 @@ import koh.utils.Couple;
  */
 public class PlayerInst {
 
-    public Map<Integer, Couple<Long, Integer>> myVictims = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
+    public Map<Integer, Couple<Long, Integer>> myVictimsById = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
     public Map<String, Couple<Long, Integer>> myVictimIPS = Collections.synchronizedMap(new HashMap<String, Couple<Long, Integer>>());
-    public Map<Integer, Couple<Long, Integer>> VictimsBy = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
-    public Map<String, Couple<Long, Integer>> VictimByIPS = Collections.synchronizedMap(new HashMap<String, Couple<Long, Integer>>());
+    public Map<Integer, Couple<Long, Integer>> victimsById = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
+    public Map<String, Couple<Long, Integer>> victimByIPS = Collections.synchronizedMap(new HashMap<String, Couple<Long, Integer>>());
 
-    public Map<Integer, Couple<Long, Integer>> VictimeKoli = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
+    public Map<Integer, Couple<Long, Integer>> kolizeumVictims = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
     public long mutedTime;
 
-    public static Map<Integer, PlayerInst> PProperties = Collections.synchronizedMap(new HashMap<Integer, PlayerInst>());
+    public static final Map<Integer, PlayerInst> P_PROPERTIES = Collections.synchronizedMap(new HashMap<Integer, PlayerInst>());
 
-    public void Clear() {
+    public void clear() {
         try {
-            this.myVictims.clear();
+            this.myVictimsById.clear();
             this.myVictimIPS.clear();
-            this.VictimeKoli.clear();
-            this.VictimsBy = null;
-            this.VictimByIPS = null;
-            this.VictimeKoli = null;
+            this.kolizeumVictims.clear();
+            this.victimsById = null;
+            this.victimByIPS = null;
+            this.kolizeumVictims = null;
             this.finalize();
         } catch (Throwable ex) {
         }

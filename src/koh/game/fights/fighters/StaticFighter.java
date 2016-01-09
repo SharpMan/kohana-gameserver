@@ -1,20 +1,10 @@
 package koh.game.fights.fighters;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import koh.game.dao.SpellDAO;
 import koh.game.entities.mob.MonsterGrade;
-import koh.game.entities.spells.EffectInstanceDice;
-import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
-import koh.game.fights.effects.EffectBase;
-import koh.game.fights.effects.EffectCast;
-import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
-import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
-import koh.utils.Couple;
+import lombok.Getter;
 
 /**
  *
@@ -22,39 +12,40 @@ import koh.utils.Couple;
  */
 public abstract class StaticFighter extends Fighter {
 
-    public MonsterGrade Grade;
+    @Getter
+    protected MonsterGrade grade;
 
     public StaticFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
         super(Fight, Summoner);
     }
     
-    public void AdjustStats() {
-        this.Stats.AddBase(StatsEnum.Vitality, (short) ((double) this.Stats.GetEffect(StatsEnum.Vitality).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.AddBase(StatsEnum.Intelligence, (short) ((double) this.Stats.GetEffect(StatsEnum.Intelligence).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.AddBase(StatsEnum.Chance, (short) ((double) this.Stats.GetEffect(StatsEnum.Chance).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.AddBase(StatsEnum.Strength, (short) ((double) this.Stats.GetEffect(StatsEnum.Strength).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.AddBase(StatsEnum.Agility, (short) ((double) this.Stats.GetEffect(StatsEnum.Agility).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
-        this.Stats.AddBase(StatsEnum.Wisdom, (short) ((double) this.Stats.GetEffect(StatsEnum.Wisdom).Base * (1.0 + (double) this.Summoner.Level() / 100.0)));
+    public void adjustStats() {
+        this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.AGILITY, (short) ((double) this.stats.getEffect(StatsEnum.AGILITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.WISDOM, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
     }
 
     @Override
-    public int MaxAP() {
+    public int getMaxAP() {
         return 0;
     }
 
     @Override
-    public int MaxMP() {
+    public int getMaxMP() {
         return 0;
     }
 
     @Override
-    public int AP() {
+    public int getAP() {
         return 0;
 
     }
 
     @Override
-    public int MP() {
+    public int getMP() {
         return 0;
     }
 
@@ -62,18 +53,23 @@ public abstract class StaticFighter extends Fighter {
 
     public void onBeginTurn() {
         if (firstTurn) {
-            this.Fight.AffectSpellTo(this, this, this.Grade.Grade, this.Grade.Monster().spells);
+            this.fight.affectSpellTo(this, this, this.grade.getGrade(), this.grade.getMonster().getSpells());
             this.firstTurn = false;
         }
     }
 
     @Override
-    public int compareTo(IFightObject obj) {
-        return Priority().compareTo(obj.Priority());
+    protected double getTacklePercent(Fighter tackler){
+        return 0;
     }
 
     @Override
-    public FightObjectType ObjectType() {
+    public int compareTo(IFightObject obj) {
+        return getPriority().compareTo(obj.getPriority());
+    }
+
+    @Override
+    public FightObjectType getObjectType() {
         return FightObjectType.OBJECT_STATIC;
     }
 

@@ -1,33 +1,38 @@
 package koh.game.entities.actors.npc;
 
 import com.google.common.primitives.Ints;
-import java.util.ArrayList;
+
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
 import koh.look.EntityLookParser;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeStartOkNpcShopMessage;
 import koh.protocol.types.game.data.items.ObjectItemToSellInNpcShop;
 import koh.protocol.types.game.look.EntityLook;
-import koh.utils.Couple;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  *
  * @author Neo-Craft
  */
+@Builder
 public class NpcTemplate {
 
-    public int Id;
-    public String Name;
-    public int[][] dialogMessages, dialogReplies;
-    public int[] actions;
-    public int gender;
-    public String look;
-    public boolean fastAnimsFun, OrderItemsByPrice, OrderItemsByLevel;
-    public Map<Integer, NpcItem> Items;
+    @Getter
+    private int id;
+    private String name;
+    private int[][] dialogMessages, dialogReplies;
+    @Getter
+    private int[] actions;
+    private int gender;
+    private String look;
+    private boolean fastAnimsFun, orderItemsByPrice, orderItemsByLevel;
+    @Getter @Setter
+    private Map<Integer, NpcItem> Items;
 
-    public int[] GetReply(int id) {
+    public int[] getReply(int id) {
         try {
             return this.dialogReplies[id];
         } catch (Exception e) {
@@ -35,7 +40,7 @@ public class NpcTemplate {
         }
     }
 
-    public int GetMessageOffset(int Message) {
+    public int getMessageOffset(int Message) {
         for (int i = 0; i < this.dialogMessages.length; i++) {
             if (Ints.contains(this.dialogMessages[i], Message)) {
                 //return Ints.indexOf(i, Message);
@@ -45,7 +50,7 @@ public class NpcTemplate {
         return -1;
     }
 
-    private ObjectItemToSellInNpcShop[] ItemList = null;
+    private ObjectItemToSellInNpcShop[] itemList = null;
 
     public static <T> Comparator<T> Compose(
             final Comparator<? super T> primary,
@@ -57,26 +62,26 @@ public class NpcTemplate {
         };
     }
 
-    public ObjectItemToSellInNpcShop[] GetItems() {
-        if (ItemList == null) {
+    public ObjectItemToSellInNpcShop[] getItems$Array() {
+        if (itemList == null) {
             if (Items == null) {
-                ItemList = new ObjectItemToSellInNpcShop[0];
+                itemList = new ObjectItemToSellInNpcShop[0];
             } else {
                 Stream<NpcItem> Objects = this.Items.values().stream();
-                if (this.Id == 816) {
-                    Objects = Objects.filter(Item -> Item.Template().level > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.Template().TypeId, e2.Template().TypeId)), ((e1, e2) -> Integer.compare(e1.Template().level, e2.Template().level))));
+                if (this.id == 816) {
+                    Objects = Objects.filter(Item -> Item.getTemplate().getLevel() > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().getTypeId(), e2.getTemplate().getTypeId())), ((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()))));
                 }
-                if (this.OrderItemsByPrice) {
-                    Objects = Objects.sorted((e1, e2) -> Float.compare(e1.Price(), e2.Price()));
+                if (this.orderItemsByPrice) {
+                    Objects = Objects.sorted((e1, e2) -> Float.compare(e1.getPrice(), e2.getPrice()));
                 }
-                if (this.OrderItemsByLevel) {
-                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.Template().level, e2.Template().level));
+                if (this.orderItemsByLevel) {
+                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()));
                 }
 
-                ItemList = Objects.map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);
+                itemList = Objects.map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);
             }
         }
-        return ItemList;
+        return itemList;
     }
 
     public int getDialogMessage(int id, int pos) {
@@ -92,15 +97,15 @@ public class NpcTemplate {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    public int CommonTokenId() {
+    public int getCommonTokenId() {
         if (Items == null) {
             return 0;
         }
-        return this.Items.values().stream().findFirst().get().Token;
+        return this.Items.values().stream().findFirst().get().getToken();
 
     }
 
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         return EntityLookParser.fromString(this.look);
     }
 

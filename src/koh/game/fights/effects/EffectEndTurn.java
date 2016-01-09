@@ -10,9 +10,9 @@ import koh.game.fights.effects.buff.BuffEndTurn;
 public class EffectEndTurn extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffEndTurn(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            Target.getBuff().addBuff(new BuffEndTurn(castInfos, Target));
         }
 
         return -1;

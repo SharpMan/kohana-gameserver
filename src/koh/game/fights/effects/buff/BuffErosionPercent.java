@@ -20,25 +20,25 @@ public class BuffErosionPercent extends BuffEffect {
     public int Added, Jet;
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        this.Jet = this.CastInfos.RandomJet(Target);
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        this.Jet = this.castInfos.randomJet(target);
         float pdamage = Jet / 100.00f;
-        if (this.Target.MaxLife() - (int) (this.Target.MaxLife() * pdamage) > 0) {
-            Added = (int) (this.Target.MaxLife() * pdamage);
+        if (this.target.getMaxLife() - (int) (this.target.getMaxLife() * pdamage) > 0) {
+            Added = (int) (this.target.getMaxLife() * pdamage);
         }
-        this.Target.setLifeMax(this.Target.MaxLife() - Added);
+        this.target.setLifeMax(this.target.getMaxLife() - Added);
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public int RemoveEffect() {
-        this.Target.setLifeMax(this.Target.MaxLife() + Added);
-        return super.RemoveEffect();
+    public int removeEffect() {
+        this.target.setLifeMax(this.target.getMaxLife() + Added);
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(Jet));
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(Jet));
     }
 }

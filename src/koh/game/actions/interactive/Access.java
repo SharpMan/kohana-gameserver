@@ -1,16 +1,9 @@
 package koh.game.actions.interactive;
 
-import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameExchange;
-import koh.game.controllers.PlayerController;
-import koh.game.dao.MapDAO;
 import koh.game.entities.actors.Player;
 import koh.game.exchange.MountExchange;
-import koh.game.exchange.NpcExchange;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeMountsStableAddMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeStartOkNpcShopMessage;
-import koh.protocol.types.game.mount.MountClientData;
 
 /**
  *
@@ -19,34 +12,34 @@ import koh.protocol.types.game.mount.MountClientData;
 public class Access implements InteractiveAction {
 
     @Override
-    public boolean isEnabled(Player Actor) {
+    public boolean isEnabled(Player actor) {
         return true; //Todo Private Enclos
     }
 
     @Override
-    public int GetDuration() {
+    public int getDuration() {
         return 0;
     }
 
     @Override
-    public void Execute(Player Actor, int Element) {
-        if (!this.isEnabled(Actor)) {
-            Actor.Send(new BasicNoOperationMessage());
+    public void execute(Player actor, int element) {
+        if (!this.isEnabled(actor)) {
+            actor.send(new BasicNoOperationMessage());
             return;
         }
 
-        Actor.Client.myExchange = new MountExchange(Actor.Client);
-        Actor.Client.AddGameAction(new GameExchange(Actor, Actor.Client.myExchange));
+        actor.getClient().setMyExchange(new MountExchange(actor.getClient()));
+        actor.getClient().addGameAction(new GameExchange(actor, actor.getClient().getMyExchange()));
 
     }
 
     @Override
-    public void Leave(Player Actor, int Element) {
+    public void leave(Player player, int element) {
 
     }
 
     @Override
-    public void Abort(Player player, int Element) {
+    public void abort(Player player, int element) {
 
     }
 

@@ -2,9 +2,8 @@ package koh.game.fights.fighters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import koh.game.Main;
-import koh.game.dao.SpellDAO;
+
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
@@ -16,7 +15,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectActivableObject;
 import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.layer.FightBomb;
+import koh.game.fights.layers.FightBomb;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.SpellShapeEnum;
@@ -30,6 +29,8 @@ import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import koh.protocol.types.game.look.EntityLook;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -37,66 +38,70 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BombFighter extends StaticFighter {
 
+
+    private static final Logger logger = LogManager.getLogger(BombFighter.class);
     public BombFighter(Fight Fight, Fighter Summoner, MonsterGrade Monster) {
         super(Fight, Summoner);
-        this.Grade = Monster;
-        super.InitFighter(this.Grade.GetStats(), Fight.GetNextContextualId());
-        this.entityLook = EntityLookParser.Copy(this.Grade.Monster().GetEntityLook());
-        super.AdjustStats();
-        super.setLife(this.Life());
-        super.setLifeMax(this.MaxLife());
+        this.grade = Monster;
+        super.initFighter(this.grade.getStats(), Fight.getNextContextualId());
+        this.entityLook = EntityLookParser.Copy(this.grade.getMonster().getEntityLook());
+        this.adjustStats();
+        this.stats.merge(this.summoner.getStats());
+        this.stats.unMerge(StatsEnum.VITALITY,this.summoner.getStats().getEffect(StatsEnum.VITALITY));
+        super.setLife(this.getLife());
+        super.setLifeMax(this.getMaxLife());
     }
 
     @Override
-    public void CalculDamages(StatsEnum Effect, MutableInt Jet) {
-        switch (Effect) {
-            case Damage_Earth:
-            case Steal_Earth:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100 + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Earth_Damages_Bonus)));
+    public void computeDamages(StatsEnum effect, MutableInt jet) {
+        switch (effect) {
+            case DAMAGE_EARTH:
+            case STEAL_EARTH:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
                 break;
-            case Damage_Neutral:
-            case Steal_Neutral:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Strength) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamagePhysic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Neutral_Damages_Bonus)));
-                break;
-
-            case Damage_Fire:
-            case Steal_Fire:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Intelligence) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Fire_Damages_Bonus)));
+            case DAMAGE_NEUTRAL:
+            case STEAL_NEUTRAL:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)));
                 break;
 
-            case Damage_Air:
-            case Steal_Air:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Agility) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Air_Damages_Bonus)));
+            case DAMAGE_FIRE:
+            case STEAL_FIRE:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)));
                 break;
 
-            case Damage_Water:
-            case Steal_Water:
-                Jet.setValue((int) Math.floor(Jet.doubleValue() * (100 + this.Stats.GetTotal(StatsEnum.Chance) + this.Stats.GetTotal(StatsEnum.Combo_Dammages)) / 100
-                        + this.Stats.GetTotal(StatsEnum.AddDamageMagic) + this.Stats.GetTotal(StatsEnum.AllDamagesBonus) + this.Stats.GetTotal(StatsEnum.Add_Water_Damages_Bonus)));
+            case DAMAGE_AIR:
+            case STEAL_AIR:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)));
+                break;
+
+            case DAMAGE_WATER:
+            case STEAL_WATER:
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
                 break;
         }
     }
 
-    public boolean Boosted = false;
+    public boolean boosted = false;
 
-    public synchronized void SlefMurder(int Caster) {
-        if (Boosted) {
+    public synchronized void selfMurder(int Caster) {
+        if (boosted) {
             return;
         }
         int TotalCombo = 0;
         ArrayList<BombFighter> Targets = new ArrayList<>(6);
-        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.CellId()).advancedOrientationTo(MapPoint.fromCellId(this.CellId()), true), this.Fight.Map)).GetCells(this.CellId())) {
-            FightCell FightCell = Fight.GetCell(aCell);
+        for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.getCellId()).advancedOrientationTo(MapPoint.fromCellId(this.getCellId()), true), this.fight.getMap())).getCells(this.getCellId())) {
+            FightCell FightCell = fight.getCell(aCell);
             if (FightCell != null) {
-                if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
-                    for (Fighter Target : FightCell.GetObjectsAsFighter()) {
-                        if (Target.ID == this.ID) {
+                if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
+                    for (Fighter Target : FightCell.getObjectsAsFighter()) {
+                        if (Target.getID() == this.ID) {
                             continue;
                         }
-                        if (Target instanceof BombFighter /*&& ((BombFighter) Target).Grade.monsterId == this.Grade.monsterId*/ && ((BombFighter) Target).Summoner == this.Summoner && !((BombFighter) Target).Boosted) {
+                        if (Target instanceof BombFighter /*&& ((BombFighter) target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).boosted) {
                             Targets.add((BombFighter) Target);
                             TotalCombo += 40;
                         }
@@ -107,36 +112,36 @@ public class BombFighter extends StaticFighter {
         if (TotalCombo == 0) {
             return;
         }
-        Fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
-        Stats.AddBoost(StatsEnum.Combo_Dammages, TotalCombo);
-        this.Boosted = true;
-        for (Fighter Bomb : Targets) {
-            Bomb.Stats.AddBoost(StatsEnum.Combo_Dammages, TotalCombo);
-            Boosted = true;
+        fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
+        stats.addBoost(StatsEnum.COMBO_DAMMAGES, TotalCombo);
+        this.boosted = true;
+        for (Fighter bomb : Targets) {
+            bomb.getStats().addBoost(StatsEnum.COMBO_DAMMAGES, TotalCombo);
+            boosted = true;
         }
-        Targets.forEach(Bomb -> Bomb.TryDie(Caster, true));
+        Targets.forEach(Bomb -> Bomb.tryDie(Caster, true));
     }
 
     @Override
-    public int TryDie(int CasterId, boolean force) {
-        if (this.Life() <= 0 && !force) {
-            if (this.Buffs.GetAllBuffs().anyMatch(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE)) {
-                return this.Buffs.GetAllBuffs().filter(x -> x.ActiveType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().ApplyEffect(null, null);
+    public int tryDie(int casterId, boolean force) {
+        if (this.getLife() <= 0 && !force) {
+            if (this.buff.getAllBuffs().anyMatch(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE)) {
+                return this.buff.getAllBuffs().filter(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().applyEffect(null, null);
             } else {
                 if (this.FightBombs != null) {
-                    this.FightBombs.forEach(Bomb -> Bomb.Remove());
+                    this.FightBombs.forEach(Bomb -> Bomb.remove());
                 }
-                return super.TryDie(CasterId, force);
+                return super.tryDie(casterId, force);
             }
         }
-        if (this.Life() <= 0 || force) {
-            SlefMurder(CasterId);
-            Fight.LaunchSpell(this, SpellDAO.Spells.get(SpellDAO.Bombs.get(this.Grade.monsterId).explodSpellId).SpellLevel(this.Grade.Grade), this.CellId(), true, true, false);
+        if (this.getLife() <= 0 || force) {
+            selfMurder(casterId);
+            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false);
             if (this.FightBombs != null) {
-                this.FightBombs.forEach(Bomb -> Bomb.Remove());
+                this.FightBombs.forEach(Bomb -> Bomb.remove());
             }
         }
-        return super.TryDie(CasterId, force);
+        return super.tryDie(casterId, force);
     }
 
     public ArrayList<FightBomb> FightBombs;
@@ -149,75 +154,75 @@ public class BombFighter extends StaticFighter {
     }
 
     @Override
-    public int OnCellChanged() {
+    public int onCellChanged() {
         if (this.myCell != null) {
-            if (this.Dead()) {
+            if (this.isDead()) {
                 return -2;
             }
             if (this.FightBombs != null) {
-                this.FightBombs.forEach(Bomb -> Bomb.Remove());
+                this.FightBombs.forEach(Bomb -> Bomb.remove());
             }
-            if (this.myCell.HasGameObject(FightObjectType.OBJECT_BOMB)) {
-                Arrays.stream(this.myCell.GetObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).Remove());
+            if (this.myCell.hasGameObject(FightObjectType.OBJECT_BOMB)) {
+                Arrays.stream(this.myCell.getObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
             Short[] Cells;
-            for (Fighter Friend : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.Summoner == this.Summoner && Pathfinder.InLine(null, this.CellId(), Fighter.CellId()) && this.Grade.monsterId == ((BombFighter) Fighter).Grade.monsterId)::iterator) {
-                int Distance = Pathfinder.GoalDistance(null, CellId(), Friend.CellId());
-                Main.Logs().writeDebug("Distance = " + Distance);
+            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
+                int Distance = Pathfinder.getGoalDistance(null, getCellId(), Friend.getCellId());
+                logger.debug("Bomb Distance = {}" , Distance);
                 if (Distance >= 2 && Distance <= 7) {
-                    Cells = Pathfinder.GetLineCellsBetweenBomb(Fight, this.CellId(), Pathfinder.GetDirection(null, this.CellId(), Friend.CellId()), Friend.CellId(), false);
+                    Cells = Pathfinder.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfinder.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
                     if (Cells != null) {
-                        Cells = (Short[]) ArrayUtils.removeElement(Cells, this.CellId());
-                        Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.CellId());
-                        FightBomb Bomb = new FightBomb(this.Summoner, SpellDAO.Spells.get(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId).SpellLevel(this.Grade.Grade), EffectActivableObject.GetColor(SpellDAO.Bombs.get(Grade.monsterId).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
-                        Fight.AddActivableObject(this.Summoner, Bomb);
+                        Cells = (Short[]) ArrayUtils.removeElement(Cells, this.getCellId());
+                        Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.getCellId());
+                        FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                        fight.addActivableObject(this, Bomb);
                     }
                 }
             }
 
-            return this.Buffs.EndMove();
+            return this.buff.endMove();
         }
         return -1;
     }
 
     @Override
-    public int BeginTurn() {
+    public int beginTurn() {
         super.onBeginTurn();
-        return super.BeginTurn();
+        return super.beginTurn();
     }
 
     @Override
-    public int Level() {
-        return this.Grade.Level;
+    public int getLevel() {
+        return this.grade.getLevel();
     }
 
     @Override
-    public short MapCell() {
+    public short getMapCell() {
         return 0;
     }
 
     @Override
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameFightMonsterInformations(this.ID, this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Grade.monsterId, this.Grade.Grade);
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameFightMonsterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.grade.getMonsterId(), this.grade.getGrade());
     }
 
     @Override
-    public FightTeamMemberInformations GetFightTeamMemberInformations() {
-        return new FightTeamMemberMonsterInformations(this.ID, this.Grade.monsterId, this.Grade.Grade);
+    public FightTeamMemberInformations getFightTeamMemberInformations() {
+        return new FightTeamMemberMonsterInformations(this.ID, this.grade.getMonsterId(), this.grade.getGrade());
     }
 
     @Override
-    public void Send(Message Packet) {
-
-    }
-
-    @Override
-    public void JoinFight() {
+    public void send(Message Packet) {
 
     }
 
     @Override
-    public EntityLook GetEntityLook() {
+    public void joinFight() {
+
+    }
+
+    @Override
+    public EntityLook getEntityLook() {
         return this.entityLook;
     }
 

@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
 import koh.game.fights.IFightObject;
-import koh.game.fights.layer.FightPortal;
+import koh.game.fights.layers.FightPortal;
 
 /**
  *
@@ -10,9 +10,9 @@ import koh.game.fights.layer.FightPortal;
 public class EffectDisablePortal extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        if (CastInfos.Cell().HasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
-            ((FightPortal) (CastInfos.Cell().GetObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).Disable(CastInfos.Caster);
+    public int applyEffect(EffectCast castInfos) {
+        if (castInfos.getCell().hasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
+            ((FightPortal) (castInfos.getCell().getObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).disable(castInfos.caster);
         }
         return -1;
     }

@@ -10,23 +10,23 @@ import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
  */
 public class BuffReflectSpell extends BuffEffect {
 
-    public byte ReflectLevel = 0;
+    public byte reflectLevel = 0;
 
     public BuffReflectSpell(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
-        this.ReflectLevel = CastInfos.SpellLevel.grade;
-        this.Target.States.AddState(this);
+        this.reflectLevel = CastInfos.spellLevel.getGrade();
+        this.target.getStates().addState(this);
     }
 
     @Override
-    public int RemoveEffect() {
-        this.Target.States.DelState(this);
+    public int removeEffect() {
+        this.target.getStates().delState(this);
 
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

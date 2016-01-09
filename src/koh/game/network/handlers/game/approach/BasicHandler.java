@@ -1,6 +1,6 @@
 package koh.game.network.handlers.game.approach;
 
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
@@ -16,33 +16,34 @@ import koh.protocol.types.game.social.AbstractSocialGroupInfos;
 public class BasicHandler {
 
     @HandlerAttribute(ID = BasicWhoIsRequestMessage.MESSAGE_ID)
-    public static void HandleBasicWhoIsRequestMessage(WorldClient Client, BasicWhoIsRequestMessage Message) {
-        Player Shearch = PlayerDAO.GetCharacter(Message.search.toLowerCase());
-        if (Shearch == null) {
-            Client.Send(new BasicWhoIsNoMatchMessage(Message.search));
+    public static void HandleBasicWhoIsRequestMessage(WorldClient Client, BasicWhoIsRequestMessage message) {
+        //TODO: Maybe anti flood
+        Player victim = DAO.getPlayers().getCharacter(message.search.toLowerCase());
+        if (victim == null) {
+            Client.send(new BasicWhoIsNoMatchMessage(message.search));
             return;
         }
         /*AlianceInfo GuildInfo */
         // TODO AreaID;
 
-        Client.Send(new BasicWhoIsMessage(Message.search.equals(Shearch.NickName), Shearch.Account.Right, Shearch.Account.NickName, Shearch.Account.ID, Shearch.NickName, Shearch.ID, (short) 0, new AbstractSocialGroupInfos[0], Message.verbose, Shearch.Status.value()));
+        Client.send(new BasicWhoIsMessage(message.search.equals(victim.getNickName()), victim.getAccount().right, victim.getAccount().nickName, victim.getAccount().id, victim.getNickName(), victim.getID(), (short) 0, new AbstractSocialGroupInfos[0], message.verbose, victim.getStatus().value()));
     }
 
     @HandlerAttribute(ID = BasicLatencyStatsMessage.MESSAGE_ID)
     public static void HandleBasicLatencyStatsMessage(WorldClient Client, BasicLatencyStatsMessage Message) {
-        Client.Latency = Message;
-        if (Client.CallBacks != null) {
-            Client.CallBacks.first.sendToField(Client.CallBacks.second);
-            Client.CallBacks.Clear();
-            Client.CallBacks = null;
+        Client.setLatency(Message);
+        if (Client.getCallBacks() != null) {
+            Client.getCallBacks().first.sendToField(Client.getCallBacks().second);
+            Client.getCallBacks().Clear();
+            Client.setCallBacks(null);
         }
-        Client.SequenceMessage();
+        Client.sequenceMessage();
     }
 
     @HandlerAttribute(ID = BasicStatMessage.MESSAGE_ID)
     public static void HandleBasicStatMessage(WorldClient Client, Message Message) {
         //Todo Switch StatisticTypeEnum
-        Client.SequenceMessage(new BasicNoOperationMessage());
+        Client.sequenceMessage(new BasicNoOperationMessage());
     }
 
 }

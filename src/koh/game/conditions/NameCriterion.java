@@ -18,11 +18,11 @@ public class NameCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Name = this.Literal;
+        this.Name = this.literal;
     }
 
     @Override
-    public boolean Eval(Player character) {
-        return this.Compare(character.NickName, this.Name);
+    public boolean eval(Player character) {
+        return this.Compare(character.getNickName(), this.Name);
     }
 }

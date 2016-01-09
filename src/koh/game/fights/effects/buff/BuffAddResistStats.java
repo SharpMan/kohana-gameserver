@@ -22,31 +22,31 @@ public class BuffAddResistStats extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
 
-        this.Value1 = CastInfos.RandomJet(Target);
+        this.Value1 = castInfos.randomJet(target);
 
-        this.Target.Stats.AddBoost(StatsEnum.WaterElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.FireElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.AirElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.EarthElementResistPercent, this.Value1);
-        this.Target.Stats.AddBoost(StatsEnum.NeutralElementResistPercent, this.Value1);
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        this.target.getStats().addBoost(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.AIR_ELEMENT_RESIST_PERCENT, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, this.Value1);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public int RemoveEffect() {
-        this.Target.Stats.GetEffect(StatsEnum.WaterElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.FireElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.AirElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.EarthElementResistPercent).additionnal -= this.Value1;
-        this.Target.Stats.GetEffect(StatsEnum.NeutralElementResistPercent).additionnal -= this.Value1;
+    public int removeEffect() {
+        this.target.getStats().getEffect(StatsEnum.WATER_ELEMENT_RESIST_PERCENT).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.AIR_ELEMENT_RESIST_PERCENT).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT).additionnal -= this.Value1;
 
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, this.IsDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Value1));
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.Value1));
     }
 }

@@ -10,9 +10,9 @@ import koh.game.fights.effects.buff.BuffReffoulage;
 public class EffectReffoulage extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-       for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffReffoulage(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+       for (Fighter Target : castInfos.targets) {
+            Target.getBuff().addBuff(new BuffReffoulage(castInfos, Target));
         }
 
         return -1;

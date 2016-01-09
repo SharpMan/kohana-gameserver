@@ -1,12 +1,15 @@
 package koh.game.entities;
 
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import koh.game.dao.AccountDataDAO;
+
+import koh.inter.messages.PlayerComingMessage;
 import koh.protocol.types.game.choice.CharacterBaseInformations;
+import lombok.Getter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -19,25 +22,36 @@ public class Account {
 
     }
 
-    public int ID;
-    public String NickName;
-    public byte Right;
-    public String SecretQuestion, SecretAnswer, LastIP,CurrentIP;
+    public Account(PlayerComingMessage message) {
+        id = message.accountId;
+        nickName = message.nickname;
+        right = message.rights;
+        secretQuestion = message.secretQuestion;
+        secretAnswer = message.secretAnswer;
+        lastIP = message.lastAddress;
+        last_login = message.lastLogin;
+    }
+
+    @Getter
+    public int id;
+    public String nickName;
+    public byte right;
+    public String secretQuestion, secretAnswer, lastIP, currentIP;
     public Timestamp last_login;
-    public ArrayList<Player> Characters;
-    public AccountData Data;
+    public ArrayList<Player> characters;
+    public AccountData accountData;
     public Player currentCharacter = null;
 
-    public List<CharacterBaseInformations> ToBaseInformations() {
-        return Characters.stream().map(x -> x.toBaseInformations()).collect(Collectors.toList());
+    public List<CharacterBaseInformations> toBaseInformations() {
+        return characters.stream().map(Player::toBaseInformations).collect(Collectors.toList());
     }
     
-    public Player GetPlayerInFight(){
-        return Characters.stream().filter(x -> x.GetFighter() != null).findAny().orElse(null);
+    public Player getPlayerInFight(){
+        return characters.stream().filter(x -> x.getFighter() != null).findAny().orElse(null);
     }
 
     public Player getPlayer(int id) {
-        return Characters.stream().filter(x -> x.ID == id).findFirst().get();
+        return characters.stream().filter(x -> x.getID() == id).findFirst().orElse(null);
     }
 
     public String toString() {
@@ -46,16 +60,16 @@ public class Account {
 
     public void continueClear() {
         try {
-            Data = null;
-            ID = 0;
-            NickName = null;
-            Right = 0;
-            SecretQuestion = null;
-            SecretAnswer = null;
-            LastIP = null;
+            accountData = null;
+            id = 0;
+            nickName = null;
+            right = 0;
+            secretQuestion = null;
+            secretAnswer = null;
+            lastIP = null;
             last_login = null;
-            Characters.clear();
-            Characters = null;
+            characters.clear();
+            characters = null;
             currentCharacter = null;
             this.finalize();
         } catch (Throwable tr) {
@@ -63,11 +77,11 @@ public class Account {
     }
 
     public void totalClear() {
-        if (this.Data != null && Data.ColumsToUpdate != null) {
-            if (Data.ColumsToUpdate != null) {
-                AccountDataDAO.Update(this.Data,this);
+        if (this.accountData != null && accountData.columsToUpdate != null) {
+            if (accountData.columsToUpdate != null) {
+                DAO.getAccountDatas().save(this.accountData,this);
             } else {
-                Data.totalClear(this);
+                accountData.totalClear(this);
             }
         } else {
             this.continueClear();

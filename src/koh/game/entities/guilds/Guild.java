@@ -3,17 +3,19 @@ package koh.game.entities.guilds;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
+
 import koh.game.Main;
-import koh.game.dao.ExpDAO;
-import koh.game.dao.GuildDAO;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
+import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.FieldNotification;
 import koh.game.entities.environments.IWorldEventObserver;
 import koh.game.network.ChatChannel;
-import koh.game.utils.Settings;
 import koh.protocol.client.enums.GuildRightsBitEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
@@ -28,6 +30,8 @@ import koh.protocol.types.game.guild.tax.TaxCollectorInformations;
 import koh.protocol.types.game.house.HouseInformationsForGuild;
 import koh.protocol.types.game.paddock.PaddockContentInformations;
 import koh.utils.Enumerable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -35,96 +39,97 @@ import koh.utils.Enumerable;
  */
 public class Guild extends IWorldEventObserver {
 
-    public volatile ChatChannel ChatChannel = new ChatChannel();
-    public Map<Integer, Player> Characters;
-    public Map<Integer, GuildMember> Members;
-    public GuildEntity Entity;
-    private GuildMember BossCache;
-    private GuildEmblem EmblemeCache;
-    public byte[] SpellLevel;
+    private static final Logger logger = LogManager.getLogger(Guild.class);
+
+    public volatile ChatChannel chatChannel = new ChatChannel();
+
+    private final Map<Integer, Player> characters = new ConcurrentHashMap<>();
+    private final Map<Integer, GuildMember> members = new ConcurrentHashMap<>();
+
+    public final GuildEntity entity;
+    private GuildMember bossCache;
+    private GuildEmblem emblemeCache;
+    public byte[] spellLevel;
 
     public Guild(GuildEntity Entity) {
-        this.Entity = Entity;
-        this.Members = Collections.synchronizedMap(new HashMap<>());
-        this.SpellLevel = Enumerable.StringToByteArray(Entity.Spells);
+        this.entity = Entity;
+        this.spellLevel = Enumerable.StringToByteArray(Entity.spells);
     }
 
-    public void onFighterAddedExperience(GuildMember Member, long XP) {
-        Member.AddExperience(XP);
-        this.Entity.AddExperience(XP);
-        while (this.Entity.Experience() >= ExpDAO.GetFloorByLevel(this.Entity.Level + 1).Guild && this.Entity.Level < Settings.GetIntElement("Max.GuildLevel")) {
-            this.Entity.Level++;
-            this.Entity.Boost += 5;
-            this.sendToField(new GuildLevelUpMessage(this.Entity.Level));
+    public void onFighterAddedExperience(GuildMember member, long XP) {
+        member.addExperience(XP);
+        this.entity.addExperience(XP);
+        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).getGuild() && this.entity.level < DAO.getSettings().getIntElement("Max.GuildLevel")) {
+            this.entity.level++;
+            this.entity.boost += 5;
+            this.sendToField(new GuildLevelUpMessage(this.entity.level));
         }
     }
 
-    public GuildMember GetBoss() {
-        if (this.BossCache == null) {
-            for (GuildMember GM : this.Members.values()) {
-                if (GM.isBoss()) {
-                    if (this.BossCache != null) {
-                        Main.Logs().writeError(String.format("There is at least two boss in guild {0} ({1}) BossSecond {3}", this.Entity.GuildID, this.Entity.Name, GM.Name));
-                    }
-                    this.BossCache = GM;
+    public GuildMember getBoss() {
+        if (this.bossCache == null) {
+            this.members.values().stream().filter(GuildMember::isBoss).forEach(GM -> {
+                if (this.bossCache != null) {
+                    logger.error("There is at least two boss in guild {0} ({1}) BossSecond {2}", this.entity.guildID, this.entity.name, GM.name);
                 }
-            }
-            if (this.BossCache == null) {
-                if (this.Members.isEmpty()) {
-                    throw new Error(String.format("Guild {0} ({1}) is empty", this.Entity.GuildID, this.Entity.Name));
+                this.bossCache = GM;
+            });
+            if (this.bossCache == null) {
+                if (this.members.isEmpty()) {
+                    throw new Error(String.format("guild {0} ({1}) is empty", this.entity.guildID, this.entity.name));
                 }
 
             }
         }
-        return this.BossCache;
+        return this.bossCache;
     }
 
-    public void SetBoss(GuildMember GuildMember) {
-        if (this.BossCache != GuildMember) {
-            if (this.BossCache != null) {
-                this.BossCache.Rank = 0;
-                this.BossCache.Rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
-                this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 199, new String[]{GuildMember.Name, this.BossCache.Name, this.Entity.Name}));
-                this.UpdateMember(this.BossCache);
+    public void setBoss(GuildMember GuildMember) {
+        if (this.bossCache != GuildMember) {
+            if (this.bossCache != null) {
+                this.bossCache.rank = 0;
+                this.bossCache.rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
+                this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 199, new String[]{GuildMember.name, this.bossCache.name, this.entity.name}));
+                this.updateMember(this.bossCache);
             }
-            this.BossCache = GuildMember;
-            this.BossCache.Rank = 1;
-            this.BossCache.Rights = GuildRightsBitEnum.GUILD_RIGHT_BOSS;
-            this.UpdateMember(GuildMember);
+            this.bossCache = GuildMember;
+            this.bossCache.rank = 1;
+            this.bossCache.rights = GuildRightsBitEnum.GUILD_RIGHT_BOSS;
+            this.updateMember(GuildMember);
         }
     }
 
-    public void addMember(GuildMember member, Player Client) {
-        this.Members.put(member.CharacterID, member);
-        Client.Guild = this;
-        Client.RefreshActor();
-        Client.Send(new GuildJoinedMessage(this.toGuildInformations(), member.Rights, true));
+    public void addMember(GuildMember member, Player client) {
+        this.members.put(member.characterID, member);
+        client.setGuild(this);
+        client.refreshActor();
+        client.send(new GuildJoinedMessage(this.toGuildInformations(), member.rights, true));
     }
 
-    public synchronized boolean ChangeParameters(Player modifier, GuildMember member, int rank, byte xpPercent, int rights) {
+    public synchronized boolean changeParameters(Player modifier, GuildMember member, int rank, byte xpPercent, int rights) {
         boolean result;
 
-        if (modifier.Guild.Entity.GuildID != member.GuildID) {
+        if (modifier.getGuild().entity.guildID != member.guildID) {
             result = false;
         } else {
-            if (modifier.GuildMember() != member && modifier.GuildMember().isBoss() && rank == 1) {
-                this.SetBoss(member);
+            if (modifier.getGuildMember() != member && modifier.getGuildMember().isBoss() && rank == 1) {
+                this.setBoss(member);
             } else {
-                if (modifier.GuildMember() == member || !member.isBoss()) {
-                    if (modifier.GuildMember().manageRanks() && rank >= 0 && rank <= 35) {
-                        member.Rank = rank;
+                if (modifier.getGuildMember() == member || !member.isBoss()) {
+                    if (modifier.getGuildMember().manageRanks() && rank >= 0 && rank <= 35) {
+                        member.rank = rank;
                     }
-                    if (modifier.GuildMember().manageRights()) {
-                        member.Rights = rights;
+                    if (modifier.getGuildMember().manageRights()) {
+                        member.rights = rights;
                     }
                 }
             }
-            if (modifier.GuildMember().manageXPContribution() || (modifier.GuildMember() == member && modifier.GuildMember().manageMyXpContribution())) {
+            if (modifier.getGuildMember().manageXPContribution() || (modifier.getGuildMember() == member && modifier.getGuildMember().manageMyXpContribution())) {
                 member.experienceGivenPercent = (xpPercent < 90) ? xpPercent : 90;
             }
-            this.UpdateMember(member);
-            if (this.Characters.containsKey(member.CharacterID)) {
-                this.Characters.get(member.CharacterID).Send(new GuildMembershipMessage(this.toGuildInformations(), member.Rights, true));
+            this.updateMember(member);
+            if (this.characters.containsKey(member.characterID)) {
+                this.characters.get(member.characterID).send(new GuildMembershipMessage(this.toGuildInformations(), member.rights, true));
             }
 
             result = true;
@@ -133,60 +138,62 @@ public class Guild extends IWorldEventObserver {
         return result;
     }
 
-    public boolean KickMember(GuildMember kickedMember, boolean kicked) {
-        if (kickedMember.isBoss() && this.Members.size() > 1) {
+    public boolean kickMember(GuildMember target, boolean kicked) {
+        if (target.isBoss() && this.members.size() > 1) {
             return false;
         }
-        if (PlayerDAO.GetCharacter(kickedMember.CharacterID) != null) {
-            PlayerDAO.GetCharacter(kickedMember.CharacterID).Guild = null;
+        if (DAO.getPlayers().getCharacter(target.characterID) != null) {
+            DAO.getPlayers().getCharacter(target.characterID).setGuild(null);
         }
-        if (this.Characters.containsKey(kickedMember.CharacterID)) {
-            this.Characters.get(kickedMember.CharacterID).RefreshActor();
-            this.Characters.get(kickedMember.CharacterID).Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 176, new String[0]));
-            this.Characters.get(kickedMember.CharacterID).Send(new GuildLeftMessage());
-            this.unregisterPlayer(this.Characters.get(kickedMember.CharacterID));
+        if (this.characters.containsKey(target.characterID)) {
+            this.characters.get(target.characterID).refreshActor();
+            this.characters.get(target.characterID).send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 176, new String[0]));
+            this.characters.get(target.characterID).send(new GuildLeftMessage());
+            this.unregisterPlayer(this.characters.get(target.characterID));
         }
-        this.Members.remove(kickedMember.CharacterID);
-        this.sendToField(new GuildMemberLeavingMessage(true, kickedMember.CharacterID));
-        if (kickedMember.isBoss() && this.Members.isEmpty()) {
-            this.DeleteGuild();
+        this.members.remove(target.characterID);
+        this.sendToField(new GuildMemberLeavingMessage(true, target.characterID));
+        if (target.isBoss() && this.members.isEmpty()) {
+            this.deleteGuild();
         }
-        GuildDAO.Remove(kickedMember);
+
+        DAO.getGuildMembers().delete(target);
+
         return true;
     }
 
-    public void DeleteGuild() {
-        GuildDAO.Remove(Entity);
+    public void deleteGuild() {
+        DAO.getGuilds().remove(entity);
         //TODO : TAX
     }
 
-    public boolean KickMember(Player kicker, GuildMember kickedMember) {
-        if (kicker.GuildMember() != kickedMember && (!kicker.GuildMember().banMembers() || kickedMember.isBoss())) {
+    public boolean kickMember(Player kicker, GuildMember kickedMember) {
+        if (kicker.getGuildMember() != kickedMember && (!kicker.getGuildMember().banMembers() || kickedMember.isBoss())) {
             return false;
         }
-        if (kicker.ID != kickedMember.CharacterID) {
-            kicker.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 117, new String[]{kickedMember.Name}));
+        if (kicker.getID() != kickedMember.characterID) {
+            kicker.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 117, new String[]{kickedMember.name}));
         }
-        return this.KickMember(kickedMember, kickedMember.CharacterID == kicker.ID);
+        return this.kickMember(kickedMember, kickedMember.characterID == kicker.getID());
     }
 
-    private void OnMemberConnected(GuildMember member) {
-        this.sendToField(new FieldNotification(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 224, new String[]{member.Name})) {
+    private void onMemberConnected(GuildMember member) {
+        this.sendToField(new FieldNotification(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 224, new String[]{member.name})) {
             @Override
             public boolean can(Player perso) {
-                return perso.Account != null && perso.Account.Data != null && perso.Account.Data.guild_warn_on_login;
+                return perso.getAccount() != null && perso.getAccount().accountData != null && perso.getAccount().accountData.guild_warn_on_login;
             }
         });
-        this.sendToField(new GuildMemberOnlineStatusMessage(member.CharacterID, true));
+        this.sendToField(new GuildMemberOnlineStatusMessage(member.characterID, true));
     }
 
-    private void OnMemberDisconnected(GuildMember member) {
-        this.sendToField(new GuildMemberOnlineStatusMessage(member.CharacterID, false));
-        this.sendToField(new GuildMemberLeavingMessage(false, member.CharacterID));
+    private void onMemberDisconnected(GuildMember member) {
+        this.sendToField(new GuildMemberOnlineStatusMessage(member.characterID, false));
+        this.sendToField(new GuildMemberLeavingMessage(false, member.characterID));
     }
 
     public GuildInfosUpgradeMessage toGuildInfosUpgradeMessage() {
-        return new GuildInfosUpgradeMessage((byte) this.Entity.MaxTaxCollectors, /*byte taxCollectorsCoun*/ (byte) 0, TaxCollectorHealth(), TaxCollectorDamageBonuses(), this.Entity.Pods, this.Entity.Prospecting, this.Entity.Wisdom, this.Entity.Boost, TAX_COLLECTOR_SPELLS, this.SpellLevel);
+        return new GuildInfosUpgradeMessage((byte) this.entity.maxTaxCollectors, /*byte taxCollectorsCoun*/ (byte) 0, getTaxCollectorHealth(), gettaxCollectorDamageBonuses(), this.entity.pods, this.entity.prospecting, this.entity.wisdom, this.entity.boost, TAX_COLLECTOR_SPELLS, this.spellLevel);
     }
 
     public PaddockContentInformations[] toPaddockContentInformations() {
@@ -198,78 +205,96 @@ public class Guild extends IWorldEventObserver {
     }
 
     public TaxCollectorListMessage toTaxCollectorListMessage() {
-        return new TaxCollectorListMessage(new TaxCollectorInformations[0], (byte) this.Entity.MaxTaxCollectors, new TaxCollectorFightersInformation[0]);
+        return new TaxCollectorListMessage(new TaxCollectorInformations[0], (byte) this.entity.maxTaxCollectors, new TaxCollectorFightersInformation[0]);
     }
 
-    public int TaxCollectorDamageBonuses() {
-        return this.Entity.Level;
+    public int gettaxCollectorDamageBonuses() {
+        return this.entity.level;
     }
 
-    public int TaxCollectorHealth() {
-        return TaxCollector.BaseHealth + (int) (20 * this.Entity.Level);
+    public int getTaxCollectorHealth() {
+        return TaxCollector.BASE_HEALTH + (int) (20 * this.entity.level);
 
     }
 
     public GuildInformationsGeneralMessage toGeneralInfos() {
-        return new GuildInformationsGeneralMessage(true, false, (byte) this.Entity.Level, (long) ExpDAO.GetFloorByLevel(this.Entity.Level).Guild, this.Entity.Experience(), (long) ExpDAO.GetFloorByLevel(this.Entity.Level + 1).Guild, this.Entity.CreationDate, this.Members.size(), this.Characters.size());
+        return new GuildInformationsGeneralMessage(true, false, (byte) this.entity.level, (long) DAO.getExps().getLevel(this.entity.level).getGuild(), this.entity.getExperience(), (long) DAO.getExps().getLevel(this.entity.level + 1).getGuild(), this.entity.creationDate, this.members.size(), this.characters.size());
     }
 
-    protected void UpdateMember(GuildMember member) {
+    protected void updateMember(GuildMember member) {
         this.sendToField(new GuildInformationsMemberUpdateMessage(toGM(member)));
-        member.Save();
+        member.save();
     }
 
     public koh.protocol.types.game.guild.GuildMember[] allGuildMembers() {
-        return this.Members.values().stream().map(x -> this.toGM(x)).toArray(koh.protocol.types.game.guild.GuildMember[]::new);
+        return this.members.values().stream().map(x -> this.toGM(x)).toArray(koh.protocol.types.game.guild.GuildMember[]::new);
     }
 
     public koh.protocol.types.game.guild.GuildMember toGM(GuildMember m) {
-        return new koh.protocol.types.game.guild.GuildMember(m.CharacterID, m.Level, m.Name, (byte) m.Breed, m.Sex, m.Rank, m.Experience(), (byte) m.experienceGivenPercent, m.Rights, this.Characters.containsKey(m.CharacterID) ? (byte) 1 : (byte) 0, (byte) m.alignmentSide, (short) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(m.LastConnection)), this.Characters.containsKey(m.CharacterID) ? this.Characters.get(m.CharacterID).MoodSmiley : (byte) -1, m.AccountID, m.achievementPoints, new PlayerStatus(this.Characters.containsKey(m.CharacterID) ? this.Characters.get(m.CharacterID).Status.value() : 0));
+        return new koh.protocol.types.game.guild.GuildMember(m.characterID, m.level, m.name, (byte) m.breed, m.sex, m.rank, m.getExperience(), (byte) m.experienceGivenPercent, m.rights, this.characters.containsKey(m.characterID) ? (byte) 1 : (byte) 0, (byte) m.alignmentSide, (short) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(m.lastConnection)), this.characters.containsKey(m.characterID) ? this.characters.get(m.characterID).getMoodSmiley() : (byte) -1, m.accountID, m.achievementPoints, new PlayerStatus(this.characters.containsKey(m.characterID) ? this.characters.get(m.characterID).getStatus().value() : 0));
     }
 
     @Override
     public void registerPlayer(Player p) {
-        if (this.Characters == null) {
-            this.Characters = Collections.synchronizedMap(new HashMap<Integer, Player>());
-        }
-        if (this.Characters.containsKey(p.ID)) {
+        if (this.characters.containsKey(p.getID())) {
             throw new Error("Two different Clients logged ! ");
         }
-        this.Characters.put(p.ID, p);
-        this.OnMemberConnected(this.Members.get(p.ID));
+        this.characters.put(p.getID(), p);
+        this.onMemberConnected(this.members.get(p.getID()));
         super.registerPlayer(p);
 
-        p.Send(new GuildMembershipMessage(this.toGuildInformations(), this.Members.get(p.ID).Rights, true));
-        p.Send(this.toGeneralInfos());
-        p.Send(new GuildInformationsMembersMessage(this.allGuildMembers()));
+        p.send(new GuildMembershipMessage(this.toGuildInformations(), this.members.get(p.getID()).rights, true));
+        p.send(this.toGeneralInfos());
+        p.send(new GuildInformationsMembersMessage(this.allGuildMembers()));
     }
 
     public boolean canAddMember() {
-        return this.Members.size() < 50;
+        return this.members.size() < 50;
     }
 
-    public GuildEmblem GetGuildEmblem() {
-        if (EmblemeCache == null) {
-            //EmblemSymbols Template = GuildEmblemDAO.Cache.get(this.Entity.EmblemForegroundShape);
-            this.EmblemeCache = new GuildEmblem(this.Entity.EmblemForegroundShape, this.Entity.EmblemForegroundColor, (byte) this.Entity.EmblemBackgroundShape, this.Entity.EmblemBackgroundColor);
+    public GuildEmblem getGuildEmblem() {
+        if (emblemeCache == null) {
+            //EmblemSymbols getTemplate = GuildEmblemDAOImpl.dofusMaps.get(this.entity.emblemForegroundShape);
+            this.emblemeCache = new GuildEmblem(this.entity.emblemForegroundShape, this.entity.emblemForegroundColor, (byte) this.entity.emblemBackgroundShape, this.entity.emblemBackgroundColor);
         }
-        return EmblemeCache;
+        return emblemeCache;
     }
 
     public GuildInformations toGuildInformations() {
-        return new GuildInformations(this.Entity.GuildID, this.Entity.Name, this.GetGuildEmblem());
+        return new GuildInformations(this.entity.guildID, this.entity.name, this.getGuildEmblem());
     }
 
     @Override
     public void unregisterPlayer(Player p) {
-        if (this.Characters != null) {
-            this.Characters.remove(p.ID);
+        if (this.characters != null) {
+            this.characters.remove(p.getID());
         }
         super.unregisterPlayer(p);
-        this.OnMemberDisconnected(this.Members.get(p.ID));
+        this.onMemberDisconnected(this.members.get(p.getID()));
     }
 
-    private static final double[][] XP_PER_GAP = new double[][]{
+    public Stream<Player> playerStream() {
+        return characters.values().stream();
+    }
+
+    public Stream<GuildMember> memberStream() {
+        return members.values().stream();
+    }
+
+    public BasicGuildInformations getBasicGuildInformations() {
+        //TODO cache that !
+        return new BasicGuildInformations(this.entity.guildID, this.entity.name);
+    }
+
+    public void addMember(GuildMember member) {
+        members.put(member.characterID, member);
+    }
+
+    public GuildMember getMember(int playerId) {
+        return members.get(playerId);
+    }
+
+    /*private static final double[][] XP_PER_GAP = new double[][]{
         new double[]{
             0.0,
             10.0
@@ -302,7 +327,7 @@ public class Guild extends IWorldEventObserver {
             70.0,
             1.0
         }
-    };
+    };*/
     public static final int[] TAX_COLLECTOR_SPELLS = new int[]{
         458,
         457,
@@ -317,10 +342,5 @@ public class Guild extends IWorldEventObserver {
         452,
         461
     };
-
-    public BasicGuildInformations GetBasicGuildInformations() {
-
-        return new BasicGuildInformations(this.Entity.GuildID, this.Entity.Name);
-    }
 
 }

@@ -18,11 +18,11 @@ public class MariedCriterion extends Criterion {
 
     @Override
     public void Build() {
-       this.Married = Integer.parseInt(Literal) == 1;
+       this.Married = Integer.parseInt(literal) == 1;
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
          return true;
     }
 

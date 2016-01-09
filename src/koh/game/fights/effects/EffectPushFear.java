@@ -13,41 +13,41 @@ import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
 public class EffectPushFear extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) { //TODO : Prise compte etat
-        byte direction = Pathfinder.GetDirection(CastInfos.Caster.Fight.Map, CastInfos.Caster.CellId(), CastInfos.CellId);
-        short targetFighterCell = Pathfinder.NextCell(CastInfos.Caster.CellId(), direction);
+    public int applyEffect(EffectCast castInfos) { //TODO : Prise compte etat
+        byte direction = Pathfinder.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
+        short targetFighterCell = Pathfinder.nextCell(castInfos.caster.getCellId(), direction);
 
-        Fighter target = CastInfos.Caster.Fight.GetFighterOnCell(targetFighterCell);
+        Fighter target = castInfos.caster.getFight().getFighterOnCell(targetFighterCell);
         if (target == null) {
             return -1;
         }
-        short StartCell = target.CellId();
-        int distance = Pathfinder.GoalDistance(CastInfos.Caster.Fight.Map, target.CellId(), CastInfos.CellId);
-        FightCell currentCell = target.myCell;
+        short StartCell = target.getCellId();
+        int distance = Pathfinder.getGoalDistance(castInfos.caster.getFight().getMap(), target.getCellId(), castInfos.cellId);
+        FightCell currentCell = target.getMyCell();
 
         for (int i = 0; i < distance; i++) {
-            FightCell nextCell = CastInfos.Caster.Fight.GetCell(Pathfinder.NextCell(currentCell.Id, direction));
+            FightCell nextCell = castInfos.caster.getFight().getCell(Pathfinder.nextCell(currentCell.Id, direction));
 
-            if (nextCell != null && nextCell.CanWalk()) {
-                if (nextCell.HasObject(IFightObject.FightObjectType.OBJECT_TRAP)) {
-                    target.Fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, nextCell.Id));
+            if (nextCell != null && nextCell.canWalk()) {
+                if (nextCell.hasObject(IFightObject.FightObjectType.OBJECT_TRAP)) {
+                    target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
 
-                    return target.SetCell(nextCell);
+                    return target.setCell(nextCell);
                 }
             } else {
                 if (i != 0) {
-                    target.Fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, currentCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
                 }
 
-                return target.SetCell(currentCell);
+                return target.setCell(currentCell);
             }
 
             currentCell = nextCell;
         }
 
-        target.Fight.sendToField(new GameActionFightSlideMessage(CastInfos.Effect.effectId, CastInfos.Caster.ID, target.ID, StartCell, currentCell.Id));
+        target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
-        return target.SetCell(currentCell);
+        return target.setCell(currentCell);
     }
 
 }

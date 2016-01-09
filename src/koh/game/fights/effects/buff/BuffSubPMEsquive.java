@@ -6,7 +6,6 @@ import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightDodgePointLossMessage;
-import koh.protocol.messages.game.actions.fight.GameActionFightPointsVariationMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -22,30 +21,30 @@ public class BuffSubPMEsquive extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        MutableInt LostPM = new MutableInt(CastInfos.RandomJet(Target));
-        LostPM.setValue(LostPM.getValue() > Target.AP() ? Target.AP() : LostPM.getValue());
-        CastInfos.DamageValue = Target.CalculDodgeAPMP(CastInfos.Caster, LostPM.intValue(), true, CastInfos.Duration > 0);
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        MutableInt LostPM = new MutableInt(castInfos.randomJet(target));
+        LostPM.setValue(LostPM.getValue() > target.getAP() ? target.getAP() : LostPM.getValue());
+        castInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, LostPM.intValue(), true, castInfos.duration > 0);
 
-        if (CastInfos.DamageValue != LostPM.intValue()) {
-            Target.Fight.sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PM, Caster.ID, Target.ID, LostPM.getValue() - CastInfos.DamageValue));
+        if (castInfos.damageValue != LostPM.intValue()) {
+            target.getFight().sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PM, caster.getID(), target.getID(), LostPM.getValue() - castInfos.damageValue));
         }
 
-        if (CastInfos.DamageValue > 0) {
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PM, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.Caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, Duration, 0), this.Target);
-            BuffStats.ApplyEffect(LostPM, null);
-            this.Target.Buffs.AddBuff(BuffStats);
-            if (Target.ID == Target.Fight.CurrentFighter.ID) {
-                // Target.Fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_LOST, this.Caster.ID, Target.ID, (short) -CastInfos.DamageValue));
+        if (castInfos.damageValue > 0) {
+            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.SUB_PM, this.castInfos.spellId, (short) this.castInfos.spellId, 0, null, this.castInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, castInfos.damageValue, castInfos.spellLevel, duration, 0), this.target);
+            BuffStats.applyEffect(LostPM, null);
+            this.target.getBuff().addBuff(BuffStats);
+            if (target.getID() == target.getFight().getCurrentFighter().getID()) {
+                // target.fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_LOST, this.caster.getID(), target.getID(), (short) -castInfos.damageValue));
             }
         }
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

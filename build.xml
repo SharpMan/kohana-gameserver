@@ -2,10 +2,10 @@
 <!-- You may freely edit this file. See commented blocks below for -->
 <!-- some examples of how to customize the build. -->
 <!-- (If you delete it and reopen the project it will be recreated.) -->
-<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- By default, only the clean and Build commands use this build script. -->
 <!-- Commands such as Run, Debug, and Test only use this build script if -->
-<!-- the Compile on Save feature is turned off for the project. -->
-<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- the Compile on save feature is turned off for the project. -->
+<!-- You can turn off the Compile on save (or Deploy on save) setting -->
 <!-- in the project's Project Properties dialog box.-->
 <project name="koh-game" default="default" basedir=".">
     <description>Builds, tests, and runs the project koh-game.</description>
@@ -30,9 +30,9 @@
       -post-jar:                 called after JAR building
       -post-clean:               called after cleaning build products
 
-    (Targets beginning with '-' are not intended to be called on their own.)
+    (targets beginning with '-' are not intended to be called on their own.)
 
-    Example of inserting an obfuscator after compilation could look like this:
+    Example of inserting an obfuscator after compilation could entityLook like this:
 
         <target name="-post-compile">
             <obfuscate>
@@ -56,7 +56,7 @@
       -javadoc-build:           Javadoc generation
       test-report:              JUnit report generation
 
-    An example of overriding the target for project execution could look like this:
+    An example of overriding the target for project execution could entityLook like this:
 
         <target name="run" depends="koh-game-impl.jar">
             <exec dir="bin" executable="launcher.exe">

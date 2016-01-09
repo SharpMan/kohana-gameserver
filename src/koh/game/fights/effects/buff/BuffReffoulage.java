@@ -21,23 +21,23 @@ public class BuffReffoulage extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (Target.CellId() != DamageInfos.targetKnownCellId || Pathfinder.GoalDistance(Target.Fight.Map, DamageInfos.Caster.CellId(), Target.CellId()) > 1) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        if (target.getCellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId()) > 1) {
             return -1;
         }
         
         DamageValue.setValue(0);
 
-        EffectCast SubInfos = new EffectCast(StatsEnum.Push_Back, 0, (short) 0, 0, null, DamageInfos.Caster, null, false, StatsEnum.NONE, 0, null);
-        byte Direction = Pathfinder.GetDirection(Target.Fight.Map, DamageInfos.Caster.CellId(), Target.CellId());
+        EffectCast SubInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
+        byte Direction = Pathfinder.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
 
         // Application du push
-        return EffectPush.ApplyPush(SubInfos, this.Target, Direction, 1);
+        return EffectPush.ApplyPush(SubInfos, this.target, Direction, 1);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.castInfos.effect.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) this.castInfos.effect.delay);
     }
 
 }

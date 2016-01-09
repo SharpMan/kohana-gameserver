@@ -1,71 +1,89 @@
 package koh.game.fights.fighters;
 
+import koh.game.entities.actors.MonsterGroup;
+import koh.game.entities.actors.Player;
 import koh.game.entities.mob.MonsterGrade;
+import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
+import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
+import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
+import koh.protocol.types.game.context.fight.FightTeamMemberMonsterInformations;
+import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author Neo-Craft
  */
-public class MonsterFighter extends Fighter {
-    
-     public MonsterGrade Grade;
+public class MonsterFighter extends VirtualFighter {
 
-    public MonsterFighter(koh.game.fights.Fight Fight, Fighter Invocator) {
-        super(Fight, Invocator);
+    @Getter @Setter private MonsterGrade grade;
+    @Getter @Setter private MonsterGroup monsterGroup;
+
+    public MonsterFighter(Fight fight, MonsterGrade monster, int monsterGuid, MonsterGroup monsterGroup) {
+        super(fight);
+        this.monsterGroup = monsterGroup;
+        this.grade = monster;
+        super.initFighter(this.grade.getStats(), monsterGuid);
+        this.entityLook = EntityLookParser.Copy(this.grade.getMonster().getEntityLook());
+        super.setLife(this.getLife());
+        super.setLifeMax(this.getMaxLife());
     }
 
     @Override
-    public void Send(Message Packet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void send(Message Packet) {
+
     }
 
     @Override
-    public void JoinFight() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void EndFight() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void endFight() {
+        super.endFight();
     }
 
 
 
     @Override
-    public short MapCell() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public short getMapCell() {
+        return this.monsterGroup.getCell().getId();
     }
 
     @Override
-    public FightTeamMemberInformations GetFightTeamMemberInformations() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public FightTeamMemberInformations getFightTeamMemberInformations() {
+        return new FightTeamMemberMonsterInformations(this.ID, this.grade.getMonsterId(), this.grade.getGrade());
     }
 
     @Override
-    public EntityLook GetEntityLook() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public EntityLook getEntityLook() {
+        return this.entityLook;
     }
 
     @Override
-    public int Level() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public int getLevel() {
+        return this.grade.getLevel();
     }
 
-    
-     @Override
+    @Override
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameFightMonsterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.grade.getMonsterId(), this.grade.getGrade());
+    }
+
+    @Override
+    public FightObjectType getObjectType() {
+        return FightObjectType./*OBJECT_FIGHTER*/OBJECT_STATIC;
+    }
+
+
+    @Override
     public int compareTo(IFightObject obj) {
-        return Priority().compareTo(obj.Priority());
+        return getPriority().compareTo(obj.getPriority());
     }
 
-    @Override
-    public int Initiative(boolean Base) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+
 
     
 }

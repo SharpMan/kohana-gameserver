@@ -3,7 +3,10 @@ package koh.game.entities.maps.pathfinding;
 import java.util.ArrayList;
 import java.util.List;
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.protocol.client.enums.DirectionsEnum;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -15,6 +18,8 @@ public class MovementPath {
     protected MapPoint _oStart;
     protected MapPoint _oEnd;
     protected List<PathElement> _aPath;
+
+    private static final Logger logger = LogManager.getLogger(MovementPath.class);
 
     public MovementPath() {
         this._oEnd = new MapPoint();
@@ -153,7 +158,7 @@ public class MovementPath {
                     elem++;
                 }
                 if (elem > MAX_PATH_LENGTH) {
-                    Main.Logs().writeError("Path too long. Maybe an orientation problem?");
+                    logger.error("Path too long. Maybe an orientation problem?");
                 }
             }
         }

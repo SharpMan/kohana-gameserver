@@ -22,11 +22,11 @@ public class PlayerController {
         "DROP", "MULE", "ADMIN", "MODO", "ANIM"
     };
 
-    public static void SendServerMessage(WorldClient c, String message) {
+    public static void sendServerMessage(WorldClient c, String message) {
         if (c == null) {
             return;
         }
-        c.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{
+        c.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{
             message
         }));
     }
@@ -35,13 +35,13 @@ public class PlayerController {
         if (c == null) {
             return;
         }
-        c.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 0, new String[]{
+        c.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 0, new String[]{
             message
         }));
     }
 
-    public static void SendServerMessage(WorldClient c, String message, String Color) {
-        SendServerMessage(c, "<font color=\"#" + Color + "\">" + message + "</font>");
+    public static void sendServerMessage(WorldClient c, String message, String Color) {
+        sendServerMessage(c, "<font color=\"#" + Color + "\">" + message + "</font>");
     }
 
     public static String GenerateName() {

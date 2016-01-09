@@ -3,7 +3,8 @@ package koh.game.entities.guilds;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import koh.game.dao.GuildDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.sqlite.GuildDAOImpl;
 
 /**
  *
@@ -11,64 +12,63 @@ import koh.game.dao.GuildDAO;
  */
 @DatabaseTable(tableName = "guilds")
 public class GuildEntity {
-    
+
     public void Save() {
-        GuildDAO.Update(this);
+        DAO.getGuilds().update(this);
     }
 
-
     @DatabaseField(columnName = "id", dataType = DataType.INTEGER, id = true)
-    public int GuildID;
+    public int guildID;
 
     @DatabaseField(columnName = "name", dataType = DataType.STRING)
-    public String Name;
+    public String name;
 
     @DatabaseField(columnName = "creation_date", dataType = DataType.INTEGER)
-    public int CreationDate;
+    public int creationDate;
 
     @DatabaseField(columnName = "level", dataType = DataType.INTEGER)
-    public int Level;
+    public int level;
 
     @DatabaseField(columnName = "experience", dataType = DataType.STRING)
-    public String Experience;
+    public String experience;
 
     @DatabaseField(columnName = "capital", dataType = DataType.INTEGER)
-    public volatile int Boost;
+    public volatile int boost;
 
     @DatabaseField(columnName = "prospecting", dataType = DataType.INTEGER)
-    public int Prospecting;
+    public int prospecting;
 
     @DatabaseField(columnName = "wisdom", dataType = DataType.INTEGER)
-    public int Wisdom;
+    public int wisdom;
 
     @DatabaseField(columnName = "pods", dataType = DataType.INTEGER)
-    public int Pods;
+    public int pods;
 
     @DatabaseField(columnName = "max_tax_collectors", dataType = DataType.INTEGER)
-    public int MaxTaxCollectors;
+    public int maxTaxCollectors;
 
     //0,0,0,0,0,0,0,0,0,0,0,0
     @DatabaseField(columnName = "spells", dataType = DataType.STRING)
-    public String Spells;
+    public String spells;
 
     @DatabaseField(columnName = "background_color", dataType = DataType.INTEGER)
-    public int EmblemBackgroundColor;
+    public int emblemBackgroundColor;
 
     @DatabaseField(columnName = "background_shape", dataType = DataType.INTEGER)
-    public int EmblemBackgroundShape;
+    public int emblemBackgroundShape;
 
     @DatabaseField(columnName = "foreground_color", dataType = DataType.INTEGER)
-    public int EmblemForegroundColor;
+    public int emblemForegroundColor;
 
     @DatabaseField(columnName = "foreground_shape", dataType = DataType.INTEGER)
-    public int EmblemForegroundShape;
+    public int emblemForegroundShape;
     
-    public long Experience() {
-        return Long.valueOf(this.Experience);
+    public long getExperience() {
+        return Long.valueOf(this.experience);
     }
 
-    public void AddExperience(long b) {
-        this.Experience = String.valueOf(Long.valueOf(this.Experience) + b);
+    public void addExperience(long value) {
+        this.experience = String.valueOf(Long.valueOf(this.experience) + value);
         this.Save();
     }
 

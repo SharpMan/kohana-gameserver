@@ -1,59 +1,123 @@
 package koh.game.entities.environments;
 
+import koh.concurrency.CancellableScheduledRunnable;
+import koh.game.dao.DAO;
+import koh.protocol.messages.game.context.GameContextMoveMultipleElementsMessage;
+import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
+import koh.protocol.messages.game.interactive.StatedMapUpdateMessage;
+import koh.protocol.types.game.interactive.StatedElement;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import koh.commons.CancellableExecutorRunnable;
-import koh.game.dao.MapDAO;
-import koh.game.utils.Settings;
-import koh.protocol.messages.game.interactive.StatedMapUpdateMessage;
-import koh.protocol.types.game.interactive.StatedElement;
 
 /**
- *
  * @author Neo-Craft
  */
+@Builder
 public class Area {
 
-    public final ScheduledExecutorService BackGroundWorker = Executors.newScheduledThreadPool(50);
+    @Getter
+    private final SecureRandom RANDOM = new SecureRandom();
 
-    public Area() {
-        new CancellableExecutorRunnable(BackGroundWorker, ((Settings.GetIntElement("Job.AgeBonusTime") + this.id) * 60) * 1000, (Settings.GetIntElement("Job.AgeBonusTime") * 60) * 1000) {
+    @Getter
+    private final ScheduledExecutorService backGroundWorker = Executors.newScheduledThreadPool(50);
+    @Getter
+    private final ArrayList<SubArea> subAreas = new ArrayList<>();
+    @Getter
+    private int id;
+    @Getter
+    private SuperArea superArea;
+    @Getter
+    private boolean containHouses, containPaddocks, hasWorldMap;
+    @Getter
+    private int worldmapId;
+
+    public void onBuilt() {
+        /*AUTO MOVE MONSTERS
+        @Alleos @Alleos13
+        new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Monster.MoveOnMap") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Monster.MoveOnMap") * 60) * 1000) {
             @Override
             public void run() {
-                Arrays.stream(SubAreas).forEach(Sub -> Arrays.stream(Sub.mapIds)
-                        .forEach(Id -> MapDAO.Cache.get(Id).InteractiveElements.stream()
-                                .filter(Element -> MapDAO.Cache.get(Id).GetStatedElementById(Element.elementId) != null && MapDAO.Cache.get(Id).GetStatedElementById(Element.elementId).elementState == 0)
+                subAreas.forEach(Sub -> Arrays.stream(Sub.getMapIds())
+                        .mapToObj(id -> DAO.getMaps().findTemplate(id))
+                        .filter(map -> map != null && !map.getMonsters().isEmpty() && map.isMyInitialized())
+                        .forEach(map -> {
+                            map.getMonsters().stream()
+                                    .filter(mob -> !mob.isFix())
+                                    .forEach(mob -> {
+
+                                    });
+                            map.sendToField(new GameContextMoveMultipleElementsMessage());
+                        }));
+            }
+        };*/
+        /* STARS ON MONSTERS */
+        new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Monster.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Monster.AgeBonusTime") * 60) * 1000) {
+            @Override
+            public void run() {
+                subAreas.forEach(Sub -> Arrays.stream(Sub.getMapIds())
+                        .mapToObj(id -> DAO.getMaps().findTemplate(id))
+                        .filter(map -> map != null && !map.getMonsters().isEmpty())
+                        .forEach(map -> {
+                            map.getMonsters().forEach(mob -> {
+
+                                if (mob.getGameRolePlayGroupMonsterInformations().ageBonus == -1) {
+                                    mob.getGameRolePlayGroupMonsterInformations().ageBonus = 0;
+                                } else if (mob.getGameRolePlayGroupMonsterInformations().ageBonus != 200) {
+                                    mob.getGameRolePlayGroupMonsterInformations().ageBonus += 4;
+
+                                } else {
+                                    return;
+                                }
+                                if (map.isMyInitialized())
+                                    map.sendToField(new GameRolePlayShowActorMessage(mob.getGameRolePlayGroupMonsterInformations()));
+                            });
+                        }));
+            }
+        };
+        /* START ON INTERACTIF ELEMENTS */
+        new CancellableScheduledRunnable(backGroundWorker, ((DAO.getSettings().getIntElement("Job.AgeBonusTime") + this.id) * 60) * 1000, (DAO.getSettings().getIntElement("Job.AgeBonusTime") * 60) * 1000) {
+            @Override
+            public void run() {
+                subAreas.forEach(Sub -> Arrays.stream(Sub.getMapIds())
+                        .forEach(Id -> DAO.getMaps().findTemplate(Id).getInteractiveElements().stream()
+                                .filter(Element -> DAO.getMaps().findTemplate(Id).getStatedElementById(Element.elementId) != null && DAO.getMaps().findTemplate(Id).getStatedElementById(Element.elementId).elementState == 0)
                                 .forEach(Interactive -> {
                                     {
-                                        if (Interactive.AgeBonus == -1) {
-                                            Interactive.AgeBonus = 0;
+                                        if (Interactive.ageBonus == -1) {
+                                            Interactive.ageBonus = 0;
                                         }
-                                        if (Interactive.AgeBonus != 200) {
-                                            Interactive.AgeBonus += 4;
+                                        if (Interactive.ageBonus != 200) {
+                                            Interactive.ageBonus += 4;
                                         }
 
                                     }
                                 })));
             }
         };
-        new CancellableExecutorRunnable(BackGroundWorker, (Settings.GetIntElement("Job.Spawn") + this.id) * 60 * 1000, Settings.GetIntElement("Job.Spawn") * 60 * 1000) {
+        /* RESPAWN INTERFACTIF ELEMENTS*/
+        new CancellableScheduledRunnable(backGroundWorker, (DAO.getSettings().getIntElement("Job.Spawn") + this.id) * 60 * 1000, DAO.getSettings().getIntElement("Job.Spawn") * 60 * 1000) {
             @Override
             public void run() {
-                Arrays.stream(SubAreas)
-                        .forEach(Sub -> Arrays.stream(Sub.mapIds)
-                                .filter(Id -> MapDAO.Cache.get(Id).myInitialized)
+                subAreas
+                        .forEach(Sub -> Arrays.stream(Sub.getMapIds())
+                                .filter(Id -> DAO.getMaps().findTemplate(Id).isMyInitialized())
                                 .forEach(Id -> {
                                     {
                                         boolean Modified = false;
-                                        for (StatedElement Element : (Iterable<StatedElement>) Arrays.stream(MapDAO.Cache.get(Id).ElementsStated)
-                                        .filter(Element -> Element.deadAt != -1 && Element.elementState > 0 && (System.currentTimeMillis() - Element.deadAt) > Settings.GetIntElement("Job.Spawn") * 60000)::iterator) {
-                                            Element.deadAt = -1;
-                                            Element.elementState = 0;
+                                        for (StatedElement element : (Iterable<StatedElement>) Arrays.stream(DAO.getMaps().findTemplate(Id).getElementsStated())
+                                                .filter(statedElement -> statedElement.deadAt != -1 && statedElement.elementState > 0 && (System.currentTimeMillis() - statedElement.deadAt) > DAO.getSettings().getIntElement("job.Spawn") * 60000)::iterator) {
+                                            element.deadAt = -1;
+                                            element.elementState = 0;
                                             Modified = true;
                                         }
                                         if (Modified) {
-                                            MapDAO.Cache.get(Id).sendToField(new StatedMapUpdateMessage(MapDAO.Cache.get(Id).ElementsStated));
+                                            DAO.getMaps().findTemplate(Id).sendToField(new StatedMapUpdateMessage(DAO.getMaps().findTemplate(Id).getElementsStated()));
                                         }
 
                                     }
@@ -62,17 +126,9 @@ public class Area {
         };
     }
 
-    public int id;
-    public SubArea[] SubAreas = new SubArea[0];
-    public SuperArea superArea;
-    public boolean containHouses;
-    public boolean containPaddocks;
-    public int worldmapId;
-    public boolean hasWorldMap;
-
     /*public IntStream Mapids() {
      if (Maps.length == 0) {
-     for (SubArea Sub : SubAreas) {
+     for (subArea Sub : subAreas) {
      Maps = ArrayUtils.addAll(Maps, Sub.mapIds);
      }
      }

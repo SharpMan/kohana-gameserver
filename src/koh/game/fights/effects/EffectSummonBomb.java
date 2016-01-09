@@ -1,12 +1,11 @@
 package koh.game.fights.effects;
 
-import koh.game.dao.MonsterDAO;
-import koh.game.dao.SpellDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
-import koh.game.fights.layer.FightBomb;
+import koh.game.fights.layers.FightBomb;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
 import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import org.apache.commons.lang.ArrayUtils;
@@ -18,33 +17,33 @@ import org.apache.commons.lang.ArrayUtils;
 public class EffectSummonBomb extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Possibilité de spawn une creature sur la case ?
 
-        MonsterTemplate Monster = MonsterDAO.Cache.get(CastInfos.Effect.diceNum);
-        // Template de monstre existante
+        MonsterTemplate Monster = DAO.getMonsters().find(castInfos.effect.diceNum);
+        // getTemplate de monstre existante
         if (Monster != null) {
-            MonsterGrade MonsterLevel = Monster.GetLevelOrNear(CastInfos.Effect.diceSide);
+            MonsterGrade MonsterLevel = Monster.getLevelOrNear(castInfos.effect.diceSide);
             if (MonsterLevel != null) {
-                if (CastInfos.Caster.Fight.IsCellWalkable(CastInfos.CellId)) {
-                    BombFighter Bomb = new BombFighter(CastInfos.Caster.Fight, CastInfos.Caster, MonsterLevel);
-                    Bomb.JoinFight();
-                    Bomb.Fight.JoinFightTeam(Bomb, CastInfos.Caster.Team, false, CastInfos.CellId, true);
-                    CastInfos.Caster.Fight.sendToField(new GameActionFightSummonMessage(1008, CastInfos.Caster.ID, (GameFightFighterInformations) Bomb.GetGameContextActorInformations(null)));
-                    CastInfos.Caster.Fight.myWorker.SummonFighter(Bomb);
-                    CastInfos.Caster.GetActivableObjects().filter(Object -> Object instanceof FightBomb)
-                            .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).Owner,Bomb))
-                            .forEach(Bombe -> ((FightBomb)Bombe).FightCells()
+                if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
+                    BombFighter Bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, MonsterLevel);
+                    Bomb.joinFight();
+                    Bomb.getFight().joinFightTeam(Bomb, castInfos.caster.getTeam(), false, castInfos.cellId, true);
+                    castInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, castInfos.caster.getID(), (GameFightFighterInformations) Bomb.getGameContextActorInformations(null)));
+                    castInfos.caster.getFight().getFightWorker().summonFighter(Bomb);
+                    castInfos.caster.getActivableObjects().filter(Object -> Object instanceof FightBomb)
+                            .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).owner,Bomb))
+                            .forEach(Bombe -> ((FightBomb)Bombe).getFightCells()
                                               .filter(Cell -> Cell.hasFighter())
-                                              .forEach(C -> {{
-                                                  for(Fighter F : C.GetObjectsAsFighter()){
-                                                      ((FightBomb)Bombe).LoadTargets(F);
-                                                      ((FightBomb)Bombe).Activate(F);
+                                              .forEach(C -> {
+                                                  for(Fighter F : C.getObjectsAsFighter()){
+                                                      ((FightBomb)Bombe).loadTargets(F);
+                                                      ((FightBomb)Bombe).activate(F);
                                                   }
-                                              }}));
+                                              }));
                 } else {
-                    //CastInfos.Caster.Fight.AffectSpellTo(CastInfos.Caster, CastInfos.Caster.Fight.GetCell(CastInfos.CellId).GetObjectsAsFighter()[0] , CastInfos.Effect.diceSide, SpellDAO.Bombs.get(CastInfos.Effect.diceNum).instantSpellId);
-                    CastInfos.Caster.Fight.LaunchSpell(CastInfos.Caster, SpellDAO.Spells.get(SpellDAO.Bombs.get(CastInfos.Effect.diceNum).instantSpellId).SpellLevel(CastInfos.Effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
+                    //castInfos.caster.fight.affectSpellTo(castInfos.caster, castInfos.caster.fight.getCell(castInfos.getCellId).getObjectsAsFighter()[0] , castInfos.effect.diceSide, SpellDAOImpl.bombs.get(castInfos.effect.diceNum).instantSpellId);
+                    castInfos.caster.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(castInfos.effect.diceNum).instantSpellId).getSpellLevel(castInfos.effect.diceSide), (short) castInfos.targetKnownCellId, true,true,true);
                 }
             }
         }

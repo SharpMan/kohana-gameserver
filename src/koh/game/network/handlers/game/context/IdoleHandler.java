@@ -14,7 +14,7 @@ public class IdoleHandler {
 
     @HandlerAttribute(ID = IdolPartyRegisterRequestMessage.M_ID)
     public static void HandleIdolPartyRegisterRequestMessage(WorldClient Client, IdolPartyRegisterRequestMessage Message) {
-        Client.Send(new IdolListMessage(new int[0], new int[0], new PartyIdol[0]));
+        Client.send(new IdolListMessage(new int[0], new int[0], new PartyIdol[0]));
     }
 
 }

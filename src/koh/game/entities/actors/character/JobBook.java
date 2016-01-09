@@ -3,17 +3,14 @@ package koh.game.entities.actors.character;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import koh.game.dao.ExpDAO;
-import koh.game.dao.JobDAO;
-import koh.game.dao.SpellDAO;
+
+import koh.game.dao.DAO;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.Player;
 import koh.game.entities.jobs.InteractiveSkill;
 import koh.game.entities.jobs.JobGatheringInfos;
-import koh.game.entities.spells.LearnableSpell;
 import koh.protocol.client.BufUtils;
 import koh.protocol.client.enums.JobEnum;
-import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.roleplay.job.JobExperienceUpdateMessage;
 import koh.protocol.messages.game.context.roleplay.job.JobLevelUpMessage;
 import koh.protocol.types.game.context.roleplay.job.JobCrafterDirectorySettings;
@@ -23,7 +20,6 @@ import koh.protocol.types.game.interactive.skill.SkillActionDescription;
 import koh.protocol.types.game.interactive.skill.SkillActionDescriptionCollect;
 import koh.protocol.types.game.interactive.skill.SkillActionDescriptionCraft;
 import koh.utils.Couple;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -34,45 +30,45 @@ public class JobBook {
 
     private Map<Byte, JobInfo> myJobs = Collections.synchronizedMap(new HashMap<Byte, JobInfo>());
 
-    public void addExperience(Player Actor, byte parentJobId, int Value) {
-        ExpLevel Floor;
+    public void addExperience(Player actor, byte parentJobId, int value) {
+        ExpLevel floor;
 
-        this.myJobs.get(parentJobId).XP += Value;
+        this.myJobs.get(parentJobId).xp += value;
 
-        Integer LastLevel = this.myJobs.get(parentJobId).jobLevel;
+        Integer lastLevel = this.myJobs.get(parentJobId).jobLevel;
 
         do {
-            Floor = ExpDAO.GetFloorByLevel(this.myJobs.get(parentJobId).jobLevel + 1);
+            floor = DAO.getExps().getLevel(this.myJobs.get(parentJobId).jobLevel + 1);
 
-            if (Floor.Job < this.myJobs.get(parentJobId).XP) {
+            if (floor.getJob() < this.myJobs.get(parentJobId).xp) {
                 this.myJobs.get(parentJobId).jobLevel++;
             }
-        } while (Floor.Job < this.myJobs.get(parentJobId).XP && this.myJobs.get(parentJobId).jobLevel != 200);
+        } while (floor.getJob() < this.myJobs.get(parentJobId).xp && this.myJobs.get(parentJobId).jobLevel != 200);
 
-        if (this.myJobs.get(parentJobId).jobLevel != LastLevel) {
-            Actor.Send(new JobLevelUpMessage((byte)this.myJobs.get(parentJobId).jobLevel,new JobDescription(parentJobId, JobDAO.Skills.values().stream().filter(Skill -> Skill.parentJobId == parentJobId && this.myJobs.get(parentJobId).jobLevel >= Skill.levelMin).map(Skill -> JobToSkill(Skill, this.myJobs.get(parentJobId))).toArray(SkillActionDescription[]::new))));
+        if (this.myJobs.get(parentJobId).jobLevel != lastLevel) {
+            actor.send(new JobLevelUpMessage((byte)this.myJobs.get(parentJobId).jobLevel,new JobDescription(parentJobId, DAO.getJobTemplates().streamSkills().filter(Skill -> Skill.getParentJobId() == parentJobId && this.myJobs.get(parentJobId).jobLevel >= Skill.getLevelMin()).map(Skill -> jobToSkill(Skill, this.myJobs.get(parentJobId))).toArray(SkillActionDescription[]::new))));
         }
 
-        Actor.Send(new JobExperienceUpdateMessage(new JobExperience(parentJobId, (byte) this.myJobs.get(parentJobId).jobLevel, this.myJobs.get(parentJobId).XP, ExpDAO.GetFloorByLevel(this.myJobs.get(parentJobId).jobLevel).Job, ExpDAO.GetFloorByLevel(this.myJobs.get(parentJobId).jobLevel + 1).Job)));
+        actor.send(new JobExperienceUpdateMessage(new JobExperience(parentJobId, (byte) this.myJobs.get(parentJobId).jobLevel, this.myJobs.get(parentJobId).xp, DAO.getExps().getLevel(this.myJobs.get(parentJobId).jobLevel).getJob(), DAO.getExps().getLevel(this.myJobs.get(parentJobId).jobLevel + 1).getJob())));
     }
 
     public class JobInfo {
 
-        public byte ID;
-        public int XP, jobLevel, minLevel;
+        public byte id;
+        public int xp, jobLevel, minLevel;
         public boolean free;
         public int gatheringItems, craftedItems;
 
         public JobInfo(byte id) {
-            this.ID = id;
-            this.XP = 0;
+            this.id = id;
+            this.xp = 0;
             this.jobLevel = 1;
             this.free = true;
         }
 
         public JobInfo(IoBuffer buf) {
-            this.ID = buf.get();
-            this.XP = buf.getInt();
+            this.id = buf.get();
+            this.xp = buf.getInt();
             this.jobLevel = buf.getInt();
             this.minLevel = buf.getInt();
             this.free = BufUtils.readBoolean(buf);
@@ -80,9 +76,9 @@ public class JobBook {
             this.craftedItems = buf.getInt();
         }
 
-        public void Serialize(IoBuffer buf) {
-            buf.put(ID);
-            buf.putInt(XP);
+        public void serialize(IoBuffer buf) {
+            buf.put(id);
+            buf.putInt(xp);
             buf.putInt(jobLevel);
             buf.putInt(minLevel);
             BufUtils.writeBoolean(buf, free);
@@ -90,22 +86,22 @@ public class JobBook {
             buf.putInt(craftedItems);
         }
 
-        public JobGatheringInfos JobEntity(int StartLevel) {
-            return JobDAO.GatheringJobs.get(JobDAO.GatheringJobs.keySet().stream().filter(x -> StartLevel >= x).mapToInt(x -> x).max().getAsInt());
+        public JobGatheringInfos jobEntity(int startLevel) {
+            return DAO.getJobTemplates().findGathJob(DAO.getJobTemplates().findHightJob(startLevel));
         }
 
-        public Couple<Integer, Integer> Quantity(int StartLevel) {
-            return JobDAO.GatheringJobs.get(JobDAO.GatheringJobs.keySet().stream().filter(x -> StartLevel >= x).mapToInt(x -> x).max().getAsInt()).LevelMinMax(this.jobLevel);
+        public Couple<Integer, Integer> quantity(int startLevel) {
+            return DAO.getJobTemplates().findGathJob(DAO.getJobTemplates().findHightJob(startLevel)).levelMinMax(this.jobLevel);
         }
 
-        public byte Probability() {
+        public byte probability() {
             return (byte) ((5 + (0.5 * jobLevel)) > 100 ? 100 : (5 + (0.5 * jobLevel)));
         }
 
         public void totalClear() {
             try {
-                this.ID = 0;
-                this.XP = 0;
+                this.id = 0;
+                this.xp = 0;
                 this.jobLevel = 0;
                 this.minLevel = 0;
                 this.free = false;
@@ -117,7 +113,7 @@ public class JobBook {
         }
     }
 
-    public void DeserializeEffects(byte[] binary) {
+    public void deserializeEffects(byte[] binary) {
         if (binary.length <= 0) {
             for (JobEnum Job : JobEnum.values()) {
                 this.AddJob(new JobInfo(Job.value));
@@ -131,46 +127,46 @@ public class JobBook {
         }
     }
 
-    public void AddJob(JobInfo Info) {
-        this.myJobs.put(Info.ID, Info);
+    public void AddJob(JobInfo info) {
+        this.myJobs.put(info.id, info);
     }
 
-    public JobDescription[] GetDescriptions() {
-        return this.myJobs.values().stream().map(Job -> new JobDescription(Job.ID, JobDAO.Skills.values().stream().filter(Skill -> Skill.parentJobId == Job.ID && Job.jobLevel >= Skill.levelMin).map(Skill -> JobToSkill(Skill, Job)).toArray(SkillActionDescription[]::new))).toArray(JobDescription[]::new);
+    public JobDescription[] getDescriptions() {
+        return this.myJobs.values().stream().map(Job -> new JobDescription(Job.id, DAO.getJobTemplates().streamSkills().filter(Skill -> Skill.getParentJobId() == Job.id && Job.jobLevel >= Skill.getLevelMin()).map(Skill -> jobToSkill(Skill, Job)).toArray(SkillActionDescription[]::new))).toArray(JobDescription[]::new);
     }
 
-    public JobExperience[] GetExperiences() {
-        return this.myJobs.values().stream().map(Job -> new JobExperience(Job.ID, (byte) Job.jobLevel, Job.XP, ExpDAO.GetFloorByLevel(Job.jobLevel).Job, ExpDAO.GetFloorByLevel(Job.jobLevel + 1).Job)).toArray(JobExperience[]::new);
+    public JobExperience[] getExperiences() {
+        return this.myJobs.values().stream().map(Job -> new JobExperience(Job.id, (byte) Job.jobLevel, Job.xp, DAO.getExps().getLevel(Job.jobLevel).getJob(), DAO.getExps().getLevel(Job.jobLevel + 1).getJob())).toArray(JobExperience[]::new);
     }
 
-    public JobCrafterDirectorySettings[] GetSettings() {
-        return this.myJobs.values().stream().map(Job -> new JobCrafterDirectorySettings(Job.ID, (byte) Job.minLevel, Job.free)).toArray(JobCrafterDirectorySettings[]::new);
+    public JobCrafterDirectorySettings[] getSettings() {
+        return this.myJobs.values().stream().map(Job -> new JobCrafterDirectorySettings(Job.id, (byte) Job.minLevel, Job.free)).toArray(JobCrafterDirectorySettings[]::new);
     }
 
-    public SkillActionDescription JobToSkill(InteractiveSkill Skill, JobInfo Job) {
-        if (Skill.isForgemagus) {
-            return new SkillActionDescriptionCraft(Skill.ID, Job.Probability());
-        } else if (Skill.gatheredRessourceItem != -1) {
-            return new SkillActionDescriptionCollect(Skill.ID, (byte) 30, Job.Quantity(Skill.levelMin).first, Job.Quantity(Skill.levelMin).second);
+    public SkillActionDescription jobToSkill(InteractiveSkill skill, JobInfo job) {
+        if (skill.isForgemagus()) {
+            return new SkillActionDescriptionCraft(skill.getID(), job.probability());
+        } else if (skill.getGatheredRessourceItem() != -1) {
+            return new SkillActionDescriptionCollect(skill.getID(), (byte) 30, job.quantity(skill.getLevelMin()).first, job.quantity(skill.getLevelMin()).second);
         } else {
-            return new SkillActionDescriptionCraft(Skill.ID, (byte) 100);
+            return new SkillActionDescriptionCraft(skill.getID(), (byte) 100);
         }
         /*else  {
-         throw new Error(String.format("Unknow Skill %s Ability %s Job %s", Skill.ID, Skill.Type, Job.ID));
+         throw new Error(String.format("Unknow skill %s Ability %s job %s", skill.id, skill.type, job.id));
          }*/
     }
 
-    public byte[] Serialize() {
+    public byte[] serialize() {
         IoBuffer buf = IoBuffer.allocate(1);
         buf.setAutoExpand(true);
 
         buf.putInt(this.myJobs.size());
-        this.myJobs.values().forEach(Spell -> Spell.Serialize(buf));
+        this.myJobs.values().forEach(Spell -> Spell.serialize(buf));
 
         return buf.array();
     }
 
-    public JobInfo GetJob(byte id) {
+    public JobInfo getJob(byte id) {
         return myJobs.get(id);
     }
 

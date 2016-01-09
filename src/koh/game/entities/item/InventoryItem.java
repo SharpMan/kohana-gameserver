@@ -3,21 +3,23 @@ package koh.game.entities.item;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-import koh.game.Main;
-import koh.game.dao.ItemDAO;
+
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.item.animal.MountInventoryItem;
 import koh.game.entities.item.animal.PetsInventoryItem;
-import koh.game.entities.spells.*;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.ObjectItem;
 import koh.protocol.types.game.data.items.effects.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -26,14 +28,19 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class InventoryItem {
 
-    public int ID;
-    public int TemplateId;
-    private int Position;
-    private int Owner;
-    private int Quantity;
-    public List<ObjectEffect> Effects; //FIXME : Think if we should migrate to Array or not , trought newArray = ArraysUtils.add(T[] Array,T Element);
-    public boolean NeedInsert, NeedRemove;
-    public List<String> ColumsToUpdate = null;
+    private static final Logger logger = LogManager.getLogger(InventoryItem.class);
+
+    @Getter
+    private int ID;
+    @Getter
+    protected int templateId;
+    @Getter
+    private int position,quantity,owner;
+    @Getter
+    protected List<ObjectEffect> effects; //FIXME : Think if we should migrate to Array or not , trought newArray = ArraysUtils.add(T[] Array,T Element);
+    @Getter @Setter
+    private boolean needInsert, needRemove;
+    public List<String> columsToUpdate = null;
 
     public InventoryItem() {
 
@@ -41,142 +48,130 @@ public class InventoryItem {
 
     private GenericStats myStats;
 
-    public static InventoryItem Instance(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
-        if (ItemDAO.Cache.get(TemplateId).GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-            return new PetsInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
-        } else if (ItemDAO.Cache.get(TemplateId).TypeId == 97) {
-            return new MountInventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects, !Effects.stream().anyMatch(x -> x.actionId == 995));
+    public static InventoryItem getInstance(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects1) {
+        if (DAO.getItemTemplates().getTemplate(templateId).getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
+            return new PetsInventoryItem(ID, templateId, position, owner, quantity, effects1, !effects1.stream().anyMatch(x -> x.actionId == 995));
+        } else if (DAO.getItemTemplates().getTemplate(templateId).getTypeId() == 97) {
+            return new MountInventoryItem(ID, templateId, position, owner, quantity, effects1, !effects1.stream().anyMatch(x -> x.actionId == 995));
         } else {
-            return new InventoryItem(ID, TemplateId, Position, Owner, Quantity, Effects);
+            return new InventoryItem(ID, templateId, position, owner, quantity, effects1);
         }
     }
 
-    public InventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects) {
+    public InventoryItem(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects) {
         this.ID = ID;
-        this.TemplateId = TemplateId;
-        this.Position = Position;
-        this.Owner = Owner;
-        this.Quantity = Quantity;
-        this.Effects = Effects;
+        this.templateId = templateId;
+        this.position = position;
+        this.owner = owner;
+        this.quantity = quantity;
+        this.effects = effects;
     }
 
-    public ObjectItem ObjectItem(int WithQuantity) {
-        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.Template().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, WithQuantity);
+    public ObjectItem getObjectItem(int withQuantity) {
+        return new ObjectItem(this.position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, withQuantity);
     }
 
-    public ObjectItem ObjectItem() {
-        return new ObjectItem(this.Position, this.TemplateId, Effects.stream().filter(Effect -> this.Template().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.Quantity);
+    public ObjectItem getObjectItem() {
+        return new ObjectItem(this.position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.quantity);
     }
 
-    public ItemSuperTypeEnum GetSuperType() {
-        return ItemSuperTypeEnum.valueOf(ItemDAO.SuperTypes.get(Template().TypeId).SuperType);
+    public ItemSuperTypeEnum getSuperType() {
+        return ItemSuperTypeEnum.valueOf(DAO.getItemTemplates().getType(getTemplate().getTypeId()).getSuperType());
     }
 
     public boolean isEquiped() {
-        return this.Position != 63;
+        return this.position != 63;
     }
 
-    public boolean IsLinked() { //928 = Lié 983 = Non echangeable
-        return this.hasEffect(982) || this.hasEffect(983) || this.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_QUEST || this.IsTokenItem();
+    public boolean isLinked() { //928 = Lié 983 = Non echangeable
+        return this.hasEffect(982) || this.hasEffect(983) || this.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_QUEST || this.isTokenItem();
     }
 
     public boolean isLivingObject() {
-        return this.Template().TypeId == 113 || (this.GetEffect(970) != null && this.GetEffect(971) != null);
+        return this.getTemplate().getTypeId() == 113 || (this.getEffect(970) != null && this.getEffect(971) != null);
     }
 
-    public short Apparrance() {
-        ObjectEffectInteger effect = (ObjectEffectInteger) this.GetEffect(972);
+    public short getApparrance() {
+        ObjectEffectInteger effect = (ObjectEffectInteger) this.getEffect(972);
         if (effect == null) {
-            return this.Template().appearanceId;
+            return this.getTemplate().getAppearanceId();
         } else {
-            ObjectEffectInteger type = (ObjectEffectInteger) this.GetEffect(970);
+            ObjectEffectInteger type = (ObjectEffectInteger) this.getEffect(970);
             if (type == null) {
-                return this.Template().appearanceId;
+                return this.getTemplate().getAppearanceId();
             }
-            return (short) ItemLivingObject.GetObviAppearanceBySkinId(effect.value, type.value);
+            return (short) ItemLivingObject.getObviAppearanceBySkinId(effect.value, type.value);
         }
     }
 
-    public int GetPosition() {
-        return Position;
+    public void setPosition(int i) {
+        this.position = i;
+        this.notifyColumn("position");
     }
 
-    public void SetPosition(int i) {
-        this.Position = i;
-        this.NotifiedColumn("position");
+    public void setQuantity(int i) {
+        this.quantity = i;
+        this.notifyColumn("stack");
     }
 
-    public int GetQuantity() {
-        return Quantity;
+    public void setOwner(int i) {
+        this.owner = i;
+        this.notifyColumn("owner");
     }
 
-    public void SetQuantity(int i) {
-        this.Quantity = i;
-        this.NotifiedColumn("stack");
-    }
-
-    public int GetOwner() {
-        return Owner;
-    }
-
-    public void SetOwner(int i) {
-        this.Owner = i;
-        this.NotifiedColumn("owner");
-    }
-
-    public void NotifiedColumn(String C) {
-        if (this.ColumsToUpdate == null) {
-            this.ColumsToUpdate = new ArrayList<>();
+    public void notifyColumn(String C) {
+        if (this.columsToUpdate == null) {
+            this.columsToUpdate = new ArrayList<>();
         }
-        if (!this.ColumsToUpdate.contains(C)) {
-            this.ColumsToUpdate.add(C);
+        if (!this.columsToUpdate.contains(C)) {
+            this.columsToUpdate.add(C);
         }
     }
 
     public boolean hasEffect(int id) {
-        return this.Effects.stream().anyMatch(x -> x.actionId == id);
+        return this.effects.stream().anyMatch(x -> x.actionId == id);
     }
 
-    public ObjectEffect GetEffect(int id) {
-        return this.Effects.stream().filter(x -> x.actionId == id).findFirst().orElse(null);
+    public ObjectEffect getEffect(int id) {
+        return this.effects.stream().filter(x -> x.actionId == id).findFirst().orElse(null);
     }
 
-    public ItemTemplate Template() {
-        return ItemDAO.Cache.get(TemplateId);
+    public ItemTemplate getTemplate() {
+        return DAO.getItemTemplates().getTemplate(templateId);
     }
 
-    public ItemType ItemType() {
-        return ItemDAO.SuperTypes.get(Template().TypeId);
+    public ItemType getItemType() {
+        return DAO.getItemTemplates().getType(getTemplate().getTypeId());
     }
 
-    public Weapon WeaponTemplate() {
-        return (Weapon) ItemDAO.Cache.get(TemplateId);
+    public Weapon getWeaponTemplate() {
+        return (Weapon) DAO.getItemTemplates().getTemplate(templateId);
     }
 
-    public CharacterInventoryPositionEnum Slot() {
-        return CharacterInventoryPositionEnum.valueOf((byte) this.Position);
+    public CharacterInventoryPositionEnum getSlot() {
+        return CharacterInventoryPositionEnum.valueOf((byte) this.position);
     }
 
-    public void RemoveEffect(int... id) {
+    public void removeEffect(int... id) {
         for (int i : id) {
-            this.RemoveEffect(i);
+            this.removeEffect(i);
         }
     }
 
-    private void RemoveEffect(int id) {
-        if (this.Effects.removeIf(x -> x.actionId == id)) {
-            this.NotifiedColumn("effects");
+    private void removeEffect(int id) {
+        if (this.effects.removeIf(x -> x.actionId == id)) {
+            this.notifyColumn("effects");
         }
     }
 
-    public List<ObjectEffect> getEffects() {
-        this.NotifiedColumn("effects");
-        return Effects;
+    public List<ObjectEffect> getEffects$Notify() {
+        this.notifyColumn("effects");
+        return effects;
     }
 
     public List<ObjectEffect> getEffectsCopy() {
         List<ObjectEffect> effects = new ArrayList<>();
-        this.Effects.stream().forEach((e) -> { //TODO: Parralel Stream
+        this.effects.stream().forEach((e) -> { //TODO: Parralel Stream
             effects.add(e.Clone());
         });
         return effects;
@@ -187,22 +182,22 @@ public class InventoryItem {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    public int Weight() {
-        return this.Template().realWeight * this.Quantity;
+    public int getWeight() {
+        return this.getTemplate().getRealWeight() * this.quantity;
     }
 
-    public void SetPosition(CharacterInventoryPositionEnum Slot) {
-        this.Position = Slot.value();
-        this.NotifiedColumn("position");
+    public void setPosition(CharacterInventoryPositionEnum Slot) {
+        this.position = Slot.value();
+        this.notifyColumn("position");
     }
 
     public boolean Equals(Collection<ObjectEffect> Effects) {
         ObjectEffect Get = null;
-        if (Effects.size() != this.Effects.size()) {
+        if (Effects.size() != this.effects.size()) {
             return false;
         }
         for (ObjectEffect e : Effects) {
-            Get = this.GetEffect(e.actionId);
+            Get = this.getEffect(e.actionId);
             if (Get == null || !Get.equals(e)) {
                 return false;
             }
@@ -210,10 +205,10 @@ public class InventoryItem {
         return true;
     }
 
-    public static List<ObjectEffect> DeserializeEffects(byte[] binary) {
+    public static List<ObjectEffect> deserializeEffects(byte[] binary) {
         IoBuffer buf = IoBuffer.wrap(binary);
         int len = buf.getInt();
-        List<ObjectEffect> Effects = new ArrayList<>();
+        List<ObjectEffect> Effects = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
             Effects.add(ObjectEffect.Instance(buf.getInt()));
             Effects.get(i).deserialize(buf);
@@ -222,12 +217,12 @@ public class InventoryItem {
         return Effects;
     }
 
-    public IoBuffer SerializeEffectInstanceDice() {
-        IoBuffer buff = IoBuffer.allocate(65535);
+    public IoBuffer serializeEffectInstanceDice() {
+        IoBuffer buff = IoBuffer.allocate(2535);
         buff.setAutoExpand(true);
 
-        buff.putInt(Effects.size());
-        for (ObjectEffect e : Effects) {
+        buff.putInt(effects.size());
+        for (ObjectEffect e : effects) {
             buff.putInt(e.getTypeId());
             e.serialize(buff);
         }
@@ -236,46 +231,48 @@ public class InventoryItem {
         return buff;
     }
 
-    public boolean AreConditionFilled(Player character) {
+    public boolean areConditionFilled(Player character) {
         try {
-            if (this.Template().CriteriaExpression() == null) {
+            if (this.getTemplate().getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.Template().CriteriaExpression().Eval(character);
+                return this.getTemplate().getCriteriaExpression().eval(character);
             }
         } catch (Exception e) {
-            Main.Logs().writeError(String.format("Bugged Item %s Condition %s", this.Template().id, this.Template().criteria));
+            logger.error("Bugged item {} condition {}", this.getTemplate().getId(), this.getTemplate().getCriteria());
             e.printStackTrace();
             return false;
         }
     }
 
     public boolean isWeapon() {
-        return ItemDAO.Cache.get(TemplateId) instanceof Weapon;
+        return DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon;
     }
 
-    private void ParseStats() {
+    private void parseStats() {
         this.myStats = new GenericStats();
 
         StatsEnum Stat;
-        for (ObjectEffect e : this.Effects) {
+        for (ObjectEffect e : this.effects) {
             if (e instanceof ObjectEffectInteger) {
                 Stat = StatsEnum.valueOf(e.actionId);
                 if (Stat == null) {
-                    Main.Logs().writeError("Undefinied Stat id " + e.actionId);
+                    logger.error("Undefined Stat id {}", e.actionId);
                     continue;
                 }
-                this.myStats.AddItem(Stat, ((ObjectEffectInteger) e).value);
+                this.myStats.addItem(Stat, ((ObjectEffectInteger) e).value);
+            }else if(e.actionId == EffectHelper.SPELL_EFFECT_PER_FIGHT){
+                this.myStats.addItem(StatsEnum.CAST_SPELL_ON_CRITICAL_HIT, ((ObjectEffectDice) e).diceNum);
             }
         }
         Stat = null;
     }
 
-    public GenericStats GetStats() {
+    public GenericStats getStats() {
         if (this.myStats == null) {
-            this.ParseStats();
-            if (this.Template() instanceof Weapon) {
-                this.WeaponTemplate().Initialize();
+            this.parseStats();
+            if (this.getTemplate() instanceof Weapon) {
+                this.getWeaponTemplate().initialize();
             }
         }
         return myStats;
@@ -284,19 +281,19 @@ public class InventoryItem {
     public void totalClear() {
         try {
             ID = 0;
-            TemplateId = 0;
-            Position = 0;
-            Owner = 0;
-            Quantity = 0;
-            /*for (ObjectEffect e : Effects) {
+            templateId = 0;
+            position = 0;
+            owner = 0;
+            quantity = 0;
+            /*for (ObjectEffect e : effects) {
              e.totalClear();
              }*/
-            Effects.clear();
-            Effects = null;
-            NeedInsert = false;
-            NeedRemove = false;
-            ColumsToUpdate.clear();
-            ColumsToUpdate = null;
+            effects.clear();
+            effects = null;
+            needInsert = false;
+            needRemove = false;
+            columsToUpdate.clear();
+            columsToUpdate = null;
             if (this.myStats == null) {
                 myStats.totalClear();
                 myStats = null;
@@ -306,7 +303,7 @@ public class InventoryItem {
         }
     }
 
-    private boolean IsTokenItem() {
+    private boolean isTokenItem() {
         return false;
     }
 

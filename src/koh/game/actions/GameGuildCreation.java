@@ -9,18 +9,18 @@ import koh.protocol.messages.game.guild.GuildCreationStartedMessage;
  */
 public class GameGuildCreation extends GameAction {
 
-    public GameGuildCreation(IGameActor Actor) {
-        super(GameActionTypeEnum.CREATE_GUILD, Actor);
+    public GameGuildCreation(IGameActor actor) {
+        super(GameActionTypeEnum.CREATE_GUILD, actor);
 
     }
 
     @Override
-    public void Execute() {
-        Actor.Send(new GuildCreationStartedMessage());
+    public void execute() {
+        actor.send(new GuildCreationStartedMessage());
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         return false;
     }
 

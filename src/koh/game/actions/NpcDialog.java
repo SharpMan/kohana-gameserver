@@ -1,10 +1,11 @@
 package koh.game.actions;
 
 import java.util.Arrays;
-import java.util.stream.Stream;
+
 import koh.game.Main;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.NpcDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
@@ -15,12 +16,16 @@ import koh.protocol.client.enums.DialogTypeEnum;
 import koh.protocol.messages.game.context.roleplay.npc.NpcDialogCreationMessage;
 import koh.protocol.messages.game.context.roleplay.npc.NpcDialogQuestionMessage;
 import koh.protocol.messages.game.dialog.LeaveDialogMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class NpcDialog extends GameAction {
+
+    private static final Logger logger = LogManager.getLogger(NpcDialog.class);
 
     public Npc NPC;
 
@@ -29,71 +34,71 @@ public class NpcDialog extends GameAction {
         this.NPC = Pnj;
     }
 
-    public void ChangeMessage(int id, int pos) {
+    public void changeMessage(int id, int pos) {
         NpcMessage Message = null;
         try {
-            Message = NpcDAO.Messages.get(this.NPC.Template().getDialogMessage(id, pos)).GetMessage((Player) this.Actor);
+            Message = DAO.getNpcs().findMessage(this.NPC.getTemplate().getDialogMessage(id, pos)).getMessage((Player) this.actor);
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (Message == null) {
-            PlayerController.SendServerMessage(this.GetClient(), "Discours de Pnj Introuvable ...");
+            PlayerController.sendServerMessage(this.getClient(), "Discours de Pnj Introuvable ...");
             try {
-                this.GetClient().EndGameAction(this.ActionType);
+                this.getClient().endGameAction(this.actionType);
             } catch (Exception e) {
             }
             return;
         }
-        Actor.Send(new NpcDialogQuestionMessage(Message.Id, Message.GetParameters((Player) this.Actor), Message.Replies != null ? Message.Replies : this.NPC.Template().GetReply(id)));
+        actor.send(new NpcDialogQuestionMessage(Message.getId(), Message.getParameters((Player) this.actor), Message.getReplies() != null ? Message.getReplies() : this.NPC.getTemplate().getReply(id)));
     }
 
-    public void ChangeMessage(NpcMessage Message) {
+    public void changeMessage(NpcMessage Message) {
         if (Message == null) {
             try {
-                this.GetClient().EndGameAction(this.ActionType);
+                this.getClient().endGameAction(this.actionType);
             } catch (Exception e) {
             }
             return;
         }
-        Actor.Send(new NpcDialogQuestionMessage(Message.Id, Message.Parameters, Message.Replies != null ? Message.Replies : this.NPC.Template().GetReply(this.NPC.Template().GetMessageOffset(Message.Id))));
+        actor.send(new NpcDialogQuestionMessage(Message.getId(), Message.getParameters(), Message.getReplies() != null ? Message.getReplies() : this.NPC.getTemplate().getReply(this.NPC.getTemplate().getMessageOffset(Message.getId()))));
     }
 
-    public void Reply(int rep) {
-        NpcReply[] Stream = NpcDAO.Replies.stream().filter(x -> x.ReplyID == rep).toArray(NpcReply[]::new);
+    public void reply(int rep) {
+        NpcReply[] Stream = DAO.getNpcs().repliesAsStream().filter(x -> x.getReplyID() == rep).toArray(NpcReply[]::new);
         if (!Arrays.stream(Stream).anyMatch(x -> x instanceof TalkReply)) {
-            this.GetClient().EndGameAction(GameActionTypeEnum.NPC_DAILOG);
+            this.getClient().endGameAction(GameActionTypeEnum.NPC_DAILOG);
         }
         for (NpcReply x : Stream) {
-            x.Execute(((Player) Actor));
+            x.execute(((Player) actor));
         }
         if (Stream.length == 0) {
-            Main.Logs().writeDebug("Undefinied reponse " + rep);
-            PlayerController.SendServerMessage(((Player) Actor).Client, "Ce discours n'est pas encore parametré...");
+            logger.debug("Undefined reponse ID {} ", rep);
+            PlayerController.sendServerMessage(((Player)actor).getClient(), "Ce discours n'est pas encore parametré...");
         }
 
     }
 
     @Override
-    public void Execute() {
-        this.Actor.Send(new NpcDialogCreationMessage(NPC.Cell.Map.Id, NPC.ID));
-        this.ChangeMessage(0, 0);
-        super.Execute();
+    public void execute() {
+        this.actor.send(new NpcDialogCreationMessage(NPC.getCell().getMap().getId(), NPC.getID()));
+        this.changeMessage(0, 0);
+        super.execute();
     }
 
     @Override
-    public void Abort(Object[] Args) {
-        super.Abort(Args);
+    public void abort(Object[] Args) {
+        super.abort(Args);
 
     }
 
     @Override
-    public void EndExecute() throws Exception {
-        Actor.Send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_DIALOG));
-        super.EndExecute();
+    public void endExecute() throws Exception {
+        actor.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_DIALOG));
+        super.endExecute();
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         return false;
     }
 

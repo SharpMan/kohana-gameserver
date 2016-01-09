@@ -1,10 +1,8 @@
 package koh.game.fights.effects.buff;
 
-import koh.game.controllers.PlayerController;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
-import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -15,7 +13,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffStats extends BuffEffect {
 
-    public int Value1;
+    public int value1;
 
     public BuffStats(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
@@ -23,26 +21,25 @@ public class BuffStats extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
 
-        this.Value1 = CastInfos.RandomJet(Target);
+        this.value1 = castInfos.randomJet(target);
 
-        this.Target.Stats.AddBoost(this.CastInfos.EffectType, this.Value1);
+        this.target.getStats().addBoost(this.castInfos.effectType, this.value1);
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public int RemoveEffect() {
-        
-        this.Target.Stats.GetEffect(this.CastInfos.EffectType).additionnal -= this.Value1;
+    public int removeEffect() {
+        this.target.getStats().addBoost(this.castInfos.effectType, -this.value1);
 
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, this.IsDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Value1));
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, this.isDebuffable() ? FightDispellableEnum.DISPELLABLE : FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.value1));
     }
 
 }

@@ -20,15 +20,15 @@ public class BuffDamage extends BuffEffect {
     //SendGameActionFightDispellEffectMessag
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        MutableInt Damage = new MutableInt(this.CastInfos.RandomJet(Target));
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        MutableInt Damage = new MutableInt(this.castInfos.randomJet(target));
 
-        return EffectDamage.ApplyDamages(this.CastInfos, this.Target, Damage);
+        return EffectDamage.applyDamages(this.castInfos, this.target, Damage);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, (byte) 0, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, (byte) 0, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

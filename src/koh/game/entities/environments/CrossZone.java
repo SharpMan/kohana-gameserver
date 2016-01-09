@@ -12,45 +12,45 @@ import koh.protocol.client.enums.DirectionsEnum;
  */
 public class CrossZone implements IZone {
 
-    public byte MinRadius;
+    public byte minRadius;
 
-    public byte Direction;
+    public byte direction;
 
-    public byte Radius;
+    public byte radius;
 
-    public boolean OnlyPerpendicular;
-    public boolean AllDirections, Diagonal;
-    public List<Byte> disabledDirection;
+    public boolean onlyPerpendicular;
+    public boolean allDirections, diagonal;
+    public final List<Byte> disabledDirection;
 
     public CrossZone(byte minRadius, byte radius) {
-        this.MinRadius = minRadius;
-        this.Radius = radius;
+        this.minRadius = minRadius;
+        this.radius = radius;
         this.disabledDirection = new ArrayList<>();
     }
 
     @Override
-    public void SetDirection(byte Direction) {
-        this.Direction = Direction;
+    public void setDirection(byte Direction) {
+        this.direction = Direction;
     }
 
     @Override
-    public void SetRadius(byte Radius) {
-        this.Radius = Radius;
+    public void setRadius(byte Radius) {
+        this.radius = Radius;
     }
 
     @Override
-    public int Surface() {
-        return ((int) this.Radius * 4 + 1);
+    public int getSurface() {
+        return ((int) this.radius * 4 + 1);
     }
 
     @Override
-    public Short[] GetCells(short centerCell) {
+    public Short[] getCells(short centerCell) {
         ArrayList<Short> list1 = new ArrayList<>();
-        if ((int) this.MinRadius == 0) {
+        if ((int) this.minRadius == 0) {
             list1.add(centerCell);
         }
-        if (this.OnlyPerpendicular) {
-            switch (this.Direction) {
+        if (this.onlyPerpendicular) {
+            switch (this.direction) {
                 case DirectionsEnum.DOWN_RIGHT:
                 case DirectionsEnum.UP_LEFT:
                     disabledDirection.add(DirectionsEnum.DOWN_RIGHT);
@@ -74,34 +74,34 @@ public class CrossZone implements IZone {
             }
         }
         MapPoint mapPoint = MapPoint.fromCellId(centerCell);
-        for (int index = (int) this.Radius; index > 0; --index) {
-            if (index >= (int) this.MinRadius) {
-                if (!this.Diagonal) {
+        for (int index = (int) this.radius; index > 0; --index) {
+            if (index >= (int) this.minRadius) {
+                if (!this.diagonal) {
                     if (!disabledDirection.contains(DirectionsEnum.DOWN_RIGHT)) {
-                        AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y(), list1);
+                        addCellIfValid(mapPoint.get_x() + index, mapPoint.get_y(), list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.UP_LEFT)) {
-                        AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y(), list1);
+                        addCellIfValid(mapPoint.get_x() - index, mapPoint.get_y(), list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.UP_RIGHT)) {
-                        AddCellIfValid(mapPoint.get_x(), mapPoint.get_y() + index, list1);
+                        addCellIfValid(mapPoint.get_x(), mapPoint.get_y() + index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.DOWN_LEFT)) {
-                        AddCellIfValid(mapPoint.get_x(), mapPoint.get_y() - index, list1);
+                        addCellIfValid(mapPoint.get_x(), mapPoint.get_y() - index, list1);
                     }
                 }
-                if (this.Diagonal || this.AllDirections) {
+                if (this.diagonal || this.allDirections) {
                     if (!disabledDirection.contains(DirectionsEnum.DOWN)) {
-                        AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() - index, list1);
+                        addCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() - index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.UP)) {
-                        AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() + index, list1);
+                        addCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() + index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.RIGHT)) {
-                        AddCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() + index, list1);
+                        addCellIfValid(mapPoint.get_x() + index, mapPoint.get_y() + index, list1);
                     }
                     if (!disabledDirection.contains(DirectionsEnum.LEFT)) {
-                        AddCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() - index, list1);
+                        addCellIfValid(mapPoint.get_x() - index, mapPoint.get_y() - index, list1);
                     }
                 }
             }
@@ -109,26 +109,26 @@ public class CrossZone implements IZone {
         return list1.stream().toArray(Short[]::new);
     }
 
-    private static void AddCellIfValid(int x, int y, List<Short> container) {
+    private static void addCellIfValid(int x, int y, List<Short> container) {
         if (!MapPoint.IsInMap(x, y)) {
             return;
         }
-        container.add(MapPoint.CoordToCellId(x, y));
+        container.add(MapPoint.coordToCellId(x, y));
     }
 
     @Override
-    public byte MinRadius() {
-        return MinRadius;
+    public byte getMinRadius() {
+        return minRadius;
     }
 
     @Override
-    public byte Direction() {
-        return Direction;
+    public byte getDirection() {
+        return direction;
     }
 
     @Override
-    public byte Radius() {
-        return Radius;
+    public byte getRadius() {
+        return radius;
     }
 
 }

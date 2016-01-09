@@ -16,7 +16,7 @@ public class EffectInstanceDate extends EffectInstance {
     public byte Mounth, Day, Hour, Minute;
 
     @Override
-    public byte SerializationIdentifier() {
+    public byte serializationIdentifier() {
         return 4;
     }
 

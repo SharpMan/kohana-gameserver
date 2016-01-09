@@ -1,123 +1,174 @@
 package koh.game.entities.actors.character;
 
 import com.google.common.primitives.Ints;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
-import koh.game.entities.item.EffectHelper;
-import koh.game.entities.item.InventoryItem;
-import koh.game.entities.item.ItemSet;
-import koh.game.entities.item.ItemTemplate;
-import koh.game.entities.item.Weapon;
+import koh.game.entities.item.*;
 import koh.game.entities.item.animal.MountInventoryItem;
-import koh.protocol.client.enums.CharacterInventoryPositionEnum;
-import koh.protocol.client.enums.EffectGenerationType;
-import koh.protocol.client.enums.ItemSuperTypeEnum;
-import koh.protocol.client.enums.ItemsEnum;
-import koh.protocol.client.enums.ObjectErrorEnum;
-import koh.protocol.client.enums.ShortcutBarEnum;
-import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
-import koh.protocol.client.enums.TextInformationTypeEnum;
+import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.KamasUpdateMessage;
-import koh.protocol.messages.game.inventory.items.ObjectAddedMessage;
-import koh.protocol.messages.game.inventory.items.ObjectDeletedMessage;
-import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
-import koh.protocol.messages.game.inventory.items.ObjectModifiedMessage;
-import koh.protocol.messages.game.inventory.items.ObjectMovementMessage;
-import koh.protocol.messages.game.inventory.items.ObjectQuantityMessage;
-import koh.protocol.messages.game.inventory.items.SetUpdateMessage;
+import koh.protocol.messages.game.inventory.items.*;
 import koh.protocol.messages.game.shortcut.ShortcutBarRemovedMessage;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.ObjectItem;
 import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import koh.protocol.types.game.look.EntityLook;
 import koh.protocol.types.game.look.SubEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
- *
  * @author Neo-Craft
  */
 public class CharacterInventory {
 
-    //TODO : Updater PartyEntityLook if Dissociate/Associate LivingObject
-    private Player Player;
-    public Map<Integer, InventoryItem> ItemsCache = Collections.synchronizedMap(new HashMap<>());
-    public final static int[] UnMergeableType = new int[]{97, 121, 18};
+    public final static int[] unMergeableType = new int[]{97, 121, 18};
+    //TODO : Updater PartyEntityLook if Dissociate/Associate livingObject
+    private Player player;
+    private Map<Integer, InventoryItem> itemsCache = new ConcurrentHashMap<>();
 
     public CharacterInventory(Player character) {
-        this.Player = character;
-        ItemDAO.InitInventoryCache(Player.ID, ItemsCache, "character_items");
+        this.player = character;
+        DAO.getItems().initInventoryCache(player.getID(), itemsCache, "character_items");
     }
 
-    public int ItemSetCount() {
-        return (int) this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63 && x.Template().ItemSet() != null).map(x -> x.Template().ItemSet()).distinct().count();
+    public static InventoryItem tryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats) {
+        return tryCreateItem(templateId, Character, quantity, position, Stats, false);
     }
 
-    public void GeneralItemSetApply() {
-        this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63 && x.Template().ItemSet() != null).map(x -> x.Template().ItemSet()).distinct().forEach(Set -> {
-            {
-                this.ApplyItemSetEffects(Set, this.CountItemSetEquiped(Set.id), true, false);
+    public static InventoryItem tryCreateItem(int templateId, Player character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
+
+        // Recup template
+        ItemTemplate template = DAO.getItemTemplates().getTemplate(templateId);
+
+        if (template == null)
+            return null;
+
+        // Creation
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.NORMAL, template instanceof Weapon) : Stats));
+        item.setNeedInsert(true);
+        item.getStats();
+        if (character != null) {
+            character.getInventoryCache().add(item, Merge);
+        }
+
+        return item;
+    }
+
+    public InventoryItem find(int id) {
+        return this.itemsCache.get(id);
+    }
+
+    public InventoryItem findTemplate(int template) {
+        return this.getItems().filter(x -> x.getTemplateId() == template).findFirst().orElse(null);
+    }
+
+    public void safeDelete(InventoryItem item, int quantity) {
+        if (item == null || quantity <= 0) {
+            this.player.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
+            return;
+        }
+        if (item.getPosition() != 63) {
+            unEquipItem(item);
+        }
+        int newQua = item.getQuantity() - quantity;
+        if (newQua <= 0) {
+            removeItem(item);
+        } else {
+            updateObjectquantity(item, newQua);
+        }
+    }
+
+    public void safeDelete(int template, int quantity) {
+        InventoryItem target;
+        for (int i = 0; quantity > i; i++) {
+            target = this.getItemInTemplate(template);
+            if (target != null) {
+                if (target.getQuantity() != 1) {
+                    int toRemove = target.getQuantity() > quantity ? quantity : target.getQuantity();
+                    this.safeDelete(target, toRemove);
+                    if (toRemove > 1) {
+                        i += toRemove - 1;
+                    }
+                } else {
+                    this.safeDelete(target, 1);
+                }
+            } else {
+                break;
             }
-        });
+        }
     }
 
-    public boolean Add(InventoryItem Item, boolean merge) //muste be true
+    public Stream<InventoryItem> getItems() {
+        return this.itemsCache.values().stream();
+    }
+
+    public int getItemSetCount() {
+        return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().count();
+    }
+
+    public void generalItemSetApply() {
+        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(set ->
+                this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false)
+        );
+    }
+
+    public boolean add(InventoryItem item, boolean merge) //muste be true
     {
-        if (merge && !Ints.contains(UnMergeableType, Item.Template().TypeId) && TryMergeItem(Item.TemplateId, Item.Effects, Item.Slot(), Item.GetQuantity(), Item, false)) {
+        if (merge && !Ints.contains(unMergeableType, item.getTemplate().getTypeId()) && tryMergeItem(item.getTemplateId(), item.getEffects(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
-        if (Item.GetOwner() != this.Player.ID) {
-            Item.SetOwner(this.Player.ID);
+        if (item.getOwner() != this.player.getID()) {
+            item.setOwner(this.player.getID());
         }
-        if (ItemsCache.containsKey(Item.ID)) {
-            RemoveFromDic(Item.ID);
+        if (itemsCache.containsKey(item.getID())) {
+            removeFromDic(item.getID());
         }
-        ItemsCache.put(Item.ID, Item);
+        itemsCache.put(item.getID(), item);
 
-        Player.Send(new ObjectAddedMessage(Item.ObjectItem()));
-        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
-        if (Item.GetPosition() != 63) {
-            if (Item.Apparrance() != 0) {
-                this.AddApparence(Item.Apparrance());
+        player.send(new ObjectAddedMessage(item.getObjectItem()));
+        player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
+        if (item.getPosition() != 63) {
+            if (item.getApparrance() != 0) {
+                this.addApparence(item.getApparrance());
             }
-            Player.RefreshEntitie();
-            Player.Stats.Merge(Item.GetStats());
-            Player.Life += Item.GetStats().GetTotal(StatsEnum.Vitality);
-            Player.RefreshStats();
+            player.refreshEntitie();
+            player.getStats().merge(item.getStats());
+            player.addLife(item.getStats().getTotal(StatsEnum.VITALITY));
+            player.refreshStats();
         }
         return true;
     }
 
-    public boolean TryMergeItem(int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem) {
-        return TryMergeItem(TemplateId, Stats, Slot, Quantity, RemoveItem, true);
+    public boolean tryMergeItem(int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int Quantity, InventoryItem removeItem) {
+        return tryMergeItem(templateId, stats, slot, Quantity, removeItem, true);
     }
 
-    public boolean TryMergeItem(int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
-        if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            for (InventoryItem Item : this.ItemsCache.values()) {
-                if (Item.TemplateId == TemplateId && Item.Slot() == Slot && !(RemoveItem != null && RemoveItem.ID == Item.ID) && Item.Equals(Stats)) {
-                    if (RemoveItem != null) {
-                        this.RemoveFromDic(RemoveItem.ID);
-                        RemoveItem.NeedInsert = false;
-                        ItemDAO.Remove(RemoveItem, "character_items");
-                        RemoveItem.ColumsToUpdate = null;
-                        if (Send) {
-                            Player.Send(new ObjectDeletedMessage(RemoveItem.ID));
+    public boolean tryMergeItem(int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int quantity, InventoryItem removeItem, boolean send) {
+        if (slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+            for (InventoryItem Item : this.itemsCache.values()) {
+                if (Item.getTemplateId() == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.getID() == Item.getID()) && Item.Equals(stats)) {
+                    if (removeItem != null) {
+                        this.removeFromDic(removeItem.getID());
+                        removeItem.setNeedInsert(false);
+                        DAO.getItems().delete(removeItem, "character_items");
+                        removeItem.columsToUpdate = null;
+                        if (send) {
+                            player.send(new ObjectDeletedMessage(removeItem.getID()));
                         }
                     }
-                    this.UpdateObjectquantity(Item, Item.GetQuantity() + Quantity);
+                    this.updateObjectquantity(Item, Item.getQuantity() + quantity);
                     return true;
                 }
             }
@@ -127,10 +178,10 @@ public class CharacterInventory {
     }
 
     public List<ObjectItem> toObjectsItem() {
-        return ItemsCache.values().stream().map(x -> x.ObjectItem()).collect(Collectors.toList());
+        return itemsCache.values().stream().map(x -> x.getObjectItem()).collect(Collectors.toList());
     }
 
-    public CharacterInventoryPositionEnum GetLivingObjectSlot(int id) {
+    public CharacterInventoryPositionEnum getLivingObjectSlot(int id) {
         switch (id) {
             case 12425:
             case 9233:
@@ -156,484 +207,461 @@ public class CharacterInventory {
         }
     }
 
-    public MountInventoryItem GetMount(double id) {
-        try {
-            return (MountInventoryItem) this.ItemsCache.values().stream().filter(x -> x instanceof MountInventoryItem && ((MountInventoryItem) x).Entity.AnimalID == (int) id).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+    public MountInventoryItem getMount(double id) {
+        return (MountInventoryItem) this.itemsCache.values().stream().filter(x -> x instanceof MountInventoryItem && ((MountInventoryItem) x).getEntity().animalID == (int) id).findFirst().orElse(null);
     }
 
-    public synchronized void RemoveApparence(short Apparence) {
-        if (Apparence != 0) {
-            if (this.Player.GetEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
-                if (this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(Apparence) != -1) {
-                    this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.remove(this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(Apparence));
+    public synchronized void removeApparence(short appearence) {
+        if (appearence != 0) {
+            if (this.player.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
+                if (this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(appearence) != -1) {
+                    this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.remove(this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(appearence));
                 }
-            } else if (this.Player.GetEntityLook().skins.indexOf(Apparence) != -1) {
-                this.Player.GetEntityLook().skins.remove(this.Player.GetEntityLook().skins.indexOf(Apparence));
+            } else if (this.player.getEntityLook().skins.indexOf(appearence) != -1) {
+                this.player.getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(appearence));
             }
         }
     }
 
-    public synchronized void AddApparence(short Apparence) {
-        if (Apparence != 0) {
-            if (this.Player.GetEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
-                this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.add(Apparence);
+    public synchronized void addApparence(short appearence) {
+        if (appearence != 0) {
+            if (this.player.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
+                this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.add(appearence);
             } else {
-                this.Player.GetEntityLook().skins.add(Apparence);
+                this.player.getEntityLook().skins.add(appearence);
             }
         }
     }
 
-    public void MoveLivingItem(int Guid, CharacterInventoryPositionEnum Slot, int quantity) {
-        InventoryItem Item = this.ItemsCache.get(Guid);
-        Slot = this.GetLivingObjectSlot(Item.TemplateId);
-        InventoryItem exItem = this.GetItemInSlot(Slot);
+    public void moveLivingItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
+        InventoryItem Item = this.itemsCache.get(guid);
+        slot = this.getLivingObjectSlot(Item.getTemplateId());
+        InventoryItem exItem = this.getItemInSlot(slot);
         if (exItem == null) {
-            Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
+            player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
             return;
         }
-        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.GetEffect(974), obviType = (ObjectEffectInteger) Item.GetEffect(973), obviState = (ObjectEffectInteger) Item.GetEffect(971), obviSkin = (ObjectEffectInteger) Item.GetEffect(972);
-        ObjectEffectDate obviTime = (ObjectEffectDate) Item.GetEffect(808), exchangeTime = (ObjectEffectDate) Item.GetEffect(983);
-        if (exItem.GetEffect(970) != null) {
-            PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet est déjà associé à un objet d'apparance.");
+        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972);
+        ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808), exchangeTime = (ObjectEffectDate) Item.getEffect(983);
+        if (exItem.getEffect(970) != null) {
+            PlayerController.sendServerMessage(player.getClient(), "action Impossible : cet objet est déjà associé à un objet d'apparance.");
             return;
         }
         if (obviXp == null || obviType == null || obviState == null || obviSkin == null || obviTime == null) {
             return;
         }
-        if (exItem.GetEffect(983) != null || exItem.GetQuantity() != 1) {
+        if (exItem.getEffect(983) != null || exItem.getQuantity() != 1) {
 
-            PlayerController.SendServerMessage(Player.Client, "Action Impossible : cet objet ne peut pas être associé." + exItem.GetEffect(983).toString());
+            PlayerController.sendServerMessage(player.getClient(), "action Impossible : cet objet ne peut pas être associé." + exItem.getEffect(983).toString());
             return;
         }
-        if (exItem.Apparrance() != 0) {
-            this.RemoveApparence(exItem.Apparrance());
-            //this.Player.GetEntityLook().skins.remove(this.Player.GetEntityLook().skins.indexOf(exItem.Apparrance()));
+        if (exItem.getApparrance() != 0) {
+            this.removeApparence(exItem.getApparrance());
+            //this.player.getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(exItem.getApparrance()));
         }
 
-        exItem.getEffects().add(new ObjectEffectInteger(970, Item.TemplateId));
-        exItem.getEffects().add(obviXp.Clone());
-        exItem.getEffects().add(obviTime.Clone());
-        exItem.getEffects().add(obviType.Clone());
-        exItem.getEffects().add(obviState.Clone());
-        exItem.getEffects().add(obviSkin.Clone());
+        exItem.getEffects$Notify().add(new ObjectEffectInteger(970, Item.getTemplateId()));
+        exItem.getEffects$Notify().add(obviXp.Clone());
+        exItem.getEffects$Notify().add(obviTime.Clone());
+        exItem.getEffects$Notify().add(obviType.Clone());
+        exItem.getEffects$Notify().add(obviState.Clone());
+        exItem.getEffects$Notify().add(obviSkin.Clone());
 
         if (exchangeTime != null) {
-            exItem.getEffects().add(exchangeTime.Clone());
+            exItem.getEffects$Notify().add(exchangeTime.Clone());
         }
 
-        if (Item.GetQuantity() == 1) {
-            RemoveItem(Item);
+        if (Item.getQuantity() == 1) {
+            removeItem(Item);
         } else {
-            this.UpdateObjectquantity(Item, Item.GetQuantity() - 1);
+            this.updateObjectquantity(Item, Item.getQuantity() - 1);
         }
-        if (exItem.Apparrance() != 0) {
-            this.AddApparence(exItem.Apparrance());
+        if (exItem.getApparrance() != 0) {
+            this.addApparence(exItem.getApparrance());
         }
 
-        Player.Send(new ObjectModifiedMessage(exItem.ObjectItem()));
-        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
-        Player.RefreshEntitie();
+        player.send(new ObjectModifiedMessage(exItem.getObjectItem()));
+        player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
+        player.refreshEntitie();
     }
 
-    public void MoveItem(int Guid, CharacterInventoryPositionEnum Slot, int quantity) {
-        InventoryItem Item = this.ItemsCache.get(Guid);
-        if (Item == null || Slot == null || Item.Slot() == Slot) {
-            Player.Send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_UNEQUIP));
+    public void moveItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
+        InventoryItem item = this.itemsCache.get(guid);
+        if (item == null || slot == null || item.getSlot() == slot) {
+            player.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_UNEQUIP));
             return;
         }
-        int count = this.CountItemSetEquiped(Item.Template().itemSetId);
-        if (Slot != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            if (Item.Template().TypeId == 113) {
-                this.MoveLivingItem(Guid, Slot, quantity);
+        int count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
+        if (slot != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+            if (item.getTemplate().getTypeId() == 113) {
+                this.moveLivingItem(guid, slot, quantity);
                 return;
             }
 
-            if (!ItemTemplate.CanPlaceInSlot(Item.GetSuperType(), Slot)) {
-                Player.Send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_EQUIP_HERE));
+            if (!ItemTemplate.canPlaceInSlot(item.getSuperType(), slot)) {
+                player.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_EQUIP_HERE));
                 return;
             }
-            this.UnEquipItem(this.GetItemInSlot(Slot));
-            this.UnEquipedDouble(Item);
+            this.unEquipItem(this.getItemInSlot(slot));
+            this.unEquipedDouble(item);
 
-            if (Item.Template().level > Player.Level) {
-                Player.Send(new ObjectErrorMessage(ObjectErrorEnum.LEVEL_TOO_LOW));
+            if (item.getTemplate().getLevel() > player.getLevel()) {
+                player.send(new ObjectErrorMessage(ObjectErrorEnum.LEVEL_TOO_LOW));
                 return;
             }
-            if (Item.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_SHIELD && hasWeaponTwoHanded()) //Todo IsValidConditions
+            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_SHIELD && hasWeaponTwoHanded()) //Todo IsValidConditions
             {
-                Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 78, new String[0]));
+                player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 78, new String[0]));
                 return;
             }
-            if (Item.isWeapon() && Item.Template().twoHanded && GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD) != null) {
-                Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 79, new String[0]));
-                return;
-            }
-
-            if (!Item.AreConditionFilled(Player)) {
-                Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 19, new String[0]));
+            if (item.isWeapon() && item.getTemplate().isTwoHanded() && getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD) != null) {
+                player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 79, new String[0]));
                 return;
             }
 
-            if (Item.GetQuantity() > 1) {
+            if (!item.areConditionFilled(player)) {
+                player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 19, new String[0]));
+                return;
+            }
+
+            if (item.getQuantity() > 1) {
                 /*InventoryItem NewItem = */
-                TryCreateItem(Item.TemplateId, this.Player, 1, Slot.value(), Item.getEffectsCopy());
-                this.UpdateObjectquantity(Item, Item.GetQuantity() - 1);
+                tryCreateItem(item.getTemplateId(), this.player, 1, slot.value(), item.getEffectsCopy());
+                this.updateObjectquantity(item, item.getQuantity() - 1);
                 return;
             }
-            if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-                Item.SetPosition(Slot);
-                Player.Send(new ObjectMovementMessage(Item.ID, (byte) Item.GetPosition()));
+            if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+                item.setPosition(slot);
+                player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
             } else {
-                Player.Stats.Merge(Item.GetStats());
-                this.Player.Life += Item.GetStats().GetTotal(StatsEnum.Vitality);
-                Item.SetPosition(Slot);
-                Player.Send(new ObjectMovementMessage(Item.ID, (byte) Item.GetPosition()));
-                if (Item.Apparrance() != 0) {
-                    if (Slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) {
-                        if (this.Player.MountInfo.isToogled) {
-                            this.Player.MountInfo.OnGettingOff();
+                player.getStats().merge(item.getStats());
+                this.player.addLife(item.getStats().getTotal(StatsEnum.VITALITY));
+                item.setPosition(slot);
+                player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
+                if (item.getApparrance() != 0) {
+                    if (slot == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) {
+                        if (this.player.getMountInfo().isToogled) {
+                            this.player.getMountInfo().onGettingOff();
                         }
-                        //TODO:  Clean Code + Clear old ArrayList from  memory
-                        if (Item.Template().TypeId == 121) { //Montelier
-                            this.Player.GetEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.Player.GetEntityLook().SkinsCopy(), this.Player.GetEntityLook().ColorsCopy(), this.Player.GetEntityLook().ScalesCopy(), this.Player.GetEntityLook().SubEntityCopy())));
-                            this.Player.GetEntityLook().bonesId = Item.Apparrance();
-                            this.Player.GetEntityLook().skins.clear();
-                            if (Item.TemplateId != ItemsEnum.Kramkram) {
-                                this.Player.GetEntityLook().indexedColors.clear();
+                        //TODO:  clean Code + clear old ArrayList from  memory
+                        if (item.getTemplate().getTypeId() == 121) { //Montelier
+                            this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
+                            this.player.getEntityLook().bonesId = item.getApparrance();
+                            this.player.getEntityLook().skins.clear();
+                            if (item.getTemplateId() != ItemsEnum.KRAMKRAM) {
+                                this.player.getEntityLook().indexedColors.clear();
                             }
-                            this.Player.GetEntityLook().scales.clear();
+                            this.player.getEntityLook().scales.clear();
                         } else {
-                            this.Player.GetEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET, 0, new EntityLook(Item.Apparrance(), new ArrayList<>(), new ArrayList<>(), new ArrayList<Short>() {
+                            this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET, 0, new EntityLook(item.getApparrance(), new ArrayList<>(), new ArrayList<>(), new ArrayList<Short>() {
                                 {
                                     this.add((short) 80);
                                 }
                             }, new ArrayList<>())));
                         }
                     } else {
-                        this.AddApparence(Item.Apparrance());
+                        this.addApparence(item.getApparrance());
                     }
                 }
             }
         } else {
-            if (Item.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+            if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
                 //Retire les stats
-                this.Player.Stats.UnMerge(Item.GetStats());
-                this.Player.Life -= Item.GetStats().GetTotal(StatsEnum.Vitality);
-                if (Player.Life <= 0) {
-                    Player.Life = 1;
+                this.player.getStats().unMerge(item.getStats());
+                this.player.addLife(-item.getStats().getTotal(StatsEnum.VITALITY));
+                if (player.getLife() <= 0) {
+                    player.setLife(1);
                 }
-                this.Player.RefreshStats();
+                this.player.refreshStats();
             }
             // On tente de fusionner
-            if (Item.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET || !this.TryMergeItem(Item.TemplateId, Item.Effects, Slot, Item.GetQuantity(), Item)) {
-                Item.SetPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
-                Player.Send(new ObjectMovementMessage(Item.ID, (byte) Item.GetPosition()));
+            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET || !this.tryMergeItem(item.getTemplateId(), item.getEffects(), slot, item.getQuantity(), item)) {
+                item.setPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
+                player.send(new ObjectMovementMessage(item.getID(), (byte) item.getPosition()));
             }
 
-            if (Item.Apparrance() != 0) {
-                if (Item.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-                    if (Item.Template().TypeId == 121) { //Montelier
+            if (item.getApparrance() != 0) {
+                if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
+                    if (item.getTemplate().getTypeId() == 121) { //Montelier
                         try {
-                            this.Player.GetEntityLook().bonesId = (short) 1;
-                            this.Player.GetEntityLook().skins = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
-                            this.Player.GetEntityLook().indexedColors = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
-                            this.Player.GetEntityLook().scales = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
-                            this.Player.GetEntityLook().subentities = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
-                            this.Player.GetEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
+                            this.player.getEntityLook().bonesId = (short) 1;
+                            this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
+                            this.player.getEntityLook().indexedColors = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
+                            this.player.getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
+                            this.player.getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
+                            this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
                         } catch (Exception e) {
                         }
                     } else {
-                        this.Player.GetEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
+                        this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
                     }
                 } else {
-                    this.RemoveApparence(Item.Apparrance());
+                    this.removeApparence(item.getApparrance());
                 }
             }
         }
-        this.CheckItemsCriterias();
-        if (Item.Template().ItemSet() != null) {
+        this.checkItemsCriterias();
+        if (item.getTemplate().getItemSet() != null) {
             if (count >= 0) {
-                this.ApplyItemSetEffects(Item.Template().ItemSet(), count, false, true);
+                this.applyItemSetEffects(item.getTemplate().getItemSet(), count, false, true);
             }
-            count = this.CountItemSetEquiped(Item.Template().itemSetId);
+            count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
             if (count > 0) {
-                this.ApplyItemSetEffects(Item.Template().ItemSet(), count, true, false);
+                this.applyItemSetEffects(item.getTemplate().getItemSet(), count, true, false);
             }
-            this.SendSetUpdateMessage(Item.Template().ItemSet(), count);
+            this.sendSetUpdateMessage(item.getTemplate().getItemSet(), count);
         }
-        Player.RefreshStats();
-        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
-        //System.out.println(this.Player.GetEntityLook().toString());
-        Player.RefreshEntitie();
+        player.refreshStats();
+        player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
+        //System.out.println(this.player.getEntityLook().toString());
+        player.refreshEntitie();
     }
 
-    public void BeforeItemSet(InventoryItem Item) {
-        if (Item.Template().ItemSet() != null) {
-            int count = this.CountItemSetEquiped(Item.Template().itemSetId);
+    public void beforeItemSet(InventoryItem Item) {
+        if (Item.getTemplate().getItemSet() != null) {
+            int count = this.countItemSetEquiped(Item.getTemplate().getItemSetId());
             if (count >= 0) {
-                this.ApplyItemSetEffects(Item.Template().ItemSet(), count, false, true);
+                this.applyItemSetEffects(Item.getTemplate().getItemSet(), count, false, true);
             }
         }
     }
 
-    public void AfterItemSet(InventoryItem Item) {
-        if (Item.Template().ItemSet() != null) {
-            int count = this.CountItemSetEquiped(Item.Template().itemSetId);
+    public void afterItemSet(InventoryItem Item) {
+        if (Item.getTemplate().getItemSet() != null) {
+            int count = this.countItemSetEquiped(Item.getTemplate().getItemSetId());
             if (count > 0) {
-                this.ApplyItemSetEffects(Item.Template().ItemSet(), count, true, false);
+                this.applyItemSetEffects(Item.getTemplate().getItemSet(), count, true, false);
             }
-            this.SendSetUpdateMessage(Item.Template().ItemSet(), count);
+            this.sendSetUpdateMessage(Item.getTemplate().getItemSet(), count);
         }
     }
 
-    public void SendSetUpdateMessage(ItemSet set, int count) {
-        this.Player.Send(new SetUpdateMessage(set.id, this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63 && x.Template().itemSetId == set.id).mapToInt(x -> x.TemplateId).toArray(), set.toObjectEffects(count)));
+    public void sendSetUpdateMessage(ItemSet set, int count) {
+        this.player.send(new SetUpdateMessage(set.getId(), this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSetId() == set.getId()).mapToInt(x -> x.getTemplateId()).toArray(), set.toObjectEffects(count)));
     }
 
-    private int CountItemSetEquiped(int id) {
-        return (int) this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63 && x.Template().itemSetId == id).count();
+    private int countItemSetEquiped(int id) {
+        return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSetId() == id).count();
     }
 
-    private void ApplyItemSetEffects(ItemSet itemSet, int count, boolean apply, boolean send) {
+    private void applyItemSetEffects(ItemSet itemSet, int count, boolean apply, boolean send) {
         try {
             if (apply) {
-                Player.Stats.Merge(itemSet.GetStats(count));
-                this.Player.Life += itemSet.GetStats(count).GetTotal(StatsEnum.Vitality);
+                player.getStats().merge(itemSet.getStats(count));
+                this.player.addLife(itemSet.getStats(count).getTotal(StatsEnum.VITALITY));
             } else {
-                Player.Stats.UnMerge(itemSet.GetStats(count));
-                this.Player.Life -= itemSet.GetStats(count).GetTotal(StatsEnum.Vitality);
+                player.getStats().unMerge(itemSet.getStats(count));
+                this.player.addLife(-itemSet.getStats(count).getTotal(StatsEnum.VITALITY));
             }
             if (send) {
-                this.Player.RefreshStats();;
+                this.player.refreshStats();
+                ;
             }
-        } catch (NullPointerException e) { //Well confortable than check nullable ItemSet , nulltables ItemSet with this count of items .. ect
+        } catch (NullPointerException e) { //Well confortable than check nullable getItemSet , nulltables getItemSet with this count of items .. ect
         }
     }
 
-    public static InventoryItem TryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats) {
-        return TryCreateItem(templateId, Character, quantity, position, Stats, false);
-    }
-
-    public static InventoryItem TryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
-        if (!ItemDAO.Cache.containsKey(templateId)) // Template inexistant
-        {
-            return null;
-        }
-
-        // Recup template
-        ItemTemplate Template = ItemDAO.Cache.get(templateId);
-
-        // Creation
-        InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, templateId, position, Character != null ? Character.ID : -1, quantity, (Stats == null ? EffectHelper.GenerateIntegerEffect(Template.possibleEffects, EffectGenerationType.Normal, Template instanceof Weapon) : Stats));
-        Item.NeedInsert = true;
-        Item.GetStats();
-        if (Character != null) {
-            Character.InventoryCache.Add(Item, Merge);
-        }
-
-        return Item;
-    }
-
-    private boolean UnEquipedDouble(InventoryItem itemToEquip) {
-        if (itemToEquip.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_DOFUS) {
-            Optional<InventoryItem> playerItem = this.GetEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.TemplateId == itemToEquip.TemplateId).findFirst();
+    private boolean unEquipedDouble(InventoryItem itemToEquip) {
+        if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_DOFUS) {
+            Optional<InventoryItem> playerItem = this.getEquipedItems()
+                    .filter(obj -> obj.getID() != itemToEquip.getID() && obj.getTemplateId() == itemToEquip.getTemplateId()).findFirst();
 
             if (playerItem.isPresent()) {
-                this.MoveItem(playerItem.get().ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
+                this.moveItem(playerItem.get().getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
                 return true;
             }
         }
-        if (itemToEquip.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_RING) {
-            Optional<InventoryItem> playerItem = this.GetEquipedItems().stream().filter(x -> x.ID != itemToEquip.ID && x.TemplateId == itemToEquip.TemplateId && x.Template().itemSetId > 0).findFirst();
+        if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_RING) {
+            Optional<InventoryItem> playerItem = this.getEquipedItems()
+                    .filter(obj -> obj.getID() != itemToEquip.getID() && obj.getTemplateId() == itemToEquip.getTemplateId() && obj.getTemplate().getItemSetId() > 0)
+                    .findFirst();
 
             if (playerItem.isPresent()) {
-                this.MoveItem(playerItem.get().ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
+                this.moveItem(playerItem.get().getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
                 return true;
             }
         }
         return false;
     }
 
-    public Collection<InventoryItem> GetEquipedItems() {
-        return this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63).collect(Collectors.toSet());
+    public Stream<InventoryItem> getEquipedItems() {
+        return this.itemsCache.values()
+                .stream()
+                .filter(obj -> obj.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
     }
 
-    public InventoryItem GetItemInTemplate(int Template) {
-        try {
-            return this.ItemsCache.values().stream().filter(x -> x.TemplateId == Template).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+    public InventoryItem getItemInTemplate(int template) {
+        return this.itemsCache.values().stream().filter(obj -> obj.getTemplateId() == template).findFirst().orElse(null);
     }
 
-    public InventoryItem GetItemInSlot(CharacterInventoryPositionEnum Slot) {
-        try {
-            return this.ItemsCache.values().stream().filter(x -> x.Slot() == Slot).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+    public InventoryItem getItemInSlot(CharacterInventoryPositionEnum slot) {
+        return this.itemsCache.values().stream().filter(x -> x.getSlot() == slot).findFirst().orElse(null);
     }
 
-    public InventoryItem GetWeapon() {
-        try {
-            return this.ItemsCache.values().stream().filter(x -> x.Slot() == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+    public InventoryItem getWeapon() {
+        return this.itemsCache.values().stream().filter(x -> x.getSlot() == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).findFirst().orElse(null);
     }
 
     public boolean hasWeaponTwoHanded() {
-        return GetWeapon() != null && GetWeapon().Template().twoHanded;
+        return getWeapon() != null && getWeapon().getTemplate().isTwoHanded();
     }
 
-    public int Weight() {
-        return this.ItemsCache.values().stream().mapToInt(x -> x.Weight()).sum();
+    public int getWeight() {
+        return this.itemsCache.values().stream().mapToInt(x -> x.getWeight()).sum();
     }
 
-    public int WeightTotal() {
-        return 1000 + this.Player.Stats.GetTotal(StatsEnum.AddPods);
+    public int getTotalWeight() {
+        return 1000 + this.player.getStats().getTotal(StatsEnum.ADD_PODS) + (5 * this.player.getStats().getTotal(StatsEnum.STRENGTH));
     }
 
-    public void UpdateObjectquantity(InventoryItem Item, int Quantity) {
-        Item.SetQuantity(Quantity);
-        if (Item.GetQuantity() <= 0) {
-            this.RemoveItem(Item);
+    public Stream<Stream<ObjectEffectDice>> getEffects(int id) {
+        return this.getEquipedItems()
+                .map(obj -> obj.getEffects().stream()
+                        .filter(e -> e.actionId == EffectHelper.SPELL_EFFECT_PER_FIGHT)
+                        .map(e -> (ObjectEffectDice) e));
+    }
+
+    public void updateObjectquantity(InventoryItem item, int quantity) {
+        item.setQuantity(quantity);
+        if (item.getQuantity() <= 0) {
+            this.removeItem(item);
             return;
         }
-        Player.Send(new ObjectQuantityMessage(Item.ID, Item.GetQuantity()));
-        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
+        player.send(new ObjectQuantityMessage(item.getID(), item.getQuantity()));
+        player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
     }
 
-    public void RemoveItem(InventoryItem Item) {
-        Item.NeedInsert = false;
-        this.RemoveFromDic(Item.ID);
-        Player.Send(new ObjectDeletedMessage(Item.ID));
-        ItemDAO.Remove(Item, "character_items");
-        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
+    public void removeItem(InventoryItem item) {
+        item.setNeedInsert(false);
+        this.removeFromDic(item.getID());
+        player.send(new ObjectDeletedMessage(item.getID()));
+        DAO.getItems().delete(item, "character_items");
+        player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
     }
 
-    public void ChangeOwner(InventoryItem Item, Player Trader) {
-        this.RemoveFromDic(Item.ID);
-        Player.Send(new ObjectDeletedMessage(Item.ID));
-        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
-        Trader.InventoryCache.Add(Item, true);
+    public void changeOwner(InventoryItem item, Player trader) {
+        this.removeFromDic(item.getID());
+        player.send(new ObjectDeletedMessage(item.getID()));
+        player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
+        trader.getInventoryCache().add(item, true);
     }
 
-    public void RemoveItemFromInventory(InventoryItem Item) {
-        Item.NeedInsert = false;
-        Item.SetOwner(-1);
-        this.RemoveFromDic(Item.ID);
-        Player.Send(new ObjectDeletedMessage(Item.ID));
-        Player.Send(new InventoryWeightMessage(Weight(), WeightTotal()));
+    public void removeItemFromInventory(InventoryItem item) {
+        item.setNeedInsert(false);
+        item.setOwner(-1);
+        this.removeFromDic(item.getID());
+        player.send(new ObjectDeletedMessage(item.getID()));
+        player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
     }
 
-    public void RemoveFromDic(int id) {
-        ItemsCache.remove(id);
+    public void removeFromDic(int id) {
+        itemsCache.remove(id);
         try {
-            this.Player.Shortcuts.myShortcuts.entrySet().stream().filter(x -> x.getValue() instanceof ItemShortcut && ((ItemShortcut) x.getValue()).ItemID == id).map(x -> x.getKey()).forEach(y -> {
-                this.Player.Shortcuts.myShortcuts.remove(y);
-                this.Player.Send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, y));
+            this.player.getShortcuts().myShortcuts.entrySet().stream().filter(x -> x.getValue() instanceof ItemShortcut && ((ItemShortcut) x.getValue()).itemID == id).map(x -> x.getKey()).forEach(y -> {
+                this.player.getShortcuts().myShortcuts.remove(y);
+                this.player.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, y));
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void AddKamas(int Value) {
-        AddKamas(Value, true);
+    public void addKamas(int value) {
+        addKamas(value, true);
     }
 
-    public void AddKamas(int Value, boolean send) {
-        this.Player.Kamas += Value;
-        this.Player.Send(new KamasUpdateMessage(this.Player.Kamas));
-        //this.Player.RefreshStats();
+    public void addKamas(int value, boolean send) {
+        this.player.addKamas(value);
+        this.player.send(new KamasUpdateMessage(this.player.getKamas()));
+        //this.player.refreshStats();
         if (send) {
-            this.Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 45, new String[]{Value + ""}));
+            this.player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 45, new String[]{value + ""}));
         }
     }
 
-    public void SubstractKamas(int Value) {
-        SubstractKamas(Value, true);
+    public void substractKamas(int value) {
+        substractKamas(value, true);
     }
 
-    public void SubstractKamas(int Value, boolean send) {
-        this.Player.Kamas -= Value;
-        this.Player.Send(new KamasUpdateMessage(this.Player.Kamas));
-        //this.Player.RefreshStats();
+    public void substractKamas(int value, boolean send) {
+        this.player.addKamas(-value);
+        this.player.send(new KamasUpdateMessage(this.player.getKamas()));
+        //this.player.refreshStats();
         if (send) {
-            this.Player.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 46, new String[]{Value + ""}));
+            this.player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 46, new String[]{value + ""}));
         }
     }
 
     public boolean isDriven() {
-        return this.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null && this.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS).Template().TypeId == 121;
+        return this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null && this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS).getTemplate().getTypeId() == 121;
     }
 
-    public void UnEquipItem(InventoryItem EquipedItem) {
-        if (EquipedItem == null) {
+    public void unEquipItem(InventoryItem equipedItem) {
+        if (equipedItem == null) {
             return;
         }
-        this.BeforeItemSet(EquipedItem);
+        this.beforeItemSet(equipedItem);
         //Deplacement dans l'inventaire
-        Player.Stats.UnMerge(EquipedItem.GetStats());
-        this.Player.Life -= EquipedItem.GetStats().GetTotal(StatsEnum.Vitality);
-        if (EquipedItem.Apparrance() != 0) {
-            if (EquipedItem.GetSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
-                if (EquipedItem.Template().TypeId == 121) { //Montelier
+        player.getStats().unMerge(equipedItem.getStats());
+        this.player.addLife(-equipedItem.getStats().getTotal(StatsEnum.VITALITY));
+        if (equipedItem.getApparrance() != 0) {
+            if (equipedItem.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET) {
+                if (equipedItem.getTemplate().getTypeId() == 121) { //Montelier
                     try {
-                        this.Player.GetEntityLook().bonesId = (short) 1;
-                        this.Player.GetEntityLook().skins = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
-                        this.Player.GetEntityLook().indexedColors = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
-                        this.Player.GetEntityLook().scales = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
-                        this.Player.GetEntityLook().subentities = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
-                        this.Player.GetEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
+                        this.player.getEntityLook().bonesId = (short) 1;
+                        this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
+                        this.player.getEntityLook().indexedColors = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
+                        this.player.getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
+                        this.player.getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
+                        this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
                     } catch (Exception e) {
 
                     }
                 } else {
-                    this.Player.GetEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
+                    this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
                 }
             } else {
-                this.RemoveApparence(EquipedItem.Apparrance());
+                this.removeApparence(equipedItem.getApparrance());
             }
         }
-        EquipedItem.SetPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
-        this.AfterItemSet(EquipedItem);
-        Player.Send(new ObjectMovementMessage(EquipedItem.ID, (byte) EquipedItem.GetPosition()));
+        equipedItem.setPosition(CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
+        this.afterItemSet(equipedItem);
+        player.send(new ObjectMovementMessage(equipedItem.getID(), (byte) equipedItem.getPosition()));
 
     }
 
-    public boolean HasItemId(int parseInt) {
-        return this.ItemsCache.values().stream().filter(x -> x.TemplateId == parseInt).findAny().isPresent();
+    public boolean hasItemId(int parseInt) {
+        return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == parseInt).findAny().isPresent();
     }
 
-    private void CheckItemsCriterias() {
-        //(!ConditionParser.validConditions(Player, x.Template().criteria)))
-        this.ItemsCache.values().stream().filter(x -> x.GetPosition() != 63 && !x.AreConditionFilled(Player)).forEach((Item) -> {
-            this.MoveItem(Item.ID, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
+    public boolean hasItemId(int parseInt, int qua) {
+        return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == parseInt).mapToInt(x -> x.getQuantity()).sum() > qua;
+    }
+
+    private void checkItemsCriterias() {
+        //(!ConditionParser.validConditions(player, x.getTemplate().criteria)))
+        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && !x.areConditionFilled(player)).forEach((Item) -> {
+            this.moveItem(Item.getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
         });
     }
 
-    public short WeaponCriticalHit() {
+    public short weaponCriticalHit() {
         InventoryItem playerItem;
-        if ((playerItem = this.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)) != null) {
-            return playerItem.Template() instanceof Weapon ? (short) ((Weapon) playerItem.Template()).criticalHitBonus : 0;
+        if ((playerItem = this.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)) != null) {
+            return playerItem.getTemplate() instanceof Weapon ? (short) ((Weapon) playerItem.getTemplate()).getCriticalHitBonus() : 0;
         } else {
             return 0;
         }
     }
 
-    public void Save(boolean Clear) {
-        this.ItemsCache.values().parallelStream().forEach(Item -> {
-            if (Item.NeedRemove) {
-                ItemDAO.Remove(Item, "character_items");
-            } else if (Item.NeedInsert) {
-                ItemDAO.Insert(Item, Clear, "character_items");
-            } else if (Item.ColumsToUpdate != null && !Item.ColumsToUpdate.isEmpty()) {
-                ItemDAO.Update(Item, Clear, "character_items");
+    public void save(boolean Clear) {
+        this.itemsCache.values().parallelStream().forEach(Item -> {
+            if (Item.isNeedRemove()) {
+                DAO.getItems().delete(Item, "character_items");
+            } else if (Item.isNeedInsert()) {
+                DAO.getItems().create(Item, Clear, "character_items");
+            } else if (Item.columsToUpdate != null && !Item.columsToUpdate.isEmpty()) {
+                DAO.getItems().create(Item, Clear, "character_items");
             } else if (Clear) {
                 Item.totalClear();
             }
@@ -641,9 +669,9 @@ public class CharacterInventory {
         if (!Clear) {
             return;
         }
-        this.Player = null;
-        this.ItemsCache.clear();
-        this.ItemsCache = null;
+        this.player = null;
+        this.itemsCache.clear();
+        this.itemsCache = null;
         try {
             this.finalize();
         } catch (Throwable tr) {

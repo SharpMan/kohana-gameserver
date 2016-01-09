@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
+import lombok.Getter;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -14,40 +15,45 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class DofusCell {
 
-    public DofusMap Map;
-    public short Id;
-    public short Floor;
-    public int LosMov = 3;
-    public byte Speed;
-    public int MapChangeData;
-    public int MoveZone;
+    @Getter
+    private  DofusMap map;
+    @Getter
+    private  short id;
+    @Getter
+    private  short floor;
+    public int losMov = 3;
+    @Getter
+    private  byte speed;
+    public int mapChangeData;
+    @Getter
+    private int moveZone;
 
     private final Map<Integer, IGameActor> myActors = Collections.synchronizedMap(new HashMap<>());
     public DofusTrigger myAction = null;
 
     public DofusCell(DofusMap map, short id, IoBuffer buf) {
-        this.Map = map;
-        this.Id = id;
-        this.Floor = buf.getShort();
-        this.LosMov = buf.getUnsigned();
-        this.Speed = buf.get();
-        this.MapChangeData = buf.getUnsigned();
-        this.MoveZone = buf.getUnsigned();
+        this.map = map;
+        this.id = id;
+        this.floor = buf.getShort();
+        this.losMov = buf.getUnsigned();
+        this.speed = buf.get();
+        this.mapChangeData = buf.getUnsigned();
+        this.moveZone = buf.getUnsigned();
     }
 
-    public void AddActor(IGameActor Actor) {
-        this.myActors.put(Actor.ID, Actor);
+    public void addActor(IGameActor actor) {
+        this.myActors.put(actor.getID(), actor);
 
         // on affecte la cell
-        Actor.Cell = this;
+        actor.setActorCell(this);
 
-        if (Actor instanceof Player && myAction != null) {
-            ((Player) Actor).Client.onMouvementConfirm = myAction;
+        if (actor instanceof Player && myAction != null) {
+            ((Player) actor).getClient().setOnMouvementConfirm(myAction);
         }
     }
 
-    public void DelActor(IGameActor Actor) {
-        this.myActors.remove(Actor.ID);
+    public void delActor(IGameActor actor) {
+        this.myActors.remove(actor.getID());
     }
     
     public Collection<IGameActor> getActors(){
@@ -59,53 +65,53 @@ public class DofusCell {
     }
 
     public DofusCell(DofusMap map, short id, short Floor, byte LosMov, byte Speed, int MapChangeData, int MoveZone) {
-        this.Map = map;
-        this.Id = id;
-        this.Floor = Floor;
-        this.LosMov = LosMov;
-        this.Speed = Speed;
-        this.MapChangeData = MapChangeData;
-        this.MoveZone = MoveZone;
+        this.map = map;
+        this.id = id;
+        this.floor = Floor;
+        this.losMov = LosMov;
+        this.speed = Speed;
+        this.mapChangeData = MapChangeData;
+        this.moveZone = MoveZone;
     }
 
-    public boolean AffectMapChange() {
-        return this.MapChangeData != 0;
+    public boolean affectMapChange() {
+        return this.mapChangeData != 0;
     }
 
-    public boolean Los() {
-        return (this.LosMov & 2) >> 1 == 1;
+    public boolean los() {
+        return (this.losMov & 2) >> 1 == 1;
     }
 
-    public boolean Mov() {
-        return (this.LosMov & 1) == 1 && !this.NonWalkableDuringFight() && !this.FarmCell();
+    public boolean mov() {
+        return (this.losMov & 1) == 1 && !this.nonWalkableDuringFight() && !this.farmCell();
     }
 
-    public boolean Walakable() {
-        return (this.LosMov & 1) == 1;
+    public boolean walakable() {
+        return (this.losMov & 1) == 1;
     }
 
-    public boolean NonWalkableDuringFight() {
-        return (this.LosMov & 4) >> 2 == 1;
+    public boolean nonWalkableDuringFight() {
+        return (this.losMov & 4) >> 2 == 1;
     }
 
-    public boolean NonWalkableDuringRP() {
-        return (this.LosMov & 128) >> 7 == 1;
+    public boolean nonWalkableDuringRP() {
+        return (this.losMov & 128) >> 7 == 1;
     }
 
-    public boolean FarmCell() {
-        return (this.LosMov & 32) >> 5 == 1;
+    public boolean farmCell() {
+        return (this.losMov & 32) >> 5 == 1;
     }
 
-    public boolean Visible() {
-        return (this.LosMov & 64) >> 6 == 1;
+    public boolean visible() {
+        return (this.losMov & 64) >> 6 == 1;
     }
 
-    public boolean Red() {
-        return (this.LosMov & 8) >> 3 == 1;
+    public boolean red() {
+        return (this.losMov & 8) >> 3 == 1;
     }
 
-    public boolean Blue() {
-        return (this.LosMov & 16) >> 4 == 1;
+    public boolean blue() {
+        return (this.losMov & 16) >> 4 == 1;
     }
 
 }

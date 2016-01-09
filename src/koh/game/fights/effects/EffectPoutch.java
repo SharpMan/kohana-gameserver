@@ -10,10 +10,10 @@ import koh.game.fights.effects.buff.BuffPoutch;
 public class EffectPoutch extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
 
-        for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffPoutch(CastInfos, Target));
+        for (Fighter Target : castInfos.targets) {
+            Target.getBuff().addBuff(new BuffPoutch(castInfos, Target));
         }
 
         return -1;

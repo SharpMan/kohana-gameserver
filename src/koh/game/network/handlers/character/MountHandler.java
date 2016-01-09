@@ -4,8 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.MountDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.animal.MountInventoryItem;
 import koh.game.network.WorldClient;
@@ -30,46 +29,46 @@ public class MountHandler {
 
     @HandlerAttribute(ID = ExchangeRequestOnMountStockMessage.M_ID)
     public static void HandleExchangeRequestOnMountStockMessage(WorldClient Client, ExchangeRequestOnMountStockMessage Message) {
-        PlayerController.SendServerMessage(Client, "Non disponnible");
+        PlayerController.sendServerMessage(Client, "Non disponnible");
     }
 
     @HandlerAttribute(ID = MountRenameRequestMessage.M_ID)
     public static void HandleMountRenameRequestMessage(WorldClient Client, MountRenameRequestMessage Message) {
-        if (Client.Character.MountInfo.Mount != null && (int) Client.Character.MountInfo.Mount.id == Message.mountId) {
-            Client.Character.MountInfo.Mount.name = Message.name;
-            Client.Character.MountInfo.Save();
-            Client.Send(new MountRenamedMessage(Message.name, Message.mountId));
-        } else if (Client.Character.InventoryCache.GetMount(Message.mountId) != null) {
-            Client.Character.InventoryCache.GetMount(Message.mountId).Mount.name = Message.name;
-            Client.Character.InventoryCache.GetMount(Message.mountId).Save();
-            Client.Send(new MountRenamedMessage(Message.name, Message.mountId));
+        if (Client.getCharacter().getMountInfo().mount != null && (int) Client.getCharacter().getMountInfo().mount.id == Message.mountId) {
+            Client.getCharacter().getMountInfo().mount.name = Message.name;
+            Client.getCharacter().getMountInfo().save();
+            Client.send(new MountRenamedMessage(Message.name, Message.mountId));
+        } else if (Client.getCharacter().getInventoryCache().getMount(Message.mountId) != null) {
+            Client.getCharacter().getInventoryCache().getMount(Message.mountId).getMount().name = Message.name;
+            Client.getCharacter().getInventoryCache().getMount(Message.mountId).save();
+            Client.send(new MountRenamedMessage(Message.name, Message.mountId));
         }
     }
 
     @HandlerAttribute(ID = MountFeedRequestMessage.M_ID)
     public static void HandleMountFeedRequestMessage(WorldClient Client, MountFeedRequestMessage Message) {
-        InventoryItem Food = Client.Character.InventoryCache.ItemsCache.get(Message.mountFoodUid);
-        if (Food == null || Food.Slot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            Client.Send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
+        InventoryItem food = Client.getCharacter().getInventoryCache().find(Message.mountFoodUid);
+        if (food == null || food.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+            Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        int newQua = Food.GetQuantity() - Message.quantity;
+        int newQua = food.getQuantity() - Message.quantity;
         if (newQua <= 0) {
-            Client.Character.InventoryCache.RemoveItem(Food);
+            Client.getCharacter().getInventoryCache().removeItem(food);
         } else {
-            Client.Character.InventoryCache.UpdateObjectquantity(Food, newQua);
+            Client.getCharacter().getInventoryCache().updateObjectquantity(food, newQua);
         }
-        Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 105, new String[0]));
+        Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 105, new String[0]));
     }
 
     @HandlerAttribute(ID = MountReleaseRequestMessage.M_ID)
     public static void HandleMountReleaseRequestMessage(WorldClient Client, MountReleaseRequestMessage Message) {
-        PlayerController.SendServerMessage(Client, "La liberté des uns s'arrête là où commence celle des autres.");
+        PlayerController.sendServerMessage(Client, "La liberté des uns s'arrête là où commence celle des autres.");
     }
 
     @HandlerAttribute(ID = MountSterilizeRequestMessage.M_ID)
     public static void HandleMountSterilizeRequestMessage(WorldClient Client, MountSterilizeRequestMessage Message) {
-        Client.Send(new MountSterilizedMessage((int) Client.Character.MountInfo.Mount.id));
+        Client.send(new MountSterilizedMessage((int) Client.getCharacter().getMountInfo().mount.id));
     }
 
     @HandlerAttribute(ID = MountSetXpRatioRequestMessage.M_ID)
@@ -77,83 +76,86 @@ public class MountHandler {
         if (Message.xpRatio > 90) {
             throw new Error("You can't >= 90%");
         }
-        Client.Character.MountInfo.Ratio = Message.xpRatio;
-        Client.Send(new MountXpRatioMessage(Client.Character.MountInfo.Ratio));
+        if(Client.getCharacter().getMountInfo() == null){
+            throw new NullPointerException("No mount present to set the ratio");
+        }
+        Client.getCharacter().getMountInfo().ratio = Message.xpRatio;
+        Client.send(new MountXpRatioMessage(Client.getCharacter().getMountInfo().ratio));
     }
 
     @HandlerAttribute(ID = 5976)
     public static void HandleMountToggleRidingRequestMessage(WorldClient Client, MountToggleRidingRequestMessage Message) {
-        if (Client.Character.MountInfo.Mount == null) {
-            throw new Error(Client.Character.NickName + " try to ride NullableMount");
+        if (Client.getCharacter().getMountInfo().mount == null) {
+            throw new Error(Client.getCharacter().getNickName() + " try to ride NullableMount");
         }
-        if (Client.Character.MountInfo.isToogled) {
-            Client.Character.MountInfo.OnGettingOff();
+        if (Client.getCharacter().getMountInfo().isToogled) {
+            Client.getCharacter().getMountInfo().onGettingOff();
         } else {
-            Client.Character.MountInfo.OnRiding();
+            Client.getCharacter().getMountInfo().onRiding();
         }
-        Client.Character.MountInfo.Save();
+        Client.getCharacter().getMountInfo().save();
     }
 
     @HandlerAttribute(ID = ExchangeHandleMountsStableMessage.ID)
     public static void HandleExchangeHandleMountsStableMessage(WorldClient Client, ExchangeHandleMountsStableMessage Message ) {
-        if (Client.IsGameAction(GameActionTypeEnum.EXCHANGE)) {
+        if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
             switch (Message.actionType) {
                 case ExchangeHandleMountStableTypeEnum.EXCHANGE_UNCERTIF_TO_EQUIPED:
-                    if (Client.Character.MountInfo.Mount != null) {
-                        PlayerController.SendServerMessage(Client, "You are already in a mount");
+                    if (Client.getCharacter().getMountInfo().mount != null) {
+                        PlayerController.sendServerMessage(Client, "You are already in a mount");
                         break;
                     }
-                    InventoryItem Dragodinde = Client.Character.InventoryCache.ItemsCache.get(Message.ridesId[0]);
-                    if (Dragodinde == null) {
-                        PlayerController.SendServerMessage(Client, "Nullable InventoryMount");
+                    InventoryItem dragodinde = Client.getCharacter().getInventoryCache().find(Message.ridesId[0]);
+                    if (dragodinde == null) {
+                        PlayerController.sendServerMessage(Client, "Nullable InventoryMount");
                         break;
                     }
-                    if(!Dragodinde.AreConditionFilled(Client.Character)){
-                         Client.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 19, new String[0]));
+                    if(!dragodinde.areConditionFilled(Client.getCharacter())){
+                         Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 19, new String[0]));
                          break;
                     }
-                    Client.Character.MountInfo.Mount = ((MountInventoryItem) Dragodinde).Mount;
-                    Client.Character.MountInfo.Entity = ((MountInventoryItem) Dragodinde).Entity;
-                    Client.Send(new MountRidingMessage(true));
-                    Client.Send(new MountSetMessage(Client.Character.MountInfo.Mount));
-                    Client.Character.InventoryCache.RemoveItem(Dragodinde);
+                    Client.getCharacter().getMountInfo().mount = ((MountInventoryItem) dragodinde).getMount();
+                    Client.getCharacter().getMountInfo().entity = ((MountInventoryItem) dragodinde).getEntity();
+                    Client.send(new MountRidingMessage(true));
+                    Client.send(new MountSetMessage(Client.getCharacter().getMountInfo().mount));
+                    Client.getCharacter().getInventoryCache().removeItem(dragodinde);
                     break;
                 case ExchangeHandleMountStableTypeEnum.EXCHANGE_EQUIPED_CERTIF:
-                    if (Client.Character.MountInfo.Mount == null) {
-                        PlayerController.SendServerMessage(Client, "Nullable mount");
+                    if (Client.getCharacter().getMountInfo().mount == null) {
+                        PlayerController.sendServerMessage(Client, "Nullable mount");
                         break;
                     }
 
-                    InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, MountDAO.Model(Client.Character.MountInfo.Mount.model).ScroolId, 63, Client.Character.ID, 1, new ArrayList<ObjectEffect>() {
+                    InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), DAO.getMounts().find(Client.getCharacter().getMountInfo().mount.model).getScroolId(), 63, Client.getCharacter().getID(), 1, new ArrayList<ObjectEffect>() {
                         {
                             add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
-                            add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.Character.MountInfo.Mount.model, Client.Character.MountInfo.Entity.AnimalID));
-                            add(new ObjectEffectString(987, Client.Character.NickName));
+                            add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(), Client.getCharacter().getMountInfo().mount.model, Client.getCharacter().getMountInfo().entity.animalID));
+                            add(new ObjectEffectString(987, Client.getCharacter().getNickName()));
                         }
                     });
-                    if (Client.Character.InventoryCache.Add(Item, true)) {
-                        Item.NeedInsert = true;
+                    if (Client.getCharacter().getInventoryCache().add(Item, true)) {
+                        Item.setNeedInsert(true);
                     }
-                    Client.Character.MountInfo.OnGettingOff();
-                    Client.Character.MountInfo.Mount = null;
-                    Client.Character.MountInfo.Entity = null;
+                    Client.getCharacter().getMountInfo().onGettingOff();
+                    Client.getCharacter().getMountInfo().mount = null;
+                    Client.getCharacter().getMountInfo().entity = null;
 
-                    Client.Send(new MountRidingMessage(false));
-                    Client.Send(new MountUnSetMessage());
+                    Client.send(new MountRidingMessage(false));
+                    Client.send(new MountUnSetMessage());
                     break;
                 default:
-                    PlayerController.SendServerMessage(Client, "Unsupported Action: You can juste equip/unequip the mount");
+                    PlayerController.sendServerMessage(Client, "Unsupported action: You can juste equip/unequip the mount");
             }
         }
     }
 
     @HandlerAttribute(ID = MountInformationRequestMessage.M_ID)
     public static void HandleMountInformationRequestMessage(WorldClient Client, MountInformationRequestMessage Message) {
-        if (Client.Character.InventoryCache.GetMount(Message.Id) == null) {
+        if (Client.getCharacter().getInventoryCache().getMount(Message.Id) == null) {
             return;
         } else {
-            //Client.Character.InventoryCache.GetMount(Message.Id).getEffects().add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), "Melan"));
-            Client.Character.Send(new MountDataMessage(Client.Character.InventoryCache.GetMount(Message.Id).Mount));
+            //Client.getCharacter().inventoryCache.getMount(Message.id).getEffects$Notify().add(new EffectInstanceString(new EffectInstance(0, 987, 0, "", 0, 0, 0, false, "C", 0, "", 0), "Melan"));
+            Client.getCharacter().send(new MountDataMessage(Client.getCharacter().getInventoryCache().getMount(Message.Id).getMount()));
         }
     }
 

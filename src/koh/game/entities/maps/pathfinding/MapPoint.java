@@ -4,8 +4,11 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.environments.DofusMap;
 import koh.protocol.client.enums.DirectionsEnum;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -27,6 +30,8 @@ public class MapPoint {
     private static boolean _bInit = false;
     public static Point[] CELLPOS = new Point[MAP_HEIGHT * (MAP_WIDTH * 2)];
 
+    private static final Logger logger = LogManager.getLogger(MapPoint.class);
+
     static {
         init();
     }
@@ -35,7 +40,7 @@ public class MapPoint {
         return x + y >= 0 && x - y >= 0 && (long) (x - y) < 40L && (long) (x + y) < 28L;
     }
 
-    public static short CoordToCellId(int x, int y) {
+    public static short coordToCellId(int x, int y) {
         if (!(_bInit)) {
             init();
         }
@@ -326,7 +331,7 @@ public class MapPoint {
 
     @Override
     public String toString() {
-        return ((((((("[MapPoint(x:" + this._nX) + ", y:") + this._nY) + ", id:") + this._nCellId) + ")]"));
+        return ((((((("[getMapPoint(x:" + this._nX) + ", y:") + this._nY) + ", id:") + this._nCellId) + ")]"));
     }
 
     private void setFromCoords() {
@@ -341,14 +346,14 @@ public class MapPoint {
             init();
         }
         if (CELLPOS[this._nCellId] == null) {
-            Main.Logs().writeError((("Cell identifier out of bounds (" + this._nCellId) + ")."));
+            logger.error("cell identifier out of bounds ({}).",this._nCellId);
         }
         Point p = CELLPOS[this._nCellId];
         this._nX = p.x;
         this._nY = p.y;
     }
 
-    public static int GetX(int cell) {
+    public static int getx(int cell) {
         if (!(_bInit)) {
             init();
         }

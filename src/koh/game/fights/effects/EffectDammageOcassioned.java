@@ -10,9 +10,9 @@ import koh.game.fights.effects.buff.BuffDammageOcassioned;
 public class EffectDammageOcassioned extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            Target.Buffs.AddBuff(new BuffDammageOcassioned(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            Target.getBuff().addBuff(new BuffDammageOcassioned(castInfos, Target));
         }
         return -1;
     }

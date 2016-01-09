@@ -19,16 +19,16 @@ public class BuffHeal extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (EffectHeal.ApplyHeal(CastInfos, Target, new MutableInt(CastInfos.RandomJet(Target))) == -3) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        if (EffectHeal.applyHeal(castInfos, target, new MutableInt(castInfos.randomJet(target))) == -3) {
             return -3;
         }
         return -1;
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

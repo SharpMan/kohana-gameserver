@@ -13,22 +13,22 @@ public class BonesCriterion extends Criterion {
 
     @Override
     public void Build() {
-        if (this.Literal.equalsIgnoreCase("B")) {
+        if (this.literal.equalsIgnoreCase("B")) {
             this.BonesId = (short) 1;
         } else {
             short result;
             try {
-                result = Short.parseShort(Literal);
+                result = Short.parseShort(literal);
             } catch (Exception e) {
-                throw new Error(String.format("Cannot build BonesCriterion, {0} is not a valid bones id", this.Literal));
+                throw new Error(String.format("Cannot build BonesCriterion, {0} is not a valid bones id", this.literal));
             }
             this.BonesId = (int) result != 0 ? result : (short) 1;
         }
     }
 
     @Override
-    public boolean Eval(Player character) {
-        return this.Compare((Comparable<Short>) character.GetEntityLook().bonesId, this.BonesId);
+    public boolean eval(Player character) {
+        return this.Compare((Comparable<Short>) character.getEntityLook().bonesId, this.BonesId);
     }
 
     @Override

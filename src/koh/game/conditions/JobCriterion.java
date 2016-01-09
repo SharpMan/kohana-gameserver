@@ -11,8 +11,8 @@ public class JobCriterion extends Criterion {
     public static String Identifier = "PJ";
     public static String Identifier2 = "Pj";
 
-    public int Id;
-    public int Level;
+    public int id;
+    public int level;
 
     @Override
     public String toString() {
@@ -21,18 +21,17 @@ public class JobCriterion extends Criterion {
 
     @Override
     public void Build() {
-        if (this.Literal.contains(",")) {
-            System.out.println(Literal);
-            this.Id = Integer.parseInt(Literal.split(",")[0]);
-            this.Level = Integer.parseInt(Literal.split(",")[1]);
+        if (this.literal.contains(",")) {
+            this.id = Integer.parseInt(literal.split(",")[0]);
+            this.level = Integer.parseInt(literal.split(",")[1]);
         } else {
-            this.Id = Integer.parseInt(Literal);
-            this.Level = -1;
+            this.id = Integer.parseInt(literal);
+            this.level = -1;
         }
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         return true;
     }
 

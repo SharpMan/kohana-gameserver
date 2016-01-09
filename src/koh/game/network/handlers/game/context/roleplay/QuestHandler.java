@@ -15,7 +15,7 @@ public class QuestHandler {
 
     @HandlerAttribute(ID = QuestListRequestMessage.MESSAGE_ID)
     public static void HandleQuestListRequestMessage(WorldClient Client, Message message) {
-        Client.SequenceMessage(new QuestListMessage(new int[0], new int[0], new QuestActiveInformations[0],new int[0]));
+        Client.sequenceMessage(new QuestListMessage(new int[0], new int[0], new QuestActiveInformations[0],new int[0]));
 
     }
 

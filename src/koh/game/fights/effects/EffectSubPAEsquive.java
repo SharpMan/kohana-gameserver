@@ -12,24 +12,24 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectSubPAEsquive extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         MutableInt DamageValue = new MutableInt();
-        if (CastInfos.Duration > 1) {
-            for (Fighter Target : CastInfos.Targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.Caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
+        if (castInfos.duration > 1) {
+            for (Fighter Target : castInfos.targets) {
+                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
-                Buff.ApplyEffect(DamageValue, null);
-                Target.Buffs.AddBuff(Buff);
+                Buff.applyEffect(DamageValue, null);
+                Target.getBuff().addBuff(Buff);
             }
         } else {
-            for (Fighter Target : CastInfos.Targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, (short) 0, 0, CastInfos.Effect, CastInfos.Caster, null, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, 0, 0);
+            for (Fighter Target : castInfos.targets) {
+                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, 0, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
-                Buff.ApplyEffect(DamageValue, null);
+                Buff.applyEffect(DamageValue, null);
 
-                Target.Buffs.AddBuff(Buff);
+                Target.getBuff().addBuff(Buff);
             }
         }
 

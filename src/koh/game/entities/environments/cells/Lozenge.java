@@ -17,35 +17,35 @@ public class Lozenge implements IZone {
 
     public byte Radius;
 
-    public DofusMap Map;
+    public DofusMap map;
 
     public Lozenge(byte minRadius, byte radius,DofusMap Map) {
         this.MinRadius = minRadius;
         this.Radius = radius;
-        this.Map = Map;
+        this.map = Map;
     }
 
     @Override
-    public void SetDirection(byte Direction) {
+    public void setDirection(byte Direction) {
         this.Direction = Direction;
     }
 
     @Override
-    public void SetRadius(byte Radius) {
+    public void setRadius(byte Radius) {
         this.Radius = Radius;
     }
 
     @Override
-    public int Surface() {
+    public int getSurface() {
         return (((int) this.Radius + 1) * ((int) this.Radius + 1) + (int) this.Radius * (int) this.Radius);
     }
 
     @Override
-    public Short[] GetCells(short centerCell) {
+    public Short[] getCells(short centerCell) {
         MapPoint mapPoint = MapPoint.fromCellId(centerCell);
         ArrayList<Short> list = new ArrayList<>();
-        if (this.Radius() == 0) {
-            if (this.MinRadius() == 0) {
+        if (this.getRadius() == 0) {
+            if (this.getMinRadius() == 0) {
                 return new Short[]{centerCell};
             }
             return new Short[0];
@@ -56,18 +56,18 @@ public class Lozenge implements IZone {
             int _loc7_ = 0;
             int _loc4_ = mapPoint.get_x();
             int _loc5_ = mapPoint.get_y();
-            _loc6_ = _loc4_ - this.Radius();
-            while (_loc6_ <= _loc4_ + this.Radius()) {
+            _loc6_ = _loc4_ - this.getRadius();
+            while (_loc6_ <= _loc4_ + this.getRadius()) {
                 _loc7_ = -_loc9_;
                 while (_loc7_ <= _loc9_) {
-                    if (Math.abs(_loc4_ - _loc6_) + Math.abs(_loc7_) >= this.MinRadius()) {
+                    if (Math.abs(_loc4_ - _loc6_) + Math.abs(_loc7_) >= this.getMinRadius()) {
                         if (MapPoint.isInMap(_loc6_, _loc7_ + _loc5_)) {
                             addCell(_loc6_, _loc7_ + _loc5_, list);
                         }
                     }
                     _loc7_++;
                 }
-                if (_loc9_ == this.Radius()) {
+                if (_loc9_ == this.getRadius()) {
                     _loc8_ = -_loc8_;
                 }
                 _loc9_ = _loc9_ + _loc8_;
@@ -78,24 +78,24 @@ public class Lozenge implements IZone {
     }
 
     private void addCell(int x, int y, List<Short> container) {
-        if (!this.Map.pointMov(x, y, true, -1, -1)) {
+        if (!this.map.pointMov(x, y, true, -1, -1)) {
             return;
         }
-        container.add(MapPoint.CoordToCellId(x, y));
+        container.add(MapPoint.coordToCellId(x, y));
     }
 
     @Override
-    public byte MinRadius() {
+    public byte getMinRadius() {
         return MinRadius;
     }
 
     @Override
-    public byte Direction() {
+    public byte getDirection() {
         return Direction;
     }
 
     @Override
-    public byte Radius() {
+    public byte getRadius() {
         return Radius;
     }
 

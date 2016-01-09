@@ -18,11 +18,11 @@ public class PreniumAccountCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.IsPrenium = Integer.parseInt(Literal) == 1;
+        this.IsPrenium = Integer.parseInt(literal) == 1;
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         return true;
     }
 }

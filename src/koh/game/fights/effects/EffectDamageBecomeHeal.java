@@ -11,12 +11,12 @@ import koh.game.fights.effects.buff.BuffEffect;
 public class EffectDamageBecomeHeal extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect Buf = null;
-        for (Fighter Target : CastInfos.Targets) {
-            Buf = new BuffDamageBecomeHeal(CastInfos, Target);
-            if (!Target.Buffs.BuffMaxStackReached(Buf)) {
-                Target.Buffs.AddBuff(Buf);
+        for (Fighter Target : castInfos.targets) {
+            Buf = new BuffDamageBecomeHeal(castInfos, Target);
+            if (!Target.getBuff().buffMaxStackReached(Buf)) {
+                Target.getBuff().addBuff(Buf);
             }
         }
         return -1;

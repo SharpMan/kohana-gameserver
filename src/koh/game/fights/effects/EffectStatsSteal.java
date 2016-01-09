@@ -1,10 +1,12 @@
 package koh.game.fights.effects;
 
 import java.util.HashMap;
-import koh.game.entities.spells.SpellLevel;
+
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffStats;
+import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.messages.game.actions.fight.GameActionFightDodgePointLossMessage;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -13,63 +15,79 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class EffectStatsSteal extends EffectBase {
 
-    public static final HashMap<StatsEnum, StatsEnum> TargetMalus = new HashMap<StatsEnum, StatsEnum>() {
+    public static final HashMap<StatsEnum, StatsEnum> TARGET_MALUS = new HashMap<StatsEnum, StatsEnum>() {
         {
-            this.put(StatsEnum.Steal_Vitality, StatsEnum.Sub_Vitality);
-            this.put(StatsEnum.Steal_Strength, StatsEnum.Sub_Strength);
-            this.put(StatsEnum.Steal_Intelligence, StatsEnum.Sub_Intelligence);
-            this.put(StatsEnum.Steal_Agility, StatsEnum.Sub_Agility);
-            this.put(StatsEnum.Steal_Wisdom, StatsEnum.Sub_Wisdom);
-            this.put(StatsEnum.Steal_Chance, StatsEnum.Sub_Chance);
-            this.put(StatsEnum.Steal_PA, StatsEnum.Sub_PA);
-            this.put(StatsEnum.Steal_PM, StatsEnum.Sub_PM);
-            this.put(StatsEnum.Steal_Range, StatsEnum.Sub_Range);
+            this.put(StatsEnum.STEAL_VITALITY, StatsEnum.SUB_VITALITY);
+            this.put(StatsEnum.STEAL_STRENGTH, StatsEnum.SUB_STRENGTH);
+            this.put(StatsEnum.STEAL_INTELLIGENCE, StatsEnum.SUB_INTELLIGENCE);
+            this.put(StatsEnum.STEAL_AGILITY, StatsEnum.SUB_AGILITY);
+            this.put(StatsEnum.STEAL_WISDOM, StatsEnum.SUB_WISDOM);
+            this.put(StatsEnum.STEAL_CHANCE, StatsEnum.SUB_CHANCE);
+            this.put(StatsEnum.STEAL_PA, StatsEnum.SUB_PA);
+            this.put(StatsEnum.STEAL_PM, StatsEnum.SUB_PM);
+            this.put(StatsEnum.STEAL_RANGE, StatsEnum.SUB_RANGE);
         }
     };
 
-    public static final HashMap<StatsEnum, StatsEnum> CasterBonus = new HashMap<StatsEnum, StatsEnum>() {
+    public static final HashMap<StatsEnum, StatsEnum> CASTER_BONUS = new HashMap<StatsEnum, StatsEnum>() {
         {
-            this.put(StatsEnum.Steal_Vitality, StatsEnum.Vitality);
-            this.put(StatsEnum.Steal_Strength, StatsEnum.Strength);
-            this.put(StatsEnum.Steal_Intelligence, StatsEnum.Intelligence);
-            this.put(StatsEnum.Steal_Agility, StatsEnum.Agility);
-            this.put(StatsEnum.Steal_Wisdom, StatsEnum.Wisdom);
-            this.put(StatsEnum.Steal_Chance, StatsEnum.Chance);
-            this.put(StatsEnum.Steal_PA, StatsEnum.ActionPoints);
-            this.put(StatsEnum.Steal_PM, StatsEnum.MovementPoints);
-            this.put(StatsEnum.Steal_Range, StatsEnum.Add_Range);
+            this.put(StatsEnum.STEAL_VITALITY, StatsEnum.VITALITY);
+            this.put(StatsEnum.STEAL_STRENGTH, StatsEnum.STRENGTH);
+            this.put(StatsEnum.STEAL_INTELLIGENCE, StatsEnum.INTELLIGENCE);
+            this.put(StatsEnum.STEAL_AGILITY, StatsEnum.AGILITY);
+            this.put(StatsEnum.STEAL_WISDOM, StatsEnum.WISDOM);
+            this.put(StatsEnum.STEAL_CHANCE, StatsEnum.CHANCE);
+            this.put(StatsEnum.STEAL_PA, StatsEnum.ACTION_POINTS);
+            this.put(StatsEnum.STEAL_PM, StatsEnum.MOVEMENT_POINTS);
+            this.put(StatsEnum.STEAL_RANGE, StatsEnum.ADD_RANGE);
         }
     };
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        StatsEnum MalusType = TargetMalus.get(CastInfos.EffectType);
-        StatsEnum BonusType = CasterBonus.get(CastInfos.EffectType);
+    public int applyEffect(EffectCast castInfos) {
+        StatsEnum malusType = TARGET_MALUS.get(castInfos.effectType);
+        StatsEnum bonusType = CASTER_BONUS.get(castInfos.effectType);
 
-        EffectCast MalusInfos = new EffectCast(MalusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration, 0);
-        EffectCast BonusInfos = new EffectCast(BonusType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets, false, StatsEnum.NONE, 0, CastInfos.SpellLevel, CastInfos.Duration - 1, 0);
-        MutableInt DamageValue = new MutableInt();
+        EffectCast malusInfos = new EffectCast(malusType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
+        EffectCast bonusInfos = new EffectCast(bonusType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration <= 0 ? castInfos.duration : castInfos.duration - 1, 0);
+        MutableInt damageValue = new MutableInt();
 
-        for (Fighter Target : CastInfos.Targets) {
-            if (Target == CastInfos.Caster) {
+        for (Fighter target : castInfos.targets) {
+            if (target == castInfos.caster) {
                 continue;
             }
 
+            if(bonusType == StatsEnum.MOVEMENT_POINTS || bonusType == StatsEnum.ACTION_POINTS){
+                if(malusInfos.effect == null){ //Old loop
+                    malusInfos.effect = bonusInfos.effect = castInfos.effect;
+                }
+                final int jet = castInfos.randomJet(target);
+                malusInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, jet, (bonusType == StatsEnum.MOVEMENT_POINTS), true);
+                bonusInfos.damageValue = malusInfos.damageValue;
+                malusInfos.effect = bonusInfos.effect = null;
+                if (malusInfos.damageValue != jet) {
+                    target.getFight().sendToField(new GameActionFightDodgePointLossMessage(bonusType == StatsEnum.MOVEMENT_POINTS ? ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PM : ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, castInfos.caster.getID(), target.getID(), jet - castInfos.damageValue));
+                    if(malusInfos.damageValue == 0){ //have succesfully esquivate all
+                        continue;
+                    }
+                }
+            }
+
             // Malus a la cible
-            BuffStats BuffStats = new BuffStats(MalusInfos, Target);
-            if (BuffStats.ApplyEffect(DamageValue, null) == -3) {
+            BuffStats buffStats = new BuffStats(malusInfos, target);
+            if (buffStats.applyEffect(damageValue, null) == -3) {
                 return -3;
             }
 
-            Target.Buffs.AddBuff(BuffStats);
+            target.getBuff().addBuff(buffStats);
 
             // Bonus au lanceur
-            BuffStats = new BuffStats(BonusInfos, CastInfos.Caster);
-            if (BuffStats.ApplyEffect(DamageValue, null) == -3) {
+            buffStats = new BuffStats(bonusInfos, castInfos.caster);
+            if (buffStats.applyEffect(damageValue, null) == -3) {
                 return -3;
             }
 
-            CastInfos.Caster.Buffs.AddBuff(BuffStats);
+            castInfos.caster.getBuff().addBuff(buffStats);
         }
 
         return -1;

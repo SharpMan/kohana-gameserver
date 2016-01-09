@@ -24,22 +24,22 @@ public class Line implements IZone {
 
     
       @Override
-    public void SetDirection(byte Direction) {
+    public void setDirection(byte Direction) {
         this.Direction = Direction;
     }
 
     @Override
-    public void SetRadius(byte Radius) {
+    public void setRadius(byte Radius) {
        this.Radius = Radius;
     }
     
     @Override
-    public int Surface() {
+    public int getSurface() {
         return this.Radius + 1;
     }
 
     @Override
-    public Short[] GetCells(short centerCell) {
+    public Short[] getCells(short centerCell) {
         MapPoint mapPoint = MapPoint.fromCellId(centerCell);
         ArrayList<Short> list = new ArrayList<>();
         for (int index = (int) this.MinRadius; index <= (int) this.Radius; ++index) {
@@ -77,21 +77,21 @@ public class Line implements IZone {
         if (!MapPoint.IsInMap(x, y)) {
             return;
         }
-        container.add(MapPoint.CoordToCellId(x, y));
+        container.add(MapPoint.coordToCellId(x, y));
     }
 
     @Override
-    public byte MinRadius() {
+    public byte getMinRadius() {
         return MinRadius;
     }
 
     @Override
-    public byte Direction() {
+    public byte getDirection() {
         return Direction;
     }
 
     @Override
-    public byte Radius() {
+    public byte getRadius() {
         return Radius;
     }
 

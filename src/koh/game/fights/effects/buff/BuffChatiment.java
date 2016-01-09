@@ -19,42 +19,42 @@ public class BuffChatiment extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         MutableInt BuffValue = new MutableInt(DamageValue.getValue() / 2); // Divise par deux les stats a boost car c'est un personnage.
-        //var StatsType = (EffectEnum)this.CastInfos.Value1 == EffectEnum.Heal ? EffectEnum.AddVitalite : (EffectEnum)this.CastInfos.Value1;
-        int MaxValue = this.CastInfos.Effect.diceSide;
-        int Duration = this.CastInfos.Effect.value;
+        //var StatsType = (EffectEnum)this.castInfos.value1 == EffectEnum.HEAL ? EffectEnum.AddVitalite : (EffectEnum)this.castInfos.value1;
+        int MaxValue = this.castInfos.effect.diceSide;
+        int Duration = this.castInfos.effect.value;
 
-        if (this.Target.Fight.CurrentFighter.ID == this.CastInfos.FakeValue) {
-            if (this.CastInfos.DamageValue < MaxValue) {
-                if (this.CastInfos.DamageValue + BuffValue.getValue() > MaxValue) {
-                    BuffValue.setValue(MaxValue - this.CastInfos.DamageValue);
+        if (this.target.getFight().getCurrentFighter().getID() == this.castInfos.fakeValue) {
+            if (this.castInfos.damageValue < MaxValue) {
+                if (this.castInfos.damageValue + BuffValue.getValue() > MaxValue) {
+                    BuffValue.setValue(MaxValue - this.castInfos.damageValue);
                 }
             } else {
                 BuffValue.setValue(0);
             }
         } else {
-            this.CastInfos.DamageValue = 0;
-            this.CastInfos.FakeValue = (int) this.Target.Fight.CurrentFighter.ID;
+            this.castInfos.damageValue = 0;
+            this.castInfos.fakeValue = (int) this.target.getFight().getCurrentFighter().getID();
 
-            if (this.CastInfos.DamageValue + BuffValue.getValue() > MaxValue) {
+            if (this.castInfos.damageValue + BuffValue.getValue() > MaxValue) {
                 BuffValue.setValue(MaxValue);
             }
         }
         if (BuffValue.getValue() > 0) {
-            this.CastInfos.DamageValue += BuffValue.getValue();
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.CastInfos.Effect.diceNum), this.CastInfos.SpellId, this.CastInfos.CellId, 0, null, CastInfos.Caster, null, false, this.CastInfos.EffectType, BuffValue.getValue(), null, Duration, this.GetId()), this.Target);
+            this.castInfos.damageValue += BuffValue.getValue();
+            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.castInfos.effect.diceNum), this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, BuffValue.getValue(), null, Duration, this.getId()), this.target);
 
-            BuffStats.ApplyEffect(BuffValue, DamageInfos);
-            this.Target.Buffs.AddBuff(BuffStats);
+            BuffStats.applyEffect(BuffValue, DamageInfos);
+            this.target.getBuff().addBuff(BuffStats);
         }
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

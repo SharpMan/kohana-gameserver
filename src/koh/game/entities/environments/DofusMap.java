@@ -7,18 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
+
+import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.InteractiveElementAction;
 import koh.game.controllers.MapController;
-import koh.game.dao.AreaDAO;
-import koh.game.dao.NpcDAO;
-import koh.game.dao.PaddockDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.IGameActor;
+import koh.game.entities.actors.MonsterGroup;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
-import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.maps.pathfinding.Path;
@@ -26,7 +27,6 @@ import koh.game.fights.Fight;
 import koh.game.fights.FightController;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
-import koh.protocol.client.enums.AggressableStatusEnum;
 import koh.protocol.messages.game.context.GameContextRemoveElementMessage;
 import koh.protocol.messages.game.context.mount.GameDataPaddockObjectListAddMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
@@ -39,7 +39,6 @@ import koh.protocol.messages.game.context.roleplay.objects.ObjectGroundRemovedMu
 import koh.protocol.messages.game.context.roleplay.paddock.PaddockPropertiesMessage;
 import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.UpdateMapPlayersAgressableStatusMessage;
-import koh.protocol.messages.game.pvp.UpdateSelfAgressableStatusMessage;
 import koh.protocol.types.game.context.MapCoordinates;
 import koh.protocol.types.game.context.fight.FightCommonInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayActorInformations;
@@ -49,8 +48,9 @@ import koh.protocol.types.game.house.HouseInformations;
 import koh.protocol.types.game.interactive.InteractiveElement;
 import koh.protocol.types.game.interactive.InteractiveElementSkill;
 import koh.protocol.types.game.interactive.InteractiveElementWithAgeBonus;
-import koh.utils.Couple;
-import koh.utils.Enumerable;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -59,117 +59,129 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class DofusMap extends IWorldEventObserver implements IWorldField {
 
-    public int Id;
-    public byte Version;
-    public int RelativeId;
-    public byte MapType;
-    public int SubAreaId;
-    public int BottomNeighbourId;
-    public int TopNeighbourId;
-    public int LeftNeighbourId, RightNeighbourId, ShadowBonusOnEntities;
-    public NeighBourStruct[] newNeighbour;
-    public boolean UseLowPassFilter, UseReverb;
-    public int PresetId;
-    private byte[] CompressedCells, CompressedLayers;
-    private String CompressedBlueCells, CompressedRedCells;
-    public boolean myInitialized = false;
-    private final Map<Integer, IGameActor> myGameActors = Collections.synchronizedMap(new HashMap<>());
-    public StatedElement[] ElementsStated = new StatedElement[0];
-    public List<InteractiveElementStruct> InteractiveElements = new ArrayList<>();
-    private Map<Short, InventoryItem> DroppedItems;
-    public List<HouseInformations> Houses = new ArrayList<>();
-    public MapPosition Position;
-    private int myNextActorId = -1;
-    private Map<Integer, MapDoor> Doors;
+    @Getter
+    private int id;
+    private byte version,mapType;
+    @Getter
+    private int relativeId,subAreaId;
+    @Getter
+    public int bottomNeighbourId,topNeighbourId, leftNeighbourId, rightNeighbourId, shadowBonusOnEntities;
+    @Getter @Setter
+    private NeighBourStruct[] newNeighbour;
+    public boolean useLowPassFilter, useReverb;
+    private int presetId;
+    private byte[] compressedCells, compressedLayers;
+    private String compressedBlueCells, compressedRedCells;
+    @Getter
+    private boolean myInitialized = false;
+    @Getter
+    private final Map<Integer, IGameActor> myGameActors = new ConcurrentHashMap<>();
+    @Getter @Setter
+    private StatedElement[] elementsStated = new StatedElement[0];
+    @Getter
+    private final List<InteractiveElementStruct> interactiveElements = new ArrayList<>();
+    private Map<Short, InventoryItem> droppedItems;
+    @Getter
+    private final List<HouseInformations> houses = new ArrayList<>();
+    @Getter @Setter
+    public MapPosition position;
+    @Getter
+    private final MutableInt myNextActorId = new MutableInt(0);
+    @Getter
+    private final ArrayList<MonsterGroup> monsters = new ArrayList<>(4);
+    private Map<Integer, MapDoor> doors;
     private FightController myFightController;
-    /*After Initialize */
-    public short[] BlueCells, RedCells;
-    private DofusCell[] Cells;
-    private Layer[] Layers;
+    /*After loadAll */
+    @Getter
+    private short[] blueCells, redCells;
+    private DofusCell[] cells;
+    private Layer[] layers;
 
-    public void SpawnActor(IGameActor Actor) {
+    public void spawnActor(IGameActor actor) {
+
         if (!this.myInitialized) {
-            this.Init();
+            this.initialize();
         }
 
-        if (Actor instanceof Player) {
-            if (((Player) Actor).Client != null) {
-                this.registerPlayer((Player) Actor);
-                this.onPlayerSpawned((Player) Actor);
+
+        if (actor instanceof Player) {
+            if (((Player) actor).getClient() != null) {
+                this.registerPlayer((Player) actor);
+                this.onPlayerSpawned((Player) actor);
             }
         }
-        this.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) Actor.GetGameContextActorInformations(null)));
+        this.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) actor.getGameContextActorInformations(null)));
 
-        this.myGameActors.put(Actor.ID, Actor);
+        this.myGameActors.put(actor.getID(), actor);
 
-        //Verif Todo    
-        /*if (this.Cells.length <  Actor.CellId) {
-         if (this.myCells[Actor.CellId].Walkable) {
-         this.myCells[Actor.CellId].AddActor(Actor);
+        //verify Todo
+        /*if (this.cells.length <  actor.getCellId) {
+         if (this.myCells[actor.getCellId].Walkable) {
+         this.myCells[actor.getCellId].addActor(actor);
          } else {
-         Actor.CellId = this.GetFreeCell();
+         actor.getCellId = this.GetFreeCell();
 
-         this.myCells[Actor.CellId].AddActor(Actor);
+         this.myCells[actor.getCellId].addActor(actor);
          }
          }*/
-        this.Cells[Actor.Cell.Id].AddActor(Actor);
+        this.cells[actor.getCell().getId()].addActor(actor);
 
     }
 
-    public void onPlayerSpawned(Player Actor) {
-        if (this.Id == 115083777) {
-            Actor.Send(new PopupWarningMessage((byte) 5, "MØ", "Pour consulter les vendeurs , parlez à Hal San !"));
+    public void onPlayerSpawned(Player actor) {
+        if (this.id == 115083777) {
+            actor.send(new PopupWarningMessage((byte) 5, "MØ", "Pour consulter les vendeurs , parlez à Hal San !"));
         }
     }
 
-    public SubArea GetSubArea() {
-        if (this.SubAreaId == 0) {
+    public SubArea getSubArea() {
+        if (this.subAreaId == 0) {
             return null;
         }
-        return AreaDAO.SubAreas.get(this.SubAreaId);
+        return DAO.getAreas().getSubArea(this.subAreaId);
     }
 
     public Area getArea() {
-        return GetSubArea() != null ? GetSubArea().area : AreaDAO.SubAreas.get(0).area;
+        return getSubArea() != null ? getSubArea().getArea() : DAO.getAreas().getSubArea(0).getArea();
     }
 
-    public MapCoordinates Cordinates() {
+    public MapCoordinates coordinates() {
         try {
-            return new MapCoordinates(this.Position.posX, this.Position.posY);
+            return new MapCoordinates(this.position.getPosX(), this.position.getPosY());
         } catch (Exception e) {
             return new MapCoordinates(); //Dj ecT..
         }
     }
 
-    public void DestroyActor(IGameActor Actor) {
+    public void destroyActor(IGameActor actor) {
 
-        if (Actor instanceof Player) {
-            if (((Player) Actor).Client != null) {
-                this.unregisterPlayer((Player) Actor);
+        if (actor instanceof Player) {
+            if (((Player) actor).getClient() != null) {
+                this.unregisterPlayer((Player) actor);
             }
         }
 
-        this.myGameActors.remove(Actor.ID);
-        this.sendToField(new GameContextRemoveElementMessage(Actor.ID));
-        this.Cells[Actor.Cell.Id].DelActor(Actor);
+        this.myGameActors.remove(actor.getID());
+        this.sendToField(new GameContextRemoveElementMessage(actor.getID()));
+        this.cells[actor.getCell().getId()].delActor(actor);
     }
 
     public DofusCell getCell(short c) {
         try {
-            return this.Cells[c];
-            //return Arrays.stream(Cells).filter(x -> x.Id == c).findFirst().get();
+            return this.cells[c];
+            //return Arrays.stream(cells).filter(x -> x.id == c).findFirst().get();
         } catch (Exception e) {
             //e.printStackTrace();
             return null;
         }
     }
 
-    public StatedElement GetStatedElementById(int id) {
-        return Arrays.stream(this.ElementsStated).filter(x -> x.elementId == id).findFirst().orElse(null);
+    public StatedElement getStatedElementById(int id) {
+        return Arrays.stream(this.elementsStated).filter(x -> x.elementId == id).findFirst().orElse(null);
     }
 
-    public InteractiveElementStruct GetInteractiveElementStruct(int id) {
-        return this.InteractiveElements.stream().filter(x -> x.elementId == id).findFirst().orElse(null);
+    public InteractiveElementStruct getInteractiveElementStruct(int id) {
+        return this.interactiveElements.stream().filter(x -> x.elementId == id).findFirst().orElse(null);
     }
 
     private static final byte TOLERANCE_ELEVATION = 11;
@@ -186,13 +198,13 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         if (MapPoint.isInMap(x, y)) {
             useNewSystem =  this.isUsingNewMovementSystem;
             cellId = MapPoint.fromCoords(x, y).get_cellId();
-            cellData = this.Cells[cellId];
-            mov = cellData.Mov() && !cellData.NonWalkableDuringFight()/*&& (((!(this.isInFight)) || (!(cellData.nonWalkableDuringFight)))))*/;
+            cellData = this.cells[cellId];
+            mov = cellData.mov() && !cellData.nonWalkableDuringFight()/*&& (((!(this.isInFight)) || (!(cellData.nonWalkableDuringFight)))))*/;
 
             if (((((((mov) && (useNewSystem))) && (!((previousCellId == -1))))) && (!((previousCellId == cellId))))) {
-                previousCellData = Cells[previousCellId];
-                dif = Math.abs((Math.abs(cellData.Floor) - Math.abs(previousCellData.Floor)));
-                if (((((!((previousCellData.MoveZone == cellData.MoveZone))) && ((dif > 0)))) || ((((((previousCellData.MoveZone == cellData.MoveZone)) && ((cellData.MoveZone == 0)))) && ((dif > TOLERANCE_ELEVATION)))))) {
+                previousCellData = cells[previousCellId];
+                dif = Math.abs((Math.abs(cellData.getFloor()) - Math.abs(previousCellData.getFloor())));
+                if (((((!((previousCellData.getMoveZone() == cellData.getMoveZone()))) && ((dif > 0)))) || ((((((previousCellData.getMoveZone() == cellData.getMoveZone())) && ((cellData.getMoveZone() == 0)))) && ((dif > TOLERANCE_ELEVATION)))))) {
                     mov = false;
                 }
             }
@@ -215,175 +227,224 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         return (mov);
     }
 
-    public UpdateMapPlayersAgressableStatusMessage GetAgressableActorsStatus(Player Character) {
+    public UpdateMapPlayersAgressableStatusMessage getAgressableActorsStatus(Player player) {
         synchronized (this.myGameActors) {
-            return new UpdateMapPlayersAgressableStatusMessage(this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> x.ID).toArray(), this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> ((Player) x).PvPEnabled).toArray());
+            return new UpdateMapPlayersAgressableStatusMessage(this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> x.getID()).toArray(), this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> ((Player) x).getPvPEnabled()).toArray());
         }
     }
 
-    public MapComplementaryInformationsDataMessage GetMapComplementaryInformationsDataMessage(Player character) {
-        return new MapComplementaryInformationsDataMessage(SubAreaId, Id, Houses, this.myGameActors.values().stream().filter(x -> x.CanBeSee(character)).map(x -> (GameRolePlayActorInformations) x.GetGameContextActorInformations(character)).collect(Collectors.toList()), this.toInteractiveElements(character), ElementsStated, new MapObstacle[0], new FightCommonInformations[0]);
+    public MapComplementaryInformationsDataMessage getMapComplementaryInformationsDataMessage(Player character) {
+        return new MapComplementaryInformationsDataMessage(subAreaId, id, houses, this.myGameActors.values().stream().filter(x -> x.canBeSeen(character)).map(x -> (GameRolePlayActorInformations) x.getGameContextActorInformations(character)).collect(Collectors.toList()), this.toInteractiveElements(character), elementsStated, new MapObstacle[0], new FightCommonInformations[0]);
     }
 
     public int getCellSpeed(int cellId) {
-        return this.Cells[(short) cellId].Speed;
+        return this.cells[(short) cellId].getSpeed();
     }
     
     private boolean isUsingNewMovementSystem = false;
 
-    public synchronized void Init() {
+    
+    public DofusMap init$Return(){
+        this.initialize();
+        return this;
+    }
+
+    public synchronized void initialize() {
         if (this.myInitialized) {
             return;
         }
         this.myInitialized = true;
-        //this.Cells = MapController.UnCompressCells(this, CompressedCells);
-        IoBuffer buf = IoBuffer.wrap(CompressedCells);
-        this.Cells = new DofusCell[buf.getInt()];
+        //this.cells = MapController.unCompressCells(this, compressedCells);
+        IoBuffer buf = IoBuffer.wrap(compressedCells);
+        this.cells = new DofusCell[buf.getInt()];
         int _oldMvtSystem = -1;
-        for (short i = 0; i < this.Cells.length; i++) {
-            this.Cells[i] = new DofusCell(this, i, buf);
+        for (short i = 0; i < this.cells.length; i++) {
+            this.cells[i] = new DofusCell(this, i, buf);
             if(_oldMvtSystem == -1){
-                _oldMvtSystem = this.Cells[i].MoveZone;
+                _oldMvtSystem = this.cells[i].getMoveZone();
             }
-            if(this.Cells[i].MoveZone != _oldMvtSystem){
+            if(this.cells[i].getMoveZone() != _oldMvtSystem){
                this.isUsingNewMovementSystem = true;
             }
         }
         buf.clear();
-        buf = IoBuffer.wrap(CompressedLayers);
-        this.Layers = new Layer[buf.getInt()];
-        for (short i = 0; i < this.Layers.length; i++) {
-            this.Layers[i] = new Layer(this, buf);
+        buf = IoBuffer.wrap(compressedLayers);
+        this.layers = new Layer[buf.getInt()];
+        for (short i = 0; i < this.layers.length; i++) {
+            this.layers[i] = new Layer(this, buf);
         }
         buf.clear();
-        this.BlueCells = MapController.UnCompressStartingCells(this, CompressedBlueCells);
-        this.RedCells = MapController.UnCompressStartingCells(this, CompressedRedCells);
+        this.blueCells = MapController.unCompressStartingCells(this, compressedBlueCells);
+        this.redCells = MapController.unCompressStartingCells(this, compressedRedCells);
         //StatedElement[]
-        //this.ElementsStated = this.ElementsList.stream().map(x -> new StatedElement(x.ID, x.ElementCellID, x.State)).collect(Collectors.toList()).toArray(new StatedElement[this.ElementsList.size()]);
-        this.CompressedCells = null;
-        this.CompressedLayers = null;
-        this.CompressedBlueCells = null;
-        this.CompressedRedCells = null;
-        if (NpcDAO.Npcs.containsKey(this.Id)) {
-            for (Npc npc : NpcDAO.Npcs.get(this.Id)) {
-                npc.ID = this.myNextActorId--;
-                npc.Cell = this.getCell(npc.CellID);
-                this.SpawnActor(npc);
+        //this.elementsStated = this.ElementsList.stream().map(x -> new StatedElement(x.id, x.ElementCellID, x.State)).collect(Collectors.toList()).toArray(new StatedElement[this.ElementsList.size()]);
+        this.compressedCells = null;
+        this.compressedLayers = null;
+        this.compressedBlueCells = null;
+        this.compressedRedCells = null;
+        //throw un nullP mieux que referencer une liste on 111000 map object
+        try {
+            for (Npc npc : DAO.getNpcs().forMap(this.id)) {
+                    npc.setID(getNextActorId());
+                    npc.setActorCell(this.getCell(npc.getCellID()));
+                    this.spawnActor(npc);
             }
-        }
+        } catch(NullPointerException ignored) {}
+
+        this.monsters.stream()
+                .filter(gr -> !gr.isFix())
+                .forEach(gr -> {
+                    gr.getGameRolePlayGroupMonsterInformations().disposition.cellId = this.getRandomWalkableCell();
+                    gr.setActorCell(this.getCell(gr.getGameContextActorInformations(null).disposition.cellId));
+                });
+        this.monsters.stream()
+                .filter(gr -> gr.isFix())
+                .forEach(gr -> gr.setActorCell(this.getCell(gr.getFixedCell())));
+
+        this.monsters.forEach(this::spawnActor);
+
         this.myFightController = new FightController();
-        //this.InteractiveElements.forEach(x -> System.out.println(x.toString()));
+        //this.interactiveElements.forEach(x -> System.out.println(x.toString()));
+    }
+
+    public synchronized void removeSpawn(final MonsterGroup grp){
+        this.destroyActor(grp);
+        final int timeReq = grp.getGameRolePlayGroupMonsterInformations().staticInfos.underlings.length * 20; //To wait 20s * MonsterIngroup
+        if(!grp.isFix()){
+            this.monsters.remove(grp);
+            final MonsterGroup newGrp = DAO.getMapMonsters().genMonsterGroup(this.getSubArea(),this);
+            this.addMonster(grp);
+            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000){
+                @Override
+                public void run() {
+                    spawnActor(newGrp);
+                }
+            };
+        }
+        else{
+            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000){
+                @Override
+                public void run() {
+                    spawnActor(grp);
+                }
+            };
+        }
+    }
+
+    public synchronized int getNextActorId(){
+        this.myNextActorId.decrement();
+        return this.myNextActorId.intValue();
     }
 
     public DofusMap(int id, byte v, int r, byte m, int SubAreaId, int bn, int tn, int ln, int rn, int sb, boolean u, boolean ur, int pr, String cc, String sl, byte[] sbb, byte[] rc) {
-        this.Id = id;
-        this.Version = v;
-        this.RelativeId = r;
-        this.MapType = m;
-        this.SubAreaId = SubAreaId;
-        //Todo SubArea Instance
-        this.BottomNeighbourId = bn;
-        this.TopNeighbourId = tn;
-        this.LeftNeighbourId = ln;
-        this.RightNeighbourId = rn;
-        this.ShadowBonusOnEntities = sb;
-        this.UseLowPassFilter = u;
-        this.UseReverb = ur;
-        this.PresetId = pr;
-        this.CompressedCells = sbb;
-        this.CompressedLayers = rc;
-        this.CompressedBlueCells = cc;
-        this.CompressedRedCells = sl;
+        this.id = id;
+        this.version = v;
+        this.relativeId = r;
+        this.mapType = m;
+        this.subAreaId = SubAreaId;
+        //Todo subArea getInstance
+        this.bottomNeighbourId = bn;
+        this.topNeighbourId = tn;
+        this.leftNeighbourId = ln;
+        this.rightNeighbourId = rn;
+        this.shadowBonusOnEntities = sb;
+        this.useLowPassFilter = u;
+        this.useReverb = ur;
+        this.presetId = pr;
+        this.compressedCells = sbb;
+        this.compressedLayers = rc;
+        this.compressedBlueCells = cc;
+        this.compressedRedCells = sl;
     }
 
     public static final ScheduledExecutorService GlobalTimer = Executors.newScheduledThreadPool(20);
 
     @Override
-    public void ActorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection) {
-        this.Cells[Actor.Cell.Id].DelActor(Actor);
-        this.Cells[newCell].AddActor(Actor);
+    public void actorMoved(Path path, IGameActor actor, short newCell, byte newDirection) {
+        this.cells[actor.getCell().getId()].delActor(actor);
+        this.cells[newCell].addActor(actor);
         if (newDirection != -1) {
-            Actor.Direction = newDirection;
+            actor.setDirection(newDirection);
         }
     }
 
-    public void OnMouvementConfirmed(Player Actor) {
-        if (Actor.Client.onMouvementConfirm != null) {
-            Actor.Client.onMouvementConfirm.Apply(Actor);
-            Actor.Client.onMouvementConfirm = null;
+    public void onMouvementConfirmed(Player actor) {
+        if (actor.getClient().getOnMouvementConfirm() != null) {
+            actor.getClient().getOnMouvementConfirm().apply(actor);
+            actor.getClient().setOnMouvementConfirm(null);
         }
-        if (DroppedItems == null || DroppedItems.isEmpty()) {
+        if (droppedItems == null || droppedItems.isEmpty()) {
             return;
         }
-        synchronized (DroppedItems) {
-            if (DroppedItems.containsKey(Actor.Cell.Id)) {
-                Actor.InventoryCache.Add(DroppedItems.get(Actor.Cell.Id), true);
-                DroppedItems.remove(Actor.Cell.Id);
-                this.sendToField(new ObjectGroundRemovedMessage(Actor.Cell.Id));
-                if (DroppedItems.isEmpty()) {
-                    this.DroppedItems = null;
+        synchronized (droppedItems) {
+            if (droppedItems.containsKey(actor.getCell().getId())) {
+                actor.getInventoryCache().add(droppedItems.get(actor.getCell().getId()), true);
+                droppedItems.remove(actor.getCell().getId());
+                this.sendToField(new ObjectGroundRemovedMessage(actor.getCell().getId()));
+                if (droppedItems.isEmpty()) {
+                    this.droppedItems = null;
                 }
             }
         }
     }
 
-    public synchronized void ClearDroppedItems() {
-        if (DroppedItems == null) {
+    public synchronized void clearDroppedItems() {
+        if (droppedItems == null) {
             return;
         }
-        synchronized (this.DroppedItems) {
-            this.sendToField(new ObjectGroundRemovedMultipleMessage(DroppedItems.keySet().toArray(new Short[DroppedItems.size()])));
-            this.DroppedItems.clear();
-            this.DroppedItems = null;
+        synchronized (this.droppedItems) {
+            this.sendToField(new ObjectGroundRemovedMultipleMessage(droppedItems.keySet().toArray(new Short[droppedItems.size()])));
+            this.droppedItems.clear();
+            this.droppedItems = null;
         }
     }
 
     public InteractiveElement[] toInteractiveElements(Player Actor) {
-        return this.InteractiveElements.stream().map(Element -> new InteractiveElementWithAgeBonus(Element.elementId,
+        return this.interactiveElements.stream().map(Element -> new InteractiveElementWithAgeBonus(Element.elementId,
                 Element.elementTypeId,
-                Element.Skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && StaticElementIsOpened(Element.elementId)).toArray(InteractiveElementSkill[]::new),
-                Element.Skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && StaticElementIsOpened(Element.elementId))).toArray(InteractiveElementSkill[]::new),
-                Element.AgeBonus)
+                Element.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId)).toArray(InteractiveElementSkill[]::new),
+                Element.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId))).toArray(InteractiveElementSkill[]::new),
+                Element.ageBonus)
         ).toArray(InteractiveElement[]::new);
     }
 
     public InteractiveElement toInteractiveElement(Player Actor, int elementId) {
-        InteractiveElementStruct Struct = this.GetInteractiveElementStruct(elementId);
+        InteractiveElementStruct Struct = this.getInteractiveElementStruct(elementId);
         return new InteractiveElementWithAgeBonus(Struct.elementId,
                 Struct.elementTypeId,
-                Struct.Skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && StaticElementIsOpened(Struct.elementId)).toArray(InteractiveElementSkill[]::new),
-                Struct.Skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && StaticElementIsOpened(Struct.elementId))).toArray(InteractiveElementSkill[]::new),
-                Struct.AgeBonus
+                Struct.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId)).toArray(InteractiveElementSkill[]::new),
+                Struct.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId))).toArray(InteractiveElementSkill[]::new),
+                Struct.ageBonus
         );
     }
 
-    public boolean StaticElementIsOpened(int elementId) {
-        return !(this.GetStatedElementById(elementId) != null && GetStatedElementById(elementId).elementState > 0);
+    public boolean staticElementIsOpened(int elementId) {
+        return !(this.getStatedElementById(elementId) != null && getStatedElementById(elementId).elementState > 0);
     }
 
-    public boolean HasActorOnCell(short cell) {
-        return this.myGameActors.values().stream().filter(x -> x.Cell != null && x.Cell.Id == cell).count() > 0;
+    public boolean hasActorOnCell(short cell) {
+        return this.myGameActors.values().stream().filter(x -> x.getCell() != null && x.getCell().getId() == cell).count() > 0;
     }
 
-    public Npc GetNpc(int contextualid) {
+    public Npc getNpc(int contextualid) {
         return (Npc) this.myGameActors.get(contextualid);
     }
 
     private final static Random RANDOM = new Random();
 
     public short getRandomCell() {
-        return this.Cells[RANDOM.nextInt(this.Cells.length)].Id;
+        return this.cells[RANDOM.nextInt(this.cells.length)].getId();
         //return this.myCells.Keys.FirstOrDefault(x => x == RANDOM.Next(this.myCells.Keys.Count));
     }
 
-    public synchronized DofusCell GetAnyCellWalakable() {
-        this.Init();
-        return Arrays.stream(this.Cells).filter(x -> x.Mov()).findAny().orElse(this.Cells[0]);
+    public synchronized DofusCell getAnyCellWalakable() {
+        this.initialize();
+        return Arrays.stream(this.cells).filter(x -> x.mov()).findAny().orElse(this.cells[0]);
     }
 
     public short getRandomWalkableCell() {
         short cell = getRandomCell();
-        if (Cells[cell].Mov()) {
+        if (cells[cell].mov()) {
             return cell;
         } else {
             return getRandomWalkableCell();
@@ -391,120 +452,127 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public void addDoor(MapDoor d) {
-        if (this.Doors == null) {
-            this.Doors = new HashMap();
+        if (this.doors == null) {
+            this.doors = new HashMap();
         }
-        this.Doors.put(d.ElementID, d);
+        this.doors.put(d.getElementID(), d);
     }
 
     public MapDoor getDoor(int id) {
-        if (this.Doors == null) {
+        if (this.doors == null) {
             return null;
         }
-        return this.Doors.get(id);
+        return this.doors.get(id);
     }
 
-    public boolean CellIsOccuped(short cell) {
-        if (DroppedItems == null) {
+    public boolean cellIsOccuped(short cell) {
+        if (droppedItems == null) {
             return false;
         }
-        synchronized (this.DroppedItems) {
-            return this.DroppedItems != null && this.DroppedItems.containsKey(cell);
+        synchronized (this.droppedItems) {
+            return this.droppedItems != null && this.droppedItems.containsKey(cell);
         }
     }
 
-    public void AddItem(Short cell, InventoryItem Item) {
-        if (this.DroppedItems == null) {
-            DroppedItems = Collections.synchronizedMap(new HashMap<>());
+    public void addItem(Short cell, InventoryItem item) {
+        if (this.droppedItems == null) {
+            droppedItems = Collections.synchronizedMap(new HashMap<>());
         }
-        this.DroppedItems.put(cell, Item);
-        this.sendToField(new ObjectGroundAddedMessage(cell, Item.TemplateId));
+        this.droppedItems.put(cell, item);
+        this.sendToField(new ObjectGroundAddedMessage(cell, item.getTemplateId()));
     }
 
-    public ObjectGroundListAddedMessage ObjectsGround() {
-        if (this.DroppedItems == null || this.DroppedItems.size() <= 0) {
+    public ObjectGroundListAddedMessage objectsGround() {
+        if (this.droppedItems == null || this.droppedItems.size() <= 0) {
             return null;
         }
-        return new ObjectGroundListAddedMessage(DroppedItems.keySet().toArray(new Short[DroppedItems.size()]), DroppedItems.values().stream().mapToInt(x -> x.TemplateId).toArray());
+        return new ObjectGroundListAddedMessage(droppedItems.keySet().toArray(new Short[droppedItems.size()]), droppedItems.values().stream().mapToInt(x -> x.getTemplateId()).toArray());
     }
 
-    public IGameActor GetActor(int target) {
+    public IGameActor getActor(int target) {
         if (!myGameActors.containsKey(target)) {
             return null;
         }
         return this.myGameActors.get(target);
     }
 
-    public Player GetPlayer(int target) {
+    public Player getPlayer(int target) {
         if (!myGameActors.containsKey(target)) {
             return null;
         }
         return (Player) this.myGameActors.get(target);
     }
 
-    public Integer PlayersCount() {
+    public Integer playersCount() {
         return (int) this.myGameActors.values().stream().filter(x -> x instanceof Player).count();
     }
 
-    public short NextFightId() {
-        return (short) this.myFightController.NextFightId();
+    public short nextFightId() {
+        return (short) this.myFightController.nextFightId();
     }
 
-    public void AddFight(Fight Fight) {
-        this.myFightController.AddFight(Fight);
+    public void addFight(Fight fight) {
+        this.myFightController.addFight(fight);
 
-        this.SendMapFightCountMessage();
+        this.sendMapFightCountMessage();
     }
 
-    public void RemoveFight(Fight Fight) {
-        this.myFightController.RemoveFight(Fight);
+    public void removeFight(Fight fight) {
+        this.myFightController.removeFight(fight);
 
-        this.SendMapFightCountMessage();
+        this.sendMapFightCountMessage();
     }
 
-    public void SendMapInfo(WorldClient Client) {
-        this.myFightController.SendFightInfos(Client);
-        if (PaddockDAO.Cache.containsKey(Id)) {
-            Client.Send(new PaddockPropertiesMessage(PaddockDAO.Cache.get(Id).Informations()));
-            if (PaddockDAO.Cache.get(Id).Items != null) {
-                Client.Send(new GameDataPaddockObjectListAddMessage(PaddockDAO.Cache.get(Id).Items));
+    public void addMonster(MonsterGroup gr){
+        gr.setID(gr.getGameRolePlayGroupMonsterInformations().contextualId);
+        this.monsters.add(gr);
+    }
+
+    public void sendMapInfo(WorldClient client) {
+        this.myFightController.sendFightInfos(client);
+        //FIXME : Dafuk am certain some maps have 2 paddocks
+        Paddock paddock = DAO.getPaddocks().find(id);
+        if (paddock != null) {
+            client.send(new PaddockPropertiesMessage(paddock.getInformations()));
+            if (paddock.getItems() != null) {
+                client.send(new GameDataPaddockObjectListAddMessage(paddock.getItems()));
             }
         }
-        Client.Send(GetAgressableActorsStatus(Client.Character));
-        // Client.Send(new UpdateSelfAgressableStatusMessage(Client.Character.PvPEnabled,(int)System.currentTimeMillis() + 360000));
-        Message Items = Client.Character.CurrentMap.ObjectsGround();
-        if (Items != null) {
-            Client.Send(Items);
+        client.send(getAgressableActorsStatus(client.getCharacter()));
+        // client.send(new UpdateSelfAgressableStatusMessage(client.character.PvPEnabled,(int)System.currentTimeMillis() + 360000));
+        Message objectsGround = client.getCharacter().getCurrentMap().objectsGround();
+        if (objectsGround != null) {
+            client.send(objectsGround);
         }
     }
 
-    public void SendMapFightCountMessage() {
-        this.sendToField(new MapFightCountMessage(this.myFightController.FightCount()));
+    public void sendMapFightCountMessage() {
+        this.sendToField(new MapFightCountMessage(this.myFightController.fightCount()));
     }
 
-    public Fight GetFight(int FightId) {
-        return this.myFightController.GetFight(FightId);
+    public Fight getFight(int FightId) {
+        return this.myFightController.getFight(FightId);
     }
 
-    public List<Fight> GetFights() {
-        return this.myFightController.Fights();
+    public List<Fight> getFights() {
+        return this.myFightController.getFights();
     }
 
-    public DofusCell[] GetCells() {
-        return this.Cells;
+    public DofusCell[] getCells() {
+        return this.cells;
     }
 
-    public DofusCell GetRandomAdjacentFreeCell(short Id) {
+    public DofusCell getRandomAdjacentFreeCell(short Id) {
         DofusCell RandomCell = this.getCell((short) MapPoint.fromCellId(Id).getNearestFreeCell(this).get_cellId());
-        if (RandomCell == null || !RandomCell.Mov()) {
+        if (RandomCell == null || !RandomCell.mov()) {
             for (int i = 0; i < 8; i++) {
                 RandomCell = this.getCell((short) MapPoint.fromCellId(Id).getNearestFreeCellInDirection(i, this, false).get_cellId());
-                if (RandomCell != null && RandomCell.Mov()) {
+                if (RandomCell != null && RandomCell.mov()) {
                     continue;
                 }
             }
             if (RandomCell == null) {
-                throw new Error("Can't find cell on " + this.Id);
+                throw new Error("Can't find cell on " + this.id);
             }
         }
         return RandomCell;

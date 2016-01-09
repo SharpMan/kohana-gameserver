@@ -11,23 +11,23 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectLifeSteal extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (castInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            castInfos.isPoison = true;
 
             // Ajout du buff
-            CastInfos.Targets.stream().forEach((Target) -> {
-                Target.Buffs.AddBuff(new BuffLifeSteal(CastInfos, Target));
+            castInfos.targets.stream().forEach((Target) -> {
+                Target.getBuff().addBuff(new BuffLifeSteal(castInfos, Target));
             });
         } else {
-            for (Fighter Target : CastInfos.Targets) {
-                if (CastInfos.SpellId == 450 && Target.Team.Id != CastInfos.Caster.Team.Id) { //Folie
+            for (Fighter Target : castInfos.targets) {
+                if (castInfos.spellId == 450 && Target.getTeam().id != castInfos.caster.getTeam().id) { //Folie
                     continue;
                 }
 
-                if (ApplyLifeSteal(CastInfos, Target, new MutableInt(CastInfos.RandomJet(Target))) == -3) {
+                if (applyLifeSteal(castInfos, Target, new MutableInt(castInfos.randomJet(Target))) == -3) {
                     return -3;
                 }
             }
@@ -36,14 +36,16 @@ public class EffectLifeSteal extends EffectBase {
         return -1;
     }
 
-    public static int ApplyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
-        if (EffectDamage.ApplyDamages(CastInfos, Target, DamageJet) == -3) {
+    public static int applyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
+        //castInfos.effectType = StatsEnum.DamageBrut;
+
+        if (EffectDamage.applyDamages(CastInfos, Target, DamageJet) == -3) {
             return -3;
         }
 
-        MutableInt HealJet = new MutableInt(DamageJet.intValue() / 2);
+        MutableInt healJet = new MutableInt(DamageJet.intValue() / 2);
 
-        if (EffectHeal.ApplyHeal(CastInfos, CastInfos.Caster, HealJet) == -3) {
+        if (EffectHeal.applyHeal(CastInfos, CastInfos.caster, healJet,false) == -3) {
             return -3;
         }
         return -1;

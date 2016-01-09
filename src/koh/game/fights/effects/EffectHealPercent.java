@@ -4,7 +4,6 @@ import koh.game.fights.effects.buff.BuffHealPercent;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMessage;
-import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMessage;
 
 /**
  *
@@ -13,20 +12,20 @@ import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsLostMes
 public class EffectHealPercent extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (castInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            castInfos.isPoison = true;
 
             // Ajout du buff
-            for (Fighter Target : CastInfos.Targets) {
-                Target.Buffs.AddBuff(new BuffHealPercent(CastInfos, Target));
+            for (Fighter Target : castInfos.targets) {
+                Target.getBuff().addBuff(new BuffHealPercent(castInfos, Target));
             }
-        } else // Heal direct
+        } else // HEAL direct
         {
-            for (Fighter Target : CastInfos.Targets) {
-                if (EffectHealPercent.ApplyHealPercent(CastInfos, Target, CastInfos.RandomJet(Target)) == -3) {
+            for (Fighter Target : castInfos.targets) {
+                if (EffectHealPercent.ApplyHealPercent(castInfos, Target, castInfos.randomJet(Target)) == -3) {
                     return -3;
                 }
             }
@@ -36,14 +35,14 @@ public class EffectHealPercent extends EffectBase {
     }
 
     public static int ApplyHealPercent(EffectCast CastInfos, Fighter Target, int Heal) {
-        Fighter Caster = CastInfos.Caster;
+        Fighter Caster = CastInfos.caster;
 
-        // Boost soin etc
-        Heal = Heal * (Target.Life() / 100);
+        // boost soin etc
+        Heal = Heal * (Target.getLife() / 100);
 
         // Si le soin est superieur a sa vie actuelle
-        if ((Target.Life() + Heal) > Target.MaxLife()) {
-            Heal = Target.MaxLife() - Target.Life();
+        if ((Target.getLife() + Heal) > Target.getMaxLife()) {
+            Heal = Target.getMaxLife() - Target.getLife();
         }
 
         if (Heal < 0) {
@@ -51,15 +50,15 @@ public class EffectHealPercent extends EffectBase {
         }
 
         // Affectation
-        Target.setLife(Target.Life() + Heal);
+        Target.setLife(Target.getLife() + Heal);
 
         // Envoi du packet
         if (Heal != 0) {
-            Target.Fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.ID, Target.ID, Heal));
+            Target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Heal));
         }
 
         // Le soin entraine la fin du combat ?
-        return Target.TryDie(Caster.ID);
+        return Target.tryDie(Caster.getID());
     }
 
 }

@@ -17,59 +17,59 @@ public class PartyRequest extends GameBaseRequest {
     }
 
     @Override
-    public boolean Accept() {
-        if (this.Requester == null || this.Requester.GetParty() == null) {
-            this.Requested.removePartyRequest(this);
-            this.Requester.removePartyRequest(this);
+    public boolean accept() {
+        if (this.requester == null || this.requester.getParty() == null) {
+            this.requested.removePartyRequest(this);
+            this.requester.removePartyRequest(this);
             return false;
         }
         
-        this.Requester.GetParty().addPlayer(this.Requested.Character);
+        this.requester.getParty().addPlayer(this.requested.getCharacter());
 
-        this.Requested.removePartyRequest(this);
-        this.Requester.removePartyRequest(this);
+        this.requested.removePartyRequest(this);
+        this.requester.removePartyRequest(this);
 
-        return super.Accept();
+        return super.accept();
     }
 
-    public void Abort() {
-        if (!super.Declin()) {
+    public void abort() {
+        if (!super.declin()) {
             return;
         }
         try {
-            this.Requester.GetParty().sendToField(new PartyCancelInvitationNotificationMessage(this.Requester.GetParty().ID, this.Requester.Character.ID, this.Requested.Character.ID));
-            this.Requested.Send(new PartyInvitationCancelledForGuestMessage(this.Requester.GetParty().ID, this.Requester.Character.ID));
-            this.Requester.GetParty().removeGuest(this.Requested.Character);
+            this.requester.getParty().sendToField(new PartyCancelInvitationNotificationMessage(this.requester.getParty().id, this.requester.getCharacter().getID(), this.requested.getCharacter().getID()));
+            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requester.getCharacter().getID()));
+            this.requester.getParty().removeGuest(this.requested.getCharacter());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        this.Requested.removePartyRequest(this);
+        this.requested.removePartyRequest(this);
     }
 
     @Override
-    public boolean Declin() {
-        if (!super.Declin()) {
+    public boolean declin() {
+        if (!super.declin()) {
             return false;
         }
         try {
-            this.Requested.Send(new PartyInvitationCancelledForGuestMessage(this.Requester.GetParty().ID, this.Requested.Character.ID));
+            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requested.getCharacter().getID()));
 
-            this.Requester.GetParty().sendToField(new PartyRefuseInvitationNotificationMessage(this.Requester.GetParty().ID, this.Requested.Character.ID));
+            this.requester.getParty().sendToField(new PartyRefuseInvitationNotificationMessage(this.requester.getParty().id, this.requested.getCharacter().getID()));
 
-            this.Requester.GetParty().removeGuest(this.Requested.Character);
+            this.requester.getParty().removeGuest(this.requested.getCharacter());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        this.Requester.removePartyRequest(this);
-        this.Requested.removePartyRequest(this);
+        this.requester.removePartyRequest(this);
+        this.requested.removePartyRequest(this);
 
         return true;
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum Action) {
+    public boolean canSubAction(GameActionTypeEnum action) {
         return false;
     }
 

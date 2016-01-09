@@ -2,6 +2,8 @@ package koh.game.inter;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import koh.game.dao.DAO;
 import koh.game.utils.Settings;
 
 /**
@@ -32,7 +34,7 @@ public class TransfererTimeOut {
         public void run() {
             try {
                 if (!connector.isConnected()) {
-                    connector.RetryConnect(Settings.GetIntElement("Inter.Port"));
+                    connector.RetryConnect(DAO.getSettings().getIntElement("Inter.Port"));
                 }
             } catch (Exception e) {
             } finally {

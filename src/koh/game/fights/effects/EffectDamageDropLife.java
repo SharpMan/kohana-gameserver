@@ -11,36 +11,36 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectDamageDropLife extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (castInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            castInfos.isPoison = true;
 
             // Ajout du buff
-            for (Fighter Target : CastInfos.Targets) {
-                Target.Buffs.AddBuff(new BuffDamageDropLife(CastInfos, Target));
+            for (Fighter Target : castInfos.targets) {
+                Target.getBuff().addBuff(new BuffDamageDropLife(castInfos, Target));
             }
         } else // Dommage direct
         {
-            int effectBase = CastInfos.RandomJet(CastInfos.Caster);
-            MutableInt DamageValue = new MutableInt((CastInfos.Caster.CurrentLife / 100) * effectBase);
-            if (EffectDamage.ApplyDamages(CastInfos, CastInfos.Caster, DamageValue) == -3) {
-                for (Fighter Target : CastInfos.Targets) {
-                    if (Target.ID == CastInfos.Caster.ID) {
+            int effectBase = castInfos.randomJet(castInfos.caster);
+            MutableInt DamageValue = new MutableInt((castInfos.caster.currentLife / 100) * effectBase);
+            if (EffectDamage.applyDamages(castInfos, castInfos.caster, DamageValue) == -3) {
+                for (Fighter Target : castInfos.targets) {
+                    if (Target.getID() == castInfos.caster.getID()) {
                         continue;
                     }
-                    if (EffectHeal.ApplyHeal(CastInfos, Target, DamageValue, false) == -3) {
+                    if (EffectHeal.applyHeal(castInfos, Target, DamageValue, false) == -3) {
                         return -3;
                     }
                 }
                 return -3;
             } else {
-                for (Fighter Target : CastInfos.Targets) {
-                    if (Target.ID == CastInfos.Caster.ID) {
+                for (Fighter Target : castInfos.targets) {
+                    if (Target.getID() == castInfos.caster.getID()) {
                         continue;
                     }
-                    if (EffectHeal.ApplyHeal(CastInfos, Target, DamageValue, false) == -3) {
+                    if (EffectHeal.applyHeal(castInfos, Target, DamageValue, false) == -3) {
                         return -3;
                     }
                 }

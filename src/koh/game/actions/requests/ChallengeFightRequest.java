@@ -15,76 +15,76 @@ public class ChallengeFightRequest extends GameBaseRequest {
 
     public ChallengeFightRequest(WorldClient Client, WorldClient Target) {
         super(Client, Target);
-        this.Requester.Send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.Requested.Character.ID, this.Requester.Character.ID, this.Requested.Character.ID));
-        this.Requested.Send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.Requester.Character.ID, this.Requester.Character.ID, this.Requested.Character.ID));
+        this.requester.send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.requested.getCharacter().getID(), this.requester.getCharacter().getID(), this.requested.getCharacter().getID()));
+        this.requested.send(new GameRolePlayPlayerFightFriendlyRequestedMessage(this.requester.getCharacter().getID(), this.requester.getCharacter().getID(), this.requested.getCharacter().getID()));
     }
 
     @Override
-    public boolean Accept() {
-        if (!super.Declin()) {
+    public boolean accept() {
+        if (!super.declin()) {
             return false;
         }
 
         try {
-            this.Requester.Send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.Requested.Character.ID, this.Requester.Character.ID, this.Requested.Character.ID, true));
+            this.requester.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requested.getCharacter().getID(), this.requester.getCharacter().getID(), this.requested.getCharacter().getID(), true));
 
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
 
-            Fight Fight = new ChallengeFight(this.Requested.Character.CurrentMap, Requester, Requested);
-            this.Requester.Character.CurrentMap.AddFight(Fight);
+            Fight Fight = new ChallengeFight(this.requested.getCharacter().getCurrentMap(), requester, requested);
+            this.requester.getCharacter().getCurrentMap().addFight(Fight);
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.Requester.SetBaseRequest(null);
-            this.Requested.SetBaseRequest(null);
+            this.requester.setBaseRequest(null);
+            this.requested.setBaseRequest(null);
         }
         return true;
     }
 
     public boolean Cancel() {
-        if (!super.Declin()) {
+        if (!super.declin()) {
             return false;
         }
 
         try {//int fightId, int sourceId, int targetId, boolean accept
-            this.Requested.Send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.Requester.Character.ID, this.Requester.Character.ID, this.Requested.Character.ID, false));
+            this.requested.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requester.getCharacter().getID(), this.requester.getCharacter().getID(), this.requested.getCharacter().getID(), false));
 
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.Requester.SetBaseRequest(null);
-            this.Requested.SetBaseRequest(null);
+            this.requester.setBaseRequest(null);
+            this.requested.setBaseRequest(null);
         }
         return true;
     }
 
     @Override
-    public boolean Declin() {
-        if (!super.Declin()) {
+    public boolean declin() {
+        if (!super.declin()) {
             return false;
         }
 
         try {//int fightId, int sourceId, int targetId, boolean accept
-            this.Requester.Send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.Requested.Character.ID, this.Requester.Character.ID, this.Requested.Character.ID, false));
+            this.requester.send(new GameRolePlayPlayerFightFriendlyAnsweredMessage(this.requested.getCharacter().getID(), this.requester.getCharacter().getID(), this.requested.getCharacter().getID(), false));
 
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.Requester.SetBaseRequest(null);
-            this.Requested.SetBaseRequest(null);
+            this.requester.setBaseRequest(null);
+            this.requested.setBaseRequest(null);
         }
         return true;
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum Action) {
-        if (Action == GameActionTypeEnum.CHALLENGE_DENY || Action == GameActionTypeEnum.CHALLENGE_ACCEPT) {
+    public boolean canSubAction(GameActionTypeEnum action) {
+        if (action == GameActionTypeEnum.CHALLENGE_DENY || action == GameActionTypeEnum.CHALLENGE_ACCEPT) {
             return true;
         }
         return false;

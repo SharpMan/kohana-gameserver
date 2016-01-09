@@ -19,19 +19,19 @@ public class HasItemCriterion extends Criterion {
     @Override
     public void Build() {
         try {
-            this.Item = Integer.parseInt(Literal);
+            this.Item = Integer.parseInt(literal);
         } catch (Exception e) {
-            throw new Error(String.format("Cannot build HasItemCriterion, {0} is not a valid item id", this.Literal));
+            throw new Error(String.format("Cannot build HasItemCriterion, {0} is not a valid item id", this.literal));
         }
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         if (this.Operator == ComparaisonOperatorEnum.EQUALS) {
-            return character.InventoryCache.HasItemId(this.Item);
+            return character.getInventoryCache().hasItemId(this.Item);
         }
         else if (this.Operator == ComparaisonOperatorEnum.INEQUALS) {
-            return !character.InventoryCache.HasItemId(this.Item);
+            return !character.getInventoryCache().hasItemId(this.Item);
         } else {
             return true;
         }

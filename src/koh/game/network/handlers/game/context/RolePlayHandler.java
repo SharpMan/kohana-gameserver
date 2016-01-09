@@ -4,9 +4,14 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import koh.game.Main;
+
+import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.D2oDao;
+import koh.game.dao.DAO;
+import koh.game.entities.actors.IGameActor;
+import koh.game.entities.actors.MonsterGroup;
+import koh.game.fights.Fight;
+import koh.game.fights.types.MonsterFight;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.StatsBoostEnum;
@@ -14,57 +19,104 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.StatsUpgradeResultEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.connection.StatsUpgradeRequestMessage;
+import koh.protocol.messages.game.character.stats.UpdateLifePointsMessage;
 import koh.protocol.messages.game.context.roleplay.ChangeMapMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayRequestMessage;
+import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayAttackMonsterRequestMessage;
 import koh.protocol.messages.game.context.roleplay.stats.StatsUpgradeResultMessage;
+import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  *
  * @author Neo-Craft
  */
+@Log4j2
 public class RolePlayHandler {
 
-    public static Map<Integer, StatsEnum> BOOST_ID_TO_STATS = new HashMap<Integer, StatsEnum>() {
+    //TODO ImmutableMap
+    public static final Map<Integer, StatsEnum> BOOST_ID_TO_STATS = new HashMap<Integer, StatsEnum>(6) {
         {
-            put(StatsBoostEnum.Strength, StatsEnum.Strength);
-            put(StatsBoostEnum.Vitality, StatsEnum.Vitality);
-            put(StatsBoostEnum.Wisdom, StatsEnum.Wisdom);
-            put(StatsBoostEnum.Chance, StatsEnum.Chance);
-            put(StatsBoostEnum.Agility, StatsEnum.Agility);
-            put(StatsBoostEnum.Intelligence, StatsEnum.Intelligence);
+            put(StatsBoostEnum.STRENGTH, StatsEnum.STRENGTH);
+            put(StatsBoostEnum.VITALITY, StatsEnum.VITALITY);
+            put(StatsBoostEnum.WISDOM, StatsEnum.WISDOM);
+            put(StatsBoostEnum.CHANCE, StatsEnum.CHANCE);
+            put(StatsBoostEnum.AGILITY, StatsEnum.AGILITY);
+            put(StatsBoostEnum.INTELLIGENCE, StatsEnum.INTELLIGENCE);
         }
     };
 
-    @HandlerAttribute(ID = EmotePlayRequestMessage.MESSAGE_ID)
-    public static void EmotePlayRequestMessage(WorldClient Client, EmotePlayRequestMessage Message) {
-        Client.Character.CurrentMap.sendToField(new EmotePlayMessage(Message.emoteId, Instant.now().getEpochSecond(), Client.Character.ID, Client.getAccount().ID));
+    @HandlerAttribute(ID = GameRolePlayAttackMonsterRequestMessage.M_ID)
+    public static void handleGameRolePlayAttackMonsterRequestMessage(WorldClient client , GameRolePlayAttackMonsterRequestMessage message){
+        if(client.isGameAction(GameActionTypeEnum.FIGHT) || !client.canGameAction(GameActionTypeEnum.FIGHT)){
+            PlayerController.sendServerMessage(client,"Impossible : Vous êtes occupé(e)");
+        }else {
+            final IGameActor target = client.getCharacter().getCurrentMap().getActor(message.monsterGroupId);
+            if(target == null || ! (target instanceof MonsterGroup)){
+                client.send(new BasicNoOperationMessage());
+                return;
+            }
+            client.abortGameActions();
+            final Fight fight = new MonsterFight(client.getCharacter().getCurrentMap(), client,(MonsterGroup) target);
+            client.getCharacter().getCurrentMap().addFight(fight);
+        }
+
     }
 
-    @HandlerAttribute(ID = StatsUpgradeRequestMessage.MESSAGE_ID)
-    public static void HandleStatsUpgradeRequestMessage(WorldClient Client, StatsUpgradeRequestMessage Message) {
-        //Todo StatsUpgradeResultEnum.FIGHT
-        if (Message.useAdditionnal) {
-            Client.Send(new BasicNoOperationMessage());
-            PlayerController.SendServerMessage(Client, "Not implanted yet");
+    @HandlerAttribute(ID = EmotePlayRequestMessage.MESSAGE_ID)
+    public static void EmotePlayRequestMessage(WorldClient client, EmotePlayRequestMessage message) {
+        if(client.isGameAction(GameActionTypeEnum.FIGHT)){
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        StatsEnum Stat = BOOST_ID_TO_STATS.get((int) Message.statId);
+        if(message.emoteId == 1 || message.emoteId == 19){
+            if(client.getCharacter().getRegenRate() != 5) {
+                client.getCharacter().stopRegen();
+                client.getCharacter().setRegenRate((byte) 5);
+                client.getCharacter().updateRegenedLife(false);
+                client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(),client.getCharacter().getMaxLife()));
+            }
+            client.getCharacter().removeHumanOption(HumanOptionEmote.class);
+            client.getCharacter().getHumanInformations().options = ArrayUtils.add(client.getCharacter().getHumanInformations().options, new HumanOptionEmote(message.emoteId,Instant.now().toEpochMilli()));
+         }else if(client.getCharacter().getRegenRate() == 5){
+            client.getCharacter().removeHumanOption(HumanOptionEmote.class);
+            client.getCharacter().stopRegen();
+            client.getCharacter().updateRegenedLife(true);
+            client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(),client.getCharacter().getMaxLife()));
+        }
+        client.getCharacter().getCurrentMap().sendToField(new EmotePlayMessage(message.emoteId, Instant.now().getEpochSecond(), client.getCharacter().getID(), client.getAccount().id));
+    }
+
+
+    @HandlerAttribute(ID = StatsUpgradeRequestMessage.MESSAGE_ID)
+    public static void HandleStatsUpgradeRequestMessage(WorldClient client, StatsUpgradeRequestMessage message) {
+        if(client.isGameAction(GameActionTypeEnum.FIGHT)){
+            PlayerController.sendServerMessage(client, "Tes statistiques ne seront affectés qu'aprés la fin du combat.");
+        }
+        if (message.useAdditionnal) {
+            client.send(new BasicNoOperationMessage());
+            PlayerController.sendServerMessage(client, "Not implanted yet");
+            return;
+        }
+        StatsEnum Stat = BOOST_ID_TO_STATS.get((int)message.statId);
         if (Stat == null) {
-            throw new Error("Wrong statsid");
+            log.error("Wrong statsid {}", message.statId);
+            return;
         }
-        if (Message.boostPoint <= 0) {
-            throw new Error("Client given 0 as boostpoint. Forbidden value.");
+        if (message.boostPoint <= 0) {
+            throw new Error("client given 0 as boostpoint. Forbidden value.");
         }
-        int base = Client.Character.Stats.GetBase(Stat);
-        short num1 = (short) Message.boostPoint;
-        if ((int) num1 < 1 || (int) Message.boostPoint > Client.Character.StatPoints) {
-            Client.Send(new BasicNoOperationMessage());
+        int base = client.getCharacter().getStats().getBase(Stat);
+        short num1 = (short) message.boostPoint;
+        if ((int) num1 < 1 || (int) message.boostPoint > client.getCharacter().getStatPoints()) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
         int oldbase = base;
-        List<List<Integer>> thresholds = D2oDao.getBreed(Client.Character.Breed).GetThresholds((int) Message.statId);
-        for (int thresholdIndex = D2oDao.getBreed(Client.Character.Breed).GetThresholdIndex((int) base, thresholds); (long) num1 >= (long) thresholds.get(thresholdIndex).get(1); thresholdIndex = D2oDao.getBreed(Client.Character.Breed).GetThresholdIndex((int) base, thresholds)) {
+        final List<List<Integer>> thresholds = DAO.getD2oTemplates().getBreed(client.getCharacter().getBreed()).GetThresholds((int) message.statId);
+        for (int thresholdIndex = DAO.getD2oTemplates().getBreed(client.getCharacter().getBreed()).GetThresholdIndex((int) base, thresholds); (long) num1 >= (long) thresholds.get(thresholdIndex).get(1); thresholdIndex = DAO.getD2oTemplates().getBreed(client.getCharacter().getBreed()).GetThresholdIndex((int) base, thresholds)) {
             short num2;
             short num3;
             if (thresholdIndex < thresholds.size() - 1 && (double) num1 / (double) thresholds.get(thresholdIndex).get(1) > (double) ((long) thresholds.get(thresholdIndex + 1).get(0) - (long) base)) {
@@ -83,62 +135,62 @@ public class RolePlayHandler {
             base += num2;
             num1 -= num3;
         }
-        Client.Character.Stats.GetEffect(Stat).Base = base;
-        switch ((int) Message.statId) {
-            case StatsBoostEnum.Strength:
-                Client.Character.Strength = base;
+        client.getCharacter().getStats().getEffect(Stat).base = base;
+        switch ((int) message.statId) {
+            case StatsBoostEnum.STRENGTH:
+                client.getCharacter().setStrength(base);
                 break;
 
-            case StatsBoostEnum.Vitality:
-                Client.Character.Vitality = base;
-                Client.Character.Life += (base - oldbase); // on boost la life
+            case StatsBoostEnum.VITALITY:
+                client.getCharacter().setVitality(base);
+                client.getCharacter().addLife(base - oldbase); // on boost la life
                 break;
 
-            case StatsBoostEnum.Wisdom:
-                Client.Character.Wisdom = base;
+            case StatsBoostEnum.WISDOM:
+                client.getCharacter().setWisdom(base);
                 break;
 
-            case StatsBoostEnum.Intelligence:
-                Client.Character.Intell = base;
+            case StatsBoostEnum.INTELLIGENCE:
+                client.getCharacter().setIntell(base);
                 break;
 
-            case StatsBoostEnum.Chance:
-                Client.Character.Chance = base;
+            case StatsBoostEnum.CHANCE:
+                client.getCharacter().setChance(base);
                 break;
 
-            case StatsBoostEnum.Agility:
-                Client.Character.Agility = base;
+            case StatsBoostEnum.AGILITY:
+                client.getCharacter().setAgility(base);
                 break;
         }
-        Client.Character.StatPoints -= ((int) Message.boostPoint - num1);
-        Client.Send(new StatsUpgradeResultMessage(StatsUpgradeResultEnum.SUCCESS, Message.boostPoint));
-        Client.Character.RefreshStats();
+        client.getCharacter().addStatPoints(- (int) message.boostPoint - num1);
+        client.send(new StatsUpgradeResultMessage(StatsUpgradeResultEnum.SUCCESS, message.boostPoint));
+        client.getCharacter().refreshStats();
     }
 
     @HandlerAttribute(ID = ChangeMapMessage.MESSAGE_ID)
     public static void HandleChangeMapMessage(WorldClient Client, ChangeMapMessage Message) {
 
-        if (Client.Character.Cell == null || !Client.Character.Cell.AffectMapChange()) {
-            System.out.println("undefinied cell");
-            Client.Send(new BasicNoOperationMessage());
+        if (Client.getCharacter().getCell() == null || !Client.getCharacter().getCell().affectMapChange()) {
+            System.out.println("undefined cell");
+            Client.send(new BasicNoOperationMessage());
             return;
         }
-        //Client.SequenceMessage();
-        //Client.sendPacket(new BasicNoOperationMessage());
+        //client.sequenceMessage();
+        //client.sendPacket(new BasicNoOperationMessage());
 
-        //System.out.println(cell.MapChangeData + "cell" + cell.Id);
-        if (Client.Character.CurrentMap.TopNeighbourId == Message.mapId) {
-            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[0].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[0].Cellid : (Client.Character.Cell.Id + 532));
-        } else if (Client.Character.CurrentMap.BottomNeighbourId == Message.mapId) {
-            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[1].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[1].Cellid : (Client.Character.Cell.Id - 532));
-        } else if (Client.Character.CurrentMap.LeftNeighbourId == Message.mapId) {
-            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[2].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[2].Cellid : (Client.Character.Cell.Id + 13));
-        } else if (Client.Character.CurrentMap.RightNeighbourId == Message.mapId) {
-            Client.Character.teleport(Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[3].Mapid : Message.mapId, Client.Character.CurrentMap.newNeighbour != null ? Client.Character.CurrentMap.newNeighbour[3].Cellid : (Client.Character.Cell.Id - 13));
+        //System.out.println(cell.mapChangeData + "cell" + cell.id);
+        if (Client.getCharacter().getCurrentMap().getTopNeighbourId() == Message.mapId) {
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[0].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[0].getCellid() : (Client.getCharacter().getCell().getId() + 532));
+        } else if (Client.getCharacter().getCurrentMap().getBottomNeighbourId() == Message.mapId) {
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[1].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[1].getCellid() : (Client.getCharacter().getCell().getId() - 532));
+        } else if (Client.getCharacter().getCurrentMap().getLeftNeighbourId() == Message.mapId) {
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[2].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[2].getCellid() : (Client.getCharacter().getCell().getId() + 13));
+        } else if (Client.getCharacter().getCurrentMap().getRightNeighbourId() == Message.mapId) {
+            Client.getCharacter().teleport(Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getMapid() : Message.mapId, Client.getCharacter().getCurrentMap().getNewNeighbour() != null ? Client.getCharacter().getCurrentMap().getNewNeighbour()[3].getCellid() : (Client.getCharacter().getCell().getId() - 13));
         } else {
-            // Client.Character.teleport(Message.mapId, -1);
-            Main.Logs().writeError("Client " + Client.Character.NickName + " teleport from " + Client.Character.CurrentMap.Id + " to " + Message.mapId);
-            Client.Send(new BasicNoOperationMessage());
+            // Client.getCharacter().teleport(Message.mapId, -1);
+            log.error("client {} teleport from {} to {}" ,Client.getCharacter().getNickName(),Client.getCharacter().getCurrentMap().getId(), Message.mapId);
+            Client.send(new BasicNoOperationMessage());
             //System.out.println("undefinied map");
         }
 

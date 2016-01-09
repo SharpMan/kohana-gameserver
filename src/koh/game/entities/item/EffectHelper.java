@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+
 import koh.d2o.entities.Effect;
-import koh.game.Logs;
-import koh.game.Main;
-import static koh.game.dao.D2oDao.getEffect;
+
+import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.EffectGenerationType;
-import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
 import koh.utils.Couple;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -26,20 +26,22 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class EffectHelper {
 
+    private static final Logger logger = LogManager.getLogger(EffectHelper.class);
+
     public static final int NEUTRAL_ELEMENT = 0;
     public static final int EARTH_ELEMENT = 1;
     public static final int FIRE_ELEMENT = 2;
     public static final int WATER_ELEMENT = 3;
     public static final int AIR_ELEMENT = 4;
     public static final int NONE_ELEMENT = 5;
-    public static final int[] DateEffect = new int[]{805, 808, 983, 998}; //971
+    public static final int[] DATE_EFFECT = new int[]{805, 808, 983, 998}; //971
     public static final int DAMAGE_EFFECT_CATEGORY = 2;
-    public static final int[] MonsterEffect = new int[]{185, 621, 1011, 905};
-    public static final int[] LadderEffects = new int[]{717};
-    public static final int[] LivingObjectEffect = new int[]{973, 971, 972, 974};
-    public static final int[] RelatedObjectsEffect = new int[]{981, 982/*, 983*/};
-    public static final int SpellEffectPerFight = 1175;
-    public static final int[] SpellItemsEffects = new int[]{
+    public static final int[] MONSTER_EFFECT = new int[]{185, 621, 1011, 905};
+    public static final int[] LADDER_EFFECTS = new int[]{717};
+    public static final int[] LIVING_OBJECT_EFFECT = new int[]{973, 971, 972, 974};
+    public static final int[] RELATED_OBJECTS_EFFECT = new int[]{981, 982/*, 983*/};
+    public static final int SPELL_EFFECT_PER_FIGHT = 1175;
+    public static final int[] SPELL_ITEMS_EFFECTS = new int[]{
         281, //Augmente la PO du sort #1 de #3
         282, //Rend la portée du sort #1 modifiable
         283, //+#3 Dommages sur le sort #1
@@ -67,16 +69,16 @@ public class EffectHelper {
         94,//Effect_StealHPFire
         95,//Effect_StealHPNeutral
         101,//Effect_RemoveAP
-        108//Heal
+        108//HEAL
     };
 
-    public static IoBuffer SerializeEffectInstanceDice(EffectInstance[] Effects) {
+    public static IoBuffer serializeEffectInstanceDice(EffectInstance[] Effects) {
         IoBuffer buff = IoBuffer.allocate(65535);
         buff.setAutoExpand(true);
 
         buff.putInt(Effects.length);
         for (EffectInstance e : Effects) {
-            buff.put(e.SerializationIdentifier());
+            buff.put(e.serializationIdentifier());
             e.toBinary(buff);
         }
 
@@ -84,20 +86,24 @@ public class EffectHelper {
         return buff;
     }
 
-    public static int RandomValue(Couple<Integer, Integer> Couple) {
-        return RandomValue(Couple.first, Couple.second);
+    public static int randomValue(Couple<Integer, Integer> Couple) {
+        return randomValue(Couple.first, Couple.second);
     }
 
-    public static int RandomValue(int i1, int i2) {
+    public static int randomValue(int i1, int i2) {
         Random rand = new Random();
         return rand.nextInt(i2 - i1 + 1) + i1;
+    }
+
+    public static Effect getEffect(int eff){
+        return DAO.getD2oTemplates().getEffect(eff);
     }
 
     public static boolean verifyEffectTrigger(Fighter pCasterId, Fighter pTargetId, EffectInstance[] pSpellEffects, EffectInstance pEffect, boolean pWeaponEffect, String pTriggers, int pSpellImpactCell) {
 
         boolean verify = true;
-        boolean isTargetAlly = pCasterId.IsFriendlyWith(pTargetId);
-        int distance = Pathfinder.getDistance( pCasterId.CellId(), pTargetId.CellId());
+        boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
+        int distance = Pathfinder.getDistance( pCasterId.getCellId(), pTargetId.getCellId());
         
         for (String trigger : pTriggers.split("\\|")) {
             switch (trigger) {
@@ -218,107 +224,107 @@ public class EffectHelper {
         return array;
     }
 
-    public static EffectInstance[] GenerateIntegerEffectArray(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
-        EffectInstance[] Effects = new EffectInstance[possibleEffects.length];
+    public static EffectInstance[] generateIntegerEffectArray(EffectInstance[] possibleEffects, EffectGenerationType genType, boolean isWeapon) {
+        EffectInstance[] effects = new EffectInstance[possibleEffects.length];
         int i = 0;
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
-                if (e.effectId == SpellEffectPerFight || ArrayUtils.contains(RelatedObjectsEffect, e.effectId) || ArrayUtils.contains(SpellItemsEffects, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
-                    Effects[i] = e;
+                if (e.effectId == SPELL_EFFECT_PER_FIGHT || ArrayUtils.contains(RELATED_OBJECTS_EFFECT, e.effectId) || ArrayUtils.contains(SPELL_ITEMS_EFFECTS, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
+                    effects[i] = e;
                     continue;
                 }
 
-                if (ArrayUtils.contains(DateEffect, e.effectId)) {
+                if (ArrayUtils.contains(DATE_EFFECT, e.effectId)) {
                     Calendar now = Calendar.getInstance();
-                    Effects[i] = (new EffectInstanceDate(e, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE)));
+                    effects[i] = (new EffectInstanceDate(e, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE)));
                     continue;
                 }
-                if (ArrayUtils.contains(MonsterEffect, e.effectId)) {
-                    Effects[i] = new EffectInstanceCreature(e, ((EffectInstanceDice) e).diceNum);
+                if (ArrayUtils.contains(MONSTER_EFFECT, e.effectId)) {
+                    effects[i] = new EffectInstanceCreature(e, ((EffectInstanceDice) e).diceNum);
                     continue;
                 }
-                if (ArrayUtils.contains(LadderEffects, e.effectId)) {
-                    Effects[i] = new EffectInstanceLadder(e, ((EffectInstanceDice) e).diceNum, 0);
+                if (ArrayUtils.contains(LADDER_EFFECTS, e.effectId)) {
+                    effects[i] = new EffectInstanceLadder(e, ((EffectInstanceDice) e).diceNum, 0);
                     continue;
                 }
 
                 short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
-                if (GenType == EffectGenerationType.MaxEffects) {
-                    Effects[i] = (new EffectInstanceInteger(e, !e.Template().operator.equalsIgnoreCase("-") ? num1 : num2));
+                if (genType == EffectGenerationType.MAX_EFFECTS) {
+                    effects[i] = (new EffectInstanceInteger(e, !e.getTemplate().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;
                 }
-                if (GenType == EffectGenerationType.MinEffects) {
-                    Effects[i] = (new EffectInstanceInteger(e, !e.Template().operator.equalsIgnoreCase("-") ? num2 : num1));
+                if (genType == EffectGenerationType.MIN_EFFECTS) {
+                    effects[i] = (new EffectInstanceInteger(e, !e.getTemplate().operator.equalsIgnoreCase("-") ? num2 : num1));
                     continue;
                 }
                 if ((int) num2 == 0) {
-                    Effects[i] = (new EffectInstanceInteger(e, num1));
+                    effects[i] = (new EffectInstanceInteger(e, num1));
                 } else {
-                    Effects[i] = (new EffectInstanceInteger(e, (short) RandomValue((int) num2, (int) num1 /*+ 1*/)));
+                    effects[i] = (new EffectInstanceInteger(e, (short) randomValue((int) num2, (int) num1 /*+ 1*/)));
                 }
             } else if (e != null) {
-                throw new Error("Effect not suport" + e.SerializationIdentifier());
+                throw new Error("effect not suport" + e.serializationIdentifier());
             }
             i++;
         }
-        return Effects;
+        return effects;
     }
 
-    public static List<ObjectEffect> GenerateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
-        List<ObjectEffect> Effects = new ArrayList<>();
+    public static List<ObjectEffect> generateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
+        List<ObjectEffect> effects = new ArrayList<>();
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
-                Main.Logs().writeDebug(e.toString());
+                logger.debug(e.toString());
                 if (e.effectId == 984 || e.effectId == 800) //Truc familiers pas sur
                 {
                     continue;
                 }
-                if (e.effectId == SpellEffectPerFight || ArrayUtils.contains(RelatedObjectsEffect, e.effectId) || ArrayUtils.contains(SpellItemsEffects, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
-                    Effects.add(new ObjectEffectDice(e.effectId, ((EffectInstanceDice) e).diceNum, ((EffectInstanceDice) e).diceSide, ((EffectInstanceDice) e).value));
+                if (e.effectId == SPELL_EFFECT_PER_FIGHT || ArrayUtils.contains(RELATED_OBJECTS_EFFECT, e.effectId) || ArrayUtils.contains(SPELL_ITEMS_EFFECTS, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
+                    effects.add(new ObjectEffectDice(e.effectId, ((EffectInstanceDice) e).diceNum, ((EffectInstanceDice) e).diceSide, ((EffectInstanceDice) e).value));
                     continue;
                 }
-                if (ArrayUtils.contains(LivingObjectEffect, e.effectId)) {
-                    Effects.add(new ObjectEffectInteger(e.effectId, ((EffectInstanceDice) e).value));
+                if (ArrayUtils.contains(LIVING_OBJECT_EFFECT, e.effectId)) {
+                    effects.add(new ObjectEffectInteger(e.effectId, ((EffectInstanceDice) e).value));
                     continue;
                 }
-                if (ArrayUtils.contains(DateEffect, e.effectId)) {
+                if (ArrayUtils.contains(DATE_EFFECT, e.effectId)) {
                     Calendar now = Calendar.getInstance();
-                    Effects.add(new ObjectEffectDate(e.effectId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR_OF_DAY), (byte) now.get(Calendar.MINUTE)));
+                    effects.add(new ObjectEffectDate(e.effectId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR_OF_DAY), (byte) now.get(Calendar.MINUTE)));
                     continue;
                 }
-                if (ArrayUtils.contains(MonsterEffect, e.effectId)) {
-                    Effects.add(new ObjectEffectCreature(e.effectId, ((EffectInstanceDice) e).diceNum));
+                if (ArrayUtils.contains(MONSTER_EFFECT, e.effectId)) {
+                    effects.add(new ObjectEffectCreature(e.effectId, ((EffectInstanceDice) e).diceNum));
                     continue;
                 }
-                if (ArrayUtils.contains(LadderEffects, e.effectId)) {
-                    Effects.add(new ObjectEffectLadder(e.effectId, ((EffectInstanceDice) e).diceNum, 0));
+                if (ArrayUtils.contains(LADDER_EFFECTS, e.effectId)) {
+                    effects.add(new ObjectEffectLadder(e.effectId, ((EffectInstanceDice) e).diceNum, 0));
                     continue;
                 }
 
                 short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
-                if (GenType == EffectGenerationType.MaxEffects) {
-                    Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num1 : num2));
+                if (GenType == EffectGenerationType.MAX_EFFECTS) {
+                    effects.add(new ObjectEffectInteger(e.effectId, !e.getTemplate().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;
                 }
-                if (GenType == EffectGenerationType.MinEffects) {
-                    Effects.add(new ObjectEffectInteger(e.effectId, !e.Template().operator.equalsIgnoreCase("-") ? num2 : num1));
+                if (GenType == EffectGenerationType.MIN_EFFECTS) {
+                    effects.add(new ObjectEffectInteger(e.effectId, !e.getTemplate().operator.equalsIgnoreCase("-") ? num2 : num1));
                     continue;
                 }
                 if ((int) num2 == 0) {
-                    Effects.add(new ObjectEffectInteger(e.effectId, num1));
+                    effects.add(new ObjectEffectInteger(e.effectId, num1));
                 } else {
-                    Effects.add(new ObjectEffectInteger(e.effectId, (short) RandomValue((int) num2, (int) num1)));
+                    effects.add(new ObjectEffectInteger(e.effectId, (short) randomValue((int) num2, (int) num1)));
                 }
             } else {
-                throw new Error("Effect not suport" + e.toString());
+                throw new Error("effect not suport" + e.toString());
             }
         }
-        return Effects;
+        return effects;
     }
 
-    public static ObjectEffect[] ObjectEffects(List<EffectInstance> effects) {
+    public static ObjectEffect[] objectEffects(List<EffectInstance> effects) {
         ObjectEffect[] array = new ObjectEffect[effects.size()];
         for (int i = 0; i < array.length; ++i) {
             //EffectInstanceCreate 

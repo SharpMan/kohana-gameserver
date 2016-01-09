@@ -3,6 +3,8 @@ package koh.game.entities.actors.npc;
 import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.entities.actors.Player;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
@@ -10,30 +12,33 @@ import koh.game.entities.actors.Player;
  */
 public class NpcReply {
 
-    public String Type;
-    public int ReplyID;
-    public String Criteria;
-    public String[] Parameters;
+    private String type;
+    @Getter @Setter
+    private int replyID;
+    @Setter
+    private String criteria;
+    @Getter @Setter
+    private String[] parameters;
 
     private ConditionExpression m_criteriaExpression;
 
-    public ConditionExpression CriteriaExpression() {
+    public ConditionExpression getCriteriaExpression() {
         if (m_criteriaExpression == null) {
-            if (Strings.isNullOrEmpty(Criteria) || this.Criteria.equalsIgnoreCase("null")) {
+            if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                 return null;
             } else {
-                this.m_criteriaExpression = ConditionExpression.Parse(this.Criteria);
+                this.m_criteriaExpression = ConditionExpression.parse(this.criteria);
             }
         }
         return m_criteriaExpression;
     }
 
-    public boolean AreConditionFilled(Player character) {
+    public boolean areConditionFilled(Player character) {
         try {
-            if (this.CriteriaExpression() == null) {
+            if (this.getCriteriaExpression() == null) {
                 return true;
             } else {
-                return this.CriteriaExpression().Eval(character);
+                return this.getCriteriaExpression().eval(character);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,8 +46,8 @@ public class NpcReply {
         }
     }
 
-    public boolean Execute(Player p) {
-        return AreConditionFilled(p);
+    public boolean execute(Player p) {
+        return areConditionFilled(p);
     }
 
 }

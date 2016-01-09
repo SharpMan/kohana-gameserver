@@ -1,18 +1,21 @@
 package koh.game.entities.item.animal;
 
+import lombok.Getter;
+
 /**
  *
  * @author Neo-Craft
  */
 public class FoodItem {
 
-    public int ItemID, Point, Stats, StatsPoints;
+    @Getter
+    private int itemID, point, stats, statsPoints;
 
     public FoodItem(int ItemID, int Point, int Stats, int StatsPoints) {
-        this.ItemID = ItemID;
-        this.Point = Point;
-        this.Stats = Stats;
-        this.StatsPoints = StatsPoints;
+        this.itemID = ItemID;
+        this.point = Point;
+        this.stats = Stats;
+        this.statsPoints = StatsPoints;
     }
     
     

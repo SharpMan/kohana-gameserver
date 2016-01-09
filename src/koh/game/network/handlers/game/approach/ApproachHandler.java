@@ -1,6 +1,6 @@
 package koh.game.network.handlers.game.approach;
 
-import koh.game.dao.AccountTicketDAO;
+import koh.game.dao.mysql.AccountTicketDAO;
 import koh.game.network.WorldClient;
 import koh.game.network.WorldServer;
 import koh.game.network.handlers.HandlerAttribute;
@@ -21,22 +21,22 @@ public class ApproachHandler {
     
     @HandlerAttribute(ID = StartupActionsExecuteMessage.M_ID)
     public static void HandleStartupActionsExecuteMessage(WorldClient Client , StartupActionsExecuteMessage Message){
-        Client.Send(new StartupActionsListMessage(new StartupActionAddObject[0]));//Client.Send(Message);
+        Client.send(new StartupActionsListMessage(new StartupActionAddObject[0]));//client.send(Message);
     }
 
     @HandlerAttribute(ID = AuthenticationTicketMessage.MESSAGE_ID)
     public static void AuthenticationTicketMessage(WorldClient Client, Message message) {
 
-        Client.tempTicket = AccountTicketDAO.getWaitingCompte(((AuthenticationTicketMessage) message).Ticket);
+        Client.setTempTicket(AccountTicketDAO.getWaitingCompte(((AuthenticationTicketMessage) message).Ticket));
 
-        if (Client.tempTicket != null && Client.tempTicket.isCorrect(Client.getIP(), ((AuthenticationTicketMessage) message).Ticket)) {
-            WorldServer.Loader.addClient(Client);
-            if (WorldServer.Loader.getPosition(Client) != 1) {
-                Client.Send(new LoginQueueStatusMessage((short) WorldServer.Loader.getPosition(Client), (short) WorldServer.Loader.getTotal()));
-                Client.showQueue = true;
+        if (Client.getTempTicket() != null && Client.getTempTicket().isCorrect(Client.getIP(), ((AuthenticationTicketMessage) message).Ticket)) {
+            WorldServer.gameLoader.addClient(Client);
+            if (WorldServer.gameLoader.getPosition(Client) != 1) {
+                Client.send(new LoginQueueStatusMessage((short) WorldServer.gameLoader.getPosition(Client), (short) WorldServer.gameLoader.getTotal()));
+                Client.setShowQueue(true);
             }
         } else {
-            Client.Send(new AuthenticationTicketRefusedMessage());
+            Client.send(new AuthenticationTicketRefusedMessage());
             //Diconnected After 1s
         }
         
@@ -44,9 +44,9 @@ public class ApproachHandler {
     
     
     @HandlerAttribute(ID = ClientKeyMessage.MESSAGE_ID)
-    public static void HandleClientKeyMessage(WorldClient Client, Message message) {
-        Client.ClientKey = (((ClientKeyMessage) message).key);
-       //Client.sendPacket(new CharacterLoadingCompleteMessage());
+    public static void HandleClientKeyMessage(WorldClient Client, ClientKeyMessage message) {
+        Client.setClientKey(message.key);
+       //client.sendPacket(new CharacterLoadingCompleteMessage());
         
         
         

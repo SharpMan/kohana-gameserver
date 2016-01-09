@@ -1,8 +1,8 @@
 package koh.game.entities.actors.character;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import koh.game.entities.actors.Player;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.ShortcutBarEnum;
@@ -19,19 +19,19 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class ShortcutBook {
 
-    public Map<Byte, PlayerShortcut> myShortcuts = Collections.synchronizedMap(new HashMap<Byte, PlayerShortcut>());
+    public Map<Byte, PlayerShortcut> myShortcuts = new ConcurrentHashMap<Byte, PlayerShortcut>();
 
-    public byte[] Serialize() {
+    public byte[] serialize() {
         IoBuffer buf = IoBuffer.allocate(1);
         buf.setAutoExpand(true);
 
         buf.putInt(myShortcuts.size());
-        myShortcuts.values().forEach(Spell -> Spell.Serialize(buf));
+        myShortcuts.values().forEach(Spell -> Spell.serialize(buf));
 
         return buf.array();
     }
 
-    public void SwapShortcuts(WorldClient Client, byte slot, byte newSlot) {
+    public void swapShortcuts(WorldClient Client, byte slot, byte newSlot) {
         PlayerShortcut shortcut1 = myShortcuts.get(slot);
         if (shortcut1 == null) {
             return;
@@ -40,35 +40,41 @@ public class ShortcutBook {
         myShortcuts.remove(slot);
         if (shortcut2 != null) {
             myShortcuts.remove(newSlot);
-            shortcut2.Position = slot;
-            this.Add(shortcut2);
-            Client.Send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut2.toShortcut(Client.Character)));
+            shortcut2.position = slot;
+            this.add(shortcut2);
+            Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut2.toShortcut(Client.getCharacter())));
         } else {
-            Client.Send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, (byte) slot));
+            Client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, (byte) slot));
         }
-        shortcut1.Position = newSlot;
-        this.Add(shortcut1);
-        Client.Send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut1.toShortcut(Client.Character)));
+        shortcut1.position = newSlot;
+        this.add(shortcut1);
+        Client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, shortcut1.toShortcut(Client.getCharacter())));
     }
 
-    public Shortcut[] toShortcuts(Player p) { //FIXME : Collectors.Arrays
+    public Shortcut[] toShortcuts(Player p) {
         Shortcut[] array = new Shortcut[this.myShortcuts.size()];
         int i = 0;
-        for (PlayerShortcut sp : this.myShortcuts.values()) {
-            if (sp.Position == -1) {
+        for (Map.Entry<Byte,PlayerShortcut> sp : this.myShortcuts.entrySet()) {
+            if (sp.getValue().position == -1) {
                 continue;
             }
-            array[i] = sp.toShortcut(p);
+            try {
+                array[i] = sp.getValue().toShortcut(p);
+            }
+            catch(NullPointerException e){
+                this.myShortcuts.remove(sp.getKey());
+                continue;
+            }
             i++;
         }
         return array;
     }
 
-    public boolean CanAddShortcutItem(ShortcutObjectItem Item) {
-        return !myShortcuts.values().stream().filter(x -> (x instanceof ItemShortcut) && ((ItemShortcut) x).ItemID == Item.itemUID).findAny().isPresent();
+    public boolean canAddShortcutItem(ShortcutObjectItem Item) {
+        return !myShortcuts.values().stream().filter(x -> (x instanceof ItemShortcut) && ((ItemShortcut) x).itemID == Item.itemUID).findAny().isPresent();
     }
 
-    public static ShortcutBook Deserialize(byte[] binary) {
+    public static ShortcutBook deserialize(byte[] binary) {
         ShortcutBook Book = new ShortcutBook();
         if (binary.length <= 0) {
             return Book;
@@ -78,7 +84,7 @@ public class ShortcutBook {
         for (int i = 0; i < len; i++) {
             switch (buf.getInt()) {
                 case ShortcutType.ShortcutItem:
-                    Book.Add(new ItemShortcut(buf));
+                    Book.add(new ItemShortcut(buf));
                     break;
                 default:
                     throw new Error("type not supported");
@@ -88,8 +94,8 @@ public class ShortcutBook {
         return Book;
     }
 
-    public void Add(PlayerShortcut ps) {
-        this.myShortcuts.put(ps.Position, ps);
+    public void add(PlayerShortcut ps) {
+        this.myShortcuts.put(ps.position, ps);
     }
 
     public void totalClear() {

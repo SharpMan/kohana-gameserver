@@ -22,30 +22,30 @@ public class BuffSubPAEsquive extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        MutableInt LostAP = new MutableInt(CastInfos.RandomJet(Target));
-        LostAP.setValue(LostAP.getValue() > Target.AP() ? Target.AP() : LostAP.getValue());
-        CastInfos.DamageValue = Target.CalculDodgeAPMP(CastInfos.Caster, LostAP.intValue(), false,CastInfos.Duration > 0);
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        MutableInt LostAP = new MutableInt(castInfos.randomJet(target));
+        LostAP.setValue(LostAP.getValue() > target.getAP() ? target.getAP() : LostAP.getValue());
+        castInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, LostAP.intValue(), false, castInfos.duration > 0);
 
-        if (CastInfos.DamageValue != LostAP.intValue()) {
-            Target.Fight.sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, Caster.ID, Target.ID, LostAP.getValue() - CastInfos.DamageValue));
+        if (castInfos.damageValue != LostAP.intValue()) {
+            target.getFight().sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, caster.getID(), target.getID(), LostAP.getValue() - castInfos.damageValue));
         }
 
-        if (CastInfos.DamageValue > 0) {
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.Sub_PA, this.CastInfos.SpellId, (short) this.CastInfos.SpellId, 0, null, this.CastInfos.Caster, null, false, StatsEnum.NOT_DISPELLABLE, CastInfos.DamageValue, CastInfos.SpellLevel, Duration, 0), this.Target);
-            BuffStats.ApplyEffect(LostAP, null);
-            this.Target.Buffs.AddBuff(BuffStats);
-            if (Target.ID == Target.Fight.CurrentFighter.ID) {
-                Target.Fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, this.Caster.ID, Target.ID, (short) CastInfos.DamageValue));
+        if (castInfos.damageValue > 0) {
+            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.SUB_PA, this.castInfos.spellId, (short) this.castInfos.spellId, 0, null, this.castInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, castInfos.damageValue, castInfos.spellLevel, duration, 0), this.target);
+            BuffStats.applyEffect(LostAP, null);
+            this.target.getBuff().addBuff(BuffStats);
+            if (target.getID() == target.getFight().getCurrentFighter().getID()) {
+                target.getFight().sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, this.caster.getID(), target.getID(), (short) castInfos.damageValue));
             }
         }
 
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

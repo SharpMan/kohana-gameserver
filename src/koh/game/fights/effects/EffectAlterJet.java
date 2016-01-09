@@ -3,7 +3,7 @@ package koh.game.fights.effects;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
-import static koh.protocol.client.enums.StatsEnum.MaximizeEffects;
+import static koh.protocol.client.enums.StatsEnum.MAXIMIZE_EFFECTS;
 
 /**
  *
@@ -12,10 +12,10 @@ import static koh.protocol.client.enums.StatsEnum.MaximizeEffects;
 public class EffectAlterJet extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        if (CastInfos.Duration > 0) {
-            for (Fighter Target : CastInfos.Targets) {
-                Target.Buffs.AddBuff(CastInfos.EffectType == MaximizeEffects ? new BuffMaximiseEffects(CastInfos, Target) : new BuffMinimizeEffects(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        if (castInfos.duration > 0) {
+            for (Fighter Target : castInfos.targets) {
+                Target.getBuff().addBuff(castInfos.effectType == MAXIMIZE_EFFECTS ? new BuffMaximiseEffects(castInfos, Target) : new BuffMinimizeEffects(castInfos, Target));
             }
         }
 

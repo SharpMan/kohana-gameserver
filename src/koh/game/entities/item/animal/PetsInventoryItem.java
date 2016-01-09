@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.PetsDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
 import koh.protocol.client.enums.ItemsEnum;
@@ -26,10 +25,10 @@ import org.apache.mina.core.buffer.IoBuffer;
 public class PetsInventoryItem extends InventoryItem {
 
     /* @Param1 = FoodId , @Param2 = Count */
-    public Map<Integer, Integer> EatedFoods = Collections.synchronizedMap(new HashMap<>());
-    public Map<Integer, Integer> EatedFoodsType = Collections.synchronizedMap(new HashMap<>());
+    public Map<Integer, Integer> eatedFoods = Collections.synchronizedMap(new HashMap<>());
+    public Map<Integer, Integer> eatedFoodsType = Collections.synchronizedMap(new HashMap<>());
 
-    public PetsInventoryItemEntity Entity;
+    public PetsInventoryItemEntity entity;
 
     protected boolean myInitialized = false;
 
@@ -37,112 +36,110 @@ public class PetsInventoryItem extends InventoryItem {
         super();
     }
 
-    public void SerializeInformations() {
-        IoBuffer buf = IoBuffer.allocate(65535);
-        buf.setAutoExpand(true);
+    public void serializeInformations() {
+        IoBuffer buf = IoBuffer.allocate(0xFFF)
+                .setAutoExpand(true);
 
-        buf.putInt(EatedFoods.size());
-        for (Entry<Integer, Integer> e : EatedFoods.entrySet()) {
+        buf.putInt(eatedFoods.size());
+        for (Entry<Integer, Integer> e : eatedFoods.entrySet()) {
             buf.putInt(e.getKey());
             buf.putInt(e.getValue());
         }
 
-        buf.putInt(EatedFoodsType.size());
-        for (Entry<Integer, Integer> e : EatedFoodsType.entrySet()) {
+        buf.putInt(eatedFoodsType.size());
+        for (Entry<Integer, Integer> e : eatedFoodsType.entrySet()) {
             buf.putInt(e.getKey());
             buf.putInt(e.getValue());
         }
 
-        buf.flip();
-        this.Entity.informations = buf.array();
-        buf.clear();
-        buf = null;
+        this.entity.informations = buf.flip().array();
     }
 
-    public PetsInventoryItem(int ID, int TemplateId, int Position, int Owner, int Quantity, List<ObjectEffect> Effects, boolean Create) {
-        super(ID, TemplateId, Position, Owner, Quantity, Effects);
-        if (!Create) {
-            this.Entity = PetsDAO.Get(((ObjectEffectInteger) this.GetEffect(995)).value);
-            if (this.Entity != null) {
-                this.Initialize();
+    public PetsInventoryItem(int ID, int templateId, int position, int owner, int quantity, List<ObjectEffect> effects, boolean create) {
+        super(ID, templateId, position, owner, quantity, effects);
+        if (!create) {
+            this.entity = DAO.getPetInventories().get(((ObjectEffectInteger) this.getEffect(995)).value);
+            if (this.entity != null) {
+                this.initialize();
             }
         }
-        if (this.Entity == null) {
-            this.Entity = new PetsInventoryItemEntity();
-            this.Entity.PetsID = ItemDAO.NextPetsID++;
-            this.Entity.lastEat = (System.currentTimeMillis() - (24 * 3600 * 1000)) + "";
-            this.Entity.PointsUsed = 0;
-            this.SerializeInformations();
-            this.RemoveEffect(995);
+        if (this.entity == null) {
+            this.entity = new PetsInventoryItemEntity();
+            this.entity.petsID = DAO.getPetInventories().nextId();
+            this.entity.lastEat = (System.currentTimeMillis() - (24 * 3600 * 1000)) + "";
+            this.entity.pointsUsed = 0;
+            this.serializeInformations();
+            this.removeEffect(995);
 
-            this.Effects.add(new ObjectEffectInteger(995, this.Entity.PetsID));
-            this.NotifiedColumn("effects");
+            this.effects.add(new ObjectEffectInteger(995, this.entity.petsID));
+            this.notifyColumn("effects");
 
-            PetsDAO.Insert(this.Entity);
+            DAO.getPetInventories().insert(this.entity);
         }
     }
 
-    public synchronized void Initialize() {
+    public synchronized void initialize() {
         if (myInitialized) {
             return;
         }
-        IoBuffer buf = IoBuffer.wrap(this.Entity.informations);
+        IoBuffer buf = IoBuffer.wrap(this.entity.informations);
         for (int i = 0; i < buf.getInt(); ++i) {
-            this.EatedFoods.put(buf.getInt(), buf.getInt());
+            this.eatedFoods.put(buf.getInt(), buf.getInt());
         }
         for (int i = 0; i < buf.getInt(); ++i) {
-            this.EatedFoodsType.put(buf.getInt(), buf.getInt());
+            this.eatedFoodsType.put(buf.getInt(), buf.getInt());
         }
         this.myInitialized = true;
     }
 
-    public Pets Animal() {
-        return ItemDAO.Pets.get(this.TemplateId);
+    public PetTemplate getAnimal() {
+        return DAO.getItemTemplates().getPetTemplate(this.getTemplateId());
     }
 
-    public boolean Eat(Player p, InventoryItem Food) {
+    public boolean eat(Player p, InventoryItem food) {
         //Todo refresh stat
-        if (!ItemDAO.Pets.containsKey(this.TemplateId)) {
+        PetTemplate pet = getAnimal();
+        if (pet == null) {
             return false;
-        } else if (Food.TemplateId == ItemsEnum.EneripsaPouder) {
-            //TODO : Life
+        } else if (food.getTemplateId() == ItemsEnum.ENERIPSA_POUDER) {
+            //TODO : life
             return true;
-        } else if (this.Entity.PointsUsed >= Animal().Hormone) {
+        } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
             return false;
-        } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat))) < ItemDAO.Pets.get(this.TemplateId).minDurationBeforeMeal) {
-            PlayerController.SendServerMessage(p.Client, "Veuillez patientez " + ((Animal().minDurationBeforeMeal) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.Entity.lastEat)))) + " heures pour le prochain repas");
+        } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < pet.getMinDurationBeforeMeal()) {
+            PlayerController.sendServerMessage(p.getClient(), "Veuillez patientez " + ((getAnimal().getMinDurationBeforeMeal()) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " heures pour le prochain repas");
             return false;
         }
 
-        for (FoodItem i : Animal().foodItems) {
-            if (Food.TemplateId == i.ItemID) {
-                if (!this.EatedFoods.containsKey(Food.TemplateId)) {
-                    this.EatedFoods.put(Food.TemplateId, 0);
+        for (FoodItem i : getAnimal().getFoodItems()) {
+            if (food.getTemplateId() == i.getItemID()) {
+                if (!this.eatedFoods.containsKey(food.getTemplateId())) {
+                    this.eatedFoods.put(food.getTemplateId(), 0);
                 }
-                this.EatedFoods.put(Food.TemplateId, this.EatedFoods.get(Food.TemplateId) + 1);
-                this.Entity.PointsUsed += i.Point;
-                this.Boost(i.Stats, i.StatsPoints);
-                UpdateFood(Food.TemplateId);
-                this.UpdateDate();
-                this.CheckLastEffect();
-                p.Send(new ObjectModifiedMessage(this.ObjectItem()));
-                this.Save();
+                this.eatedFoods.put(food.getTemplateId(), this.eatedFoods.get(food.getTemplateId()) + 1);
+                this.entity.pointsUsed += i.getPoint();
+                this.boost(i.getStats(), i.getStatsPoints());
+                updateFood(food.getTemplateId());
+                this.updateDate();
+                this.checkLastEffect();
+                p.send(new ObjectModifiedMessage(this.getObjectItem()));
+                this.save();
                 return true;
             }
         }
-        for (FoodItem i : Animal().foodTypes) {
-            if (Food.Template().TypeId == i.ItemID) {
-                if (!this.EatedFoodsType.containsKey(Food.Template().TypeId)) {
-                    this.EatedFoodsType.put(Food.Template().TypeId, 0);
+        for (FoodItem i : getAnimal().getFoodTypes()) {
+            if (food.getTemplate().getTypeId() == i.getItemID()) {
+                if (!this.eatedFoodsType.containsKey(food.getTemplate().getTypeId())) {
+                    this.eatedFoodsType.put(food.getTemplate().getTypeId(), 0);
                 }
-                this.EatedFoodsType.put(Food.Template().TypeId, this.EatedFoodsType.get(Food.Template().TypeId) + 1);
-                this.Entity.PointsUsed += i.Point;
-                this.Boost(i.Stats, i.StatsPoints);
-                UpdateFood(Food.TemplateId);
-                this.UpdateDate();
-                this.CheckLastEffect();
-                p.Send(new ObjectModifiedMessage(this.ObjectItem()));
-                this.Save();
+                this.eatedFoodsType.put(food.getTemplate().getTypeId(), this.eatedFoodsType.get(food.getTemplate().getTypeId()) + 1);
+                this.entity.pointsUsed += i.getPoint();
+                this.boost(i.getStats(), i.getStatsPoints());
+                updateFood(food.getTemplateId());
+                this.updateDate();
+                this.checkLastEffect();
+                p.send(new ObjectModifiedMessage(this.getObjectItem()));
+                this.save();
                 return true;
             }
         }
@@ -150,39 +147,39 @@ public class PetsInventoryItem extends InventoryItem {
         return false;
     }
 
-    public int GetEatedFood(int id) {
-        if (this.EatedFoods.containsKey(id)) {
-            return this.EatedFoods.get(id);
+    public int getEatedFood(int id) {
+        if (this.eatedFoods.containsKey(id)) {
+            return this.eatedFoods.get(id);
         }
         return 0;
     }
 
-    public void UpdateDate() {
+    public void updateDate() {
         Calendar now = Calendar.getInstance();
-        ((ObjectEffectDate) this.GetEffect(808)).SetDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE));
+        ((ObjectEffectDate) this.getEffect(808)).SetDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE));
     }
 
-    public void UpdateFood(int food) {
-        ((ObjectEffectInteger) this.GetEffect(807)).value = food;
+    public void updateFood(int food) {
+        ((ObjectEffectInteger) this.getEffect(807)).value = food;
     }
 
-    public void Boost(int EffectID, int Count) {
-        ObjectEffect Effect = this.GetEffect(EffectID);
+    public void boost(int effectID, int count) {
+        ObjectEffect Effect = this.getEffect(effectID);
         if (Effect == null) {
-            this.Effects.add(new ObjectEffectInteger(EffectID, Count));
+            this.effects.add(new ObjectEffectInteger(effectID, count));
         } else {
-            ((ObjectEffectInteger) Effect).value += Count;
+            ((ObjectEffectInteger) Effect).value += count;
         }
-        this.Entity.lastEat = System.currentTimeMillis() + "";
-        this.NotifiedColumn("effects");
+        this.entity.lastEat = System.currentTimeMillis() + "";
+        this.notifyColumn("effects");
     }
 
-    public void Save() {
-        this.SerializeInformations();
-        PetsDAO.Update(Entity);
+    public void save() {
+        this.serializeInformations();
+        DAO.getPetInventories().update(entity);
     }
 
-    public void CheckLastEffect() {
+    public void checkLastEffect() {
 
     }
 
@@ -197,13 +194,13 @@ public class PetsInventoryItem extends InventoryItem {
 
     @Override
     public void totalClear() {
-        this.EatedFoods.clear();
-        this.EatedFoods = null;
-        this.EatedFoodsType.clear();
-        this.EatedFoodsType = null;
+        this.eatedFoods.clear();
+        this.eatedFoods = null;
+        this.eatedFoodsType.clear();
+        this.eatedFoodsType = null;
         this.myInitialized = false;
-        this.Entity.totalClear();
-        this.Entity = null;
+        this.entity.totalClear();
+        this.entity = null;
         super.totalClear();
     }
 

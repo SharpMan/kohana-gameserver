@@ -12,15 +12,15 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 public class EffectTeleportSymetricMySelf extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         FightCell cell;
-        for (Fighter Target : CastInfos.Targets) {
-            cell = CastInfos.Caster.Fight.GetCell(CastInfos.Caster.MapPoint().pointSymetry(Target.MapPoint()).get_cellId());
+        for (Fighter Target : castInfos.targets) {
+            cell = castInfos.caster.getFight().getCell(castInfos.caster.getMapPoint().pointSymetry(Target.getMapPoint()).get_cellId());
 
-            if (cell != null && cell.IsWalkable()) {
-                CastInfos.Caster.Fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.Caster.ID, CastInfos.Caster.ID, cell.Id));
+            if (cell != null && cell.canWalk()) {
+                castInfos.caster.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), castInfos.caster.getID(), cell.Id));
 
-                return Target.SetCell(cell);
+                return Target.setCell(cell);
             }
         }
         return -1;

@@ -1,7 +1,6 @@
 package koh.game.network.handlers.character;
 
-import java.time.Instant;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.AccountData.FriendContact;
 import koh.game.entities.AccountData.IgnoredContact;
 import koh.game.entities.actors.Player;
@@ -33,8 +32,6 @@ import koh.protocol.messages.game.friend.IgnoredAddedMessage;
 import koh.protocol.messages.game.friend.IgnoredDeleteRequestMessage;
 import koh.protocol.messages.game.friend.IgnoredDeleteResultMessage;
 import koh.protocol.messages.game.friend.SpouseStatusMessage;
-import koh.protocol.types.game.friend.FriendInformations;
-import koh.protocol.types.game.friend.IgnoredInformations;
 import koh.protocol.types.game.context.roleplay.BasicGuildInformations;
 import koh.protocol.types.game.friend.FriendOnlineInformations;
 import koh.protocol.types.game.friend.IgnoredOnlineInformations;
@@ -46,106 +43,106 @@ import koh.protocol.types.game.friend.IgnoredOnlineInformations;
 public class FriendHandler {
 
     @HandlerAttribute(ID = IgnoredAddRequestMessage.M_ID)
-    public static void HandleIgnoredAddRequestMessage(WorldClient Client, IgnoredAddRequestMessage Message) {
-        Player Target = PlayerDAO.GetCharacter(Message.name);
-        if (Target == null || Target.Client == null) {
-            Client.Send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
-        } else if (Client.getAccount().Data.Ignore(Target.Account.ID)) {
-            Client.Send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_IS_DOUBLE));
-        } else if (Client.getAccount().Data.Ignored.length >= ListAddFailureEnum.MAX_QUOTA) {
-            Client.Send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_OVER_QUOTA));
+    public static void HandleIgnoredAddRequestMessage(WorldClient Client, IgnoredAddRequestMessage message) {
+        Player target = DAO.getPlayers().getCharacter(message.name);
+        if (target == null || target.getClient() == null) {
+            Client.send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
+        } else if (Client.getAccount().accountData.ignore(target.getAccount().id)) {
+            Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_IS_DOUBLE));
+        } else if (Client.getAccount().accountData.ignored.length >= ListAddFailureEnum.MAX_QUOTA) {
+            Client.send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_OVER_QUOTA));
         } else {
-            Client.getAccount().Data.AddIgnored(new IgnoredContact() {
+            Client.getAccount().accountData.addIgnored(new IgnoredContact() {
                 {
-                    AccountID = Target.Account.ID;
-                    accountName = Target.Account.NickName;
+                    accountID = target.getAccount().id;
+                    accountName = target.getAccount().nickName;
                 }
             });
-            Client.Send(new IgnoredAddedMessage(new IgnoredOnlineInformations(Target.Account.ID, Target.Account.NickName, Target.ID, Target.NickName, Target.Breed, Target.Sexe == 1), Message.session));
+            Client.send(new IgnoredAddedMessage(new IgnoredOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getID(), target.getNickName(), target.getBreed(), target.hasSexe()), message.session));
         }
     }
 
     @HandlerAttribute(ID = FriendAddRequestMessage.ID)
     public static void HandleFriendAddRequestMessage(WorldClient Client, FriendAddRequestMessage Message) {
-        Player Target = PlayerDAO.GetCharacter(Message.Name);
-        if (Target == null || Target.Client == null) {
-            Client.Send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
-        } else if (Target.Account == null || Target.Account.Data == null) {
-            Client.Send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
-        } else if (Client.getAccount().Data.HasFriend(Target.Account.ID)) {
-            Client.Send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_IS_DOUBLE));
-        } else if (Client.getAccount().Data.Friends.length >= ListAddFailureEnum.MAX_QUOTA) {
-            Client.Send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_OVER_QUOTA));
+        Player target = DAO.getPlayers().getCharacter(Message.Name);
+        if (target == null || target.getClient() == null) {
+            Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
+        } else if (target.getAccount() == null || target.getAccount().accountData == null) {
+            Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
+        } else if (Client.getAccount().accountData.hasFriend(target.getAccount().id)) {
+            Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_IS_DOUBLE));
+        } else if (Client.getAccount().accountData.friends.length >= ListAddFailureEnum.MAX_QUOTA) {
+            Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_OVER_QUOTA));
         } else {
-            Client.getAccount().Data.AddFriend(new FriendContact() {
+            Client.getAccount().accountData.addFriend(new FriendContact() {
                 {
-                    AccountID = Target.Account.ID;
-                    accountName = Target.Account.NickName;
+                    accountID = target.getAccount().id;
+                    accountName = target.getAccount().nickName;
                     lastConnection = System.currentTimeMillis();
-                    achievementPoints = Target.achievementPoints;
+                    achievementPoints = target.getAchievementPoints();
                 }
             });
-            if (Target.Account.Data.HasFriend(Client.getAccount().ID)) {
-                Client.Send(new FriendAddedMessage(new FriendOnlineInformations(Target.Account.ID, Target.Account.NickName, Target.GetPlayerState(), -1, Target.achievementPoints, Target.ID, Target.NickName, (byte) Target.Level, Target.AlignmentSide.value, Target.Breed, Target.Sexe == 1, Target.GetBasicGuildInformations(), Target.MoodSmiley, new PlayerStatus(Target.Status.value()))));
+            if (target.getAccount().accountData.hasFriend(Client.getAccount().id)) {
+                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) target.getLevel(), target.getAlignmentSide().value, target.getBreed(), target.hasSexe(), target.getBasicGuildInformations(), target.getMoodSmiley(), new PlayerStatus(target.getStatus().value()))));
             } else {
-                Client.Send(new FriendAddedMessage(new FriendOnlineInformations(Target.Account.ID, Target.Account.NickName, PlayerStateEnum.UNKNOWN_STATE, -1, Target.achievementPoints, Target.ID, Target.NickName, (byte) 0, (byte) -1, Target.Breed, Target.Sexe == 1, new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(Target.Status.value()))));
+                Client.send(new FriendAddedMessage(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, PlayerStateEnum.UNKNOWN_STATE, -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) 0, (byte) -1, target.getBreed(), target.hasSexe(), new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(target.getStatus().value()))));
             }
         }
     }
 
     @HandlerAttribute(ID = IgnoredDeleteRequestMessage.M_ID)
     public static void HandleIgnoredDeleteRequestMessage(WorldClient Client, IgnoredDeleteRequestMessage Message) {
-        IgnoredContact Contact = Client.getAccount().Data.GetIgnored(Message.accountId);
+        IgnoredContact Contact = Client.getAccount().accountData.getIgnored(Message.accountId);
         if (Contact == null) {
-            Client.Send(new IgnoredDeleteResultMessage(false, "", Message.session));
+            Client.send(new IgnoredDeleteResultMessage(false, "", Message.session));
         } else {
-            Client.getAccount().Data.RemoveIgnored(Contact);
-            Client.Send(new IgnoredDeleteResultMessage(true, Contact.accountName, Message.session));
+            Client.getAccount().accountData.removeIgnored(Contact);
+            Client.send(new IgnoredDeleteResultMessage(true, Contact.accountName, Message.session));
         }
     }
 
     @HandlerAttribute(ID = FriendDeleteRequestMessage.M_ID)
     public static void HandleFriendDeleteRequestMessage(WorldClient Client, FriendDeleteRequestMessage Message) {
-        FriendContact Contact = Client.getAccount().Data.GetFriend(Message.accountId);
+        FriendContact Contact = Client.getAccount().accountData.getFriend(Message.accountId);
         if (Contact == null) {
-            Client.Send(new FriendDeleteResultMessage(false, ""));
+            Client.send(new FriendDeleteResultMessage(false, ""));
         } else {
-            Client.getAccount().Data.RemoveFriend(Contact);
-            Client.Send(new FriendDeleteResultMessage(true, Contact.accountName));
+            Client.getAccount().accountData.removeFriend(Contact);
+            Client.send(new FriendDeleteResultMessage(true, Contact.accountName));
         }
     }
 
     @HandlerAttribute(ID = FriendSetWarnOnConnectionMessage.M_ID)
     public static void HandleFriendSetWarnOnConnectionMessage(WorldClient Client, FriendSetWarnOnConnectionMessage Message) {
-        Client.getAccount().Data.setFriendWarnOnLogin(Message.enable);
-        Client.Send(new FriendWarnOnConnectionStateMessage(Message.enable));
+        Client.getAccount().accountData.setFriendWarnOnLogin(Message.enable);
+        Client.send(new FriendWarnOnConnectionStateMessage(Message.enable));
     }
 
     @HandlerAttribute(ID = FriendSetWarnOnLevelGainMessage.M_ID)
     public static void HandleFriendSetWarnOnLevelGainMessage(WorldClient Client, FriendSetWarnOnLevelGainMessage Message) {
-        Client.getAccount().Data.setFriendWarnOnLevelGain(Message.enable);
-        Client.Send(new FriendWarnOnLevelGainStateMessage(Message.enable));
+        Client.getAccount().accountData.setFriendWarnOnLevelGain(Message.enable);
+        Client.send(new FriendWarnOnLevelGainStateMessage(Message.enable));
     }
 
     @HandlerAttribute(ID = GuildMemberSetWarnOnConnectionMessage.M_ID)
     public static void HandleGuildMemberSetWarnOnConnectionMessage(WorldClient Client, GuildMemberSetWarnOnConnectionMessage Message) {
-        Client.getAccount().Data.setFriendWarnOnGuildLogin(Message.enable);
-        Client.Send(new GuildMemberWarnOnConnectionStateMessage(Message.enable));
+        Client.getAccount().accountData.setFriendWarnOnGuildLogin(Message.enable);
+        Client.send(new GuildMemberWarnOnConnectionStateMessage(Message.enable));
     }
 
     @HandlerAttribute(ID = FriendsGetListMessage.MESSAGE_ID)
     public static void HandleFriendsGetListMessage(WorldClient Client, Message message) {
-        Client.SequenceMessage(new FriendsListMessage(Client.getAccount().Data.GetFriendsInformations()));
+        Client.sequenceMessage(new FriendsListMessage(Client.getAccount().accountData.getFriendsInformations()));
     }
 
     @HandlerAttribute(ID = IgnoredGetListMessage.MESSAGE_ID)
     public static void HandleIgnoredGetListMessage(WorldClient Client, Message message) {
-        Client.SequenceMessage(new IgnoredListMessage(Client.getAccount().Data.GetIgnoredInformations()));
+        Client.sequenceMessage(new IgnoredListMessage(Client.getAccount().accountData.getIgnoredInformations()));
     }
 
     @HandlerAttribute(ID = SpouseGetInformationsMessage.MESSAGE_ID)
     public static void HandleSpouseGetInformationsMessage(WorldClient Client, Message message) {
-        Client.SequenceMessage(new SpouseStatusMessage(false));
+        Client.sequenceMessage(new SpouseStatusMessage(false));
     }
 
 }

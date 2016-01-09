@@ -1,10 +1,10 @@
 package koh.game.actions.requests;
 
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.dao.GuildDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.network.WorldClient;
-import koh.protocol.client.Message;
 import koh.protocol.client.enums.GuildInvitationStateEnum;
 import koh.protocol.client.enums.GuildRightsBitEnum;
 import koh.protocol.messages.game.guild.GuildInvitationStateRecrutedMessage;
@@ -21,69 +21,69 @@ public class GuildJoinRequest extends GameBaseRequest {
     }
 
     @Override
-    public boolean Accept() {
-        if (!super.Declin()) {
+    public boolean accept() {
+        if (!super.declin()) {
             return false;
         }
 
         try {
-            this.Requester.Send(new GuildInvitationStateRecruterMessage(this.Requested.Character.NickName, GuildInvitationStateEnum.GUILD_INVITATION_OK));
-            this.Requested.Send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_OK));
+            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.getCharacter().getNickName(), GuildInvitationStateEnum.GUILD_INVITATION_OK));
+            this.requested.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_OK));
 
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            if (this.Requester.Character.Guild != null) {
-                this.Requester.Character.Guild.addMember(new GuildMember(this.Requester.Character.Guild.Entity.GuildID) {
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            if (this.requester.getCharacter().getGuild() != null) {
+                this.requester.getCharacter().getGuild().addMember(new GuildMember(this.requester.getCharacter().getGuild().entity.guildID) {
                     {
-                        this.AccountID = Requested.getAccount().ID;
-                        this.Breed = Requested.Character.Breed;
-                        this.CharacterID = Requested.Character.ID;
-                        this.LastConnection = System.currentTimeMillis() + "";
-                        this.Level = Requested.Character.Level;
-                        this.Name = Requested.Character.NickName;
-                        this.Rank = 0;
-                        this.Experience = "0";
-                        this.Rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
-                        this.Sex = Requested.Character.Sexe == 1;
-                        this.achievementPoints = Requested.Character.achievementPoints;
-                        this.alignmentSide = Requested.Character.AlignmentSide.value;
-                        GuildDAO.Insert(this);
+                        this.accountID = requested.getAccount().id;
+                        this.breed = requested.getCharacter().getBreed();
+                        this.characterID = requested.getCharacter().getID();
+                        this.lastConnection = System.currentTimeMillis() + "";
+                        this.level = requested.getCharacter().getLevel();
+                        this.name = requested.getCharacter().getNickName();
+                        this.rank = 0;
+                        this.experience = "0";
+                        this.rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
+                        this.sex = requested.getCharacter().hasSexe();
+                        this.achievementPoints = requested.getCharacter().getAchievementPoints();
+                        this.alignmentSide = requested.getCharacter().getAlignmentSide().value;
+                        DAO.getGuildMembers().insert(this);
                     }
-                }, this.Requested.Character);
-                this.Requester.Character.Guild.registerPlayer(Requested.Character);
+                }, this.requested.getCharacter());
+                this.requester.getCharacter().getGuild().registerPlayer(requested.getCharacter());
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.Requester.SetBaseRequest(null);
-            this.Requested.SetBaseRequest(null);
+            this.requester.setBaseRequest(null);
+            this.requested.setBaseRequest(null);
         }
         return true;
     }
 
     @Override
-    public boolean Declin() {
-        if (!super.Declin()) {
+    public boolean declin() {
+        if (!super.declin()) {
             return false;
         }
 
         try {
-            this.Requester.Send(new GuildInvitationStateRecruterMessage(this.Requested.Character.NickName, GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
-            this.Requested.Send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
+            this.requester.send(new GuildInvitationStateRecruterMessage(this.requested.getCharacter().getNickName(), GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
+            this.requested.send(new GuildInvitationStateRecrutedMessage(GuildInvitationStateEnum.GUILD_INVITATION_CANCELED));
 
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            this.Requester.SetBaseRequest(null);
-            this.Requested.SetBaseRequest(null);
+            this.requester.setBaseRequest(null);
+            this.requested.setBaseRequest(null);
         }
         return true;
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum Action) {
+    public boolean canSubAction(GameActionTypeEnum action) {
         return false;
     }
 

@@ -23,15 +23,15 @@ public class Cone implements IZone {
     }
 
     @Override
-    public int Surface() {
-        return (int) (Math.pow((this.Radius() + 1), 2));
+    public int getSurface() {
+        return (int) (Math.pow((this.getRadius() + 1), 2));
     }
 
     @Override
-    public Short[] GetCells(short centerCell) {
+    public Short[] getCells(short centerCell) {
         MapPoint mapPoint = MapPoint.fromCellId(centerCell);
         ArrayList<Short> list = new ArrayList<>();
-        if ((int) this.Radius() == 0) {
+        if ((int) this.getRadius() == 0) {
             if ((int) this.MinRadius == 0) {
                 list.add(centerCell);
             }
@@ -41,7 +41,7 @@ public class Cone implements IZone {
             int num2 = 1;
             switch (this.Direction) {
                 case DirectionsEnum.DOWN_RIGHT:
-                    for (int x = mapPoint.get_x(); x <= mapPoint.get_x() + (int) this.Radius(); ++x) {
+                    for (int x = mapPoint.get_x(); x <= mapPoint.get_x() + (int) this.getRadius(); ++x) {
                         for (int index = -num1; index <= num1; ++index) {
                             if ((int) this.MinRadius == 0 || Math.abs(mapPoint.get_x() - x) + Math.abs(index) >= (int) this.MinRadius) {
                                 Cone.AddCellIfValid(x, index + mapPoint.get_y(), list);
@@ -51,7 +51,7 @@ public class Cone implements IZone {
                     }
                     break;
                 case DirectionsEnum.DOWN_LEFT:
-                    for (int y = mapPoint.get_y(); y >= mapPoint.get_y() - (int) this.Radius(); --y) {
+                    for (int y = mapPoint.get_y(); y >= mapPoint.get_y() - (int) this.getRadius(); --y) {
                         for (int index = -num1; index <= num1; ++index) {
                             if ((int) this.MinRadius == 0 || Math.abs(index) + Math.abs(mapPoint.get_y() - y) >= (int) this.MinRadius) {
                                 Cone.AddCellIfValid(index + mapPoint.get_x(), y, list);
@@ -61,7 +61,7 @@ public class Cone implements IZone {
                     }
                     break;
                 case DirectionsEnum.UP_LEFT:
-                    for (int x = mapPoint.get_x(); x >= mapPoint.get_x() - (int) this.Radius(); --x) {
+                    for (int x = mapPoint.get_x(); x >= mapPoint.get_x() - (int) this.getRadius(); --x) {
                         for (int index = -num1; index <= num1; ++index) {
                             if ((int) this.MinRadius == 0 || Math.abs(mapPoint.get_x() - x) + Math.abs(index) >= (int) this.MinRadius) {
                                 Cone.AddCellIfValid(x, index + mapPoint.get_y(), list);
@@ -71,9 +71,9 @@ public class Cone implements IZone {
                     }
                     break;
                 case DirectionsEnum.UP_RIGHT:
-                    /*for (int y = mapPoint.get_y(); y <= mapPoint.get_y() - (int) this.Radius(); ++y) {
+                    /*for (int y = mapPoint.get_y(); y <= mapPoint.get_y() - (int) this.getRadius(); ++y) {
                      for (int index = -num1; index <= num1; ++index) {
-                     if ((int) this.MinRadius == 0 || Math.abs(index) + Math.abs(mapPoint.get_y() - y) >= (int) this.MinRadius) {
+                     if ((int) this.getMinRadius == 0 || Math.abs(index) + Math.abs(mapPoint.get_y() - y) >= (int) this.getMinRadius) {
                      Cone.AddCellIfValid(index + mapPoint.get_x(), y, list);
                      }
                      }
@@ -82,10 +82,10 @@ public class Cone implements IZone {
                      break;*/
                     int i = 0;
                     int j = mapPoint.get_y();
-                    while (j <= (mapPoint.get_y() + this.Radius())) {
+                    while (j <= (mapPoint.get_y() + this.getRadius())) {
                         i = -(num1);
                         while (i <= num1) {
-                            if ((((int) this.MinRadius == 0) || (((Math.abs(i) + Math.abs((mapPoint.get_y() - j))) >= this.MinRadius())))) {
+                            if ((((int) this.MinRadius == 0) || (((Math.abs(i) + Math.abs((mapPoint.get_y() - j))) >= this.getMinRadius())))) {
                                 if (MapPoint.isInMap((i + mapPoint.get_x()), j)) {
                                     Cone.AddCellIfValid(i + mapPoint.get_x(), j, list);
                                 };
@@ -105,31 +105,31 @@ public class Cone implements IZone {
         if (!MapPoint.IsInMap(x, y)) {
             return;
         }
-        container.add(MapPoint.CoordToCellId(x, y));
+        container.add(MapPoint.coordToCellId(x, y));
     }
 
     @Override
-    public byte MinRadius() {
+    public byte getMinRadius() {
         return MinRadius;
     }
 
     @Override
-    public byte Direction() {
+    public byte getDirection() {
         return Direction;
     }
 
     @Override
-    public byte Radius() {
+    public byte getRadius() {
         return Radius;
     }
 
     @Override
-    public void SetDirection(byte Direction) {
+    public void setDirection(byte Direction) {
         this.Direction = Direction;
     }
 
     @Override
-    public void SetRadius(byte Radius) {
+    public void setRadius(byte Radius) {
         this.Radius = Radius;
     }
 

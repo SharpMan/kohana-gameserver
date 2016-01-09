@@ -10,9 +10,9 @@ import koh.game.fights.Fighter;
 public class EffectDamagePercentReduced extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for(Fighter Target : CastInfos.Targets){
-            Target.Buffs.AddBuff(new BuffDamagePercentReduced(CastInfos,Target));
+    public int applyEffect(EffectCast castInfos) {
+        for(Fighter Target : castInfos.targets){
+            Target.getBuff().addBuff(new BuffDamagePercentReduced(castInfos,Target));
         }
          return -1;
     }

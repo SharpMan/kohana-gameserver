@@ -20,26 +20,26 @@ public class BuffDamageDropLife extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageJet, EffectCast DamageInfos) {
-            //var Damage = this.CastInfos.RandomJet;
+    public int applyEffect(MutableInt DamageJet, EffectCast DamageInfos) {
+            //var Damage = this.castInfos.randomJet;
 
-        // return EffectDamage.ApplyDamages(this.CastInfos, this.Target, ref Damage);
+        // return EffectDamage.applyDamages(this.castInfos, this.target, ref Damage);
         int effectBase = DamageJet.getValue();
-        //var DamageValuea = (Target.CurrentLife / 100) * effectBase;
-        MutableInt DamageValue = new MutableInt((CastInfos.Caster.CurrentLife / 100) * effectBase);
-        if (EffectDamage.ApplyDamages(CastInfos, CastInfos.Caster, DamageValue) == -3) {
-            EffectHeal.ApplyHeal(CastInfos, Target, DamageValue);
+        //var DamageValuea = (target.currentLife / 100) * effectBase;
+        MutableInt DamageValue = new MutableInt((castInfos.caster.currentLife / 100) * effectBase);
+        if (EffectDamage.applyDamages(castInfos, castInfos.caster, DamageValue) == -3) {
+            EffectHeal.applyHeal(castInfos, target, DamageValue);
             return -3;
         } else {
-            return EffectHeal.ApplyHeal(CastInfos, Target, DamageValue);
+            return EffectHeal.applyHeal(castInfos, target, DamageValue);
         }
 
         //DamageValuea = (-DamageValuea);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.CastInfos.RandomJet(Target)));
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.castInfos.randomJet(target)));
     }
 
 }

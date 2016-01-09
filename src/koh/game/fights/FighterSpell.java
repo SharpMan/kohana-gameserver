@@ -5,6 +5,7 @@ import java.util.HashMap;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffSpellCoolDown;
+import lombok.Getter;
 
 /**
  *
@@ -13,7 +14,8 @@ import koh.game.fights.effects.buff.BuffSpellCoolDown;
 public class FighterSpell {
 
     private HashMap<Integer, ArrayList<SpellTarget>> myTargets = new HashMap<>();
-    public HashMap<Integer, SpellinitialCooldown> myinitialCooldown = new HashMap<>();
+    @Getter
+    private HashMap<Integer, SpellinitialCooldown> initialCooldown = new HashMap<>();
 
     public FighterBuff Buffs;
 
@@ -21,33 +23,34 @@ public class FighterSpell {
         this.Buffs = FighterBuffs;
     }
 
-    public boolean CanLaunchSpell(SpellLevel Spell, int TargetId) {
-        if (Spell.minCastInterval > 0) {
-            if (this.myinitialCooldown.containsKey(Spell.spellId)) {
-                if (this.myinitialCooldown.get(Spell.spellId) != null) {
-                    int newCoolDown = MinCastInterval(Spell.spellId);
-                    if ((newCoolDown == 0 ? this.myinitialCooldown.get(Spell.spellId).initialCooldown : newCoolDown) > 0) {
+    public boolean canLaunchSpell(SpellLevel Spell, int TargetId) {
+        if (Spell.getMinCastInterval() > 0) {
+            if (this.initialCooldown.containsKey(Spell.getSpellId())) {
+                if (this.initialCooldown.get(Spell.getSpellId()) != null) {
+                    int newCoolDown = minCastInterval(Spell.getSpellId());
+                    if ((newCoolDown == 0 ? this.initialCooldown.get(Spell.getSpellId()).initialCooldown : newCoolDown) > 0) {
                         return false;
                     }
                 }
             }
         }
-        if (Spell.maxCastPerTurn == 0 && Spell.maxCastPerTarget == 0) {
+        if (Spell.getMaxCastPerTurn() == 0 && Spell.getMaxCastPerTarget() == 0) {
             return true;
         }
 
-        if (Spell.maxCastPerTurn > 0) {
-            if (this.myTargets.containsKey(Spell.spellId)) {
-                if (this.myTargets.get(Spell.spellId).size() >= Spell.maxCastPerTurn) {
+        if (Spell.getMaxCastPerTurn() > 0) {
+            if (this.myTargets.containsKey(Spell.getSpellId())) {
+                if (this.myTargets.get(Spell.getSpellId()).size() >= Spell.getMaxCastPerTurn()) {
+                    System.out.println("2"+this.myTargets.get(Spell.getSpellId()).size()+" "+Spell.getMaxCastPerTurn());
                     return false;
                 }
             }
         }
 
-        if (Spell.maxCastPerTarget > 0) {
-            if (this.myTargets.containsKey(Spell.spellId)) {
-                if (this.myTargets.get(Spell.spellId).stream().filter(x -> x.TargetId == TargetId).count() >= Spell.maxCastPerTarget) {
-                    //System.out.println("ici" + this.myTargets.get(Spell.spellId).stream().filter(x -> x.TargetId == TargetId).count());
+        if (Spell.getMaxCastPerTarget() > 0) {
+            if (this.myTargets.containsKey(Spell.getSpellId())) {
+                if (this.myTargets.get(Spell.getSpellId()).stream().filter(x -> x.targetId == TargetId).count() >= Spell.getMaxCastPerTarget()) {
+                    System.out.println("ici" + this.myTargets.get(Spell.getSpellId()).stream().filter(x -> x.targetId == TargetId).count());
                     return false;
                 }
             }
@@ -56,41 +59,41 @@ public class FighterSpell {
         return true;
     }
 
-    public int MinCastInterval(int Spell) {
-        BuffEffect Buff = this.Buffs.GetAllBuffs().filter(x -> x instanceof BuffSpellCoolDown && ((BuffSpellCoolDown) x).Spell == Spell).findFirst().orElse(null);
-        if (Buff == null) {
+    public byte minCastInterval(int spell) {
+        BuffEffect buff = this.Buffs.getAllBuffs().filter(x -> x instanceof BuffSpellCoolDown && ((BuffSpellCoolDown) x).spell == spell).findFirst().orElse(null);
+        if (buff == null) {
             return 0;
         } else {
-            return ((BuffSpellCoolDown) Buff).Value - Buff.Duration;
+            return (byte) (((BuffSpellCoolDown) buff).value - buff.duration);
         }
     }
 
-    public void Actualise(SpellLevel Spell, int TargetId) {
-        if (Spell.minCastInterval > 0) {
-            if (!this.myinitialCooldown.containsKey(Spell.spellId)) {
-                this.myinitialCooldown.put(Spell.spellId, new SpellinitialCooldown(Spell.minCastInterval));
+    public void actualize(SpellLevel spell, int targetId) {
+        if (spell.getMinCastInterval() > 0) {
+            if (!this.initialCooldown.containsKey(spell.getSpellId())) {
+                this.initialCooldown.put(spell.getSpellId(), new SpellinitialCooldown(spell.getMinCastInterval()));
             } else {
-                this.myinitialCooldown.get(Spell.spellId).initialCooldown = Spell.minCastInterval;
+                this.initialCooldown.get(spell.getSpellId()).initialCooldown = spell.getMinCastInterval();
             }
         }
 
-        if (Spell.maxCastPerTurn == 0 && Spell.maxCastPerTarget == 0) {
+        if (spell.getMaxCastPerTurn() == 0 && spell.getMaxCastPerTarget() == 0) {
             return;
         }
 
-        if (!this.myTargets.containsKey(Spell.spellId)) {
-            this.myTargets.put(Spell.spellId, new ArrayList<>());
+        if (!this.myTargets.containsKey(spell.getSpellId())) {
+            this.myTargets.put(spell.getSpellId(), new ArrayList<>());
         }
-        this.myTargets.get(Spell.spellId).add(new SpellTarget(TargetId));
+        this.myTargets.get(spell.getSpellId()).add(new SpellTarget(targetId));
     }
 
-    public void EndTurn() {
+    public void endTurn() {
         myTargets.values().stream().forEach((Targets) -> {
             Targets.clear();
         });
 
-        this.myinitialCooldown.values().stream().forEach((initialCooldown) -> {
-            initialCooldown.Decrement();
+        this.initialCooldown.values().stream().forEach((initialCooldown) -> {
+            initialCooldown.decrement();
         });
 
     }
@@ -103,17 +106,17 @@ public class FighterSpell {
             this.initialCooldown = initialCooldown;
         }
 
-        public void Decrement() {
+        public void decrement() {
             this.initialCooldown--;
         }
     }
 
     public class SpellTarget {
 
-        public int TargetId;
+        public int targetId;
 
         public SpellTarget(int TargetId) {
-            this.TargetId = TargetId;
+            this.targetId = TargetId;
         }
     }
 

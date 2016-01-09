@@ -1,12 +1,9 @@
 package koh.game.fights.effects.buff;
 
-import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectDamage;
-import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
 import koh.protocol.client.enums.FightDispellableEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -22,27 +19,27 @@ public class BuffSacrifice extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (DamageInfos.IsReflect || DamageInfos.IsReturnedDamages || DamageInfos.IsPoison) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
             return -1;
         }
         // mort
-        if (Caster.Dead()) {
-            //Target.Buffs.RemoveBuff(this);
+        if (caster.isDead()) {
+            //target.buff.RemoveBuff(this);
             return -1;
         }
 
         DamageValue.setValue(0);
 
-        DamageInfos.IsReturnedDamages = true;
+        DamageInfos.isReturnedDamages = true;
 
-        return EffectDamage.ApplyDamages(DamageInfos, CastInfos.Caster, new MutableInt(DamageInfos.RandomJet(Caster)));
+        return EffectDamage.applyDamages(DamageInfos, castInfos.caster, new MutableInt(DamageInfos.randomJet(caster)));
 
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.castInfos.effect.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) this.castInfos.effect.delay);
     }
 
 }

@@ -10,10 +10,10 @@ import java.sql.Statement;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
-import koh.d2o.d2oReader;
-import koh.game.dao.*;
-import static koh.game.dao.PlayerDAO.AccountInUnload;
-import koh.game.utils.Settings;
+
+//import static koh.game.dao.mysql.PlayerDAOImpl.AccountInUnload;
+
+import koh.game.dao.DAO;
 
 /**
  *
@@ -56,22 +56,22 @@ public class MySQL {
         try {
             myLocker.lock();
             try {
-                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.Name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
+                Connection = DriverManager.getConnection("jdbc:mysql://" + DAO.getSettings().getStringElement("Database.Host") + "/" + DAO.getSettings().getStringElement("Database.name"), DAO.getSettings().getStringElement("Database.User"), DAO.getSettings().getStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(1000)) || (!Connection.isValid(1000))) {
-                    Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
+                   // Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
                     return false;
                 }
                 needCommit = false;
             } finally {
                 myLocker.unlock();
             }
-            Main.Logs().writeInfo("MySQL Database Connected");
+            //Main.Logs().writeInfo("MySQL Database Connected");
             TIMER(true);
 
             return true;
         } catch (SQLException e) {
-            Main.Logs().writeError("SQL ERROR: " + e.getMessage());
+            //Main.Logs().writeError("SQL ERROR: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -111,10 +111,10 @@ public class MySQL {
                     } catch (Exception e) {
                     }
                 }
-                Connection = DriverManager.getConnection("jdbc:mysql://" + Settings.GetStringElement("Database.Host") + "/" + Settings.GetStringElement("Database.Name"), Settings.GetStringElement("Database.User"), Settings.GetStringElement("Database.Password"));
+                Connection = DriverManager.getConnection("jdbc:mysql://" + DAO.getSettings().getStringElement("Database.Host") + "/" + DAO.getSettings().getStringElement("Database.name"), DAO.getSettings().getStringElement("Database.User"), DAO.getSettings().getStringElement("Database.Password"));
                 Connection.setAutoCommit(false);
                 if ((!Connection.isValid(60000))) {
-                    Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
+                    //Main.Logs().writeError("SQLError : Connexion a la BD invalide!");
                     return false;
                 }
                 needCommit = false;
@@ -125,7 +125,7 @@ public class MySQL {
             }
             return true;
         } catch (SQLException e) {
-            Main.Logs().writeError("SQL ERROR: " + e.getMessage());
+            //Main.Logs().writeError("SQL ERROR: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -147,7 +147,7 @@ public class MySQL {
                     MySQL.commitDatabase();
                     MySQL.needCommit = false;
                 }
-            }, Settings.GetIntElement("Database.Commit"), Settings.GetIntElement("Database.Commit"));
+            }, DAO.getSettings().getIntElement("Database.Commit"), DAO.getSettings().getIntElement("Database.Commit"));
         } else {
             if (timerCommit != null) {
                 timerCommit.cancel();
@@ -181,52 +181,52 @@ public class MySQL {
     }
 
     public static void LoadCache() {
-        D2oDao.Initialize();
+        /*D2oDaoImpl.loadAll();
         Main.Logs().writeInfo(d2oReader.Breeds.size() + " Breeds catched");
         Main.Logs().writeInfo(d2oReader.Heads.size() + " Heads catched");
-        Main.Logs().writeInfo(d2oReader.Effects.size() + " Effects catched");
-        PlayerDAO.InitializeNextIdentifiant();
-        ItemDAO.DistinctItems();
+        Main.Logs().writeInfo(d2oReader.Effects.size() + " effects catched");
+        PlayerDAOImpl.InitializeNextIdentifiant();
+        ItemTemplateDAOImpl.DistinctItems();
         PetsDAO.InitNextKey();
         GuildDAO.InitNextKey();
-        ItemDAO.InitializeNextIdentifiant();
-        ExpDAO.load_ExpLevels();
-        Main.Logs().writeInfo(AreaDAO.FindSuper() + " SuperAreas catched");
-        Main.Logs().writeInfo(AreaDAO.FindAll() + " Areas catched");
-        Main.Logs().writeInfo(AreaDAO.FindSubAreas() + " SubAreas catched");
-        Main.Logs().writeInfo(MapDAO.FindAll() + " DofusMaps catched");
-        Main.Logs().writeInfo(MapDAO.FindSatedElements() + " StatedElements catched");
-        Main.Logs().writeInfo(MapDAO.FindInteractiveElements() + " InteractiveElements catched");
-        Main.Logs().writeInfo(MapDAO.FindHouseInformations() + " HouseInformations catched");
-        Main.Logs().writeInfo(MapDAO.FindDoors() + " InteractiveDoors catched");
-        Main.Logs().writeInfo(MapDAO.FindMapPositions() + " MapPositions catched");
-        Main.Logs().writeInfo(MapDAO.FindZaaps() + " MapZaaps catched");
-        Main.Logs().writeInfo(MapDAO.FindSubways() + " MapSubways catched");
-        Main.Logs().writeInfo(SpellDAO.FindLevels() + " SpellLevels catched ");
-        Main.Logs().writeInfo(SpellDAO.FindAll() + " Spells catched ");
-        Main.Logs().writeInfo(SpellDAO.FindBombs() + " SpellBombs catched ");
-        Main.Logs().writeInfo(GuildEmblemDAO.FindAll() + " GuildEmblems catched ");
-        Main.Logs().writeInfo(SpellDAO.FindLearnables() + " LearnableSpells catched ");
-         Main.Logs().writeInfo(ItemDAO.FindItemTypes() + " ItemTypes catched ");
-        Main.Logs().writeInfo(ItemDAO.FindAll() + " ItemTemplates catched ");
-        Main.Logs().writeInfo(ItemDAO.FindWeapons() + " Weapons catched ");
-        Main.Logs().writeInfo(ItemDAO.FindItemSets() + " ItemSets catched ");
-        Main.Logs().writeInfo(ItemDAO.FindPets() + " ItemPets catched ");
-        Main.Logs().writeInfo(NpcDAO.FindAll() + " NpcTemplates catched ");
-        Main.Logs().writeInfo(NpcDAO.FindSpawns() + " NpcSpawns catched ");
-        Main.Logs().writeInfo(NpcDAO.FindItems() + " NpcItems catched ");
-        Main.Logs().writeInfo(NpcDAO.FindMessages() + " NpcMessages catched ");
-        Main.Logs().writeInfo(NpcDAO.FindReplies() + " NpcReplies catched ");
-        Main.Logs().writeInfo(MapDAO.FindTriggers() + " Triggers catched");
-        Main.Logs().writeInfo(PaddockDAO.FindAll() + " Paddocks catched");
-        Main.Logs().writeInfo(MountDAO.FindAll() + " Mounts catched");
-        Main.Logs().writeInfo(GuildDAO.FindAll() + " Guild catched");
-        Main.Logs().writeInfo(GuildDAO.FindMembers() + " GuildMembers catched");
-        Main.Logs().writeInfo(JobDAO.FindAllGatheringInfos() + " GatheringJob LevelInfos catched");
-        Main.Logs().writeInfo(JobDAO.FindAllSkills() + " InteractiveSkills LevelInfos catched");
-        Main.Logs().writeInfo(MonsterDAO.FindAll() + " Monster Templates catched");
-        Main.Logs().writeInfo(MonsterDAO.FindGrades() + " Monster Grades catched");
-        Main.Logs().writeInfo(MonsterDAO.FindDrops() + " Monster Drops catched");
+        ItemTemplateDAOImpl.InitializeNextIdentifiant();
+        ExpDAOImpl.load_ExpLevels();
+        Main.Logs().writeInfo(AreaDAOImpl.FindSuper() + " SuperAreas catched");
+        Main.Logs().writeInfo(AreaDAOImpl.FindAll() + " areas catched");
+        Main.Logs().writeInfo(AreaDAOImpl.FindSubAreas() + " subAreas catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindAll() + " DofusMaps catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadAllSatedElements() + " StatedElements catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindInteractiveElements() + " interactiveElements catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadALlHouseInformations() + " HouseInformations catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadAllDoors() + " InteractiveDoors catched");
+        Main.Logs().writeInfo(MapDAOImpl.loadALlPositions() + " MapPositions catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindZaaps() + " MapZaaps catched");
+        Main.Logs().writeInfo(MapDAOImpl.FindSubways() + " MapSubways catched");
+        Main.Logs().writeInfo(SpellDAOImpl.FindLevels() + " SpellLevels catched ");
+        Main.Logs().writeInfo(SpellDAOImpl.FindAll() + " spells catched ");
+        Main.Logs().writeInfo(SpellDAOImpl.loadAllBombs() + " SpellBombs catched ");
+        Main.Logs().writeInfo(GuildEmblemDAOImpl.FindAll() + " GuildEmblems catched ");
+        Main.Logs().writeInfo(SpellDAOImpl.loadLearnables() + " learnableSpells catched ");
+         Main.Logs().writeInfo(ItemTemplateDAOImpl.FindItemTypes() + " ItemTypes catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindAll() + " ItemTemplates catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindWeapons() + " Weapons catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindItemSets() + " ItemSets catched ");
+        Main.Logs().writeInfo(ItemTemplateDAOImpl.FindPets() + " ItemPets catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.loadAll() + " NpcTemplates catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindSpawns() + " NpcSpawns catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindItems() + " NpcItems catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindMessages() + " NpcMessages catched ");
+        Main.Logs().writeInfo(NpcDAOImpl.FindReplies() + " NpcReplies catched ");
+        Main.Logs().writeInfo(MapDAOImpl.FindTriggers() + " Triggers catched");
+        Main.Logs().writeInfo(PaddockDAOImpl.FindAll() + " Paddocks catched");
+        Main.Logs().writeInfo(MountDAOImpl.FindAll() + " Mounts catched");
+        Main.Logs().writeInfo(GuildDAO.FindAll() + " guild catched");
+        Main.Logs().writeInfo(GuildDAO.FindMembers() + " guildMembers catched");
+        Main.Logs().writeInfo(JobDAOImpl.loadAllGatheringInfos() + " GatheringJob LevelInfos catched");
+        Main.Logs().writeInfo(JobDAOImpl.loadAllSkills() + " InteractiveSkills LevelInfos catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindAll() + " Monster Templates catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindGrades() + " getMonster Grades catched");
+        Main.Logs().writeInfo(MonsterDAOImpl.FindDrops() + " getMonster Drops catched");*/
     }
 
     public synchronized Savepoint commitDatabase(boolean createSavePoint) {
@@ -243,7 +243,7 @@ public class MySQL {
                     myLocker.unlock();
                 }
             } catch (SQLException e) {
-                Main.Logs().writeError("SQL ERROR:" + e.getMessage());
+                //Main.Logs().writeError("SQL ERROR:" + e.getMessage());
                 e.printStackTrace();
             }
         } else {
@@ -256,11 +256,11 @@ public class MySQL {
         try {
             Connection dbCon = Connection();
             dbCon.commit();
-            synchronized (AccountInUnload) {
+            /*synchronized (AccountInUnload) {
                 AccountInUnload.clear();
-            }
+            }*/
         } catch (SQLException ex) {
-            Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
+            //Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -276,7 +276,7 @@ public class MySQL {
                 myLocker.unlock();
             }
         } catch (SQLException ex) {
-            Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
+            //Main.Logs().writeError("SQL ERROR:" + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -293,7 +293,7 @@ public class MySQL {
                 myLocker.unlock();
             }
         } catch (Exception e) {
-            Main.Logs().writeError("Erreur a la fermeture des connexions SQL:" + e.getMessage());
+            //Main.Logs().writeError("Erreur a la fermeture des connexions SQL:" + e.getMessage());
             e.printStackTrace();
         }
     }

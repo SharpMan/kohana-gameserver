@@ -1,65 +1,76 @@
 package koh.game.entities.item;
 
-import java.util.List;
-import koh.game.Main;
+import koh.game.dao.api.ItemTemplateDAO;
 import koh.game.entities.actors.character.GenericStats;
-import koh.game.entities.spells.EffectInstance;
-import koh.game.entities.spells.EffectInstanceCreature;
-import koh.game.entities.spells.EffectInstanceDate;
-import koh.game.entities.spells.EffectInstanceDice;
-import koh.game.entities.spells.EffectInstanceInteger;
-import koh.game.entities.spells.EffectInstanceLadder;
-import koh.game.entities.spells.EffectInstanceMinMax;
-import koh.game.entities.spells.EffectInstanceMount;
-import koh.game.entities.spells.EffectInstanceString;
+import koh.game.entities.spells.*;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.data.items.ObjectEffect;
-import koh.protocol.types.game.data.items.effects.ObjectEffectCreature;
-import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
-import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
-import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
-import koh.protocol.types.game.data.items.effects.ObjectEffectLadder;
-import koh.protocol.types.game.data.items.effects.ObjectEffectMinMax;
-import koh.protocol.types.game.data.items.effects.ObjectEffectMount;
-import koh.protocol.types.game.data.items.effects.ObjectEffectString;
+import koh.protocol.types.game.data.items.effects.*;
+import koh.utils.Enumerable;
+import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.mina.core.buffer.IoBuffer;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- *
  * @author Neo-Craft
  */
 public class ItemSet {
 
-    public int id;
-    public int[] items;
-    public boolean bonusIsSecret;
-    public EffectInstance[][] effects; //Dice
+    private static final Logger logger = LogManager.getLogger(ItemSet.class);
+    @Getter
+    private int id;
+    @Getter
+    private int[] items;
+    @Getter
+    private boolean bonusIsSecret;
+    @Getter
+    private EffectInstance[][] effects; //Dice
+    @Getter
     private GenericStats[] myStats;
-    
-    //TODO: Create Cache  ObjectEffect[] toObjectEffects
+
+    //TODO: Create dofusMaps  ObjectEffect[] toObjectEffects
+    //TODO2: se rappeller poruquoi je voulais faire sa
+
+    public ItemSet(ResultSet result) throws SQLException {
+        this.id = result.getInt("id");
+        this.items = Enumerable.StringToIntArray(result.getString("items"));
+        this.bonusIsSecret = result.getBoolean("bonus_is_secret");
+        IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));
+        this.effects = new EffectInstance[buf.getInt()][];
+        for (int i = 0; i < this.effects.length; ++i) {
+            this.effects[i] = ItemTemplateDAO.readEffectInstance(buf);
+        }
+        buf.clear();
+    }
+
 
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    private void ParseStats() {
+    private void parseStats() {
         StatsEnum Stat;
         this.myStats = new GenericStats[this.effects.length];
         for (int i = 0; i < this.effects.length; i++) {
 
             this.myStats[i] = new GenericStats();
-            for (EffectInstance e : EffectHelper.GenerateIntegerEffectArray(this.effects[i], EffectGenerationType.Normal, false)) {
+            for (EffectInstance e : EffectHelper.generateIntegerEffectArray(this.effects[i], EffectGenerationType.NORMAL, false)) {
                 if (e == null) {
                     continue;
                 }
                 if (e instanceof EffectInstanceInteger) {
                     Stat = StatsEnum.valueOf(e.effectId);
                     if (Stat == null) {
-                        Main.Logs().writeError("Undefinied Stat id " + e.effectId);
+                        logger.error("Undefined Stat id {} ", e.effectId);
                         continue;
                     }
-                    this.myStats[i].AddItem(Stat, ((EffectInstanceInteger) e).value);
+                    this.myStats[i].addItem(Stat, ((EffectInstanceInteger) e).value);
                 }
 
             }
@@ -68,10 +79,10 @@ public class ItemSet {
         Stat = null;
     }
 
-    public GenericStats GetStats(int round) {
+    public GenericStats getStats(int round) {
         try {
             if (this.myStats == null) {
-                this.ParseStats();
+                this.parseStats();
             }
             return myStats[round - 1];
         } catch (Exception e) {

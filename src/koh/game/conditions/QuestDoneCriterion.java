@@ -23,11 +23,11 @@ public class QuestDoneCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.QuestId = Integer.parseInt(Literal);
+        this.QuestId = Integer.parseInt(literal);
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         return true;
     }
 

@@ -1,13 +1,8 @@
 package koh.game.exchange;
 
-import java.util.ArrayList;
-import java.util.List;
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.dao.ItemDAO;
-import koh.game.entities.actors.Npc;
-import koh.game.entities.item.EffectHelper;
+import koh.game.dao.DAO;
 import koh.game.entities.item.InventoryItem;
-import koh.game.entities.item.Weapon;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.DialogTypeEnum;
@@ -27,123 +22,123 @@ public class StorageExchange extends Exchange {
 
     public StorageExchange(WorldClient Client) {
         this.myClient = Client;
-        this.Send(new ExchangeStartedWithStorageMessage(ExchangeTypeEnum.STORAGE, 2147483647));
-        this.Send(new StorageInventoryContentMessage(Client.getAccount().Data.toObjectsItem(), Client.getAccount().Data.Kamas));
+        this.send(new ExchangeStartedWithStorageMessage(ExchangeTypeEnum.STORAGE, 2147483647));
+        this.send(new StorageInventoryContentMessage(Client.getAccount().accountData.toObjectsItem(), Client.getAccount().accountData.kamas));
     }
 
     @Override
-    public boolean MoveItems(WorldClient Client, InventoryItem[] Items, boolean Add) {
-        InventoryItem NewItem = null;
-        if (Add) {
-            for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.Instance(ItemDAO.NextStorageID++, Item.TemplateId, 63, Client.getAccount().ID, Item.GetQuantity(), Item.Effects);
-                if (Client.getAccount().Data.Add(Client.Character, NewItem, true)) {
-                    NewItem.NeedInsert = true;
+    public boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add) {
+        InventoryItem newItem = null;
+        if (add) {
+            for (InventoryItem Item : items) {
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, Client.getAccount().id, Item.getQuantity(), Item.getEffects());
+                if (Client.getAccount().accountData.add(Client.getCharacter(), newItem, true)) {
+                    newItem.setNeedInsert(true);
                 }
-                Client.Character.InventoryCache.UpdateObjectquantity(Item, 0);
+                Client.getCharacter().getInventoryCache().updateObjectquantity(Item, 0);
             }
         } else {
-            for (InventoryItem Item : Items) {
-                NewItem = InventoryItem.Instance(ItemDAO.NextID++, Item.TemplateId, 63, Client.Character.ID, Item.GetQuantity(), Item.Effects);
-                if (Client.Character.InventoryCache.Add(NewItem, true)) {
-                    NewItem.NeedInsert = true;
+            for (InventoryItem Item : items) {
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, Client.getCharacter().getID(), Item.getQuantity(), Item.getEffects());
+                if (Client.getCharacter().getInventoryCache().add(newItem, true)) {
+                    newItem.setNeedInsert(true);
                 }
-                Client.getAccount().Data.UpdateObjectquantity(Client.Character, Item, 0);
+                Client.getAccount().accountData.updateObjectQuantity(Client.getCharacter(), Item, 0);
             }
         }
         return true;
     }
 
     @Override
-    public boolean MoveItem(WorldClient Client, int ItemID, int Quantity) {
-        if (Quantity == 0) {
+    public boolean moveItem(WorldClient client, int itemID, int quantity) {
+        if (quantity == 0) {
             return false;
-        } else if (Quantity <= 0) { //Remove from Bank
-            InventoryItem BankItem = Client.getAccount().Data.ItemsCache.get(ItemID);
+        } else if (quantity <= 0) { //Remove from Bank
+            InventoryItem BankItem = client.getAccount().accountData.itemscache.get(itemID);
             if (BankItem == null) {
                 return false;
             }
-            Client.getAccount().Data.UpdateObjectquantity(Client.Character, BankItem, BankItem.GetQuantity() + Quantity);
-            InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, BankItem.TemplateId, 63, Client.Character.ID, -Quantity, BankItem.Effects);
-            if (Client.Character.InventoryCache.Add(Item, true)) {
-                Item.NeedInsert = true;
+            client.getAccount().accountData.updateObjectQuantity(client.getCharacter(), BankItem, BankItem.getQuantity() + quantity);
+            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.getTemplateId(), 63, client.getCharacter().getID(), -quantity, BankItem.getEffects());
+            if (client.getCharacter().getInventoryCache().add(Item, true)) {
+                Item.setNeedInsert(true);
             }
-        } else { //Add In bank
-            InventoryItem Item = Client.Character.InventoryCache.ItemsCache.get(ItemID);
+        } else { //add In bank
+            InventoryItem Item = client.getCharacter().getInventoryCache().find(itemID);
             if (Item == null) {
                 return false;
             }
-            Client.Character.InventoryCache.UpdateObjectquantity(Item, Item.GetQuantity() - Quantity);
-            InventoryItem NewItem = InventoryItem.Instance(ItemDAO.NextStorageID++, Item.TemplateId, 63, Client.getAccount().ID, Quantity, Item.Effects);
-            if (Client.getAccount().Data.Add(Client.Character, NewItem, true)) {
-                NewItem.NeedInsert = true;
+            client.getCharacter().getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - quantity);
+            InventoryItem NewItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, client.getAccount().id, quantity, Item.getEffects());
+            if (client.getAccount().accountData.add(client.getCharacter(), NewItem, true)) {
+                NewItem.setNeedInsert(true);
             }
         }
         return true;
     }
 
     @Override
-    public boolean MoveKamas(WorldClient Client, int Quantity) {
-        if (Quantity == 0) {
+    public boolean moveKamas(WorldClient Client, int quantity) {
+        if (quantity == 0) {
             return false;
-        } else if (Quantity < 0) {
-            if (Client.getAccount().Data.Kamas + Quantity < 0) {
+        } else if (quantity < 0) {
+            if (Client.getAccount().accountData.kamas + quantity < 0) {
                 return false;
             }
-            Client.getAccount().Data.SetBankKamas(Client.getAccount().Data.Kamas + Quantity);
-            Client.Send(new StorageKamasUpdateMessage(Client.getAccount().Data.Kamas));
-            Client.Character.InventoryCache.SubstractKamas(Quantity, false);
+            Client.getAccount().accountData.setBankKamas(Client.getAccount().accountData.kamas + quantity);
+            Client.send(new StorageKamasUpdateMessage(Client.getAccount().accountData.kamas));
+            Client.getCharacter().getInventoryCache().substractKamas(quantity, false);
         } else {
-            if (Client.Character.Kamas - Quantity < 0) {
+            if (Client.getCharacter().getKamas() - quantity < 0) {
                 return false;
             }
-            Client.getAccount().Data.SetBankKamas(Client.getAccount().Data.Kamas + Quantity);
-            Client.Send(new StorageKamasUpdateMessage(Client.getAccount().Data.Kamas));
-            Client.Character.InventoryCache.SubstractKamas(Quantity, false);
+            Client.getAccount().accountData.setBankKamas(Client.getAccount().accountData.kamas + quantity);
+            Client.send(new StorageKamasUpdateMessage(Client.getAccount().accountData.kamas));
+            Client.getCharacter().getInventoryCache().substractKamas(quantity, false);
         }
         return true;
     }
 
     @Override
-    public boolean BuyItem(WorldClient Client, int TemplateId, int Quantity) {
+    public boolean buyItem(WorldClient Client, int templateId, int quantity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean SellItem(WorldClient Client, InventoryItem Item, int Quantity) {
+    public boolean sellItem(WorldClient Client, InventoryItem item, int quantity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean Validate(WorldClient Client) {
+    public boolean validate(WorldClient Client) {
         return false;
     }
 
     @Override
-    public boolean Finish() {
+    public boolean finish() {
         this.myEnd = true;
 
         return true;
     }
 
     @Override
-    public boolean CloseExchange(boolean Success) {
-        this.Finish();
-        this.myClient.myExchange = null;
-        this.myClient.Send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
-        this.myClient.EndGameAction(GameActionTypeEnum.EXCHANGE);
+    public boolean closeExchange(boolean Success) {
+        this.finish();
+        this.myClient.setMyExchange(null);
+        this.myClient.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
+        this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 
         return true;
     }
 
     @Override
-    public void Send(Message Packet) {
-        this.myClient.Send(Packet);
+    public void send(Message Packet) {
+        this.myClient.send(Packet);
     }
 
     @Override
-    public boolean TransfertAllToInv(WorldClient Client, InventoryItem[] Items) {
-        return Client.myExchange.MoveItems(Client, Client.getAccount().Data.ItemsCache.values().toArray(new InventoryItem[Client.getAccount().Data.ItemsCache.size()]), false);
+    public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
+        return Client.getMyExchange().moveItems(Client, Client.getAccount().accountData.itemscache.values().toArray(new InventoryItem[Client.getAccount().accountData.itemscache.size()]), false);
     }
 
 }

@@ -18,7 +18,7 @@ public class EffectInstanceDice extends EffectInstanceInteger {
     public static final int classID = 3;
 
     @Override
-    public byte SerializationIdentifier() {
+    public byte serializationIdentifier() {
         return 3;
     }
 
@@ -31,7 +31,7 @@ public class EffectInstanceDice extends EffectInstanceInteger {
         this.diceSide = diceSide;
     }
 
-    public int[] GetValues() {
+    public int[] getValues() {
         return new int[]{
             this.diceNum,
             this.diceSide,

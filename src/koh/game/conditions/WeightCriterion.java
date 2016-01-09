@@ -8,8 +8,8 @@ import koh.game.entities.actors.Player;
  */
 public class WeightCriterion extends Criterion {
 
-    public static String Identifier = "PW";
-    public Integer Weight;
+    public static final String IDENTIFIER = "PW";
+    public Integer weight;
 
     @Override
     public String toString() {
@@ -18,11 +18,11 @@ public class WeightCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.Weight = Integer.parseInt(Literal);
+        this.weight = Integer.parseInt(literal);
     }
 
     @Override
-    public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.InventoryCache.Weight(), this.Weight);
+    public boolean eval(Player character) {
+        return this.Compare((Comparable<Integer>) character.getInventoryCache().getWeight(), this.weight);
     }
 }

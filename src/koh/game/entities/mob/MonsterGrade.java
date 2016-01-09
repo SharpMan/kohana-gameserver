@@ -1,8 +1,12 @@
 package koh.game.entities.mob;
 
-import koh.game.dao.MonsterDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.character.GenericStats;
 import koh.protocol.client.enums.StatsEnum;
+import lombok.Getter;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -10,72 +14,102 @@ import koh.protocol.client.enums.StatsEnum;
  */
 public class MonsterGrade {
 
-    public byte Grade;
-    public int monsterId, Level, lifePoints, actionPoints, movementPoints, paDodge, pmDodge;
-    public int Wisdom, tackleEvade, tackleBlock, Strenght, Chance, Intelligence, Agility, earthResistance, airResistance, fireResistance, waterResistance, neutralResistance;
-    public int gradeXp, damageReflect, hiddenLevel;
+    @Getter
+    private byte grade;
+    @Getter
+    private int monsterId, level, lifePoints, actionPoints, movementPoints, paDodge, pmDodge;
+    @Getter
+    private int wisdom, tackleEvade, tackleBlock, strenght, chance, intelligence, agility, earthResistance, airResistance, fireResistance, waterResistance, neutralResistance;
+    @Getter
+    private int gradeXp, damageReflect, hiddenLevel;
 
     private GenericStats myStats;
 
-    private void ParseStats() {
+    public MonsterGrade(ResultSet result) throws SQLException {
+        grade = result.getByte("grade");
+        monsterId = result.getInt("monster_id");
+        level = result.getInt("level");
+        lifePoints = result.getInt("life_points");
+        actionPoints = result.getInt("action_points");
+        movementPoints = result.getInt("movement_points");
+        paDodge = result.getInt("pa_dodge");
+        pmDodge = result.getInt("pm_dodge");
+        wisdom = result.getInt("wisdom");
+        tackleEvade = result.getInt("tackle_evade");
+        tackleBlock = result.getInt("tackle_block");
+        strenght = result.getInt("strength");
+        chance = result.getInt("chance");
+        intelligence = result.getInt("intelligence");
+        agility = result.getInt("agility");
+        earthResistance = result.getInt("earth_resistance");
+        airResistance = result.getInt("air_resistance");
+        fireResistance = result.getInt("fire_resistance");
+        waterResistance = result.getInt("water_resistance");
+        neutralResistance = result.getInt("neutral_resistance");
+        gradeXp = result.getInt("grade_xp");
+        damageReflect = result.getInt("damage_reflect");
+        hiddenLevel = result.getInt("hidden_level");
+    }
+
+    private void parseStats() {
         this.myStats = new GenericStats();
 
-        this.myStats.AddBase(StatsEnum.Vitality, this.lifePoints);
-        this.myStats.AddBase(StatsEnum.ActionPoints, this.actionPoints);
-        this.myStats.AddBase(StatsEnum.MovementPoints, this.monsterId);
-        this.myStats.AddBase(StatsEnum.DodgePALostProbability, this.paDodge);
-        this.myStats.AddBase(StatsEnum.DodgePMLostProbability, this.pmDodge);
-        this.myStats.AddBase(StatsEnum.Wisdom, this.Wisdom);
+        this.myStats.addBase(StatsEnum.VITALITY, this.lifePoints);
+        this.myStats.addBase(StatsEnum.ACTION_POINTS, this.actionPoints);
+        this.myStats.addBase(StatsEnum.MOVEMENT_POINTS, this.monsterId);
+        this.myStats.addBase(StatsEnum.DODGE_PA_LOST_PROBABILITY, this.paDodge);
+        this.myStats.addBase(StatsEnum.DODGE_PM_LOST_PROBABILITY, this.pmDodge);
+        this.myStats.addBase(StatsEnum.WISDOM, this.wisdom);
 
-        this.myStats.AddBase(StatsEnum.Add_TackleEvade, this.tackleEvade);
-        this.myStats.AddBase(StatsEnum.Add_TackleBlock, this.tackleBlock);
+        this.myStats.addBase(StatsEnum.ADD_TACKLE_EVADE, this.tackleEvade);
+        this.myStats.addBase(StatsEnum.ADD_TACKLE_BLOCK, this.tackleBlock);
 
-        if (!this.Monster().useBombSlot && !this.Monster().useSummonSlot && this.Strenght == 0 && this.Chance == 0 && this.Intelligence == 0 && this.Agility == 0) {
-            int Bonus;
-            switch (this.Grade) {
+        if (!this.getMonster().isUseBombSlot() && !this.getMonster().isUseSummonSlot() && this.strenght == 0 && this.chance == 0 && this.intelligence == 0 && this.agility == 0) {
+            int bonus;
+            switch (this.grade) {
                 case 1:
-                    Bonus = 80;
+                    bonus = 80;
                     break;
                 case 2:
-                    Bonus = 85;
+                    bonus = 85;
                     break;
                 case 3:
-                    Bonus = 90;
+                    bonus = 90;
                     break;
                 case 4:
-                    Bonus = 95;
+                    bonus = 95;
                     break;
                 case 5:
                 default:
-                    Bonus = 100;
+                    bonus = 100;
             }
-            this.myStats.AddBase(StatsEnum.Strength, Bonus);
-            this.myStats.AddBase(StatsEnum.Chance, Bonus);
-            this.myStats.AddBase(StatsEnum.Intelligence, Bonus);
-            this.myStats.AddBase(StatsEnum.Agility, this.Monster().canTackle ? Bonus : 0);
+            this.myStats.addBase(StatsEnum.STRENGTH, bonus);
+            this.myStats.addBase(StatsEnum.CHANCE, bonus);
+            this.myStats.addBase(StatsEnum.INTELLIGENCE, bonus);
+            this.myStats.addBase(StatsEnum.AGILITY, this.getMonster().isCanTackle() ? bonus : 0);
         } else {
-            this.myStats.AddBase(StatsEnum.Strength, this.Strenght);
-            this.myStats.AddBase(StatsEnum.Chance, this.Chance);
-            this.myStats.AddBase(StatsEnum.Intelligence, this.Intelligence);
-            this.myStats.AddBase(StatsEnum.Agility, this.Agility);
+            this.myStats.addBase(StatsEnum.STRENGTH, this.strenght);
+            this.myStats.addBase(StatsEnum.CHANCE, this.chance);
+            this.myStats.addBase(StatsEnum.INTELLIGENCE, this.intelligence);
+            this.myStats.addBase(StatsEnum.AGILITY, this.agility);
         }
 
-        this.myStats.AddBase(StatsEnum.EarthElementResistPercent, this.earthResistance);
-        this.myStats.AddBase(StatsEnum.AirElementResistPercent, this.airResistance);
-        this.myStats.AddBase(StatsEnum.FireElementResistPercent, this.fireResistance);
-        this.myStats.AddBase(StatsEnum.WaterElementResistPercent, this.waterResistance);
-        this.myStats.AddBase(StatsEnum.NeutralElementResistPercent, this.neutralResistance);
-        this.myStats.AddBase(StatsEnum.DamageReflection, this.damageReflect);
+        this.myStats.addBase(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT, this.earthResistance);
+        this.myStats.addBase(StatsEnum.AIR_ELEMENT_RESIST_PERCENT, this.airResistance);
+        this.myStats.addBase(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT, this.fireResistance);
+        this.myStats.addBase(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, this.waterResistance);
+        this.myStats.addBase(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, this.neutralResistance);
+        this.myStats.addBase(StatsEnum.DamageReflection, this.damageReflect);
 
     }
 
-    public MonsterTemplate Monster() {
-        return MonsterDAO.Cache.get(this.monsterId);
+    public MonsterTemplate getMonster() {
+        return DAO.getMonsters().find(this.monsterId);
     }
 
-    public GenericStats GetStats() {
+    public GenericStats getStats() {
         if (this.myStats == null) {
-            this.ParseStats();
+            this.parseStats();
         }
         return myStats;
     }

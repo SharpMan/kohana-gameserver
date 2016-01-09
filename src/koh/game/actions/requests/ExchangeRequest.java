@@ -4,7 +4,6 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.DialogTypeEnum;
-import koh.protocol.client.enums.ExchangeTypeEnum;
 import koh.protocol.messages.game.inventory.exchanges.ExchangeLeaveMessage;
 
 /**
@@ -18,36 +17,36 @@ public class ExchangeRequest extends GameBaseRequest {
     }
 
     @Override
-    public boolean Accept() {
-        return super.Accept();
+    public boolean accept() {
+        return super.accept();
     }
 
     @Override
-    public boolean Declin() {
-        if (!super.Declin()) {
+    public boolean declin() {
+        if (!super.declin()) {
             return false;
         }
 
         try {
             Message Message = new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, false);
 
-            this.Requester.Send(Message);
-            this.Requested.Send(Message);
+            this.requester.send(Message);
+            this.requested.send(Message);
             
-            this.Requester.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
-            this.Requested.EndGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+            this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        this.Requester.SetBaseRequest(null);
-        this.Requested.SetBaseRequest(null);
+        this.requester.setBaseRequest(null);
+        this.requested.setBaseRequest(null);
 
         return true;
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum Action) {
+    public boolean canSubAction(GameActionTypeEnum action) {
         return false;
     }
 }

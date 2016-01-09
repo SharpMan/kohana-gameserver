@@ -1,21 +1,19 @@
 package koh.game.entities.actors.character;
 
-import koh.game.Main;
-import koh.game.dao.ExpDAO;
-import koh.game.dao.MountDAO;
-import koh.game.dao.PetsDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.animal.MountInventoryItemEntity;
 import koh.protocol.client.BufUtils;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
-import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import koh.protocol.types.game.look.EntityLook;
 import koh.protocol.types.game.look.SubEntity;
 import koh.protocol.types.game.mount.MountClientData;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -24,54 +22,58 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class MountInformations {
 
-    public MountClientData Mount;
-    public byte Ratio;
+    private static final Logger logger = LogManager.getLogger(MountInformations.class);
+
+    public MountClientData mount;
+    public byte ratio;
     public boolean isToogled;
-    public MountInventoryItemEntity Entity;
-    public Player Player;
+    public MountInventoryItemEntity entity;
+    public Player player;
     private GenericStats myStats;
 
+    public MountInformations() {}
+
     public MountInformations(Player P) {
-        this.Player = P;
+        this.player = P;
     }
 
-    public void Save() {
-        if (this.Mount != null && this.Entity != null) {
-            this.SerializeInformations();
-            PetsDAO.Update(Entity);
+    public void save() {
+        if (this.mount != null && this.entity != null) {
+            this.serializeInformations();
+            DAO.getMountInventories().update(entity);
         }
     }
 
-    public void OnRiding() {
+    public void onRiding() {
         if (this.isToogled) {
-            throw new Error("Player" + Player.NickName + " try to ride a rided mount");
-        } else if (this.Player.InventoryCache.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null) {
-            this.Player.InventoryCache.UnEquipItem(this.Player.InventoryCache.GetItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS));
+            throw new Error("player" + player.getNickName() + " try to ride a rided mount");
+        } else if (this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null) {
+            this.player.getInventoryCache().unEquipItem(this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS));
         }
         this.isToogled = true;
-        this.EnableStats(true);
-        this.Player.GetEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.Player.GetEntityLook().SkinsCopy(), this.Player.GetEntityLook().ColorsCopy(), this.Player.GetEntityLook().ScalesCopy(), this.Player.GetEntityLook().SubEntityCopy())));
-        this.Player.GetEntityLook().bonesId = MountDAO.Model(this.Mount.model).Look.bonesId;
-        this.Player.GetEntityLook().indexedColors = MountDAO.Model(this.Mount.model).Look.indexedColors;
-        this.Player.GetEntityLook().skins.clear();
-        /*if (Item.TemplateId != ItemsEnum.Kramkram) { //Todo KAMELEONE
-         this.Player.GetEntityLook().indexedColors.clear();
+        this.enableStats(true);
+        this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
+        this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
+        this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
+        this.player.getEntityLook().skins.clear();
+        /*if (item.templateId != ItemsEnum.KRAMKRAM) { //Todo KAMELEONE
+         this.player.getEntityLook().indexedColors.clear();
          }*/
-        this.Player.GetEntityLook().scales = MountDAO.Model(this.Mount.model).Look.scales;
-        this.Player.RefreshEntitie();
+        this.player.getEntityLook().scales = DAO.getMounts().find(this.mount.model).getEntityLook().scales;
+        this.player.refreshEntitie();
     }
 
-    public void OnGettingOff() {
+    public void onGettingOff() {
         if (this.isToogled) {
             this.isToogled = false;
-            this.EnableStats(false);
-            this.Player.GetEntityLook().bonesId = (short) 1;
-            this.Player.GetEntityLook().skins = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
-            this.Player.GetEntityLook().indexedColors = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
-            this.Player.GetEntityLook().scales = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
-            this.Player.GetEntityLook().subentities = this.Player.GetEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
-            this.Player.GetEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
-            this.Player.RefreshEntitie();
+            this.enableStats(false);
+            this.player.getEntityLook().bonesId = (short) 1;
+            this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
+            this.player.getEntityLook().indexedColors = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
+            this.player.getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
+            this.player.getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
+            this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
+            this.player.refreshEntitie();
         }
     }
 
@@ -79,20 +81,20 @@ public class MountInformations {
         this.myStats = new GenericStats();
 
         StatsEnum Stat;
-        for (ObjectEffectInteger e : this.Mount.effectList) {
+        for (ObjectEffectInteger e : this.mount.effectList) {
 
             Stat = StatsEnum.valueOf(e.actionId);
             if (Stat == null) {
-                Main.Logs().writeError("Undefinied MountStat id " + e.actionId);
+                logger.error("Undefined MountStat id {} ", e.actionId);
                 continue;
             }
-            this.myStats.AddItem(Stat, e.value);
+            this.myStats.addItem(Stat, e.value);
 
         }
         Stat = null;
     }
 
-    public GenericStats GetStats() {
+    public GenericStats getStats() {
         if (this.myStats == null) {
             this.ParseStats();
         }
@@ -100,88 +102,92 @@ public class MountInformations {
     }
 
     public void addExperience(long amount) {
-        this.Mount.experience += amount;
+        this.mount.experience += amount;
 
-        while (this.Mount.experience >= ExpDAO.GetFloorByLevel(this.Mount.level + 1).Mount && this.Mount.level < 100) {
+        while (this.mount.experience >= DAO.getExps().getLevel(this.mount.level + 1).getMount() && this.mount.level < 100) {
             levelUp();
         }
 
-        this.Save();
+        this.save();
     }
 
-    public void EnableStats(boolean enable) {
+    public void enableStats(boolean enable) {
         if (enable) {
-            this.Player.Stats.Merge(GetStats());
-            this.Player.Life += GetStats().GetTotal(StatsEnum.Vitality);
+            this.player.getStats().merge(getStats());
+            this.player.addLife(getStats().getTotal(StatsEnum.VITALITY));
         } else {
-            this.Player.Stats.UnMerge(GetStats());
-            this.Player.Life -= GetStats().GetTotal(StatsEnum.Vitality);
+            this.player.getStats().unMerge(getStats());
+            this.player.addLife(-getStats().getTotal(StatsEnum.VITALITY));
         }
-        this.Player.RefreshStats();
+        this.player.refreshStats();
     }
 
     public void levelUp() {
-        this.Mount.level++;
-        this.Mount.effectList = ArrayUtils.removeAll(this.Mount.effectList);
-        this.Mount.effectList = MountDAO.MountByEffect(this.Mount.model, this.Mount.level);
+        this.mount.level++;
+        this.mount.effectList = ArrayUtils.removeAll(this.mount.effectList);
+        this.mount.effectList = DAO.getMounts().getMountByEffect(this.mount.model, this.mount.level);
         if (this.isToogled) {
-            this.EnableStats(false);
+            this.enableStats(false);
             this.myStats = null;
-            this.EnableStats(true);
+            this.enableStats(true);
         }
-        this.Mount.experienceForLevel = ExpDAO.GetFloorByLevel(this.Mount.level).Mount;
-        this.Mount.experienceForNextLevel = ExpDAO.GetFloorByLevel(this.Mount.level == 100 ? 100 : this.Mount.level + 1).Mount;
+        this.mount.experienceForLevel = DAO.getExps().getLevel(this.mount.level).getMount();
+        this.mount.experienceForNextLevel = DAO.getExps().getLevel(this.mount.level == 100 ? 100 : this.mount.level + 1).getMount();
     }
 
-    public byte[] Serialize() {
+    public byte[] serialize() {
         IoBuffer buf = IoBuffer.allocate(1);
         buf.setAutoExpand(true);
 
-        buf.putInt(Mount == null ? -1 : (int) Mount.id);
-        buf.put(this.Ratio);
+        buf.putInt(mount == null ? -1 : (int) mount.id);
+        buf.put(this.ratio);
         BufUtils.writeBoolean(buf, isToogled);
 
         return buf.array();
     }
 
-    public void SerializeInformations() {
-        IoBuffer buf = IoBuffer.allocate(65535);
-        buf.setAutoExpand(true);
-        this.Mount.serialize(buf);
-        buf.flip();
-        this.Entity.informations = buf.array();
-        buf.clear();
-        buf = null;
+    public void serializeInformations() {
+        IoBuffer buf = IoBuffer.allocate(0xFFF)
+                .setAutoExpand(true);
+        this.mount.serialize(buf);
+        this.entity.informations = buf.flip().array();
     }
 
-    public synchronized void Initialize(int id) {
-        if (id == -1) {
+    public synchronized void initialize(int id) {
+        if (id == -1)
             return;
-        }
-        this.Entity = PetsDAO.GetMount(id);
-        if (this.Entity != null) {
-            IoBuffer buf = IoBuffer.wrap(this.Entity.informations);
-            this.Mount = new MountClientData();
-            this.Mount.deserialize(buf);
+
+        this.entity = DAO.getMountInventories().get(id);
+        if (this.entity != null) {
+            IoBuffer buf = IoBuffer.wrap(this.entity.informations);
+            this.mount = new MountClientData();
+            this.mount.deserialize(buf);
         }
     }
 
-    public void Deserialize(byte[] binary) {
-        if (binary.length <= 0) {
-            return;
+
+    public void setPlayer(Player p){
+        this.player = p;
+    }
+
+
+    public MountInformations deserialize(byte[] binary) {
+        if (binary == null || binary.length <= 0) {
+            return this;
         }
         IoBuffer buf = IoBuffer.wrap(binary);
-        this.Initialize(buf.getInt());
-        this.Ratio = buf.get();
+        this.initialize(buf.getInt());
+        this.ratio = buf.get();
         this.isToogled = BufUtils.readBoolean(buf);
+        return this;
     }
 
     public void totalClear() {
-        //this.Mount.clear();
-        this.Mount = null;
-        if (Entity != null) {
-            this.Entity.totalClear();
-            this.Entity = null;
+        //this.mount.clear();
+        this.mount = null;
+        if (entity != null) {
+            this.entity.totalClear();
+            this.entity = null;
         }
     }
 

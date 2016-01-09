@@ -1,17 +1,13 @@
 package koh.game.actions.interactive;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import koh.commons.CancellableExecutorRunnable;
-import koh.game.Main;
+import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.ItemDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.jobs.InteractiveSkill;
-import koh.game.utils.Settings;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.interactive.InteractiveElementUpdatedMessage;
@@ -19,6 +15,8 @@ import koh.protocol.messages.game.interactive.InteractiveUseEndedMessage;
 import koh.protocol.messages.game.interactive.StatedElementUpdatedMessage;
 import koh.protocol.messages.game.inventory.items.ObtainedItemMessage;
 import koh.protocol.messages.game.inventory.items.ObtainedItemWithBonusMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -26,8 +24,10 @@ import koh.protocol.messages.game.inventory.items.ObtainedItemWithBonusMessage;
  */
 public class Collect implements InteractiveAction {
 
+    private static final Logger logger = LogManager.getLogger(InteractiveAction.class);
+
     private final InteractiveSkill Skill;
-    public float AgeBonus;
+    public float ageBonus;
     public boolean Aborted;
 
     public Collect(InteractiveSkill Skill) {
@@ -35,39 +35,39 @@ public class Collect implements InteractiveAction {
     }
 
     @Override
-    public boolean isEnabled(Player Actor) {
+    public boolean isEnabled(Player actor) {
         try {
-            return Actor.myJobs.GetJob(Skill.parentJobId).jobLevel >= Skill.levelMin;
+            return actor.getMyJobs().getJob(Skill.getParentJobId()).jobLevel >= Skill.getLevelMin();
         } catch (Exception e) {
-            Main.Logs().writeError(String.format("Enabled %s with SkillLevel %s", Skill.parentJobId, Skill.levelMin));
+            logger.error("Enabled {} with SkillLevel {}", Skill.getParentJobId(), Skill.getLevelMin());
             e.printStackTrace();
             return false;
         }
     }
 
     @Override
-    public void Execute(Player Actor, int Element) {
-        if (!this.isEnabled(Actor)) {
-            Actor.Send(new BasicNoOperationMessage());
-            Actor.Client.DelGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
+    public void execute(Player actor, int element) {
+        if (!this.isEnabled(actor)) {
+            actor.send(new BasicNoOperationMessage());
+            actor.getClient().delGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
             return;
         }
-        if (Actor.CurrentMap.GetStatedElementById(Element).elementState == 2) {
-            PlayerController.SendServerMessage(Actor.Client, "Impossible de collecter un item déjà en recolte.");
-            Actor.Client.DelGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
+        if (actor.getCurrentMap().getStatedElementById(element).elementState == 2) {
+            PlayerController.sendServerMessage(actor.getClient(), "Impossible de collecter un item déjà en recolte.");
+            actor.getClient().delGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
             return;
         }
-        Actor.CurrentMap.GetStatedElementById(Element).elementState = 2;
-        this.AgeBonus = Actor.CurrentMap.GetInteractiveElementStruct(Element).AgeBonus;
-        Actor.CurrentMap.GetInteractiveElementStruct(Element).AgeBonus = -1;
+        actor.getCurrentMap().getStatedElementById(element).elementState = 2;
+        this.ageBonus = actor.getCurrentMap().getInteractiveElementStruct(element).ageBonus;
+        actor.getCurrentMap().getInteractiveElementStruct(element).ageBonus = -1;
 
-        Actor.CurrentMap.sendToField(Player -> Player.Send(new InteractiveElementUpdatedMessage(Actor.CurrentMap.toInteractiveElement(Player, Element))));
-        Actor.CurrentMap.sendToField(new StatedElementUpdatedMessage(Actor.CurrentMap.GetStatedElementById(Element)));
-        new CancellableExecutorRunnable(Actor.CurrentMap.getArea().BackGroundWorker, this.GetDuration() * 100) {
+        actor.getCurrentMap().sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(actor.getCurrentMap().toInteractiveElement(Player, element))));
+        actor.getCurrentMap().sendToField(new StatedElementUpdatedMessage(actor.getCurrentMap().getStatedElementById(element)));
+        new CancellableScheduledRunnable(actor.getCurrentMap().getArea().getBackGroundWorker(), this.getDuration() * 100) {
             @Override
             public void run() {
                 try {
-                    Actor.Client.EndGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
+                    actor.getClient().endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
                 } catch (Exception e) {
                 }
             }
@@ -76,45 +76,45 @@ public class Collect implements InteractiveAction {
     }
 
     @Override
-    public int GetDuration() {
+    public int getDuration() {
         return 30;
     }
 
     @Override
-    public void Leave(Player Actor, int Element) {
+    public void leave(Player player, int element) {
         if (Aborted) {
             return;
         }
-        Actor.CurrentMap.sendToField(new InteractiveUseEndedMessage(Element, this.Skill.ID));
-        int quantityGathered = EffectHelper.RandomValue(Actor.myJobs.GetJob(Skill.parentJobId).Quantity(Skill.levelMin));
-        int bonusQuantity = EffectHelper.RandomValue(Actor.myJobs.GetJob(Skill.parentJobId).JobEntity(Skill.levelMin).bonusMin, Actor.myJobs.GetJob(Skill.parentJobId).JobEntity(Skill.levelMin).bonusMax);
-        if (AgeBonus > 0) {
-            bonusQuantity += (int) ((float) bonusQuantity * AgeBonus / 100);
+        player.getCurrentMap().sendToField(new InteractiveUseEndedMessage(element, this.Skill.getID()));
+        int quantityGathered = EffectHelper.randomValue(player.getMyJobs().getJob(Skill.getParentJobId()).quantity(Skill.getLevelMin()));
+        int bonusQuantity = EffectHelper.randomValue(player.getMyJobs().getJob(Skill.getParentJobId()).jobEntity(Skill.getLevelMin()).getBonusMin(), player.getMyJobs().getJob(Skill.getParentJobId()).jobEntity(Skill.getLevelMin()).getBonusMax());
+        if (ageBonus > 0) {
+            bonusQuantity += (int) ((float) bonusQuantity * ageBonus / 100);
         }
-        InventoryItem Item = InventoryItem.Instance(ItemDAO.NextID++, Skill.gatheredRessourceItem, 63, Actor.ID, bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.GenerateIntegerEffect(ItemDAO.Cache.get(Skill.gatheredRessourceItem).possibleEffects, EffectGenerationType.Normal, false));
-        if (Actor.InventoryCache.Add(Item, true)) {
-            Item.NeedInsert = true;
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.getGatheredRessourceItem(), 63, player.getID(), bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.getGatheredRessourceItem()).getPossibleEffects(), EffectGenerationType.NORMAL, false));
+        if (player.getInventoryCache().add(item, true)) {
+            item.setNeedInsert(true);
         }
-        Actor.myJobs.GetJob(Skill.parentJobId).gatheringItems += bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered;
-        Actor.Send(bonusQuantity > 0 ? new ObtainedItemWithBonusMessage(Skill.gatheredRessourceItem, quantityGathered, bonusQuantity) : new ObtainedItemMessage(Skill.gatheredRessourceItem, quantityGathered));
-        Actor.myJobs.addExperience(Actor, Skill.parentJobId, Actor.myJobs.GetJob(Skill.parentJobId).JobEntity(Skill.levelMin).xpEarned * Settings.GetIntElement("Job.Rate"));
-        Actor.CurrentMap.GetStatedElementById(Element).elementState = 1;
-        Actor.CurrentMap.GetStatedElementById(Element).deadAt = System.currentTimeMillis();
-        Actor.CurrentMap.GetInteractiveElementStruct(Element).AgeBonus = -1;
+        player.getMyJobs().getJob(Skill.getParentJobId()).gatheringItems += bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered;
+        player.send(bonusQuantity > 0 ? new ObtainedItemWithBonusMessage(Skill.getGatheredRessourceItem(), quantityGathered, bonusQuantity) : new ObtainedItemMessage(Skill.getGatheredRessourceItem(), quantityGathered));
+        player.getMyJobs().addExperience(player, Skill.getParentJobId(), player.getMyJobs().getJob(Skill.getParentJobId()).jobEntity(Skill.getLevelMin()).getXpEarned() * DAO.getSettings().getIntElement("job.Rate"));
+        player.getCurrentMap().getStatedElementById(element).elementState = 1;
+        player.getCurrentMap().getStatedElementById(element).deadAt = System.currentTimeMillis();
+        player.getCurrentMap().getInteractiveElementStruct(element).ageBonus = -1;
 
-        Actor.CurrentMap.sendToField(Player -> Player.Send(new InteractiveElementUpdatedMessage(Actor.CurrentMap.toInteractiveElement(Player, Element))));
-        Actor.CurrentMap.sendToField(new StatedElementUpdatedMessage(Actor.CurrentMap.GetStatedElementById(Element)));
+        player.getCurrentMap().sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(player.getCurrentMap().toInteractiveElement(Player, element))));
+        player.getCurrentMap().sendToField(new StatedElementUpdatedMessage(player.getCurrentMap().getStatedElementById(element)));
 
     }
 
     @Override
-    public void Abort(Player Actor, int Element) {
+    public void abort(Player Actor, int element) {
         this.Aborted = true;
-        Actor.CurrentMap.GetStatedElementById(Element).elementState = 0;
-        Actor.CurrentMap.GetInteractiveElementStruct(Element).AgeBonus = (short) this.AgeBonus;
+        Actor.getCurrentMap().getStatedElementById(element).elementState = 0;
+        Actor.getCurrentMap().getInteractiveElementStruct(element).ageBonus = (short) this.ageBonus;
 
-        Actor.CurrentMap.sendToField(Player -> Player.Send(new InteractiveElementUpdatedMessage(Actor.CurrentMap.toInteractiveElement(Player, Element))));
-        Actor.CurrentMap.sendToField(new StatedElementUpdatedMessage(Actor.CurrentMap.GetStatedElementById(Element)));
+        Actor.getCurrentMap().sendToField(Player -> Player.send(new InteractiveElementUpdatedMessage(Actor.getCurrentMap().toInteractiveElement(Player, element))));
+        Actor.getCurrentMap().sendToField(new StatedElementUpdatedMessage(Actor.getCurrentMap().getStatedElementById(element)));
 
     }
 

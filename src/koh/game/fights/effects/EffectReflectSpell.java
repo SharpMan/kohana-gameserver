@@ -10,10 +10,10 @@ import koh.game.fights.effects.buff.BuffReflectSpell;
 public class EffectReflectSpell extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        if (CastInfos.Duration > 0) {
-            for (Fighter Target : CastInfos.Targets) {
-                Target.Buffs.AddBuff(new BuffReflectSpell(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        if (castInfos.duration > 0) {
+            for (Fighter Target : castInfos.targets) {
+                Target.getBuff().addBuff(new BuffReflectSpell(castInfos, Target));
             }
         }
 

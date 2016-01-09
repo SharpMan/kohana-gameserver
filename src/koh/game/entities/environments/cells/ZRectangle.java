@@ -30,22 +30,22 @@ public class ZRectangle implements IZone {
     }
 
     @Override
-    public int Surface() {
+    public int getSurface() {
         return (int) (Math.pow(((this.Radius + this._radius2) + 1), 2));
     }
     
       @Override
-    public void SetDirection(byte Direction) {
+    public void setDirection(byte Direction) {
         this.Direction = Direction;
     }
 
     @Override
-    public void SetRadius(byte Radius) {
+    public void setRadius(byte Radius) {
        this.Radius = Radius;
     }
 
     @Override
-    public Short[] GetCells(short centerCell) {
+    public Short[] getCells(short centerCell) {
         MapPoint origin = MapPoint.fromCellId(centerCell);
         ArrayList<Short> list = new ArrayList<>();
 
@@ -53,14 +53,14 @@ public class ZRectangle implements IZone {
         int j;
         int x = origin.get_x();
         int y = origin.get_y();
-        if ((((this.Radius() == 0)) || ((this._radius2 == 0)))) {
-            if ((((this.MinRadius() == 0)) && (!(this.diagonalFree)))) {
+        if ((((this.getRadius() == 0)) || ((this._radius2 == 0)))) {
+            if ((((this.getMinRadius() == 0)) && (!(this.diagonalFree)))) {
                 list.add(centerCell);
             };
             return list.stream().toArray(Short[]::new);
         };
-        i = (x - this.Radius());
-        while (i <= (x + this.Radius())) {
+        i = (x - this.getRadius());
+        while (i <= (x + this.getRadius())) {
             j = (y - this._radius2);
             while (j <= (y + this._radius2)) {
                // System.out.println("sss");
@@ -87,11 +87,11 @@ public class ZRectangle implements IZone {
         /*if (!MapPoint.IsInMap(x, y)) {
             return;
         }*/
-        container.add(MapPoint.CoordToCellId(x, y));
+        container.add(MapPoint.coordToCellId(x, y));
     }
 
     @Override
-    public byte MinRadius() {
+    public byte getMinRadius() {
         return _minRadius;
     }
     
@@ -101,12 +101,12 @@ public class ZRectangle implements IZone {
     }
 
     @Override
-    public byte Direction() {
+    public byte getDirection() {
         return Direction;
     }
 
     @Override
-    public byte Radius() {
+    public byte getRadius() {
         return Radius;
     }
 

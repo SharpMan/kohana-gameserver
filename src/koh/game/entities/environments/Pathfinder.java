@@ -1,17 +1,17 @@
 package koh.game.entities.environments;
 
 import java.util.ArrayList;
-import koh.game.Main;
+
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.fights.Fight;
 import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
+import koh.game.fights.fighters.BombFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import org.apache.commons.lang.StringUtils;
 
 /**
  *
@@ -33,31 +33,31 @@ public class Pathfinder {
         return Math.max(Math.abs(_loc3_.get_x() - _loc4_.get_x()), Math.abs(_loc3_.get_y() - _loc4_.get_y()));
     }
 
-    public static double GetPathTime(int Len) {
+    public static double getPathTime(int Len) {
         return ((Len >= 6 ? Pathfinder.RUN_SPEED : Pathfinder.WALK_SPEED) * 1000 * Len);
     }
 
     public static MovementPath DecodePath(DofusMap Map, short CurrentCell, byte CurrentDirection, short[] Path) {
         MovementPath MovementPath = new MovementPath();
 
-        //MovementPath.AddCell(CurrentCell, CurrentDirection);
+        //MovementPath.addCell(CurrentCell, CurrentDirection);
         for (short i : Path) {
-            MovementPath.AddCell((short) (i & 4095), (byte) (i >> 12 & 7));
+            MovementPath.addCell((short) (i & 4095), (byte) (i >> 12 & 7));
         }
 
         return MovementPath;
     }
 
-    public static MovementPath IsValidPath(Fight Fight, Fighter Fighter, short CurrentCell, byte CurrentDirection, short[] EncodedPath) {
-        MovementPath DecodedPath = Pathfinder.DecodePath(Fight.Map, CurrentCell, CurrentDirection, EncodedPath);
+    public static MovementPath isValidPath(Fight fight, Fighter fighter, short currentCell, byte currentDirection, short[] encodedPath) {
+        MovementPath DecodedPath = Pathfinder.DecodePath(fight.getMap(), currentCell, currentDirection, encodedPath);
         MovementPath FinalPath = new MovementPath();
 
         int Index = 0;
         short TransitCell = 0;
         do {
-            TransitCell = DecodedPath.TransitCells.get(Index);
+            TransitCell = DecodedPath.transitCells.get(Index);
 
-            int Length = Pathfinder.IsValidLine(Fight, Fighter, FinalPath, TransitCell, DecodedPath.GetDirection(TransitCell), DecodedPath.TransitCells.get(DecodedPath.TransitCells.size() == 1 ? Index : Index + 1));
+            int Length = Pathfinder.isValidLine(fight, fighter, FinalPath, TransitCell, DecodedPath.getDirection(TransitCell), DecodedPath.transitCells.get(DecodedPath.transitCells.size() == 1 ? Index : Index + 1));
             if (Length == -1) {
                 return null;
             } else if (Length == -2) {
@@ -66,102 +66,102 @@ public class Pathfinder {
 
             Index++;
 
-        } while (TransitCell != DecodedPath.LastStep());
+        } while (TransitCell != DecodedPath.getLastStep());
 
         return FinalPath;
     }
 
-    public static int IsValidLine(Fight Fight, Fighter Fighter, MovementPath Path, short BeginCell, byte Direction, int EndCell) {
-        int Length = -1;
-        Short ActualCell = BeginCell;
+    public static int isValidLine(Fight fight, Fighter fighter, MovementPath path, short beginCell, byte direction, int endCell) {
+        int length = -1;
+        Short ActualCell = beginCell;
 
-        if (!Pathfinder.InLine(Fight.Map, BeginCell, EndCell)) {
-            return Length;
+        if (!Pathfinder.inLine(fight.getMap(), beginCell, endCell)) {
+            return length;
         }
 
-        Length = (int) GoalDistanceEstimate(Fight.Map, BeginCell, EndCell);
+        length = (int) getGoalDistanceEstimate(fight.getMap(), beginCell, endCell);
 
-        Path.AddCell(ActualCell, Direction);
+        path.addCell(ActualCell, direction);
 
-        for (int i = 0; i < Length; i++) {
+        for (int i = 0; i < length; i++) {
 
-            ActualCell = (short) Pathfinder.NextCell(ActualCell, Direction);
+            ActualCell = (short) Pathfinder.nextCell(ActualCell, direction);
 
-            if (!Fight.Map.getCell(ActualCell).Walakable()) {
+            if (!fight.getMap().getCell(ActualCell).walakable()) {
                 return -2;
             }
 
-            if (Fight.GetFighterOnCell(ActualCell) != null) {
+            if (fight.getFighterOnCell(ActualCell) != null) {
                 if (i == 0) {
-                    Fighter.Send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 276));
+                    fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 276));
                 }
                 return -2;
             }
 
-            Path.AddCell(ActualCell, Direction);
+            path.addCell(ActualCell, direction);
 
-            Path.MovementLength++;
+            path.movementLength++;
 
-            if (Pathfinder.IsStopCell(Fighter.Fight, Fighter.Team, ActualCell, Fighter)) {
+            if (Pathfinder.isStopCell(fighter.getFight(), fighter.getTeam(), ActualCell, fighter)) {
                 return -2;
             }
         }
 
-        return Length;
+        return length;
     }
 
-    public static boolean IsStopCell(Fight Fight, FightTeam Team, short CellId, Fighter Fighter) {
+    public static boolean isStopCell(Fight fight, FightTeam team, short cellId, Fighter fighter) {
         // Un piege etc ?
-        if (Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_TRAP) || Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_BOMB) || Fight.GetCell(CellId).HasGameObject(FightObjectType.OBJECT_PORTAL)) {
-            //Fight.GetCell(CellId).GetObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
+        if (fight.getCell(cellId).hasGameObject(FightObjectType.OBJECT_TRAP) || fight.getCell(cellId).hasGameObject(FightObjectType.OBJECT_BOMB) || fight.getCell(cellId).hasGameObject(FightObjectType.OBJECT_PORTAL)) {
+            //fight.getCell(getCellId).getObjects<FightTrap>().ForEach(x => x.onTraped(Fighter));
             return true;
         }
-        if (Team != null) {
-            return GetEnnemyNear(Fight, Team, CellId, true).size() > 0;
+        if (team != null) {
+            return GetEnnemyNear(fight, team, cellId, true).size() > 0;
         } else {
             return false;
         }
     }
 
-    public static ArrayList<Fighter> GetEnnemyNear(Fight Fight, FightTeam Team, short CellId) {
-        return GetEnnemyNear(Fight, Team, CellId, false);
+    public static ArrayList<Fighter> GetEnnemyNear(Fight fight, FightTeam team, short cellId) {
+        return GetEnnemyNear(fight, team, cellId, false);
     }
 
-    public static ArrayList<Fighter> GetEnnemyNear(Fight Fight, FightTeam Team, short CellId, boolean NotVisible) {
-        ArrayList<Fighter> Ennemies = new ArrayList<>();
+    public static ArrayList<Fighter> GetEnnemyNear(Fight fight, FightTeam team, short cellId, boolean notVisible) {
+        ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
-            Fighter Ennemy = Fight.HasEnnemyInCell((short) Pathfinder.NextCell(CellId, Direction), Team);
+            Fighter Ennemy = fight.hasEnnemyInCell((short) Pathfinder.nextCell(cellId, Direction), team);
             if (Ennemy != null) {
-                if (!Ennemy.Dead && !(NotVisible && Ennemy.VisibleState != GameActionFightInvisibilityStateEnum.INVISIBLE)) {
-                    Ennemies.add(Ennemy);
+                if (!Ennemy.isDead() && !(notVisible && Ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE)) {
+                    ennemies.add(Ennemy);
                 }
             }
         }
 
-        return Ennemies;
+        return ennemies;
     }
 
-    public static ArrayList<Fighter> GetEnnemyNearToTakle(Fight Fight, FightTeam Team, short CellId) {
-        ArrayList<Fighter> Ennemies = new ArrayList<>();
+    public static ArrayList<Fighter> getEnnemyNearToTakle(Fight Fight, FightTeam Team, short CellId) {
+        ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
-            Fighter Ennemy = Fight.HasEnnemyInCell((short) Pathfinder.NextCell(CellId, Direction), Team);
-            if (Ennemy != null) {
-                if (!Ennemy.Dead() && !Ennemy.States.HasState(FightStateEnum.Enraciné) && Ennemy.VisibleState != GameActionFightInvisibilityStateEnum.INVISIBLE) {
-                    Ennemies.add(Ennemy);
+            Fighter ennemy = Fight.hasEnnemyInCell((short) Pathfinder.nextCell(CellId, Direction), Team);
+            if (ennemy != null) {
+                if (!ennemy.isDead() && !(ennemy instanceof BombFighter) && !ennemy.getStates().hasState(FightStateEnum.Enraciné) && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                    ennemies.add(ennemy);
                 }
             }
         }
 
-        return Ennemies;
+        return ennemies;
     }
 
-    public static byte OppositeDirection(byte Direction) {
+    public static byte oppositeDirection(byte Direction) {
         return (byte) (Direction >= 4 ? Direction - 4 : Direction + 4);
     }
 
-    public static short NextCell(short Cell, byte Direction) //TOODO : Refaire tout la merde d'Ankama en static , pour ne pas faire tout ces instances de merde
+    public static short nextCell(short Cell, byte Direction) //TOODO : Refaire tout la merde d'Ankama en static , pour ne pas faire tout ces instances de merde
     {
         try {
             return MapPoint.fromCellId(Cell).getNearestCellInDirection(Direction).get_cellId();
@@ -170,12 +170,12 @@ public class Pathfinder {
         }
     }
 
-    public static short NextCell(short Cell, byte Direction, int Time) {
+    public static short nextCell(short cell, byte direction, int time) {
         try {
-            short Cell2 = MapPoint.fromCellId(Cell).getNearestCellInDirection(Direction).get_cellId();
+            short Cell2 = MapPoint.fromCellId(cell).getNearestCellInDirection(direction).get_cellId();
 
-            for (int i = 1; i < Time; i++) {
-                Cell2 = MapPoint.fromCellId(Cell2).getNearestCellInDirection(Direction).get_cellId();
+            for (int i = 1; i < time; i++) {
+                Cell2 = MapPoint.fromCellId(Cell2).getNearestCellInDirection(direction).get_cellId();
             }
             return Cell2;
         } catch (Exception e) {
@@ -183,91 +183,91 @@ public class Pathfinder {
         }
     }
 
-    public static byte GetDirection(DofusMap Map, int BeginCell, int EndCell) {
-        return MapPoint.fromCellId(BeginCell).orientationTo(MapPoint.fromCellId(EndCell));
+    public static byte getDirection(DofusMap map, int beginCell, int endCell) {
+        return MapPoint.fromCellId(beginCell).orientationTo(MapPoint.fromCellId(endCell));
     }
 
-    public static boolean InLine(DofusMap Map, int BeginCell, int EndCell) {
+    public static boolean inLine(DofusMap map, int beginCell, int endCell) {
         try {
-            return MapPoint.GetX(BeginCell) == MapPoint.GetX(EndCell) || MapPoint.GetY(BeginCell) == MapPoint.GetY(EndCell);
+            return MapPoint.getx(beginCell) == MapPoint.getx(endCell) || MapPoint.GetY(beginCell) == MapPoint.GetY(endCell);
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
     }
 
-    public static double GoalDistanceEstimate(DofusMap Map, int BeginCell, int EndCell) {
-        //return MapPoint.fromCellId(BeginCell).distanceToCell(MapPoint.fromCellId(EndCell));
-        int loc7 = MapPoint.GetX(BeginCell) - MapPoint.GetX(EndCell);
+    public static double getGoalDistanceEstimate(DofusMap map, int BeginCell, int EndCell) {
+        //return MapPoint.fromCellId(beginCell).distanceToCell(MapPoint.fromCellId(getEndCell));
+        int loc7 = MapPoint.getx(BeginCell) - MapPoint.getx(EndCell);
         int loc8 = MapPoint.GetY(BeginCell) - MapPoint.GetY(EndCell);
 
         return Math.sqrt(Math.pow(loc7, 2) + Math.pow(loc8, 2));
     }
 
-    public static int GoalDistance(DofusMap Map, int beginCell, int endCell) { //To not use
-        return (int) (Math.abs(MapPoint.GetX(endCell) - MapPoint.GetX(beginCell)) + Math.abs(MapPoint.GetY(endCell) - MapPoint.GetY(beginCell)));
+    public static int getGoalDistance(DofusMap map, int beginCell, int endCell) { //To not use
+        return (int) (Math.abs(MapPoint.getx(endCell) - MapPoint.getx(beginCell)) + Math.abs(MapPoint.GetY(endCell) - MapPoint.GetY(beginCell)));
     }
 
-    public static Short[] GetLineCellsBetween(Fight Fight, short BeginCell, byte Direction, int EndCell) {
-        return GetLineCellsBetween(Fight, BeginCell, Direction, EndCell, true);
+    public static Short[] getLineCellsBetween(Fight fight, short beginCell, byte direction, int endCell) {
+        return getLineCellsBetween(fight, beginCell, direction, endCell, true);
     }
 
-    public static Short[] GetLineCellsBetweenBomb(Fight Fight, short BeginCell, byte Direction, int EndCell, boolean WithoutFighter) {
-        int Length = -1;
-        Short ActualCell = BeginCell;
+    public static Short[] getLineCellsBetweenBomb(Fight fight, short beginCell, byte direction, int endCell, boolean withoutFighter) {
+        int length = -1;
+        Short actualCell = beginCell;
 
-        if (!Pathfinder.InLine(Fight.Map, BeginCell, EndCell)) {
+        if (!Pathfinder.inLine(fight.getMap(), beginCell, endCell)) {
             return null;
         }
 
-        Length = (int) GoalDistanceEstimate(Fight.Map, BeginCell, EndCell) - 1;
-        Short[] Cells = new Short[Length];
+        length = (int) getGoalDistanceEstimate(fight.getMap(), beginCell, endCell) - 1;
+        Short[] cells = new Short[length];
 
-        for (int i = 0; i < Length; i++) {
+        for (int i = 0; i < length; i++) {
 
-            ActualCell = (short) Pathfinder.NextCell(ActualCell, Direction);
+            actualCell = (short) Pathfinder.nextCell(actualCell, direction);
 
 
-            if (WithoutFighter && Fight.GetFighterOnCell(ActualCell) != null) {
+            if (withoutFighter && fight.getFighterOnCell(actualCell) != null) {
                 return null;
             }
 
-            Cells[i] = ActualCell;
+            cells[i] = actualCell;
 
-            if (Pathfinder.IsStopCell(Fight, null, ActualCell, null)) {
+            if (Pathfinder.isStopCell(fight, null, actualCell, null)) {
                 return null;
             }
         }
 
-        return Cells;
+        return cells;
     }
     
-    public static Short[] GetLineCellsBetween(Fight Fight, short BeginCell, byte Direction, int EndCell, boolean WithoutFighter) {
-        int Length = -1;
-        Short ActualCell = BeginCell;
+    public static Short[] getLineCellsBetween(Fight fight, short beginCell, byte direction, int endCell, boolean withoutFighter) {
+        int length = -1;
+        Short actualCell = beginCell;
 
-        if (!Pathfinder.InLine(Fight.Map, BeginCell, EndCell)) {
+        if (!Pathfinder.inLine(fight.getMap(), beginCell, endCell)) {
             return null;
         }
 
-        Length = (int) GoalDistanceEstimate(Fight.Map, BeginCell, EndCell) - 1;
-        Short[] Cells = new Short[Length];
+        length = (int) getGoalDistanceEstimate(fight.getMap(), beginCell, endCell) - 1;
+        Short[] Cells = new Short[length];
 
-        for (int i = 0; i < Length; i++) {
+        for (int i = 0; i < length; i++) {
 
-            ActualCell = (short) Pathfinder.NextCell(ActualCell, Direction);
+            actualCell = (short) Pathfinder.nextCell(actualCell, direction);
 
-            if (!Fight.Map.getCell(ActualCell).Walakable()) {
+            if (!fight.getMap().getCell(actualCell).walakable()) {
                 return null;
             }
 
-            if (WithoutFighter && Fight.GetFighterOnCell(ActualCell) != null) {
+            if (withoutFighter && fight.getFighterOnCell(actualCell) != null) {
                 return null;
             }
 
-            Cells[i] = ActualCell;
+            Cells[i] = actualCell;
 
-            if (Pathfinder.IsStopCell(Fight, null, ActualCell, null)) {
+            if (Pathfinder.isStopCell(fight, null, actualCell, null)) {
                 return null;
             }
         }

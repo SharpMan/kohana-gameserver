@@ -1,9 +1,7 @@
 package koh.game.actions;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
+
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.network.WorldClient;
@@ -17,40 +15,40 @@ public abstract class GameAction {
 
     //private List<Method> myEndCallBacks = new ArrayList<>();
 
-    public abstract boolean CanSubAction(GameActionTypeEnum ActionType);
+    public abstract boolean canSubAction(GameActionTypeEnum ActionType);
 
-    public GameActionTypeEnum ActionType;
+    public GameActionTypeEnum actionType;
 
-    public IGameActor Actor;
+    public IGameActor actor;
 
-    public boolean IsFinish;
+    public boolean isFinish;
 
-    public GameAction(GameActionTypeEnum ActionType, IGameActor Actor) {
-        this.Actor = Actor;
-        this.ActionType = ActionType;
+    public GameAction(GameActionTypeEnum actionType, IGameActor actor) {
+        this.actor = actor;
+        this.actionType = actionType;
     }
     
-    public WorldClient GetClient(){
+    public WorldClient getClient(){
         try{
-            return ((Player) Actor).Client;
+            return ((Player) actor).getClient();
         }
         catch(Exception e){
             return null;
         }
     }
 
-    public void Execute() {
+    public void execute() {
     }
 
-    public void Abort(Object[] Args) {
-        this.IsFinish = true;
+    public void abort(Object[] Args) {
+        this.isFinish = true;
     }
 
-    public void EndExecute() throws Exception {
-        this.IsFinish = true;
+    public void endExecute() throws Exception {
+        this.isFinish = true;
     }
 
-    public void RegisterEnd(Method CallBack) {
+    public void registerEnd(Method CallBack) {
         //this.myEndCallBacks.add(CallBack);
     }
     

@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import koh.game.dao.AccountDataDAO;
-import koh.game.dao.ItemDAO;
-import koh.game.dao.PlayerDAO;
+
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
 import koh.protocol.client.BufUtils;
@@ -33,87 +32,87 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class AccountData {
 
-    public int Id;
-    public int Kamas;
-    public FriendContact[] Friends;
-    public IgnoredContact[] Ignored;
-    public IgnoredContact Spouse;
+    public int id;
+    public int kamas;
+    public FriendContact[] friends;
+    public IgnoredContact[] ignored;
+    public IgnoredContact spouse;
     public boolean friend_warn_on_login;
     public boolean friend_warn_on_level_gain;
     public boolean guild_warn_on_login;
-    public Map<Integer, InventoryItem> ItemsCache = Collections.synchronizedMap(new HashMap<>());
+    public Map<Integer, InventoryItem> itemscache = Collections.synchronizedMap(new HashMap<>());
 
-    public List<String> ColumsToUpdate = null;
+    public List<String> columsToUpdate = null;
 
     public List<ObjectItem> toObjectsItem() {
-        return ItemsCache.values().stream().map(x -> x.ObjectItem()).collect(Collectors.toList());
+        return itemscache.values().stream().map(InventoryItem::getObjectItem).collect(Collectors.toList());
     }
 
-    public void UpdateObjectquantity(Player Player, InventoryItem Item, int Quantity) {
-        Item.SetQuantity(Quantity);
-        if (Item.GetQuantity() <= 0) {
-            this.RemoveItem(Player, Item);
+    public void updateObjectQuantity(Player player, InventoryItem item, int quantity) {
+        item.setQuantity(quantity);
+        if (item.getQuantity() <= 0) {
+            this.removeItem(player, item);
             return;
         }
-        Player.Send(new StorageObjectUpdateMessage(Item.ObjectItem()));
+        player.send(new StorageObjectUpdateMessage(item.getObjectItem()));
     }
 
-    public void RemoveItem(Player Player, InventoryItem Item) {
-        Item.NeedInsert = false;
-        Item.ColumsToUpdate = null;
-        this.RemoveFromDic(Item.ID);
-        Player.Send(new StorageObjectRemoveMessage(Item.ID));
-        ItemDAO.Remove(Item, "storage_items");
+    public void removeItem(Player player, InventoryItem item) {
+        item.setNeedInsert(false);
+        item.columsToUpdate = null;
+        this.removeFromDic(item.getID());
+        player.send(new StorageObjectRemoveMessage(item.getID()));
+        DAO.getItems().delete(item, "storage_items");
     }
 
-    public void SetBankKamas(int Price) {
-        this.Kamas = Price;
-        this.NotifiedColumn("kamas");
+    public void setBankKamas(int Price) {
+        this.kamas = Price;
+        this.notifyColumn("kamas");
     }
 
-    public void RemoveFromDic(int id) {
-        ItemsCache.remove(id);
+    public void removeFromDic(int id) {
+        itemscache.remove(id);
     }
 
     public void setFriendWarnOnGuildLogin(boolean b) {
         this.guild_warn_on_login = b;
-        this.NotifiedColumn("friend_warn_on_login");
+        this.notifyColumn("friend_warn_on_login");
     }
 
     public void setFriendWarnOnLevelGain(boolean b) {
         this.friend_warn_on_level_gain = b;
-        this.NotifiedColumn("friend_warn_on_level_gain");
+        this.notifyColumn("friend_warn_on_level_gain");
     }
 
-    public boolean Add(Player Player, InventoryItem Item, boolean merge) //muste be true
+    public boolean add(Player player, InventoryItem item, boolean merge) //muste be true
     {
-        if (merge && TryMergeItem(Player, Item.TemplateId, Item.Effects, Item.Slot(), Item.GetQuantity(), Item, false)) {
+        if (merge && tryMergeItem(player, item.getTemplateId(), item.getEffects$Notify(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
-        if (Item.GetOwner() != Id) {
-            Item.SetOwner(Id);
+        if (item.getOwner() != id) {
+            item.setOwner(id);
         }
-        if (ItemsCache.containsKey(Item.ID)) {
-            RemoveFromDic(Item.ID);
+        if (itemscache.containsKey(item.getID())) {
+            removeFromDic(item.getID());
         }
-        ItemsCache.put(Item.ID, Item);
+        itemscache.put(item.getID(), item);
 
-        Player.Send(new StorageObjectUpdateMessage(Item.ObjectItem()));
+        player.send(new StorageObjectUpdateMessage(item.getObjectItem()));
 
         return true;
     }
 
-    public boolean TryMergeItem(Player Player, int TemplateId, List<ObjectEffect> Stats, CharacterInventoryPositionEnum Slot, int Quantity, InventoryItem RemoveItem, boolean Send) {
-        if (Slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            for (InventoryItem Item : this.ItemsCache.values()) {
-                if (Item.TemplateId == TemplateId && Item.Slot() == Slot && !(RemoveItem != null && RemoveItem.ID == Item.ID) && Item.Equals(Stats) ) {
-                    if (RemoveItem != null) {
-                        this.RemoveFromDic(RemoveItem.ID);
-                        RemoveItem.NeedInsert = false;
-                        ItemDAO.Remove(RemoveItem, "storage_items");
-                        RemoveItem.ColumsToUpdate = null;
+    public boolean tryMergeItem(Player player, int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int quantity, InventoryItem removeItem, boolean send) {
+        if (slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+            for (InventoryItem Item : this.itemscache.values()) {
+                if (Item.getTemplateId() == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.getID() == Item.getID()) && Item.Equals(stats) ) {
+                    if (removeItem != null) {
+                        this.removeFromDic(removeItem.getID());
+                        removeItem.setNeedInsert(false);
+                        DAO.getItems().delete(removeItem, "storage_items");
+                        removeItem.columsToUpdate = null;
                     }
-                    this.UpdateObjectquantity(Player, Item, Item.GetQuantity() + Quantity);
+                    this.updateObjectQuantity(player, Item, Item.getQuantity() + quantity);
                     return true;
                 }
             }
@@ -124,187 +123,177 @@ public class AccountData {
 
     public void setFriendWarnOnLogin(boolean b) {
         this.friend_warn_on_login = b;
-        this.NotifiedColumn("friend_warn_on_login");
+        this.notifyColumn("friend_warn_on_login");
     }
 
-    public void AddFriend(FriendContact Friend) {
-        this.Friends = ArrayUtils.add(Friends, Friend);
-        this.NotifiedColumn("friends");
+    public void addFriend(FriendContact friend) {
+        this.friends = ArrayUtils.add(friends, friend);
+        this.notifyColumn("friends");
     }
 
-    public void AddIgnored(IgnoredContact Friend) {
-        this.Ignored = ArrayUtils.add(Ignored, Friend);
-        this.NotifiedColumn("ignored");
+    public void addIgnored(IgnoredContact friend) {
+        this.ignored = ArrayUtils.add(ignored, friend);
+        this.notifyColumn("ignored");
     }
 
-    public FriendContact GetFriend(int account) {
+    public FriendContact getFriend(int account) {
         try {
-            return Arrays.stream(Friends).filter(x -> x.AccountID == account).findFirst().get();
+            return Arrays.stream(friends).filter(x -> x.accountID == account).findFirst().get();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public IgnoredContact GetIgnored(int account) {
-        try {
-            return Arrays.stream(Ignored).filter(x -> x.AccountID == account).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+    public IgnoredContact getIgnored(int account) {
+         return Arrays.stream(ignored).filter(x -> x.accountID == account).findFirst().orElse(null);
     }
 
-    public boolean HasFriend(int account) {
-        return Arrays.stream(Friends).anyMatch(x -> x.AccountID == account);
+    public boolean hasFriend(int account) {
+        return Arrays.stream(friends).anyMatch(x -> x.accountID == account);
     }
 
-    public boolean Ignore(int account) {
-        return Arrays.stream(Ignored).anyMatch(x -> x.AccountID == account);
+    public boolean ignore(int account) {
+        return Arrays.stream(ignored).anyMatch(x -> x.accountID == account);
     }
 
-    public List<FriendInformations> GetFriendsInformations() {
-        List<FriendInformations> Friends = new ArrayList<>();
-        for (FriendContact Friend : this.Friends) {
-            Player Target = PlayerDAO.GetCharacterByAccount(Friend.AccountID);
-            if (Target == null || Target.Client == null) {
-                Friends.add(new FriendInformations(Friend.AccountID, Friend.accountName, PlayerStateEnum.NOT_CONNECTED, (int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Friend.lastConnection), Friend.achievementPoints));
+    public List<FriendInformations> getFriendsInformations() {
+        List<FriendInformations> friends = new ArrayList<>();
+        for (FriendContact friend : this.friends) {
+            Player target = DAO.getPlayers().getCharacterByAccount(friend.accountID);
+            if (target == null || target.getClient() == null) {
+                friends.add(new FriendInformations(friend.accountID, friend.accountName, PlayerStateEnum.NOT_CONNECTED, (int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - friend.lastConnection), friend.achievementPoints));
             } else {
-                Friend.achievementPoints = Target.achievementPoints;
-                Friend.lastConnection = System.currentTimeMillis();
-                this.NotifiedColumn("friends");
-                if (Target.Account.Data != null && Target.Account.Data.HasFriend(this.Id)) {
-                    Friends.add(new FriendOnlineInformations(Target.Account.ID, Target.Account.NickName, Target.GetPlayerState(), -1, Target.achievementPoints, Target.ID, Target.NickName, (byte) Target.Level, Target.AlignmentSide.value, Target.Breed, Target.Sexe == 1, Target.GetBasicGuildInformations(), Target.MoodSmiley, new PlayerStatus(Target.Status.value())));
+                friend.achievementPoints = target.getAchievementPoints();
+                friend.lastConnection = System.currentTimeMillis();
+                this.notifyColumn("friends");
+                if (target.getAccount().accountData != null && target.getAccount().accountData.hasFriend(this.id)) {
+                    friends.add(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) target.getLevel(), target.getAlignmentSide().value, target.getBreed(), target.hasSexe(), target.getBasicGuildInformations(), target.getMoodSmiley(), new PlayerStatus(target.getStatus().value())));
                 } else {
-                    Friends.add(new FriendOnlineInformations(Target.Account.ID, Target.Account.NickName, Target.GetPlayerState(), -1, Target.achievementPoints, Target.ID, Target.NickName, (byte) 0, (byte) -1, Target.Breed, Target.Sexe == 1, new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(Target.Status.value())));
+                    friends.add(new FriendOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getPlayerState(), -1, target.getAchievementPoints(), target.getID(), target.getNickName(), (byte) 0, (byte) -1, target.getBreed(), target.hasSexe(), new BasicGuildInformations(0, ""), (byte) -1, new PlayerStatus(target.getStatus().value())));
                 }
             }
         }
-        return Friends;
+        return friends;
     }
 
-    public List<IgnoredInformations> GetIgnoredInformations() {
-        List<IgnoredInformations> Friends = new ArrayList<>();
-        for (IgnoredContact Friend : this.Ignored) {
-            Player Target = PlayerDAO.GetCharacterByAccount(Friend.AccountID);
-            if (Target == null || Target.Client == null) {
-                Friends.add(new IgnoredInformations(Friend.AccountID, Friend.accountName));
+    public List<IgnoredInformations> getIgnoredInformations() {
+        List<IgnoredInformations> friends = new ArrayList<>();
+        for (IgnoredContact Friend : this.ignored) {
+            Player target = DAO.getPlayers().getCharacterByAccount(Friend.accountID);
+            if (target == null || target.getClient() == null) {
+                friends.add(new IgnoredInformations(Friend.accountID, Friend.accountName));
             } else {
-                Friends.add(new IgnoredOnlineInformations(Target.Account.ID, Target.Account.NickName, Target.ID, Target.NickName, Target.Breed, Target.Sexe == 1));
+                friends.add(new IgnoredOnlineInformations(target.getAccount().id, target.getAccount().nickName, target.getID(), target.getNickName(), target.getBreed(), target.hasSexe()));
             }
         }
-        return Friends;
+        return friends;
     }
 
-    public boolean RemoveIgnored(int ID) {
-        IgnoredContact Person = null;
-        try {
-            Person = Arrays.stream(Ignored).filter(x -> x.AccountID == ID).findFirst().get();
-        } catch (Exception e) {
+    public boolean removeIgnored(int id) {
+        IgnoredContact person = person = Arrays.stream(ignored).filter(x -> x.accountID == id).findFirst().orElse(null);
+        if(person == null)
             return false;
-        }
-        this.Ignored = ArrayUtils.removeElement(Ignored, Person);
-        this.NotifiedColumn("ignored");
+        this.ignored = ArrayUtils.removeElement(ignored, person);
+        this.notifyColumn("ignored");
         return true;
     }
 
-    public void RemoveIgnored(IgnoredContact Person) {
-        this.Ignored = ArrayUtils.removeElement(Ignored, Person);
-        this.NotifiedColumn("ignored");
+    public void removeIgnored(IgnoredContact person) {
+        this.ignored = ArrayUtils.removeElement(ignored, person);
+        this.notifyColumn("ignored");
     }
 
-    public void RemoveFriend(FriendContact Friend) {
-        this.Friends = ArrayUtils.removeElement(Friends, Friend);
-        this.NotifiedColumn("friends");
+    public void removeFriend(FriendContact friend) {
+        this.friends = ArrayUtils.removeElement(friends, friend);
+        this.notifyColumn("friends");
     }
 
-    public boolean RemoveFriend(int ID) {
-        FriendContact Friend = null;
-        try {
-            Friend = Arrays.stream(Friends).filter(x -> x.AccountID == ID).findFirst().get();
-        } catch (Exception e) {
+    public boolean removeFriend(int id) {
+        FriendContact friend = friend = Arrays.stream(friends).filter(x -> x.accountID == id).findFirst().orElse(null);
+        if(friend == null)
             return false;
-        }
-        this.Friends = ArrayUtils.removeElement(Friends, Friend);
-        this.NotifiedColumn("friends");
+        this.friends = ArrayUtils.removeElement(friends, friend);
+        this.notifyColumn("friends");
         return true;
     }
 
-    public void Save(boolean Clear) {
-        synchronized (ItemsCache) {
-            this.ItemsCache.values().parallelStream().forEach(Item -> {
-                if (Item.NeedRemove) {
-                    ItemDAO.Remove(Item, "storage_items");
-                } else if (Item.NeedInsert) {
-                    ItemDAO.Insert(Item, Clear, "storage_items");
-                } else if (Item.ColumsToUpdate != null && !Item.ColumsToUpdate.isEmpty()) {
-                    ItemDAO.Update(Item, Clear, "storage_items");
-                } else if (Clear) {
+    public void save(boolean clear) {
+        synchronized (itemscache) {
+            this.itemscache.values().parallelStream().forEach(Item -> {
+                if (Item.isNeedRemove()) {
+                    DAO.getItems().delete(Item, "storage_items");
+                } else if (Item.isNeedInsert()) {
+                    DAO.getItems().create(Item, clear, "storage_items");
+                } else if (Item.columsToUpdate != null && !Item.columsToUpdate.isEmpty()) {
+                    DAO.getItems().save(Item, clear, "storage_items");
+                } else if (clear) {
                     Item.totalClear();
                 }
             });
-            if (!Clear && this.ColumsToUpdate != null) {
-                AccountDataDAO.Update(this, null);
+            if (!clear && this.columsToUpdate != null) {
+                DAO.getAccountDatas().save(this, null);
             }
         }
     }
 
     public void totalClear(Account c) {
         try {
-            this.Save(true);
-            Id = 0;
-            Kamas = 0;
-            Friends = null;
-            Ignored = null;
+            this.save(true);
+            id = 0;
+            kamas = 0;
+            friends = null;
+            ignored = null;
             friend_warn_on_login = false;
             friend_warn_on_level_gain = false;
             guild_warn_on_login = false;
-            this.ItemsCache.clear();
-            this.ItemsCache = null;
+            this.itemscache.clear();
+            this.itemscache = null;
             c.continueClear();
             this.finalize();
         } catch (Throwable tr) {
         }
     }
 
-    public byte[] SerializeFriends() {
+    public byte[] serializeFriends() {
         IoBuffer buf = IoBuffer.allocate(1);
         buf.setAutoExpand(true);
-        buf.putInt(Friends.length);
-        Arrays.stream(Friends).forEach(Contact -> Contact.Serialize(buf));
+        buf.putInt(friends.length);
+        Arrays.stream(friends).forEach(contact -> contact.serialize(buf));
 
         return buf.array();
     }
 
-    public byte[] SerializeIgnored() {
+    public byte[] serializeIgnored() {
         IoBuffer buf = IoBuffer.allocate(1);
         buf.setAutoExpand(true);
-        buf.putInt(Ignored.length);
-        Arrays.stream(Ignored).forEach(Contact -> Contact.Serialize(buf));
+        buf.putInt(ignored.length);
+        Arrays.stream(ignored).forEach(contact -> contact.serialize(buf));
 
         return buf.array();
     }
 
     public static class FriendContact {
 
-        public int AccountID;
+        public int accountID;
         public String accountName;
         public long lastConnection;
         public int achievementPoints;
 
-        public void Serialize(IoBuffer buf) {
-            buf.putInt(AccountID);
+        public void serialize(IoBuffer buf) {
+            buf.putInt(accountID);
             BufUtils.writeUTF(buf, accountName);
             buf.putLong(lastConnection);
             buf.putInt(achievementPoints);
         }
 
-        public static FriendContact[] Deserialize(byte[] binary) {
+        public static FriendContact[] deserialize(byte[] binary) {
             IoBuffer buf = IoBuffer.wrap(binary);
             int len = buf.getInt();
             FriendContact[] toReturn = new FriendContact[len];
             for (int i = 0; i < len; i++) {
                 toReturn[i] = new FriendContact() {
                     {
-                        AccountID = buf.getInt();
+                        accountID = buf.getInt();
                         accountName = BufUtils.readUTF(buf);
                         lastConnection = buf.getLong();
                         achievementPoints = buf.getInt();
@@ -319,22 +308,22 @@ public class AccountData {
 
     public static class IgnoredContact {
 
-        public int AccountID;
+        public int accountID;
         public String accountName;
 
-        public void Serialize(IoBuffer buf) {
-            buf.putInt(AccountID);
+        public void serialize(IoBuffer buf) {
+            buf.putInt(accountID);
             BufUtils.writeUTF(buf, accountName);
         }
 
-        public static IgnoredContact[] Deserialize(byte[] binary) {
+        public static IgnoredContact[] deserialize(byte[] binary) {
             IoBuffer buf = IoBuffer.wrap(binary);
             int len = buf.getInt();
             IgnoredContact[] toReturn = new IgnoredContact[len];
             for (int i = 0; i < len; i++) {
                 toReturn[i] = new IgnoredContact() {
                     {
-                        AccountID = buf.getInt();
+                        accountID = buf.getInt();
                         accountName = BufUtils.readUTF(buf);
                     }
                 };
@@ -343,12 +332,12 @@ public class AccountData {
         }
     }
 
-    public void NotifiedColumn(String C) {
-        if (this.ColumsToUpdate == null) {
-            this.ColumsToUpdate = new ArrayList<>();
+    public void notifyColumn(String C) {
+        if (this.columsToUpdate == null) {
+            this.columsToUpdate = new ArrayList<>();
         }
-        if (!this.ColumsToUpdate.contains(C)) {
-            this.ColumsToUpdate.add(C);
+        if (!this.columsToUpdate.contains(C)) {
+            this.columsToUpdate.add(C);
         }
     }
 

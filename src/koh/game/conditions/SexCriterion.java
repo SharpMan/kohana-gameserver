@@ -9,7 +9,7 @@ import koh.game.entities.actors.Player;
 public class SexCriterion extends Criterion {
 
     public static String Identifier = "PS";
-    public Integer Sex;
+    public Integer sex;
 
     @Override
     public String toString() {
@@ -18,11 +18,11 @@ public class SexCriterion extends Criterion {
 
     @Override
     public void Build() {
-       this.Sex = Integer.parseInt(Literal);
+       this.sex = Integer.parseInt(literal);
     }
 
     @Override
-    public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.Sexe, this.Sex);
+    public boolean eval(Player character) {
+        return this.Compare((Comparable<Integer>) character.getSexe(), this.sex);
     }
 }

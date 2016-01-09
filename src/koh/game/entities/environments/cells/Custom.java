@@ -14,37 +14,37 @@ public class Custom implements IZone {
     public byte Radius;
 
     @Override
-    public int Surface() {
+    public int getSurface() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
    @Override
-    public byte MinRadius() {
+    public byte getMinRadius() {
         return MinRadius;
     }
 
     @Override
-    public byte Direction() {
+    public byte getDirection() {
         return Direction;
     }
 
     @Override
-    public byte Radius() {
+    public byte getRadius() {
         return Radius;
     }
 
     @Override
-    public void SetDirection(byte Direction) {
+    public void setDirection(byte Direction) {
         this.Direction = Direction;
     }
 
     @Override
-    public void SetRadius(byte Radius) {
+    public void setRadius(byte Radius) {
        this.Radius = Radius;
     }
 
     @Override
-    public Short[] GetCells(short centerCell) {
+    public Short[] getCells(short centerCell) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

@@ -2,12 +2,7 @@ package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
-import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectDamage;
-import koh.game.fights.effects.EffectDamage;
-import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.effects.buff.BuffDecrementType;
-import koh.game.fights.effects.buff.BuffEffect;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
@@ -24,18 +19,18 @@ public class BuffLifeDamage extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        //var Damage = this.CastInfos.RandomJet;
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        //var Damage = this.castInfos.randomJet;
 
-        // return EffectDamage.ApplyDamages(this.CastInfos, this.Target, ref Damage);
-        int effectBase = CastInfos.RandomJet(Target);
-        MutableInt DamageValuea = new MutableInt((Target.CurrentLife / 100) * effectBase);
+        // return EffectDamage.applyDamages(this.castInfos, this.target, ref Damage);
+        int effectBase = castInfos.randomJet(target);
+        MutableInt DamageValuea = new MutableInt((target.currentLife / 100) * effectBase);
         //DamageValuea = (-DamageValuea);
-        return EffectDamage.ApplyDamages(this.CastInfos, this.Target, DamageValuea);
+        return EffectDamage.applyDamages(this.castInfos, this.target, DamageValuea);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.CastInfos.RandomJet(Target)));
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.castInfos.randomJet(target)));
     }
 }

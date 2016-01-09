@@ -7,6 +7,6 @@ package koh.game.entities.actors;
 public class TaxCollector {
 
     public static final int TAXCOLLECTOR_BONES = 714;
-    public static final int BaseHealth = 3000;
+    public static final int BASE_HEALTH = 3000;
         
 }

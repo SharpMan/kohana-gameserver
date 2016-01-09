@@ -11,14 +11,14 @@ import koh.protocol.messages.game.actions.fight.GameActionFightModifyEffectsDura
 public class EffectDispellEffectDuration extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
-            short Jet = CastInfos.RandomJet(Target);
-            if (Target.Buffs.DecrementEffectDuration(Jet) == -3) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            short Jet = castInfos.randomJet(Target);
+            if (Target.getBuff().decrementEffectDuration(Jet) == -3) {
                 return -3;
             }
 
-            Target.Fight.sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.Caster.ID, Target.ID, (short) -Jet));
+            Target.getFight().sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, castInfos.caster.getID(), Target.getID(), (short) -Jet));
         }
 
         return -1;

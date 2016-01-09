@@ -7,7 +7,6 @@ import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_ADD_SPELL_
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSpellCooldownVariationMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
-import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -17,33 +16,33 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffSpellCoolDown extends BuffEffect {
 
-    public int Value, Spell;
+    public int value, spell;
 
     public BuffSpellCoolDown(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
-        this.Value = CastInfos.Effect.value;
-        this.Spell = CastInfos.Effect.diceNum;
+        this.value = CastInfos.effect.value;
+        this.spell = CastInfos.effect.diceNum;
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        //FighterSpell.SpellinitialCooldown CurrentCooldown = this.Target.SpellsController.myinitialCooldown.get(Spell);
-        this.Target.Send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, Value));
-        return super.ApplyEffect(DamageValue, DamageInfos);
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        //FighterSpell.SpellinitialCooldown CurrentCooldown = this.target.spellsController.initialCooldown.get(spell);
+        this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), spell, value));
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public int RemoveEffect() {
-        FighterSpell.SpellinitialCooldown CurrentCooldown = this.Target.SpellsController.myinitialCooldown.get(Spell);
-        if (CurrentCooldown != null) {
-            this.Target.Send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.Caster.ID, Target.ID, Spell, CurrentCooldown.initialCooldown + 1));
+    public int removeEffect() {
+        FighterSpell.SpellinitialCooldown currentCooldown = this.target.getSpellsController().getInitialCooldown().get(spell);
+        if (currentCooldown != null) {
+            this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), spell, currentCooldown.initialCooldown + 1));
         }
-        return super.RemoveEffect();
+        return super.removeEffect();
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.CastInfos.Effect.duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) this.CastInfos.Effect.delay);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.castInfos.effect.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) this.castInfos.effect.delay);
     }
 
 }

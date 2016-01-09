@@ -11,21 +11,21 @@ import koh.game.fights.fighters.IllusionFighter;
 public class EffectAddAllResist extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
             if (Target instanceof IllusionFighter) {
                 continue;//Roulette tue clone ...
             }
-            EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets, CastInfos.SpellLevel);
+            EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
             BuffAddResistStats BuffStats = new BuffAddResistStats(SubInfos, Target);
-            if (Target.Buffs.BuffMaxStackReached(BuffStats)) {
+            if (Target.getBuff().buffMaxStackReached(BuffStats)) {
                 return -1;
             }
-            if (BuffStats.ApplyEffect(null, null) == -3) {
+            if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 
-            Target.Buffs.AddBuff(BuffStats);
+            Target.getBuff().addBuff(BuffStats);
         }
 
         return -1;

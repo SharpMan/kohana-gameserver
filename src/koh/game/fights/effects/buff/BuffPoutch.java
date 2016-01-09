@@ -2,8 +2,8 @@ package koh.game.fights.effects.buff;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import koh.game.Main;
-import koh.game.dao.SpellDAO;
+
+import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
@@ -20,6 +20,8 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -27,59 +29,61 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffPoutch extends BuffEffect {
 
+    private static final Logger logger = LogManager.getLogger(BuffPoutch.class);
+
     public BuffPoutch(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (DamageInfos.IsReflect || DamageInfos.IsReturnedDamages || DamageInfos.IsPoison) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
             return -1;
         }
         // mort
-        if (Caster.Dead()) {
-            //Target.Buffs.RemoveBuff(this);
+        if (caster.isDead()) {
+            //target.buff.RemoveBuff(this);
             return -1;
         }
 
-        if (CastInfos.SpellId == 2809) {
-            if(Pathfinder.GoalDistance(null, DamageInfos.Caster.CellId(), Target.CellId()) > 1){
+        if (castInfos.spellId == 2809) {
+            if(Pathfinder.getGoalDistance(null, DamageInfos.caster.getCellId(), target.getCellId()) > 1){
                 return -1;
             }
-            //Target = DamageInfos.Caster;
+            //target = DamageInfos.caster;
         }
 
-        SpellLevel SpellLevel = SpellDAO.Spells.get(CastInfos.Effect.diceNum).spellLevels[CastInfos.Effect.diceSide == 0 ? 0 : CastInfos.Effect.diceSide - 1];
+        SpellLevel SpellLevel = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide == 0 ? 0 : castInfos.effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();
-        double num2 = (double) Arrays.stream(SpellLevel.effects).mapToInt(x -> x.random).sum();
+        double num2 = (double) Arrays.stream(SpellLevel.getEffects()).mapToInt(x -> x.random).sum();
         boolean flag = false;
-        for (EffectInstanceDice Effect : SpellLevel.effects) {
-            Main.Logs().writeDebug(Effect.toString());
-            ArrayList<Fighter> Targets = new ArrayList<>();
-            for (short Cell : (new Zone(Effect.ZoneShape(), Effect.ZoneSize(), MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true), this.Caster.Fight.Map)).GetCells(Target.CellId())) {
-                FightCell FightCell = Target.Fight.GetCell(Cell);
+        for (EffectInstanceDice Effect : SpellLevel.getEffects()) {
+            logger.debug(Effect.toString());
+            ArrayList<Fighter> targets = new ArrayList<>();
+            for (short Cell : (new Zone(Effect.getZoneShape(), Effect.zoneSize(), MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true), this.caster.getFight().getMap())).getCells(target.getCellId())) {
+                FightCell FightCell = target.getFight().getCell(Cell);
                 if (FightCell != null) {
-                    if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
-                        for (Fighter Target2 : FightCell.GetObjectsAsFighter()) {
-                            if (CastInfos.SpellId == 2809 && Target2 == Target) {
+                    if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
+                        for (Fighter Target2 : FightCell.getObjectsAsFighter()) {
+                            if (castInfos.spellId == 2809 && Target2 == target) {
                                 continue;
                             }
-                            if (Effect.IsValidTarget(this.Target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.Target, Target2, Effect,Target2.ID)) {
-                                if (Effect.targetMask.equals("C") && this.Target.GetCarriedActor() == Target2.ID) {
+                            if (Effect.isValidTarget(this.target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.target, Target2, Effect,Target2.getID())) {
+                                if (Effect.targetMask.equals("C") && this.target.getCarriedActor() == Target2.getID()) {
                                     continue;
-                                } else if (Effect.targetMask.equals("a,A") && this.Target.GetCarriedActor() != 0 & this.Target.ID == Target2.ID) {
+                                } else if (Effect.targetMask.equals("a,A") && this.target.getCarriedActor() != 0 & this.target.getID() == Target2.getID()) {
                                     continue;
                                 }
-                                Targets.add(Target2);
+                                targets.add(Target2);
 
                             }
                         }
                     }
                 }
             }
-            if(CastInfos.SpellId == 94){
-                Targets.clear();
-                Targets.add(DamageInfos.Caster);
+            if(castInfos.spellId == 94){
+                targets.clear();
+                targets.add(DamageInfos.caster);
             }
             if (Effect.random > 0) {
                 if (!flag) {
@@ -93,35 +97,35 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            EffectCast Cast2 = new EffectCast(Effect.EffectType(), SpellLevel.spellId, (CastInfos.EffectType == StatsEnum.Refoullage) ? Caster.CellId() : this.Target.CellId(), num1, Effect, this.Target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
-            Cast2.targetKnownCellId = Target.CellId();
-            if (EffectBase.TryApplyEffect(Cast2) == -3) {
+            EffectCast Cast2 = new EffectCast(Effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            Cast2.targetKnownCellId = target.getCellId();
+            if (EffectBase.tryApplyEffect(Cast2) == -3) {
                 return -3;
             }
         }
 
-        /*int Apply = -1;
-         for (short Cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(Target.CellId()).advancedOrientationTo(MapPoint.fromCellId(Target.CellId()), true))).GetCells(Target.CellId())) {
-         FightCell FightCell = this.Target.Fight.GetCell(Cell);
+        /*int apply = -1;
+         for (short cell : (new Zone(X, (byte) 1, MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true))).getCells(target.getCellId())) {
+         FightCell FightCell = this.target.fight.getCell(cell);
          if (FightCell != null) {
-         if (FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.HasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
-         for (Fighter Target : FightCell.GetObjectsAsFighter()) {
-         int newValue = EffectDamage.ApplyDamages(DamageInfos, Target, new MutableInt((DamageInfos.RandomJet(Target) * 20) / 100));
-         if (newValue < Apply) {
-         Apply = newValue;
+         if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_CAWOTTE)) {
+         for (Fighter target : FightCell.getObjectsAsFighter()) {
+         int newValue = EffectDamage.applyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100));
+         if (newValue < apply) {
+         apply = newValue;
          }
          }
          }
          }
          }
-         return Apply;*/
-        //return EffectDamage.ApplyDamages(DamageInfos, Target, new MutableInt((DamageInfos.RandomJet(Target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
-        return super.ApplyEffect(DamageValue, DamageInfos);
+         return apply;*/
+        //return EffectDamage.applyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

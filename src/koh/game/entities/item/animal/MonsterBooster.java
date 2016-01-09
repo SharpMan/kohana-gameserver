@@ -2,6 +2,7 @@ package koh.game.entities.item.animal;
 
 import java.util.Arrays;
 import koh.utils.Enumerable;
+import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -10,28 +11,29 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class MonsterBooster {
 
-    public int MonsterFamily, DeathNumber;
-    public int Point;
-    private int StatsBoost;
-    public int[] Stats;
-    public int[] FakeBoostStats;
+    @Getter
+    public int monsterFamily, deathNumber;
+    @Getter
+    public int point, statsBoost;
+    @Getter
+    public int[] stats, fakeBoostStats;
 
     public MonsterBooster(int MonsterFamily, int DeathNumber, int Point, int[] Stats, int StatsPoints, String CorrectStat) {
-        this.MonsterFamily = MonsterFamily;
-        this.DeathNumber = DeathNumber;
-        this.Point = Point;
-        this.Stats = Stats;
-        this.StatsBoost = StatsPoints;
+        this.monsterFamily = MonsterFamily;
+        this.deathNumber = DeathNumber;
+        this.point = Point;
+        this.stats = Stats;
+        this.statsBoost = StatsPoints;
         if (CorrectStat != null) {
-            this.FakeBoostStats = Enumerable.StringToIntArray(CorrectStat, ":");
+            this.fakeBoostStats = Enumerable.StringToIntArray(CorrectStat, ":");
         }
     }
 
     public int getStatsBoost(int Stat) {
-        if (this.FakeBoostStats == null) {
-            return StatsBoost;
+        if (this.fakeBoostStats == null) {
+            return statsBoost;
         } else {
-            return this.FakeBoostStats[Arrays.binarySearch(Stats, Stat)];
+            return this.fakeBoostStats[Arrays.binarySearch(stats, Stat)];
         }
     }
     

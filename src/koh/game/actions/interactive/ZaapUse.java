@@ -1,6 +1,5 @@
 package koh.game.actions.interactive;
 
-import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.ZaapAction;
 import koh.game.entities.actors.Player;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
@@ -12,32 +11,32 @@ import koh.protocol.messages.connection.BasicNoOperationMessage;
 public class ZaapUse implements InteractiveAction {
 
     @Override
-    public boolean isEnabled(Player Actor) {
-        return Actor.Dishonor <= 0;
+    public boolean isEnabled(Player actor) {
+        return actor.getDishonor() <= 2;
     }
 
     @Override
-    public int GetDuration() {
+    public int getDuration() {
         return 0;
     }
 
     @Override
-    public void Execute(Player Actor, int Element) {
-        if (!this.isEnabled(Actor)) {
-            Actor.Send(new BasicNoOperationMessage());
+    public void execute(Player actor, int element) {
+        if (!this.isEnabled(actor)) {
+            actor.send(new BasicNoOperationMessage());
             return;
         }
-        Actor.Client.AddGameAction(new ZaapAction(Actor));
-        //Actor.Client.EndGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
+        actor.getClient().addGameAction(new ZaapAction(actor));
+        //actor.client.endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
     }
 
     @Override
-    public void Leave(Player Actor, int Element) {
+    public void leave(Player player, int element) {
 
     }
 
     @Override
-    public void Abort(Player player, int Element) {
+    public void abort(Player player, int element) {
 
     }
 

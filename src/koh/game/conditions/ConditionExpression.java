@@ -8,9 +8,9 @@ import koh.game.entities.actors.Player;
  */
 public abstract class ConditionExpression {
 
-    public static ConditionExpression Parse(String str) {
-        return new ConditionParser(str).Parse();
+    public static ConditionExpression parse(String str) {
+        return new ConditionParser(str).parse();
     }
 
-    public abstract boolean Eval(Player character);
+    public abstract boolean eval(Player character);
 }

@@ -9,34 +9,34 @@ import koh.game.network.WorldClient;
  */
 public abstract class GameBaseRequest {
 
-    public abstract boolean CanSubAction(GameActionTypeEnum Action);
+    public abstract boolean canSubAction(GameActionTypeEnum action);
 
-    public WorldClient Requester;
+    public WorldClient requester;
 
-    public WorldClient Requested;
+    public WorldClient requested;
 
-    public boolean IsFinish;
+    public boolean isFinish;
 
-    public GameBaseRequest(WorldClient Requester, WorldClient Requested) {
-        this.Requester = Requester;
-        this.Requested = Requested;
+    public GameBaseRequest(WorldClient requester, WorldClient requested) {
+        this.requester = requester;
+        this.requested = requested;
     }
 
-    public boolean Accept() {
-        if (this.IsFinish) {
+    public boolean accept() {
+        if (this.isFinish) {
             return false;
         }
 
-        this.IsFinish = true;
+        this.isFinish = true;
 
         return true;
     }
 
-    public boolean Declin() {
-        if (this.IsFinish) {
+    public boolean declin() {
+        if (this.isFinish) {
             return false;
         }
-        this.IsFinish = true;
+        this.isFinish = true;
 
         return true;
     }

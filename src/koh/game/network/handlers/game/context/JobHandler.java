@@ -13,10 +13,10 @@ import koh.protocol.types.game.context.roleplay.job.JobCrafterDirectorySettings;
 public class JobHandler {
 
     @HandlerAttribute(ID = JobCrafterDirectoryDefineSettingsMessage.M_ID)
-    public static void HandleJobCrafterDirectoryDefineSettingsMessage(WorldClient Client, JobCrafterDirectoryDefineSettingsMessage Message) {
-        Client.Character.myJobs.GetJob(Message.settings.jobId).minLevel = Message.settings.minLevel;
-        Client.Character.myJobs.GetJob(Message.settings.jobId).free = Message.settings.free;
-        Client.Send(new JobCrafterDirectorySettingsMessage(new JobCrafterDirectorySettings[] { Message.settings }));
+    public static void HandleJobCrafterDirectoryDefineSettingsMessage(WorldClient client, JobCrafterDirectoryDefineSettingsMessage Message) {
+        client.getCharacter().getMyJobs().getJob(Message.settings.jobId).minLevel = Message.settings.minLevel;
+        client.getCharacter().getMyJobs().getJob(Message.settings.jobId).free = Message.settings.free;
+        client.send(new JobCrafterDirectorySettingsMessage(new JobCrafterDirectorySettings[] { Message.settings }));
 
     }
 

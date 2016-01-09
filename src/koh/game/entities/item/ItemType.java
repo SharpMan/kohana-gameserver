@@ -1,23 +1,34 @@
 package koh.game.entities.item;
 
 import com.mysql.jdbc.StringUtils;
-import koh.game.Main;
+import lombok.Builder;
+import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
+@Builder
 public class ItemType {
 
-    public int SuperType;
-    public boolean plural;
-    public int gender;
-    public String rawZone;
-    public boolean needUseConfirm, mimickable;
+    @Getter
+    private int superType;
+    @Getter
+    private boolean plural;
+    @Getter
+    private int gender;
+    @Getter
+    private String rawZone;
+    @Getter
+    private boolean needUseConfirm, mimickable;
 
-    private int _zoneSize = Integer.MAX_VALUE;
-    private int _zoneShape = Integer.MAX_VALUE;
-    private int _zoneMinSize = Integer.MAX_VALUE;
+    private static final Logger logger = LogManager.getLogger(ItemType.class);
+
+    private int _zoneSize;
+    private int _zoneShape;
+    private int _zoneMinSize;
 
     public byte zoneSize() {
         if (this._zoneSize == Integer.MAX_VALUE) {
@@ -60,10 +71,10 @@ public class ItemType {
                     this._zoneMinSize = 0;
                 };
             } else {
-                Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
+                logger.error("Zone incorrect ({})",this.rawZone);
             };
         } catch (java.lang.NumberFormatException e) {
-            Main.Logs().writeError(String.format("Error with ItemType %s", this.SuperType));
+            logger.error("Error with getItemType {}", this.superType);
         }
     }
 

@@ -19,34 +19,34 @@ public class BuffPorteur extends BuffEffect {
 
     public BuffPorteur(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
-        this.Duration = -1;
-        CastInfos.Caster.States.FakeState(FightStateEnum.Porteur, true);
-        this.CastInfos.EffectType = StatsEnum.Add_State;
-        this.Caster.Fight.sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER,Caster.ID,Target.ID,Caster.CellId()));
+        this.duration = -1;
+        CastInfos.caster.getStates().fakeState(FightStateEnum.PORTEUR, true);
+        this.castInfos.effectType = StatsEnum.ADD_STATE;
+        this.caster.getFight().sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostStateEffect(this.GetId(), this.Caster.ID, (short) this.Duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.CastInfos.SpellId, (short)/*this.CastInfos.GetEffectUID()*/ 2, this.CastInfos.ParentUID, (short) 1, (short) 3);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostStateEffect(this.getId(), this.caster.getID(), (short) this.duration, FightDispellableEnum.REALLY_NOT_DISPELLABLE, (short) this.castInfos.spellId, (short)/*this.castInfos.getEffectUID()*/ 2, this.castInfos.parentUID, (short) 1, (short) 3);
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         // Si effet finis
-        if (!this.Target.States.HasState(FightStateEnum.Porté)) {
-            this.Duration = 0;
+        if (!this.target.getStates().hasState(FightStateEnum.PORTÉ)) {
+            this.duration = 0;
             return -1;
         }
 
         // On affecte la meme cell pour la cible porté
-        return this.Target.SetCell(this.Caster.myCell);
+        return this.target.setCell(this.caster.getMyCell());
     }
 
     @Override
-    public int RemoveEffect() {
-        CastInfos.Caster.States.FakeState(FightStateEnum.Porteur, false);
-        this.Duration = 0;
-        return super.RemoveEffect();
+    public int removeEffect() {
+        castInfos.caster.getStates().fakeState(FightStateEnum.PORTEUR, false);
+        this.duration = 0;
+        return super.removeEffect();
     }
 
 }

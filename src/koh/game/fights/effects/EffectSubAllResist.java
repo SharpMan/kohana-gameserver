@@ -1,7 +1,6 @@
 package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
-import koh.game.fights.effects.buff.BuffAddResistStats;
 import koh.game.fights.effects.buff.BuffSubResistStats;
 import koh.game.fights.fighters.IllusionFighter;
 
@@ -12,23 +11,23 @@ import koh.game.fights.fighters.IllusionFighter;
 public class EffectSubAllResist extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
             if (Target instanceof IllusionFighter) {
                 continue;//Roulette tue clone ...
             }
-            EffectCast SubInfos = new EffectCast(CastInfos.EffectType, CastInfos.SpellId, CastInfos.CellId, CastInfos.Chance, CastInfos.Effect, CastInfos.Caster, CastInfos.Targets, CastInfos.SpellLevel);
+            EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
             BuffSubResistStats BuffStats = new BuffSubResistStats(SubInfos, Target);
 
-            if (Target.Buffs.BuffMaxStackReached(BuffStats)) {
+            if (Target.getBuff().buffMaxStackReached(BuffStats)) {
                 return -1;
             }
 
-            if (BuffStats.ApplyEffect(null, null) == -3) {
+            if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 
-            Target.Buffs.AddBuff(BuffStats);
+            Target.getBuff().addBuff(BuffStats);
         }
 
         return -1;

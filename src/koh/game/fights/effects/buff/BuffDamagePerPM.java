@@ -20,19 +20,19 @@ public class BuffDamagePerPM extends BuffEffect {
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        int pas = this.CastInfos.Effect.diceNum;
-        int val = this.CastInfos.Effect.diceSide;
-        int nbr = (int) Math.floor((double) Target.UsedMP / (double) pas);
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        int pas = this.castInfos.effect.diceNum;
+        int val = this.castInfos.effect.diceSide;
+        int nbr = (int) Math.floor((double) target.getUsedMP() / (double) pas);
         DamageValue.setValue(val * nbr);
         //Poison Paralysant
 
-        int inte = CastInfos.Caster.Stats.GetTotal(StatsEnum.Intelligence);
+        int inte = castInfos.caster.getStats().getTotal(StatsEnum.INTELLIGENCE);
         
         if (inte < 0) {
             inte = 0;
         }
-        int pdom = CastInfos.Caster.Stats.GetTotal(StatsEnum.AddDamagePercent);
+        int pdom = castInfos.caster.getStats().getTotal(StatsEnum.ADD_DAMAGE_PERCENT);
         if (pdom < 0) {
             pdom = 0;
         }
@@ -41,12 +41,12 @@ public class BuffDamagePerPM extends BuffEffect {
         // dgt);
         DamageValue.setValue((((100 + inte + pdom) / 100) * DamageValue.getValue() * 1.5));
 
-        return EffectDamage.ApplyDamages(this.CastInfos, this.Target, DamageValue);
+        return EffectDamage.applyDamages(this.castInfos, this.target, DamageValue);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTriggeredEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, this.CastInfos.SpellId, this.CastInfos.Effect.effectUid, 0, (short) this.CastInfos.Effect.diceNum, (short) this.CastInfos.Effect.diceSide, (short) this.CastInfos.Effect.value, (short) 0/*(this.CastInfos.Effect.delay)*/);
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTriggeredEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, this.castInfos.spellId, this.castInfos.effect.effectUid, 0, (short) this.castInfos.effect.diceNum, (short) this.castInfos.effect.diceSide, (short) this.castInfos.effect.value, (short) 0/*(this.castInfos.effect.delay)*/);
     }
 
 }

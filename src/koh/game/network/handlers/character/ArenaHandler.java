@@ -14,12 +14,12 @@ public class ArenaHandler {
     
     @HandlerAttribute(ID = 6301)
     public static void HandleGameRolePlayArenaUpdatePlayerInfosMessage(WorldClient Client , GameRolePlayArenaUpdatePlayerInfosMessage Message){
-        PlayerController.SendServerMessage(Client, "Option non disponnible");
+        PlayerController.sendServerMessage(Client, "Option non disponnible");
     }
 
     @HandlerAttribute(ID = PartyInvitationArenaRequestMessage.M_ID)
     public static void HandlePartyInvitationArenaRequestMessage(WorldClient Client, PartyInvitationArenaRequestMessage Message) {
-        PlayerController.SendServerMessage(Client, "Option non disponnible");
+        PlayerController.sendServerMessage(Client, "Option non disponnible");
     }
 
 }

@@ -7,9 +7,6 @@ package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
-import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.effects.buff.BuffDecrementType;
-import koh.game.fights.effects.buff.BuffEffect;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
@@ -25,18 +22,18 @@ public class BuffDamagePercentReduced extends BuffEffect {
 
     public BuffDamagePercentReduced(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
-        this.Jet = CastInfos.RandomJet(Target);
+        this.Jet = CastInfos.randomJet(Target);
     }
 
     @Override
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         DamageValue.subtract((DamageValue.intValue() * this.Jet) / 100);
-        return super.ApplyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
-    public AbstractFightDispellableEffect GetAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.GetId(), this.Target.ID, (short) this.Duration, FightDispellableEnum.DISPELLABLE, (short) this.CastInfos.SpellId, this.CastInfos.GetEffectUID(), this.CastInfos.ParentUID, (short) Math.abs(this.Jet));
+    public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.Jet));
     }
 
 }

@@ -1,45 +1,46 @@
 package koh.game.entities.actors.npc;
 
-import koh.game.dao.ItemDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.ItemTemplate;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.types.game.data.items.ObjectItemToSellInNpcShop;
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  *
  * @author Neo-Craft
  */
+@Builder
 public class NpcItem {
 
-    public boolean MaximiseStats;
-    public int Item, Token;
-    public String BuyCriterion;
-    public float CustomPrice;
+    private boolean maximiseStats;
+    @Getter
+    private int item, token;
+    private String buyCriterion;
+    private float customPrice;
 
-    public float Price() {
-        return CustomPrice == -1 ? Template().price : this.CustomPrice;
+    public float getPrice() {
+        return customPrice == -1 ? getTemplate().getPrice() : this.customPrice;
     }
 
-    public EffectGenerationType GenType(){
-        return this.MaximiseStats ? EffectGenerationType.MaxEffects : EffectGenerationType.Normal;
+    public EffectGenerationType genType(){
+        return this.maximiseStats ? EffectGenerationType.MAX_EFFECTS : EffectGenerationType.NORMAL;
     }
     
-    public ItemTemplate ItemToken() {
-        return ItemDAO.Cache.get(Token);
+    public ItemTemplate getItemToken() {
+        return DAO.getItemTemplates().getTemplate(token);
     }
 
-    public ItemTemplate Template() {
-        return ItemDAO.Cache.get(Item);
+    public ItemTemplate getTemplate() {
+        return DAO.getItemTemplates().getTemplate(item);
     }
 
     /*/int objectGID, ObjectEffect[] effects, int objectPrice, String buyCriterion*/
     public ObjectItemToSellInNpcShop toShop() {
-        return new ObjectItemToSellInNpcShop(this.Item, EffectHelper.toObjectEffects(this.Template().possibleEffects), (int) Price(), this.BuyCriterion);
+        return new ObjectItemToSellInNpcShop(this.item, EffectHelper.toObjectEffects(this.getTemplate().getPossibleEffects()), (int) getPrice(), this.buyCriterion);
     }
 
-    public NpcItem() {
-
-    }
 
 }

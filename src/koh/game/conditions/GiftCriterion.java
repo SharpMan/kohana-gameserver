@@ -22,19 +22,19 @@ public class GiftCriterion extends Criterion {
     public void Build() {
         int result1 = -1;
         int result2;
-        if (this.Literal.contains(",")) {
+        if (this.literal.contains(",")) {
             try {
-                String[] strArray = this.Literal.split(",");
+                String[] strArray = this.literal.split(",");
                 result2 = Integer.parseInt(strArray[0]);
                 result1 = Integer.parseInt(strArray[1]);
             } catch (Exception e) {
-                throw new Error(String.format("Cannot build GiftCriterion, {0} is not a valid gift (format 'id,level')", this.Literal));
+                throw new Error(String.format("Cannot build GiftCriterion, {0} is not a valid gift (format 'id,level')", this.literal));
             }
         } else {
             try {
-                result2 = Integer.parseInt(Literal);
+                result2 = Integer.parseInt(literal);
             } catch (Exception ee) {
-                throw new Error(String.format("Cannot build GiftCriterion, {0} is not a valid gift (format 'id,level')", this.Literal));
+                throw new Error(String.format("Cannot build GiftCriterion, {0} is not a valid gift (format 'id,level')", this.literal));
             }
         }
         this.Id = result2;
@@ -42,7 +42,7 @@ public class GiftCriterion extends Criterion {
     }
 
     @Override
-    public boolean Eval(Player character) {
+    public boolean eval(Player character) {
         return true;
     }
 

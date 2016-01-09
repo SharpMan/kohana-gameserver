@@ -2,7 +2,7 @@ package koh.game.fights;
 
 import java.util.stream.Stream;
 import koh.game.entities.actors.character.PlayerInst;
-import static koh.game.entities.actors.character.PlayerInst.PProperties;
+import static koh.game.entities.actors.character.PlayerInst.P_PROPERTIES;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.utils.Couple;
 
@@ -12,67 +12,67 @@ import koh.utils.Couple;
  */
 public class AntiCheat {
 
-    public final static int AggroPerMin = 180;
+    public final static int AGGRO_PER_MIN = 180;
 
-    public static short DeviserBy(Stream<Fighter> Versus, Fighter Fighter, boolean Win) {
+    public static short deviserBy(Stream<Fighter> versus, Fighter fighter, boolean win) {
         short DeviseBy = 1;
-        if (!PlayerInst.PProperties.containsKey(Fighter.ID)) {
-            PlayerInst.PProperties.put(Fighter.ID, new PlayerInst());
+        if (!PlayerInst.P_PROPERTIES.containsKey(fighter.getID())) {
+            PlayerInst.P_PROPERTIES.put(fighter.getID(), new PlayerInst());
         }
-        if (Win) {
-            for (Fighter Target : (Iterable<Fighter>) Versus::iterator) {
+        if (win) {
+            for (Fighter Target : (Iterable<Fighter>) versus::iterator) {
                 int bestScore = 0;
-                if (!PProperties.get(Fighter.ID).myVictimIPS.containsKey(((CharacterFighter) Target).Character.Account.CurrentIP)) {
-                    PProperties.get(Fighter.ID).myVictimIPS.put(((CharacterFighter) Target).Character.Account.CurrentIP, new Couple<>(System.currentTimeMillis(), 1));
+                if (!P_PROPERTIES.get(fighter.getID()).myVictimIPS.containsKey(((CharacterFighter) Target).getCharacter().getAccount().currentIP)) {
+                    P_PROPERTIES.get(fighter.getID()).myVictimIPS.put(((CharacterFighter) Target).getCharacter().getAccount().currentIP, new Couple<>(System.currentTimeMillis(), 1));
                 } else {
-                    long time = PProperties.get(Fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).first;
-                    if ((System.currentTimeMillis() - time) < AggroPerMin * 60 * 1000) {
-                        bestScore += PProperties.get(Fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).second;
-                        PProperties.get(Fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).second++;
+                    long time = P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).first;
+                    if ((System.currentTimeMillis() - time) < AGGRO_PER_MIN * 60 * 1000) {
+                        bestScore += P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).second;
+                        P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).second++;
                     } else {
-                        PProperties.get(Fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).first = System.currentTimeMillis();
-                        PProperties.get(Fighter.ID).myVictimIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).second = 1;
+                        P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).first = System.currentTimeMillis();
+                        P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).second = 1;
                     }
                 }
-                if (!PProperties.get(Fighter.ID).myVictims.containsKey(Target.ID)) {
-                    PProperties.get(Fighter.ID).myVictims.put(Target.ID, new Couple<>(System.currentTimeMillis(), 1));
+                if (!P_PROPERTIES.get(fighter.getID()).myVictimsById.containsKey(Target.getID())) {
+                    P_PROPERTIES.get(fighter.getID()).myVictimsById.put(Target.getID(), new Couple<>(System.currentTimeMillis(), 1));
                 } else {
-                    long time = PProperties.get(Fighter.ID).myVictims.get(Target.ID).first;
-                    if ((System.currentTimeMillis() - time) < AggroPerMin * 60 * 1000) {
-                        bestScore = (bestScore > PProperties.get(Fighter.ID).myVictims.get(Target.ID).second) ? bestScore : PProperties.get(Fighter.ID).myVictims.get(Target.ID).second;
-                        PProperties.get(Fighter.ID).myVictims.get(Target.ID).second++;
+                    long time = P_PROPERTIES.get(fighter.getID()).myVictimsById.get(Target.getID()).first;
+                    if ((System.currentTimeMillis() - time) < AGGRO_PER_MIN * 60 * 1000) {
+                        bestScore = (bestScore > P_PROPERTIES.get(fighter.getID()).myVictimsById.get(Target.getID()).second) ? bestScore : P_PROPERTIES.get(fighter.getID()).myVictimsById.get(Target.getID()).second;
+                        P_PROPERTIES.get(fighter.getID()).myVictimsById.get(Target.getID()).second++;
                     } else {
-                        PProperties.get(Fighter.ID).myVictims.get(Target.ID).first = System.currentTimeMillis();
-                        PProperties.get(Fighter.ID).myVictims.get(Target.ID).second = 1;
+                        P_PROPERTIES.get(fighter.getID()).myVictimsById.get(Target.getID()).first = System.currentTimeMillis();
+                        P_PROPERTIES.get(fighter.getID()).myVictimsById.get(Target.getID()).second = 1;
                     }
                 }
                 DeviseBy += bestScore;
             }
         } else {
-            for (Fighter Target : (Iterable<Fighter>) Versus::iterator) {
+            for (Fighter Target : (Iterable<Fighter>) versus::iterator) {
                 int bestScore = 0;
-                if (!PProperties.get(Fighter.ID).VictimByIPS.containsKey(((CharacterFighter) Target).Character.Account.CurrentIP)) {
-                    PProperties.get(Fighter.ID).VictimByIPS.put(((CharacterFighter) Target).Character.Account.CurrentIP, new Couple<>(System.currentTimeMillis(), 1));
+                if (!P_PROPERTIES.get(fighter.getID()).victimByIPS.containsKey(((CharacterFighter) Target).getCharacter().getAccount().currentIP)) {
+                    P_PROPERTIES.get(fighter.getID()).victimByIPS.put(((CharacterFighter) Target).getCharacter().getAccount().currentIP, new Couple<>(System.currentTimeMillis(), 1));
                 } else {
-                    long time = PProperties.get(Fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).first;
-                    if ((System.currentTimeMillis() - time) < AggroPerMin * 60 * 1000) {
-                        bestScore += PProperties.get(Fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).second;
-                        PProperties.get(Fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).second++;
+                    long time = P_PROPERTIES.get(fighter.getID()).victimByIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).first;
+                    if ((System.currentTimeMillis() - time) < AGGRO_PER_MIN * 60 * 1000) {
+                        bestScore += P_PROPERTIES.get(fighter.getID()).victimByIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).second;
+                        P_PROPERTIES.get(fighter.getID()).victimByIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).second++;
                     } else {
-                        PProperties.get(Fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).first = System.currentTimeMillis();
-                        PProperties.get(Fighter.ID).VictimByIPS.get(((CharacterFighter) Target).Character.Account.CurrentIP).second = 1;
+                        P_PROPERTIES.get(fighter.getID()).victimByIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).first = System.currentTimeMillis();
+                        P_PROPERTIES.get(fighter.getID()).victimByIPS.get(((CharacterFighter) Target).getCharacter().getAccount().currentIP).second = 1;
                     }
                 }
-                if (!PProperties.get(Fighter.ID).VictimsBy.containsKey(Target.ID)) {
-                    PProperties.get(Fighter.ID).VictimsBy.put(Target.ID, new Couple<>(System.currentTimeMillis(), 1));
+                if (!P_PROPERTIES.get(fighter.getID()).victimsById.containsKey(Target.getID())) {
+                    P_PROPERTIES.get(fighter.getID()).victimsById.put(Target.getID(), new Couple<>(System.currentTimeMillis(), 1));
                 } else {
-                    long time = PProperties.get(Fighter.ID).VictimsBy.get(Target.ID).first;
-                    if ((System.currentTimeMillis() - time) < AggroPerMin * 60 * 1000) {
-                        bestScore = (bestScore > PProperties.get(Fighter.ID).VictimsBy.get(Target.ID).second) ? bestScore : PProperties.get(Fighter.ID).VictimsBy.get(Target.ID).second;
-                        PProperties.get(Fighter.ID).VictimsBy.get(Target.ID).second++;
+                    long time = P_PROPERTIES.get(fighter.getID()).victimsById.get(Target.getID()).first;
+                    if ((System.currentTimeMillis() - time) < AGGRO_PER_MIN * 60 * 1000) {
+                        bestScore = (bestScore > P_PROPERTIES.get(fighter.getID()).victimsById.get(Target.getID()).second) ? bestScore : P_PROPERTIES.get(fighter.getID()).victimsById.get(Target.getID()).second;
+                        P_PROPERTIES.get(fighter.getID()).victimsById.get(Target.getID()).second++;
                     } else {
-                        PProperties.get(Fighter.ID).VictimsBy.get(Target.ID).first = System.currentTimeMillis();
-                        PProperties.get(Fighter.ID).VictimsBy.get(Target.ID).second = 1;
+                        P_PROPERTIES.get(fighter.getID()).victimsById.get(Target.getID()).first = System.currentTimeMillis();
+                        P_PROPERTIES.get(fighter.getID()).victimsById.get(Target.getID()).second = 1;
                     }
                 }
                 DeviseBy += bestScore;

@@ -1,18 +1,14 @@
 package koh.game.entities.spells;
 
 import com.mysql.jdbc.StringUtils;
-import java.io.IOException;
-import java.io.ObjectOutput;
+
 import java.io.Serializable;
 import java.util.regex.Matcher;
-import jregex.MatchIterator;
+
 import jregex.Pattern;
 import jregex.REFlags;
 import koh.d2o.entities.Effect;
-import koh.game.Main;
-import koh.game.dao.D2oDao;
-import koh.game.dao.MonsterDAO;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.dao.DAO;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.SummonedFighter;
@@ -27,6 +23,8 @@ import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -37,10 +35,10 @@ public class EffectInstance implements Serializable {
 
     //private static final RegExp exclusiveTargetMasks = RegExpFactory.create("\\*?[bBeEfFzZKoOPpTWUvV][0-9]*", "g");
     private static final java.util.regex.Pattern exclusiveTargetMasks = java.util.regex.Pattern.compile("(\\*?[bBeEfFzZKoOPpTWUvV][0-9]*)");
-
+    private static final Logger logger = LogManager.getLogger(EffectInstance.class);
     public static final int classID = 1;
 
-    public byte SerializationIdentifier() {
+    public byte serializationIdentifier() {
         return 1;
     }
 
@@ -65,12 +63,12 @@ public class EffectInstance implements Serializable {
         return this.zoneMaxEfficiency;
     }
 
-    public int zoneMinSize() {
+    public byte zoneMinSize() {
         this.parseZone();
-        return this.zoneMinSize;
+        return (byte)this.zoneMinSize;
     }
 
-    public byte ZoneSize() {
+    public byte zoneSize() {
         this.parseZone();
         return (byte) zoneSize;
     }
@@ -80,18 +78,18 @@ public class EffectInstance implements Serializable {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    public StatsEnum EffectType() {
+    public StatsEnum getEffectType() {
         return StatsEnum.valueOf(this.effectId);
     }
 
     
 
-    public boolean IsValidTarget(Fighter Caster, Fighter actor) {
-        return Targets() == SpellTargetType.NONE
-                || Targets() == SpellTargetType.ALL
-                || Caster == actor && Targets().HasFlag(SpellTargetType.SELF)
-                || (!Targets().HasFlag(SpellTargetType.ONLY_SELF) || actor == Caster)
-                && (Caster.IsFriendlyWith(actor) && Caster != actor && ((Targets().HasFlag(SpellTargetType.ALLY_1) || Targets().HasFlag(SpellTargetType.ALLY_2) || (Targets().HasFlag(SpellTargetType.ALLY_3) || Targets().HasFlag(SpellTargetType.ALLY_4)) || Targets().HasFlag(SpellTargetType.ALLY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ALLY_SUMMONS) || Targets().HasFlag(SpellTargetType.ALLY_STATIC_SUMMONS)) && actor instanceof SummonedFighter) || Caster.IsEnnemyWith(actor) && ((Targets().HasFlag(SpellTargetType.ENNEMY_1) || Targets().HasFlag(SpellTargetType.ENNEMY_2) || (Targets().HasFlag(SpellTargetType.ENNEMY_3) || Targets().HasFlag(SpellTargetType.ENNEMY_4)) || Targets().HasFlag(SpellTargetType.ENNEMY_5)) && !(actor instanceof SummonedFighter) || (Targets().HasFlag(SpellTargetType.ENNEMY_SUMMONS) || Targets().HasFlag(SpellTargetType.ENNEMY_STATIC_SUMMONS)) && actor instanceof SummonedFighter));
+    public boolean isValidTarget(Fighter Caster, Fighter actor) {
+        return targets() == SpellTargetType.NONE
+                || targets() == SpellTargetType.ALL
+                || Caster == actor && targets().HasFlag(SpellTargetType.SELF)
+                || (!targets().HasFlag(SpellTargetType.ONLY_SELF) || actor == Caster)
+                && (Caster.isFriendlyWith(actor) && Caster != actor && ((targets().HasFlag(SpellTargetType.ALLY_1) || targets().HasFlag(SpellTargetType.ALLY_2) || (targets().HasFlag(SpellTargetType.ALLY_3) || targets().HasFlag(SpellTargetType.ALLY_4)) || targets().HasFlag(SpellTargetType.ALLY_5)) && !(actor instanceof SummonedFighter) || (targets().HasFlag(SpellTargetType.ALLY_SUMMONS) || targets().HasFlag(SpellTargetType.ALLY_STATIC_SUMMONS)) && actor instanceof SummonedFighter) || Caster.isEnnemyWith(actor) && ((targets().HasFlag(SpellTargetType.ENNEMY_1) || targets().HasFlag(SpellTargetType.ENNEMY_2) || (targets().HasFlag(SpellTargetType.ENNEMY_3) || targets().HasFlag(SpellTargetType.ENNEMY_4)) || targets().HasFlag(SpellTargetType.ENNEMY_5)) && !(actor instanceof SummonedFighter) || (targets().HasFlag(SpellTargetType.ENNEMY_SUMMONS) || targets().HasFlag(SpellTargetType.ENNEMY_STATIC_SUMMONS)) && actor instanceof SummonedFighter));
     }
 
     public int zoneShape() {
@@ -99,12 +97,12 @@ public class EffectInstance implements Serializable {
         return zoneShape;
     }
 
-    public SpellShapeEnum ZoneShape() {
+    public SpellShapeEnum getZoneShape() {
         this.parseZone();
         return SpellShapeEnum.valueOf(zoneShape);
     }
 
-    public SpellTargetType Targets() {
+    public SpellTargetType targets() {
         return SpellTargetType.valueOf(this.targetId);
     }
 
@@ -169,10 +167,10 @@ public class EffectInstance implements Serializable {
     }
 
     public int category() {
-        if (D2oDao.getEffect(this.effectId) == null) {
+        if (DAO.getD2oTemplates().getEffect(this.effectId) == null) {
             return -1;
         }
-        return D2oDao.getEffect(this.effectId).category;
+        return DAO.getD2oTemplates().getEffect(this.effectId).category;
     }
 
     public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect, int pTriggeringSpellCasterId) {
@@ -187,12 +185,12 @@ public class EffectInstance implements Serializable {
         if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
             return (false);
         };
-        boolean targetIsCaster = (pTargetId.ID == pCasterId.ID);
-        boolean targetIsCarried = pTargetId.GetCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
+        boolean targetIsCaster = (pTargetId.getID() == pCasterId.getID());
+        boolean targetIsCarried = pTargetId.getCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
-        GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.GetGameContextActorInformations(null);
-        GameFightMonsterInformations monsterInfo = pTargetId.GetGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.GetGameContextActorInformations(null) : null;
-        boolean isTargetAlly = pCasterId.IsFriendlyWith(pTargetId);
+        GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
+        GameFightMonsterInformations monsterInfo = pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.getGameContextActorInformations(null) : null;
+        boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
         
         if (targetIsCaster) {
             if (pEffect.effectId == 90) {
@@ -204,19 +202,19 @@ public class EffectInstance implements Serializable {
                 return (false);
             };
         } else {
-            if (((((targetIsCarried) && (!((pEffect.ZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.ZoneShape() == SpellShapeEnum.a))))) {
+            if (((((targetIsCarried) && (!((pEffect.getZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.getZoneShape() == SpellShapeEnum.a))))) {
                 return (true);
             };
-            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(MonsterDAO.Cache.get(monsterInfo.creatureGenericId).canPlay)))) {
+            if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(DAO.getMonsters().find(monsterInfo.creatureGenericId).isCanPlay())))) {
                 targetMaskPattern = ((isTargetAlly) ? "agsj" : "ASJ");
             } else {
                 if (targetInfos.stats.summoned) {
                     targetMaskPattern = ((isTargetAlly) ? "agij" : "AIJ");
                 } else {
-                    if ((pTargetId.GetGameContextActorInformations(null) instanceof GameFightCompanionInformations)) {
+                    if ((pTargetId.getGameContextActorInformations(null) instanceof GameFightCompanionInformations)) {
                         targetMaskPattern = ((isTargetAlly) ? "agdl" : "ADL");
                     } else {
-                        if ((pTargetId.GetGameContextActorInformations(null) instanceof GameFightMonsterInformations)) {
+                        if ((pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations)) {
                             targetMaskPattern = ((isTargetAlly) ? "agm" : "AM");
                         } else {
                             targetMaskPattern = ((isTargetAlly) ? "gahl" : "AHL");
@@ -249,17 +247,17 @@ public class EffectInstance implements Serializable {
                     case 'e':
                         maskState = Integer.parseInt(exclusiveMaskParam);
                         if (exclusiveMaskCasterOnly) {
-                            verify = !pCasterId.HasState(maskState);
+                            verify = !pCasterId.hasState(maskState);
                         } else {
-                            verify = !pTargetId.HasState(maskState);
+                            verify = !pTargetId.hasState(maskState);
                         }
                         break;
                     case 'E':
                         maskState = Integer.parseInt(exclusiveMaskParam);
                         if (exclusiveMaskCasterOnly) {
-                            verify = pCasterId.HasState(maskState);
+                            verify = pCasterId.hasState(maskState);
                         } else {
-                            verify = pTargetId.HasState(maskState);
+                            verify = pTargetId.hasState(maskState);
                         }
                         break;
                     case 'f':
@@ -283,7 +281,7 @@ public class EffectInstance implements Serializable {
                         verify = true;
                         break;
                     case 'O':
-                        verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.ID == pTriggeringSpellCasterId)));
+                        verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.getID() == pTriggeringSpellCasterId)));
                         break;
                     case 'p':
                         break;
@@ -325,7 +323,7 @@ public class EffectInstance implements Serializable {
         if (((this.rawZone != null) && (!this.rawZone.isEmpty()))) {
             this.zoneShape = this.rawZone.charAt(0);
             params = this.rawZone.substring(1).split(",");
-            hasMinSize = (((((((((this.ZoneShape() == SpellShapeEnum.C)) || ((this.ZoneShape() == SpellShapeEnum.X)))) || ((this.ZoneShape() == SpellShapeEnum.Q)))) || ((this.ZoneShape() == SpellShapeEnum.plus)))) || ((this.ZoneShape() == SpellShapeEnum.sharp)));
+            hasMinSize = (((((((((this.getZoneShape() == SpellShapeEnum.C)) || ((this.getZoneShape() == SpellShapeEnum.X)))) || ((this.getZoneShape() == SpellShapeEnum.Q)))) || ((this.getZoneShape() == SpellShapeEnum.plus)))) || ((this.getZoneShape() == SpellShapeEnum.sharp)));
             if (this.rawZone.substring(1).contains(",")) {
                 switch (params.length) {
                     case 1:
@@ -365,7 +363,7 @@ public class EffectInstance implements Serializable {
                 }
             }
         } else {
-            Main.Logs().writeError(("Zone incorrect (" + this.rawZone) + ")");
+            logger.error("Zone incorrect ({})",this.rawZone);
         };
         if (this.zoneMinSize >= 63) {
             this.zoneMinSize = 63;
@@ -391,8 +389,8 @@ public class EffectInstance implements Serializable {
         this.initialized = true;
     }
 
-    public Effect Template() {
-        return D2oDao.getEffect(this.effectId);
+    public Effect getTemplate() {
+        return DAO.getD2oTemplates().getEffect(this.effectId);
     }
 
     public EffectInstance(IoBuffer buf) {

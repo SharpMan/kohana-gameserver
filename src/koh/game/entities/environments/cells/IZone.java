@@ -6,18 +6,18 @@ package koh.game.entities.environments.cells;
  */
 public interface IZone {
 
-    public int Surface();
+    public int getSurface();
 
-    public byte MinRadius();
+    public byte getMinRadius();
 
-    public byte Direction();
+    public byte getDirection();
 
-    public byte Radius();
+    public byte getRadius();
 
-    public void SetDirection(byte Direction);
+    public void setDirection(byte Direction);
 
-    public void SetRadius(byte Radius);
+    public void setRadius(byte Radius);
 
-    public Short[] GetCells(short centerCell);
+    public Short[] getCells(short centerCell);
 
 }

@@ -1,11 +1,12 @@
 package koh.game.fights.effects;
 
-import koh.game.Main;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffHeal;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMessage;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -13,55 +14,59 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class EffectHeal extends EffectBase {
 
-    public static int ApplyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal) {
-        return ApplyHeal(CastInfos, Target, Heal, true);
+
+    private static final Logger logger = LogManager.getLogger(EffectHeal.class);
+
+    public static int applyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal) {
+        return applyHeal(CastInfos, Target, Heal, true);
     }
 
-    public static int ApplyHeal(EffectCast CastInfos, Fighter Target, MutableInt Heal, boolean Calculate) {
-        Fighter Caster = CastInfos.Caster;
+    public static int applyHeal(EffectCast castInfos, Fighter target, MutableInt heal, boolean calculate) {
+        Fighter Caster = castInfos.caster;
 
-        // Boost soin etc
-        if (Calculate) {
-            Caster.CalculHeal(Heal);
+        // boost soin etc
+        if (calculate) {
+            Caster.calculheal(heal);
         }
         
-        if (Target.Buffs.OnHealPostJet(CastInfos, Heal) == -3) {
+        if (target.getBuff().onHealPostJet(castInfos, heal) == -3) {
             return -3; // Fin du combat
         }
 
         // Si le soin est superieur a sa vie actuelle
-        if (Target.Life() + Heal.getValue() > Target.MaxLife()) {
-            Heal.setValue(Target.MaxLife() - Target.Life());
-            if (Heal.getValue() < 0) {
-                Main.Logs().writeError("TargetMaxlife" + Target.MaxLife() + " TargettLife" + Target.Life());
+        if (target.getLife() + heal.getValue() > target.getMaxLife()) {
+            heal.setValue(target.getMaxLife() - target.getLife());
+            if (heal.getValue() < 0) {
+                logger.error("TargetMaxlife {} TargettLife {}" ,target.getMaxLife(), target.getLife());
             }
         }
 
         // Affectation
-        Target.setLife(Target.Life() + Heal.getValue());
+        target.setLife(target.getLife() + heal.getValue());
 
         // Envoi du packet
-        Target.Fight.sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.ID, Target.ID, Math.abs(Heal.getValue())));
+        if(heal.getValue() != 0)
+            target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), target.getID(), Math.abs(heal.getValue())));
 
         // Le soin entraine la fin du combat ?
-        return Target.TryDie(Caster.ID);
+        return target.tryDie(Caster.getID());
     }
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.Duration > 0) {
+        if (castInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.IsPoison = true;
+            castInfos.isPoison = true;
 
             // Ajout du buff
-            for (Fighter Target : CastInfos.Targets) {
-                Target.Buffs.AddBuff(new BuffHeal(CastInfos, Target));
+            for (Fighter Target : castInfos.targets) {
+                Target.getBuff().addBuff(new BuffHeal(castInfos, Target));
             }
-        } else // Heal direct
+        } else // HEAL direct
         {
-            for (Fighter Target : CastInfos.Targets) {
-                if (EffectHeal.ApplyHeal(CastInfos, Target, new MutableInt(CastInfos.RandomJet(Target))) == -3) {
+            for (Fighter Target : castInfos.targets) {
+                if (EffectHeal.applyHeal(castInfos, Target, new MutableInt(castInfos.randomJet(Target))) == -3) {
                     return -3;
                 }
             }

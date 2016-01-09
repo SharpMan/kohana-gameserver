@@ -1,7 +1,5 @@
 package koh.game.actions;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.Party;
 import koh.protocol.messages.game.context.roleplay.party.PartyLeaveMessage;
@@ -12,31 +10,31 @@ import koh.protocol.messages.game.context.roleplay.party.PartyLeaveMessage;
  */
 public class GameParty extends GameAction {
 
-    public Party Party;
+    public Party party;
 
     public Player player;
 
     public GameParty(Player p1, Party p) {
         super(GameActionTypeEnum.GROUP, p1);
-        Party = p;
+        party = p;
         this.player = p1;
     }
 
     @Override
-    public void EndExecute() throws Exception {
-        Party.Leave(this.player,false);
-        player.Send(new PartyLeaveMessage(Party.ID));
-        super.EndExecute();
+    public void endExecute() throws Exception {
+        party.leave(this.player,false);
+        player.send(new PartyLeaveMessage(party.id));
+        super.endExecute();
     }
 
     @Override
-    public void Abort(Object[] Args) {
-        Party.Leave(this.player,false);
-        super.Abort(Args);
+    public void abort(Object[] Args) {
+        party.leave(this.player,false);
+        super.abort(Args);
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         if (ActionType == GameActionTypeEnum.GROUP) {
             return false;
         }

@@ -13,25 +13,25 @@ public class FightController {
 
     private CopyOnWriteArrayList<Fight> myFights = new CopyOnWriteArrayList<>();
 
-    public int NextFightId() {
+    public int nextFightId() {
         if (this.myFights.isEmpty()) {
             return 1;
         }
-        return this.myFights.stream().mapToInt(x -> x.FightId).max().getAsInt() + 1;
+        return this.myFights.stream().mapToInt(x -> x.getFightId()).max().getAsInt() + 1;
     }
 
-    public int FightCount() {
+    public int fightCount() {
         return this.myFights.size();
     }
 
-    public List<Fight> Fights() {
+    public List<Fight> getFights() {
         return this.myFights;
     }
 
-    public Fight GetFight(int FightId) {
+    public Fight getFight(int FightId) {
         synchronized (this.myFights) {
             for (Fight Fight : this.myFights) {
-                if (Fight.FightId == FightId) {
+                if (Fight.getFightId() == FightId) {
                     return Fight;
                 }
             }
@@ -39,18 +39,18 @@ public class FightController {
         }
     }
 
-    public void SendFightInfos(WorldClient Client) {
-        this.myFights.stream().filter((Fight) -> (Fight.FightState == FightState.STATE_PLACE)).forEach((Fight) -> {
-            Fight.SendFightFlagInfos(Client);
+    public void sendFightInfos(WorldClient Client) {
+        this.myFights.stream().filter((Fight) -> (Fight.getFightState() == FightState.STATE_PLACE)).forEach((Fight) -> {
+            Fight.sendFightFlagInfos(Client);
         });
-        Client.Send(new MapFightCountMessage(this.myFights.size()));
+        Client.send(new MapFightCountMessage(this.myFights.size()));
     }
 
-    public void AddFight(Fight Fight) {
+    public void addFight(Fight Fight) {
         this.myFights.add(Fight);
     }
 
-    public void RemoveFight(Fight Fight) {
+    public void removeFight(Fight Fight) {
         this.myFights.remove(Fight);
     }
 

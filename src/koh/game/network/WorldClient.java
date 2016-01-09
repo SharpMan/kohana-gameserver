@@ -8,15 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
-import koh.game.Main;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameParty;
 import koh.game.actions.requests.GameBaseRequest;
 import koh.game.actions.requests.PartyRequest;
-import koh.game.dao.AccountDataDAO;
-import koh.game.dao.AccountOccupedException;
-import koh.game.dao.PlayerDAO;
+import koh.game.dao.DAO;
+import koh.game.dao.mysql.AccountOccupedException;
 import koh.game.entities.Account;
 import koh.game.entities.AccountTicket;
 import koh.game.entities.actors.Player;
@@ -25,8 +23,6 @@ import koh.game.entities.environments.DofusTrigger;
 import koh.game.entities.environments.IWorldEventObserver;
 import koh.game.exchange.Exchange;
 import koh.game.executors.Waiter;
-import koh.game.fights.Fight;
-import koh.game.fights.Fighter;
 import koh.game.network.handlers.Handler;
 import koh.protocol.client.Message;
 import static koh.protocol.client.enums.ChatActivableChannelsEnum.*;
@@ -41,6 +37,10 @@ import koh.protocol.messages.game.basic.BasicAckMessage;
 import koh.protocol.messages.game.basic.BasicLatencyStatsMessage;
 import koh.protocol.messages.game.basic.BasicTimeMessage;
 import koh.protocol.messages.secure.TrustStatusMessage;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
 
 /**
@@ -50,21 +50,33 @@ import org.apache.mina.core.session.IoSession;
 public class WorldClient {
 
     private final IoSession session;
-    public AccountTicket tempTicket;
-    public boolean showQueue;
-    public Player Character;
-    public String ClientKey;
+    @Getter @Setter
+    private AccountTicket tempTicket;
+    @Getter @Setter
+    private boolean showQueue;
+    @Getter @Setter
+    private Player character;
+    @Getter
+    private Object $mutex = new Object();
+    @Setter
+    private String clientKey;
     private final Map<GameActionTypeEnum, GameAction> myActions = Collections.synchronizedMap(new HashMap<GameActionTypeEnum, GameAction>());
-    public int lastPacketId, Seq = 0;
-    public boolean firstCheck = true;
-    public BasicLatencyStatsMessage Latency;
-    public volatile Couple<IWorldEventObserver, Message> CallBacks;
-    public volatile DofusTrigger onMouvementConfirm = null;
+    private int lastPacketId, sequenceMessage = 0;
+    //public boolean firstCheck = true;
+    @Setter
+    private BasicLatencyStatsMessage latency;
+    @Getter @Setter
+    private volatile Couple<IWorldEventObserver, Message> callBacks;
+    @Getter @Setter
+    private volatile DofusTrigger onMouvementConfirm = null;
+    @Getter @Setter
     public Exchange myExchange = null;
     private GameBaseRequest myBaseRequest = null;
-    private CopyOnWriteArrayList<PartyRequest> PartyRequests;
+    private CopyOnWriteArrayList<PartyRequest> partyRequests;
+    private static final Logger logger = LogManager.getLogger(WorldClient.class);
 
-    public Map<Byte, Long> LastChannelMessage = new HashMap<Byte, Long>() {
+    @Getter
+    public Map<Byte, Long> lastChannelMessage = new HashMap<Byte, Long>() {
         {
             put(CHANNEL_SALES, 0L);
             put(CHANNEL_SEEK, 0L);
@@ -79,56 +91,53 @@ public class WorldClient {
         this.session = session;
     }
 
-    public void AbortGameActions() {
+    public void abortGameActions() {
         synchronized (myActions) {
             myActions.values().stream().forEach((action) -> {
-                action.Abort(new Object[0]);
+                action.abort(new Object[0]);
             });
         }
         this.myActions.clear();
     }
 
-    public boolean CanGameAction(GameActionTypeEnum ActionType) {
+    public boolean canGameAction(GameActionTypeEnum ActionType) {
         synchronized (this.myActions) {
-            this.myActions.values().stream().forEach(x -> System.out.println(x.ActionType));
-            return this.myActions.values().stream().allMatch(x -> x.CanSubAction(ActionType));
+            this.myActions.values().stream().forEach(x -> System.out.println(x.actionType));
+            return this.myActions.values().stream().allMatch(x -> x.canSubAction(ActionType));
         }
     }
 
     public void addPartyRequest(PartyRequest req) {
-        if (this.PartyRequests == null) {
-            this.PartyRequests = new CopyOnWriteArrayList<>();
+        if (this.partyRequests == null) {
+            this.partyRequests = new CopyOnWriteArrayList<>();
         }
-        this.PartyRequests.add(req);
+        this.partyRequests.add(req);
     }
 
     public void removePartyRequest(PartyRequest req) {
-        this.PartyRequests.remove(req);
+        this.partyRequests.remove(req);
     }
 
     public PartyRequest getPartyRequest(int id, int guestId) {
-        try {
-            return this.PartyRequests.stream().filter(x -> x.Requester.GetParty() != null && x.Requester.GetParty().ID == id && x.Requested.Character.ID == guestId).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+       return this.partyRequests.stream().filter(x -> x.requester.getParty() != null && x.requester.getParty().id == id && x.requested.character.getID() == guestId).findFirst().orElse(null);
+
     }
 
     public PartyRequest getPartyRequest(int id) {
         try {
-            return this.PartyRequests.stream().filter(x -> x.Requester.GetParty() != null && x.Requester.GetParty().ID == id).findFirst().get();
+            return this.partyRequests.stream().filter(x -> x.requester.getParty() != null && x.requester.getParty().id == id).findFirst().get();
         } catch (Exception e) {
             return null;
         }
     }
 
-    public void AddGameAction(GameAction Action) {
+    public void addGameAction(GameAction Action) {
         try {
             synchronized (this.myActions) {
-                this.myActions.put(Action.ActionType, Action);
+                this.myActions.put(Action.actionType, Action);
             }
-            Action.RegisterEnd(WorldClient.class.getMethod("DelGameAction", GameAction.class));
-            Action.Execute();
+            Action.registerEnd(WorldClient.class.getMethod("delGameAction", GameAction.class));
+            Action.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,11 +147,11 @@ public class WorldClient {
         return this.myActions.size();
     }
 
-    public void EndGameAction(GameActionTypeEnum Action) {
+    public void endGameAction(GameActionTypeEnum Action) {
         try {
             synchronized (this.myActions) {
                 if (this.myActions.containsKey(Action)) {
-                    this.myActions.get(Action).EndExecute();
+                    this.myActions.get(Action).endExecute();
                     this.myActions.remove(Action);
                 }
             }
@@ -151,7 +160,7 @@ public class WorldClient {
         }
     }
 
-    public GameAction GetGameAction(GameActionTypeEnum Action) {
+    public GameAction getGameAction(GameActionTypeEnum Action) {
         synchronized (this.myActions) {
             if (this.myActions.containsKey(Action)) {
                 return this.myActions.get(Action);
@@ -160,29 +169,29 @@ public class WorldClient {
         }
     }
 
-    public Party GetParty() {
+    public Party getParty() {
         try {
-            return ((GameParty) GetGameAction(GameActionTypeEnum.GROUP)).Party;
+            return ((GameParty) getGameAction(GameActionTypeEnum.GROUP)).party;
         } catch (Exception e) {
             return null;
         }
     }
 
-    public void AbortGameAction(GameActionTypeEnum Action, Object[] Args) {
+    public void abortGameAction(GameActionTypeEnum Action, Object[] Args) {
         synchronized (this.myActions) {
             if (this.myActions.containsKey(Action)) {
-                this.myActions.get(Action).Abort(Args);
+                this.myActions.get(Action).abort(Args);
             }
         }
     }
 
-    public void DelGameAction(GameAction GameAction) {
+    public void delGameAction(GameAction GameAction) {
         synchronized (this.myActions) {
-            this.myActions.remove(GameAction.ActionType);
+            this.myActions.remove(GameAction.actionType);
         }
     }
 
-    public void DelGameAction(GameActionTypeEnum Action) {
+    public void delGameAction(GameActionTypeEnum Action) {
         synchronized (this.myActions) {
             this.myActions.remove(Action);
         }
@@ -190,7 +199,7 @@ public class WorldClient {
 
     
 
-    public boolean IsGameAction(GameActionTypeEnum Action) {
+    public boolean isGameAction(GameActionTypeEnum Action) {
         synchronized (this.myActions) {
             return this.myActions.containsKey(Action);
         }
@@ -204,23 +213,23 @@ public class WorldClient {
         return tempTicket.valid();
     }
 
-    public void parsePacket(Message message) { //Synchronized ?
+    public void parsePacket(Message message) {
         try {
             if (message == null) {
                 return;
             }
             if (message instanceof BasicPingMessage) {
-                this.Send(new BasicPongMessage(((BasicPingMessage) message).quiet));
+                this.send(new BasicPongMessage(((BasicPingMessage) message).quiet));
                 return;
             }
 
             this.lastPacketId = message.getMessageId();
-            this.Seq++;
-            Method MessageIdentifier = Handler.getMethodByMessage(message.getMessageId());
-            if (MessageIdentifier != null) {
-                MessageIdentifier.invoke(null, this, message);
+            this.sequenceMessage++;
+            Method messageIdentifier = Handler.getMethodByMessage(message.getMessageId());
+            if (messageIdentifier != null) {
+                messageIdentifier.invoke(null, this, message);
             } else {
-                Main.Logs().writeInfo("Packet not handled " + message.getMessageId());
+                logger.error("Packet not handled {}" , message.getMessageId());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,7 +240,7 @@ public class WorldClient {
      *
      * @param packet
      */
-    public void Send(Message packet) {
+    public void send(Message packet) {
         if (packet == null) {
             return;
         }
@@ -239,12 +248,14 @@ public class WorldClient {
         session.write(packet);
     }
 
-    public void SequenceMessage() {
-        this.Send(new BasicAckMessage(Seq, lastPacketId, null));
+    public void sequenceMessage() {
+        //TODO : Right seq and lastPacketId value
+        this.send(new BasicAckMessage(sequenceMessage, lastPacketId));
     }
 
-    public void SequenceMessage(Message Dofus) {
-        this.Send(new BasicAckMessage(Seq, lastPacketId, Dofus));
+    public void sequenceMessage(Message Dofus) {
+        //TODO: SequenceMessage BASIC + Dofus blinded
+        //this.send(new BasicAckMessage(sequenceMessage, lastPacketId, Dofus));
     }
 
     public void timeOut() {
@@ -257,20 +268,20 @@ public class WorldClient {
 
     public void threatWaiting() {
         try {
-            PlayerDAO.FindAll(this.getAccount());
-            if (this.getAccount().Data == null) {
-                this.getAccount().Data = AccountDataDAO.Find(this.getAccount().ID);
+            DAO.getPlayers().getByAccount(this.getAccount());
+            if (this.getAccount().accountData == null) {
+                this.getAccount().accountData = DAO.getAccountDatas().get(this.getAccount().id);
             }
             if (showQueue) {
-                this.Send(new LoginQueueStatusMessage((short) 0, (short) 0));
+                this.send(new LoginQueueStatusMessage((short) 0, (short) 0));
             }
-            this.Send(new AuthenticationTicketAcceptedMessage());
-            this.Send(new BasicTimeMessage((double) (new Date().getTime()), 0));
-            this.Send(new ServerOptionalFeaturesMessage(new byte[]{1, 2}));
-            this.Send(new AccountCapabilitiesMessage(getAccount().ID, false, (short) Integer.MAX_VALUE, (short) Integer.MAX_VALUE, this.getAccount().Right));
-            this.Send(new TrustStatusMessage(true));
-            if (this.getAccount().Right > 0) {
-                this.Send(new ConsoleCommandsListMessage(new String[]{"infos"}, new String[]{"infos"}, new String[]{"infos"}));
+            this.send(new AuthenticationTicketAcceptedMessage());
+            this.send(new BasicTimeMessage((double) (new Date().getTime()), 0));
+            this.send(new ServerOptionalFeaturesMessage(new byte[]{1, 2}));
+            this.send(new AccountCapabilitiesMessage(getAccount().id, false, (short) Integer.MAX_VALUE, (short) Integer.MAX_VALUE, this.getAccount().right));
+            this.send(new TrustStatusMessage(true));
+            if (this.getAccount().right > 0) {
+                this.send(new ConsoleCommandsListMessage(new String[]{"infos"}, new String[]{"infos"}, new String[]{"infos"}));
             }
         } catch (AccountOccupedException ex) {
             new Waiter(this);
@@ -282,45 +293,45 @@ public class WorldClient {
 
     public synchronized void close() {
         try {
-            this.AbortGameActions();
+            this.abortGameActions();
         } catch (Exception ex) {
         }
-        if (this.PartyRequests != null) {
-            for (PartyRequest req : this.PartyRequests) {
-                if (req.Requester == this) {
-                    req.Abort();
+        if (this.partyRequests != null) {
+            for (PartyRequest req : this.partyRequests) {
+                if (req.requester == this) {
+                    req.abort();
                 } else {
-                    req.Declin();
+                    req.declin();
                 }
             }
 
-            this.PartyRequests.clear();
-            this.PartyRequests = null;
+            this.partyRequests.clear();
+            this.partyRequests = null;
         }
         if (session != null && !session.isClosing()) {
             session.close(true);
         }
 
         this.showQueue = false;
-        if (this.Character != null) {
-            Main.Logs().writeDebug("Player " + this.Character.NickName + " disconnected");
-            ChatChannel.UnRegister(this);
-            this.Character.OnDisconnect();
-            this.Character = null;
+        if (this.character != null) {
+            logger.debug("Player {} disconnected",this.character.getNickName());
+            ChatChannel.unRegister(this);
+            this.character.onDisconnect();
+            this.character = null;
         }
         if (tempTicket != null) {
-            WorldServer.Loader.onClientDisconnect(this);
+            WorldServer.gameLoader.onClientDisconnect(this);
             tempTicket.clear();
             tempTicket = null;
         }
 
     }
 
-    public void SetBaseRequest(GameBaseRequest Request) {
+    public void setBaseRequest(GameBaseRequest Request) {
         this.myBaseRequest = Request;
     }
 
-    public GameBaseRequest GetBaseRequest() {
+    public GameBaseRequest getBaseRequest() {
         return this.myBaseRequest;
     }
 

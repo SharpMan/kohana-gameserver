@@ -12,18 +12,18 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 public class EffectTeleport extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        return ApplyTeleport(CastInfos);
+    public int applyEffect(EffectCast castInfos) {
+        return ApplyTeleport(castInfos);
     }
 
     public static int ApplyTeleport(EffectCast castInfos) {
-        Fighter caster = castInfos.Caster;
-        FightCell cell = caster.Fight.GetCell(castInfos.CellId);
+        Fighter caster = castInfos.caster;
+        FightCell cell = caster.getFight().getCell(castInfos.cellId);
 
-        if (cell != null) {
-            caster.Fight.sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, caster.ID, caster.ID, castInfos.CellId));
+        if (cell != null && cell.canWalk()) {
+            caster.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, caster.getID(), caster.getID(), castInfos.cellId));
 
-            return caster.SetCell(cell);
+            return caster.setCell(cell);
         }
 
         return -1;

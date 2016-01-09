@@ -17,47 +17,47 @@ public class SummonedFighter extends Fighter {
     }
 
     @Override
-    public void EndFight() {
+    public void endFight() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public int Level() {
+    public int getLevel() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public short MapCell() {
+    public short getMapCell() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public FightTeamMemberInformations GetFightTeamMemberInformations() {
+    public FightTeamMemberInformations getFightTeamMemberInformations() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void Send(Message Packet) {
+    public void send(Message Packet) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void JoinFight() {
+    public void joinFight() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
      @Override
     public int compareTo(IFightObject obj) {
-        return Priority().compareTo(obj.Priority());
+        return getPriority().compareTo(obj.getPriority());
     }
 
     @Override
-    public int Initiative(boolean Base) {
+    public int getInitiative(boolean Base) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

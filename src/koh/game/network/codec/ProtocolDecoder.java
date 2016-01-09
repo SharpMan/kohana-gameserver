@@ -1,12 +1,12 @@
 package koh.game.network.codec;
 
 import java.nio.BufferUnderflowException;
-import koh.game.Main;
+
 import koh.game.network.handlers.Handler;
 import koh.protocol.MessageEnum;
 import koh.protocol.client.Message;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
-import koh.protocol.messages.game.basic.BasicAckMessage;
+import org.apache.logging.log4j.*;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
@@ -20,6 +20,8 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
 
     private static final int BIT_MASK = 3;
     private static final int BIT_RIGHT_SHIFT_LEN_PACKET_ID = 2;
+
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(ProtocolDecoder.class);
 
     public static int getMessageLength(IoBuffer buf, int header) {
         switch (header & BIT_MASK) {
@@ -65,9 +67,9 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         Message message;
 
         try {
-            message = (Message) Handler.Messages.get(getMessageId(header)).newInstance();
+            message = (Message) Handler.messages.get(getMessageId(header)).newInstance();
         } catch (Exception e) {
-            Main.Logs().writeError("[ERROR] Unknown Message Header Handler " + (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) + session.getRemoteAddress().toString());
+            logger.error("[ERROR] Unknown Message Header Handler {} {}" , (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) , session.getRemoteAddress().toString());
             session.write(new BasicNoOperationMessage());
             buf.skip(messageLength);
             return true;

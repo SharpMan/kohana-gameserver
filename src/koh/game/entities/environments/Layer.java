@@ -9,20 +9,20 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class Layer {
 
-    public DofusMap Map;
-    public int LayerId;
-    public short[] Cells;
+    private DofusMap map;
+    private int layerId;
+    private short[] cells;
 
     public Layer(DofusMap map, int l, short[] d) {
-        this.Map = map;
-        this.LayerId = l;
-        this.Cells = d;
+        this.map = map;
+        this.layerId = l;
+        this.cells = d;
     }
 
     public Layer(DofusMap map, IoBuffer buf) {
-        this.Map = map;
-        this.LayerId = buf.getInt();
-        this.Cells = BufUtils.ReadShortArray(buf);
+        this.map = map;
+        this.layerId = buf.getInt();
+        this.cells = BufUtils.readShortArray(buf);
     }
 
 }

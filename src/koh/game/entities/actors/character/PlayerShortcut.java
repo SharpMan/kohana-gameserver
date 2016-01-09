@@ -1,10 +1,7 @@
 package koh.game.entities.actors.character;
 
-import java.util.ArrayList;
 import koh.game.entities.actors.Player;
-import koh.protocol.client.enums.ShortcutType;
 import koh.protocol.types.game.shortcut.Shortcut;
-import koh.protocol.types.game.shortcut.ShortcutObjectItem;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -13,27 +10,27 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class PlayerShortcut {
 
-    public byte Type;
-    public byte Position;
+    public byte type;
+    public byte position;
 
     public PlayerShortcut(byte Pos, byte Type) {
-        this.Position = Pos;
-        this.Type = Type;
+        this.position = Pos;
+        this.type = Type;
     }
 
-    public void Serialize(IoBuffer buf) {
-        buf.putInt(Type);
-        buf.put(Position);
+    public void serialize(IoBuffer buf) {
+        buf.putInt(type);
+        buf.put(position);
     }
 
     public Shortcut toShortcut(Player p) {
-        return new Shortcut(Position);
+        return new Shortcut(position);
     }
 
     public void totalClear() {
         try {
-            Type = 0;
-            Position = 0;
+            type = 0;
+            position = 0;
             this.finalize();
         } catch (Throwable tr) {
         }

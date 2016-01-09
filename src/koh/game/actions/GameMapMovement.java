@@ -1,16 +1,20 @@
 package koh.game.actions;
 
 import koh.game.Main;
+import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.IGameActor;
-import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.IWorldField;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public class GameMapMovement extends GameAction {
+
+    private static final Logger logger = LogManager.getLogger(GameMapMovement.class);
 
     // syncro
     private final Object sync = new Object();
@@ -22,35 +26,35 @@ public class GameMapMovement extends GameAction {
     // map du deplacement
     private final IWorldField myField;
 
-    public GameMapMovement(IWorldField Field, IGameActor Actor, short[] keyMovements) {
-        super(GameActionTypeEnum.MAP_MOVEMENT, Actor);
+    public GameMapMovement(IWorldField field, IGameActor actor, short[] keyMovements) {
+        super(GameActionTypeEnum.MAP_MOVEMENT, actor);
         this.keyMovements = keyMovements;
-        this.myField = Field;
+        this.myField = field;
     }
 
     @Override
-    public void Execute() {
+    public void execute() {
         try {
             synchronized (this.sync) {
-                if (!this.IsFinish) {
+                if (!this.isFinish) {
                     // mouvement stoppé ?
                     if (!this.myAborted) {
-                        this.myField.ActorMoved(null, this.Actor, (short) (keyMovements[keyMovements.length - 1] & 4095), (byte) (keyMovements[keyMovements.length - 1] >> 12 & 7));
+                        this.myField.actorMoved(null, this.actor, (short) (keyMovements[keyMovements.length - 1] & 4095), (byte) (keyMovements[keyMovements.length - 1] >> 12 & 7));
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Main.Logs().writeError(this.toString());
+            logger.error(this.toString());
         }
-        super.Execute();
+        super.execute();
     }
 
     @Override
-    public void Abort(Object[] Args) {
+    public void abort(Object[] Args) {
         synchronized (this.sync) {
             // deja fini ?
-            if (!this.IsFinish) {
+            if (!this.isFinish) {
                 // deja aborté ?
                 if (!this.myAborted) {
                     // cell de transit ?
@@ -59,11 +63,11 @@ public class GameMapMovement extends GameAction {
 
                         try {
                             // on apell
-                            super.EndExecute();
+                            super.endExecute();
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        this.myField.ActorMoved(null, this.Actor, StoppedCell, (byte) -1);
+                        this.myField.actorMoved(null, this.actor, StoppedCell, (byte) -1);
                     }
 
                     this.myAborted = true;
@@ -73,12 +77,12 @@ public class GameMapMovement extends GameAction {
     }
 
     @Override
-    public void EndExecute() throws Exception {
-        super.EndExecute();
+    public void endExecute() throws Exception {
+        super.endExecute();
     }
 
     @Override
-    public boolean CanSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum ActionType) {
         return false;
     }
 

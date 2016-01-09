@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
 import koh.game.fights.IFightObject;
-import koh.game.fights.layer.FightActivableObject;
+import koh.game.fights.layers.FightActivableObject;
 
 /**
  *
@@ -10,10 +10,10 @@ import koh.game.fights.layer.FightActivableObject;
 public class EffectPortalTeleportation extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        if (CastInfos.Caster.Fight.GetCell(CastInfos.CellId).HasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
-            ((FightActivableObject) (CastInfos.Caster.Fight.GetCell(CastInfos.CellId).GetObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).LoadTargets(CastInfos.Targets.get(0));
-            return ((FightActivableObject) (CastInfos.Caster.Fight.GetCell(CastInfos.CellId).GetObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).Activate(CastInfos.Targets.get(0));
+    public int applyEffect(EffectCast castInfos) {
+        if (castInfos.caster.getFight().getCell(castInfos.cellId).hasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
+            ((FightActivableObject) (castInfos.caster.getFight().getCell(castInfos.cellId).getObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).loadTargets(castInfos.targets.get(0));
+            return ((FightActivableObject) (castInfos.caster.getFight().getCell(castInfos.cellId).getObjects(IFightObject.FightObjectType.OBJECT_PORTAL)[0])).activate(castInfos.targets.get(0));
         }
         return -1;
     }

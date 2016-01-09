@@ -11,14 +11,14 @@ import koh.protocol.messages.game.actions.fight.GameActionFightDispellSpellMessa
 public class EffectDispellSpell extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.Targets) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
             
-            if (Target.Buffs.Dispell(CastInfos.Effect.value) == -3) {
+            if (Target.getBuff().dispell(castInfos.effect.value) == -3) {
                 return -3;
             }
 
-            Target.Fight.sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.Caster.ID, Target.ID, CastInfos.Effect.value));
+            Target.getFight().sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, castInfos.caster.getID(), Target.getID(), castInfos.effect.value));
         }
 
         return -1;

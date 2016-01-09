@@ -13,8 +13,8 @@ import koh.game.entities.actors.Player;
  */
 public class PanoplieBonusCriterion extends Criterion {
 
-    public static String Identifier = "Pk";
-    public Integer PanoplieCount;
+    public static final String IDENTIFIER = "Pk";
+    public Integer panoplieCount;
 
     @Override
     public String toString() {
@@ -23,11 +23,11 @@ public class PanoplieBonusCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.PanoplieCount = Integer.parseInt(Literal);
+        this.panoplieCount = Integer.parseInt(literal);
     }
 
     @Override
-    public boolean Eval(Player character) {
-        return this.Compare((Comparable<Integer>) character.InventoryCache.ItemSetCount(), this.PanoplieCount);
+    public boolean eval(Player character) {
+        return this.Compare((Comparable<Integer>) character.getInventoryCache().getItemSetCount(), this.panoplieCount);
     }
 }

@@ -10,7 +10,7 @@ import koh.game.entities.environments.DofusMap;
  */
 public class MapController {
 
-    public static DofusCell[] UnCompressCells(DofusMap map, String cells) {
+    public static DofusCell[] unCompressCells(DofusMap map, String cells) {
         int lenght = cells.split(";").length;
         DofusCell[] Cells = new DofusCell[lenght];
 
@@ -27,7 +27,7 @@ public class MapController {
         return Cells;
     }
 
-    public static Layer[] UnCompressLayers(DofusMap map, String layer) {
+    public static Layer[] unCompressLayers(DofusMap map, String layer) {
         int lenght = layer.split(";").length;
         Layer[] Layers = new Layer[lenght];
         int i = 0;
@@ -53,7 +53,7 @@ public class MapController {
         return Layers;
     }
 
-    public static short[] UnCompressStartingCells(DofusMap aThis, String BlueCells) {
+    public static short[] unCompressStartingCells(DofusMap aThis, String BlueCells) {
         if (BlueCells.isEmpty()) {
             return new short[0];
         }

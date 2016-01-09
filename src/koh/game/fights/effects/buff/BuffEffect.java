@@ -4,7 +4,6 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -25,87 +24,86 @@ public abstract class BuffEffect {
     public static final int[] TRIGGERED_EFFECTS_IDS = new int[]{138, 1040};
     public static final int[] NO_BOOST_EFFECTS_IDS = new int[]{144, 82};
 
-    public BuffDecrementType DecrementType;
-    public BuffActiveType ActiveType;
-    public EffectCast CastInfos;
-    public Fighter Caster;
-    public Fighter Target;
-    public int Duration, Delay;
+    public BuffDecrementType decrementType;
+    public BuffActiveType activeType;
+    public EffectCast castInfos;
+    public Fighter caster;
+    public Fighter target;
+    public int duration, delay;
     private int Uid = -1;
 
-    public int GetId() {
+    public int getId() {
         if (this.Uid == -1) {
-            Uid = Target.NextBuffUid.incrementAndGet();
+            Uid = target.getNextBuffUid().incrementAndGet();
         }
         return this.Uid;
     }
 
     //TODO: Create List in Setting
-    public boolean IsDebuffable() {
-        switch (this.CastInfos.EffectType) {
-            case Damage_Armor_Reduction:
-                return CastInfos.SpellId != SpellIDEnum.TREVE;
-            case Add_State:
-            case Change_Appearance:
+    public boolean isDebuffable() {
+        switch (this.castInfos.effectType) {
+            case DAMAGE_ARMOR_REDUCTION:
+                return castInfos.spellId != SpellIDEnum.TREVE;
+            case ADD_STATE:
+            case CHANGE_APPEARANCE:
             case CHATIMENT:
             //Domage de sort
             case TRANSFORMATION:
                 return false;
         }
-        return this.CastInfos.SubEffect != StatsEnum.NOT_DISPELLABLE;
+        return this.castInfos.subEffect != StatsEnum.NOT_DISPELLABLE;
 
         //return true;
     }
 
-    public BuffEffect(EffectCast CastInfos, Fighter Target, BuffActiveType ActiveType, BuffDecrementType DecrementType) {
-        this.CastInfos = CastInfos;
+    public BuffEffect(EffectCast CastInfos, Fighter target, BuffActiveType activeType, BuffDecrementType decrementType) {
+        this.castInfos = CastInfos;
 
-        //this.Duration = (CastInfos.Duration == -1) ? -1 : (Target.Fight.CurrentFighter == Target /*&& CastInfos.Duration == 0*/ ? CastInfos.Duration + 1 : CastInfos.Duration) - CastInfos.Delay();
-        this.Duration = (CastInfos.Duration == -1) ? -1 : (DecrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.Duration : (CastInfos.Duration) - CastInfos.Delay());
-        
-        //System.out.println(Target.Fight.CurrentFighter == Target);
-        if (DecrementType == BuffDecrementType.TYPE_ENDTURN && Target.ID == CastInfos.Caster.ID) {
-            this.Duration++;
-        }
-        this.Delay = CastInfos.Delay();
-        this.Caster = CastInfos.Caster;
-        this.Target = Target;
+        //this.duration = (castInfos.duration == -1) ? -1 : (target.fight.currentFighter == target /*&& castInfos.duration == 0*/ ? castInfos.duration + 1 : castInfos.duration) - castInfos.getDelay();
+        this.duration = (CastInfos.duration == -1) ? -1 : (decrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.duration : (CastInfos.duration) - CastInfos.getDelay());
+        //Why do i use this
+       /* if (decrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID() && this.duration != -1) {
+            this.duration++;
+        }*/
+        this.delay = CastInfos.getDelay();
+        this.caster = CastInfos.caster;
+        this.target = target;
 
-        this.ActiveType = ActiveType;
-        this.DecrementType = DecrementType;
+        this.activeType = activeType;
+        this.decrementType = decrementType;
     }
 
-    public int ApplyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        return this.Target.TryDie(this.Caster.ID);
+    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+        return this.target.tryDie(this.caster.getID());
     }
 
-    public abstract AbstractFightDispellableEffect GetAbstractFightDispellableEffect();
+    public abstract AbstractFightDispellableEffect getAbstractFightDispellableEffect();
 
     /// <summary>
     /// Fin du buff
     /// </summary>
     /// <returns></returns>
-    public int RemoveEffect() {
-        return this.Target.TryDie(this.Caster.ID);
+    public int removeEffect() {
+        return this.target.tryDie(this.caster.getID());
     }
 
     /// <summary>
-    /// Decrement le buff
+    /// decrement le buff
     /// </summary>
-    public int DecrementDuration() {
-        this.Duration--;
+    public int decrementDuration() {
+        this.duration--;
 
-        this.CastInfos.FakeValue = 0;
+        this.castInfos.fakeValue = 0;
 
-        return this.Duration;
+        return this.duration;
     }
 
-    public int DecrementDuration(int Duration) {
-        this.Duration -= Duration;
+    public int decrementDuration(int Duration) {
+        this.duration -= Duration;
 
-        this.CastInfos.FakeValue = 0;
+        this.castInfos.fakeValue = 0;
 
-        return this.Duration;
+        return this.duration;
     }
 
 }

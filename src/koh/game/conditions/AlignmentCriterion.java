@@ -8,22 +8,22 @@ import koh.game.entities.actors.Player;
  */
 public class AlignmentCriterion extends Criterion {
 
-    public byte AlignmentSide;
+    public byte alignmentSide;
 
     @Override
     public void Build() {
         int result;
         try {
-            result = Integer.parseInt(Literal);
+            result = Integer.parseInt(literal);
         } catch (Exception e) {
-            throw new Error(String.format("Cannot build AdminRightsCriterion, {0} is not a valid role", this.Literal));
+            throw new Error(String.format("Cannot build AdminRightsCriterion, {0} is not a valid role", this.literal));
         }
-        this.AlignmentSide = (byte) result;
+        this.alignmentSide = (byte) result;
     }
 
     @Override
-    public boolean Eval(Player character) {
-        return this.Compare((Comparable<Byte>) character.AlignmentSide.value, this.AlignmentSide);
+    public boolean eval(Player character) {
+        return this.Compare((Comparable<Byte>) character.getAlignmentSide().value, this.alignmentSide);
     }
 
     @Override

@@ -1,118 +1,103 @@
 package koh.game.fights.fighters;
 
-import java.util.Date;
 import koh.game.actions.GameActionTypeEnum;
-import koh.game.dao.ExpDAO;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
-import koh.game.fights.Fight;
-import koh.game.fights.FightState;
-import koh.game.fights.FightTypeEnum;
-import koh.game.fights.Fighter;
-import koh.game.fights.IFightObject;
-import koh.game.fights.types.ChallengeFight;
+import koh.game.fights.*;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
-import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_MAKE_INVISIBLE;
-import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.PlayerEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
-import koh.protocol.messages.game.actions.fight.GameActionFightInvisibleDetectedMessage;
 import koh.protocol.messages.game.actions.fight.GameActionFightVanishMessage;
-import koh.protocol.messages.game.basic.BasicTimeMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.character.stats.FighterStatsListMessage;
-import koh.protocol.messages.game.character.stats.LifePointsRegenBeginMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
-import koh.protocol.messages.game.context.fight.character.GameFightRefreshFighterMessage;
 import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
 import koh.protocol.types.game.character.characteristic.CharacterSpellModification;
 import koh.protocol.types.game.context.GameContextActorInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberCharacterInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
-import koh.protocol.types.game.context.fight.GameFightCharacterInformations;
-import koh.protocol.types.game.context.fight.GameFightMinimalStats;
-import koh.protocol.types.game.context.fight.GameFightMinimalStatsPreparation;
+import koh.protocol.types.game.context.fight.*;
+import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import koh.protocol.types.game.look.EntityLook;
+import lombok.Getter;
 
 /**
- *
  * @author Neo-Craft
  */
 public class CharacterFighter extends Fighter {
 
-    public Player Character;
-    public EntityLook Look;
+    public int fakeContextualId = -1000;
+    @Getter
+    private Player character;
 
-    public CharacterFighter(Fight Fight, WorldClient Client) {
+    public CharacterFighter(Fight Fight, WorldClient client) {
         super(Fight, null);
-        this.TurnReady = false;
-        this.Character = Client.Character;
+        this.turnReady = false;
+        this.character = client.getCharacter();
 
-        this.Character.SetFight(Fight);
-        this.Character.SetFighter(this);
-        this.Character.StopRegen();
-        //this.Character.CurrentMap.unregisterPlayer(Character);
-        this.Fight.registerPlayer(Character);
-        super.InitFighter(this.Character.Stats, this.Character.ID);
-        super.setLife(this.Character.Life);
-        super.setLifeMax(this.Character.MaxLife());
-        if (super.Life() == 0) {
+        this.character.setFight(Fight);
+        this.character.setFighter(this);
+        this.character.stopRegen();
+        this.character.removeHumanOption(HumanOptionEmote.class);
+        //this.character.currentMap.unregisterPlayer(character);
+        this.fight.registerPlayer(character);
+        super.initFighter(this.character.getStats(), this.character.getID());
+        super.setLife(this.character.getLife());
+        super.setLifeMax(this.character.getMaxLife());
+        if (super.getLife() == 0) {
             super.setLife(1);
         }
-        this.entityLook = EntityLookParser.Copy(this.Character.GetEntityLook());
+        this.entityLook = EntityLookParser.Copy(this.character.getEntityLook());
     }
 
     @Override
-    public GameFightMinimalStats GetGameFightMinimalStats(Player character) {
-        if (this.Fight.FightState == FightState.STATE_PLACE) {
-            return new GameFightMinimalStatsPreparation(this.Life(), this.MaxLife(), this.Character.MaxLife(), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.GetTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character), this.Initiative(false));
+    public GameFightMinimalStats getGameFightMinimalStats(Player character) {
+        if (this.fight.getFightState() == FightState.STATE_PLACE) {
+            return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), this.character.getMaxLife(), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
         }
-        return new GameFightMinimalStats(this.Life(), this.MaxLife(), this.Character.MaxLife(), this.Stats.GetTotal(StatsEnum.PermanentDamagePercent), this.shieldPoints(), this.AP(), this.MaxAP(), this.MP(), this.MaxMP(), Summoner(), Summoner() != 0, this.Stats.GetTotal(StatsEnum.NeutralElementResistPercent), this.Stats.GetTotal(StatsEnum.EarthElementResistPercent), this.Stats.GetTotal(StatsEnum.WaterElementResistPercent), this.Stats.GetTotal(StatsEnum.AirElementResistPercent), this.Stats.GetTotal(StatsEnum.FireElementResistPercent), this.Stats.GetTotal(StatsEnum.NeutralElementReduction), this.Stats.GetTotal(StatsEnum.EarthElementReduction), this.Stats.GetTotal(StatsEnum.WaterElementReduction), this.Stats.GetTotal(StatsEnum.AirElementReduction), this.Stats.GetTotal(StatsEnum.FireElementReduction), this.Stats.GetTotal(StatsEnum.Add_Push_Damages_Reduction), this.Stats.GetTotal(StatsEnum.Add_Critical_Damages_Reduction), this.Stats.GetTotal(StatsEnum.DodgePALostProbability), this.Stats.GetTotal(StatsEnum.DodgePMLostProbability), this.Stats.GetTotal(StatsEnum.Add_TackleBlock), this.Stats.GetTotal(StatsEnum.Add_TackleEvade), character == null ? this.VisibleState.value : this.GetVisibleStateFor(character));
-    }
-
-    public int fakeContextualId = -1000;
-
-    @Override
-    public GameContextActorInformations GetGameContextActorInformations(Player character) {
-        return new GameFightCharacterInformations(((fakeContextualId != -1000 && !this.IsMyFriend(character)) ? this.fakeContextualId : this.ID), this.GetEntityLook(), this.GetEntityDispositionInformations(character), this.Team.Id, this.wave, this.IsAlive(), this.GetGameFightMinimalStats(character), this.previousPositions, this.Character.NickName, this.Character.PlayerStatus(), (byte) this.Level(), this.Character.GetActorAlignmentInformations(), this.Character.Breed, this.Character.Sexe());
+        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), this.character.getMaxLife(), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
     }
 
     @Override
-    public FightTeamMemberInformations GetFightTeamMemberInformations() {
-        return new FightTeamMemberCharacterInformations(this.ID, this.Character.NickName, (byte) this.Character.Level);
+    public GameContextActorInformations getGameContextActorInformations(Player character) {
+        return new GameFightCharacterInformations(((fakeContextualId != -1000 && !this.isMyFriend(character)) ? this.fakeContextualId : this.ID), this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, this.character.getNickName(), this.character.getPlayerStatus(), (byte) this.getLevel(), this.character.getActorAlignmentInformations(), this.character.getBreed(), this.character.hasSexe());
     }
 
     @Override
-    public void JoinFight() {
-        this.Character.DestroyFromMap();
+    public FightTeamMemberInformations getFightTeamMemberInformations() {
+        return new FightTeamMemberCharacterInformations(this.ID, this.character.getNickName(), (byte) this.character.getLevel());
     }
 
     @Override
-    public void MiddleTurn() {
-        /*if (this.Character.Client != null) {
-         this.Character.Client.Send(this.FighterStatsListMessagePacket());
+    public void joinFight() {
+        this.character.destroyFromMap();
+    }
+
+    @Override
+    public void middleTurn() {
+        /*if (this.character.client != null) {
+         this.character.client.send(this.FighterStatsListMessagePacket());
          }*/
-        super.MiddleTurn();
+        super.middleTurn();
     }
 
     @Override
-    public int EndTurn() {
-        if (this.Character.Client == null) {
-            this.Fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 162, new String[]{this.Character.NickName, Integer.toString(this.TurnRunning)}));
-            this.TurnRunning--;
+    public int endTurn() {
+        if (this.character.getClient() == null) {
+            this.fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 162, new String[]{this.character.getNickName(), Integer.toString(this.turnRunning)}));
+            this.turnRunning--;
         }
-        return super.EndTurn();
+        return super.endTurn();
     }
 
     public void CleanClone() {
         boolean updated = false;
-        for (Fighter Clone : (Iterable<Fighter>) this.Team.GetAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.Summoner == this)::iterator) {
-            Clone.TryDie(this.ID);
+        for (Fighter Clone : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.getSummoner() == this)::iterator) {
+            Clone.tryDie(this.ID);
             updated = true;
         }
         if (updated) {
@@ -121,120 +106,131 @@ public class CharacterFighter extends Fighter {
     }
 
     public void onCloneCleared() {
-        this.Fight.observers.stream().filter(x -> !this.IsMyFriend(((Player) x))).forEach(o -> ((Player) o).Send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
+        this.fight.observers.stream().filter(x -> !this.isMyFriend(((Player) x))).forEach(o -> ((Player) o).send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
         this.fakeContextualId = -1000;
-        this.Buffs.Dispell(2763);
+        this.buff.dispell(2763);
 
-        this.Send(this.FighterStatsListMessagePacket());
+        this.send(this.FighterStatsListMessagePacket());
     }
 
     @Override
-    public int BeginTurn() {
+    public int beginTurn() {
         this.CleanClone();
-        if (this.Character.Client == null && this.TurnRunning <= 0) {
-            return this.TryDie(this.ID, true);
+        if (this.character.getClient() == null && this.turnRunning <= 0) {
+            return this.tryDie(this.ID, true);
         }
-        return super.BeginTurn();
+        return super.beginTurn();
     }
 
     @Override
-    public int TryDie(int Caster, boolean Force) {
+    public int tryDie(int casterId, boolean Force) {
 
         this.CleanClone();
-        return super.TryDie(Caster, Force);
+        return super.tryDie(casterId, Force);
     }
 
     @Override
-    public void LeaveFight() {
-        super.LeaveFight();
-        this.EndFight();
+    public void leaveFight() {
+        super.leaveFight();
+        this.endFight();
     }
 
     @Override
-    public int Level() {
-        return this.Character.Level;
+    public int getLevel() {
+        return this.character.getLevel();
     }
 
     @Override
-    public EntityLook GetEntityLook() {
+    public EntityLook getEntityLook() {
         return this.entityLook;
     }
 
     @Override
-    public void EndFight() {
-        if (Fight.FightType != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
-            if (super.Life() <= 0) {
-                this.Character.Life = 1;
-            } else {
-                this.Character.Life = super.Life();
+    public void endFight() {
+        try {
+            if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
+                if (super.getLife() <= 0) {
+                    this.character.setLife(1);
+                } else if (this.character.computeLife(50) > super.getLife()) {
+                    this.character.setLife(this.character.computeLife(50));
+                } else {
+                    this.character.setLife(super.getLife());
+                }
             }
+
+            this.fight.unregisterPlayer(character);
+
+            if (this.character.isInWorld()) {
+                this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
+                this.character.send(new GameContextDestroyMessage());
+                this.character.send(new GameContextCreateMessage((byte) 1));
+                this.character.refreshStats(false, true);
+                if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && this.team.id == this.fight.getLoosers().id) {
+                    this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
+                } else {
+                    this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
+                    //this.character.send(new BasicTimeMessage((double) (new Date().getTime()), 0));
+                    this.character.getCurrentMap().spawnActor(this.character);
+                }
+            } else {
+                if (this.isLeft() || (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && this.team.id == this.fight.getLoosers().id)) {
+                    this.character.offlineTeleport(this.character.getSavedMap(), this.character.getSavedCell());
+                }
+            }
+            this.character.setFight(null);
+            this.character.setFighter(null);
+        }catch(Exception e){
+            e.printStackTrace();
+            this.fight.getLogger().error(e);
+            this.fight.getLogger().warn(e.getMessage());
         }
 
-        this.Fight.unregisterPlayer(Character);
-
-        if (this.Character.IsInWorld) {
-            this.Character.Client.EndGameAction(GameActionTypeEnum.FIGHT);
-            this.Character.Send(new GameContextDestroyMessage());
-            this.Character.Send(new GameContextCreateMessage((byte) 1));
-            //this.Character.Send(new LifePointsRegenBeginMessage());
-            this.Character.RefreshStats(false);
-            if (!(this.Fight instanceof ChallengeFight) && this.Team.Id == this.Fight.GetLoosers().Id) {
-                this.Character.teleport(this.Character.SavedMap, this.Character.SavedCell);
-            } else {
-                this.Character.Send(new CurrentMapMessage(this.Character.CurrentMap.Id, "649ae451ca33ec53bbcbcc33becf15f4"));
-                //this.Character.Send(new BasicTimeMessage((double) (new Date().getTime()), 0));
-                this.Character.CurrentMap.SpawnActor(this.Character);
-
-            }
-        }//elseSetstats mapid...
-        this.Character.SetFight(null);
-        this.Character.SetFighter(null);
     }
 
     @Override
-    public short MapCell() {
-        return this.Character.Cell.Id;
+    public short getMapCell() {
+        return this.character.getCell().getId();
     }
 
     @Override
-    public void Send(Message Packet) {
-        this.Character.Send(Packet);
+    public void send(Message packet) {
+        this.character.send(packet);
     }
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
-        return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) Character.Experience, (double) ExpDAO.PersoXpMin(Character.Level), (double) ExpDAO.PersoXpMax(Character.Level), Character.Kamas, Character.StatPoints, 0, Character.SpellPoints, Character.GetActorAlignmentExtendInformations(),
-                Life(), MaxLife(), Character.Energy, PlayerEnum.MaxEnergy,
-                (short) this.AP(), (short) this.MP(),
-                new CharacterBaseCharacteristic(this.Initiative(true), 0, Stats.GetItem(StatsEnum.Initiative), 0, 0), Stats.GetEffect(StatsEnum.Prospecting), Stats.GetEffect(StatsEnum.ActionPoints),
-                Stats.GetEffect(StatsEnum.MovementPoints), Stats.GetEffect(StatsEnum.Strength), Stats.GetEffect(StatsEnum.Vitality),
-                Stats.GetEffect(StatsEnum.Wisdom), Stats.GetEffect(StatsEnum.Chance), Stats.GetEffect(StatsEnum.Agility),
-                Stats.GetEffect(StatsEnum.Intelligence), Stats.GetEffect(StatsEnum.Add_Range), Stats.GetEffect(StatsEnum.AddSummonLimit),
-                Stats.GetEffect(StatsEnum.DamageReflection), Stats.GetEffect(StatsEnum.Add_CriticalHit), Character.InventoryCache.WeaponCriticalHit(),
-                Stats.GetEffect(StatsEnum.CriticalMiss), Stats.GetEffect(StatsEnum.Add_Heal_Bonus), Stats.GetEffect(StatsEnum.AllDamagesBonus),
-                Stats.GetEffect(StatsEnum.WeaponDamagesBonusPercent), Stats.GetEffect(StatsEnum.AddDamagePercent), Stats.GetEffect(StatsEnum.TrapBonus),
-                Stats.GetEffect(StatsEnum.Trap_Damage_Percent), Stats.GetEffect(StatsEnum.GlyphBonusPercent), Stats.GetEffect(StatsEnum.PermanentDamagePercent), Stats.GetEffect(StatsEnum.Add_TackleBlock),
-                Stats.GetEffect(StatsEnum.Add_TackleEvade), Stats.GetEffect(StatsEnum.Add_RETRAIT_PA), Stats.GetEffect(StatsEnum.Add_RETRAIT_PM), Stats.GetEffect(StatsEnum.Add_Push_Damages_Bonus),
-                Stats.GetEffect(StatsEnum.Add_Critical_Damages), Stats.GetEffect(StatsEnum.Add_Neutral_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Earth_Damages_Bonus),
-                Stats.GetEffect(StatsEnum.Add_Water_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Air_Damages_Bonus), Stats.GetEffect(StatsEnum.Add_Fire_Damages_Bonus),
-                Stats.GetEffect(StatsEnum.DodgePALostProbability), Stats.GetEffect(StatsEnum.DodgePMLostProbability), Stats.GetEffect(StatsEnum.NeutralElementResistPercent),
-                Stats.GetEffect(StatsEnum.EarthElementResistPercent), Stats.GetEffect(StatsEnum.WaterElementResistPercent), Stats.GetEffect(StatsEnum.AirElementResistPercent),
-                Stats.GetEffect(StatsEnum.FireElementResistPercent), Stats.GetEffect(StatsEnum.NeutralElementReduction), Stats.GetEffect(StatsEnum.EarthElementReduction),
-                Stats.GetEffect(StatsEnum.WaterElementReduction), Stats.GetEffect(StatsEnum.AirElementReduction), Stats.GetEffect(StatsEnum.FireElementReduction),
-                Stats.GetEffect(StatsEnum.Add_Push_Damages_Reduction), Stats.GetEffect(StatsEnum.Add_Critical_Damages_Reduction), Stats.GetEffect(StatsEnum.PvpNeutralElementResistPercent),
-                Stats.GetEffect(StatsEnum.PvpEarthElementResistPercent), Stats.GetEffect(StatsEnum.PvpWaterElementResistPercent), Stats.GetEffect(StatsEnum.PvpAirElementResistPercent),
-                Stats.GetEffect(StatsEnum.PvpFireElementResistPercent), Stats.GetEffect(StatsEnum.PvpNeutralElementReduction), Stats.GetEffect(StatsEnum.PvpEarthElementReduction),
-                Stats.GetEffect(StatsEnum.PvpWaterElementReduction), Stats.GetEffect(StatsEnum.PvpAirElementReduction), Stats.GetEffect(StatsEnum.PvpFireElementReduction),
+        return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) character.getExperience(), (double) DAO.getExps().getPlayerMinExp(character.getLevel()), (double) DAO.getExps().getPlayerMaxExp(character.getLevel()), character.getKamas(), character.getStatPoints(), 0, character.getSpellPoints(), character.getActorAlignmentExtendInformations(),
+                getLife(), getMaxLife(), character.getEnergy(), PlayerEnum.MAX_ENERGY,
+                (short) this.getAP(), (short) this.getMP(),
+                new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.INITIATIVE), 0, 0), stats.getEffect(StatsEnum.PROSPECTING), stats.getEffect(StatsEnum.ACTION_POINTS),
+                stats.getEffect(StatsEnum.MOVEMENT_POINTS), stats.getEffect(StatsEnum.STRENGTH), stats.getEffect(StatsEnum.VITALITY),
+                stats.getEffect(StatsEnum.WISDOM), stats.getEffect(StatsEnum.CHANCE), stats.getEffect(StatsEnum.AGILITY),
+                stats.getEffect(StatsEnum.INTELLIGENCE), stats.getEffect(StatsEnum.ADD_RANGE), stats.getEffect(StatsEnum.ADD_SUMMON_LIMIT),
+                stats.getEffect(StatsEnum.DamageReflection), stats.getEffect(StatsEnum.ADD_CRITICAL_HIT), character.getInventoryCache().weaponCriticalHit(),
+                stats.getEffect(StatsEnum.CRITICAL_MISS), stats.getEffect(StatsEnum.ADD_HEAL_BONUS), stats.getEffect(StatsEnum.ALL_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT), stats.getEffect(StatsEnum.ADD_DAMAGE_PERCENT), stats.getEffect(StatsEnum.TRAP_BONUS),
+                stats.getEffect(StatsEnum.TRAP_DAMAGE_PERCENT), stats.getEffect(StatsEnum.GLYPH_BONUS_PERCENT), stats.getEffect(StatsEnum.PERMANENT_DAMAGE_PERCENT), stats.getEffect(StatsEnum.ADD_TACKLE_BLOCK),
+                stats.getEffect(StatsEnum.ADD_TACKLE_EVADE), stats.getEffect(StatsEnum.ADD_RETRAIT_PA), stats.getEffect(StatsEnum.ADD_RETRAIT_PM), stats.getEffect(StatsEnum.ADD_PUSH_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.ADD_CRITICAL_DAMAGES), stats.getEffect(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_EARTH_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.ADD_WATER_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_AIR_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_FIRE_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.DODGE_PA_LOST_PROBABILITY), stats.getEffect(StatsEnum.DODGE_PM_LOST_PROBABILITY), stats.getEffect(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.AIR_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.EARTH_ELEMENT_REDUCTION),
+                stats.getEffect(StatsEnum.WATER_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.AIR_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.FIRE_ELEMENT_REDUCTION),
+                stats.getEffect(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), stats.getEffect(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), stats.getEffect(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION),
+                stats.getEffect(StatsEnum.PVP_WATER_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.PVP_AIR_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION),
                 new CharacterSpellModification[0], (short) 0));
     }
 
     @Override
     public int compareTo(IFightObject obj) {
-        return Priority().compareTo(obj.Priority());
+        return getPriority().compareTo(obj.getPriority());
     }
 
     @Override
-    public int Initiative(boolean Base) {
-        return this.Character.Initiative(Base);
+    public int getInitiative(boolean base) {
+        return this.character.getInitiative(base);
     }
 
 }

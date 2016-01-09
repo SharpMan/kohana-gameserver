@@ -11,13 +11,13 @@ import koh.game.fights.effects.buff.BuffSkin;
 public class EffectSkin extends EffectBase {
 
     @Override
-    public int ApplyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect Buff = null;
-        for (Fighter Target : CastInfos.Targets) {
-            Buff = new BuffSkin(CastInfos, Target);
-            if (!Target.Buffs.BuffMaxStackReached(Buff)) {
-                Target.Buffs.AddBuff(Buff);
-                if (Buff.ApplyEffect(null, null) == -3) {
+        for (Fighter Target : castInfos.targets) {
+            Buff = new BuffSkin(castInfos, Target);
+            if (!Target.getBuff().buffMaxStackReached(Buff)) {
+                Target.getBuff().addBuff(Buff);
+                if (Buff.applyEffect(null, null) == -3) {
                     return -3;
                 }
             }
