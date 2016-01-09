@@ -12,16 +12,16 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 public class EffectTpPrevPos extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         int toReturn = -1;
-        for (Fighter Target : CastInfos.targets) {
+        for (Fighter Target : castInfos.targets) {
             if (Target.getPreviousCellPos().isEmpty()) {
                 continue;
             }
             FightCell cell = Target.getFight().getCell(Target.getPreviousCellPos().get(Target.getPreviousCellPos().size() - 1));
 
             if (cell != null && cell.canWalk()) {
-                Target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), Target.getID(), cell.Id));
+                Target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), Target.getID(), cell.Id));
 
                 toReturn = Target.setCell(cell);
             }

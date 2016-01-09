@@ -12,14 +12,14 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 public class EffectTeleportSymetricFromCaster extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         int toReturn = -1;
         FightCell cell;
-        for (Fighter target : CastInfos.targets) {
-            cell = CastInfos.caster.getFight().getCell(target.getMapPoint().pointSymetry(CastInfos.caster.getMapPoint()).get_cellId());
+        for (Fighter target : castInfos.targets) {
+            cell = castInfos.caster.getFight().getCell(target.getMapPoint().pointSymetry(castInfos.caster.getMapPoint()).get_cellId());
 
             if (cell != null && cell.canWalk()) {
-                target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), target.getID(), cell.Id));
+                target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), target.getID(), cell.Id));
 
                 toReturn = target.setCell(cell);
                 if (toReturn != -1) {

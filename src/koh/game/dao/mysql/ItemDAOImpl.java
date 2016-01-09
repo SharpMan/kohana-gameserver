@@ -113,7 +113,21 @@ public class ItemDAOImpl extends ItemDAO {
 
             //TODO better dispose/totalClear pattern
             return true;
-        } catch (Exception e) {
+        }
+        catch(com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e1){
+            try (ConnectionResult conn = dbSource.executeQuery("SELECT template,owner FROM `character_items` WHERE id = "+item.getID()+";")) {
+                ResultSet result = conn.getResult();
+                if(result.first()){
+                    logger.error("Duplicate {} item oldTemplate,owner {} {} ,new {} {}",item.getID(),result.getInt("template"),result.getInt("owner"),item.getTemplate(),item.getOwner());
+                }
+                e1.printStackTrace();
+            }
+            catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        }
+        catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
         }

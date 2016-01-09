@@ -83,7 +83,7 @@ public class EffectPunishment extends EffectBase {
         }
         damageJet.setValue((double) castInfos.caster.getLife() * num1 * (double) castInfos.randomJet(target) / 100.0);
 
-        if(castInfos.caster.hasState(FightStateEnum.Pacifiste.value) && !castInfos.isGlyph){
+        if(castInfos.caster.hasState(FightStateEnum.PACIFISTE.value) && !castInfos.isGlyph){ //Une glyphe qui punit .. beh
             damageJet.setValue(0);
         }
 
@@ -116,7 +116,7 @@ public class EffectPunishment extends EffectBase {
             if (Caster.getBuff().onAttackAfterJet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
-            if (target.getBuff().onattackedafterjet(castInfos, damageJet) == -3) {
+            if (target.getBuff().onAttackedAfterjet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
@@ -125,27 +125,27 @@ public class EffectPunishment extends EffectBase {
         if (damageJet.getValue() > 0) {
             // Si c'est pas un poison ou un renvoi on applique le renvoie
             if (!castInfos.isPoison && !castInfos.isReflect) {
-                MutableInt ReflectDamage = new MutableInt(target.getReflectedDamage());
+                MutableInt reflectDamage = new MutableInt(target.getReflectedDamage());
 
                 // Si du renvoi
-                if (ReflectDamage.intValue() > 0 && target.getID() != Caster.getID()) {
+                if (reflectDamage.intValue() > 0 && target.getID() != Caster.getID()) {
                     target.getFight().sendToField(new GameActionFightReflectDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_REFLECTOR, target.getID(), Caster.getID()));
 
                     // Trop de renvois
-                    if (ReflectDamage.getValue() > damageJet.getValue()) {
-                        ReflectDamage.setValue(damageJet.getValue());
+                    if (reflectDamage.getValue() > damageJet.getValue()) {
+                        reflectDamage.setValue(damageJet.getValue());
                     }
 
                     EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
                     SubInfos.isReflect = true;
 
                     // Si le renvoi de dommage entraine la fin de combat on stop
-                    if (EffectDamage.applyDamages(SubInfos, Caster, ReflectDamage) == -3) {
+                    if (EffectDamage.applyDamages(SubInfos, Caster, reflectDamage) == -3) {
                         return -3;
                     }
 
                     // Dommage renvoyé
-                    damageJet.add(-ReflectDamage.intValue());
+                    damageJet.add(-reflectDamage.intValue());
                 }
             }
         }

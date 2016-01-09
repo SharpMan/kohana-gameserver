@@ -16,23 +16,23 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectDamage extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.duration > 0) {
+        if (castInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.isPoison = true;
+            castInfos.isPoison = true;
 
             // Ajout du buff
-            CastInfos.targets.stream().forEach((Target) -> {
-                Target.getBuff().addBuff(new BuffDamage(CastInfos, Target));
+            castInfos.targets.stream().forEach((Target) -> {
+                Target.getBuff().addBuff(new BuffDamage(castInfos, Target));
             });
         } else // Dommage direct
         {
-            for (Fighter Target : CastInfos.targets) {
+            for (Fighter Target : castInfos.targets) {
                 //Eppe de iop ?
-                MutableInt DamageValue = new MutableInt(CastInfos.randomJet(Target));
+                MutableInt DamageValue = new MutableInt(castInfos.randomJet(Target));
 
-                if (EffectDamage.applyDamages(CastInfos, Target, DamageValue) == -3) {
+                if (EffectDamage.applyDamages(castInfos, Target, DamageValue) == -3) {
                     return -3;
                 }
             }
@@ -74,7 +74,7 @@ public class EffectDamage extends EffectBase {
             caster.calculBonusDamages(castInfos.effect, damageJet,castInfos.cellId, target.getCellId(),castInfos.oldCell);
         }
 
-        if(castInfos.caster.hasState(FightStateEnum.Pacifiste.value) && !castInfos.isGlyph){
+        if(castInfos.caster.hasState(FightStateEnum.PACIFISTE.value) && !castInfos.isGlyph){
             damageJet.setValue(0);
         }
 
@@ -107,7 +107,7 @@ public class EffectDamage extends EffectBase {
             if (caster.getBuff().onAttackAfterJet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
-            if (target.getBuff().onattackedafterjet(castInfos, damageJet) == -3) {
+            if (target.getBuff().onAttackedAfterjet(castInfos, damageJet) == -3) {
                 return -3; // Fin du combat
             }
         }
@@ -127,11 +127,11 @@ public class EffectDamage extends EffectBase {
                         reflectDamage.setValue(damageJet.getValue());
                     }
 
-                    EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
-                    SubInfos.isReflect = true;
+                    EffectCast subInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
+                    subInfos.isReflect = true;
 
                     // Si le renvoi de dommage entraine la fin de combat on stop
-                    if (EffectDamage.applyDamages(SubInfos, caster, reflectDamage) == -3) {
+                    if (EffectDamage.applyDamages(subInfos, caster, reflectDamage) == -3) {
                         return -3;
                     }
 

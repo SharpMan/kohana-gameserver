@@ -12,8 +12,8 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 public class EffectTeleport extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        return ApplyTeleport(CastInfos);
+    public int applyEffect(EffectCast castInfos) {
+        return ApplyTeleport(castInfos);
     }
 
     public static int ApplyTeleport(EffectCast castInfos) {

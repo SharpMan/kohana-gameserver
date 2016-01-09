@@ -77,7 +77,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     @Getter @Setter
     protected FightCell myCell;
     @Getter @Setter
-    protected int usedAP, usedMP, turnRunning = 19,shieldPoints;
+    protected int usedAP, usedMP, turnRunning = 19, shieldPoints;
     @Getter
     protected GenericStats stats;
     @Getter
@@ -491,10 +491,14 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return Option.isPresent() ? Option.get().caster.getID() : 0;
     }
 
+    public Fighter getCarrierActor() {
+        Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).findFirst();
+        return Option.isPresent() ? Option.get().caster : null;
+    }
+
     public boolean isVisibleFor(Player character) {
         return this.getVisibleStateFor(character) != GameActionFightInvisibilityStateEnum.INVISIBLE.value;
     }
-
 
 
     public int getSummonerID() {
@@ -843,9 +847,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int calculArmor(StatsEnum DamageEffect) {
         /*switch (DamageEffect) {
          default:
-         return this.stats.getTotal(StatsEnum.AddArmor);
+         return this.stats.getTotal(StatsEnum.ADD_ARMOR);
          }*/
-        return this.stats.getTotal(StatsEnum.AddArmor);
+        return this.stats.getTotal(StatsEnum.ADD_ARMOR);
     }
 
     public int getReflectedDamage() {

@@ -9,11 +9,11 @@ import koh.game.fights.effects.buff.BuffIncreaseSpellJet;
 public class EffectIncreaseSpellJet extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        if (CastInfos.caster == null) {
+    public int applyEffect(EffectCast castInfos) {
+        if (castInfos.caster == null) {
             return -1;
         }
-        CastInfos.caster.getBuff().addBuff(new BuffIncreaseSpellJet(CastInfos, CastInfos.caster));
+        castInfos.caster.getBuff().addBuff(new BuffIncreaseSpellJet(castInfos, castInfos.caster));
 
         return -1;
     }

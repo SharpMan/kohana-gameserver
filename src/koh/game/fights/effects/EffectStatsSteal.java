@@ -4,7 +4,9 @@ import java.util.HashMap;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffStats;
+import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.messages.game.actions.fight.GameActionFightDodgePointLossMessage;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -42,34 +44,50 @@ public class EffectStatsSteal extends EffectBase {
     };
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        StatsEnum MalusType = TARGET_MALUS.get(CastInfos.effectType);
-        StatsEnum BonusType = CASTER_BONUS.get(CastInfos.effectType);
+    public int applyEffect(EffectCast castInfos) {
+        StatsEnum malusType = TARGET_MALUS.get(castInfos.effectType);
+        StatsEnum bonusType = CASTER_BONUS.get(castInfos.effectType);
 
-        EffectCast MalusInfos = new EffectCast(MalusType, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, CastInfos.effect, CastInfos.caster, CastInfos.targets, false, StatsEnum.NONE, 0, CastInfos.spellLevel, CastInfos.duration, 0);
-        EffectCast BonusInfos = new EffectCast(BonusType, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, CastInfos.effect, CastInfos.caster, CastInfos.targets, false, StatsEnum.NONE, 0, CastInfos.spellLevel, CastInfos.duration - 1, 0);
-        MutableInt DamageValue = new MutableInt();
+        EffectCast malusInfos = new EffectCast(malusType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
+        EffectCast bonusInfos = new EffectCast(bonusType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration <= 0 ? castInfos.duration : castInfos.duration - 1, 0);
+        MutableInt damageValue = new MutableInt();
 
-        for (Fighter Target : CastInfos.targets) {
-            if (Target == CastInfos.caster) {
+        for (Fighter target : castInfos.targets) {
+            if (target == castInfos.caster) {
                 continue;
             }
 
+            if(bonusType == StatsEnum.MOVEMENT_POINTS || bonusType == StatsEnum.ACTION_POINTS){
+                if(malusInfos.effect == null){ //Old loop
+                    malusInfos.effect = bonusInfos.effect = castInfos.effect;
+                }
+                final int jet = castInfos.randomJet(target);
+                malusInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, jet, (bonusType == StatsEnum.MOVEMENT_POINTS), true);
+                bonusInfos.damageValue = malusInfos.damageValue;
+                malusInfos.effect = bonusInfos.effect = null;
+                if (malusInfos.damageValue != jet) {
+                    target.getFight().sendToField(new GameActionFightDodgePointLossMessage(bonusType == StatsEnum.MOVEMENT_POINTS ? ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PM : ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, castInfos.caster.getID(), target.getID(), jet - castInfos.damageValue));
+                    if(malusInfos.damageValue == 0){ //have succesfully esquivate all
+                        continue;
+                    }
+                }
+            }
+
             // Malus a la cible
-            BuffStats BuffStats = new BuffStats(MalusInfos, Target);
-            if (BuffStats.applyEffect(DamageValue, null) == -3) {
+            BuffStats buffStats = new BuffStats(malusInfos, target);
+            if (buffStats.applyEffect(damageValue, null) == -3) {
                 return -3;
             }
 
-            Target.getBuff().addBuff(BuffStats);
+            target.getBuff().addBuff(buffStats);
 
             // Bonus au lanceur
-            BuffStats = new BuffStats(BonusInfos, CastInfos.caster);
-            if (BuffStats.applyEffect(DamageValue, null) == -3) {
+            buffStats = new BuffStats(bonusInfos, castInfos.caster);
+            if (buffStats.applyEffect(damageValue, null) == -3) {
                 return -3;
             }
 
-            CastInfos.caster.getBuff().addBuff(BuffStats);
+            castInfos.caster.getBuff().addBuff(buffStats);
         }
 
         return -1;

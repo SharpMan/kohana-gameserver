@@ -11,11 +11,11 @@ import koh.protocol.client.enums.StatsEnum;
 public class EffectVitalityPercent extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
-            EffectCast SubInfos = new EffectCast(StatsEnum.VITALITY, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, null, CastInfos.caster, CastInfos.targets, CastInfos.spellLevel);
-            SubInfos.damageValue = (int) (((double) Target.getLife() / 100) * CastInfos.randomJet(Target));
-            SubInfos.duration = CastInfos.duration;
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            EffectCast SubInfos = new EffectCast(StatsEnum.VITALITY, castInfos.spellId, castInfos.cellId, castInfos.chance, null, castInfos.caster, castInfos.targets, castInfos.spellLevel);
+            SubInfos.damageValue = (int) (((double) Target.getLife() / 100) * castInfos.randomJet(Target));
+            SubInfos.duration = castInfos.duration;
             BuffStats BuffStats = new BuffStats(SubInfos, Target);
             if (BuffStats.applyEffect(null, null) == -3) {
                 return -3;

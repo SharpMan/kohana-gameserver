@@ -25,7 +25,6 @@ public class BuffReduceDamage extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
-        System.out.println(this.castInfos.effect.triggers);
         if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId)) {
             final int armor = JET * (100 + (castInfos.caster.getLevel() * 5)) / 100;
             target.getFight().sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, target.getID(), target.getID(), armor));

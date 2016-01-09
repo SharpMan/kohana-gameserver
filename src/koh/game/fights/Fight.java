@@ -603,7 +603,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         logger.debug("SpellNeedFreeCell {} SpellIsTakenCell {} fighterHasState {} fighterForbidState {} cellInZone {} controllerOk {}"
                 , (!spell.isNeedFreeCell() || targetId == -1)
                 , (!spell.isNeedTakenCell() || targetId != -1)
-                , !(spell.isNeedFreeTrapCell() && this.myCells.get(cellId).hasGameObject(FightObjectType.OBJECT_TRAP))
                 , !Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x))
                 , !Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x))
                 , (ArrayUtils.contains(fighter.getCastZone(spell), cellId))
@@ -1214,9 +1213,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             });
             fighter.send(new GameEntitiesDispositionMessage(this.getAliveFighters().map(x -> x.GetIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
             fighter.send(new GameFightResumeMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.fightWorker.fightTurn, (int) (System.currentTimeMillis() - this.fightTime), getIdols(),
-                    fighter.getSpellsController().myinitialCooldown.entrySet()
+                    fighter.getSpellsController().getInitialCooldown().entrySet()
                             .stream()
-                            .map(x -> new GameFightSpellCooldown(x.getKey(), x.getValue().initialCooldown))
+                            .map(x -> new GameFightSpellCooldown(x.getKey(), fighter.getSpellsController().minCastInterval(x.getKey()) == 0 ? x.getValue().initialCooldown : fighter.getSpellsController().minCastInterval(x.getKey())))
                             .toArray(GameFightSpellCooldown[]::new),
                     (byte) fighter.getTeam().getAliveFighters()
                             .filter(x -> x.getSummonerID() == fighter.getID() && !(x instanceof BombFighter))

@@ -78,7 +78,7 @@ public class GenericStats {
         this.myStats.put(StatsEnum.ACTION_POINTS, new CharacterBaseCharacteristic(character.getLevel() >= 100 ? 7 : 6));
         this.myStats.put(StatsEnum.MOVEMENT_POINTS, new CharacterBaseCharacteristic(3));
         this.myStats.put(StatsEnum.PROSPECTING, new CharacterBaseCharacteristic((character.getBreed() == BreedEnum.Enutrof ? 120 : 100)));
-        this.myStats.put(StatsEnum.AddPods, new CharacterBaseCharacteristic(1000));
+        this.myStats.put(StatsEnum.ADD_PODS, new CharacterBaseCharacteristic(1000));
         this.myStats.put(StatsEnum.ADD_SUMMON_LIMIT, new CharacterBaseCharacteristic(1));
         this.myStats.put(StatsEnum.INITIATIVE, new CharacterBaseCharacteristic(100));
 

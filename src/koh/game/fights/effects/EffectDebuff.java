@@ -11,13 +11,13 @@ import koh.protocol.messages.game.actions.fight.GameActionFightDispellMessage;
 public class EffectDebuff extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
             if (Target.getBuff().debuff() == -3) {
                 return -3;
             }
 
-            Target.getFight().sendToField(new GameActionFightDispellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, CastInfos.caster.getID(), Target.getID()));
+            Target.getFight().sendToField(new GameActionFightDispellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, castInfos.caster.getID(), Target.getID()));
         }
 
         return -1;

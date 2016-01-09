@@ -23,49 +23,49 @@ public class EffectPush extends EffectBase {
     private static final Random RANDOM_PUSHDAMAGE = new Random();
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         byte direction = 0;
-        for (Fighter Target : CastInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.PORTÉ) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
-            switch (CastInfos.effectType) {
+        for (Fighter Target : castInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.PORTÉ) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+            switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
-                    if(CastInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfinder.inLine(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId())){
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
+                    if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfinder.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId())){
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
                     }
-                    else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId()) && CastInfos.cellId != Target.getCellId()) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId());
-                    } else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId())) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
+                    else if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
+                    } else if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
                     } else {
                         return -1;
                     }
                     break;
                 case ADVANCE_CELL:
-                    Fighter pp = CastInfos.caster;
-                    CastInfos.caster = Target;
+                    Fighter pp = castInfos.caster;
+                    castInfos.caster = Target;
                     Target = pp;
-                    CastInfos.targets.remove(0);
-                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
+                    castInfos.targets.remove(0);
+                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
                     break;
                 case PULL_FORWARD:
-                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.caster.getCellId());
-                    if(CastInfos.spellId == 5382 || CastInfos.spellId == 5475){
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), CastInfos.targetKnownCellId);
+                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
+                    if(castInfos.spellId == 5382 || castInfos.spellId == 5475){
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.targetKnownCellId);
                     }
                     break;
                 case BACK_CELL:
-                    Fighter p = CastInfos.caster;
-                    CastInfos.caster = Target;
+                    Fighter p = castInfos.caster;
+                    castInfos.caster = Target;
                     Target = p;
-                    CastInfos.targets.remove(0);
-                    if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId()) && CastInfos.cellId != Target.getCellId()) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.cellId, Target.getCellId());
-                    } else if (Pathfinder.inLine(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId())) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), CastInfos.caster.getCellId(), Target.getCellId());
+                    castInfos.targets.remove(0);
+                    if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
+                    } else if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
+                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
                     }
                     break;
             }
-            if (EffectPush.ApplyPush(CastInfos, Target, direction, CastInfos.randomJet(Target)) == -3) {
+            if (EffectPush.ApplyPush(castInfos, Target, direction, castInfos.randomJet(Target)) == -3) {
                 return -3;
             }
         }

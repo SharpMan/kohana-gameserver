@@ -10,13 +10,13 @@ import koh.game.fights.effects.buff.BuffSacrifice;
 public class EffectSacrifice extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter target : CastInfos.targets) {
-            if (target.getTeam() != CastInfos.caster.getTeam() || target == CastInfos.caster) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter target : castInfos.targets) {
+            if (target.getTeam() != castInfos.caster.getTeam() || target == castInfos.caster) {
                 continue;
             }
 
-            target.getBuff().addBuff(new BuffSacrifice(CastInfos, target));
+            target.getBuff().addBuff(new BuffSacrifice(castInfos, target));
         }
 
         return -1;

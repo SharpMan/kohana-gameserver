@@ -11,17 +11,17 @@ import koh.protocol.client.enums.StatsEnum;
 public class EffectLostPdvPercent extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
-            EffectCast SubInfos = new EffectCast(StatsEnum.SUB_VITALITY, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, null, CastInfos.caster, CastInfos.targets, CastInfos.spellLevel);
-            SubInfos.damageValue = (int) (((double) Target.getLife() / 100) * CastInfos.randomJet(Target));
-            SubInfos.duration = CastInfos.duration;
-            BuffStats BuffStats = new BuffStats(SubInfos, Target);
-            if (BuffStats.applyEffect(null, null) == -3) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            EffectCast subInfos = new EffectCast(StatsEnum.SUB_VITALITY, castInfos.spellId, castInfos.cellId, castInfos.chance, null, castInfos.caster, castInfos.targets, castInfos.spellLevel);
+            subInfos.damageValue = (int) (((double) Target.getLife() / 100) * castInfos.randomJet(Target));
+            subInfos.duration = castInfos.duration;
+            BuffStats buffStats = new BuffStats(subInfos, Target);
+            if (buffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 
-            Target.getBuff().addBuff(BuffStats);
+            Target.getBuff().addBuff(buffStats);
         }
 
         return -1;

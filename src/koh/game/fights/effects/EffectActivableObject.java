@@ -16,37 +16,37 @@ import koh.protocol.client.enums.SpellShapeEnum;
 public class EffectActivableObject extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         FightActivableObject obj = null;
-        switch (CastInfos.effectType) {
+        switch (castInfos.effectType) {
             case LAYING_GLYPH_RANKED:
             case LAYING_GLYPH_RANKED_2:
             case LAYING_GLYPH:
-                obj = new FightGlyph(CastInfos, CastInfos.duration, getColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
+                obj = new FightGlyph(castInfos, castInfos.duration, getColor(castInfos.spellId), castInfos.effect.zoneSize(), GetMarkType(castInfos.effect.ZoneShape()));
                 break;
 
             case LAYING_TRAP_LEVEL:
-                if (!CastInfos.caster.getFight().canPutObject(CastInfos.cellId)) {
+                if (!castInfos.caster.getFight().canPutObject(castInfos.cellId)) {
                     return -1;
                 }
-                obj = new FightTrap(CastInfos, 0, getColor(CastInfos.spellId), CastInfos.effect.zoneSize(), GetMarkType(CastInfos.effect.ZoneShape()));
+                obj = new FightTrap(castInfos, 0, getColor(castInfos.spellId), castInfos.effect.zoneSize(), GetMarkType(castInfos.effect.ZoneShape()));
                 break;
             case LAYING_PORTAIL:
-                if (CastInfos.getCell().hasGameObject(FightObjectType.OBJECT_PORTAL)) {
-                    ((FightPortal) CastInfos.getCell().getObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
-                } else if (CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster) != null
-                        && CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
-                    CastInfos.caster.getFight().getActivableObjects().get(CastInfos.caster).stream().findFirst().get().remove();
+                if (castInfos.getCell().hasGameObject(FightObjectType.OBJECT_PORTAL)) {
+                    ((FightPortal) castInfos.getCell().getObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
+                } else if (castInfos.caster.getFight().getActivableObjects().get(castInfos.caster) != null
+                        && castInfos.caster.getFight().getActivableObjects().get(castInfos.caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
+                    castInfos.caster.getFight().getActivableObjects().get(castInfos.caster).stream().findFirst().get().remove();
                 }
                 /*if (!castInfos.caster.getFight().canPutObject(castInfos.getCellId)) {
                  return -1;
                  }*/
-                obj = new FightPortal(CastInfos.caster.getFight(), CastInfos.caster, CastInfos, CastInfos.cellId);
+                obj = new FightPortal(castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId);
                 break;
         }
 
         if (obj != null) {
-            CastInfos.caster.getFight().addActivableObject(CastInfos.caster, obj);
+            castInfos.caster.getFight().addActivableObject(castInfos.caster, obj);
         }
         return -1;
     }

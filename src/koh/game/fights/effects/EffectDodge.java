@@ -10,9 +10,9 @@ import koh.game.fights.effects.buff.BuffDodge;
 public class EffectDodge extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
-            Target.getBuff().addBuff(new BuffDodge(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            Target.getBuff().addBuff(new BuffDodge(castInfos, Target));
         }
 
         return -1;

@@ -10,9 +10,9 @@ import koh.game.fights.effects.buff.BuffChatiment;
 public class EffectChatiment extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
-            Target.getBuff().addBuff(new BuffChatiment(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            Target.getBuff().addBuff(new BuffChatiment(castInfos, Target));
         }
 
         return -1;

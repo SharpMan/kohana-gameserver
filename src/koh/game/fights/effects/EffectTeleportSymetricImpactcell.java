@@ -12,16 +12,16 @@ import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_TELEPORT_O
 public class EffectTeleportSymetricImpactcell extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         int toReturn = -1;
         FightCell cell;
 
-        cell = CastInfos.caster.getFight().getCell(CastInfos.caster.getMapPoint().pointSymetry(MapPoint.fromCellId(CastInfos.cellId)).get_cellId());
+        cell = castInfos.caster.getFight().getCell(castInfos.caster.getMapPoint().pointSymetry(MapPoint.fromCellId(castInfos.cellId)).get_cellId());
 
         if (cell != null && cell.canWalk()) {
-            CastInfos.caster.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, CastInfos.caster.getID(), CastInfos.caster.getID(), cell.Id));
+            castInfos.caster.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), castInfos.caster.getID(), cell.Id));
 
-            return CastInfos.caster.setCell(cell);
+            return castInfos.caster.setCell(cell);
         } return -1;
     }
 }

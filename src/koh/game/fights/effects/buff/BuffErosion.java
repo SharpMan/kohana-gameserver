@@ -5,6 +5,7 @@ import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
+import lombok.Getter;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -14,6 +15,8 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class BuffErosion extends BuffEffect {
 
     private final int JET;
+    @Getter
+    private int score;
 
     public BuffErosion(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
@@ -22,15 +25,22 @@ public class BuffErosion extends BuffEffect {
 
     
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
         float pdamage = JET / 100.00f;
-        int BuffValue = this.target.getMaxLife() - (int) (DamageValue.getValue() * pdamage);
-        if (BuffValue < 0) {
-            BuffValue = 0;
+        int buffValue = this.target.getMaxLife() - (int) (damageValue.getValue() * pdamage);
+        score += damageValue.getValue() * pdamage;
+        if (buffValue < 0) {
+            buffValue = 0;
         }
-        this.target.setLifeMax(BuffValue);
+        this.target.setLifeMax(buffValue);
 
-        return super.applyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(damageValue, damageInfos);
+    }
+
+    @Override
+    public int removeEffect(){
+        this.target.setLifeMax(this.target.getMaxLife() + score);
+        return super.removeEffect();
     }
 
     @Override

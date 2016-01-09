@@ -241,7 +241,7 @@ public class FighterBuff {
     /// </summary>
     /// <param name="castInfos"></param>
     /// <param name="damageValue"></param>
-    public int onattackedafterjet(EffectCast CastInfos, MutableInt DamageValue) {
+    public int onAttackedAfterjet(EffectCast CastInfos, MutableInt DamageValue) {
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET)) {
             if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;

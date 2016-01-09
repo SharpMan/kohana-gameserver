@@ -11,10 +11,10 @@ import koh.game.fights.effects.buff.BuffSpellCoolDown;
 public class EffectSpellCoolDown extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
 
-        for (Fighter Target : CastInfos.targets) {
-            BuffEffect Buff = new BuffSpellCoolDown(CastInfos, Target);
+        for (Fighter Target : castInfos.targets) {
+            BuffEffect Buff = new BuffSpellCoolDown(castInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(Buff)) {
                 Target.getBuff().addBuff(Buff);
                 if (Buff.applyEffect(null, null) == -3) {

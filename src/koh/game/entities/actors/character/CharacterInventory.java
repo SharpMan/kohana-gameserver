@@ -525,11 +525,11 @@ public class CharacterInventory {
     }
 
     public int getTotalWeight() {
-        return 1000 + this.player.getStats().getTotal(StatsEnum.AddPods);
+        return 1000 + this.player.getStats().getTotal(StatsEnum.ADD_PODS) + (5 * this.player.getStats().getTotal(StatsEnum.STRENGTH));
     }
 
     public void updateObjectquantity(InventoryItem item, int quantity) {
-        item.SetQuantity(quantity);
+        item.setQuantity(quantity);
         if (item.getQuantity() <= 0) {
             this.removeItem(item);
             return;

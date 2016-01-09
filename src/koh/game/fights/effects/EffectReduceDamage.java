@@ -12,10 +12,10 @@ public class EffectReduceDamage extends EffectBase {
 
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect buf = null;
-        for (Fighter Target : CastInfos.targets) {
-            buf = new BuffReduceDamage(CastInfos, Target);
+        for (Fighter Target : castInfos.targets) {
+            buf = new BuffReduceDamage(castInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(buf)) {
                 Target.getBuff().addBuff(buf);
             }

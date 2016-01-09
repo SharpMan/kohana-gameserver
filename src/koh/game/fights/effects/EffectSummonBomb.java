@@ -17,21 +17,21 @@ import org.apache.commons.lang.ArrayUtils;
 public class EffectSummonBomb extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Possibilité de spawn une creature sur la case ?
 
-        MonsterTemplate Monster = DAO.getMonsters().find(CastInfos.effect.diceNum);
+        MonsterTemplate Monster = DAO.getMonsters().find(castInfos.effect.diceNum);
         // getTemplate de monstre existante
         if (Monster != null) {
-            MonsterGrade MonsterLevel = Monster.getLevelOrNear(CastInfos.effect.diceSide);
+            MonsterGrade MonsterLevel = Monster.getLevelOrNear(castInfos.effect.diceSide);
             if (MonsterLevel != null) {
-                if (CastInfos.caster.getFight().isCellWalkable(CastInfos.cellId)) {
-                    BombFighter Bomb = new BombFighter(CastInfos.caster.getFight(), CastInfos.caster, MonsterLevel);
+                if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
+                    BombFighter Bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, MonsterLevel);
                     Bomb.joinFight();
-                    Bomb.getFight().joinFightTeam(Bomb, CastInfos.caster.getTeam(), false, CastInfos.cellId, true);
-                    CastInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, CastInfos.caster.getID(), (GameFightFighterInformations) Bomb.getGameContextActorInformations(null)));
-                    CastInfos.caster.getFight().getFightWorker().summonFighter(Bomb);
-                    CastInfos.caster.getActivableObjects().filter(Object -> Object instanceof FightBomb)
+                    Bomb.getFight().joinFightTeam(Bomb, castInfos.caster.getTeam(), false, castInfos.cellId, true);
+                    castInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, castInfos.caster.getID(), (GameFightFighterInformations) Bomb.getGameContextActorInformations(null)));
+                    castInfos.caster.getFight().getFightWorker().summonFighter(Bomb);
+                    castInfos.caster.getActivableObjects().filter(Object -> Object instanceof FightBomb)
                             .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).owner,Bomb))
                             .forEach(Bombe -> ((FightBomb)Bombe).getFightCells()
                                               .filter(Cell -> Cell.hasFighter())
@@ -43,7 +43,7 @@ public class EffectSummonBomb extends EffectBase {
                                               }));
                 } else {
                     //castInfos.caster.fight.affectSpellTo(castInfos.caster, castInfos.caster.fight.getCell(castInfos.getCellId).getObjectsAsFighter()[0] , castInfos.effect.diceSide, SpellDAOImpl.bombs.get(castInfos.effect.diceNum).instantSpellId);
-                    CastInfos.caster.getFight().launchSpell(CastInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(CastInfos.effect.diceNum).instantSpellId).getSpellLevel(CastInfos.effect.diceSide), (short) CastInfos.targetKnownCellId, true,true,true);
+                    castInfos.caster.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(castInfos.effect.diceNum).instantSpellId).getSpellLevel(castInfos.effect.diceSide), (short) castInfos.targetKnownCellId, true,true,true);
                 }
             }
         }

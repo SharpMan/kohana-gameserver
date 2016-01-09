@@ -21,24 +21,27 @@ public class EffectStats extends EffectBase {
     private static final int[] BLACKLISTED_EFFECTS = DAO.getSettings().getIntArray("Effect.BlacklistedByTriggers");
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
-            if(Target instanceof IllusionFighter){
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter target : castInfos.targets) {
+            if(target instanceof IllusionFighter){
                 continue;//Roulette tue clone ...
             }
-            EffectCast subInfos = new EffectCast(CastInfos.effectType, CastInfos.spellId, CastInfos.cellId, CastInfos.chance, CastInfos.effect, CastInfos.caster, CastInfos.targets,CastInfos.spellLevel);
+            if(target.getCarriedActor() != 0){
+                target = target.getCarrierActor();
+            }
+            EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
 
-            if(ArrayUtils.contains(BLACKLISTED_EFFECTS,CastInfos.effect.effectUid)){ //Feca special spell
-                Target.getBuff().addBuff(new BuffStatsByHit(subInfos, Target));
+            if(ArrayUtils.contains(BLACKLISTED_EFFECTS, castInfos.effect.effectUid)){ //Feca special spell
+                target.getBuff().addBuff(new BuffStatsByHit(subInfos, target));
                 return -1;
             }
 
-            BuffStats BuffStats = new BuffStats(subInfos, Target);
-            if (BuffStats.applyEffect(null, null) == -3) {
+            BuffStats buffStats = new BuffStats(subInfos, target);
+            if (buffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 
-            Target.getBuff().addBuff(BuffStats);
+            target.getBuff().addBuff(buffStats);
         }
 
         return -1;

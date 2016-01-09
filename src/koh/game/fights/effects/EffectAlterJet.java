@@ -12,10 +12,10 @@ import static koh.protocol.client.enums.StatsEnum.MAXIMIZE_EFFECTS;
 public class EffectAlterJet extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        if (CastInfos.duration > 0) {
-            for (Fighter Target : CastInfos.targets) {
-                Target.getBuff().addBuff(CastInfos.effectType == MAXIMIZE_EFFECTS ? new BuffMaximiseEffects(CastInfos, Target) : new BuffMinimizeEffects(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        if (castInfos.duration > 0) {
+            for (Fighter Target : castInfos.targets) {
+                Target.getBuff().addBuff(castInfos.effectType == MAXIMIZE_EFFECTS ? new BuffMaximiseEffects(castInfos, Target) : new BuffMinimizeEffects(castInfos, Target));
             }
         }
 

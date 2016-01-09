@@ -11,10 +11,10 @@ import koh.game.fights.effects.buff.BuffErosionPercent;
 public class EffectErosionPercent extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect Buf;
-        for (Fighter Target : CastInfos.targets) {
-            Buf = new BuffErosionPercent(CastInfos, Target);
+        for (Fighter Target : castInfos.targets) {
+            Buf = new BuffErosionPercent(castInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(Buf)) {
                 if (Buf.applyEffect(null, null) == -3) {
                     return -3;

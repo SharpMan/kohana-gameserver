@@ -51,6 +51,11 @@ public abstract class EffectBase {
             //Effet de IOP
             this.put(StatsEnum.POUTCH, new EffectPoutch());
             this.put(StatsEnum.DISTRIBUTES_DAMAGES_OCCASIONED, new EffectDistributesDamagesOccasioned());
+            this.put(StatsEnum.LIFE_PERCENT_ERODED_NEUTRAL, new EffectLifeEroded());
+            this.put(StatsEnum.LIFE_PERCENT_ERODED_AIR, new EffectLifeEroded());
+            this.put(StatsEnum.LIFE_PERCENT_ERODED_FIRE, new EffectLifeEroded());
+            this.put(StatsEnum.LIFE_PERCENT_ERODED_WATER, new EffectLifeEroded());
+            this.put(StatsEnum.LIFE_PERCENT_ERODED_EARTH, new EffectLifeEroded());
 
             this.put(StatsEnum.PUNITION, new EffectPunishment());
             this.put(StatsEnum.LAYING_GLYPH_RANKED, new EffectActivableObject());
@@ -294,21 +299,21 @@ public abstract class EffectBase {
         return EffectBase.EFFECTS.get(Effect);
     }
 
-    public static int tryApplyEffect(EffectCast CastInfos) {
+    public static int tryApplyEffect(EffectCast castInfos) {
 
-        if (!EffectBase.EFFECTS.containsKey(CastInfos.effectType)) {
-            logger.debug("Unexist effect {} " , CastInfos.effect.effectId);
+        if (!EffectBase.EFFECTS.containsKey(castInfos.effectType)) {
+            logger.debug("Unexist effect {} " , castInfos.effect.effectId);
             return -1;
         }
 
-        return EffectBase.EFFECTS.get(CastInfos.effectType).applyEffect(CastInfos);
+        return EffectBase.EFFECTS.get(castInfos.effectType).applyEffect(castInfos);
     }
 
     /// <summary>
     /// Application de l'effet
     /// </summary>
     /// <param name="Fighter"></param>
-    public abstract int applyEffect(EffectCast CastInfos);
+    public abstract int applyEffect(EffectCast castInfos);
 
     public boolean silentCast() {
         return false;

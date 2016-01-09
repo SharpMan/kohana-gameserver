@@ -16,26 +16,26 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffSpellCoolDown extends BuffEffect {
 
-    public int Value, Spell;
+    public int value, spell;
 
     public BuffSpellCoolDown(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
-        this.Value = CastInfos.effect.value;
-        this.Spell = CastInfos.effect.diceNum;
+        this.value = CastInfos.effect.value;
+        this.spell = CastInfos.effect.diceNum;
     }
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        //FighterSpell.SpellinitialCooldown CurrentCooldown = this.target.spellsController.myinitialCooldown.get(spell);
-        this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), Spell, Value));
+        //FighterSpell.SpellinitialCooldown CurrentCooldown = this.target.spellsController.initialCooldown.get(spell);
+        this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), spell, value));
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int removeEffect() {
-        FighterSpell.SpellinitialCooldown CurrentCooldown = this.target.getSpellsController().myinitialCooldown.get(Spell);
-        if (CurrentCooldown != null) {
-            this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), Spell, CurrentCooldown.initialCooldown + 1));
+        FighterSpell.SpellinitialCooldown currentCooldown = this.target.getSpellsController().getInitialCooldown().get(spell);
+        if (currentCooldown != null) {
+            this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), spell, currentCooldown.initialCooldown + 1));
         }
         return super.removeEffect();
     }

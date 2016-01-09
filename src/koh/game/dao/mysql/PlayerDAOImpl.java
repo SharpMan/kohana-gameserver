@@ -75,6 +75,8 @@ public class PlayerDAOImpl extends PlayerDAO {
     private final Map<String, Player> myCharacterByName = Collections.synchronizedMap(new HashMap<>());
     private final ConcurrentLinkedQueue<Couple<Long, Player>> characterUnloadQueue = new ConcurrentLinkedQueue();
 
+
+
     @Inject
     private DatabaseSource dbSource;
 

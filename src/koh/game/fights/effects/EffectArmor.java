@@ -11,10 +11,10 @@ import koh.game.fights.effects.buff.BuffEffect;
 public class EffectArmor extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect Buf = null;
-        for (Fighter Target : CastInfos.targets) {
-            Buf = new BuffArmor(CastInfos, Target);
+        for (Fighter Target : castInfos.targets) {
+            Buf = new BuffArmor(castInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(Buf)) {
                 Target.getBuff().addBuff(Buf);
             }

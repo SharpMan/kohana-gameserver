@@ -11,10 +11,10 @@ import koh.game.fights.effects.buff.BuffPorteur;
 public class EffectPorter extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
-            CastInfos.caster.getBuff().addBuff(new BuffPorteur(CastInfos, Target));
-            Target.getBuff().addBuff(new BuffPorter(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            castInfos.caster.getBuff().addBuff(new BuffPorteur(castInfos, Target));
+            Target.getBuff().addBuff(new BuffPorter(castInfos, Target));
         }
 
         return -1;

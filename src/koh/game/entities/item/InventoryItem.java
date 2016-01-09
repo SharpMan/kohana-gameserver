@@ -109,7 +109,7 @@ public class InventoryItem {
         this.notifyColumn("position");
     }
 
-    public void SetQuantity(int i) {
+    public void setQuantity(int i) {
         this.quantity = i;
         this.notifyColumn("stack");
     }

@@ -11,23 +11,23 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectLifeSteal extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         // Si > 0 alors c'est un buff
-        if (CastInfos.duration > 0) {
+        if (castInfos.duration > 0) {
             // L'effet est un poison
-            CastInfos.isPoison = true;
+            castInfos.isPoison = true;
 
             // Ajout du buff
-            CastInfos.targets.stream().forEach((Target) -> {
-                Target.getBuff().addBuff(new BuffLifeSteal(CastInfos, Target));
+            castInfos.targets.stream().forEach((Target) -> {
+                Target.getBuff().addBuff(new BuffLifeSteal(castInfos, Target));
             });
         } else {
-            for (Fighter Target : CastInfos.targets) {
-                if (CastInfos.spellId == 450 && Target.getTeam().id != CastInfos.caster.getTeam().id) { //Folie
+            for (Fighter Target : castInfos.targets) {
+                if (castInfos.spellId == 450 && Target.getTeam().id != castInfos.caster.getTeam().id) { //Folie
                     continue;
                 }
 
-                if (applyLifeSteal(CastInfos, Target, new MutableInt(CastInfos.randomJet(Target))) == -3) {
+                if (applyLifeSteal(castInfos, Target, new MutableInt(castInfos.randomJet(Target))) == -3) {
                     return -3;
                 }
             }

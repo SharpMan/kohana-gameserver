@@ -12,19 +12,19 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class EffectSubPAEsquive extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         MutableInt DamageValue = new MutableInt();
-        if (CastInfos.duration > 1) {
-            for (Fighter Target : CastInfos.targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.effectType, CastInfos.spellId, (short) 0, 0, CastInfos.effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.spellLevel, CastInfos.duration, 0);
+        if (castInfos.duration > 1) {
+            for (Fighter Target : castInfos.targets) {
+                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
                 Buff.applyEffect(DamageValue, null);
                 Target.getBuff().addBuff(Buff);
             }
         } else {
-            for (Fighter Target : CastInfos.targets) {
-                EffectCast SubInfos = new EffectCast(CastInfos.effectType, CastInfos.spellId, (short) 0, 0, CastInfos.effect, CastInfos.caster, null, false, StatsEnum.NONE, 0, CastInfos.spellLevel, 0, 0);
+            for (Fighter Target : castInfos.targets) {
+                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, 0, 0);
 
                 BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
                 Buff.applyEffect(DamageValue, null);

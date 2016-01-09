@@ -12,11 +12,11 @@ import koh.protocol.client.enums.FightStateEnum;
 public class EffectAddState extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect buff;
-        for (Fighter target : CastInfos.targets) {
-            buff = new BuffState(CastInfos, target);
-            if (target.getStates().canState(FightStateEnum.valueOf(CastInfos.effect.value)) && !target.getBuff().buffMaxStackReached(buff)) {
+        for (Fighter target : castInfos.targets) {
+            buff = new BuffState(castInfos, target);
+            if (target.getStates().canState(FightStateEnum.valueOf(castInfos.effect.value)) && !target.getBuff().buffMaxStackReached(buff)) {
                 target.getBuff().addBuff(buff);
                 if (buff.applyEffect(null, null) == -3) {
                     return -3;

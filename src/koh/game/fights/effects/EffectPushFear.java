@@ -13,30 +13,30 @@ import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
 public class EffectPushFear extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) { //TODO : Prise compte etat
-        byte direction = Pathfinder.getDirection(CastInfos.caster.getFight().getMap(), CastInfos.caster.getCellId(), CastInfos.cellId);
-        short targetFighterCell = Pathfinder.nextCell(CastInfos.caster.getCellId(), direction);
+    public int applyEffect(EffectCast castInfos) { //TODO : Prise compte etat
+        byte direction = Pathfinder.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
+        short targetFighterCell = Pathfinder.nextCell(castInfos.caster.getCellId(), direction);
 
-        Fighter target = CastInfos.caster.getFight().getFighterOnCell(targetFighterCell);
+        Fighter target = castInfos.caster.getFight().getFighterOnCell(targetFighterCell);
         if (target == null) {
             return -1;
         }
         short StartCell = target.getCellId();
-        int distance = Pathfinder.getGoalDistance(CastInfos.caster.getFight().getMap(), target.getCellId(), CastInfos.cellId);
+        int distance = Pathfinder.getGoalDistance(castInfos.caster.getFight().getMap(), target.getCellId(), castInfos.cellId);
         FightCell currentCell = target.getMyCell();
 
         for (int i = 0; i < distance; i++) {
-            FightCell nextCell = CastInfos.caster.getFight().getCell(Pathfinder.nextCell(currentCell.Id, direction));
+            FightCell nextCell = castInfos.caster.getFight().getCell(Pathfinder.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.hasObject(IFightObject.FightObjectType.OBJECT_TRAP)) {
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
 
                     return target.setCell(nextCell);
                 }
             } else {
                 if (i != 0) {
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
                 }
 
                 return target.setCell(currentCell);
@@ -45,7 +45,7 @@ public class EffectPushFear extends EffectBase {
             currentCell = nextCell;
         }
 
-        target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+        target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
         return target.setCell(currentCell);
     }

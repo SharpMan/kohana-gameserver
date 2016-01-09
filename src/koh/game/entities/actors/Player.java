@@ -378,7 +378,7 @@ public class Player extends IGameActor implements Observer {
                     logger.error(this.toString());
                 }
                 for (Player p : this.account.characters) { //TODO: ALleos
-                    if(DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x.second.nickName.equalsIgnoreCase(p.nickName))){
+                    if(DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x != null && p.nickName.equalsIgnoreCase(x.second.nickName))){
                         logger.debug(p.nickName + " already aded");
                     }
                     DAO.getPlayers().addCharacterInQueue(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));

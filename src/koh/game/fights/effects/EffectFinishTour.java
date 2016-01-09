@@ -9,8 +9,8 @@ import koh.game.fights.Fight.FightLoopState;
 public class EffectFinishTour extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        CastInfos.caster.getFight().setFightLoopState(FightLoopState.STATE_END_TURN);
+    public int applyEffect(EffectCast castInfos) {
+        castInfos.caster.getFight().setFightLoopState(FightLoopState.STATE_END_TURN);
 
         return -1;
     }

@@ -11,10 +11,10 @@ import koh.game.fights.effects.buff.BuffExpandSize;
 public class EffectExpandSize extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect Buff = null;
-        for (Fighter Target : CastInfos.targets) {
-            Buff = new BuffExpandSize(CastInfos, Target);
+        for (Fighter Target : castInfos.targets) {
+            Buff = new BuffExpandSize(castInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(Buff)) {
                 Target.getBuff().addBuff(Buff);
                 if (Buff.applyEffect(null, null) == -3) {

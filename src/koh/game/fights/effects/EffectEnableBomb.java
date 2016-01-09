@@ -16,14 +16,14 @@ import org.apache.commons.lang.ArrayUtils;
 public class EffectEnableBomb extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
             if (Target instanceof BombFighter) {
-                if (CastInfos.duration > 0) {
-                    Target.getBuff().addBuff(new BuffEnableBomb(CastInfos, Target));
+                if (castInfos.duration > 0) {
+                    Target.getBuff().addBuff(new BuffEnableBomb(castInfos, Target));
                     continue;
                 }
-                if (Explose(Target, CastInfos) == -3) {
+                if (Explose(Target, castInfos) == -3) {
                     return -3;
                 }
             }

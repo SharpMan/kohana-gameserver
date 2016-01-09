@@ -49,7 +49,7 @@ public class AccountData {
     }
 
     public void updateObjectQuantity(Player player, InventoryItem item, int quantity) {
-        item.SetQuantity(quantity);
+        item.setQuantity(quantity);
         if (item.getQuantity() <= 0) {
             this.removeItem(player, item);
             return;

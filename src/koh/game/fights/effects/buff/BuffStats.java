@@ -32,8 +32,7 @@ public class BuffStats extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        
-        this.target.getStats().getEffect(this.castInfos.effectType).additionnal -= this.value1;
+        this.target.getStats().addBoost(this.castInfos.effectType, -this.value1);
 
         return super.removeEffect();
     }

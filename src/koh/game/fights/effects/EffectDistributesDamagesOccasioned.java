@@ -17,7 +17,7 @@ public class EffectDistributesDamagesOccasioned extends EffectBase {
         int Apply = -1;
         for (Fighter target : castInfos.targets) {
             int damageJet = (castInfos.damageValue * castInfos.randomJet(target)) / 100;
-            if (damageJet < 0 || (castInfos.caster.hasState(FightStateEnum.Pacifiste.value) && !castInfos.isGlyph)) {
+            if (damageJet < 0 || (castInfos.caster.hasState(FightStateEnum.PACIFISTE.value) && !castInfos.isGlyph)) {
                 damageJet = (0);
             }
 

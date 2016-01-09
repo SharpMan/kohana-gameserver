@@ -11,11 +11,11 @@ public class EffectCastSpell extends EffectBase {
 
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        SpellLevel spell = DAO.getSpells().findSpell(CastInfos.effect.diceNum).getSpellLevel(CastInfos.effect.diceSide);
+    public int applyEffect(EffectCast castInfos) {
+        SpellLevel spell = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide);
 
-        for(Fighter target : CastInfos.targets){
-            target.getFight().affectSpellTo(CastInfos.caster,target,CastInfos.effect.diceSide,CastInfos.effect.diceNum);
+        for(Fighter target : castInfos.targets){
+            target.getFight().affectSpellTo(castInfos.caster,target, castInfos.effect.diceSide, castInfos.effect.diceNum);
         }
         return -1;
     }

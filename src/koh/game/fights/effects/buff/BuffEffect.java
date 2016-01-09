@@ -56,12 +56,11 @@ public abstract class BuffEffect {
         //return true;
     }
 
-    public BuffEffect(EffectCast CastInfos, Fighter target, BuffActiveType ActiveType, BuffDecrementType decrementType) {
+    public BuffEffect(EffectCast CastInfos, Fighter target, BuffActiveType activeType, BuffDecrementType decrementType) {
         this.castInfos = CastInfos;
 
         //this.duration = (castInfos.duration == -1) ? -1 : (target.fight.currentFighter == target /*&& castInfos.duration == 0*/ ? castInfos.duration + 1 : castInfos.duration) - castInfos.getDelay();
         this.duration = (CastInfos.duration == -1) ? -1 : (decrementType == BuffDecrementType.TYPE_ENDTURN ? CastInfos.duration : (CastInfos.duration) - CastInfos.getDelay());
-
         //Why do i use this
        /* if (decrementType == BuffDecrementType.TYPE_ENDTURN && target.getID() == CastInfos.caster.getID() && this.duration != -1) {
             this.duration++;
@@ -70,7 +69,7 @@ public abstract class BuffEffect {
         this.caster = CastInfos.caster;
         this.target = target;
 
-        this.activeType = ActiveType;
+        this.activeType = activeType;
         this.decrementType = decrementType;
     }
 

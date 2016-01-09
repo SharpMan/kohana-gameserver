@@ -10,9 +10,9 @@ import koh.game.fights.effects.buff.BuffSubPaAfterHealed;
 public class EffectSubPaAfterHealed extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        for (Fighter Target : CastInfos.targets) {
-            Target.getBuff().addBuff(new BuffSubPaAfterHealed(CastInfos, Target));
+    public int applyEffect(EffectCast castInfos) {
+        for (Fighter Target : castInfos.targets) {
+            Target.getBuff().addBuff(new BuffSubPaAfterHealed(castInfos, Target));
         }
         return -1;
     }

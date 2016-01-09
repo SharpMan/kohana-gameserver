@@ -11,10 +11,10 @@ import koh.game.fights.effects.buff.BuffAddSpellRange;
 public class EffectAddSpellRange extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
+    public int applyEffect(EffectCast castInfos) {
         BuffEffect buff = null;
-        for (Fighter target : CastInfos.targets) {
-            buff = new BuffAddSpellRange(CastInfos, target);
+        for (Fighter target : castInfos.targets) {
+            buff = new BuffAddSpellRange(castInfos, target);
             if (!target.getBuff().buffMaxStackReached(buff)) {
                 target.getBuff().addBuff(buff);
                 if (buff.applyEffect(null, null) == -3) {

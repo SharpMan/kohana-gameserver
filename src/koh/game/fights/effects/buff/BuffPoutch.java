@@ -59,7 +59,7 @@ public class BuffPoutch extends BuffEffect {
         boolean flag = false;
         for (EffectInstanceDice Effect : SpellLevel.getEffects()) {
             logger.debug(Effect.toString());
-            ArrayList<Fighter> Targets = new ArrayList<>();
+            ArrayList<Fighter> targets = new ArrayList<>();
             for (short Cell : (new Zone(Effect.ZoneShape(), Effect.zoneSize(), MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true), this.caster.getFight().getMap())).getCells(target.getCellId())) {
                 FightCell FightCell = target.getFight().getCell(Cell);
                 if (FightCell != null) {
@@ -74,7 +74,7 @@ public class BuffPoutch extends BuffEffect {
                                 } else if (Effect.targetMask.equals("a,A") && this.target.getCarriedActor() != 0 & this.target.getID() == Target2.getID()) {
                                     continue;
                                 }
-                                Targets.add(Target2);
+                                targets.add(Target2);
 
                             }
                         }
@@ -82,8 +82,8 @@ public class BuffPoutch extends BuffEffect {
                 }
             }
             if(castInfos.spellId == 94){
-                Targets.clear();
-                Targets.add(DamageInfos.caster);
+                targets.clear();
+                targets.add(DamageInfos.caster);
             }
             if (Effect.random > 0) {
                 if (!flag) {
@@ -97,7 +97,7 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            EffectCast Cast2 = new EffectCast(Effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, Targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            EffectCast Cast2 = new EffectCast(Effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
             Cast2.targetKnownCellId = target.getCellId();
             if (EffectBase.tryApplyEffect(Cast2) == -3) {
                 return -3;

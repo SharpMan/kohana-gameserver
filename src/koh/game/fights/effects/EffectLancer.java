@@ -12,13 +12,13 @@ import koh.protocol.messages.game.actions.fight.GameActionFightThrowCharacterMes
 public class EffectLancer extends EffectBase {
 
     @Override
-    public int applyEffect(EffectCast CastInfos) {
-        if (CastInfos.caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffPorteur)) {
-            Fighter Target = CastInfos.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).findFirst().get().target;
+    public int applyEffect(EffectCast castInfos) {
+        if (castInfos.caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffPorteur)) {
+            Fighter Target = castInfos.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).findFirst().get().target;
             if (Target != null) {
-                Target.getFight().sendToField(new GameActionFightThrowCharacterMessage(ACTION_THROW_CARRIED_CHARACTER, CastInfos.caster.getID(), Target.getID(), CastInfos.cellId));
+                Target.getFight().sendToField(new GameActionFightThrowCharacterMessage(ACTION_THROW_CARRIED_CHARACTER, castInfos.caster.getID(), Target.getID(), castInfos.cellId));
 
-                return Target.setCell(Target.getFight().getCell(CastInfos.cellId));
+                return Target.setCell(Target.getFight().getCell(castInfos.cellId));
             }
         }
 
