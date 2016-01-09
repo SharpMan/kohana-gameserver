@@ -23,7 +23,7 @@ public class SpawnMonsterGroup  extends ItemAction {
         if(!super.execute(p, cell) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         //TODO: arena if(inArena && !World.isArenaMap(perso.get_curCarte().get_id()))return;
-        //TODO2: Parse MonsterEffect
+        //TODO2: Parse MONSTER_EFFECT
         return true;
     }
 }

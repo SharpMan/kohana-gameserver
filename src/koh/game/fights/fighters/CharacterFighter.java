@@ -3,12 +3,7 @@ package koh.game.fights.fighters;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
-import koh.game.fights.Fight;
-import koh.game.fights.FightState;
-import koh.game.fights.FightTypeEnum;
-import koh.game.fights.Fighter;
-import koh.game.fights.IFightObject;
-import koh.game.fights.types.ChallengeFight;
+import koh.game.fights.*;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
@@ -25,24 +20,19 @@ import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteris
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
 import koh.protocol.types.game.character.characteristic.CharacterSpellModification;
 import koh.protocol.types.game.context.GameContextActorInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberCharacterInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
-import koh.protocol.types.game.context.fight.GameFightCharacterInformations;
-import koh.protocol.types.game.context.fight.GameFightMinimalStats;
-import koh.protocol.types.game.context.fight.GameFightMinimalStatsPreparation;
+import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
 
 /**
- *
  * @author Neo-Craft
  */
 public class CharacterFighter extends Fighter {
 
+    public int fakeContextualId = -1000;
     @Getter
     private Player character;
-
 
     public CharacterFighter(Fight Fight, WorldClient client) {
         super(Fight, null);
@@ -71,8 +61,6 @@ public class CharacterFighter extends Fighter {
         }
         return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), this.character.getMaxLife(), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
     }
-
-    public int fakeContextualId = -1000;
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
@@ -159,32 +147,44 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public void endFight() {
-        if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
-            if (super.getLife() <= 0) {
-                this.character.setLife(1);
-            } else {
-                this.character.setLife(super.getLife());
+        try {
+            if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
+                if (super.getLife() <= 0) {
+                    this.character.setLife(1);
+                } else if (this.character.computeLife(50) > super.getLife()) {
+                    this.character.setLife(this.character.computeLife(50));
+                } else {
+                    this.character.setLife(super.getLife());
+                }
             }
+
+            this.fight.unregisterPlayer(character);
+
+            if (this.character.isInWorld()) {
+                this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
+                this.character.send(new GameContextDestroyMessage());
+                this.character.send(new GameContextCreateMessage((byte) 1));
+                this.character.refreshStats(false, true);
+                if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && this.team.id == this.fight.getLoosers().id) {
+                    this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
+                } else {
+                    this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
+                    //this.character.send(new BasicTimeMessage((double) (new Date().getTime()), 0));
+                    this.character.getCurrentMap().spawnActor(this.character);
+                }
+            } else {
+                if (this.isLeft() || (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && this.team.id == this.fight.getLoosers().id)) {
+                    this.character.offlineTeleport(this.character.getSavedMap(), this.character.getSavedCell());
+                }
+            }
+            this.character.setFight(null);
+            this.character.setFighter(null);
+        }catch(Exception e){
+            e.printStackTrace();
+            this.fight.getLogger().error(e);
+            this.fight.getLogger().warn(e.getMessage());
         }
 
-        this.fight.unregisterPlayer(character);
-
-        if (this.character.isInWorld()) {
-            this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
-            this.character.send(new GameContextDestroyMessage());
-            this.character.send(new GameContextCreateMessage((byte) 1));
-            this.character.refreshStats(false,true);
-            if (!(this.fight instanceof ChallengeFight) && this.team.id == this.fight.getLoosers().id) {
-                this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
-            } else {
-                this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
-                //this.character.send(new BasicTimeMessage((double) (new Date().getTime()), 0));
-                this.character.getCurrentMap().spawnActor(this.character);
-
-            }
-        }//elseSetstats mapid...
-        this.character.setFight(null);
-        this.character.setFighter(null);
     }
 
     @Override
@@ -193,8 +193,8 @@ public class CharacterFighter extends Fighter {
     }
 
     @Override
-    public void send(Message Packet) {
-        this.character.send(Packet);
+    public void send(Message packet) {
+        this.character.send(packet);
     }
 
     public FighterStatsListMessage FighterStatsListMessagePacket() {
@@ -229,8 +229,8 @@ public class CharacterFighter extends Fighter {
     }
 
     @Override
-    public int getInitiative(boolean Base) {
-        return this.character.getInitiative(Base);
+    public int getInitiative(boolean base) {
+        return this.character.getInitiative(base);
     }
 
 }

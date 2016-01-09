@@ -91,7 +91,7 @@ public class Collect implements InteractiveAction {
         if (ageBonus > 0) {
             bonusQuantity += (int) ((float) bonusQuantity * ageBonus / 100);
         }
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.getGatheredRessourceItem(), 63, player.getID(), bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.getGatheredRessourceItem()).getPossibleEffects(), EffectGenerationType.Normal, false));
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), Skill.getGatheredRessourceItem(), 63, player.getID(), bonusQuantity > 0 ? quantityGathered + bonusQuantity : quantityGathered, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(Skill.getGatheredRessourceItem()).getPossibleEffects(), EffectGenerationType.NORMAL, false));
         if (player.getInventoryCache().add(item, true)) {
             item.setNeedInsert(true);
         }

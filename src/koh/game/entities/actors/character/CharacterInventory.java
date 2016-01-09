@@ -1,8 +1,26 @@
 package koh.game.entities.actors.character;
 
 import com.google.common.primitives.Ints;
+import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
+import koh.game.entities.actors.Player;
+import koh.game.entities.item.*;
+import koh.game.entities.item.animal.MountInventoryItem;
+import koh.protocol.client.enums.*;
+import koh.protocol.messages.game.basic.TextInformationMessage;
+import koh.protocol.messages.game.inventory.InventoryWeightMessage;
+import koh.protocol.messages.game.inventory.KamasUpdateMessage;
+import koh.protocol.messages.game.inventory.items.*;
+import koh.protocol.messages.game.shortcut.ShortcutBarRemovedMessage;
+import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.ObjectItem;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
+import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
+import koh.protocol.types.game.look.EntityLook;
+import koh.protocol.types.game.look.SubEntity;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,67 +28,53 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import koh.game.controllers.PlayerController;
-import koh.game.dao.DAO;
-import koh.game.entities.actors.Player;
-import koh.game.entities.item.EffectHelper;
-import koh.game.entities.item.InventoryItem;
-import koh.game.entities.item.ItemSet;
-import koh.game.entities.item.ItemTemplate;
-import koh.game.entities.item.Weapon;
-import koh.game.entities.item.animal.MountInventoryItem;
-import koh.protocol.client.enums.CharacterInventoryPositionEnum;
-import koh.protocol.client.enums.EffectGenerationType;
-import koh.protocol.client.enums.ItemSuperTypeEnum;
-import koh.protocol.client.enums.ItemsEnum;
-import koh.protocol.client.enums.ObjectErrorEnum;
-import koh.protocol.client.enums.ShortcutBarEnum;
-import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
-import koh.protocol.client.enums.TextInformationTypeEnum;
-import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.protocol.messages.game.inventory.InventoryWeightMessage;
-import koh.protocol.messages.game.inventory.KamasUpdateMessage;
-import koh.protocol.messages.game.inventory.items.ObjectAddedMessage;
-import koh.protocol.messages.game.inventory.items.ObjectDeletedMessage;
-import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
-import koh.protocol.messages.game.inventory.items.ObjectModifiedMessage;
-import koh.protocol.messages.game.inventory.items.ObjectMovementMessage;
-import koh.protocol.messages.game.inventory.items.ObjectQuantityMessage;
-import koh.protocol.messages.game.inventory.items.SetUpdateMessage;
-import koh.protocol.messages.game.shortcut.ShortcutBarRemovedMessage;
-import koh.protocol.types.game.data.items.ObjectEffect;
-import koh.protocol.types.game.data.items.ObjectItem;
-import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
-import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
-import koh.protocol.types.game.look.EntityLook;
-import koh.protocol.types.game.look.SubEntity;
-
 /**
- *
  * @author Neo-Craft
  */
 public class CharacterInventory {
 
+    public final static int[] unMergeableType = new int[]{97, 121, 18};
     //TODO : Updater PartyEntityLook if Dissociate/Associate livingObject
     private Player player;
     private Map<Integer, InventoryItem> itemsCache = new ConcurrentHashMap<>();
-    public final static int[] unMergeableType = new int[]{97, 121, 18};
 
     public CharacterInventory(Player character) {
         this.player = character;
         DAO.getItems().initInventoryCache(player.getID(), itemsCache, "character_items");
     }
 
-    public InventoryItem find(int id){
+    public static InventoryItem tryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats) {
+        return tryCreateItem(templateId, Character, quantity, position, Stats, false);
+    }
+
+    public static InventoryItem tryCreateItem(int templateId, Player character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
+
+        // Recup template
+        ItemTemplate template = DAO.getItemTemplates().getTemplate(templateId);
+
+        if (template == null)
+            return null;
+
+        // Creation
+        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.NORMAL, template instanceof Weapon) : Stats));
+        item.setNeedInsert(true);
+        item.getStats();
+        if (character != null) {
+            character.getInventoryCache().add(item, Merge);
+        }
+
+        return item;
+    }
+
+    public InventoryItem find(int id) {
         return this.itemsCache.get(id);
     }
 
-    public InventoryItem findTemplate(int template){
+    public InventoryItem findTemplate(int template) {
         return this.getItems().filter(x -> x.getTemplateId() == template).findFirst().orElse(null);
     }
 
-    public void safeDelete(InventoryItem item, int quantity){
+    public void safeDelete(InventoryItem item, int quantity) {
         if (item == null || quantity <= 0) {
             this.player.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
             return;
@@ -86,30 +90,29 @@ public class CharacterInventory {
         }
     }
 
-    public void safeDelete(int template, int quantity){
+    public void safeDelete(int template, int quantity) {
         InventoryItem target;
-        for(int i = 0; quantity > i; i++){
+        for (int i = 0; quantity > i; i++) {
             target = this.getItemInTemplate(template);
-            if(target != null){
-                if(target.getQuantity() != 1){
+            if (target != null) {
+                if (target.getQuantity() != 1) {
                     int toRemove = target.getQuantity() > quantity ? quantity : target.getQuantity();
                     this.safeDelete(target, toRemove);
-                    if(toRemove > 1){
-                        i += toRemove -1;
+                    if (toRemove > 1) {
+                        i += toRemove - 1;
                     }
-                }else{
-                    this.safeDelete(target , 1);
+                } else {
+                    this.safeDelete(target, 1);
                 }
-            }else{
+            } else {
                 break;
             }
         }
     }
 
-    public Stream<InventoryItem> getItems(){
+    public Stream<InventoryItem> getItems() {
         return this.itemsCache.values().stream();
     }
-
 
     public int getItemSetCount() {
         return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().count();
@@ -117,7 +120,7 @@ public class CharacterInventory {
 
     public void generalItemSetApply() {
         this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(set ->
-            this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false)
+                this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false)
         );
     }
 
@@ -451,38 +454,17 @@ public class CharacterInventory {
                 this.player.addLife(-itemSet.getStats(count).getTotal(StatsEnum.VITALITY));
             }
             if (send) {
-                this.player.refreshStats();;
+                this.player.refreshStats();
+                ;
             }
         } catch (NullPointerException e) { //Well confortable than check nullable getItemSet , nulltables getItemSet with this count of items .. ect
         }
     }
 
-    public static InventoryItem tryCreateItem(int templateId, Player Character, int quantity, byte position, List<ObjectEffect> Stats) {
-        return tryCreateItem(templateId, Character, quantity, position, Stats, false);
-    }
-
-    public static InventoryItem tryCreateItem(int templateId, Player character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
-
-        // Recup template
-        ItemTemplate template = DAO.getItemTemplates().getTemplate(templateId);
-
-        if(template == null)
-            return null;
-
-        // Creation
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.Normal, template instanceof Weapon) : Stats));
-        item.setNeedInsert(true);
-        item.getStats();
-        if (character != null) {
-            character.getInventoryCache().add(item, Merge);
-        }
-
-        return item;
-    }
-
     private boolean unEquipedDouble(InventoryItem itemToEquip) {
         if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_DOFUS) {
-            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.getID() != itemToEquip.getID() && x.getTemplateId() == itemToEquip.getTemplateId()).findFirst();
+            Optional<InventoryItem> playerItem = this.getEquipedItems()
+                    .filter(obj -> obj.getID() != itemToEquip.getID() && obj.getTemplateId() == itemToEquip.getTemplateId()).findFirst();
 
             if (playerItem.isPresent()) {
                 this.moveItem(playerItem.get().getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
@@ -490,7 +472,9 @@ public class CharacterInventory {
             }
         }
         if (itemToEquip.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_RING) {
-            Optional<InventoryItem> playerItem = this.getEquipedItems().stream().filter(x -> x.getID() != itemToEquip.getID() && x.getTemplateId()== itemToEquip.getTemplateId() && x.getTemplate().getItemSetId() > 0).findFirst();
+            Optional<InventoryItem> playerItem = this.getEquipedItems()
+                    .filter(obj -> obj.getID() != itemToEquip.getID() && obj.getTemplateId() == itemToEquip.getTemplateId() && obj.getTemplate().getItemSetId() > 0)
+                    .findFirst();
 
             if (playerItem.isPresent()) {
                 this.moveItem(playerItem.get().getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
@@ -500,20 +484,22 @@ public class CharacterInventory {
         return false;
     }
 
-    public Collection<InventoryItem> getEquipedItems() {
-        return this.itemsCache.values().stream().filter(x -> x.getPosition() != 63).collect(Collectors.toSet());
+    public Stream<InventoryItem> getEquipedItems() {
+        return this.itemsCache.values()
+                .stream()
+                .filter(obj -> obj.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED);
     }
 
     public InventoryItem getItemInTemplate(int template) {
-            return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == template).findFirst().orElse(null);
+        return this.itemsCache.values().stream().filter(obj -> obj.getTemplateId() == template).findFirst().orElse(null);
     }
 
     public InventoryItem getItemInSlot(CharacterInventoryPositionEnum slot) {
-            return this.itemsCache.values().stream().filter(x -> x.getSlot() == slot).findFirst().orElse(null);
+        return this.itemsCache.values().stream().filter(x -> x.getSlot() == slot).findFirst().orElse(null);
     }
 
     public InventoryItem getWeapon() {
-            return this.itemsCache.values().stream().filter(x -> x.getSlot() == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).findFirst().orElse(null);
+        return this.itemsCache.values().stream().filter(x -> x.getSlot() == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).findFirst().orElse(null);
     }
 
     public boolean hasWeaponTwoHanded() {
@@ -526,6 +512,13 @@ public class CharacterInventory {
 
     public int getTotalWeight() {
         return 1000 + this.player.getStats().getTotal(StatsEnum.ADD_PODS) + (5 * this.player.getStats().getTotal(StatsEnum.STRENGTH));
+    }
+
+    public Stream<Stream<ObjectEffectDice>> getEffects(int id) {
+        return this.getEquipedItems()
+                .map(obj -> obj.getEffects().stream()
+                        .filter(e -> e.actionId == EffectHelper.SPELL_EFFECT_PER_FIGHT)
+                        .map(e -> (ObjectEffectDice) e));
     }
 
     public void updateObjectquantity(InventoryItem item, int quantity) {
@@ -591,7 +584,7 @@ public class CharacterInventory {
     }
 
     public void substractKamas(int value, boolean send) {
-        this.player.addKamas(- value);
+        this.player.addKamas(-value);
         this.player.send(new KamasUpdateMessage(this.player.getKamas()));
         //this.player.refreshStats();
         if (send) {

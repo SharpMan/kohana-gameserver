@@ -164,7 +164,7 @@ public class CharacterHandler {
         }
     }
 
-    public static void SendCharacterStatsListMessage(WorldClient client) {
+    public static void sendCharacterStatsListMessage(WorldClient client) {
         client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.getCharacter().getExperience(), (double) DAO.getExps().getPlayerMinExp(client.getCharacter().getLevel()), (double) DAO.getExps().getPlayerMaxExp(client.getCharacter().getLevel()), client.getCharacter().getKamas(), client.getCharacter().getStatPoints(), 0, client.getCharacter().getSpellPoints(), client.getCharacter().getActorAlignmentExtendInformations(),
                 client.getCharacter().getLife(), client.getCharacter().getMaxLife(), client.getCharacter().getEnergy(), PlayerEnum.MAX_ENERGY,
                 (short) client.getCharacter().getStats().getTotal(StatsEnum.ACTION_POINTS), (short) client.getCharacter().getStats().getTotal(StatsEnum.MOVEMENT_POINTS),

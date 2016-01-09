@@ -32,13 +32,13 @@ public class ChallengeFight extends Fight {
 
     public ChallengeFight(DofusMap Map, WorldClient attacker, WorldClient defender) {
         super(FightTypeEnum.FIGHT_TYPE_CHALLENGE, Map);
-        Fighter AttFighter = new CharacterFighter(this, attacker);
-        Fighter DefFighter = new CharacterFighter(this, defender);
+        Fighter attFighter = new CharacterFighter(this, attacker);
+        Fighter defFighter = new CharacterFighter(this, defender);
 
-        attacker.addGameAction(new GameFight(AttFighter, this));
-        defender.addGameAction(new GameFight(DefFighter, this));
+        attacker.addGameAction(new GameFight(attFighter, this));
+        defender.addGameAction(new GameFight(defFighter, this));
 
-        super.initFight(AttFighter, DefFighter);
+        super.initFight(attFighter, defFighter);
 
     }
 

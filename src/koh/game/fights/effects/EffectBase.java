@@ -151,6 +151,8 @@ public abstract class EffectBase {
             //DommageSubis
             this.put(StatsEnum.DAMMAGES_OCASSIONED, new EffectDammageOcassioned());
             this.put(StatsEnum.REDUCE_FINAl_DAMAGE_PERCENT, new EffectDamagePercentReduced());
+            this.put(StatsEnum.INCREASE_FINAL_DAMAGES_PERCENT, new EffectDammageOcassioned());
+
             //Enleve les effets du sort
             this.put(StatsEnum.DISPELL_SPELL, new EffectDispellSpell());
 

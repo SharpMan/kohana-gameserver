@@ -83,6 +83,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             StatsEnum.STEAL_NEUTRAL, StatsEnum.STEAL_EARTH, StatsEnum.STEAL_AIR, StatsEnum.STEAL_FIRE, StatsEnum.STEAL_WATER, StatsEnum.STEAL_PV_FIX,
             StatsEnum.DAMAGE_LIFE_NEUTRE, StatsEnum.DAMAGE_LIFE_WATER, StatsEnum.DAMAGE_LIFE_TERRE, StatsEnum.DAMAGE_LIFE_AIR, StatsEnum.DAMAGE_LIFE_FEU, StatsEnum.DAMAGE_DROP_LIFE
     };
+    @Getter
     protected static final Logger logger = LogManager.getLogger(Fight.class);
     private static final HashMap<Integer, HashMap<Integer, Short[]>> MAP_FIGHTCELLS = new HashMap<>();
     private final Object $mutex_lock = new Object();
@@ -344,8 +345,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             logger.debug("CC: " + IsCc + " TauxCC " + TauxCC + " getSpellLevel.criticalHitProbability " + spellLevel.getCriticalHitProbability());
         }
         IsCc &= !fighter.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
-        if (IsCc && fighter.getStats().getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Tutu
-
+        if (IsCc && !fakeLaunch && fighter.getStats().getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Turquoise
+            fighter.getPlayer().getInventoryCache().getEffects(CAST_SPELL_ON_CRITICAL_HIT.value()).forEach(list -> {
+                list.forEach(effect -> {
+                    launchSpell(fighter, DAO.getSpells().findSpell(effect.diceNum).getSpellLevel(effect.diceSide), fighter.getCellId(), true,true,true);
+                });
+            });
         }
 
         EffectInstanceDice[] spellEffects = IsCc ? spellLevel.getCriticalEffect() : spellLevel.getEffects();
@@ -385,7 +390,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             System.out.println(effect.toString());
             targets.put(effect, new ArrayList<>());
             //.
-            final Fighter[] targetsOnZone = Arrays.stream((new Zone(effect.ZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map))
+            final Fighter[] targetsOnZone = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map))
                     .getCells(cellId))
                     .map(cell -> this.getCell(cell))
                     .filter(cell -> cell != null && cell.hasGameObject(FightObjectType.OBJECT_FIGHTER, FightObjectType.OBJECT_STATIC))
@@ -1178,7 +1183,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         fighter.send(new GameFightPlacementPossiblePositionsMessage(this.myFightCells.get(myTeam1).keySet().stream().mapToInt(x -> x.intValue()).toArray(), this.myFightCells.get(myTeam2).keySet().stream().mapToInt(x -> x.intValue()).toArray(), fighter.getTeam().id));
 
         if (!update) {
-            CharacterHandler.SendCharacterStatsListMessage(fighter.getCharacter().getClient());
+            CharacterHandler.sendCharacterStatsListMessage(fighter.getCharacter().getClient());
         }
         this.fighters().forEach((Actor) -> {
             fighter.send(new GameFightShowFighterMessage(Actor.getGameContextActorInformations(null)));
@@ -1228,7 +1233,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
             /*/213.248.126.93 ChallengeInfoMessage Second8 paket
              /213.248.126.93 ChallengeResultMessage Second9 paket*/
-            CharacterHandler.SendCharacterStatsListMessage(fighter.getCharacter().getClient());
+            CharacterHandler.sendCharacterStatsListMessage(fighter.getCharacter().getClient());
             if (this.currentFighter.getID() == fighter.getID()) {
                 fighter.send(this.currentFighter.asPlayer().FighterStatsListMessagePacket());
             }
@@ -1383,11 +1388,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.fightTime = 0;
         this.ageBonus = 0;
         this.endAllSequences();
-        this.fighters().forEach(x -> x.endFight());
+        this.fighters().forEach(fighter -> fighter.endFight());
 
         this.kickSpectators(true);
 
-        this.myCells.values().stream().forEach((c) -> {
+        this.myCells.values().forEach((c) -> {
             c.clear();
         });
         this.myCells.clear();

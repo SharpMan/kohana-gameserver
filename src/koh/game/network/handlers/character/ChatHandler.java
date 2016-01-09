@@ -362,13 +362,13 @@ public class ChatHandler {
                         EffectGenerationType Type;
                         switch (message.Content.split(" ")[3]) {
                             case "max":
-                                Type = EffectGenerationType.MaxEffects;
+                                Type = EffectGenerationType.MAX_EFFECTS;
                                 break;
                             case "min":
-                                Type = EffectGenerationType.MinEffects;
+                                Type = EffectGenerationType.MIN_EFFECTS;
                                 break;
                             default:
-                                Type = EffectGenerationType.Normal;
+                                Type = EffectGenerationType.NORMAL;
                                 break;
                         }
                         ItemTemplate template = DAO.getItemTemplates().getTemplate(Id);

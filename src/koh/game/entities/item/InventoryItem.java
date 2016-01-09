@@ -261,6 +261,8 @@ public class InventoryItem {
                     continue;
                 }
                 this.myStats.addItem(Stat, ((ObjectEffectInteger) e).value);
+            }else if(e.actionId == EffectHelper.SPELL_EFFECT_PER_FIGHT){
+                this.myStats.addItem(StatsEnum.CAST_SPELL_ON_CRITICAL_HIT, ((ObjectEffectDice) e).diceNum);
             }
         }
         Stat = null;

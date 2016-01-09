@@ -13,22 +13,22 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffDammageOcassioned extends BuffEffect {
 
-    private int Jet;
+    private final int JET;
 
     public BuffDammageOcassioned(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
-        this.Jet = CastInfos.randomJet(Target);
+        this.JET = CastInfos.randomJet(Target);
     }
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        DamageValue.setValue((DamageValue.intValue() * this.Jet) / 100);
+        DamageValue.setValue((DamageValue.intValue() * this.JET) / 100);
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public AbstractFightDispellableEffect getAbstractFightDispellableEffect() {
-        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.Jet));
+        return new FightTemporaryBoostEffect(this.getId(), this.target.getID(), (short) this.duration, FightDispellableEnum.DISPELLABLE, (short) this.castInfos.spellId, this.castInfos.getEffectUID(), this.castInfos.parentUID, (short) Math.abs(this.JET));
     }
 
 }

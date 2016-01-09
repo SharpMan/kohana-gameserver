@@ -63,7 +63,7 @@ public abstract class FightActivableObject implements IFightObject {
         activationType = activeType;
         this.color = color;
         targets = new ArrayList<>();
-        affectedCells = new Zone(castInfos.effect.ZoneShape(), size, (byte) 0, fight.getMap(), castInfos.effect.zoneMinSize()).getCells(this.cell.Id);
+        affectedCells = new Zone(castInfos.effect.getZoneShape(), size, (byte) 0, fight.getMap(), castInfos.effect.zoneMinSize()).getCells(this.cell.Id);
         this.duration = duration;
         this.visibileState = visibleState;
         this.size = size;

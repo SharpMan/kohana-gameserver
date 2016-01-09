@@ -291,6 +291,26 @@ public class Player extends IGameActor implements Observer {
         return this.guild.getMember(ID);
     }
 
+    public void offlineTeleport(int newMapID, int newCellID) {
+        if (this.currentMap.getId() == newMapID) {
+            this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
+            return;
+        }
+        DofusMap nextMap = DAO.getMaps().findTemplate(newMapID);
+        if (nextMap == null) {
+            logger.error("Nulled map on {}", newMapID);
+            return;
+        }
+        nextMap.initialize();
+        this.currentMap.destroyActor(this);
+        this.currentMap = nextMap;
+        if (nextMap.getCell((short) newCellID) == null || newCellID < 0 || newCellID > 559) {
+            this.cell = nextMap.getAnyCellWalakable();
+        } else {
+            this.cell = nextMap.getCell((short) newCellID);
+        }
+    }
+
     public synchronized void teleport(int newMapID, int newCellID) {
         if (this.currentMap.getId() == newMapID) {
             this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
@@ -306,7 +326,6 @@ public class Player extends IGameActor implements Observer {
         }
         nextMap.initialize();
         stopSitEmote();
-        client.sequenceMessage();
         this.currentMap.destroyActor(this);
         this.currentMap = nextMap;
         if (nextMap.getCell((short) newCellID) == null || newCellID < 0 || newCellID > 559) {
@@ -399,7 +418,7 @@ public class Player extends IGameActor implements Observer {
         refreshStats(true,true);
     }
 
-    public void refreshStats(boolean Logged, boolean stopRegen) {
+    public void refreshStats(boolean logged, boolean stopRegen) {
         if(this.life > this.getMaxLife()){
             this.setLife(this.getMaxLife());
         }
@@ -408,12 +427,12 @@ public class Player extends IGameActor implements Observer {
             if (client.getParty() != null) {
                 client.getParty().updateMember(this);
             }
-            if (Logged && getFighter() != null && getFight().getFightState() == FightState.STATE_PLACE) {
+            if (logged && getFighter() != null && getFight().getFightState() == FightState.STATE_PLACE) {
                 this.myFighter.getStats().reset();
                 this.myFighter.getStats().merge(this.stats);
                 client.send(((CharacterFighter) getFighter()).FighterStatsListMessagePacket());
             } else {
-                CharacterHandler.SendCharacterStatsListMessage(this.client);
+                CharacterHandler.sendCharacterStatsListMessage(this.client);
             }
         }
     }
@@ -805,6 +824,10 @@ public class Player extends IGameActor implements Observer {
         this.scores.put(ScoreType.PVM_WIN, 0);
         this.scores.put(ScoreType.PVM_LOOSE, 0);
         this.scores.put(ScoreType.PVP_TOURNAMENT, 0);
+    }
+
+    public int computeLife(float percent){
+        return (int) (this.getMaxLife() * percent / 100.00f);
     }
 
     public double getExpBonus() {

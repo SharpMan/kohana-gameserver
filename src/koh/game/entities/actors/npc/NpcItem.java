@@ -1,7 +1,6 @@
 package koh.game.entities.actors.npc;
 
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.ItemTemplate;
 import koh.protocol.client.enums.EffectGenerationType;
@@ -27,7 +26,7 @@ public class NpcItem {
     }
 
     public EffectGenerationType genType(){
-        return this.maximiseStats ? EffectGenerationType.MaxEffects : EffectGenerationType.Normal;
+        return this.maximiseStats ? EffectGenerationType.MAX_EFFECTS : EffectGenerationType.NORMAL;
     }
     
     public ItemTemplate getItemToken() {

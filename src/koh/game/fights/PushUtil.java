@@ -36,7 +36,7 @@ public class PushUtil {
      GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
      if (((targetInfos) && (isPushableEntity(pTargetId))))
      {
-     origin = ((!(hasMinSize(pEffect.ZoneShape()))) ? pCasterId.getCellId() : pSpellImpactCell);
+     origin = ((!(hasMinSize(pEffect.getZoneShape()))) ? pCasterId.getCellId() : pSpellImpactCell);
      originPoint = MapPoint.fromCellId(origin);
      direction = originPoint.advancedOrientationTo(MapPoint.fromCellId(targetInfos.disposition.cellId), false);
      pushForce = getPushForce(origin, targetInfos, pSpellEffects, pEffect);

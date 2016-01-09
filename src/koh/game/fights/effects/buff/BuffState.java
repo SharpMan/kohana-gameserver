@@ -20,7 +20,6 @@ public class BuffState extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        System.out.println(this.duration);
         this.target.getStates().addState(this);
         return super.applyEffect(DamageValue, DamageInfos);
     }

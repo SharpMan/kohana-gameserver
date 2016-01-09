@@ -22,7 +22,7 @@ public class EffectPerception extends EffectBase {
     //TODO dofusMaps AffectedCell in castInfos et nettoyer ce code
     @Override
     public int applyEffect(EffectCast castInfos) {
-        for (short Cell : (new Zone(castInfos.effect.ZoneShape(), castInfos.effect.zoneSize(), MapPoint.fromCellId(castInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castInfos.cellId), true), castInfos.caster.getFight().getMap())).getCells(castInfos.cellId)) {
+        for (short Cell : (new Zone(castInfos.effect.getZoneShape(), castInfos.effect.zoneSize(), MapPoint.fromCellId(castInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castInfos.cellId), true), castInfos.caster.getFight().getMap())).getCells(castInfos.cellId)) {
             FightCell fightCell = castInfos.caster.getFight().getCell(Cell);
             if (fightCell != null) {
                 fightCell.getObjects().stream().filter((fightObject) -> (fightObject.getCellId() == Cell)).forEach((fightObject) -> {

@@ -60,7 +60,7 @@ public class ItemSet {
         for (int i = 0; i < this.effects.length; i++) {
 
             this.myStats[i] = new GenericStats();
-            for (EffectInstance e : EffectHelper.generateIntegerEffectArray(this.effects[i], EffectGenerationType.Normal, false)) {
+            for (EffectInstance e : EffectHelper.generateIntegerEffectArray(this.effects[i], EffectGenerationType.NORMAL, false)) {
                 if (e == null) {
                     continue;
                 }

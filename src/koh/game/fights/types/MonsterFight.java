@@ -112,7 +112,7 @@ public class MonsterFight extends Fight {
                     serializedLoots[i + 1] = loots.get(i / 2).getQuantity();
                 }
                 loots.forEach(lot -> {
-                    final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), lot.getItem(), 63, fighter.getPlayer().getID(), lot.getQuantity(), EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(lot.getItem()).getPossibleEffects(), EffectGenerationType.Normal, DAO.getItemTemplates().getTemplate(lot.getItem()) instanceof Weapon));
+                    final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), lot.getItem(), 63, fighter.getPlayer().getID(), lot.getQuantity(), EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(lot.getItem()).getPossibleEffects(), EffectGenerationType.NORMAL, DAO.getItemTemplates().getTemplate(lot.getItem()) instanceof Weapon));
                     if (fighter.getPlayer().getInventoryCache().add(item, true)) {
                         item.setNeedInsert(true);
                     }

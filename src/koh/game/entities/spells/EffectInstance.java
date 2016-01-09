@@ -97,7 +97,7 @@ public class EffectInstance implements Serializable {
         return zoneShape;
     }
 
-    public SpellShapeEnum ZoneShape() {
+    public SpellShapeEnum getZoneShape() {
         this.parseZone();
         return SpellShapeEnum.valueOf(zoneShape);
     }
@@ -202,7 +202,7 @@ public class EffectInstance implements Serializable {
                 return (false);
             };
         } else {
-            if (((((targetIsCarried) && (!((pEffect.ZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.ZoneShape() == SpellShapeEnum.a))))) {
+            if (((((targetIsCarried) && (!((pEffect.getZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.getZoneShape() == SpellShapeEnum.a))))) {
                 return (true);
             };
             if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(DAO.getMonsters().find(monsterInfo.creatureGenericId).isCanPlay())))) {
@@ -323,7 +323,7 @@ public class EffectInstance implements Serializable {
         if (((this.rawZone != null) && (!this.rawZone.isEmpty()))) {
             this.zoneShape = this.rawZone.charAt(0);
             params = this.rawZone.substring(1).split(",");
-            hasMinSize = (((((((((this.ZoneShape() == SpellShapeEnum.C)) || ((this.ZoneShape() == SpellShapeEnum.X)))) || ((this.ZoneShape() == SpellShapeEnum.Q)))) || ((this.ZoneShape() == SpellShapeEnum.plus)))) || ((this.ZoneShape() == SpellShapeEnum.sharp)));
+            hasMinSize = (((((((((this.getZoneShape() == SpellShapeEnum.C)) || ((this.getZoneShape() == SpellShapeEnum.X)))) || ((this.getZoneShape() == SpellShapeEnum.Q)))) || ((this.getZoneShape() == SpellShapeEnum.plus)))) || ((this.getZoneShape() == SpellShapeEnum.sharp)));
             if (this.rawZone.substring(1).contains(",")) {
                 switch (params.length) {
                     case 1:

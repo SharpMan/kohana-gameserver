@@ -22,14 +22,14 @@ public class EffectActivableObject extends EffectBase {
             case LAYING_GLYPH_RANKED:
             case LAYING_GLYPH_RANKED_2:
             case LAYING_GLYPH:
-                obj = new FightGlyph(castInfos, castInfos.duration, getColor(castInfos.spellId), castInfos.effect.zoneSize(), GetMarkType(castInfos.effect.ZoneShape()));
+                obj = new FightGlyph(castInfos, castInfos.duration, getColor(castInfos.spellId), castInfos.effect.zoneSize(), GetMarkType(castInfos.effect.getZoneShape()));
                 break;
 
             case LAYING_TRAP_LEVEL:
                 if (!castInfos.caster.getFight().canPutObject(castInfos.cellId)) {
                     return -1;
                 }
-                obj = new FightTrap(castInfos, 0, getColor(castInfos.spellId), castInfos.effect.zoneSize(), GetMarkType(castInfos.effect.ZoneShape()));
+                obj = new FightTrap(castInfos, 0, getColor(castInfos.spellId), castInfos.effect.zoneSize(), GetMarkType(castInfos.effect.getZoneShape()));
                 break;
             case LAYING_PORTAIL:
                 if (castInfos.getCell().hasGameObject(FightObjectType.OBJECT_PORTAL)) {
