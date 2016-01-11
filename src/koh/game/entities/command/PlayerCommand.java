@@ -18,25 +18,29 @@ public interface PlayerCommand {
     public default void call(WorldClient client, String args){
         if(client.getAccount().right < this.roleRestrained()){
             PlayerController.sendServerMessage(client, "You do not have the appropriate rank");
-            return;
         }
-        if(this.can(client)){
+        else if(args.split(" ").length < this.argsNeeded()){
+            PlayerController.sendServerMessage(client,"Valeurs incorrects, cette commande demande "+this.argsNeeded()+" arguments","01EA85");
+        }
+        else if(this.can(client)){
             try {
-                this.apply(client, args);
+                this.apply(client, args.split(" ",this.argsNeeded()));
             }catch(Exception e){
                 logger.error(e);
                 logger.warn(e.getMessage());
-                PlayerController.sendServerMessage(client, "Please enter correctly the command's arg");
+                PlayerController.sendServerMessage(client, "Please enter correctly the command's args");
                 PlayerController.sendServerMessage(client,this.getDescription());
             }
         }
     }
 
-    public void apply(WorldClient client,String args);
+    public void apply(WorldClient client,String[] args);
 
     public boolean can(WorldClient client);
 
     public int roleRestrained();
+
+    public int argsNeeded();
 
 
 }

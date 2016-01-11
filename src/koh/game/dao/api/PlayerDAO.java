@@ -35,4 +35,8 @@ public abstract class PlayerDAO implements Service {
     public abstract void getByAccount(Account account) throws Exception;
 
     public abstract boolean add(Player character);
+
+    public abstract int getCharacterOwner(String name);
+
+    public abstract Player[] getByIp(String ip);
 }

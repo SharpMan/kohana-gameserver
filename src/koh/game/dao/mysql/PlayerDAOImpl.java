@@ -144,6 +144,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .scales(stringToShortArray(result.getString("scales")))
                             .level(result.getInt("level"))
                             .account(account)
+                            .owner(result.getInt("owner"))
                             .currentMap(maps.findTemplate(result.getInt("map")).init$Return())
                             .spellPoints(result.getInt("spell_points"))
                             .statPoints(result.getInt("stat_points"))
@@ -349,6 +350,35 @@ public class PlayerDAOImpl extends PlayerDAO {
     @Override
     public Player getCharacter(String characterName) {
         return myCharacterByName.get(characterName.toLowerCase());
+    }
+
+
+    @Override
+    public int getCharacterOwner(String name){
+        Player target = this.getCharacter(name);
+        if(target != null){
+            return target.getOwner();
+        }
+        else{
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("SELECT owner FROM `character` WHERE LOWER(nickname) = LOWER(?);")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setString(1, name);
+                ResultSet set = pStatement.executeQuery();
+                if(set.first())
+                    return set.getInt("owner");
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public Player[] getByIp(String ip){ //No strean in Jython
+        return this.myCharacterById.values().stream()
+                .filter(pl -> pl.isInWorld() && pl.getClient().getIP().equalsIgnoreCase(ip))
+                .toArray(Player[]::new);
     }
 
     @Override

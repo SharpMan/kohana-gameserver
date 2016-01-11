@@ -147,12 +147,12 @@ public class WorldClient {
         return this.myActions.size();
     }
 
-    public void endGameAction(GameActionTypeEnum Action) {
+    public void endGameAction(GameActionTypeEnum action) {
         try {
             synchronized (this.myActions) {
-                if (this.myActions.containsKey(Action)) {
-                    this.myActions.get(Action).endExecute();
-                    this.myActions.remove(Action);
+                if (this.myActions.containsKey(action)) {
+                    this.myActions.get(action).endExecute();
+                    this.myActions.remove(action);
                 }
             }
         } catch (Exception e) {

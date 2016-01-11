@@ -29,9 +29,9 @@ public class SmileyHandler {
             return;
         }
         if(client.isGameAction(GameActionTypeEnum.FIGHT))
-            client.getCharacter().getFight().sendToField(new ChatSmileyMessage(client.getCharacter().getID(), message.smileyId, client.getCharacter().getAccountId()));
+            client.getCharacter().getFight().sendToField(new ChatSmileyMessage(client.getCharacter().getID(), message.smileyId, client.getCharacter().getOwner()));
         else
-            client.getCharacter().getCurrentMap().sendToField(new ChatSmileyMessage(client.getCharacter().getID(), message.smileyId, client.getCharacter().getAccountId()));
+            client.getCharacter().getCurrentMap().sendToField(new ChatSmileyMessage(client.getCharacter().getID(), message.smileyId, client.getCharacter().getOwner()));
 
         client.getLastChannelMessage().put(SMILEY_CHANNEL, System.currentTimeMillis());
     }

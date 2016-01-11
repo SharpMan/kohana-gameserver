@@ -1,7 +1,9 @@
 package koh.game.entities.command;
 
+import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
 import koh.game.network.WorldClient;
 
 /**
@@ -12,18 +14,19 @@ public class TeleportCommand implements PlayerCommand {
 
     @Override
     public String getDescription() {
-        return "Teleporte a la map {1} et cellule {2}";
+        return "Teleporte a la map arg1 et cellule arg2";
     }
 
     @Override
-    public void apply(WorldClient client, String args) {
-        int mapid = Integer.parseInt(args.split(" ")[0]);
-        int cellid = args.split(" ").length < 1 ? -1 : Integer.parseInt(args.split(" ")[1]);
+    public void apply(WorldClient client, String args[]) {
+        int mapid = Integer.parseInt(args[0]);
+        int cellid = args.length > 1 ? Integer.parseInt(args[1]) : -1;
         client.getCharacter().teleport(mapid, cellid);
     }
 
     @Override
     public boolean can(WorldClient client) {
+
         if(client.isGameAction(GameActionTypeEnum.FIGHT)){
             PlayerController.sendServerMessage(client, "Action impossible : Vous etes en combat");
             return false;
@@ -37,6 +40,11 @@ public class TeleportCommand implements PlayerCommand {
 
     @Override
     public int roleRestrained() {
+        return 1;
+    }
+
+    @Override
+    public int argsNeeded() {
         return 1;
     }
 }

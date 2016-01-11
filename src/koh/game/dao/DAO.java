@@ -68,5 +68,8 @@ public class DAO {
     @Inject @Getter
     private static MapMonsterDAO mapMonsters;
 
+    @Inject @Getter
+    private static PlayerCommandDAO commands;
+
 
 }

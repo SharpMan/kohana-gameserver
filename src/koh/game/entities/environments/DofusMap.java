@@ -50,7 +50,7 @@ import koh.protocol.types.game.interactive.InteractiveElementSkill;
 import koh.protocol.types.game.interactive.InteractiveElementWithAgeBonus;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang.mutable.MutableInt;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -576,6 +576,13 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             }
         }
         return RandomCell;
+    }
+
+    public String posToString(){
+        if(this.position != null){
+            return this.position.getPosX() +" " + this.position.getPosY();
+        }
+        return "Undefined mapid " + this.id;
     }
 
 }

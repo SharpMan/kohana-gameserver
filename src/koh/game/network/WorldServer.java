@@ -67,7 +67,7 @@ public class WorldServer {
         //this.inactivity_manager.start();
     }
 
-    public void SendPacket(Message message) {
+    public void sendPacket(Message message) {
         acceptor.getManagedSessions().values().stream().filter((session) -> (session.getAttribute("session") instanceof WorldClient) /*&& ((RealmClient) session.getAttribute("session")).ClientState == State.ON_GAMESERVER_LIST*/).forEach((session) -> {
             ((WorldClient) session.getAttribute("session")).send(message);
         });

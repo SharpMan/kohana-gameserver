@@ -542,7 +542,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         Targets.remove(fighter);
         ObjectEffectDice[] Effects = weapon.getEffects$Notify()
                 .stream()
-                .filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.unRandomablesEffects, Effect.actionId))
+                .filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.UN_RANDOMABLES_EFFECTS, Effect.actionId))
                 .map(x -> (ObjectEffectDice) x)
                 .toArray(ObjectEffectDice[]::new);
 

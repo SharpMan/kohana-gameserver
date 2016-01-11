@@ -164,6 +164,7 @@ public class CharacterFighter extends Fighter {
                 this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
                 this.character.send(new GameContextDestroyMessage());
                 this.character.send(new GameContextCreateMessage((byte) 1));
+                this.character.setFight(null);
                 this.character.refreshStats(false, true);
                 if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && this.team.id == this.fight.getLoosers().id) {
                     this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());

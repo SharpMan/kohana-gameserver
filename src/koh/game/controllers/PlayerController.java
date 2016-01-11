@@ -1,6 +1,8 @@
 package koh.game.controllers;
 
 import java.util.regex.Pattern;
+
+import koh.game.Main;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
@@ -15,12 +17,18 @@ public class PlayerController {
 
     private final static String ENCRYPTED_REGEX = "^[A-Z][a-z]{2,9}(?:-[A-Z][a-z]{2,9}|[a-z]{1,10})$";
     public final static Pattern ENCRYPTED_MATCHER = Pattern.compile(ENCRYPTED_REGEX);
-    public final static String[] ForbiddenNames = new String[]{
+    public final static String[] FORBIDDEN_NAMES = new String[]{
         "XELOR", "IOP", "FECA", "ENIRIPSA",
         "SADIDA", "ECAFLIP", "ENUTROF", "PANDAWA",
         "SRAM", "CRA", "OSAMODAS", "SACRIEUR",
         "DROP", "MULE", "ADMIN", "MODO", "ANIM"
     };
+
+    public static void sendServerMessage(String message, String color) {
+        Main.worldServer().sendPacket(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{
+                "<font color=\"#" + color + "\">" + message + "</font>"
+        }));
+    }
 
     public static void sendServerMessage(WorldClient c, String message) {
         if (c == null) {
@@ -40,8 +48,8 @@ public class PlayerController {
         }));
     }
 
-    public static void sendServerMessage(WorldClient c, String message, String Color) {
-        sendServerMessage(c, "<font color=\"#" + Color + "\">" + message + "</font>");
+    public static void sendServerMessage(WorldClient c, String message, String color) {
+        sendServerMessage(c, "<font color=\"#" + color + "\">" + message + "</font>");
     }
 
     public static String GenerateName() {

@@ -57,7 +57,7 @@ public class EffectHelper {
         293, //Augmente les dégâts de base du sort #1 de #3
         294, //Diminue la portée du sort #1 de #3
     };
-    public static final int[] unRandomablesEffects = new int[]{
+    public static final int[] UN_RANDOMABLES_EFFECTS = new int[]{
         96,//Effect_DamageWater
         97,//Effect_DamageEarth
         98,//Effect_DamageAir
@@ -229,7 +229,7 @@ public class EffectHelper {
         int i = 0;
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
-                if (e.effectId == SPELL_EFFECT_PER_FIGHT || ArrayUtils.contains(RELATED_OBJECTS_EFFECT, e.effectId) || ArrayUtils.contains(SPELL_ITEMS_EFFECTS, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
+                if (e.effectId == SPELL_EFFECT_PER_FIGHT || ArrayUtils.contains(RELATED_OBJECTS_EFFECT, e.effectId) || ArrayUtils.contains(SPELL_ITEMS_EFFECTS, e.effectId) || (isWeapon && ArrayUtils.contains(UN_RANDOMABLES_EFFECTS, e.effectId))) {
                     effects[i] = e;
                     continue;
                 }
@@ -280,7 +280,7 @@ public class EffectHelper {
                 {
                     continue;
                 }
-                if (e.effectId == SPELL_EFFECT_PER_FIGHT || ArrayUtils.contains(RELATED_OBJECTS_EFFECT, e.effectId) || ArrayUtils.contains(SPELL_ITEMS_EFFECTS, e.effectId) || (isWeapon && ArrayUtils.contains(unRandomablesEffects, e.effectId))) {
+                if (e.effectId == SPELL_EFFECT_PER_FIGHT || ArrayUtils.contains(RELATED_OBJECTS_EFFECT, e.effectId) || ArrayUtils.contains(SPELL_ITEMS_EFFECTS, e.effectId) || (isWeapon && ArrayUtils.contains(UN_RANDOMABLES_EFFECTS, e.effectId))) {
                     effects.add(new ObjectEffectDice(e.effectId, ((EffectInstanceDice) e).diceNum, ((EffectInstanceDice) e).diceSide, ((EffectInstanceDice) e).value));
                     continue;
                 }

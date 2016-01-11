@@ -217,6 +217,10 @@ public class ItemTemplate {
     }
 
 
+    public boolean isWeapon(){
+        return this instanceof  Weapon;
+    }
+
 
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

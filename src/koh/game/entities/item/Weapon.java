@@ -5,8 +5,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
-import static koh.game.entities.item.EffectHelper.unRandomablesEffects;
+
+import static koh.game.entities.item.EffectHelper.UN_RANDOMABLES_EFFECTS;
 
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,7 +44,7 @@ public class Weapon extends ItemTemplate {
         if(this.initialized)
             return;
         Arrays.stream(this.possibleEffects)
-                .filter(e -> ArrayUtils.contains(unRandomablesEffects, e.effectId))
+                .filter(e -> ArrayUtils.contains(UN_RANDOMABLES_EFFECTS, e.effectId))
                 .forEach(effect -> effect.rawZone = this.getItemType().getRawZone());
         this.initialized = true;
     }

@@ -15,7 +15,7 @@ public class AntiCheat {
     public final static int AGGRO_PER_MIN = 180;
 
     public static short deviserBy(Stream<Fighter> versus, Fighter fighter, boolean win) {
-        short DeviseBy = 1;
+        short devisedBy = 1;
         if (!PlayerInst.P_PROPERTIES.containsKey(fighter.getID())) {
             PlayerInst.P_PROPERTIES.put(fighter.getID(), new PlayerInst());
         }
@@ -46,7 +46,7 @@ public class AntiCheat {
                         P_PROPERTIES.get(fighter.getID()).myVictimsById.get(Target.getID()).second = 1;
                     }
                 }
-                DeviseBy += bestScore;
+                devisedBy += bestScore;
             }
         } else {
             for (Fighter Target : (Iterable<Fighter>) versus::iterator) {
@@ -75,10 +75,10 @@ public class AntiCheat {
                         P_PROPERTIES.get(fighter.getID()).victimsById.get(Target.getID()).second = 1;
                     }
                 }
-                DeviseBy += bestScore;
+                devisedBy += bestScore;
             }
         }
-        return DeviseBy;
+        return devisedBy;
     }
 
 }

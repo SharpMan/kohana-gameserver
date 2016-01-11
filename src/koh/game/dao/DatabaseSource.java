@@ -59,7 +59,9 @@ public class DatabaseSource implements Service {
         binder.bind(PlayerCommandDAO.class).to(PlayerCommandDAOImpl.class).asEagerSingleton();
         binder.bind(PlayerDAO.class).to(PlayerDAOImpl.class).asEagerSingleton();
         binder.bind(SpellDAO.class).to(SpellDAOImpl.class).asEagerSingleton();
-        binder.bind(MapMonsterDAO.class).to(MapMonsterDAOImpl.class).asEagerSingleton();;
+        binder.bind(MapMonsterDAO.class).to(MapMonsterDAOImpl.class).asEagerSingleton();
+        binder.bind(PlayerCommandDAO.class).to(PlayerCommandDAOImpl.class).asEagerSingleton();
+
         binder.requestStaticInjection(DAO.class);
     }
 

@@ -262,7 +262,7 @@ public class CharacterHandler {
 
 
                 client.getAccount().characters.add(0, character);
-                Main.interClient().Send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
+                Main.interClient().send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.OK.value()));
                 client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
             }

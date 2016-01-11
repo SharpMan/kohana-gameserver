@@ -1,12 +1,16 @@
 package koh.game.dao.script;
 
-import koh.game.dao.api.AreaDAO;
 import koh.game.dao.api.PlayerCommandDAO;
-import koh.game.entities.command.PlayerCommand;
+import koh.game.entities.command.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Created by Melancholia on 12/10/15.
@@ -18,36 +22,78 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
     private final HashMap<String, PlayerCommand> chatCommands = new HashMap<>(20), consoleCommands = new HashMap<>(20);
 
     @Override
-    public PlayerCommand findChatCommand(String message){
+    public PlayerCommand findChatCommand(String message) {
         return this.chatCommands.entrySet()
                 .stream()
                 .filter(key -> message.startsWith(key.getKey()))
                 .map(entry -> entry.getValue())
                 .findFirst()
-                .orElseGet(null);
+                .orElse(null);
     }
 
     @Override
-    public PlayerCommand findConsoleCommand(String message){
+    public PlayerCommand findConsoleCommand(String message) {
         return this.consoleCommands.entrySet()
                 .stream()
                 .filter(key -> message.startsWith(key.getKey()))
                 .map(entry -> entry.getValue())
                 .findFirst()
-                .orElseGet(null);
+                .orElse(null);
     }
 
-    private int loadAll(){
-        //TODO : Folder1 = chat, 2 = console
-        return 0;
+    private int loadChatCommands() {
+        try {
+            this.chatCommands.clear();
+            Files.walk(Paths.get("data/script/chat"))
+                    .filter(Files::isRegularFile)
+                    .filter(file -> file.toString().endsWith(".py"))
+                    .forEach((Path file) ->
+                    {
+                        this.chatCommands.put(file.getFileName()
+                                        .toString()
+                                        .substring(0, file.getFileName().toString().length() - 10)
+                                        .toLowerCase()
+                                ,PythonUtils.getJythonObject(PlayerCommand.class, file.toString()));
+
+                    });
+            this.chatCommands.put("help", new HelpCommand(this.chatCommands));
+        } catch (Exception e) {
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+        return chatCommands.size();
     }
 
+    private int loadConsoleCommands() {
+        try {
+            this.consoleCommands.clear();
+            this.consoleCommands.put("teleport", new TeleportCommand()); //FOR TEST
+
+            Files.walk(Paths.get("data/script/console"))
+                    .filter(Files::isRegularFile)
+                    .filter(file -> file.toString().endsWith(".py"))
+                    .forEach((Path file) ->
+                    {
+                        this.consoleCommands.put(file.getFileName()
+                                        .toString()
+                                        .substring(0, file.getFileName().toString().length() - 10)
+                                        .toLowerCase()
+                                , PythonUtils.getJythonObject(PlayerCommand.class, file.toString()));
+
+                    });
+            this.consoleCommands.put("help", new HelpCommand(this.consoleCommands));
+        } catch (Exception e) {
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+        return consoleCommands.size();
+    }
 
 
     @Override
     public void start() {
-        logger.info("Loaded {} player commands", this.loadAll());
-
+        logger.info("Loaded {} chat commands", this.loadChatCommands());
+        logger.info("Loaded {} console commands", this.loadConsoleCommands());
     }
 
     @Override

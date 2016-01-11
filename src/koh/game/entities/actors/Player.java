@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import koh.d2o.Couple;
+import koh.game.actions.*;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 
@@ -324,10 +325,12 @@ public class Player extends IGameActor implements Observer {
             //client.sendPacket(new ErrorMapNotFoundMessage());
             return;
         }
+        client.endGameAction(koh.game.actions.GameActionTypeEnum.MAP_MOVEMENT);
         nextMap.initialize();
         stopSitEmote();
         this.currentMap.destroyActor(this);
         this.currentMap = nextMap;
+        this.mapid = newMapID;
         if (nextMap.getCell((short) newCellID) == null || newCellID < 0 || newCellID > 559) {
             this.cell = nextMap.getAnyCellWalakable();
         } else {
@@ -437,12 +440,13 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
+    private static final int[] TAVERNE_MAP = new int[] { 146233,148796,146237,148786,144698,145208,145714};
+
     public void updateRegenedEnergy(){
         if(this.energy < PlayerEnum.MAX_ENERGY && this.regenStartTime != 0){
             long timeElapsed = TimeUnit.MILLISECONDS.toHours(Instant.now().minusMillis(this.regenStartTime).toEpochMilli());
             if(timeElapsed > 0){
-                timeElapsed *= 50;
-                //TODO Taverne *=2
+                timeElapsed *= ArrayUtils.contains(TAVERNE_MAP, this.mapid) ? 100 : 50;
                 if (this.energy + timeElapsed > PlayerEnum.MAX_ENERGY) {
                     timeElapsed = PlayerEnum.MAX_ENERGY - this.energy;
                 }
@@ -459,9 +463,11 @@ public class Player extends IGameActor implements Observer {
                 this.stopRegen(stopRegen);
                 this.regenStartTime = 0;
             }
+        }
+        else if(this.myFight != null){
             return;
         }
-        if(this.regenStartTime == 0){
+        else if(this.regenStartTime == 0){
             this.regenStartTime = Instant.now().toEpochMilli();
             this.send(new LifePointsRegenBeginMessage(this.regenRate));
         }else{
@@ -781,9 +787,6 @@ public class Player extends IGameActor implements Observer {
         return this.sexe == 1;
     }
 
-    public int getAccountId() {
-        return this.account.id;
-    }
 
     @Override
     public void Observer$update(Observable o, Object... args) {
