@@ -1,8 +1,11 @@
 package koh.game.fights.fighters;
 
 import java.util.Arrays;
+import java.util.List;
+
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
+import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.look.EntityLookParser;
@@ -91,6 +94,11 @@ public class IllusionFighter extends StaticFighter {
     @Override
     public EntityLook getEntityLook() {
         return this.entityLook;
+    }
+
+    @Override
+    public List<SpellLevel> getSpells() {
+        return null;
     }
 
 }

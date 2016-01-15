@@ -3,6 +3,7 @@ package koh.game.fights.fighters;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
+import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.*;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
@@ -24,6 +25,9 @@ import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Neo-Craft
@@ -146,6 +150,11 @@ public class CharacterFighter extends Fighter {
     }
 
     @Override
+    public List<SpellLevel> getSpells() {
+        return this.character.getMySpells().getSpells();
+    }
+
+    @Override
     public void endFight() {
         try {
             if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
@@ -206,7 +215,7 @@ public class CharacterFighter extends Fighter {
                 stats.getEffect(StatsEnum.MOVEMENT_POINTS), stats.getEffect(StatsEnum.STRENGTH), stats.getEffect(StatsEnum.VITALITY),
                 stats.getEffect(StatsEnum.WISDOM), stats.getEffect(StatsEnum.CHANCE), stats.getEffect(StatsEnum.AGILITY),
                 stats.getEffect(StatsEnum.INTELLIGENCE), stats.getEffect(StatsEnum.ADD_RANGE), stats.getEffect(StatsEnum.ADD_SUMMON_LIMIT),
-                stats.getEffect(StatsEnum.DamageReflection), stats.getEffect(StatsEnum.ADD_CRITICAL_HIT), character.getInventoryCache().weaponCriticalHit(),
+                stats.getEffect(StatsEnum.DAMAGE_REFLECTION), stats.getEffect(StatsEnum.ADD_CRITICAL_HIT), character.getInventoryCache().weaponCriticalHit(),
                 stats.getEffect(StatsEnum.CRITICAL_MISS), stats.getEffect(StatsEnum.ADD_HEAL_BONUS), stats.getEffect(StatsEnum.ALL_DAMAGES_BONUS),
                 stats.getEffect(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT), stats.getEffect(StatsEnum.ADD_DAMAGE_PERCENT), stats.getEffect(StatsEnum.TRAP_BONUS),
                 stats.getEffect(StatsEnum.TRAP_DAMAGE_PERCENT), stats.getEffect(StatsEnum.GLYPH_BONUS_PERCENT), stats.getEffect(StatsEnum.PERMANENT_DAMAGE_PERCENT), stats.getEffect(StatsEnum.ADD_TACKLE_BLOCK),

@@ -49,6 +49,10 @@ public class MovementPath {
         return transitCells.get(transitCells.size() - 1);
     }
 
+    public byte getEndDirection() {
+        return directions.get(directions.size() - 1);
+    }
+
     public void addCell(short Cell, byte Direction) {
         this.transitCells.add(Cell);
         this.directions.add(Direction);

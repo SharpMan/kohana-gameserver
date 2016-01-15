@@ -10,12 +10,15 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightBomb;
+import lombok.Getter;
 
 /**
  *
  * @author Neo-Craft
  */
 public class FightCell {
+
+
 
     public class FightCellComparator implements Comparator<IFightObject> {
 
@@ -25,6 +28,7 @@ public class FightCell {
         }
     }
 
+    @Getter
     public short Id;
     private boolean myWalkable;
     private boolean myLineOfSight;
@@ -111,6 +115,11 @@ public class FightCell {
         return myFightObjects.contains(objectType);
     }
 
+    public FightActivableObject[] getObjectsLayer() {
+        return this.myFightObjects.stream().filter(x -> x instanceof FightActivableObject)
+                .map(obj -> ((FightActivableObject)obj)).toArray(FightActivableObject[]::new);
+    }
+
     public IFightObject[] getObjects(FightObjectType ObjectType) {
         return this.myFightObjects.stream().filter(x -> x.getObjectType() == ObjectType).toArray(IFightObject[]::new);
     }
@@ -121,6 +130,15 @@ public class FightCell {
     
     public boolean hasFighter(){
         return myFightObjects.stream().anyMatch(x -> x instanceof Fighter);
+    }
+
+
+    public Fighter getFighter() {
+        return myFightObjects.stream()
+                .filter(x -> x instanceof Fighter)
+                .map(x -> (Fighter)x)
+                .findFirst()
+                .orElse(null);
     }
 
     public Fighter[] getObjectsAsFighter() {
@@ -139,14 +157,14 @@ public class FightCell {
       if (!this.hasFighter()) {
             return null;
         }
-        return (this.getObjectsAsFighter()[0].getTeam().id != Team.id && !this.getObjectsAsFighter()[0].isMarkedDead()) ? this.getObjectsAsFighter()[0] : null; //Class not id ...
+        return (this.getObjectsAsFighter()[0].getTeam().id != Team.id && this.getObjectsAsFighter()[0].isAlive()) ? this.getObjectsAsFighter()[0] : null; //Class not id ...
     }
 
     public Fighter hasFriend(FightTeam Team) {
         if (!this.hasFighter()) {
             return null;
         }
-        return (this.getObjectsAsFighter()[0].getTeam().id == Team.id && !this.getObjectsAsFighter()[0].isMarkedDead()) ? this.getObjectsAsFighter()[0] : null; //Class not id ...
+        return (this.getObjectsAsFighter()[0].getTeam().id == Team.id && this.getObjectsAsFighter()[0].isAlive()) ? this.getObjectsAsFighter()[0] : null; //Class not id ...
     }
 
     public synchronized int addObject(IFightObject fightObject) {

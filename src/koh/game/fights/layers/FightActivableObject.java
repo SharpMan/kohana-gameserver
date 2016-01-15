@@ -15,6 +15,7 @@ import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.actions.fight.GameActionFightTriggerGlyphTrapMessage;
 import koh.protocol.types.game.actions.fight.GameActionMark;
 import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
@@ -42,7 +43,8 @@ public abstract class FightActivableObject implements IFightObject {
     public GameActionMarkCellsTypeEnum shape;
     public short ID;
     protected Fight m_fight;
-    protected SpellLevel m_actionEffect;
+    @Getter
+    protected SpellLevel castSpell;
     protected MapPoint cachedMapPoints;
 
     public FightActivableObject() {
@@ -56,7 +58,7 @@ public abstract class FightActivableObject implements IFightObject {
         m_spellId = castInfos.spellId;
         m_spell_level = castInfos.spellLevel.getGrade();
         try {
-            m_actionEffect = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide - 1];
+            castSpell = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide - 1];
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
         }
         this.cell = fight.getCell(cell);
@@ -69,8 +71,8 @@ public abstract class FightActivableObject implements IFightObject {
         this.size = size;
         shape = shap;
 
-        if (m_actionEffect != null) {
-            for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
+        if (castSpell != null) {
+            for (EffectInstanceDice effect : castSpell.getEffects()) {
                 if (EffectCast.isDamageEffect(effect.getEffectType())) {
                     priority--;
                 }
@@ -161,13 +163,13 @@ public abstract class FightActivableObject implements IFightObject {
         m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(getGameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.caster.getID(), this.ID, activator.getID(), this.m_spellId));
         activator.getFight().startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         ArrayList<Fighter> targetsPerEffect = new ArrayList<>();
-        for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
+        for (EffectInstanceDice effect : castSpell.getEffects()) {
             targetsPerEffect.addAll(targets);
-            targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, m_actionEffect.getEffects(), effect, false, effect.triggers, target.getCellId())
+            targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, castSpell.getEffects(), effect, false, effect.triggers, target.getCellId())
                     && effect.isValidTarget(caster, target)
                     && EffectInstanceDice.verifySpellEffectMask(caster, target, effect)));
 
-            EffectCast castInfos = new EffectCast(effect.getEffectType(), this.m_actionEffect.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.m_actionEffect);
+            EffectCast castInfos = new EffectCast(effect.getEffectType(), this.castSpell.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.castSpell);
             castInfos.isTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;
             castInfos.isGlyph = this.getObjectType() == FightObjectType.OBJECT_GLYPHE;
             if (EffectBase.tryApplyEffect(castInfos) == -3) {

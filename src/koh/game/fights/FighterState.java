@@ -48,7 +48,7 @@ public class FighterState {
                 for (Player o : this.myFighter.getFight().Observable$stream()) {
                     o.send(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.caster.getID(), myFighter.getID(), myFighter.getVisibleStateFor(o)));
                 }
-                this.myStates.put(FightStateEnum.Invisible, Buff);
+                this.myStates.put(FightStateEnum.INVISIBLE, Buff);
                 return;
 
             case REFLECT_SPELL:
@@ -69,7 +69,7 @@ public class FighterState {
                 this.myFighter.setVisibleState(GameActionFightInvisibilityStateEnum.VISIBLE);
                 this.myFighter.getFight().sendToField(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.caster.getID(), myFighter.getID(), myFighter.getVisibleStateFor(null)));
                 this.myFighter.getFight().sendToField(new GameFightRefreshFighterMessage(myFighter.getGameContextActorInformations(null)));
-                this.myStates.remove(FightStateEnum.Invisible);
+                this.myStates.remove(FightStateEnum.INVISIBLE);
                 return;
             case REFLECT_SPELL:
                 this.myStates.remove(FightStateEnum.STATE_REFLECT_SPELL);

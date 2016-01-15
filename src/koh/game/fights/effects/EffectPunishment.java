@@ -62,7 +62,7 @@ public class EffectPunishment extends EffectBase {
         Fighter Caster = castInfos.caster;
         // Perd l'invisibilité s'il inflige des dommages direct
         if (!castInfos.isPoison && !castInfos.isTrap && !castInfos.isReflect) {
-            Caster.getStates().removeState(FightStateEnum.Invisible);
+            Caster.getStates().removeState(FightStateEnum.INVISIBLE);
         }
 
         // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat

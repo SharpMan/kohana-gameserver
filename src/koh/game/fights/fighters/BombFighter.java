@@ -2,6 +2,8 @@ package koh.game.fights.fighters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
@@ -9,6 +11,7 @@ import koh.game.entities.environments.Pathfinder;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.mob.MonsterGrade;
+import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
@@ -83,6 +86,11 @@ public class BombFighter extends StaticFighter {
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
                 break;
         }
+    }
+
+    @Override
+    public List<SpellLevel> getSpells() {
+        return null;
     }
 
     public boolean boosted = false;

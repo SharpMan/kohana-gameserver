@@ -262,10 +262,6 @@ public class WorldClient {
         close();
     }
 
-    public void setTimeout(int ms) {
-        //TODO : Timer 
-    }
-
     public void threatWaiting() {
         try {
             DAO.getPlayers().getByAccount(this.getAccount());

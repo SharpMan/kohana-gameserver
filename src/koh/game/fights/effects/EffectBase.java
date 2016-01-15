@@ -31,7 +31,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.TELEPORT_SYMETRIC_FROM_IMPACT_CELL, new EffectTeleportSymetricImpactcell());
 
             //Téleportation
-            this.put(StatsEnum.Teleport_4, new EffectTeleport());
+            this.put(StatsEnum.TELEPORT_4, new EffectTeleport());
             this.put(StatsEnum.TELEPORT, new EffectTeleport());
 
             //Déclanche les Glyphe
@@ -59,10 +59,10 @@ public abstract class EffectBase {
 
             this.put(StatsEnum.PUNITION, new EffectPunishment());
             this.put(StatsEnum.LAYING_GLYPH_RANKED, new EffectActivableObject());
-            this.put(StatsEnum.LAYING_GLYPH_RANKED_2, new EffectActivableObject());
+            this.put(StatsEnum.LAYING_BLYPH, new EffectActivableObject());
             this.put(StatsEnum.LAYING_GLYPH, new EffectActivableObject());
             this.put(StatsEnum.LAYING_TRAP_LEVEL, new EffectActivableObject());
-            this.put(StatsEnum.Reveals_Invisible, new EffectPerception());
+            this.put(StatsEnum.REVEALS_INVISIBLE, new EffectPerception());
             this.put(StatsEnum.LAYING_PORTAIL, new EffectActivableObject());
 
             // 1 PA,PM Utilisé = X Pdv perdu
@@ -86,7 +86,7 @@ public abstract class EffectBase {
             // Ajout d'un etat / changement de skin
             this.put(StatsEnum.INVISIBILITY, new EffectAddState());
             this.put(StatsEnum.ADD_STATE, new EffectAddState());
-            this.put(StatsEnum.REMOVES_STATE_3, new EffectLostState());
+            this.put(StatsEnum.REMOVE_STATE, new EffectLostState());
 
             this.put(StatsEnum.STEAL_NEUTRAL, new EffectLifeSteal());
             this.put(StatsEnum.STEAL_EARTH, new EffectLifeSteal());
@@ -143,6 +143,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.SUB_DODGE_PA_PROBABILITY, new EffectStats());
             this.put(StatsEnum.SUB_DODGE_PM_PROBABILITY, new EffectStats());
             this.put(StatsEnum.ADD_DAMAGE_PHYSIC, new EffectStats());
+
             this.put(StatsEnum.SUB_PA_ESQUIVE_2, new EffectSubPAEsquive());
             this.put(StatsEnum.SubPAEsquive, new EffectSubPAEsquive());
             this.put(StatsEnum.SUB_PM_ESQUIVE_2, new EffectSubPMEsquive());
@@ -171,13 +172,15 @@ public abstract class EffectBase {
             this.put(StatsEnum.WISDOM, new EffectStats());
             this.put(StatsEnum.AGILITY, new EffectStats());
             this.put(StatsEnum.VITALITY, new EffectStats());
-            this.put(StatsEnum.AddVie, new EffectStats());
+            this.put(StatsEnum.ADD_VIE, new EffectStats());
+
             this.put(StatsEnum.SUB_STRENGTH, new EffectStats());
             this.put(StatsEnum.SUB_INTELLIGENCE, new EffectStats());
             this.put(StatsEnum.SUB_CHANCE, new EffectStats());
             this.put(StatsEnum.SUB_AGILITY, new EffectStats());
             this.put(StatsEnum.SUB_WISDOM, new EffectStats());
             this.put(StatsEnum.SUB_VITALITY, new EffectStats());
+
             this.put(StatsEnum.PROSPECTING, new EffectStats());
             this.put(StatsEnum.ADD_DAMAGE_MAGIC, new EffectStats());
             this.put(StatsEnum.ADD_DAMAGE_FINAL_PERCENT, new EffectStats());
@@ -186,7 +189,6 @@ public abstract class EffectBase {
             this.put(StatsEnum.ADD_CRITICAL_DAMAGES, new EffectStats());
             this.put(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION, new EffectStats());
             this.put(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION, new EffectStats());
-            this.put(StatsEnum.ADD_CRITICAL_DAMAGES, new EffectStats());
             this.put(StatsEnum.SUB_PROSPECTING, new EffectStats());
             this.put(StatsEnum.SUB_DAMAGE, new EffectStats());
             this.put(StatsEnum.SUB_DAMAGE_BONUS_PERCENT, new EffectStats());
@@ -256,7 +258,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.PORTER_TARGET, new EffectPorter());
             this.put(StatsEnum.LAUNCHER_ENTITY, new EffectLancer());
 
-            this.put(StatsEnum.KiKILLl, new EffectDieFighter());
+            this.put(StatsEnum.KILL, new EffectDieFighter());
 
             //AlterJet
             this.put(StatsEnum.MAXIMIZE_EFFECTS, new EffectAlterJet());

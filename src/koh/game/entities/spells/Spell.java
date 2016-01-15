@@ -42,4 +42,21 @@ public class Spell {
         }
         return spellLevels[Level - 1];
     }
+
+    public SpellLevel getLevelOrNear(int level) {
+        int near = 10000;
+        SpellLevel objNear = null;
+        for (SpellLevel objLevel : spellLevels) {
+            if (objLevel.getGrade() == level) {
+                return objLevel;
+            } else {
+                int diff = Math.abs(objLevel.getGrade() - level);
+                if (near > diff) {
+                    near = diff;
+                    objNear = objLevel;
+                }
+            }
+        }
+        return objNear;
+    }
 }

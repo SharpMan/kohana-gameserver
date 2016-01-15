@@ -28,6 +28,7 @@ import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.fighters.VirtualFighter;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightPortal;
+import koh.game.fights.utils.Algo;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
 import koh.game.utils.Three;
@@ -76,7 +77,7 @@ import static koh.protocol.client.enums.StatsEnum.CAST_SPELL_ON_CRITICAL_HIT;
 public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     //public static final ImprovedCachedThreadPool BackGroundWorker2 = new ImprovedCachedThreadPool(5, 50, 2);
-    public static final ScheduledExecutorService BackGroundWorker = Executors.newScheduledThreadPool(50);
+    public static final ScheduledExecutorService BACK_GROUND_WORKER = Executors.newScheduledThreadPool(50);
     public static final Random RANDOM = new Random();
     public static final StatsEnum[] EFFECT_NOT_SILENCED = new StatsEnum[]{
             StatsEnum.DAMAGE_NEUTRAL, StatsEnum.DAMAGE_EARTH, StatsEnum.DAMAGE_AIR, StatsEnum.DAMAGE_FIRE, StatsEnum.DAMAGE_WATER,
@@ -114,7 +115,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected long fightTime, creationTime;
     @Getter
     protected FightTypeEnum fightType;
-    protected Map<Short, FightCell> myCells = new HashMap<>();
+    @Getter
+    protected Map<Short, FightCell> fightCells = new HashMap<>();
     protected Map<FightTeam, Map<Short, FightCell>> myFightCells = new HashMap<>();
     protected short ageBonus = -1, lootShareLimitMalus = -1;
     protected Map<String, CancellableScheduledRunnable> myTimers = new HashMap<>();
@@ -157,8 +159,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         return this.fightState == fightState.STATE_ACTIVE && !this.myTeam1.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_SECRET) && !this.myTeam2.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_SECRET);
     }
 
-    public FightTeam getEnnemyTeam(FightTeam Team) {
-        return (Team == this.myTeam1 ? this.myTeam2 : this.myTeam1);
+    public FightTeam getEnnemyTeam(FightTeam team) {
+        return (team == this.myTeam1 ? this.myTeam2 : this.myTeam1);
+    }
+
+    public FightTeam getAllyTeam(FightTeam team)
+    {
+        return (team == this.myTeam1 ? this.myTeam1 : this.myTeam2);
     }
 
     public FightTeam getTeam(int LeaderId) {
@@ -177,7 +184,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private void initCells() {
         // Ajout des cells
         for (DofusCell Cell : this.map.getCells()) {
-            this.myCells.put(Cell.getId(), new FightCell(Cell.getId(), Cell.mov(), Cell.los()));
+            this.fightCells.put(Cell.getId(), new FightCell(Cell.getId(), Cell.mov(), Cell.los()));
         }
         this.myFightCells.put(myTeam1, new HashMap<>());
         this.myFightCells.put(myTeam2, new HashMap<>());
@@ -186,17 +193,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             // Ajout
             synchronized (Fight.MAP_FIGHTCELLS) {
                 for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(0)) {
-                    this.myFightCells.get(this.myTeam1).put(Cell, this.myCells.get(Cell));
+                    this.myFightCells.get(this.myTeam1).put(Cell, this.fightCells.get(Cell));
                 }
                 for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(1)) {
-                    this.myFightCells.get(this.myTeam2).put(Cell, this.myCells.get(Cell));
+                    this.myFightCells.get(this.myTeam2).put(Cell, this.fightCells.get(Cell));
                 }
             }
             return;
         }
 
         for (Short CellValue : this.map.getRedCells()) {
-            FightCell Cell = this.myCells.get(CellValue);
+            FightCell Cell = this.fightCells.get(CellValue);
             if (Cell == null || !Cell.canWalk()) {
                 continue;
             }
@@ -204,7 +211,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         for (Short CellValue : this.map.getBlueCells()) {
-            FightCell Cell = this.myCells.get(CellValue);
+            FightCell Cell = this.fightCells.get(CellValue);
             if (Cell == null || !Cell.canWalk()) {
                 continue;
             }
@@ -589,7 +596,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         // Fake cellId
-        if (!this.myCells.containsKey(cellId)) {
+        if (!this.fightCells.containsKey(cellId)) {
             return false;
         }
 
@@ -598,26 +605,26 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return false;
         }
 
-        //Todo check po PO
+
         if (!this.map.getCell(cellId).walakable() || this.map.getCell(cellId).nonWalkableDuringFight()) {
             return false;
         }
         //targetId == -1
 
         //TODO return a message foreach issues
-        logger.debug("SpellNeedFreeCell {} SpellIsTakenCell {} fighterHasState {} fighterForbidState {} cellInZone {} controllerOk {}"
+       /* logger.debug("SpellNeedFreeCell {} SpellIsTakenCell {} fighterHasState {} fighterForbidState {} cellInZone {} controllerOk {}"
                 , (!spell.isNeedFreeCell() || targetId == -1)
                 , (!spell.isNeedTakenCell() || targetId != -1)
                 , !Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x))
                 , !Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x))
                 , (ArrayUtils.contains(fighter.getCastZone(spell), cellId))
-                , (fighter.getSpellsController().canLaunchSpell(spell, targetId)));
+                , (fighter.getSpellsController().canLaunchSpell(spell, targetId)));*/
         return (!spell.isNeedFreeCell() || targetId == -1)
                 && (!spell.isNeedTakenCell() || targetId != -1)
-                && !(spell.isNeedFreeTrapCell() && this.myCells.get(cellId).hasGameObject(FightObjectType.OBJECT_TRAP))
+                && !(spell.isNeedFreeTrapCell() && this.fightCells.get(cellId).hasGameObject(FightObjectType.OBJECT_TRAP))
                 && !Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x))
                 && !Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x))
-                && ArrayUtils.contains(fighter.getCastZone(spell), cellId)
+                && ArrayUtils.contains(fighter.getCastZone(spell,currentCell), cellId)
                 && fighter.getSpellsController().canLaunchSpell(spell, targetId);
 
     }
@@ -705,7 +712,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.fightLoopState = fightLoopState.STATE_WAIT_START;
 
         // Lancement du gameLoop 10 ms d'interval.
-        this.startTimer(new CancellableScheduledRunnable(BackGroundWorker, 10, 10) {
+        this.startTimer(new CancellableScheduledRunnable(BACK_GROUND_WORKER, 10, 10) {
             @Override
             public void run() {
                 gameLoop();
@@ -749,20 +756,19 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     break;
 
                 case STATE_WAIT_AI: // Artificial intelligence
-                     /*if (this.currentFighter istanceof VirtualFighter)
+                     if (this.currentFighter instanceof VirtualFighter)
                      {
                      // Lancement de l'IA pour 30 secondes maximum
-                     (this.currentFighter as VirtualFighter).Mind.runAI();
-                     //new AIProcessor(this, this.currentFighter).applyIA(Environment.TickCount + 30000);
+                         (this.currentFighter.asVirtual()).getMind().runAI();
                      }
-                     else*/
-                    if (this.currentFighter.getObjectType() == FightObjectType.OBJECT_STATIC) {
-                        this.myLoopActionTimeOut = System.currentTimeMillis() + 750;
-                    }
-                    // Fin de tour
-                    if (this.fightLoopState != fightLoopState.STATE_WAIT_END) {
-                        this.fightLoopState = fightLoopState.STATE_END_TURN;
-                    }
+                     else if (this.currentFighter.getObjectType() == FightObjectType.OBJECT_STATIC) {
+                         this.myLoopActionTimeOut = System.currentTimeMillis() + 750;
+                     }
+                         // Fin de tour
+                     if (this.fightLoopState != fightLoopState.STATE_WAIT_END) {
+                         this.fightLoopState = fightLoopState.STATE_END_TURN;
+                     }
+
                     break;
 
                 case STATE_WAIT_END: // Fin du combat
@@ -886,7 +892,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     }
 
-    protected void onTackled(Fighter fighter, MovementPath path) {
+    protected void onTackled(Fighter fighter, int movementLength) {
         ArrayList<Fighter> tacklers = Pathfinder.getEnnemyNearToTakle(this, fighter.getTeam(), fighter.getCellId());
 
         int tackledMp = fighter.getTackledMP();
@@ -902,7 +908,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, fighter.getID(), fighter.getID(), (short) -tackledAp));
             this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -tackledMp));
 
-            if (path.movementLength <= fighter.getMP()) {
+            if (movementLength <= fighter.getMP()) {
                 return;
             }
         }
@@ -947,6 +953,40 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
+    public synchronized GameMapMovement tryMove(Fighter fighter, koh.game.paths.Pathfinder path) {
+        if (fighter != this.currentFighter) {
+            return null;
+        }
+
+        // Pas assez de point de mouvement
+        if (path.getPoints() > fighter.getMP()) {
+            return null;
+        }
+
+        this.startSequence(SequenceTypeEnum.SEQUENCE_MOVE);
+
+        if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.getStates().hasState(FightStateEnum.ENRACINÉ)) {
+            this.onTackled(fighter, path.getPoints());
+
+        }
+        GameMapMovement gameMapMovement = new GameMapMovement(this, fighter, path.getPath().encode());
+
+        this.sendToField(new FieldNotification(new GameMapMovementMessage(gameMapMovement.keyMovements, fighter.getID())) {
+            @Override
+            public boolean can(Player perso) {
+                return fighter.isVisibleFor(perso);
+            }
+        });
+
+        fighter.usedMP += path.getPoints();
+        this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -path.getPoints()));
+
+        fighter.setCell(this.getCell(path.getPath().last().getCell()));
+        fighter.setDirection(path.getPath().last().getOrientation());
+        this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
+        return gameMapMovement;
+    }
+
     public synchronized GameMapMovement tryMove(Fighter fighter, MovementPath path) {
         // Pas a lui de jouer
         if (fighter != this.currentFighter) {
@@ -962,17 +1002,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         this.startSequence(SequenceTypeEnum.SEQUENCE_MOVE);
 
-        if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.getStates().hasState(FightStateEnum.Enraciné)) {
-            this.onTackled(fighter, path);
+        if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.getStates().hasState(FightStateEnum.ENRACINÉ)) {
+            this.onTackled(fighter, path.movementLength);
             if (path.transitCells.isEmpty() || path.movementLength == 0) {
                 this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
                 return null;
             }
 
         }
-        GameMapMovement GameMovement = new GameMapMovement(this, fighter, path.serializePath());
+        GameMapMovement gameMapMovement = new GameMapMovement(this, fighter, path.serializePath());
 
-        this.sendToField(new FieldNotification(new GameMapMovementMessage(path.serializePath(), fighter.getID())) {
+        this.sendToField(new FieldNotification(new GameMapMovementMessage(gameMapMovement.keyMovements, fighter.getID())) {
             @Override
             public boolean can(Player perso) {
                 return fighter.isVisibleFor(perso);
@@ -983,8 +1023,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -path.movementLength));
 
         fighter.setCell(this.getCell(path.getEndCell()));
+        fighter.setDirection(path.getEndDirection());
         this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
-        return GameMovement;
+        return gameMapMovement;
 
     }
 
@@ -1085,7 +1126,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         // Si un timer pour le lancement du combat
         if (this.getStartTimer() != -1) {
             //FIXME: remove Thread.sleep
-            this.startTimer(new CancellableScheduledRunnable(BackGroundWorker, (getStartTimer() * 1000)) {
+            this.startTimer(new CancellableScheduledRunnable(BACK_GROUND_WORKER, (getStartTimer() * 1000)) {
                 @Override
                 public void run() {
                     try {
@@ -1392,17 +1433,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         this.kickSpectators(true);
 
-        this.myCells.values().forEach((c) -> {
+        this.fightCells.values().forEach((c) -> {
             c.clear();
         });
-        this.myCells.clear();
+        this.fightCells.clear();
         this.myTimers.clear();
         this.fightWorker.dispose();
         this.myTeam1.dispose();
         this.myTeam2.dispose();
 
         this.myFightCells = null;
-        this.myCells = null;
+        this.fightCells = null;
         this.myTeam1 = null;
         this.myTeam2 = null;
         this.fightWorker = null;
@@ -1511,30 +1552,30 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public boolean hasObjectOnCell(FightObjectType type, short cell) {
-        if (!this.myCells.containsKey(cell)) {
+        if (!this.fightCells.containsKey(cell)) {
             return false;
         }
-        return this.myCells.get(cell).hasObject(type);
+        return this.fightCells.get(cell).hasObject(type);
     }
 
     public boolean canPutObject(short cellId) {
-        if (!this.myCells.containsKey(cellId)) {
+        if (!this.fightCells.containsKey(cellId)) {
             return false;
         }
-        return this.myCells.get(cellId).canPutObject();
+        return this.fightCells.get(cellId).canPutObject();
     }
 
     public boolean isCellWalkable(short CellId) {
-        if (!this.myCells.containsKey(CellId)) {
+        if (!this.fightCells.containsKey(CellId)) {
             return false;
         }
 
-        return this.myCells.get(CellId).canWalk();
+        return this.fightCells.get(CellId).canWalk();
     }
 
     public FightCell getCell(short CellId) {
-        if (this.myCells.containsKey(CellId)) {
-            return this.myCells.get(CellId);
+        if (this.fightCells.containsKey(CellId)) {
+            return this.fightCells.get(CellId);
         }
         return null;
     }
@@ -1543,14 +1584,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (CellId == -1) {
             return null;
         }
-        return this.myCells.get(CellId).hasEnnemy(Team);
+        return this.fightCells.get(CellId).hasEnnemy(Team);
     }
 
     public Fighter hasFriendInCell(short CellId, FightTeam Team) {
         if (CellId == -1) {
             return null;
         }
-        return this.myCells.get(CellId).hasFriend(Team);
+        return this.fightCells.get(CellId).hasFriend(Team);
     }
 
     public GameFightTurnListMessage getFightTurnListMessage() {
@@ -1574,7 +1615,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     @Override
     public void actorMoved(Path Path, IGameActor Actor, short newCell, byte newDirection) {
-        //((Fighter) actor).setCell(myCells.get(newCell));
+        //((Fighter) actor).setCell(fightCells.get(newCell));
         Actor.setDirection(newDirection);
     }
 
@@ -1601,7 +1642,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public int getPlacementTimeLeft() {
+    public short getPlacementTimeLeft() {
         if (this.isStarted()) {
             return 0;
         }
@@ -1609,7 +1650,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (num < 0.0) {
             num = 0.0;
         }
-        return (int) num;
+        return (short) num;
     }
 
     public enum FightLoopState {

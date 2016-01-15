@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class MonsterDAOImpl extends MonsterDAO {
 
     private static final Logger logger = LogManager.getLogger(MonsterDAOImpl.class);
-    private final HashMap<Integer, MonsterTemplate> templates = new HashMap<>(3000);
+    private final HashMap<Integer, MonsterTemplate> templates = new HashMap<>();
     @Inject
     private DatabaseSource dbSource;
 
@@ -40,6 +40,7 @@ public class MonsterDAOImpl extends MonsterDAO {
                 templates.put(result.getInt("id"), new MonsterTemplate(result));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -72,6 +73,7 @@ public class MonsterDAOImpl extends MonsterDAO {
                 i++;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

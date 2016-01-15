@@ -6,7 +6,7 @@ package koh.game.fights;
  */
 public interface IFightObject {
     
-    public Integer getPriority();
+    Integer getPriority();
 
    
 
@@ -26,16 +26,16 @@ public interface IFightObject {
         }
     }
 
-    public FightObjectType getObjectType();
+    FightObjectType getObjectType();
 
-    public short getCellId();
+    short getCellId();
 
-    public boolean canWalk();
+    boolean canWalk();
 
-    public boolean canStack();
+    boolean canStack();
     
-     public boolean canGoThrough();
+    boolean canGoThrough();
     
-    public int compareTo(IFightObject obj);
+    int compareTo(IFightObject obj);
 
 }

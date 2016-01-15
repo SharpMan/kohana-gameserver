@@ -19,7 +19,7 @@ public class EffectTranspose extends EffectBase {
                 .filter(fr -> !(fr instanceof StaticFighter)
                         && !fr.getStates().hasState(FightStateEnum.PORTÉ)
                         && !fr.getStates().hasState(FightStateEnum.Inébranlable)
-                        && !fr.getStates().hasState(FightStateEnum.Enraciné)
+                        && !fr.getStates().hasState(FightStateEnum.ENRACINÉ)
                         && !fr.getStates().hasState(FightStateEnum.Indéplaçable))
                 .toArray(Fighter[]::new)) {
             if (castInfos.spellId == 445) {

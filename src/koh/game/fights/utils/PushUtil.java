@@ -1,5 +1,6 @@
-package koh.game.fights;
+package koh.game.fights.utils;
 
+import koh.game.fights.Fighter;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.fights.fighters.StaticFighter;
 import koh.protocol.client.enums.SpellShapeEnum;

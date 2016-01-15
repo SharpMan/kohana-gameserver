@@ -12,7 +12,7 @@ from koh.inter.messages import PlayerAddressSuspendedMessage
 class IPBanCommand(PlayerCommand):
 
     def getDescription(self):
-        return "Ban the ip's player arg1 from arg2 hours";
+        return "Ban the player's ip arg1 from arg2 hours";
 
     def apply(self,client,args):
         target = DAO.getPlayers().getCharacter(args[0]);

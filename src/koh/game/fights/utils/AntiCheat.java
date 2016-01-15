@@ -1,8 +1,10 @@
-package koh.game.fights;
+package koh.game.fights.utils;
 
 import java.util.stream.Stream;
 import koh.game.entities.actors.character.PlayerInst;
 import static koh.game.entities.actors.character.PlayerInst.P_PROPERTIES;
+
+import koh.game.fights.Fighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.utils.Couple;
 

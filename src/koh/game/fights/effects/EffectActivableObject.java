@@ -20,7 +20,7 @@ public class EffectActivableObject extends EffectBase {
         FightActivableObject obj = null;
         switch (castInfos.effectType) {
             case LAYING_GLYPH_RANKED:
-            case LAYING_GLYPH_RANKED_2:
+            case LAYING_BLYPH:
             case LAYING_GLYPH:
                 obj = new FightGlyph(castInfos, castInfos.duration, getColor(castInfos.spellId), castInfos.effect.zoneSize(), GetMarkType(castInfos.effect.getZoneShape()));
                 break;

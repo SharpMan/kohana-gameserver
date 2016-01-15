@@ -11,7 +11,7 @@ import koh.game.fights.Fight.FightLoopState;
 import koh.game.fights.FightState;
 import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
-import koh.game.fights.SwapPositionRequest;
+import koh.game.fights.utils.SwapPositionRequest;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.types.AgressionFight;
 import koh.game.network.WorldClient;

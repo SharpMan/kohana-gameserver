@@ -126,6 +126,13 @@ public class GenericStats {
         }
     }
 
+    public int totalBasePoints(){
+        return this.myStats.values().stream()
+                .filter(stat -> stat.base > 0)
+                .mapToInt(stat -> stat.base)
+                .sum();
+    }
+
     public void unMerge(GenericStats Stats) {
         for (Entry<StatsEnum, CharacterBaseCharacteristic> effect : Stats.getEffects().entrySet()) {
             if(OPPOSITE_STATS.containsKey(effect.getKey())){

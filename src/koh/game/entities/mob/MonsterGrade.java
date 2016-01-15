@@ -2,18 +2,23 @@ package koh.game.entities.mob;
 
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.GenericStats;
+import koh.game.entities.spells.SpellLevel;
 import koh.protocol.client.enums.StatsEnum;
 import lombok.Getter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- *
  * @author Neo-Craft
  */
 public class MonsterGrade {
 
+
+    private ArrayList<SpellLevel> spells;
     @Getter
     private byte grade;
     @Getter
@@ -22,7 +27,6 @@ public class MonsterGrade {
     private int wisdom, tackleEvade, tackleBlock, strenght, chance, intelligence, agility, earthResistance, airResistance, fireResistance, waterResistance, neutralResistance;
     @Getter
     private int gradeXp, damageReflect, hiddenLevel;
-
     private GenericStats myStats;
 
     public MonsterGrade(ResultSet result) throws SQLException {
@@ -51,12 +55,22 @@ public class MonsterGrade {
         hiddenLevel = result.getInt("hidden_level");
     }
 
+    public List<SpellLevel> getSpells(){
+        if(this.spells == null){
+            this.spells = new ArrayList<>(5);
+        }
+        Arrays.stream(this.getMonster().getSpells())
+                .mapToObj(id -> DAO.getSpells().findSpell(id).getLevelOrNear(this.grade))
+                .forEach(spell ->  this.spells.add(spell) );
+        return spells;
+    }
+
     private void parseStats() {
         this.myStats = new GenericStats();
 
         this.myStats.addBase(StatsEnum.VITALITY, this.lifePoints);
         this.myStats.addBase(StatsEnum.ACTION_POINTS, this.actionPoints);
-        this.myStats.addBase(StatsEnum.MOVEMENT_POINTS, this.monsterId);
+        this.myStats.addBase(StatsEnum.MOVEMENT_POINTS, this.movementPoints);
         this.myStats.addBase(StatsEnum.DODGE_PA_LOST_PROBABILITY, this.paDodge);
         this.myStats.addBase(StatsEnum.DODGE_PM_LOST_PROBABILITY, this.pmDodge);
         this.myStats.addBase(StatsEnum.WISDOM, this.wisdom);
@@ -99,7 +113,7 @@ public class MonsterGrade {
         this.myStats.addBase(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT, this.fireResistance);
         this.myStats.addBase(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, this.waterResistance);
         this.myStats.addBase(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, this.neutralResistance);
-        this.myStats.addBase(StatsEnum.DamageReflection, this.damageReflect);
+        this.myStats.addBase(StatsEnum.DAMAGE_REFLECTION, this.damageReflect);
 
     }
 
@@ -113,6 +127,6 @@ public class MonsterGrade {
         }
         return myStats;
     }
-    
+
 
 }

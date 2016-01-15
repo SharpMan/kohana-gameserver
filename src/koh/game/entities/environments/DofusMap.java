@@ -116,12 +116,12 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
         //verify Todo
         /*if (this.cells.length <  actor.getCellId) {
-         if (this.myCells[actor.getCellId].Walkable) {
-         this.myCells[actor.getCellId].addActor(actor);
+         if (this.fightCells[actor.getCellId].Walkable) {
+         this.fightCells[actor.getCellId].addActor(actor);
          } else {
          actor.getCellId = this.GetFreeCell();
 
-         this.myCells[actor.getCellId].addActor(actor);
+         this.fightCells[actor.getCellId].addActor(actor);
          }
          }*/
         this.cells[actor.getCell().getId()].addActor(actor);
@@ -434,7 +434,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     public short getRandomCell() {
         return this.cells[RANDOM.nextInt(this.cells.length)].getId();
-        //return this.myCells.Keys.FirstOrDefault(x => x == RANDOM.Next(this.myCells.Keys.Count));
+        //return this.fightCells.Keys.FirstOrDefault(x => x == RANDOM.Next(this.fightCells.Keys.Count));
     }
 
     public synchronized DofusCell getAnyCellWalakable() {

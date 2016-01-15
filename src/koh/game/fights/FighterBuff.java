@@ -14,6 +14,7 @@ import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffState;
 import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.utils.Couple;
+import lombok.Getter;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +44,7 @@ public class FighterBuff {
         }
     };
 
+    @Getter
     private HashMap<BuffDecrementType, ArrayList<BuffEffect>> buffsDec = new HashMap<BuffDecrementType, ArrayList<BuffEffect>>() {
         {
             this.put(BuffDecrementType.TYPE_BEGINTURN, new ArrayList<>());

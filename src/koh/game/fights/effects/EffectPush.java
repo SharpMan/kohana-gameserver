@@ -12,6 +12,7 @@ import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
+import lombok.Getter;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -20,12 +21,13 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class EffectPush extends EffectBase {
 
+    @Getter
     private static final Random RANDOM_PUSHDAMAGE = new Random();
 
     @Override
     public int applyEffect(EffectCast castInfos) {
         byte direction = 0;
-        for (Fighter Target : castInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.PORTÉ) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.Enraciné) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter Target : castInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.PORTÉ) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.ENRACINÉ) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:

@@ -42,7 +42,7 @@ public class FightBomb extends FightActivableObject {
         caster = Caster;
         m_spellId = Spell.getSpellId();
         m_spell_level = Spell.getGrade();
-        m_actionEffect = Spell;
+        castSpell = Spell;
         activationType = BuffActiveType.ACTIVE_ENDMOVE;
 
         this.color = color;
@@ -53,7 +53,7 @@ public class FightBomb extends FightActivableObject {
         size = 0;
         this.shape = GameActionMarkCellsTypeEnum.CELLS_CIRCLE;
 
-        for (EffectInstanceDice effect : m_actionEffect.getEffects()) {
+        for (EffectInstanceDice effect : castSpell.getEffects()) {
             if (EffectCast.isDamageEffect(effect.getEffectType())) {
                 priority--;
             }

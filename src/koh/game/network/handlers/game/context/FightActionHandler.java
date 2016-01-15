@@ -21,10 +21,10 @@ public class FightActionHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        SpellLevel Spell = Client.getCharacter().getMySpells().getSpellLevel(Message.spellId);
+        SpellLevel spell = Client.getCharacter().getMySpells().getSpellLevel(Message.spellId);
         Fighter Fighter = Client.getCharacter().getFight().getFighter(Message.targetId);
-        if (Spell != null && Fighter != null) {
-            Client.getCharacter().getFight().launchSpell(Client.getCharacter().getFighter(), Spell, Fighter.getCellId(), false);
+        if (spell != null && Fighter != null) {
+            Client.getCharacter().getFight().launchSpell(Client.getCharacter().getFighter(), spell, Fighter.getCellId(), false);
         }
     }
 

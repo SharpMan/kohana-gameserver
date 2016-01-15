@@ -148,7 +148,7 @@ public class Pathfinder {
         for (byte Direction : Pathfinder.FIGHT_DIRECTIONS) {
             Fighter ennemy = Fight.hasEnnemyInCell((short) Pathfinder.nextCell(CellId, Direction), Team);
             if (ennemy != null) {
-                if (!ennemy.isDead() && !(ennemy instanceof BombFighter) && !ennemy.getStates().hasState(FightStateEnum.Enraciné) && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                if (!ennemy.isDead() && !(ennemy instanceof BombFighter) && !ennemy.getStates().hasState(FightStateEnum.ENRACINÉ) && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
                     ennemies.add(ennemy);
                 }
             }
@@ -161,10 +161,10 @@ public class Pathfinder {
         return (byte) (Direction >= 4 ? Direction - 4 : Direction + 4);
     }
 
-    public static short nextCell(short Cell, byte Direction) //TOODO : Refaire tout la merde d'Ankama en static , pour ne pas faire tout ces instances de merde
+    public static short nextCell(short cell, byte direction) //TOODO : Refaire tout la merde d'Ankama en static , pour ne pas faire tout ces instances de merde
     {
         try {
-            return MapPoint.fromCellId(Cell).getNearestCellInDirection(Direction).get_cellId();
+            return MapPoint.fromCellId(cell).getNearestCellInDirection(direction).get_cellId();
         } catch (Exception e) {
             return -1;
         }

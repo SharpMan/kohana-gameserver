@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
 import koh.game.entities.environments.DofusMap;
-import koh.game.fights.AntiCheat;
+import koh.game.fights.utils.AntiCheat;
 import koh.game.fights.Fight;
 import koh.game.fights.FightFormulas;
 import koh.game.fights.FightTeam;

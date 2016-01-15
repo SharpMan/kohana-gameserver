@@ -1,4 +1,4 @@
-package koh.game.fights;
+package koh.game.fights.utils;
 
 /**
  *

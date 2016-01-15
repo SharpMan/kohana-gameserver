@@ -1,14 +1,16 @@
-package koh.game.fights;
+package koh.game.fights.utils;
+
+import koh.game.entities.environments.DofusMap;
+import koh.game.entities.environments.Pathfinder;
+import koh.game.fights.Fight;
+import koh.game.fights.FightCell;
+import koh.utils.Couple;
 
 import java.util.ArrayList;
 import java.util.Random;
-import koh.game.entities.environments.DofusMap;
-import koh.game.entities.environments.Pathfinder;
-import koh.utils.Couple;
 
 /**
- *
- * @author Neo-Craft
+ * Created by Melancholia on 1/13/16.
  */
 public class Algo {
 
@@ -27,16 +29,16 @@ public class Algo {
         ArrayList<FightCell> team1 = new ArrayList<>();
         ArrayList<FightCell> team2 = new ArrayList<>();
 
-        /*
-         * BaseCells
-         */
+            /*
+             * BaseCells
+             */
         Couple<Short, Short> baseCells = getRandomBaseCellPlaces(fight.getMap());
         team1.add(fight.getCell(baseCells.first));
         team2.add(fight.getCell(baseCells.second));
 
-        /*
-         * Remplissage
-         */
+            /*
+             * Remplissage
+             */
         int boucles = 0;
         while (team1.size() < 8) {
             if (boucles > 500) {

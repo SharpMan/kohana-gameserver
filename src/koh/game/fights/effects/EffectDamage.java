@@ -50,7 +50,7 @@ public class EffectDamage extends EffectBase {
         Fighter caster = castInfos.caster;
         // Perd l'invisibilité s'il inflige des dommages direct
         if (!castInfos.isPoison && !castInfos.isTrap && !castInfos.isReflect) {
-            caster.getStates().removeState(FightStateEnum.Invisible);
+            caster.getStates().removeState(FightStateEnum.INVISIBLE);
         }
 
         // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat

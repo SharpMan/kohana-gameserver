@@ -3,6 +3,7 @@ package koh.game.fights.fighters;
 import koh.game.entities.actors.MonsterGroup;
 import koh.game.entities.actors.Player;
 import koh.game.entities.mob.MonsterGrade;
+import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
@@ -15,6 +16,8 @@ import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  *
@@ -81,6 +84,11 @@ public class MonsterFighter extends VirtualFighter {
     @Override
     public int compareTo(IFightObject obj) {
         return getPriority().compareTo(obj.getPriority());
+    }
+
+    @Override
+    public List<SpellLevel> getSpells() {
+        return this.grade.getSpells();
     }
 
 

@@ -1,5 +1,6 @@
 package koh.game.fights.fighters;
 
+import koh.game.fights.AI.AIProcessor;
 import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
@@ -14,7 +15,7 @@ import lombok.Setter;
  */
 public abstract class VirtualFighter extends Fighter {
 
-    //@Getter private final AIProcessor mind;
+    @Getter private  AIProcessor mind;
 
     public VirtualFighter(Fight fight) {
         super(fight, null);
@@ -27,7 +28,7 @@ public abstract class VirtualFighter extends Fighter {
 
     @Override
     public void joinFight(){
-        //this.Mind = new AIProcessor(Fight, this)
+        this.mind = new AIProcessor(fight, this);
     }
 
 

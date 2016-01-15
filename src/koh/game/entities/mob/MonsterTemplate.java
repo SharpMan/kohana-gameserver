@@ -41,6 +41,8 @@ public class MonsterTemplate {
     private boolean canBePushed, fastAnimsFun, canSwitchPos;
     @Getter
     private int[] incompatibleIdols;
+    @Getter
+    private final int monsterAI;
 
     private EntityLook myEntityLook;
 
@@ -68,6 +70,7 @@ public class MonsterTemplate {
         incompatibleIdols = Enumerable.StringToIntArray(result.getString("incompatable_idols"));
         this.minKamas = result.getInt("min_kamas");
         this.maxKamas = result.getInt("max_kamas");
+        this.monsterAI = 1;
     }
 
 
@@ -80,15 +83,15 @@ public class MonsterTemplate {
     }
 
     public MonsterGrade getLevelOrNear(int Level) {
-        int Near = 10000;
+        int near = 10000;
         MonsterGrade objNear = null;
         for (MonsterGrade objLevel : grades) {
             if (objLevel.getGrade() == Level) {
                 return objLevel;
             } else {
                 int Diff = Math.abs(objLevel.getGrade() - Level);
-                if (Near > Diff) {
-                    Near = Diff;
+                if (near > Diff) {
+                    near = Diff;
                     objNear = objLevel;
                 }
             }

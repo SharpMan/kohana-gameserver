@@ -188,7 +188,7 @@ public class MonsterFight extends Fight {
     @Override
     protected void sendGameFightJoinMessage(Fighter fighter) {
         //boolean canBeCancelled, boolean canSayReady, boolean isFightStarted, short timeMaxBeforeFightStart, byte fightType
-        fighter.send(new GameFightJoinMessage(true, !this.isStarted(), this.isStarted(), (short) this.getPlacementTimeLeft(), this.fightType.value));
+        fighter.send(new GameFightJoinMessage(true, !this.isStarted(), this.isStarted(),  this.getPlacementTimeLeft(), this.fightType.value));
     }
 
     @Override

@@ -71,5 +71,8 @@ public class DAO {
     @Inject @Getter
     private static PlayerCommandDAO commands;
 
+    @Inject @Getter
+    private static MonsterMindDAO AI_Minds;
+
 
 }

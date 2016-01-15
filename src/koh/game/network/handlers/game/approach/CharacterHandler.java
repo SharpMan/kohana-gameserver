@@ -89,78 +89,79 @@ public class CharacterHandler {
     }
 
     @HandlerAttribute(ID = 165) //Suppresion
-    public static void HandleCharacterDeletionRequestMessage(WorldClient Client, CharacterDeletionRequestMessage Message) {
+    public static void handleCharacterDeletionRequestMessage(WorldClient Client, CharacterDeletionRequestMessage Message) {
         Client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
     }
 
     @HandlerAttribute(ID = 152)
-    public static void HandleCharacterSelectionMessage(WorldClient Client, CharacterSelectionMessage message) {
+    public static void handleCharacterSelectionMessage(WorldClient Client, CharacterSelectionMessage message) {
         characterSelectionMessage(Client, message.id);
     }
 
-    public static void characterSelectionMessage(WorldClient Client, int id) {
+    public static void characterSelectionMessage(WorldClient client, int id) {
         try {
 
-            Player character = Client.getAccount().getPlayer(id);
+            Player character = client.getAccount().getPlayer(id);
             if (character == null) {
-                Client.send(new CharacterSelectedErrorMessage());
+                client.send(new CharacterSelectedErrorMessage());
             } else {
-                Client.setCharacter(character);
-                character.setClient(Client);
+                client.setCharacter(character);
+                character.setClient(client);
                 character.initialize();
-                Client.getAccount().currentCharacter = character;
-                Client.sequenceMessage();
+                client.getAccount().currentCharacter = character;
+                client.sequenceMessage();
                 //client.send(new ComicReadingBeginMessage(79));
-                Client.send(new EnabledChannelsMessage(character.getEnabledChannels(), character.getDisabledChannels()));
-                Client.send(new NotificationListMessage(new int[]{2147483647}));
-                Client.send(new CharacterSelectedSuccessMessage(character.toBaseInformations(), false));
-                Client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
-                Client.send(new InventoryContentMessage(character.getInventoryCache().toObjectsItem(), character.getKamas()));
-                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, character.getShortcuts().toShortcuts(character)));
-                Client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, character.getMySpells().toShortcuts()));
-                Client.send(new EmoteListMessage(character.getEmotes()));
-                Client.send(new JobDescriptionMessage(character.getMyJobs().getDescriptions()));
-                Client.send(new JobExperienceMultiUpdateMessage(character.getMyJobs().getExperiences()));
-                Client.send(new JobCrafterDirectorySettingsMessage(character.getMyJobs().getSettings()));
+                client.send(new EnabledChannelsMessage(character.getEnabledChannels(), character.getDisabledChannels()));
+                client.send(new NotificationListMessage(new int[]{2147483647}));
+                client.send(new CharacterSelectedSuccessMessage(character.toBaseInformations(), false));
+                client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
+                client.send(new InventoryContentMessage(character.getInventoryCache().toObjectsItem(), character.getKamas()));
+                client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, character.getShortcuts().toShortcuts(character)));
+                client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, character.getMySpells().toShortcuts()));
+                client.send(new EmoteListMessage(character.getEmotes()));
+                client.send(new JobDescriptionMessage(character.getMyJobs().getDescriptions()));
+                client.send(new JobExperienceMultiUpdateMessage(character.getMyJobs().getExperiences()));
+                client.send(new JobCrafterDirectorySettingsMessage(character.getMyJobs().getSettings()));
 
-                Client.send(new SpellListMessage(true, character.getMySpells().toSpellItems()));
-                Client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false), character.getID()));
-                Client.send(new InventoryWeightMessage(character.getInventoryCache().getWeight(), character.getInventoryCache().getTotalWeight()));
+                client.send(new SpellListMessage(true, character.getMySpells().toSpellItems()));
+                client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false), character.getID()));
+                client.send(new InventoryWeightMessage(character.getInventoryCache().getWeight(), character.getInventoryCache().getTotalWeight()));
                 //GuilMember =! null
-                Client.send(new FriendWarnOnConnectionStateMessage(Client.getAccount().accountData.friend_warn_on_login));
-                Client.send(new FriendWarnOnLevelGainStateMessage(Client.getAccount().accountData.friend_warn_on_level_gain));
-                Client.send(new GuildMemberWarnOnConnectionStateMessage(Client.getAccount().accountData.guild_warn_on_login));
-                Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 89, new String[0]));
+                client.send(new FriendWarnOnConnectionStateMessage(client.getAccount().accountData.friend_warn_on_login));
+                client.send(new FriendWarnOnLevelGainStateMessage(client.getAccount().accountData.friend_warn_on_level_gain));
+                client.send(new GuildMemberWarnOnConnectionStateMessage(client.getAccount().accountData.guild_warn_on_login));
+                client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 89, new String[0]));
 
-                Client.send(new ServerSettingsMessage("fr", (byte) 1, (byte) 0));
+                client.send(new ServerSettingsMessage("fr", (byte) 1, (byte) 0));
 
-                //System.out.println(String.valueOf(client.getAccount().last_login.getYear() +" "+String.valueOf(client.getAccount().last_login.getMonth())+" "+String.valueOf(client.getAccount().last_login.getDay()))+" "+String.valueOf(client.getAccount().last_login.getHours()));
                 try {
-                    Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 152, new String[]{
-                            String.valueOf(Client.getAccount().last_login.getYear() - 100 + 2000),
-                            String.valueOf(Client.getAccount().last_login.getDay()),
-                            String.valueOf(Client.getAccount().last_login.getDate()),
-                            String.valueOf(Client.getAccount().last_login.getHours()),
-                            String.valueOf(Client.getAccount().last_login.getMinutes()), Client.getAccount().lastIP}));
+                    client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 152,
+                            String.valueOf(client.getAccount().last_login.getYear() - 100 + 2000),
+                            String.valueOf(client.getAccount().last_login.getDay()),
+                            String.valueOf(client.getAccount().last_login.getDate()),
+                            String.valueOf(client.getAccount().last_login.getHours()),
+                            String.valueOf(client.getAccount().last_login.getMinutes()), client.getAccount().lastIP));
+                    client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 153, client.getIP()));
+
 
                 } catch (Exception e) {
                 }
-                Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 153, new String[]{Client.getIP()}));
 
                 //client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
-                Client.send(new CharacterCapabilitiesMessage(4095));
-                if (Client.getCharacter().getMountInfo().mount != null) {
-                    Client.send(new MountSetMessage(Client.getCharacter().getMountInfo().mount));
-                    Client.send(new MountXpRatioMessage(Client.getCharacter().getMountInfo().ratio));
-                    Client.send(new MountRidingMessage(true));
+                client.send(new CharacterCapabilitiesMessage(4095));
+                if (client.getCharacter().getMountInfo().mount != null) {
+                    client.send(new MountSetMessage(client.getCharacter().getMountInfo().mount));
+                    client.send(new MountXpRatioMessage(client.getCharacter().getMountInfo().ratio));
+                    client.send(new MountRidingMessage(true));
                 }
-                Client.getAccount().last_login = new Timestamp(System.currentTimeMillis());
-                Client.getAccount().lastIP = Client.getIP();
-                //Todo : LastCharacter? + UPdate
+                client.getAccount().last_login = new Timestamp(System.currentTimeMillis());
+                client.getAccount().lastIP = client.getIP();
 
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
         }
     }
 
@@ -172,7 +173,7 @@ public class CharacterHandler {
                 client.getCharacter().getStats().getEffect(StatsEnum.MOVEMENT_POINTS), client.getCharacter().getStats().getEffect(StatsEnum.STRENGTH), client.getCharacter().getStats().getEffect(StatsEnum.VITALITY),
                 client.getCharacter().getStats().getEffect(StatsEnum.WISDOM), client.getCharacter().getStats().getEffect(StatsEnum.CHANCE), client.getCharacter().getStats().getEffect(StatsEnum.AGILITY),
                 client.getCharacter().getStats().getEffect(StatsEnum.INTELLIGENCE), client.getCharacter().getStats().getEffect(StatsEnum.ADD_RANGE), client.getCharacter().getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT),
-                client.getCharacter().getStats().getEffect(StatsEnum.DamageReflection), client.getCharacter().getStats().getEffect(StatsEnum.ADD_CRITICAL_HIT), (short) client.getCharacter().getInventoryCache().weaponCriticalHit(),
+                client.getCharacter().getStats().getEffect(StatsEnum.DAMAGE_REFLECTION), client.getCharacter().getStats().getEffect(StatsEnum.ADD_CRITICAL_HIT), (short) client.getCharacter().getInventoryCache().weaponCriticalHit(),
                 client.getCharacter().getStats().getEffect(StatsEnum.CRITICAL_MISS), client.getCharacter().getStats().getEffect(StatsEnum.ADD_HEAL_BONUS), client.getCharacter().getStats().getEffect(StatsEnum.ALL_DAMAGES_BONUS),
                 client.getCharacter().getStats().getEffect(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT), client.getCharacter().getStats().getEffect(StatsEnum.ADD_DAMAGE_PERCENT), client.getCharacter().getStats().getEffect(StatsEnum.TRAP_BONUS),
                 client.getCharacter().getStats().getEffect(StatsEnum.TRAP_DAMAGE_PERCENT), client.getCharacter().getStats().getEffect(StatsEnum.GLYPH_BONUS_PERCENT), client.getCharacter().getStats().getEffect(StatsEnum.PERMANENT_DAMAGE_PERCENT), client.getCharacter().getStats().getEffect(StatsEnum.ADD_TACKLE_BLOCK),

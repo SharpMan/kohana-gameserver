@@ -1,8 +1,6 @@
 package koh.game.fights;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -23,6 +21,7 @@ import koh.game.fights.effects.buff.BuffPorter;
 import koh.game.fights.effects.buff.BuffAddSpellRange;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
+import koh.game.fights.fighters.VirtualFighter;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightGlyph;
 import koh.game.fights.layers.FightPortal;
@@ -297,7 +296,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int currentLife, currentLifeMax;
 
     public void setLife(int value) {
-        this.currentLife = value - (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.HEAL)) /*+ this.stats.getTotal(StatsEnum.AddVie)*/;
+        this.currentLife = value - (this.stats.getTotal(StatsEnum.VITALITY) + this.stats.getTotal(StatsEnum.HEAL)) /*+ this.stats.getTotal(StatsEnum.ADD_VIE)*/;
     }
 
     public int getLife() {
@@ -408,7 +407,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return (int) Math.ceil((double) this.getMP() * num2);
     }
 
-    public Short[] getCastZone(SpellLevel spellLevel) {
+    public Short[] getCastZone(SpellLevel spellLevel, short cell) {
         int num = spellLevel.getRange()
                 + this.buff.getAllBuffs()
                 .filter(buff -> buff instanceof BuffAddSpellRange) //TODO && spellid
@@ -440,7 +439,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         } else {
             shape = new Lozenge((byte) spellLevel.getMinRange(), (byte) num, this.fight.getMap());
         }
-        return shape.getCells(this.getCellId());
+        return shape.getCells(cell);
     }
 
     public boolean hasState(int stateId) {
@@ -853,8 +852,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int getReflectedDamage() {
-        return ((1 + (this.stats.getTotal(StatsEnum.WISDOM) / 100)) * this.stats.getTotal(StatsEnum.DAMAGE_RETURN)) + this.stats.getTotal(StatsEnum.DamageReflection);
+        return ((1 + (this.stats.getTotal(StatsEnum.WISDOM) / 100)) * this.stats.getTotal(StatsEnum.DAMAGE_RETURN)) + this.stats.getTotal(StatsEnum.DAMAGE_REFLECTION);
     }
+
+    public abstract List<SpellLevel> getSpells();
 
     @Override
     public Integer getPriority() {
@@ -872,6 +873,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public CharacterFighter asPlayer(){
         return (CharacterFighter) this;
+    }
+
+    public VirtualFighter asVirtual(){
+        return (VirtualFighter) this;
     }
 
     public Player getPlayer(){

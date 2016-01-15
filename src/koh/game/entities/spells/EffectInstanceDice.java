@@ -3,8 +3,12 @@ package koh.game.entities.spells;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+
+import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.BufUtils;
 import static koh.protocol.client.BufUtils.*;
+
+import koh.protocol.client.enums.StatsEnum;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.mina.core.buffer.IoBuffer;
@@ -24,6 +28,18 @@ public class EffectInstanceDice extends EffectInstanceInteger {
 
     public int diceNum;
     public int diceSide;
+
+    public short randomJet() {
+
+        int num1 = this.diceNum >= (int) this.diceSide ? this.diceNum : this.diceSide;
+        int num2 = this.diceNum <= (int) this.diceSide ? this.diceNum : this.diceSide;
+
+        if (num2 == 0) {
+            return (short) num1;
+        } else {
+            return (short) EffectCast.randomValue(num2, num1);
+        }
+    }
 
     public EffectInstanceDice(EffectInstance Parent, int value, int diceNum, int diceSide) {
         super(Parent, value);
@@ -62,6 +78,10 @@ public class EffectInstanceDice extends EffectInstanceInteger {
         this.delay = buf.getInt();
         this.triggers = readUTF(buf);
         this.group = buf.getInt();
+    }
+
+    public StatsEnum getEffectType(){
+        return StatsEnum.valueOf(this.effectId);
     }
 
     @Override

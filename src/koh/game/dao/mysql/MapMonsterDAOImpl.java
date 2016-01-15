@@ -56,6 +56,7 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                                 });
                     });
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e);
             log.warn(e.getMessage());
         }

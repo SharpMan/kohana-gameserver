@@ -73,4 +73,6 @@ public abstract class StaticFighter extends Fighter {
         return FightObjectType.OBJECT_STATIC;
     }
 
+
+
 }

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.stream.Stream;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
+import koh.game.fights.utils.SwapPositionRequest;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.FightOptionsEnum;
