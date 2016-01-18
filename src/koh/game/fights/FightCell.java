@@ -31,7 +31,8 @@ public class FightCell {
     @Getter
     public short Id;
     private boolean myWalkable;
-    private boolean myLineOfSight;
+    @Getter
+    private boolean lineOfSight;
 
     private AbstractQueue<IFightObject> myFightObjects = new PriorityBlockingQueue<>(20, new FightCellComparator());
     //Never change this is the heart of trap network
@@ -39,7 +40,7 @@ public class FightCell {
     public FightCell(short Id, boolean walk, boolean los) {
         this.Id = Id;
         this.myWalkable = walk;
-        this.myLineOfSight = los;
+        this.lineOfSight = los;
     }
 
     public int beginTurn(Fighter fighter) {
@@ -80,6 +81,8 @@ public class FightCell {
         return this.myWalkable;
     }
 
+
+
     public boolean hasObject(FightObjectType type) {
         return this.myFightObjects.stream().anyMatch(obj -> obj.getObjectType() == type);
     }
@@ -95,6 +98,10 @@ public class FightCell {
     public boolean canWalk() {
         //return this.myWalkable && !this.hasGameObject(FightObjectType.OBJECT_CAWOTTE) && !this.hasGameObject(FightObjectType.OBJECT_FIGHTER);
         return this.myWalkable && this.myFightObjects.stream().allMatch(obj -> obj.canGoThrough());
+    }
+
+    public boolean canGoTrough(){
+        return this.myFightObjects.stream().allMatch(obj -> obj.canGoThrough());
     }
 
     public boolean hasGameObject(FightObjectType objectType) {
@@ -211,7 +218,7 @@ public class FightCell {
         try {
             Id = 0;
             myWalkable = false;
-            myLineOfSight = false;
+            lineOfSight = false;
             myFightObjects.clear();
             myFightObjects = null;
             this.finalize();

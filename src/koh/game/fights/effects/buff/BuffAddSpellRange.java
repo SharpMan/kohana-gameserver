@@ -5,6 +5,7 @@ import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporarySpellBoostEffect;
+import lombok.Getter;
 
 /**
  *
@@ -12,8 +13,12 @@ import koh.protocol.types.game.actions.fight.FightTemporarySpellBoostEffect;
  */
 public class BuffAddSpellRange extends BuffEffect {
 
-    public BuffAddSpellRange(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
+    @Getter
+    private final int spell;
+
+    public BuffAddSpellRange(EffectCast castInfos, Fighter target) {
+        super(castInfos, target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
+        this.spell = this.castInfos.effect.diceNum;
     }
 
     @Override

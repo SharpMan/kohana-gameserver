@@ -1,4 +1,4 @@
-package koh.game.fights.AI;
+package koh.game.fights.AI.actions;
 
 import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfinder;
@@ -7,6 +7,8 @@ import koh.game.entities.mob.MonsterTemplate;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.Spell;
 import koh.game.entities.spells.SpellLevel;
+import koh.game.fights.AI.AIAction;
+import koh.game.fights.AI.AIProcessor;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
@@ -24,12 +26,12 @@ import java.util.stream.Collectors;
 /**
  * Created by Melancholia on 1/11/16.
  */
-public class AttackAction extends AIAction {
+public class HealHimselfAction extends AIAction {
 
     @Override
     protected double scoreHeal(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         double score = 0;
-        int baseScore = 13;
+        int baseScore = 25;
         baseScore *= effect.randomJet();
 
         for (Fighter target : targets)
@@ -60,14 +62,22 @@ public class AttackAction extends AIAction {
                 currScore *= effect.duration;
             if (reverse)
             {
-                if (target.getTeam() == AI.getFighter().getTeam())
+                if (target == AI.getFighter())
+                {
+                    score -= currScore * 4;
+                }
+                else if (target.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
             }
             else
             {
-                if (target.getTeam() != AI.getFighter().getTeam())
+                if (target == AI.getFighter())
+                {
+                    score += currScore * 4;
+                }
+                else  if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
@@ -267,7 +277,7 @@ public class AttackAction extends AIAction {
     @Override
     protected double scoreDamage_I(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         int score = 0;
-        int baseScore = 25;
+        int baseScore = 15;
         baseScore *= Math.abs(effect.diceNum);
         for (Fighter fighter : targets)
         {
@@ -307,7 +317,7 @@ public class AttackAction extends AIAction {
     @Override
     protected double scoreDamage_II(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         int score = 0;
-        int baseScore = 27;
+        int baseScore = 18;
         baseScore *= Math.abs(effect.diceNum);
         for (Fighter fighter : targets)
         {
@@ -347,7 +357,7 @@ public class AttackAction extends AIAction {
     @Override
     protected double scoreDamage_III(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         int score = 0;
-        int baseScore = 29;
+        int baseScore = 20  ;
         baseScore *= Math.abs(effect.diceNum);
         for (Fighter fighter : targets)
         {
@@ -860,27 +870,27 @@ public class AttackAction extends AIAction {
         if (!AI.getNeuron().myScoreInvocations.containsKey(invocationId))
         {
 
-                MonsterGrade monsterLevel = DAO.getMonsters().find(invocationId).getLevelOrNear(invocationLevel);
-                // Level de monstre existant
-                if (monsterLevel != null)
+            MonsterGrade monsterLevel = DAO.getMonsters().find(invocationId).getLevelOrNear(invocationLevel);
+            // Level de monstre existant
+            if (monsterLevel != null)
+            {
+                List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isDead()).collect(Collectors.toList());
+                for (SpellLevel spell : monsterLevel.getSpells())
                 {
-                    List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isDead()).collect(Collectors.toList());
-                    for (SpellLevel spell : monsterLevel.getSpells())
+                    for (EffectInstanceDice spellEffect : spell.getEffects())
                     {
-                        for (EffectInstanceDice spellEffect : spell.getEffects())
+                        int currScore = (int) this.getEffectScore(AI, (short)-1, (short)-1, spellEffect, possibleTargets, false,true);
+                        if (currScore > 0)
                         {
-                            int currScore = (int) this.getEffectScore(AI, (short)-1, (short)-1, spellEffect, possibleTargets, false,true);
-                            if (currScore > 0)
-                            {
-                                score += currScore;
-                            }
+                            score += currScore;
                         }
                     }
-                    score += monsterLevel.getStats().totalBasePoints();
-                    score *= monsterLevel.getLevel();
-                    AI.getNeuron().myScoreInvocations.put(invocationId, score);
-                    return score;
                 }
+                score += monsterLevel.getStats().totalBasePoints();
+                score *= monsterLevel.getLevel();
+                AI.getNeuron().myScoreInvocations.put(invocationId, score);
+                return score;
+            }
 
         }
         else

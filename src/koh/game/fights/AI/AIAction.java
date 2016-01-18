@@ -1,6 +1,7 @@
 package koh.game.fights.AI;
 
 import koh.game.entities.spells.EffectInstanceDice;
+import koh.game.fights.AI.actions.*;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.FightStateEnum;
 import org.apache.logging.log4j.LogManager;
@@ -19,7 +20,7 @@ public abstract class AIAction {
 
     public static final Map<AIActionEnum, AIAction> AI_ACTIONS = new HashMap<AIActionEnum, AIAction>() {
         {
-           /* this.put(AIActionEnum.SELF_ACTING, new SelfActingAction());
+            this.put(AIActionEnum.SELF_ACTING, new SelfActingAction());
 
             this.put(AIActionEnum.BUFF_HIMSELF, new BuffHimselfAction());
             this.put(AIActionEnum.BUFF_ALLY, new BuffAllyAction());
@@ -27,18 +28,18 @@ public abstract class AIAction {
             this.put(AIActionEnum.SUBBUFF, new SubBuffAction());
 
             this.put(AIActionEnum.HEAL_HIMSELF, new HealHimselfAction());
-            this.put(AIActionEnum.HEAL_ALLY, new BuffAllyAction());*/
+            this.put(AIActionEnum.HEAL_ALLY, new BuffAllyAction());
 
             this.put(AIActionEnum.ATTACK, new AttackAction());
 
-            /*this.put(AIActionEnum.SUPPORT, new SupportAction());
+            this.put(AIActionEnum.SUPPORT, new SupportAction());
 
             this.put(AIActionEnum.DEBUFF_ALLY, new DebuffAllyAction());
             this.put(AIActionEnum.DEBUFF_ENNEMY, new DebuffEnnemyAction());
 
             this.put(AIActionEnum.REPELS, new RepelsAction());
             this.put(AIActionEnum.INVOK, new InvokAction());
-            this.put(AIActionEnum.MAD, new MadAction());*/
+            this.put(AIActionEnum.MAD, new MadAction());
         }
     };
 

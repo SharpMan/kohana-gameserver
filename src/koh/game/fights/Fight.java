@@ -1,5 +1,6 @@
 package koh.game.fights;
 
+import com.sun.javafx.geom.Line2D;
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameMapMovement;
@@ -8,17 +9,17 @@ import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
 import koh.game.entities.environments.*;
+import koh.game.entities.environments.MovementPath;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
-import koh.game.entities.maps.pathfinding.LinkedCellsManager;
-import koh.game.entities.maps.pathfinding.MapPoint;
-import koh.game.entities.maps.pathfinding.Path;
+import koh.game.entities.maps.pathfinding.*;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
+import koh.game.fights.effects.buff.BuffAddSpellRange;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffEndTurn;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
@@ -60,6 +61,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.*;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -183,8 +185,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     private void initCells() {
         // Ajout des cells
-        for (DofusCell Cell : this.map.getCells()) {
-            this.fightCells.put(Cell.getId(), new FightCell(Cell.getId(), Cell.mov(), Cell.los()));
+        for (DofusCell cell : this.map.getCells()) {
+            this.fightCells.put(cell.getId(), new FightCell(cell.getId(), cell.mov(), cell.los()));
         }
         this.myFightCells.put(myTeam1, new HashMap<>());
         this.myFightCells.put(myTeam2, new HashMap<>());
@@ -247,6 +249,82 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void launchSpell(Fighter fighter, SpellLevel spelllevel, short cellId, boolean friend) {
         launchSpell(fighter, spelllevel, cellId, friend, false, true);
+    }
+
+
+    public boolean pointLos(int x, int y, boolean bAllowTroughEntity)
+    {
+        final FightCell cell = this.getCell(MapPoint.fromCoords(x, y).get_cellId());
+        boolean los = cell.isLineOfSight();
+        if (!(bAllowTroughEntity))
+        {
+            if(!cell.canGoTrough())
+                return false;
+        };
+        return (los);
+    }
+
+    private static final int TOLERANCE_ELEVATION = 11;
+
+    public boolean pointMov(int x, int y, boolean bAllowTroughEntity, int previousCellId, int endCellId)
+    {
+        boolean useNewSystem;
+        short cellId;
+        DofusCell cellData,previousCellData;
+        boolean mov;
+        int  dif;
+        if (MapPoint.isInMap(x, y))
+        {
+            useNewSystem =  map.isUsingNewMovementSystem();
+            cellId = MapPoint.fromCoords(x, y).get_cellId();
+            cellData = map.getCell(cellId);
+            mov = ((cellData.mov()) && (cellData.nonWalkableDuringFight()));
+            if (((((((mov) && (useNewSystem))) && (!((previousCellId == -1))))) && (!((previousCellId == cellId)))))
+            {
+                previousCellData = map.getCell((short)previousCellId);
+                dif = Math.abs((Math.abs(cellData.getFloor()) - Math.abs(previousCellData.getFloor())));
+                if (((((!((previousCellData.getMoveZone() == cellData.getMoveZone()))) && ((dif > 0)))) || ((((((previousCellData.getMoveZone() == cellData.getMoveZone())) && ((cellData.getMoveZone() == 0)))) && ((dif > TOLERANCE_ELEVATION))))))
+                {
+                    mov = false;
+                }
+            }
+            if (!(bAllowTroughEntity))
+            {
+                for(IFightObject o : this.getCell(cellId).getObjects()){
+                    if ((((endCellId == cellId)) && (o.canWalk())))
+                    {
+                    }
+                    else
+                    {
+                        if (!(o.canGoThrough()))
+                        {
+                            return (false);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            mov = false;
+        }
+        return (mov);
+    }
+
+    public boolean hasEntity(int x, int y){
+        final short cell = (short) Math.abs(MapPoint.coordToCellId(x, y));
+        try {
+            for(IFightObject o : this.getCell(cell).getObjects()){
+                if(!o.canGoThrough()){
+                    return true;
+                }
+            }
+            return !this.map.getCell(cell).los() && !this.map.getCell(cell).farmCell();
+        }
+        catch(ArrayIndexOutOfBoundsException | NullPointerException e){
+            System.out.println("ha"+cell);
+        }
+        return false;
     }
 
     private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter Fighter, int param1) {
@@ -326,9 +404,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             TargetE = this.hasFriendInCell(cellId, fighter.getTeam());
         }
 
-        int TargetId = TargetE == null ? -1 : TargetE.getID();
+        int targetId = TargetE == null ? -1 : TargetE.getID();
         // Peut lancer le sort ?
-        if (!fakeLaunch && !this.canLaunchSpell(fighter, spellLevel, fighter.getCellId(), cellId, TargetId)) {
+        if (!fakeLaunch && !this.canLaunchSpell(fighter, spellLevel, fighter.getCellId(), cellId, targetId)) {
             fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             this.endSequence(SequenceTypeEnum.SEQUENCE_SPELL, false);
             return;
@@ -337,7 +415,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.startSequence(SequenceTypeEnum.SEQUENCE_SPELL);
 
             fighter.setUsedAP(fighter.getUsedAP() + spellLevel.getApCost());
-            fighter.getSpellsController().actualize(spellLevel, TargetId);
+            fighter.getSpellsController().actualize(spellLevel, targetId);
         }
 
         boolean IsCc = false;
@@ -385,7 +463,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
             }
             for (Player player : this.Observable$stream()) {
-                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), TargetId, cellId, (byte) (IsCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) || silentCast), spellLevel.getSpellId(), spellLevel.getGrade(), informations == null ? new int[0] : informations.second));
+                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), targetId, cellId, (byte) (IsCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) || silentCast), spellLevel.getSpellId(), spellLevel.getGrade(), informations == null ? new int[0] : informations.second));
             }
             if (informations != null) {
                 informations.Clear();
@@ -602,31 +680,75 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         // PA manquant ?
         if (fighter.getAP() < spell.getApCost()) {
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 170, String.valueOf(fighter.getAP()),String.valueOf(spell.getApCost())));
+            return false;
+        }
+        else if (!this.map.getCell(cellId).walakable() || this.map.getCell(cellId).nonWalkableDuringFight()) {
+            return false;
+        }
+        else if(!(!spell.isNeedFreeCell() || targetId == -1)){
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 172));
+            return false;
+        }
+        else if(!(!spell.isNeedTakenCell() || targetId != -1)
+                || (spell.isNeedFreeTrapCell() && this.fightCells.get(cellId).hasGameObject(FightObjectType.OBJECT_TRAP)) ){
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 193));
+            return false;
+        }
+        else if(Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x))
+                || Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x))){
+            return false;
+        }
+        else if(!fighter.getSpellsController().canLaunchSpell(spell, targetId)){
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             return false;
         }
 
+        int range = spell.getRange()
+                + fighter.getBuff().getAllBuffs()
+                .filter(buff -> buff instanceof BuffAddSpellRange && buff.castInfos.effect.diceNum == spell.getSpellId())
+                .mapToInt(buff -> buff.castInfos.effect.value)
+                .sum();
 
-        if (!this.map.getCell(cellId).walakable() || this.map.getCell(cellId).nonWalkableDuringFight()) {
+        if (spell.isRangeCanBeBoosted()) {
+            int val1 = range + fighter.getStats().getTotal(StatsEnum.ADD_RANGE);
+            if (val1 < spell.getMinRange()) {
+                val1 = spell.getMinRange();
+            }
+            range = Math.min(val1, 280);
+        }
+
+        final Short[] zone = fighter.getCastZone(range,spell,currentCell);
+
+        if((!ArrayUtils.contains(zone, cellId))){
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 171, String.valueOf(spell.getMinRange() != 0 ? spell.getMinRange() : 0), String.valueOf(range), String.valueOf(spell.getRange())));
             return false;
         }
-        //targetId == -1
+        else if(spell.isCastTestLos() && !spell.isNeedFreeTrapCell()){
+            final MapPoint target = MapPoint.fromCellId(cellId);
+            final byte dir = fighter.getMapPoint().advancedOrientationTo(target);
+            FightCell cell,lastCell = null;
+            boolean result = true;
 
-        //TODO return a message foreach issues
-       /* logger.debug("SpellNeedFreeCell {} SpellIsTakenCell {} fighterHasState {} fighterForbidState {} cellInZone {} controllerOk {}"
-                , (!spell.isNeedFreeCell() || targetId == -1)
-                , (!spell.isNeedTakenCell() || targetId != -1)
-                , !Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x))
-                , !Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x))
-                , (ArrayUtils.contains(fighter.getCastZone(spell), cellId))
-                , (fighter.getSpellsController().canLaunchSpell(spell, targetId)));*/
-        return (!spell.isNeedFreeCell() || targetId == -1)
-                && (!spell.isNeedTakenCell() || targetId != -1)
-                && !(spell.isNeedFreeTrapCell() && this.fightCells.get(cellId).hasGameObject(FightObjectType.OBJECT_TRAP))
-                && !Arrays.stream(spell.getStatesForbidden()).anyMatch(x -> fighter.hasState(x))
-                && !Arrays.stream(spell.getStatesRequired()).anyMatch(x -> !fighter.hasState(x))
-                && ArrayUtils.contains(fighter.getCastZone(spell,currentCell), cellId)
-                && fighter.getSpellsController().canLaunchSpell(spell, targetId);
-
+            for(Point p : Bresenham.findLine(fighter.getMapPoint().get_x(),fighter.getMapPoint().get_y(),target.get_x(),target.get_y())){
+                if (!(MapPoint.isInMap(p.x, p.y))) {
+                }else {
+                    cell = this.getCell(MapTools.getCellNumFromXYCoordinates(p.x, p.y));fighter.send(new ShowCellMessage(0,cell.Id));
+                    if(lastCell != null && lastCell.hasFighter()){
+                        result = false;
+                    }
+                    if(!(cell.isLineOfSight())){
+                        result = false;
+                    }
+                    lastCell = cell;
+                }
+            }
+            if(!result){
+                fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 174));
+                return false;
+            }
+        }
+        return true;
     }
 
     public void toggleLock(Fighter fighter, FightOptionsEnum type) {

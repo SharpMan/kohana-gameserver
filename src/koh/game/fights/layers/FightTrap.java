@@ -8,7 +8,6 @@ import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
-import static koh.protocol.client.enums.GameActionFightInvisibilityStateEnum.VISIBLE;
 import koh.protocol.client.enums.GameActionMarkCellsTypeEnum;
 import koh.protocol.client.enums.GameActionMarkTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightMarkCellsMessage;
@@ -16,8 +15,9 @@ import koh.protocol.messages.game.actions.fight.GameActionFightUnmarkCellsMessag
 import koh.protocol.types.game.actions.fight.GameActionMark;
 import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
 
+import static koh.protocol.client.enums.GameActionFightInvisibilityStateEnum.VISIBLE;
+
 /**
- *
  * @author Neo-Craft
  */
 public class FightTrap extends FightActivableObject {

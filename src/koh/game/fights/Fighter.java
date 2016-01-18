@@ -410,7 +410,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public Short[] getCastZone(SpellLevel spellLevel, short cell) {
         int num = spellLevel.getRange()
                 + this.buff.getAllBuffs()
-                .filter(buff -> buff instanceof BuffAddSpellRange) //TODO && spellid
+                .filter(buff -> buff instanceof BuffAddSpellRange && buff.castInfos.effect.diceNum == spellLevel.getSpellId())
                 .mapToInt(buff -> buff.castInfos.effect.value)
                 .sum();
 
@@ -421,6 +421,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             }
             num = Math.min(val1, 280);
         }
+       return this.getCastZone(num,spellLevel,cell);
+    }
+
+    public Short[] getCastZone(final int num, SpellLevel spellLevel, short cell) {
         IZone shape;
         if (spellLevel.isCastInDiagonal() && spellLevel.isCastInLine()) {
             shape = new CrossZone((byte) spellLevel.getMinRange(), (byte) num) {
@@ -440,7 +444,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             shape = new Lozenge((byte) spellLevel.getMinRange(), (byte) num, this.fight.getMap());
         }
         return shape.getCells(cell);
+
     }
+
 
     public boolean hasState(int stateId) {
         return this.states.hasState(FightStateEnum.valueOf(stateId));

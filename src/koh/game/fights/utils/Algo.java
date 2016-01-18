@@ -14,6 +14,8 @@ import java.util.Random;
  */
 public class Algo {
 
+    private static final Random RANDOM = new Random();
+
     private static Couple<Short, Short> getRandomBaseCellPlaces(DofusMap map) {
         short team1_baseCell = map.getRandomWalkableCell();
         short team2_baseCell = map.getRandomWalkableCell();
@@ -101,13 +103,11 @@ public class Algo {
     }
 
     public static int random(int i1, int i2) {
-        Random rand = new Random();
-        return rand.nextInt(i2 - i1 + 1) + i1;
+        return RANDOM.nextInt(i2 - i1 + 1) + i1;
     }
 
     public static byte randomDiretion() {
-        Random rand = new Random();
-        return (byte) rand.nextInt(7);
+        return (byte) RANDOM.nextInt(7);
     }
 
 }

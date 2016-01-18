@@ -71,7 +71,7 @@ public class MapPoint {
     }
 
     public static boolean isInMap(int x, int y) {
-        return (((((((((x + y) >= 0)) && (((x - y) >= 0)))) && (((x - y) < (MAP_HEIGHT * 2))))) && (((x + y) < (MAP_WIDTH * 2)))));
+        return coordToCellId(x, y) >= 0 && coordToCellId(x, y) <= MapTools._CELLCOUNT && (((((((((x + y) >= 0)) && (((x - y) >= 0)))) && (((x - y) < (MAP_HEIGHT * 2))))) && (((x + y) < (MAP_WIDTH * 2)))));
     }
 
     private static void init() {
@@ -183,7 +183,7 @@ public class MapPoint {
         return (result);
     }
 
-    public int advancedOrientationTo(MapPoint mp) {
+    public byte advancedOrientationTo(MapPoint mp) {
         return advancedOrientationTo(mp, true);
     }
 

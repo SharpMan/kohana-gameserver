@@ -5,7 +5,7 @@ import koh.game.actions.GameMapMovement;
 import koh.game.dao.DAO;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.item.EffectHelper;
-import koh.game.entities.maps.pathfinding.MapPoint;
+import koh.game.entities.maps.pathfinding.*;
 import koh.game.entities.mob.IAMind;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -22,6 +22,7 @@ import koh.game.paths.PathNotFoundException;
 import koh.game.paths.Pathfinder;
 import koh.protocol.client.enums.IAMindEnum;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.messages.game.context.ShowCellMessage;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
@@ -207,6 +208,7 @@ public class AIProcessor {
             {
                 neuron.myBestCastCell = this.fighter.getCellId();
             }
+
             this.fight.launchSpell(this.fighter, neuron.myBestSpell, neuron.myBestCastCell, true);
             neuron.myAttacked = true;
             BACKGROUND_WORKER.execute(new Runnable() {
@@ -228,11 +230,11 @@ public class AIProcessor {
         Short[] cells = fighter.getCastZone(spell,currentCell);
         for (Short cell : cells)
         {
-            FightCell FightCell = this.fight.getCell(cell);
+            FightCell fightCell = this.fight.getCell(cell);
 
-            if (FightCell != null)
+            if (fightCell != null)
             {
-                Fighter firstTarget = FightCell.getFighter();
+                Fighter firstTarget = fightCell.getFighter();
                 if (this.fight.canLaunchSpell(this.fighter, spell, currentCell, cell, firstTarget == null ? -1 : firstTarget.getID()))
                 {
                     double score = this.getSpellScore(Action, spell, currentCell, cell);
@@ -244,14 +246,12 @@ public class AIProcessor {
                         else
                             score -= distance;
 
-                    if (FightCell.hasEnnemy(this.fighter.getTeam()) != null)
+                    if (fightCell.hasEnnemy(this.fighter.getTeam()) != null)
                     {
                         if (score > 0)
                             score += 50;
                     }
 
-                    if(score != 0)
-                    System.out.println(score);
                     if (score >  neuron.myBestScore)
                     {
                         neuron.myBestScore = (int)score;
@@ -317,13 +317,13 @@ public class AIProcessor {
         return false;
     }
 
-    public boolean SelfAction()
+    public boolean selfAction()
     {
         this.mode = AIAction.AIActionEnum.SELF_ACTING;
         return react();
     }
 
-    public boolean MadSelfAction()
+    public boolean madSelfAction()
     {
         this.mode = AIAction.AIActionEnum.MAD;
         return react();
@@ -341,67 +341,67 @@ public class AIProcessor {
     /*
      * Buff Actions
      */
-    public boolean BuffMe()
+    public boolean buffMe()
     {
         this.mode = AIAction.AIActionEnum.BUFF_HIMSELF;
         return react();
     }
 
-    public boolean BuffAlly()
+    public boolean buffAlly()
     {
         this.mode = AIAction.AIActionEnum.BUFF_ALLY;
         return react();
     }
 
-    public boolean Buff()
+    public boolean buff()
     {
-        return BuffAlly() || BuffMe();
+        return buffAlly() || buffMe();
     }
 
     /*
      * Debuff Actions
      */
-    public boolean DebuffAlly()
+    public boolean debuffAlly()
     {
         this.mode = AIAction.AIActionEnum.DEBUFF_ALLY;
         return react();
     }
 
-    public boolean DebuffEnnemy()
+    public boolean debuffEnnemy()
     {
         this.mode = AIAction.AIActionEnum.DEBUFF_ENNEMY;
         return react();
     }
 
-    public boolean Debuff()
+    public boolean debuff()
     {
-        return DebuffAlly() || DebuffEnnemy();
+        return debuffAlly() || debuffEnnemy();
     }
 
     /*
      * Heal Actions
      */
-    public boolean HealMe()
+    public boolean healMe()
     {
         this.mode = AIAction.AIActionEnum.HEAL_HIMSELF;
         return react();
     }
 
-    public boolean HealAlly()
+    public boolean healAlly()
     {
         this.mode = AIAction.AIActionEnum.HEAL_ALLY;
         return react();
     }
 
-    public boolean Heal()
+    public boolean heal()
     {
-        return HealAlly() || HealMe();
+        return healAlly() || healMe();
     }
 
     /*
      * Actions de support
      */
-    public boolean Support()
+    public boolean support()
     {
         //return Repels() || HealAlly() || Debuff() || Subbuff() || BuffAlly() || Invocate();
         this.mode = AIAction.AIActionEnum.SUPPORT;
@@ -411,7 +411,7 @@ public class AIProcessor {
     /*
      * Invocation
      */
-    public boolean Invocate()
+    public boolean invocate()
     {
         this.mode = AIAction.AIActionEnum.INVOK;
         return react();
@@ -420,7 +420,7 @@ public class AIProcessor {
     /*
      * Repousse les ennemis
      */
-    public boolean Repels()
+    public boolean repels()
     {
         this.mode = AIAction.AIActionEnum.REPELS;
         return react();
@@ -429,7 +429,7 @@ public class AIProcessor {
     /*
      * Ralenti les ennemis
      */
-    public boolean Subbuff()
+    public boolean subbuff()
     {
         this.mode = AIAction.AIActionEnum.SUBBUFF;
         return react();

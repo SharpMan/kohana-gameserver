@@ -196,7 +196,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         //var cellEntities:Array; Obstacle glyphe ect lol ?
         //var o:IObstacle;
         if (MapPoint.isInMap(x, y)) {
-            useNewSystem =  this.isUsingNewMovementSystem;
+            useNewSystem =  this.usingNewMovementSystem;
             cellId = MapPoint.fromCoords(x, y).get_cellId();
             cellData = this.cells[cellId];
             mov = cellData.mov() && !cellData.nonWalkableDuringFight()/*&& (((!(this.isInFight)) || (!(cellData.nonWalkableDuringFight)))))*/;
@@ -240,8 +240,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public int getCellSpeed(int cellId) {
         return this.cells[(short) cellId].getSpeed();
     }
-    
-    private boolean isUsingNewMovementSystem = false;
+
+    @Getter
+    private boolean usingNewMovementSystem = false;
 
     
     public DofusMap init$Return(){
@@ -264,7 +265,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
                 _oldMvtSystem = this.cells[i].getMoveZone();
             }
             if(this.cells[i].getMoveZone() != _oldMvtSystem){
-               this.isUsingNewMovementSystem = true;
+               this.usingNewMovementSystem = true;
             }
         }
         buf.clear();
