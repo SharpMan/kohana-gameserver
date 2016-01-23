@@ -1,6 +1,6 @@
 package koh.game.fights.effects.buff;
 
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectPush;
@@ -22,14 +22,14 @@ public class BuffDodge extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (target.getCellId() != DamageInfos.targetKnownCellId || Pathfinder.getGoalDistance(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId()) > 1) {
+        if (target.getCellId() != DamageInfos.targetKnownCellId || Pathfunction.goalDistance(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId()) > 1) {
             return -1;
         }
         
         DamageValue.setValue(0);
 
         EffectCast SubInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
-        byte Direction = Pathfinder.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
+        byte Direction = Pathfunction.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
 
         // Application du push
         return EffectPush.ApplyPush(SubInfos, this.target, Direction, 1);

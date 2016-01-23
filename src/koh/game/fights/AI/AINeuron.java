@@ -2,6 +2,8 @@ package koh.game.fights.AI;
 
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fighter;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,13 +16,14 @@ import java.util.Map;
 public class AINeuron {
 
     public List<Fighter> myEnnemies = new ArrayList<Fighter>();
-    public boolean myAttacked = false;
+    @Getter @Setter
+    private boolean attacked = false;
     public List<Short> myReachableCells = new ArrayList<Short>();
     public SpellLevel myBestSpell;
     public int myBestScore = 0;
     public short myBestMoveCell, myBestCastCell;
     public boolean myFirstTargetIsMe;
-    public Map<Integer,Integer> myScoreInvocations = new HashMap<Integer,Integer>();
+    public Map<Integer,Double> myScoreInvocations = new HashMap<>();
 
     @Override
     public void finalize(){
@@ -30,7 +33,7 @@ public class AINeuron {
                 myEnnemies.clear();
                 myEnnemies = null;
             }
-            myAttacked = false;
+            attacked = false;
             if (myReachableCells != null)
             {
                 myReachableCells.clear();

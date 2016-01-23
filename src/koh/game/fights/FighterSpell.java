@@ -41,7 +41,6 @@ public class FighterSpell {
         if (Spell.getMaxCastPerTurn() > 0) {
             if (this.myTargets.containsKey(Spell.getSpellId())) {
                 if (this.myTargets.get(Spell.getSpellId()).size() >= Spell.getMaxCastPerTurn()) {
-                    System.out.println("2"+this.myTargets.get(Spell.getSpellId()).size()+" "+Spell.getMaxCastPerTurn());
                     return false;
                 }
             }
@@ -50,7 +49,6 @@ public class FighterSpell {
         if (Spell.getMaxCastPerTarget() > 0) {
             if (this.myTargets.containsKey(Spell.getSpellId())) {
                 if (this.myTargets.get(Spell.getSpellId()).stream().filter(x -> x.targetId == TargetId).count() >= Spell.getMaxCastPerTarget()) {
-                    System.out.println("ici" + this.myTargets.get(Spell.getSpellId()).stream().filter(x -> x.targetId == TargetId).count());
                     return false;
                 }
             }

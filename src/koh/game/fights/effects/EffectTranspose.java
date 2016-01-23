@@ -17,7 +17,7 @@ public class EffectTranspose extends EffectBase {
     public int applyEffect(EffectCast castInfos) {
         for (Fighter target : castInfos.targets.stream()
                 .filter(fr -> !(fr instanceof StaticFighter)
-                        && !fr.getStates().hasState(FightStateEnum.PORTÉ)
+                        && !fr.getStates().hasState(FightStateEnum.CARRIED)
                         && !fr.getStates().hasState(FightStateEnum.Inébranlable)
                         && !fr.getStates().hasState(FightStateEnum.ENRACINÉ)
                         && !fr.getStates().hasState(FightStateEnum.Indéplaçable))

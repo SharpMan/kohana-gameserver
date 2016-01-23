@@ -75,9 +75,8 @@ public class Cells {
     }
 
     public static short getCellIdByOrientation(short cellId, byte orientation) {
-        return koh.game.entities.environments.Pathfinder.nextCell(cellId,orientation);
-        /*
-        switch (orientation) {
+        return Pathfunction.nextCell(cellId,orientation);
+       /* lol des fois sa sort de lautre bout map et rentre dans un new switch (orientation) {
             case DirectionsEnum.RIGHT:
                 return (short) (cellId + 1);
             case DirectionsEnum.DOWN_RIGHT:

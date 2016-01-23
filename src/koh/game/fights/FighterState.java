@@ -26,9 +26,9 @@ public class FighterState {
 
     public boolean canState(FightStateEnum State) {
         switch (State) {
-            case PORTÉ:
-            case PORTEUR:
-                return !hasState(FightStateEnum.Lourd);
+            case CARRIED:
+            case CARRIER:
+                return !hasState(FightStateEnum.HEAVY);
         }
         return !hasState(State);
     }

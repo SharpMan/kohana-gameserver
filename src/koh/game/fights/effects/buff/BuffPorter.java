@@ -28,7 +28,7 @@ public class BuffPorter extends BuffEffect {
     public BuffPorter(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
-        Target.getStates().fakeState(FightStateEnum.PORTÉ, true);
+        Target.getStates().fakeState(FightStateEnum.CARRIED, true);
         this.castInfos.effectType = StatsEnum.ADD_STATE;
         Target.setCell(this.caster.getMyCell());
     }
@@ -63,7 +63,7 @@ public class BuffPorter extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        target.getStates().fakeState(FightStateEnum.PORTÉ, false);
+        target.getStates().fakeState(FightStateEnum.CARRIED, false);
 
         return super.removeEffect();
     }

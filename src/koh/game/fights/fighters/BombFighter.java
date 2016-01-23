@@ -3,11 +3,10 @@ package koh.game.fights.fighters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.mob.MonsterGrade;
@@ -30,7 +29,7 @@ import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
 import koh.protocol.types.game.context.fight.FightTeamMemberMonsterInformations;
 import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import koh.protocol.types.game.look.EntityLook;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -174,14 +173,14 @@ public class BombFighter extends StaticFighter {
                 Arrays.stream(this.myCell.getObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
             Short[] Cells;
-            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfinder.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
-                int Distance = Pathfinder.getGoalDistance(null, getCellId(), Friend.getCellId());
+            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfunction.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
+                int Distance = Pathfunction.goalDistance(null, getCellId(), Friend.getCellId());
                 logger.debug("Bomb Distance = {}" , Distance);
                 if (Distance >= 2 && Distance <= 7) {
-                    Cells = Pathfinder.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfinder.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
+                    Cells = Pathfunction.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfunction.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
                     if (Cells != null) {
-                        Cells = (Short[]) ArrayUtils.removeElement(Cells, this.getCellId());
-                        Cells = (Short[]) ArrayUtils.removeElement(Cells, Friend.getCellId());
+                        Cells =  ArrayUtils.removeElement(Cells, this.getCellId());
+                        Cells =  ArrayUtils.removeElement(Cells, Friend.getCellId());
                         FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
                         fight.addActivableObject(this, Bomb);
                     }

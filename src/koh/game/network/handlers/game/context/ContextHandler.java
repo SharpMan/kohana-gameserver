@@ -8,7 +8,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.actors.character.CharacterInventory;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.MovementPath;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.item.InventoryItem;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.WorldClient;
@@ -19,7 +19,6 @@ import koh.protocol.client.enums.ObjectErrorEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.protocol.messages.game.character.stats.UpdateLifePointsMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextCreateRequestMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
@@ -179,14 +178,14 @@ public class ContextHandler {
         }
 
         if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            MovementPath Path = Pathfinder.isValidPath(client.getCharacter().getFight(), client.getCharacter().getFighter(), client.getCharacter().getFighter().getCellId(), client.getCharacter().getFighter().getDirection(), message.keyMovements);
-            if (Path != null) {
+            MovementPath path = Pathfunction.isValidPath(client.getCharacter().getFight(), client.getCharacter().getFighter(), client.getCharacter().getFighter().getCellId(), client.getCharacter().getFighter().getDirection(), message.keyMovements);
+            if (path != null) {
                 if (client.getCharacter().getFighter().isDead()) {
                     client.send(new BasicNoOperationMessage());
                     client.getCharacter().getFight().endTurn();
                     return;
                 }
-                GameMapMovement GameMovement = client.getCharacter().getFight().tryMove(client.getCharacter().getFighter(), Path);
+                GameMapMovement GameMovement = client.getCharacter().getFight().tryMove(client.getCharacter().getFighter(), path);
 
                 if (GameMovement != null) {
                     GameMovement.execute();

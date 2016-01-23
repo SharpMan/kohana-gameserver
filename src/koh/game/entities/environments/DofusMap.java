@@ -586,4 +586,25 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         return "Undefined mapid " + this.id;
     }
 
+    public short getBestCellBetween(short cellId, short nextCell, List<Short> closes) {
+        short bestCell = -1;
+        int bestDist = 1000;
+        for (int i = 1; i < 8; i += 2)
+        {
+            short cell = Pathfunction.computeNextCell(cellId, (byte) ((i + 2) % 8));
+
+
+            if (Arrays.stream(cells).anyMatch(c -> c.getId() == cell))
+                if (!closes.contains(cell))
+                {
+                    int dist = Pathfunction.goalDistanceScore(this, cell, nextCell);
+                    if (dist <= bestDist)
+                    {
+                        bestCell = cell;
+                        bestDist = dist;
+                    }
+                }
+        }
+        return bestCell;
+    }
 }

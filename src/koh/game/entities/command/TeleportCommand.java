@@ -20,7 +20,7 @@ public class TeleportCommand implements PlayerCommand {
     @Override
     public void apply(WorldClient client, String args[]) {
         int mapid = Integer.parseInt(args[0]);
-        int cellid = args.length > 1 ? Integer.parseInt(args[1]) : -1;
+        int cellid = Integer.parseInt(args[1]);
         client.getCharacter().teleport(mapid, cellid);
     }
 
@@ -45,6 +45,6 @@ public class TeleportCommand implements PlayerCommand {
 
     @Override
     public int argsNeeded() {
-        return 1;
+        return 2;
     }
 }

@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
 import java.util.Random;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
@@ -27,17 +27,17 @@ public class EffectPush extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         byte direction = 0;
-        for (Fighter Target : castInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.PORTÉ) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.ENRACINÉ) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter Target : castInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.CARRIED) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.ENRACINÉ) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
-                    if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfinder.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId())){
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
+                    if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId())){
+                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
                     }
-                    else if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
-                    } else if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
+                    else if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
+                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
+                    } else if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
+                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
                     } else {
                         return -1;
                     }
@@ -47,12 +47,12 @@ public class EffectPush extends EffectBase {
                     castInfos.caster = Target;
                     Target = pp;
                     castInfos.targets.remove(0);
-                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
+                    direction = Pathfunction.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
                     break;
                 case PULL_FORWARD:
-                    direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
+                    direction = Pathfunction.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
                     if(castInfos.spellId == 5382 || castInfos.spellId == 5475){
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.targetKnownCellId);
+                        direction = Pathfunction.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.targetKnownCellId);
                     }
                     break;
                 case BACK_CELL:
@@ -60,10 +60,10 @@ public class EffectPush extends EffectBase {
                     castInfos.caster = Target;
                     Target = p;
                     castInfos.targets.remove(0);
-                    if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
-                    } else if (Pathfinder.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
-                        direction = Pathfinder.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
+                    if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
+                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
+                    } else if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
+                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
                     }
                     break;
             }
@@ -78,7 +78,7 @@ public class EffectPush extends EffectBase {
         FightCell currentCell = target.getMyCell();
         short StartCell = target.getCellId();
         for (int i = 0; i < length; i++) {
-            FightCell nextCell = target.getFight().getCell(Pathfinder.nextCell(currentCell.Id, direction));
+            FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {

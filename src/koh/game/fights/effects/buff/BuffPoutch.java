@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import koh.game.dao.DAO;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -47,7 +47,7 @@ public class BuffPoutch extends BuffEffect {
         }
 
         if (castInfos.spellId == 2809) {
-            if(Pathfinder.getGoalDistance(null, DamageInfos.caster.getCellId(), target.getCellId()) > 1){
+            if(Pathfunction.goalDistance(null, DamageInfos.caster.getCellId(), target.getCellId()) > 1){
                 return -1;
             }
             //target = DamageInfos.caster;

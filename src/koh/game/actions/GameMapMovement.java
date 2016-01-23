@@ -51,23 +51,23 @@ public class GameMapMovement extends GameAction {
     }
 
     @Override
-    public void abort(Object[] Args) {
+    public void abort(Object[] args) {
         synchronized (this.sync) {
             // deja fini ?
             if (!this.isFinish) {
                 // deja aborté ?
                 if (!this.myAborted) {
                     // cell de transit ?
-                    if (Args.length > 0) {
-                        short StoppedCell = (short) Args[0];
+                    if (args.length > 0) {
+                        short stoppedCell = (short) args[0];
 
                         try {
-                            // on apell
+                            // on apelle
                             super.endExecute();
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                        this.myField.actorMoved(null, this.actor, StoppedCell, (byte) -1);
+                        this.myField.actorMoved(null, this.actor, stoppedCell, (byte) -1);
                     }
 
                     this.myAborted = true;

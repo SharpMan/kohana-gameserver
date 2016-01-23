@@ -3,9 +3,10 @@ package koh.game.fights.AI;
 import koh.concurrency.ImprovedCachedThreadPool;
 import koh.game.actions.GameMapMovement;
 import koh.game.dao.DAO;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.item.EffectHelper;
-import koh.game.entities.maps.pathfinding.*;
+import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.mob.IAMind;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -21,8 +22,6 @@ import koh.game.fights.fighters.VirtualFighter;
 import koh.game.paths.PathNotFoundException;
 import koh.game.paths.Pathfinder;
 import koh.protocol.client.enums.IAMindEnum;
-import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.context.ShowCellMessage;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
@@ -40,20 +39,18 @@ public class AIProcessor {
     private static final ImprovedCachedThreadPool BACKGROUND_WORKER = new ImprovedCachedThreadPool("AIServicesEventsExecutor", 20, 50, 10, 300);
     private static final Logger logger = LogManager.getLogger(AIProcessor.class);
     private static final int[] BLACKLISTED_EFFECTS = DAO.getSettings().getIntArray("Effect.BlacklistedByTriggers");
-
-
+    protected List<SpellLevel> mySpells;
+    protected long whenIStartIA;
     @Getter
     private Fight fight;
     @Getter
     private VirtualFighter fighter;
-    protected List<SpellLevel> mySpells;
     @Getter
     private AINeuron neuron;
     private AIAction.AIActionEnum mode;
     private int type;
     @Getter
     private int usedNeurons = 0;
-    protected long whenIStartIA;
 
     public AIProcessor(Fight fight, VirtualFighter fighter) {
         this.type = IAMindOf(fighter);
@@ -65,7 +62,7 @@ public class AIProcessor {
 
     public static int IAMindOf(Fighter fr) {
         if (fr == null) {
-            return IAMindEnum.PASSIVE.value;
+            return IAMindEnum.PASSIVE;
         } else if (fr instanceof MonsterFighter) {
             return ((MonsterFighter) fr).getGrade().getMonster().getMonsterAI();
         }
@@ -78,7 +75,7 @@ public class AIProcessor {
             return IAMindEnum.TAXCOLLECTOR;
         }*/
         else {
-            return IAMindEnum.PASSIVE.value;
+            return IAMindEnum.PASSIVE;
         }
     }
 
@@ -141,8 +138,7 @@ public class AIProcessor {
         }
     }
 
-    public long getRemainingTime()
-    {
+    public long getRemainingTime() {
         return (whenIStartIA + fight.getTurnTime()) - System.currentTimeMillis();
     }
 
@@ -151,8 +147,7 @@ public class AIProcessor {
     }
 
 
-    public boolean canPlay()
-    {
+    public boolean canPlay() {
         return fighter != null
                 && fighter.isAlive()
                 && (getRemainingTime() > 0)
@@ -161,14 +156,11 @@ public class AIProcessor {
                 && !fight.onlyOneTeam();
     }
 
-    public void selectBestAction()
-    {
+    public void selectBestAction() {
         AIAction action = AIAction.AI_ACTIONS.get(mode);
-        if (action != null){
-            for (short cell : neuron.myReachableCells)
-            {
-                for (SpellLevel spell : this.mySpells)
-                {
+        if (action != null) {
+            for (short cell : neuron.myReachableCells) {
+                for (SpellLevel spell : this.mySpells) {
                     this.selectBestSpell(action, spell, cell);
                 }
             }
@@ -176,49 +168,39 @@ public class AIProcessor {
     }
 
 
-    public void applyBestAction()
-    {
-        if (neuron.myBestSpell != null)
-        {
-            if (neuron.myBestMoveCell != this.fighter.getCellId() && neuron.myBestMoveCell != 0)
-            {
+    public void applyBestAction() {
+        if (neuron.myBestSpell != null) {
+            if (neuron.myBestMoveCell != this.fighter.getCellId() && neuron.myBestMoveCell != 0) {
                 try {
-                    Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), neuron.myBestMoveCell, false, fighter);
+                    final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), neuron.myBestMoveCell, false, fighter);
                     path.find();
                     GameMapMovement action = this.fight.tryMove(this.fighter, path);
-                    if (action != null)
-                    {
-                        BACKGROUND_WORKER.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(path.getPath().estimateTimeOn());
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                    if (action != null) {
+                        BACKGROUND_WORKER.execute(() -> {
+                            try {
+                                Thread.sleep(path.getPath().estimateTimeOn());
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
                         });
-
-                        fighter.setDirection(path.getPath().last().getOrientation());
+                        action.execute();
                     }
-                } catch (PathNotFoundException e) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-            if (neuron.myFirstTargetIsMe)
-            {
+            if (neuron.myFirstTargetIsMe) {
                 neuron.myBestCastCell = this.fighter.getCellId();
             }
 
             this.fight.launchSpell(this.fighter, neuron.myBestSpell, neuron.myBestCastCell, true);
-            neuron.myAttacked = true;
-            BACKGROUND_WORKER.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1250 + koh.game.entities.environments.Pathfinder.getGoalDistance(fight.getMap(), fighter.getCellId(), neuron.myBestCastCell)*250);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            neuron.setAttacked(true);
+            final long timeToSleep = 1250 + Pathfunction.goalDistance(fight.getMap(), fighter.getCellId(), neuron.myBestCastCell) * 250;
+            BACKGROUND_WORKER.execute(() -> {
+                try {
+                    Thread.sleep(timeToSleep);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             });
 
@@ -227,34 +209,29 @@ public class AIProcessor {
     }
 
     protected void selectBestSpell(AIAction Action, SpellLevel spell, short currentCell) {
-        Short[] cells = fighter.getCastZone(spell,currentCell);
-        for (Short cell : cells)
-        {
+        Short[] cells = fighter.getCastZone(spell, currentCell);
+        for (Short cell : cells) {
             FightCell fightCell = this.fight.getCell(cell);
 
-            if (fightCell != null)
-            {
+            if (fightCell != null) {
                 Fighter firstTarget = fightCell.getFighter();
-                if (this.fight.canLaunchSpell(this.fighter, spell, currentCell, cell, firstTarget == null ? -1 : firstTarget.getID()))
-                {
+                if (this.fight.canLaunchSpell(this.fighter, spell, currentCell, cell, firstTarget == null ? -1 : firstTarget.getID())) {
                     double score = this.getSpellScore(Action, spell, currentCell, cell);
 
-                    int distance = (koh.game.entities.environments.Pathfinder.getGoalDistance(this.fight.getMap(), this.fighter.getCellId(), currentCell) * 5);
+                    int distance = (Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), currentCell) * 5);
                     if (score > 0)
                         if (score - distance < 0)
                             score = 1;
                         else
                             score -= distance;
 
-                    if (fightCell.hasEnnemy(this.fighter.getTeam()) != null)
-                    {
+                    if (fightCell.hasEnnemy(this.fighter.getTeam()) != null) {
                         if (score > 0)
                             score += 50;
                     }
 
-                    if (score >  neuron.myBestScore)
-                    {
-                        neuron.myBestScore = (int)score;
+                    if (score > neuron.myBestScore) {
+                        neuron.myBestScore = (int) score;
                         neuron.myBestSpell = spell;
                         neuron.myFirstTargetIsMe = firstTarget == this.fighter;
                         //if (myNeuron.myFirstTargetIsMe)
@@ -272,42 +249,264 @@ public class AIProcessor {
         }
     }
 
-    public void initCells(){
+    public void initCells() {
         neuron.myReachableCells.clear();
         neuron.myReachableCells.add(this.fighter.getCellId());
 
         this.fight.getFightCells().values().stream()
                 .filter(cell -> cell.canWalk()
-                        && koh.game.entities.environments.Pathfinder.getGoalDistance(this.fight.getMap(), this.fighter.getCellId(), cell.getId()) <= this.fighter.getMP())
+                        && Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), cell.getId()) <= this.fighter.getMP())
                 .forEach(cell -> neuron.myReachableCells.add(cell.getId()));
     }
 
-    protected double getSpellScore(AIAction action, SpellLevel spell, short currentCellId, short castCell)
-    {
+    protected double getSpellScore(AIAction action, SpellLevel spell, short currentCellId, short castCell) {
         double score = 0;
-        for (EffectInstanceDice effect : spell.getEffects())
-        {
+        for (EffectInstanceDice effect : spell.getEffects()) {
             List<Fighter> targets = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castCell), true), this.fight.getMap()))
                     .getCells(castCell))
                     .map(cell -> fight.getCell(cell))
                     .filter(cell -> cell != null && cell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER, IFightObject.FightObjectType.OBJECT_STATIC))
                     .map(fightCell -> fightCell.getObjectsAsFighter()[0]).collect(Collectors.toList());
 
-            targets.removeIf(target -> !((((ArrayUtils.contains(BLACKLISTED_EFFECTS,effect.effectUid)
-                || EffectHelper.verifyEffectTrigger(fighter, target, spell.getEffects(), effect, false, effect.triggers, castCell))
-                && effect.isValidTarget(fighter, target)
-                && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)))));
+            targets.removeIf(target -> !((((ArrayUtils.contains(BLACKLISTED_EFFECTS, effect.effectUid)
+                    || EffectHelper.verifyEffectTrigger(fighter, target, spell.getEffects(), effect, false, effect.triggers, castCell))
+                    && effect.isValidTarget(fighter, target)
+                    && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)))));
 
-            if (targets.size() > 0 || (spell.isNeedFreeCell() && targets.size() == 0))
-            {
-                score += Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets,false,false));
+            if (targets.size() > 0 || (spell.isNeedFreeCell() && targets.size() == 0)) {
+                score += Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));
             }
         }
         return score;
     }
 
-    private boolean react()
+    public boolean moveTo(Fighter target, int maxDistance) {
+        int baseDistance = Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), target.getCellId());
+        if (maxDistance > baseDistance) {
+            maxDistance = baseDistance;
+        }
+        int baseDistanceDisplacement = baseDistance - this.fighter.getMP();
+        if (baseDistanceDisplacement <= 1) baseDistanceDisplacement = 1;
+
+        if (baseDistanceDisplacement <= maxDistance) {
+            short bestCell = -1;
+            int bestDistance = maxDistance;
+
+            for (short cell : Pathfunction.getCircleZone(target.getCellId(), maxDistance)) {
+                FightCell fCell = fight.getCell(cell);
+                if (fCell != null && fCell.canWalk()) {
+                    int distance = Pathfunction.goalDistance(this.fight.getMap(), target.getCellId(), cell);
+                    if (distance < bestDistance) {
+                        bestCell = cell;
+                        bestDistance = distance;
+                    }
+                }
+            }
+            System.out.println(baseDistance +" a "+ maxDistance + " b"+bestCell + " "+this.fighter.getCellId());
+
+            if (bestCell != -1 && bestCell != this.fighter.getCellId()) {
+                final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), bestCell, false, fighter);
+                try {
+                    path.find();
+                    GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                    if (action != null) {
+                        BACKGROUND_WORKER.execute(() -> {
+                            try {
+                                Thread.sleep(path.getPath().estimateTimeOn());
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        fighter.setDirection(path.getPath().last().getOrientation());
+                        return true;
+                    }
+                } catch (PathNotFoundException ee) {
+                    ee.printStackTrace();
+                    //TODO search another cell
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean moveTo(Fighter target, int minDistance, int maxDistance)
     {
+       int baseDistance = Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), target.getCellId());
+        if (maxDistance < minDistance)
+        {
+            maxDistance = minDistance;
+        }
+        if (maxDistance > baseDistance)
+        {
+            maxDistance = baseDistance;
+        }
+        int baseDistanceDisplacement = baseDistance - this.fighter.getMP();
+        if (baseDistanceDisplacement <= 1) baseDistanceDisplacement = 1;
+        if (baseDistanceDisplacement <= maxDistance && baseDistanceDisplacement >= minDistance)
+        {
+            short bestCell = -1;
+            int bestDistance = maxDistance;
+
+            for(short Cell : Pathfunction.getCircleZone(target.getCellId(), maxDistance))
+            {
+                FightCell fCell = fight.getCell(Cell);
+                if (fCell != null && fCell.canWalk())
+                {
+                    int distance = Pathfunction.goalDistance(this.fight.getMap(), target.getCellId(), Cell);
+                    if (distance < bestDistance && distance > minDistance)
+                    {
+                        bestCell = Cell;
+                        bestDistance = distance;
+                    }
+                }
+            }
+
+            if (bestCell != -1 && bestCell != this.fighter.getCellId())
+            {
+                final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), bestCell, false, fighter);
+                try {
+                    path.find();
+                    GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                    if (action != null) {
+                        BACKGROUND_WORKER.execute(() -> {
+                            try {
+                                Thread.sleep(path.getPath().estimateTimeOn());
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        fighter.setDirection(path.getPath().last().getOrientation());
+                        return true;
+                    }
+                } catch (PathNotFoundException ee) {
+                    ee.printStackTrace();
+                    //TODO search another cell
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean moveToEnnemy()
+    {
+        int bestDistance = 64;
+        Fighter bestEnnemy = null;
+        for (Fighter ennemy : (Iterable<Fighter>) this.fight.getEnnemyTeam(this.fighter.getTeam()).getAliveFighters()::iterator)
+        {
+           int distance = Pathfunction.goalDistance(this.fight.getMap(),this.fighter.getCellId(), ennemy.getCellId());
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestEnnemy = ennemy;
+            }
+        }
+        System.out.println("b"+(bestEnnemy == null));
+        if (bestEnnemy != null)
+        {
+            return moveTo(bestEnnemy, 64);
+        }
+        else return false;
+    }
+
+    public boolean moveFar() {
+        return moveFar(64);
+    }
+
+    public boolean moveFar(int maxDistance)
+    {
+        int bestDistance = maxDistance;
+        short bestEnnemyCell = -1;
+
+        for (Fighter ennemy : (Iterable<Fighter>) this.fight.getEnnemyTeam(this.fighter.getTeam()).getAliveFighters()::iterator)
+        {
+           int distance = Pathfunction.goalDistance(this.fight.getMap(),this.fighter.getCellId(), ennemy.getCellId());
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestEnnemyCell = ennemy.getCellId();
+            }
+        }
+
+        if (bestEnnemyCell != -1)
+        {
+            short bestCell = -1;
+            bestDistance = 0;
+
+            for (short cell : Pathfunction.getCircleZone(this.fighter.getCellId(), fighter.getMP()))
+            {
+                FightCell fCell = fight.getCell(cell);
+                if (fCell != null && fCell.canWalk())
+                {
+                    int distance = Pathfunction.goalDistance(this.fight.getMap(), bestEnnemyCell, cell);
+                    if (distance > bestDistance)
+                    {
+                        boolean Ok = true;
+                        for (short AroundCell : Pathfunction.getCircleZone(fighter.getCellId(), distance))
+                        {
+                            FightCell fAroundCell =fight.getCell(AroundCell);
+                            if (fAroundCell != null && fAroundCell.hasEnnemy(fighter.getTeam()) != null)
+                            {
+                                if (Pathfunction.goalDistance(this.fight.getMap(), cell, AroundCell) < distance)
+                                {
+                                    Ok = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (Ok)
+                        {
+                            bestCell = cell;
+                            bestDistance = distance;
+                        }
+                    }
+                }
+            }
+
+            if (bestCell != -1 && bestCell != this.fighter.getCellId())
+            {
+                final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), bestCell, false, fighter);
+                try {
+                    path.find();
+                    GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                    if (action != null) {
+                        BACKGROUND_WORKER.execute(() -> {
+                            try {
+                                Thread.sleep(path.getPath().estimateTimeOn());
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        fighter.setDirection(path.getPath().last().getOrientation());
+                        return true;
+                    }
+                } catch (PathNotFoundException ee) {
+                    ee.printStackTrace();
+                    //TODO search another cell
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void wait(int millis)
+    {
+        BACKGROUND_WORKER.execute(() -> {
+            try {
+                Thread.sleep(millis);
+            } catch (InterruptedException e) {
+            }
+        });
+    }
+
+
+
+
+    private boolean react() {
         selectBestAction();
         if (neuron.myBestScore > 0)//En fonction des calculs, signifie "Action voulue trouvée"
         {
@@ -317,14 +516,12 @@ public class AIProcessor {
         return false;
     }
 
-    public boolean selfAction()
-    {
+    public boolean selfAction() {
         this.mode = AIAction.AIActionEnum.SELF_ACTING;
         return react();
     }
 
-    public boolean madSelfAction()
-    {
+    public boolean madSelfAction() {
         this.mode = AIAction.AIActionEnum.MAD;
         return react();
     }
@@ -332,8 +529,7 @@ public class AIProcessor {
     /*
      * attack
      */
-    public boolean attack()
-    {
+    public boolean attack() {
         this.mode = AIAction.AIActionEnum.ATTACK;
         return react();
     }
@@ -341,68 +537,58 @@ public class AIProcessor {
     /*
      * Buff Actions
      */
-    public boolean buffMe()
-    {
+    public boolean buffMe() {
         this.mode = AIAction.AIActionEnum.BUFF_HIMSELF;
         return react();
     }
 
-    public boolean buffAlly()
-    {
+    public boolean buffAlly() {
         this.mode = AIAction.AIActionEnum.BUFF_ALLY;
         return react();
     }
 
-    public boolean buff()
-    {
+    public boolean buff() {
         return buffAlly() || buffMe();
     }
 
     /*
      * Debuff Actions
      */
-    public boolean debuffAlly()
-    {
+    public boolean debuffAlly() {
         this.mode = AIAction.AIActionEnum.DEBUFF_ALLY;
         return react();
     }
 
-    public boolean debuffEnnemy()
-    {
+    public boolean debuffEnnemy() {
         this.mode = AIAction.AIActionEnum.DEBUFF_ENNEMY;
         return react();
     }
 
-    public boolean debuff()
-    {
+    public boolean debuff() {
         return debuffAlly() || debuffEnnemy();
     }
 
     /*
      * Heal Actions
      */
-    public boolean healMe()
-    {
+    public boolean healMe() {
         this.mode = AIAction.AIActionEnum.HEAL_HIMSELF;
         return react();
     }
 
-    public boolean healAlly()
-    {
+    public boolean healAlly() {
         this.mode = AIAction.AIActionEnum.HEAL_ALLY;
         return react();
     }
 
-    public boolean heal()
-    {
+    public boolean heal() {
         return healAlly() || healMe();
     }
 
     /*
      * Actions de support
      */
-    public boolean support()
-    {
+    public boolean support() {
         //return Repels() || HealAlly() || Debuff() || Subbuff() || BuffAlly() || Invocate();
         this.mode = AIAction.AIActionEnum.SUPPORT;
         return react();
@@ -411,8 +597,7 @@ public class AIProcessor {
     /*
      * Invocation
      */
-    public boolean invocate()
-    {
+    public boolean invocate() {
         this.mode = AIAction.AIActionEnum.INVOK;
         return react();
     }
@@ -420,8 +605,7 @@ public class AIProcessor {
     /*
      * Repousse les ennemis
      */
-    public boolean repels()
-    {
+    public boolean repels() {
         this.mode = AIAction.AIActionEnum.REPELS;
         return react();
     }
@@ -429,8 +613,7 @@ public class AIProcessor {
     /*
      * Ralenti les ennemis
      */
-    public boolean subbuff()
-    {
+    public boolean subbuff() {
         this.mode = AIAction.AIActionEnum.SUBBUFF;
         return react();
     }

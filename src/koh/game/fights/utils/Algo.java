@@ -1,7 +1,7 @@
 package koh.game.fights.utils;
 
 import koh.game.entities.environments.DofusMap;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.fights.Fight;
 import koh.game.fights.FightCell;
 import koh.utils.Couple;
@@ -20,7 +20,7 @@ public class Algo {
         short team1_baseCell = map.getRandomWalkableCell();
         short team2_baseCell = map.getRandomWalkableCell();
 
-        if (Pathfinder.getGoalDistance(map, team1_baseCell, team2_baseCell) < 3) {
+        if (Pathfunction.goalDistance(map, team1_baseCell, team2_baseCell) < 3) {
             return getRandomBaseCellPlaces(map);
         } else {
             return new Couple<>(team1_baseCell, team2_baseCell);

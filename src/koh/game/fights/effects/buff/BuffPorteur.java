@@ -20,7 +20,7 @@ public class BuffPorteur extends BuffEffect {
     public BuffPorteur(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ENDMOVE, BuffDecrementType.TYPE_ENDMOVE);
         this.duration = -1;
-        CastInfos.caster.getStates().fakeState(FightStateEnum.PORTEUR, true);
+        CastInfos.caster.getStates().fakeState(FightStateEnum.CARRIER, true);
         this.castInfos.effectType = StatsEnum.ADD_STATE;
         this.caster.getFight().sendToField(new GameActionFightCarryCharacterMessage(ACTION_CARRY_CHARACTER, caster.getID(),Target.getID(), caster.getCellId()));
     }
@@ -33,7 +33,7 @@ public class BuffPorteur extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         // Si effet finis
-        if (!this.target.getStates().hasState(FightStateEnum.PORTÉ)) {
+        if (!this.target.getStates().hasState(FightStateEnum.CARRIED)) {
             this.duration = 0;
             return -1;
         }
@@ -44,7 +44,7 @@ public class BuffPorteur extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        castInfos.caster.getStates().fakeState(FightStateEnum.PORTEUR, false);
+        castInfos.caster.getStates().fakeState(FightStateEnum.CARRIER, false);
         this.duration = 0;
         return super.removeEffect();
     }

@@ -18,29 +18,29 @@ import java.util.Random;
 public class MonsterTemplate {
 
     @Getter
-    private int Id;
+    private final int Id;
     @Getter
     private String nameId,look;
     @Getter
-    private int gfxId, race;
+    private final int gfxId, race;
     @Getter
     private final ArrayList<MonsterGrade> grades = new ArrayList<>(6);
     @Getter
-    private boolean useSummonSlot, useBombSlot, canPlay,canTackle, isBoss;
+    private final boolean useSummonSlot, useBombSlot, canPlay,canTackle, isBoss;
     @Getter
     private final ArrayList<MonsterDrop> drops = new ArrayList<>(5);
     @Getter
-    private int[] subareas, spells;
+    private final int[] subareas, spells;
     @Getter
-    private int favoriteSubareaId;
+    private final int favoriteSubareaId;
     @Getter
-    private boolean isMiniBoss, isQuestMonster;
+    private final boolean isMiniBoss, isQuestMonster;
     @Getter
-    private int correspondingMiniBossId, speedAdjust, creatureBoneId, minKamas,maxKamas;
+    private final int correspondingMiniBossId, speedAdjust, creatureBoneId, minKamas,maxKamas;
     @Getter
-    private boolean canBePushed, fastAnimsFun, canSwitchPos;
+    private final boolean canBePushed, fastAnimsFun, canSwitchPos;
     @Getter
-    private int[] incompatibleIdols;
+    private final int[] incompatibleIdols;
     @Getter
     private final int monsterAI;
 
@@ -70,7 +70,7 @@ public class MonsterTemplate {
         incompatibleIdols = Enumerable.StringToIntArray(result.getString("incompatable_idols"));
         this.minKamas = result.getInt("min_kamas");
         this.maxKamas = result.getInt("max_kamas");
-        this.monsterAI = 1;
+        this.monsterAI = result.getInt("ai_type");
     }
 
 

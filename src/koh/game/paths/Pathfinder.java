@@ -1,9 +1,14 @@
 package koh.game.paths;
 
 import koh.collections.SortedList;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.DirectionsEnum;
+import koh.protocol.messages.game.context.ShowCellMessage;
 import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static koh.game.paths.Cells.distanceBetween;
 import static koh.game.paths.Cells.getCellIdByOrientation;
@@ -13,7 +18,7 @@ import static koh.game.paths.Cells.getCellIdByOrientation;
  */
 public class Pathfinder {
 
-    private byte[] DIRECTIONS = new byte[] {
+    private final static byte[] DIRECTIONS = new byte[] {
             DirectionsEnum.DOWN,
             DirectionsEnum.DOWN_LEFT,
             DirectionsEnum.DOWN_RIGHT,
@@ -24,7 +29,7 @@ public class Pathfinder {
             DirectionsEnum.UP_RIGHT
     };
 
-    private byte[] ADJACENTS = new byte[] {
+    private final static byte[] ADJACENTS = new byte[] {
             DirectionsEnum.DOWN_LEFT,
             DirectionsEnum.DOWN_RIGHT,
             DirectionsEnum.UP_LEFT,
@@ -61,19 +66,19 @@ public class Pathfinder {
         if (found) return path;
         found = true;
 
-        path.add(0, start);
+            addAdjacents(start, allDirections);
 
-        addAdjacents(start, allDirections);
+            while (!open.isEmpty()) {
+                ScoredNode best = open.remove(0);
+                path.add(best);
+                onAdded(best);
+                if (mayStop(best)) break;
 
-        while (!open.isEmpty()) {
-            ScoredNode best = open.remove(0);
-            path.add(best);
-            onAdded(best);
-            if (mayStop(best)) break;
+                addAdjacents(best, allDirections);
 
-            addAdjacents(best, allDirections);
-            if (open.isEmpty()) throw new PathNotFoundException();
-        }
+
+                if (open.isEmpty()) throw new PathNotFoundException();
+            }
 
         return path;
     }
@@ -90,8 +95,13 @@ public class Pathfinder {
         return  (!path.contains(cellId) && cellId <= 560 &&  fighter.getFight().getCell(cellId).canWalk());
     }
 
+    public void cutPath(int index) {
+        this.points -= (path.size() - index);
+        this.path.subList(index, path.size()).clear();
+    }
+
     protected void addAdjacents(Node node, boolean allDirections) {
-        for (byte orientation : (allDirections ? DIRECTIONS : ADJACENTS)) {
+        for (byte orientation : (ADJACENTS)) {
             short cellId = getCellIdByOrientation(node, orientation);
 
             if (cellId != -1 && canAdd(cellId)) {
@@ -102,5 +112,19 @@ public class Pathfinder {
                 open.add(newNode);
             }
         }
+    }
+
+    protected boolean addAdjacents(Node node, byte orientation) {
+            short cellId = getCellIdByOrientation(node, orientation);
+
+            if (cellId != -1 && canAdd(cellId)) {
+                ScoredNode newNode = new ScoredNode(orientation, cellId);
+                newNode.setDistanceToStart(distanceBetween(start, newNode));
+                newNode.setDistanceToEnd(distanceBetween(newNode, target));
+
+                open.add(newNode);
+                return true;
+            }
+        return false;
     }
 }

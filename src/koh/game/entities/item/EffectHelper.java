@@ -8,7 +8,7 @@ import java.util.Random;
 import koh.d2o.entities.Effect;
 
 import koh.game.dao.DAO;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.EffectGenerationType;
@@ -103,7 +103,7 @@ public class EffectHelper {
 
         boolean verify = true;
         boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
-        int distance = Pathfinder.getDistance( pCasterId.getCellId(), pTargetId.getCellId());
+        int distance = Pathfunction.getDistance( pCasterId.getCellId(), pTargetId.getCellId());
         
         for (String trigger : pTriggers.split("\\|")) {
             switch (trigger) {

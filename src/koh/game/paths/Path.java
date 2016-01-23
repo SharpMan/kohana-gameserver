@@ -1,12 +1,23 @@
 package koh.game.paths;
 
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by Melancholia on 1/13/16.
  */
 public class Path extends ArrayList<Node> {
+
+    public Path(){
+        super();
+    }
+
+    public Path(Collection<Node> c){
+        super(c);
+    }
 
     public Node first() {
         return get(0);
@@ -44,34 +55,36 @@ public class Path extends ArrayList<Node> {
 
 
     private ArrayList <Node> getCompress(){
-        ArrayList <Node> copies = new ArrayList<>(this.size());
-        copies.addAll(this);
         /*int elem = 0;
         try {
             if (size() > 0) {
                 elem = (copies.size() - 1);
                 while (elem > 0) {
                     if (copies.get(elem).getOrientation() == copies.get((elem - 1)).getOrientation()) {
-                        this.deletePoint(elem, -1, copies);
+                        this.deletePoint(elem, 1, copies);
                         elem--;
                     } else {
                         elem--;
                     }
                 }
             }
-        }
-        catch(ArrayIndexOutOfBoundsException e){
         }*/
-        return copies;
+
+        return this;
+    }
+
+    public Node getLastStep() {
+        return this.get(size() < 2 ? 0 : size() - 2);
     }
 
     public short[] encode(){
-        final ArrayList<Node> cells = this.getCompress();
-        final short[] encodedPath = new short[cells.size()];
+        //final ArrayList<Node> cells = this.getCompress();
+
+        final short[] encodedPath = new short[this.size()];
         byte lastOrientation;
-        for(int i = 0 ; i < encodedPath.length; i++){
-            lastOrientation = cells.get(i).getOrientation();
-            encodedPath[i] = (short) (((lastOrientation & 7) << 12) | (cells.get(i).getCell() & 4095));
+            for(int i = 0 ; i < encodedPath.length; i++){
+            lastOrientation = this.get(i).getOrientation();
+            encodedPath[i] = (short) (((lastOrientation & 7) << 12) | (this.get(i).getCell() & 4095));
         }
         return encodedPath;
     }

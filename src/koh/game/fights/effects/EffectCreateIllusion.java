@@ -1,7 +1,7 @@
 package koh.game.fights.effects;
 
 import koh.game.entities.actors.Player;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.fights.FightCell;
 import koh.game.fights.effects.buff.BuffDecrementType;
 import koh.game.fights.effects.buff.BuffState;
@@ -25,8 +25,8 @@ public class EffectCreateIllusion extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        int DistanceCharacterFromHidedPlace = Pathfinder.getGoalDistance(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
-        byte IgnoredDirection = Pathfinder.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
+        int DistanceCharacterFromHidedPlace = Pathfunction.goalDistance(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
+        byte IgnoredDirection = Pathfunction.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
         short StartCell = castInfos.caster.getCellId();
 
         BuffState Buff = new BuffState(new EffectCast(StatsEnum.INVISIBILITY, castInfos.spellId, castInfos.cellId, castInfos.chance, null, castInfos.caster, null), castInfos.caster);
@@ -54,7 +54,7 @@ public class EffectCreateIllusion extends EffectBase {
             if (IgnoredDirection == Direction) {
                 continue;
             }
-            FightCell Cell = castInfos.caster.getFight().getCell(Pathfinder.nextCell(StartCell, Direction, DistanceCharacterFromHidedPlace));
+            FightCell Cell = castInfos.caster.getFight().getCell(Pathfunction.nextCell(StartCell, Direction, DistanceCharacterFromHidedPlace));
             if (Cell != null && Cell.canWalk()) {
                 IllusionFighter Clone = new IllusionFighter(castInfos.caster.getFight(), castInfos.caster);
                 Clone.getFight().joinFightTeam(Clone, castInfos.caster.getTeam(), false, Cell.Id, true);

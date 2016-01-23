@@ -3,6 +3,9 @@ package koh.game.entities.environments;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.ArrayUtils;
 
 /**
@@ -11,19 +14,45 @@ import org.apache.commons.lang.ArrayUtils;
  */
 public class MovementPath {
 
-    private short[] keyMovements = new short[0];
+    private short[] keyMovements;
     private boolean mySerialized = false;
+
+    private ArrayList <Short> getCompress(){
+        ArrayList <Short> copies = new ArrayList<>(transitCells.size());
+        copies.addAll(transitCells);
+        return copies;
+    }
+
+    public short[] encode(){
+        final ArrayList<Short> cells = this.getCompress();
+        final short[] encodedPath = new short[cells.size()];
+        byte lastOrientation;
+        for(int i = 0 ; i < encodedPath.length; i++){
+            lastOrientation = this.directions.get(i);
+            encodedPath[i] = (short) (((lastOrientation & 7) << 12) | (cells.get(i) & 4095));
+        }
+        return encodedPath;
+    }
 
     public short[] serializePath() {
         if (!this.mySerialized) {
-            //byte lastDirection = -1;
-            for (int i = 0; i < transitCells.size(); i++) {
-                /* if (lastDirection == directions.get(i)) {
-                 System.out.println(lastDirection +" "+directions.get(i));
-                 continue;
-                 }*/
-                this.keyMovements = ArrayUtils.add(keyMovements, (short) (((directions.get(i) & 7) << 12) | (transitCells.get(i) & 4095)));
-                //lastDirection = directions.get(i);
+            try {
+                byte lastDirection = -1;
+                if (transitCells.size() > 0) {
+                    for (int i = transitCells.size() - 2; i > 0; i--) {
+                        if (directions.get(i) == directions.get(i - 1)) {
+                            transitCells.remove(i);
+                            directions.remove(i);
+                        }
+                    }
+                }
+                this.keyMovements = new short[transitCells.size()];
+                for (int i = 0; i < transitCells.size(); i++) {
+                    this.keyMovements[i] = (short) (((directions.get(i) & 7) << 12) | (transitCells.get(i) & 4095));
+                }
+            }
+            catch (Exception e){
+                e.printStackTrace();
             }
             this.mySerialized = true;
         }
@@ -32,13 +61,14 @@ public class MovementPath {
     }
 
     public short beginCell() {
-        return transitCells.stream().findFirst().get();
+        return transitCells.get(0);
     }
 
-    public int movementLength;
+    @Setter @Getter
+    private int movementLength = 0;
 
     public int getMovementTime() {
-        return (int) Pathfinder.getPathTime(this.movementLength);
+        return (int) Pathfunction.getPathTime(this.movementLength);
     }
 
     public short getLastStep() {
@@ -58,28 +88,32 @@ public class MovementPath {
         this.directions.add(Direction);
     }
 
+    public byte getDirection(int index) {
+        return this.directions.get(index);
+    }
+
     public byte getDirection(short Cell) {
         return this.directions.get(transitCells.indexOf(Cell));
     }
 
     public void clean() {
-        List<Short> TransitCells = new ArrayList<>();
-        List<Byte> Directions = new ArrayList<>();
+        List<Short> transitCells = new ArrayList<>();
+        List<Byte> directions = new ArrayList<>();
 
         for (int i = 0; i < this.directions.size(); i++) {
             if (i == this.directions.size() - 1) {
-                TransitCells.add(this.transitCells.get(i));
-                Directions.add(this.directions.get(i));
+                transitCells.add(this.transitCells.get(i));
+                directions.add(this.directions.get(i));
             } else {
                 if (!Objects.equals(this.directions.get(i), this.directions.get(i + 1))) {
-                    TransitCells.add(this.transitCells.get(i));
-                    Directions.add(this.directions.get(i));
+                    transitCells.add(this.transitCells.get(i));
+                    directions.add(this.directions.get(i));
                 }
             }
         }
 
-        this.transitCells = TransitCells;
-        this.directions = Directions;
+        this.transitCells = transitCells;
+        this.directions = directions;
     }
 
     public List<Short> transitCells = new ArrayList<>();
@@ -92,7 +126,6 @@ public class MovementPath {
         this.transitCells = this.transitCells.subList(0, index);
         this.directions = this.directions.subList(0, index);
         this.movementLength = index - 1;
-        //this.keyMovements = ArrayUtils.subarray(this.keyMovements ,0, index);
     }
 
 }

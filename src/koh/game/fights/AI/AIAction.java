@@ -49,8 +49,8 @@ public abstract class AIAction {
             case INVISIBLE:
             case STATE_REFLECT_SPELL:
             case SAOUL:
-            case PORTÉ:
-            case PORTEUR: {
+            case CARRIED:
+            case CARRIER: {
                 return true;
             }
 

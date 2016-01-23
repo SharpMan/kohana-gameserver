@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.CrossZone;
 import koh.game.entities.environments.cells.IZone;
 import koh.game.entities.environments.cells.Lozenge;
@@ -388,7 +388,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfinder.GetEnnemyNear(fight, team, this.getCellId(), true)) {
+        for (Fighter Tackler : Pathfunction.GetEnnemyNear(fight, team, this.getCellId(), true)) {
             if (num1 == 0.0) {
                 num1 = this.getTacklePercent(Tackler);
             } else {
@@ -457,7 +457,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfinder.GetEnnemyNear(fight, team, this.getCellId())) {
+        for (Fighter Tackler : Pathfunction.GetEnnemyNear(fight, team, this.getCellId())) {
             {
                 if (num1 == 0.0) {
                     num1 = this.getTacklePercent(Tackler);
@@ -691,7 +691,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public static double getShapeEfficiency(int param1, int param2, int param3, int param4, int param5, int param6, int param7) {
         if (SpellShapeEnum.valueOf(param1) == null) {
-            return getSimpleEfficiency(Pathfinder.getDistance(param2, param3), param4, param5, param6, param7);
+            return getSimpleEfficiency(Pathfunction.getDistance(param2, param3), param4, param5, param6, param7);
         }
         int _loc8_ = 0;
 
@@ -709,15 +709,15 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             case V:
             case G:
             case W:
-                _loc8_ = Pathfinder.getSquareDistance(param2, param3);
+                _loc8_ = Pathfunction.getSquareDistance(param2, param3);
                 break;
             case minus:
             case plus:
             case U:
-                _loc8_ = Pathfinder.getDistance(param2, param3) / 2;
+                _loc8_ = Pathfunction.getDistance(param2, param3) / 2;
                 break;
             default:
-                _loc8_ = Pathfinder.getDistance(param2, param3);
+                _loc8_ = Pathfunction.getDistance(param2, param3);
         }
         return getSimpleEfficiency(_loc8_, param4, param5, param6, param7);
     }

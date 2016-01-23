@@ -353,14 +353,14 @@ public class MapPoint {
         this._nY = p.y;
     }
 
-    public static int getx(int cell) {
+    public static int getX(int cell) {
         if (!(_bInit)) {
             init();
         }
         return CELLPOS[cell].x;
     }
 
-    public static int GetY(int cell) {
+    public static int getY(int cell) {
         if (!(_bInit)) {
             init();
         }

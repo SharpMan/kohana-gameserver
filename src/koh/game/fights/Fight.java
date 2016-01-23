@@ -1,6 +1,5 @@
 package koh.game.fights;
 
-import com.sun.javafx.geom.Line2D;
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameMapMovement;
@@ -32,6 +31,7 @@ import koh.game.fights.layers.FightPortal;
 import koh.game.fights.utils.Algo;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
+import koh.game.paths.Node;
 import koh.game.utils.Three;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.*;
@@ -186,7 +186,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private void initCells() {
         // Ajout des cells
         for (DofusCell cell : this.map.getCells()) {
-            this.fightCells.put(cell.getId(), new FightCell(cell.getId(), cell.mov(), cell.los()));
+            this.fightCells.put(cell.getId(), new FightCell(cell.getId(), cell.walakableInFight(), cell.los()));
         }
         this.myFightCells.put(myTeam1, new HashMap<>());
         this.myFightCells.put(myTeam2, new HashMap<>());
@@ -322,7 +322,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return !this.map.getCell(cell).los() && !this.map.getCell(cell).farmCell();
         }
         catch(ArrayIndexOutOfBoundsException | NullPointerException e){
-            System.out.println("ha"+cell);
         }
         return false;
     }
@@ -588,8 +587,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             targetE = this.hasFriendInCell(cellId, fighter.getTeam());
         }
         int targetId = targetE == null ? -1 : targetE.getID();
-        if (!(Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) <= weapon.getWeaponTemplate().getRange()
-                && Pathfinder.getGoalDistance(map, cellId, fighter.getCellId()) >= weapon.getWeaponTemplate().getMinRange()
+        if (!(Pathfunction.goalDistance(map, cellId, fighter.getCellId()) <= weapon.getWeaponTemplate().getRange()
+                && Pathfunction.goalDistance(map, cellId, fighter.getCellId()) >= weapon.getWeaponTemplate().getMinRange()
                 && fighter.getAP() >= weapon.getWeaponTemplate().getApCost())) {
             fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
@@ -1015,7 +1014,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     protected void onTackled(Fighter fighter, int movementLength) {
-        ArrayList<Fighter> tacklers = Pathfinder.getEnnemyNearToTakle(this, fighter.getTeam(), fighter.getCellId());
+        ArrayList<Fighter> tacklers = Pathfunction.getEnnemyNearToTakle(this, fighter.getTeam(), fighter.getCellId());
 
         int tackledMp = fighter.getTackledMP();
         int tackledAp = fighter.getTackledAP();
@@ -1085,12 +1084,23 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return null;
         }
 
+
         this.startSequence(SequenceTypeEnum.SEQUENCE_MOVE);
 
         if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.getStates().hasState(FightStateEnum.ENRACINÉ)) {
             this.onTackled(fighter, path.getPoints());
 
         }
+
+        for(int i = 0; i < path.getPath().size(); ++i){
+            if(Pathfunction.isStopCell(this, fighter.getTeam(), path.getPath().get(i).getCell(), fighter)){
+                if(path.getPath().last() != path.getPath().get(i)) {
+                    path.cutPath(i +1);
+                    break;
+                }
+            }
+        }
+
         GameMapMovement gameMapMovement = new GameMapMovement(this, fighter, path.getPath().encode());
 
         this.sendToField(new FieldNotification(new GameMapMovementMessage(gameMapMovement.keyMovements, fighter.getID())) {
@@ -1116,17 +1126,15 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         // Pas assez de point de mouvement
-        if (path.movementLength > fighter.getMP() || path.movementLength == -1) {
-            System.out.println(path.movementLength > fighter.getMP());
-            System.out.println(path.movementLength + " " + fighter.getMP());
+        if (path.getMovementLength() > fighter.getMP() || path.getMovementLength() == -1) {
             return null;
         }
 
         this.startSequence(SequenceTypeEnum.SEQUENCE_MOVE);
 
         if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.getStates().hasState(FightStateEnum.ENRACINÉ)) {
-            this.onTackled(fighter, path.movementLength);
-            if (path.transitCells.isEmpty() || path.movementLength == 0) {
+            this.onTackled(fighter, path.getMovementLength());
+            if (path.transitCells.isEmpty() || path.getMovementLength() == 0) {
                 this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
                 return null;
             }
@@ -1141,8 +1149,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         });
 
-        fighter.usedMP += path.movementLength;
-        this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -path.movementLength));
+        fighter.usedMP += path.getMovementLength();
+        this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -path.getMovementLength()));
 
         fighter.setCell(this.getCell(path.getEndCell()));
         fighter.setDirection(path.getEndDirection());
@@ -1177,7 +1185,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         FightCell cell2 = fighterTarget.getMyCell();
         fighter.setCell(cell2);
         fighterTarget.setCell(cell);
-        this.fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
+        this.fighters().forEach(fr -> fr.setDirection(this.findPlacementDirection(fr)));
         this.sendToField(new GameFightPlacementSwapPositionsMessage(new IdentifiedEntityDispositionInformations[]{fighter.GetIdentifiedEntityDispositionInformations(), fighterTarget.GetIdentifiedEntityDispositionInformations()}));
     }
 

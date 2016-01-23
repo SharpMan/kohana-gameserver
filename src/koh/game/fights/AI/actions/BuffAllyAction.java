@@ -1,7 +1,7 @@
 package koh.game.fights.AI.actions;
 
 import koh.game.dao.DAO;
-import koh.game.entities.environments.Pathfinder;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -292,7 +292,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreDamage_I(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
         int baseScore = 15;
         baseScore *= Math.abs(effect.diceNum);
         for (Fighter fighter : targets)
@@ -332,7 +332,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreDamage_II(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
         int baseScore = 18;
         baseScore *= Math.abs(effect.diceNum);
         for (Fighter fighter : targets)
@@ -372,7 +372,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreDamage_III(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
         int baseScore = 20;
         baseScore *= Math.abs(effect.diceNum);
         for (Fighter fighter : targets)
@@ -412,7 +412,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreDamagesPerPA(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
 
         int baseScore = 11;
 
@@ -456,7 +456,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreSubBuff_I(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
-        int score = 0;
+        double score = 0;
         int baseScore = 10;
         if (!notUseJet)
         {
@@ -499,7 +499,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreSubBuff_II(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
-        int score = 0;
+        double score = 0;
         int baseScore = 12;
         if (!notUseJet)
         {
@@ -542,7 +542,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreSubBuff_III(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
-        int score = 0;
+        double score = 0;
         int baseScore = 15;
         if (!notUseJet)
         {
@@ -585,7 +585,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreSubBuff_IV(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
-        int score = 0;
+        double score = 0;
         int baseScore = 18;
         if (!notUseJet)
         {
@@ -628,7 +628,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreAddStateGood(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
         int baseScore = 11;
         for (Fighter fighter : targets)
         {
@@ -666,7 +666,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreAddStateBad(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
         int baseScore = 11;
         for (Fighter fighter : targets)
         {
@@ -704,7 +704,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreRemStateGood(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
         int BaseScore = 11;
         for (Fighter fighter : targets)
         {
@@ -742,7 +742,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreRemStateBad(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
-        int score = 0;
+        double score = 0;
         int baseScore = 11;
         for (Fighter fighter : targets)
         {
@@ -784,7 +784,7 @@ public class BuffAllyAction extends AIAction {
         {
             return 0;
         }
-        int score = 0;
+        double score = 0;
         int baseScore = 11;
 
         //BaseScore *= effect.randomJet();
@@ -812,7 +812,7 @@ public class BuffAllyAction extends AIAction {
             return 0;
         }
         int baseScore = 11;
-        int score = baseScore;
+        double score = baseScore;
 
         final int invocationId = effect.diceNum;
         final int invocationLevel = effect.diceSide;
@@ -875,7 +875,7 @@ public class BuffAllyAction extends AIAction {
             return 0;
         }
         int baseScore = 11;
-        int score = baseScore;
+        double score = baseScore;
 
         int invocationId = effect.diceNum;
         int invocationLevel = effect.diceSide;
@@ -916,13 +916,13 @@ public class BuffAllyAction extends AIAction {
         return 0;
     }
 
-    private int scorePush(AIProcessor AI, Fighter target, byte direction, int length, boolean fear)
+    private double scorePush(AIProcessor AI, Fighter target, byte direction, int length, boolean fear)
     {
         boolean isAlly = target.getTeam() == AI.getFighter().getTeam();
         List<Fighter> fighterList = new ArrayList<Fighter>();
         fighterList.add(target);
         FightCell lastCell = target.getMyCell();
-        int score = 0;
+        double score = 0;
 
         for (FightActivableObject layer : target.getMyCell().getObjectsLayer())//On cherche à savoir si décaller de cette cellule est utile
         {
@@ -942,7 +942,7 @@ public class BuffAllyAction extends AIAction {
         int finalLength = 0;
         for (int i = 0; i < length; i++)
         {
-            FightCell nextCell = target.getFight().getCell(Pathfinder.nextCell(lastCell.getId(), direction));
+            FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(lastCell.getId(), direction));
             if (nextCell != null)
             {
                 lastCell = nextCell;
@@ -1012,19 +1012,19 @@ public class BuffAllyAction extends AIAction {
         {
             return 0;
         }
-        int score = 0;
+        double score = 0;
         if (isFear)
         {
-            byte d = Pathfinder.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell);
-            FightCell startCell = AI.getFight().getCell(Pathfinder.nextCell(AI.getFighter().getCellId(), d));
+            byte d = Pathfunction.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell);
+            FightCell startCell = AI.getFight().getCell(Pathfunction.nextCell(AI.getFighter().getCellId(), d));
             FightCell endCell = AI.getFight().getCell(castCell);
             if (startCell != null && endCell != null)
             {
                 Fighter target = startCell.getFighter();
                 if (target != null)
                 {
-                    score += scorePush(AI, target, Pathfinder.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell),
-                            Pathfinder.getGoalDistance(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell), true);
+                    score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell),
+                            Pathfunction.goalDistance(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell), true);
                 }
             }
         }
@@ -1036,7 +1036,7 @@ public class BuffAllyAction extends AIAction {
                 Fighter target = startCell.getFighter();
                 if (target != null)
                 {
-                    score += scorePush(AI, target, Pathfinder.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(),castCell), effect.randomJet(), false);
+                    score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(),castCell), effect.randomJet(), false);
                 }
             }
         }
@@ -1051,16 +1051,16 @@ public class BuffAllyAction extends AIAction {
             return 0;
         }
 
-        int score = 0;
-        byte d = Pathfinder.getDirection(AI.getFight().getMap(),castCell, AI.getFighter().getCellId());
-        FightCell endCell = AI.getFight().getCell(Pathfinder.nextCell(AI.getFighter().getCellId(), d));
+        double score = 0;
+        byte d = Pathfunction.getDirection(AI.getFight().getMap(),castCell, AI.getFighter().getCellId());
+        FightCell endCell = AI.getFight().getCell(Pathfunction.nextCell(AI.getFighter().getCellId(), d));
         FightCell startCell = AI.getFight().getCell(castCell);
         if (startCell != null && endCell != null)
         {
             Fighter target = startCell.getFighter();
             if (target != null)
             {
-                score += scorePush(AI, target, Pathfinder.getDirection(AI.getFight().getMap(),castCell, AI.getFighter().getCellId()), Pathfinder.getGoalDistance(AI.getFight().getMap(), castCell, AI.getFighter().getCellId()), true);
+                score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(),castCell, AI.getFighter().getCellId()), Pathfunction.goalDistance(AI.getFight().getMap(), castCell, AI.getFighter().getCellId()), true);
             }
         }
 
@@ -1073,18 +1073,18 @@ public class BuffAllyAction extends AIAction {
         {
             return 0;
         }
-        int score = 0;
+        double score = 0;
 
         if (isThrow)
         {
             FightCell targetCell = AI.getFight().getCell(castCell);
             if (targetCell != null)
             {
-                BuffEffect infos = AI.getFighter().getStates().findState(FightStateEnum.PORTEUR);
+                BuffEffect infos = AI.getFighter().getStates().findState(FightStateEnum.CARRIER);
                 if (infos != null)
                 {
                     Fighter target = infos.target;
-                    if (target != null && target.getStates().hasState(FightStateEnum.PORTÉ))
+                    if (target != null && target.getStates().hasState(FightStateEnum.CARRIED))
                     {
                         List<Fighter> targetList = new ArrayList<>();
                         targetList.add(target);
@@ -1119,7 +1119,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreExchangePlace(AIProcessor AI, short casterCell, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean invokPreview) {
-        int score = 0;
+        double score = 0;
         FightCell targetCell = AI.getFight().getCell(castCell);
         FightCell launchCell = AI.getFight().getCell(casterCell);
         if (targetCell != null)
@@ -1173,7 +1173,7 @@ public class BuffAllyAction extends AIAction {
 
     @Override
     protected double scoreUseLayer(AIProcessor AI, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
-        int score = 0;
+        double score = 0;
         Spell spell = DAO.getSpells().findSpell(effect.diceNum);
         if (spell != null)
         {
