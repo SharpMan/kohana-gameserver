@@ -133,7 +133,7 @@ public class FightPortal extends FightActivableObject {
         }
 
         final int[] Links = LinkedCellsManager.getLinks(this.getMapPoint(), Arrays.stream(Portails).map(Portail -> Portail.getMapPoint()).toArray(MapPoint[]::new));
-        //System.out.println(Enumerable.Join(Links));
+        //System.out.println(Enumerable.join(Links));
         FightPortal lastPortal = Arrays.stream(Portails).filter(x -> x.getCellId() == (short) Links[Links.length - 1]).findFirst().get();
 
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.getID(), ID, false));

@@ -64,7 +64,7 @@ public class WorldServer {
         }
 
         return this;
-        //this.inactivity_manager.start();
+        //this.inactivity_manager._oStart();
     }
 
     public void sendPacket(Message message) {

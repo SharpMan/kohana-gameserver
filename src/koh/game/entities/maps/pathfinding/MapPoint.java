@@ -3,8 +3,7 @@ package koh.game.entities.maps.pathfinding;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import koh.game.Main;
-import koh.game.dao.api.AccountDataDAO;
+
 import koh.game.entities.environments.DofusMap;
 import koh.protocol.client.enums.DirectionsEnum;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +27,7 @@ public class MapPoint {
     public static final int MAP_WIDTH = 14;
     public static final int MAP_HEIGHT = 20;
     private static boolean _bInit = false;
-    public static Point[] CELLPOS = new Point[MAP_HEIGHT * (MAP_WIDTH * 2)];
+    public static Point[] CELL_POS = new Point[MAP_HEIGHT * (MAP_WIDTH * 2)];
 
     private static final Logger logger = LogManager.getLogger(MapPoint.class);
 
@@ -84,14 +83,14 @@ public class MapPoint {
         while (a < MAP_HEIGHT) {
             b = 0;
             while (b < MAP_WIDTH) {
-                CELLPOS[cell] = new Point((startX + b), (startY + b));
+                CELL_POS[cell] = new Point((startX + b), (startY + b));
                 cell++;
                 b++;
             }
             startX++;
             b = 0;
             while (b < MAP_WIDTH) {
-                CELLPOS[cell] = new Point((startX + b), (startY + b));
+                CELL_POS[cell] = new Point((startX + b), (startY + b));
                 cell++;
                 b++;
             }
@@ -345,10 +344,10 @@ public class MapPoint {
         if (!(_bInit)) {
             init();
         }
-        if (CELLPOS[this._nCellId] == null) {
+        if (CELL_POS[this._nCellId] == null) {
             logger.error("cell identifier out of bounds ({}).",this._nCellId);
         }
-        Point p = CELLPOS[this._nCellId];
+        Point p = CELL_POS[this._nCellId];
         this._nX = p.x;
         this._nY = p.y;
     }
@@ -357,14 +356,14 @@ public class MapPoint {
         if (!(_bInit)) {
             init();
         }
-        return CELLPOS[cell].x;
+        return CELL_POS[cell].x;
     }
 
     public static int getY(int cell) {
         if (!(_bInit)) {
             init();
         }
-        return CELLPOS[cell].y;
+        return CELL_POS[cell].y;
     }
 
    public Point coordinates() {

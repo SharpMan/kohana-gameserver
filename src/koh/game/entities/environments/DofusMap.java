@@ -24,6 +24,7 @@ import koh.game.entities.item.InventoryItem;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.maps.pathfinding.Path;
 import koh.game.fights.Fight;
+import koh.game.fights.FightCell;
 import koh.game.fights.FightController;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
@@ -607,4 +608,17 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
         return bestCell;
     }
+
+    public boolean isChangeZone(short cell1, short cell2)
+    {
+        final DofusCell cellData1 = this.getCell(cell1);
+        final DofusCell cellData2 = this.getCell(cell2);
+        int dif = Math.abs((Math.abs(cellData1.getFloor()) - Math.abs(cellData2.getFloor())));
+        if (((!((cellData1.getMoveZone() == cellData2.getMoveZone()))) && ((dif == 0))))
+        {
+            return (true);
+        }
+        return (false);
+    }
+
 }

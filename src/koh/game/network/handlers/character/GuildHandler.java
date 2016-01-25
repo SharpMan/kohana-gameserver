@@ -67,7 +67,7 @@ public class GuildHandler {
             Client.getCharacter().getGuild().spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, message.spellId)]++;
             Client.getCharacter().getGuild().entity.boost -= 5;
             Client.getCharacter().getGuild().sendToField(Client.getCharacter().getGuild().toGuildInfosUpgradeMessage());
-            Client.getCharacter().getGuild().entity.spells = Enumerable.Join(Client.getCharacter().getGuild().spellLevel, ',');
+            Client.getCharacter().getGuild().entity.spells = Enumerable.join(Client.getCharacter().getGuild().spellLevel, ',');
             DAO.getGuilds().update(Client.getCharacter().getGuild().entity);
         } else {
             Client.send(new BasicNoOperationMessage());

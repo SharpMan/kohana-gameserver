@@ -278,7 +278,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             useNewSystem =  map.isUsingNewMovementSystem();
             cellId = MapPoint.fromCoords(x, y).get_cellId();
             cellData = map.getCell(cellId);
-            mov = ((cellData.mov()) && (cellData.nonWalkableDuringFight()));
+            mov = ((cellData.mov()) && (!cellData.nonWalkableDuringFight()));
             if (((((((mov) && (useNewSystem))) && (!((previousCellId == -1))))) && (!((previousCellId == cellId)))))
             {
                 previousCellData = map.getCell((short)previousCellId);
@@ -293,11 +293,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 for(IFightObject o : this.getCell(cellId).getObjects()){
                     if ((((endCellId == cellId)) && (o.canWalk())))
                     {
+
                     }
                     else
                     {
                         if (!(o.canGoThrough()))
                         {
+                            System.out.println("return false");
                             return (false);
                         }
                     }
@@ -310,6 +312,57 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
         return (mov);
     }
+
+    public double pointWeight(int x, int y) {
+        return pointWeight(x, y ,true);
+    }
+
+    public double pointWeight(int x, int y, boolean bAllowTroughEntity) {
+        IFightObject entity;
+        double weight = 1;
+        int speed = this.getMap().getCellSpeed(MapPoint.fromCoords(x, y).get_cellId());
+        if (bAllowTroughEntity) {
+            if (speed >= 0) {
+                weight = (weight + (5 - speed));
+            } else {
+                weight = (weight + (11 + Math.abs(speed)));
+            }
+            entity = this.getCell(MapTools.getCellNumFromXYCoordinates(x, y)).getFighter();
+            if (((entity != null) && (!(entity.canGoThrough())))) {
+                weight = 20;
+            }
+        } else {
+            if (this.getCell(MapTools.getCellNumFromXYCoordinates(x, y)).getFighter() != null) {
+                weight = (weight + 0.3);
+            }
+
+            if (this.getCell(MapTools.getCellNumFromXYCoordinates((x + 1), y)).getFighter() != null) {
+                weight = (weight + 0.3);
+            }
+
+            if (this.getCell(MapTools.getCellNumFromXYCoordinates(x, (y + 1))).getFighter() != null) {
+                weight = (weight + 0.3);
+            }
+
+            if (this.getCell(MapTools.getCellNumFromXYCoordinates((x - 1), y)).getFighter() != null) {
+                weight = (weight + 0.3);
+            }
+
+            if (this.getCell(MapTools.getCellNumFromXYCoordinates(x, (y - 1))).getFighter() != null) {
+                weight = (weight + 0.3);
+            }
+
+            if (this.getCell(MapTools.getCellNumFromXYCoordinates(x, y)).hasGameObject(FightObjectType.OBJECT_TRAP)) { //orglyph
+                weight = (weight + 0.2);
+            }
+            /*if ((this.pointSpecialEffects(x, y) & 2) == 2)
+            {
+                weight = (weight + 0.2);
+            };*/
+        }
+        return (weight);
+    }
+
 
     public boolean hasEntity(int x, int y){
         final short cell = (short) Math.abs(MapPoint.coordToCellId(x, y));

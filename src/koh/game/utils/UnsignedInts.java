@@ -103,7 +103,7 @@ public final class UnsignedInts {
    * {@code separator}. For example, {@code join("-", 1, 2, 3)} returns the string {@code "1-2-3"}.
    *
    * @param separator the text that should appear between consecutive values in the resulting
-   *        string (but not at the start or end)
+   *        string (but not at the _oStart or end)
    * @param array an array of unsigned {@code int} values, possibly empty
    */
   public static String join(String separator, int... array) {

@@ -241,8 +241,8 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setBytes(15, character.getShortcuts().serialize());
             pStatement.setString(16, character.getSavedMap() + "," + character.getSavedCell());
             pStatement.setString(17, EntityLookParser.ConvertToString(character.getEntityLook()));
-            pStatement.setString(18, Enumerable.Join(character.getEmotes(), ','));
-            pStatement.setString(19, Enumerable.Join(character.getOrnaments(), ',') + ";" + Enumerable.Join(character.getTitles(), ','));
+            pStatement.setString(18, Enumerable.join(character.getEmotes(), ','));
+            pStatement.setString(19, Enumerable.join(character.getOrnaments(), ',') + ";" + Enumerable.join(character.getTitles(), ','));
             pStatement.setBytes(20, character.getMountInfo().serialize());
             pStatement.setBytes(21, character.getMyJobs().serialize());
             pStatement.setInt(22, character.getHonor());
@@ -287,8 +287,8 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setBytes(17, character.getShortcuts().serialize());
             pStatement.setString(18, character.getSavedMap() + "," + character.getSavedCell());
             pStatement.setString(19, EntityLookParser.ConvertToString(character.getEntityLook()));
-            pStatement.setString(20, Enumerable.Join(character.getEmotes(), ','));
-            pStatement.setString(21, Enumerable.Join(character.getOrnaments(), ',') + ";" + Enumerable.Join(character.getTitles(), ','));
+            pStatement.setString(20, Enumerable.join(character.getEmotes(), ','));
+            pStatement.setString(21, Enumerable.join(character.getOrnaments(), ',') + ";" + Enumerable.join(character.getTitles(), ','));
             pStatement.setBytes(22, character.getMyJobs().serialize());
             pStatement.setInt(23, character.getHonor());
             pStatement.setString(24, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor());

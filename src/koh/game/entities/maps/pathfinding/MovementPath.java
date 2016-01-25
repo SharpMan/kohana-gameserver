@@ -2,8 +2,7 @@ package koh.game.entities.maps.pathfinding;
 
 import java.util.ArrayList;
 import java.util.List;
-import koh.game.Main;
-import koh.game.dao.api.AccountDataDAO;
+
 import koh.protocol.client.enums.DirectionsEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,10 +84,10 @@ public class MovementPath {
             this._aPath.remove(index);
             //this._aPath.splice(index);
         } else {
-            int Index = index + deleteCount;
-            while (Index >= index) {
-                this._aPath.remove(Index);
-                Index--;
+            int indexAt = index + deleteCount;
+            while (indexAt >= index) {
+                this._aPath.remove(indexAt);
+                indexAt--;
             }
 
             //this._aPath.splice(index, deleteCount);
@@ -114,6 +113,7 @@ public class MovementPath {
         int elem;
         PathElement pFinal;
         PathElement pe;
+        System.out.println(" b"+_aPath.size());
         if (this._aPath.size() > 0) {
             elem = 0;
             pFinal = new PathElement();
@@ -153,6 +153,7 @@ public class MovementPath {
                     this._aPath.remove(elem + 1);
                     this._aPath.add(elem + 1, pe);
                     //this._aPath.splice((elem + 1), 0, pe);
+                    //this._aPath.splice((elem + 1), 0, pe);
                     elem++;
                 } else {
                     elem++;
@@ -161,8 +162,9 @@ public class MovementPath {
                     logger.error("Path too long. Maybe an orientation problem?");
                 }
             }
+            this._aPath.remove(this._aPath.size() - 1);
         }
-        this._aPath.remove(this._aPath.size() - 1);
+
         //this._aPath.pop();
     }
 

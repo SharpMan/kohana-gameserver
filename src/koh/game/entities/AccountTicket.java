@@ -29,7 +29,7 @@ public class AccountTicket {
         this.ip = ip;
         this.key = ticket;
         //timer = createTimer();
-        //timer.start();
+        //timer._oStart();
     }
 
     private Timer createTimer() {

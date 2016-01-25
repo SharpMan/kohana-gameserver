@@ -83,7 +83,8 @@ public class DofusCell {
     }
 
     public boolean mov() {
-        return los() && !this.nonWalkableDuringFight() && !this.farmCell();
+        //return los() && !this.nonWalkableDuringFight() && !this.farmCell();
+        return ((this.losMov & 1) == 1);
     }
 
     public boolean walakableInFight() {

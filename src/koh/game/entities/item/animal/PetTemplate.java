@@ -110,7 +110,7 @@ public class PetTemplate {
                     if (total != (int) (b.getStatsBoost(i) * (hormone / b.point))) {
                         System.out.println("ErreurEffect stat " + i + " Familier " + id + " StatsNormalMax " + ((int) a.diceNum >= (int) a.diceSide ? a.diceNum : a.diceSide) + " != " + b.getStatsBoost(i)  * (hormone / b.point));
                         int maySet = total / (hormone / b.point);
-                        System.out.println("Familier" + ItemDAO.dofusMaps.get(id).nameId + "id " + id + " getMonster " + b.monsterFamily + " you should put " + b.monsterFamily + ";" + b.deathNumber + ";" + b.point + ";" + Enumerable.Join(b.stats, ':') + ";" + maySet);
+                        System.out.println("Familier" + ItemDAO.dofusMaps.get(id).nameId + "id " + id + " getMonster " + b.monsterFamily + " you should put " + b.monsterFamily + ";" + b.deathNumber + ";" + b.point + ";" + Enumerable.join(b.stats, ':') + ";" + maySet);
                     }
                 }*/
 

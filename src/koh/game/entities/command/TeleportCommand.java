@@ -1,10 +1,13 @@
 package koh.game.entities.command;
 
-import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.dao.DAO;
+import koh.game.entities.maps.pathfinding.MapPoint;
+import koh.game.entities.maps.pathfinding.MovementPath;
+import koh.game.entities.maps.pathfinding.PathElement;
+import koh.game.entities.maps.pathfinding.Pathfinding;
 import koh.game.network.WorldClient;
+import koh.protocol.messages.game.context.ShowCellMessage;
 
 /**
  * Created by Melancholia on 12/10/15.
@@ -22,6 +25,18 @@ public class TeleportCommand implements PlayerCommand {
         int mapid = Integer.parseInt(args[0]);
         int cellid = Integer.parseInt(args[1]);
         client.getCharacter().teleport(mapid, cellid);
+        /*try {
+            final MovementPath p = Pathfinding.findPath(client.getCharacter().getFight(), client.getCharacter().getFighter().getMapPoint(), MapPoint.fromCellId(cellid), false,false);
+            System.out.println(client.getCharacter().getFighter().getMapPoint().toString());
+            System.out.println(MapPoint.fromCellId(cellid));
+
+            PlayerController.sendServerMessage(client,p.toString());
+            for (PathElement pp : p.get_path()) {
+                client.send(new ShowCellMessage(0, pp.get_cellId()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
     }
 
     @Override

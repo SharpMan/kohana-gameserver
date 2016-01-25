@@ -63,7 +63,7 @@ public class Main {
             $TransfererTimeOut = new TransfererTimeOut();
             $InterClient = new InterClient().bind();
             $WorldServer = new WorldServer(DAO.getSettings().getIntElement("World.Port")).configure().launch();
-            logger.info("WorldServer start in {} ms.", (System.currentTimeMillis() - time));
+            logger.info("WorldServer _oStart in {} ms.", (System.currentTimeMillis() - time));
 
         } catch (Exception e) {
             logger.fatal(e);
