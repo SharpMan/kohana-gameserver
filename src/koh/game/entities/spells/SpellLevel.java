@@ -59,8 +59,8 @@ public class SpellLevel {
         this.criticalFailureEndsTurn = result.getBoolean("critical_failure_ends_turn");
         this.hideEffects = result.getBoolean("hide_effects");
         this.hidden = result.getBoolean("hidden");
-        this.statesRequired = Enumerable.StringToIntArray(result.getString("states_required"));
-        this.statesForbidden = Enumerable.StringToIntArray(result.getString("states_forbidden"));
+        this.statesRequired = Enumerable.stringToIntArray(result.getString("states_required"));
+        this.statesForbidden = Enumerable.stringToIntArray(result.getString("states_forbidden"));
 
         {
             IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));
@@ -69,6 +69,9 @@ public class SpellLevel {
                 this.effects[i] = new EffectInstanceDice(buf);
                 if (this.spellId == 126) {//To patch in DAO After
                     this.effects[i].targetMask = "a";
+                }
+                if(this.spellId == 5567 && this.grade == 3){
+                    System.out.println(this.effects[i].toString());
                 }
                             /* if(this.effects[i].effectId == 165)
                              System.out.println("hn"+this.spellId);*/

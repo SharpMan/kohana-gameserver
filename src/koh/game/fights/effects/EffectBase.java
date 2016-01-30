@@ -95,6 +95,8 @@ public abstract class EffectBase {
             this.put(StatsEnum.STEAL_WATER, new EffectLifeSteal());
             this.put(StatsEnum.STEAL_PV_FIX, new EffectLifeSteal());
 
+            this.put(StatsEnum.SUB_VITALITY_PERCENT, new EffectSubLifePercent());
+
             this.put(StatsEnum.REFLECT_SPELL, new EffectReflectSpell());
             this.put(StatsEnum.DESENVOUTEMENT, new EffectDebuff());
             this.put(StatsEnum.INCREASE_EFFECT_DURATION, new EffectDispellEffectDuration());
@@ -264,6 +266,12 @@ public abstract class EffectBase {
             this.put(StatsEnum.MAXIMIZE_EFFECTS, new EffectAlterJet());
             this.put(StatsEnum.MINIMIZE_EFFECTS, new EffectAlterJet());
 
+            //Invocation
+            this.put(StatsEnum.SUMMON, new EffectSummon());
+            this.put(StatsEnum.SUMMON_DOUBLE , new EffectSummonDouble());
+            this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION, new EffectSummon());
+
+
             //Roublard
             this.put(StatsEnum.ACTION_SUMMON_BOMB, new EffectSummonBomb());
             this.put(StatsEnum.COMBO_DAMMAGES, new EffectStats());
@@ -295,6 +303,9 @@ public abstract class EffectBase {
 
             //Sadida
             this.put(StatsEnum.CAST_SPELL_ALL_ENEMY , new EffectCastSpell());
+
+            //Arbre de vie
+            this.put(StatsEnum.HEAL_ATTACKER_DAMAGE_PERCENT_INCURED, new EffectHealDamageIncured());
 
         }
     };

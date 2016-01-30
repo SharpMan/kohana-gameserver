@@ -1201,4 +1201,52 @@ public class BuffAllyAction extends AIAction {
 
         return score;
     }
+
+    @Override
+    protected double scoreLaunchSpell(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
+        if (reverse)//On evite la boucle infinie
+        {
+            return 0;
+        }
+        int baseScore = 11;
+        double score = baseScore;
+
+        final int spellId = effect.diceNum;
+        final int spellLevel = effect.diceSide;
+
+        if (!AI.getNeuron().myScoreSpells.containsKey(spellId)) {
+            MonsterTemplate monster = DAO.getMonsters().find(spellId);
+            // Template de monstre existante
+            if (monster != null) {
+                final SpellLevel spell = DAO.getSpells().findSpell(spellId).getSpellLevels()[spellLevel == 0 ? 0 : spellLevel - 1];
+                // Level de monstre existant
+                if (spell != null) {
+                    final List<Fighter> possibleTargets = new ArrayList<Fighter>() {{
+                        add(AI.getFighter());
+                    }};
+
+                    for (EffectInstanceDice spellEffect : spell.getEffects()) {
+                        int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                        if (currScore > 0) {
+                            score += currScore;
+                        }
+                    }
+
+                    for (EffectInstanceDice spellEffect : spell.getEffects()) {
+                        int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                        if (currScore > 0) {
+                            score += currScore;
+                        }
+                    }
+
+                    score *= spellLevel;
+                    AI.getNeuron().myScoreSpells.put(spellId, score);
+                    return score;
+                }
+            }
+        } else {
+            return AI.getNeuron().myScoreSpells.get(spellId);
+        }
+        return 0;
+    }
 }

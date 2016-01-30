@@ -113,6 +113,8 @@ public abstract class AIAction {
 
     protected abstract double scoreUseLayer(AIProcessor AI, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet);
 
+    protected abstract double scoreLaunchSpell(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse);
+
     public double getEffectScore(AIProcessor AI, short casterCell, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean invokPreview) {
         switch (effect.getEffectType()) {
             case HEAL:
@@ -252,6 +254,8 @@ public abstract class AIAction {
             case SUB_RETRAIT_PA :
             case SUB_RETRAIT_PM :
             case SUB_PROSPECTING :
+            case DODGE_PM_LOST_PROBABILITY: //not the right place
+            case DODGE_PA_LOST_PROBABILITY :
             case SUB_DAMAGE :
             case SUB_DAMAGE_BONUS_PERCENT :
             case SUB_PUSH_DAMAGES_BONUS :
@@ -276,6 +280,11 @@ public abstract class AIAction {
             case SUB_AIR_ELEMENT_REDUCTION :
             case SUB_NEUTRAL_ELEMENT_REDUCTION :
                 return scoreSubBuff_I(AI, effect,targets, reverse,false);
+
+
+
+            case CHANGE_APPEARANCE:
+                return scoreAddStateGood(AI, effect,targets, reverse);
 
             case ADD_STATE:
             {
@@ -344,6 +353,10 @@ public abstract class AIAction {
 
             case DO_NOTHING:
                 return 0;
+
+            case POUTCH:
+            case REFOULLAGE:
+                return scoreLaunchSpell(AI,effect,targets,reverse);
 
             default:
             {

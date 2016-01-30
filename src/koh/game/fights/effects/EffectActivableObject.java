@@ -72,6 +72,8 @@ public class EffectActivableObject extends EffectBase {
             case 77:
             case 13:
                 return Color.BLUE;
+            case 367:
+                return Color.WHITE;
             case 2825:
             case 10:
                 return Color.RED;

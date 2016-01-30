@@ -27,7 +27,7 @@ public class TeleporterAction extends GameAction {
 
     @Override
     public void execute() {
-        this.actor.send(new TeleportDestinationsListMessage(TeleporterTypeEnum.TELEPORTER_SUBWAY, mapIds(), subAreaIds(), getCost(), Enumerable.DuplicatedKey(mapIds().length, TeleporterTypeEnum.TELEPORTER_SUBWAY)));
+        this.actor.send(new TeleportDestinationsListMessage(TeleporterTypeEnum.TELEPORTER_SUBWAY, mapIds(), subAreaIds(), getCost(), Enumerable.duplicatedKey(mapIds().length, TeleporterTypeEnum.TELEPORTER_SUBWAY)));
     }
 
     @Override
@@ -60,7 +60,7 @@ public class TeleporterAction extends GameAction {
     public int[] subAreaIds() {
         ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).getCurrentMap().getSubArea().getArea().getId());
         if (zaaps == null) {
-            return Enumerable.DuplicatedKeyInt(39, ((Player) actor).getMapid());
+            return Enumerable.duplicatedKeyInt(39, ((Player) actor).getMapid());
         }
         return zaaps.stream().mapToInt(x -> x.getSubArea()).toArray();
     }
@@ -68,13 +68,13 @@ public class TeleporterAction extends GameAction {
     public int[] mapIds() {
         ArrayList<DofusZaap> zaaps = DAO.getMaps().getSubway(((Player) actor).getCurrentMap().getSubArea().getArea().getId());
         if (zaaps == null) {
-            return Enumerable.DuplicatedKeyInt(39, ((Player) actor).getMapid());
+            return Enumerable.duplicatedKeyInt(39, ((Player) actor).getMapid());
         }
         return zaaps.stream().mapToInt(x -> x.getMapid()).toArray();
     }
 
     public int[] getCost() {
-        return Enumerable.DuplicatedKeyInt(mapIds().length, 20);
+        return Enumerable.duplicatedKeyInt(mapIds().length, 20);
     }
 
     public short getCostTo(DofusMap map) {

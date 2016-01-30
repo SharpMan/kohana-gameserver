@@ -53,32 +53,31 @@ public class BuffPoutch extends BuffEffect {
             //target = DamageInfos.caster;
         }
 
-        SpellLevel SpellLevel = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide == 0 ? 0 : castInfos.effect.diceSide - 1];
+        final SpellLevel SpellLevel = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide == 0 ? 0 : castInfos.effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();
         double num2 = (double) Arrays.stream(SpellLevel.getEffects()).mapToInt(x -> x.random).sum();
         boolean flag = false;
         for (EffectInstanceDice Effect : SpellLevel.getEffects()) {
             logger.debug(Effect.toString());
-            ArrayList<Fighter> targets = new ArrayList<>();
+            final ArrayList<Fighter> targets = new ArrayList<>();
             for (short Cell : (new Zone(Effect.getZoneShape(), Effect.zoneSize(), MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true), this.caster.getFight().getMap())).getCells(target.getCellId())) {
-                FightCell FightCell = target.getFight().getCell(Cell);
+                final FightCell FightCell = target.getFight().getCell(Cell);
                 if (FightCell != null) {
-                    if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) | FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
-                        for (Fighter Target2 : FightCell.getObjectsAsFighter()) {
-                            if (castInfos.spellId == 2809 && Target2 == target) {
+                    for (final Fighter target2 : FightCell.getObjectsAsFighter()) {
+                            if (castInfos.spellId == 2809 && target2 == target) {
                                 continue;
                             }
-                            if (Effect.isValidTarget(this.target, Target2) && EffectInstanceDice.verifySpellEffectMask(this.target, Target2, Effect,Target2.getID())) {
-                                if (Effect.targetMask.equals("C") && this.target.getCarriedActor() == Target2.getID()) {
+                            if (Effect.isValidTarget(this.target, target2) && EffectInstanceDice.verifySpellEffectMask(this.target, target2, Effect,target2.getID())) {
+                                if (Effect.targetMask.equals("C") && this.target.getCarriedActor() == target2.getID()) {
                                     continue;
-                                } else if (Effect.targetMask.equals("a,A") && this.target.getCarriedActor() != 0 & this.target.getID() == Target2.getID()) {
+                                } else if (Effect.targetMask.equals("a,A") && this.target.getCarriedActor() != 0 & this.target.getID() == target2.getID()) {
                                     continue;
                                 }
-                                targets.add(Target2);
+                                targets.add(target2);
 
                             }
                         }
-                    }
+
                 }
             }
             if(castInfos.spellId == 94){
@@ -97,9 +96,9 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            EffectCast Cast2 = new EffectCast(Effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
-            Cast2.targetKnownCellId = target.getCellId();
-            if (EffectBase.tryApplyEffect(Cast2) == -3) {
+            final EffectCast cast = new EffectCast(Effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            cast.targetKnownCellId = target.getCellId();
+            if (EffectBase.tryApplyEffect(cast) == -3) {
                 return -3;
             }
         }

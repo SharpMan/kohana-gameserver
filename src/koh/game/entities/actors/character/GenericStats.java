@@ -5,6 +5,7 @@ import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.BreedEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Collections;
@@ -18,7 +19,8 @@ import java.util.Map.Entry;
 @ToString
 public class GenericStats {
 
-    private Map<StatsEnum, CharacterBaseCharacteristic> myStats = Collections.synchronizedMap(new HashMap<>());
+    @Getter
+    private Map<StatsEnum, CharacterBaseCharacteristic> stats = Collections.synchronizedMap(new HashMap<>());
 
     private static final Map<StatsEnum, StatsEnum> OPPOSITE_STATS = new HashMap<StatsEnum, StatsEnum>() {
         {
@@ -75,23 +77,23 @@ public class GenericStats {
     }
 
     public GenericStats(Player character) {
-        this.myStats.put(StatsEnum.ACTION_POINTS, new CharacterBaseCharacteristic(character.getLevel() >= 100 ? 7 : 6));
-        this.myStats.put(StatsEnum.MOVEMENT_POINTS, new CharacterBaseCharacteristic(3));
-        this.myStats.put(StatsEnum.PROSPECTING, new CharacterBaseCharacteristic((character.getBreed() == BreedEnum.Enutrof ? 120 : 100)));
-        this.myStats.put(StatsEnum.ADD_PODS, new CharacterBaseCharacteristic(1000));
-        this.myStats.put(StatsEnum.ADD_SUMMON_LIMIT, new CharacterBaseCharacteristic(1));
-        this.myStats.put(StatsEnum.INITIATIVE, new CharacterBaseCharacteristic(100));
+        this.stats.put(StatsEnum.ACTION_POINTS, new CharacterBaseCharacteristic(character.getLevel() >= 100 ? 7 : 6));
+        this.stats.put(StatsEnum.MOVEMENT_POINTS, new CharacterBaseCharacteristic(3));
+        this.stats.put(StatsEnum.PROSPECTING, new CharacterBaseCharacteristic((character.getBreed() == BreedEnum.Enutrof ? 120 : 100)));
+        this.stats.put(StatsEnum.ADD_PODS, new CharacterBaseCharacteristic(1000));
+        this.stats.put(StatsEnum.ADD_SUMMON_LIMIT, new CharacterBaseCharacteristic(1));
+        this.stats.put(StatsEnum.INITIATIVE, new CharacterBaseCharacteristic(100));
 
-        this.myStats.put(StatsEnum.VITALITY, new CharacterBaseCharacteristic(character.getVitality()));
-        this.myStats.put(StatsEnum.WISDOM, new CharacterBaseCharacteristic(character.getWisdom()));
-        this.myStats.put(StatsEnum.STRENGTH, new CharacterBaseCharacteristic(character.getStrength()));
-        this.myStats.put(StatsEnum.INTELLIGENCE, new CharacterBaseCharacteristic(character.getIntell()));
-        this.myStats.put(StatsEnum.AGILITY, new CharacterBaseCharacteristic(character.getAgility()));
-        this.myStats.put(StatsEnum.CHANCE, new CharacterBaseCharacteristic(character.getChance()));
+        this.stats.put(StatsEnum.VITALITY, new CharacterBaseCharacteristic(character.getVitality()));
+        this.stats.put(StatsEnum.WISDOM, new CharacterBaseCharacteristic(character.getWisdom()));
+        this.stats.put(StatsEnum.STRENGTH, new CharacterBaseCharacteristic(character.getStrength()));
+        this.stats.put(StatsEnum.INTELLIGENCE, new CharacterBaseCharacteristic(character.getIntell()));
+        this.stats.put(StatsEnum.AGILITY, new CharacterBaseCharacteristic(character.getAgility()));
+        this.stats.put(StatsEnum.CHANCE, new CharacterBaseCharacteristic(character.getChance()));
     }
 
     public Map<StatsEnum, CharacterBaseCharacteristic> getEffects() {
-        return this.myStats;
+        return this.stats;
     }
 
     /* TO DELETE after read id , ; explanation about this code part
@@ -108,26 +110,26 @@ public class GenericStats {
 
 
     public void unMerge(StatsEnum key, CharacterBaseCharacteristic stat) {
-        if (!this.myStats.containsKey(key)) {
-            this.myStats.get(key).unMerge(stat);
+        if (!this.stats.containsKey(key)) {
+            this.stats.get(key).unMerge(stat);
         }
     }
 
     public void merge(GenericStats stats) {
         for (Entry<StatsEnum, CharacterBaseCharacteristic> effect : stats.getEffects().entrySet()) {
             if(OPPOSITE_STATS.containsKey(effect.getKey())){
-                this.myStats.get(OPPOSITE_STATS.get(effect.getKey())).unMerge(effect.getValue());
+                this.stats.get(OPPOSITE_STATS.get(effect.getKey())).unMerge(effect.getValue());
                 continue;
             }
-            if (!this.myStats.containsKey(effect.getKey())) {
-                this.myStats.put(effect.getKey(), new CharacterBaseCharacteristic());
+            if (!this.stats.containsKey(effect.getKey())) {
+                this.stats.put(effect.getKey(), new CharacterBaseCharacteristic());
             }
-            this.myStats.get(effect.getKey()).merge(effect.getValue());
+            this.stats.get(effect.getKey()).merge(effect.getValue());
         }
     }
 
     public int totalBasePoints(){
-        return this.myStats.values().stream()
+        return this.stats.values().stream()
                 .filter(stat -> stat.base > 0)
                 .mapToInt(stat -> stat.base)
                 .sum();
@@ -136,18 +138,18 @@ public class GenericStats {
     public void unMerge(GenericStats Stats) {
         for (Entry<StatsEnum, CharacterBaseCharacteristic> effect : Stats.getEffects().entrySet()) {
             if(OPPOSITE_STATS.containsKey(effect.getKey())){
-                this.myStats.get(OPPOSITE_STATS.get(effect.getKey())).merge(effect.getValue());
+                this.stats.get(OPPOSITE_STATS.get(effect.getKey())).merge(effect.getValue());
                 continue;
             }
-            if (!this.myStats.containsKey(effect.getKey())) {
-                this.myStats.put(effect.getKey(), new CharacterBaseCharacteristic());
+            if (!this.stats.containsKey(effect.getKey())) {
+                this.stats.put(effect.getKey(), new CharacterBaseCharacteristic());
             }
-            this.myStats.get(effect.getKey()).unMerge(effect.getValue());
+            this.stats.get(effect.getKey()).unMerge(effect.getValue());
         }
     }
 
     public void reset() {
-        this.myStats.values().forEach(x -> {
+        this.stats.values().forEach(x -> {
             x.base = 0;
             x.additionnal = 0;
             x.alignGiftBonus = 0;
@@ -156,7 +158,7 @@ public class GenericStats {
         });
     }
 
-    //TODO
+
     public GenericStats clone() {
         GenericStats stats = new GenericStats();
         return stats;
@@ -170,8 +172,8 @@ public class GenericStats {
         int total = 0;
 
         // existant ?
-        if (myStats.containsKey(effectType)) {
-            total += myStats.get(effectType).Total();
+        if (stats.containsKey(effectType)) {
+            total += stats.get(effectType).Total();
         }
 
         switch (effectType) {
@@ -184,14 +186,14 @@ public class GenericStats {
                 total += getTotal(StatsEnum.WISDOM) / 4;
                 break;
             case ACTION_POINTS:
-                if (isCharacterFighter && (total - myStats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pa")) {
-                    total -= (total - myStats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pa");
+                if (isCharacterFighter && (total - stats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pa")) {
+                    total -= (total - stats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pa");
                 }
                 total += getTotal(StatsEnum.ADD_PA_BIS);
                 break;
             case MOVEMENT_POINTS:
-                if (isCharacterFighter && (total - myStats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pm")) {
-                    total -= (total - myStats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pm");
+                if (isCharacterFighter && (total - stats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pm")) {
+                    total -= (total - stats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pm");
                 }
                 total += getTotal(StatsEnum.ADD_PM);
                 break;
@@ -204,10 +206,10 @@ public class GenericStats {
     }
 
     public CharacterBaseCharacteristic getEffect(StatsEnum effectType) {
-        if (!this.myStats.containsKey(effectType)) {
-            this.myStats.put(effectType, new CharacterBaseCharacteristic());
+        if (!this.stats.containsKey(effectType)) {
+            this.stats.put(effectType, new CharacterBaseCharacteristic());
         }
-        return this.myStats.get(effectType);
+        return this.stats.get(effectType);
     }
 
     public CharacterBaseCharacteristic getEffect(int effectType) {
@@ -219,15 +221,15 @@ public class GenericStats {
             this.addBase(OPPOSITE_STATS.get(effectType), -value);
             return;
         }
-        if (!this.myStats.containsKey(effectType)) {
-            this.myStats.put(effectType, new CharacterBaseCharacteristic(value, 0, 0, 0, 0));
+        if (!this.stats.containsKey(effectType)) {
+            this.stats.put(effectType, new CharacterBaseCharacteristic(value, 0, 0, 0, 0));
         } else {
-            this.myStats.get(effectType).base += value;
+            this.stats.get(effectType).base += value;
         }
     }
 
     public void resetBase() {
-        this.myStats.values().forEach(stat -> stat.base = 0);
+        this.stats.values().forEach(stat -> stat.base = 0);
     }
 
     public void addBoost(StatsEnum effectType, int value) {
@@ -235,37 +237,37 @@ public class GenericStats {
             this.addBoost(OPPOSITE_STATS.get(effectType), -value);
             return;
         }
-        if (!this.myStats.containsKey(effectType)) {
-            this.myStats.put(effectType, new CharacterBaseCharacteristic(0, value, 0, 0, 0));
+        if (!this.stats.containsKey(effectType)) {
+            this.stats.put(effectType, new CharacterBaseCharacteristic(0, value, 0, 0, 0));
         } else {
-            this.myStats.get(effectType).additionnal += value;
+            this.stats.get(effectType).additionnal += value;
         }
     }
 
     public int getBase(StatsEnum effectType) {
-        if (!this.myStats.containsKey(effectType)) {
-            this.myStats.put(effectType, new CharacterBaseCharacteristic());
+        if (!this.stats.containsKey(effectType)) {
+            this.stats.put(effectType, new CharacterBaseCharacteristic());
         }
         switch (effectType) {
             /*case getInitiative:
-             return this.myStats.get(effectType).base + getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
+             return this.stats.get(effectType).base + getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
             default:
-                return this.myStats.get(effectType).base;
+                return this.stats.get(effectType).base;
         }
     }
 
     public int getBoost(StatsEnum effectType) {
-        if (!this.myStats.containsKey(effectType)) {
-            this.myStats.put(effectType, new CharacterBaseCharacteristic());
+        if (!this.stats.containsKey(effectType)) {
+            this.stats.put(effectType, new CharacterBaseCharacteristic());
         }
-        return this.myStats.get(effectType).additionnal;
+        return this.stats.get(effectType).additionnal;
     }
 
     public int getItem(StatsEnum effectType) {
-        if (!this.myStats.containsKey(effectType)) {
-            this.myStats.put(effectType, new CharacterBaseCharacteristic());
+        if (!this.stats.containsKey(effectType)) {
+            this.stats.put(effectType, new CharacterBaseCharacteristic());
         }
-        return this.myStats.get(effectType).objectsAndMountBonus;
+        return this.stats.get(effectType).objectsAndMountBonus;
     }
 
     public void addItem(StatsEnum effectType, int value) {
@@ -273,18 +275,18 @@ public class GenericStats {
             this.addItem(OPPOSITE_STATS.get(effectType), -value);
             return;
         }
-        if (!this.myStats.containsKey(effectType)) {
-            this.myStats.put(effectType, new CharacterBaseCharacteristic(0, 0, value, 0, 0));
+        if (!this.stats.containsKey(effectType)) {
+            this.stats.put(effectType, new CharacterBaseCharacteristic(0, 0, value, 0, 0));
         } else {
-            this.myStats.get(effectType).objectsAndMountBonus += value;
+            this.stats.get(effectType).objectsAndMountBonus += value;
         }
     }
 
     public void totalClear() {
         try {
-            this.myStats.values().forEach(CharacterBaseCharacteristic::totalClear);
-            myStats.clear();
-            myStats = null;
+            this.stats.values().forEach(CharacterBaseCharacteristic::totalClear);
+            stats.clear();
+            stats = null;
             this.finalize();
         } catch (Throwable tr) {
         }

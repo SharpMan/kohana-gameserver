@@ -162,6 +162,9 @@ public class SpellBook {
         return array;
     }
 
+    //No byte in jython
+    public static final byte firstLevel = 1;
+
     public void addSpell(int spellId, byte level/* = 1*/, byte position/* = 25*/, WorldClient client) {
         if (!this.mySpells.containsKey(spellId)) {
             this.mySpells.put(spellId, new SpellInfo(spellId, level, position));

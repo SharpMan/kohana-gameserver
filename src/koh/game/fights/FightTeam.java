@@ -6,6 +6,7 @@
 package koh.game.fights;
 
 import koh.game.fights.fighters.CharacterFighter;
+import koh.game.fights.fighters.DoubleFighter;
 import koh.game.fights.fighters.MonsterFighter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -144,8 +145,7 @@ public class FightTeam {
     }
 
     public void endFight() {
-        this.myFighters.removeIf(x -> x.getSummoner() != null); // On delete les invocations
-        //this.myFighters.RemoveAll(x =  > x is DoubleFighter);  // On delete les doubles
+        this.myFighters.removeIf(fr -> fr.getSummoner() != null || fr instanceof DoubleFighter); // On delete les invocations
     }
 
     public void dispose() {

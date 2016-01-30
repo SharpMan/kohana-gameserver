@@ -5,7 +5,6 @@ import koh.game.entities.actors.Player;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
-import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
@@ -33,7 +32,7 @@ public class MonsterFighter extends VirtualFighter {
         this.monsterGroup = monsterGroup;
         this.grade = monster;
         super.initFighter(this.grade.getStats(), monsterGuid);
-        this.entityLook = EntityLookParser.Copy(this.grade.getMonster().getEntityLook());
+        this.entityLook = EntityLookParser.copy(this.grade.getMonster().getEntityLook());
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());
     }
@@ -77,7 +76,7 @@ public class MonsterFighter extends VirtualFighter {
 
     @Override
     public FightObjectType getObjectType() {
-        return FightObjectType./*OBJECT_FIGHTER*/OBJECT_STATIC;
+        return FightObjectType.OBJECT_FIGHTER;
     }
 
 

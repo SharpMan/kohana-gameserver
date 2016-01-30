@@ -2,10 +2,8 @@ package koh.game.entities.command;
 
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
-import koh.game.entities.maps.pathfinding.MapPoint;
-import koh.game.entities.maps.pathfinding.MovementPath;
-import koh.game.entities.maps.pathfinding.PathElement;
-import koh.game.entities.maps.pathfinding.Pathfinding;
+import koh.game.entities.environments.DofusCell;
+import koh.game.fights.utils.*;
 import koh.game.network.WorldClient;
 import koh.protocol.messages.game.context.ShowCellMessage;
 
@@ -22,17 +20,16 @@ public class TeleportCommand implements PlayerCommand {
 
     @Override
     public void apply(WorldClient client, String args[]) {
-        int mapid = Integer.parseInt(args[0]);
-        int cellid = Integer.parseInt(args[1]);
+        final int mapid = Integer.parseInt(args[0]);
+        final short cellid = Short.parseShort(args[1]);
         client.getCharacter().teleport(mapid, cellid);
         /*try {
-            final MovementPath p = Pathfinding.findPath(client.getCharacter().getFight(), client.getCharacter().getFighter().getMapPoint(), MapPoint.fromCellId(cellid), false,false);
-            System.out.println(client.getCharacter().getFighter().getMapPoint().toString());
-            System.out.println(MapPoint.fromCellId(cellid));
+            final Path p = new Pathfinder(client.getCharacter().getCurrentMap(), client.getCharacter().getFight(), true, false).findPath(client.getCharacter().getFight().getMap().getCell(client.getCharacter().getFighter().getCellId()),client.getCharacter().getFight().getMap().getCell(cellid), false,6);
 
-            PlayerController.sendServerMessage(client,p.toString());
-            for (PathElement pp : p.get_path()) {
-                client.send(new ShowCellMessage(0, pp.get_cellId()));
+
+            PlayerController.sendServerMessage(client,p.getCellsPath().length+" ");
+            for (DofusCell pp : p.getCellsPath()) {
+                client.send(new ShowCellMessage(0, pp.getId()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +38,6 @@ public class TeleportCommand implements PlayerCommand {
 
     @Override
     public boolean can(WorldClient client) {
-
         if(client.isGameAction(GameActionTypeEnum.FIGHT)){
             PlayerController.sendServerMessage(client, "Action impossible : Vous etes en combat");
             return false;

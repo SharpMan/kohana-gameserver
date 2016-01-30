@@ -84,7 +84,7 @@ public class ItemTemplate {
         this.hideEffects = result.getBoolean("hide_effects");
         this.enhanceable = result.getBoolean("enhanceable");
         this.nonUsableOnAnother = result.getBoolean("non_usable_on_another");
-        this.appearanceId = result.getShort("apprance_id");
+        this.appearanceId = result.getShort("appearance_id");
         this.secretRecipe = result.getBoolean("secret_recipe");
         this.recipeSlots = result.getInt("recipe_slots");
         this.recipeIds = ItemTemplateDAO.parseIds(result.getString("recipe_ids"));

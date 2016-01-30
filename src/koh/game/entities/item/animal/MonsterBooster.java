@@ -25,7 +25,7 @@ public class MonsterBooster {
         this.stats = Stats;
         this.statsBoost = StatsPoints;
         if (CorrectStat != null) {
-            this.fakeBoostStats = Enumerable.StringToIntArray(CorrectStat, ":");
+            this.fakeBoostStats = Enumerable.stringToIntArray(CorrectStat, ":");
         }
     }
 

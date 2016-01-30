@@ -24,6 +24,7 @@ public class AINeuron {
     public short myBestMoveCell, myBestCastCell;
     public boolean myFirstTargetIsMe;
     public Map<Integer,Double> myScoreInvocations = new HashMap<>();
+    public Map<Integer,Double> myScoreSpells = new HashMap<>();
 
     @Override
     public void finalize(){

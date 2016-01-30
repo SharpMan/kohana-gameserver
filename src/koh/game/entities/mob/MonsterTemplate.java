@@ -26,7 +26,7 @@ public class MonsterTemplate {
     @Getter
     private final ArrayList<MonsterGrade> grades = new ArrayList<>(6);
     @Getter
-    private final boolean useSummonSlot, useBombSlot, canPlay,canTackle, isBoss;
+    private final boolean useSummonSlot, useBombSlot, canPlay,canTackle, isBoss,isStatic;
     @Getter
     private final ArrayList<MonsterDrop> drops = new ArrayList<>(5);
     @Getter
@@ -43,6 +43,8 @@ public class MonsterTemplate {
     private final int[] incompatibleIdols;
     @Getter
     private final int monsterAI;
+    @Getter
+    private int[] spellsOnSummons;
 
     private EntityLook myEntityLook;
 
@@ -56,8 +58,8 @@ public class MonsterTemplate {
         canPlay = result.getBoolean("can_play");
         canTackle = result.getBoolean("can_tackle");
         isBoss = result.getBoolean("is_boss");
-        subareas = Enumerable.StringToIntArray(result.getString("subareas"));
-        spells = Enumerable.StringToIntArray(result.getString("spells"));
+        subareas = Enumerable.stringToIntArray(result.getString("subareas"));
+        spells = Enumerable.stringToIntArray(result.getString("spells"));
         favoriteSubareaId = result.getInt("favorite_subarea_id");
         isMiniBoss = result.getBoolean("is_mini_boss");
         isQuestMonster = result.getBoolean("is_quest_monster");
@@ -67,10 +69,12 @@ public class MonsterTemplate {
         canBePushed = result.getBoolean("can_be_pushed");
         fastAnimsFun = result.getBoolean("fast_anims_fun");
         canSwitchPos = result.getBoolean("can_switch_pos");
-        incompatibleIdols = Enumerable.StringToIntArray(result.getString("incompatable_idols"));
+        incompatibleIdols = Enumerable.stringToIntArray(result.getString("incompatable_idols"));
         this.minKamas = result.getInt("min_kamas");
         this.maxKamas = result.getInt("max_kamas");
         this.monsterAI = result.getInt("ai_type");
+        spellsOnSummons = Enumerable.stringToIntArray(result.getString("spell_on_summon"));
+        isStatic = result.getBoolean("static");
     }
 
 
@@ -108,6 +112,9 @@ public class MonsterTemplate {
     }
 
     public int getKamasWin(final Random random){
+        if (this.minKamas <= 0){
+            return Math.abs(maxKamas);
+        }
         return maxKamas - random.nextInt(this.minKamas);
     }
 

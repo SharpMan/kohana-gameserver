@@ -49,6 +49,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
                     .filter(file -> file.toString().endsWith(".py"))
                     .forEach((Path file) ->
                     {
+                        System.out.println(file.toAbsolutePath().toString());
                         this.chatCommands.put(file.getFileName()
                                         .toString()
                                         .substring(0, file.getFileName().toString().length() - 10)
@@ -58,6 +59,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
                     });
             this.chatCommands.put("help", new HelpCommand(this.chatCommands));
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -83,6 +85,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
                     });
             this.consoleCommands.put("help", new HelpCommand(this.consoleCommands));
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

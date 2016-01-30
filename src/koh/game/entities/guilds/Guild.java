@@ -1,16 +1,11 @@
 package koh.game.entities.guilds;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import koh.game.Main;
 import koh.game.dao.DAO;
-import koh.game.dao.api.AccountDataDAO;
-import koh.game.dao.sqlite.GuildDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.FieldNotification;
@@ -53,7 +48,7 @@ public class Guild extends IWorldEventObserver {
 
     public Guild(GuildEntity Entity) {
         this.entity = Entity;
-        this.spellLevel = Enumerable.StringToByteArray(Entity.spells);
+        this.spellLevel = Enumerable.stringToByteArray(Entity.spells);
     }
 
     public void onFighterAddedExperience(GuildMember member, long XP) {

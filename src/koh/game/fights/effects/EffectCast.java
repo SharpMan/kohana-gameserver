@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
+import koh.game.fights.Fight;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
@@ -56,6 +57,10 @@ public class EffectCast {
     public Fighter caster;
     public ArrayList<Fighter> targets;
     public int duration;
+
+    public Fight getFight(){
+        return this.caster.getFight();
+    }
 
     public static int randomValue(int i1, int i2) {
         //random rand = new random();

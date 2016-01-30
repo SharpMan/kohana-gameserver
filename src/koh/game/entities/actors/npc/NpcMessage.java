@@ -37,7 +37,7 @@ public class NpcMessage {
             if (result.getString("replies").isEmpty()) {
                 this.replies = new int[0];
             } else {
-                this.replies = Enumerable.StringToIntArray(result.getString("replies"));
+                this.replies = Enumerable.stringToIntArray(result.getString("replies"));
             }
         }
     }

@@ -39,7 +39,7 @@ public class ItemSet {
 
     public ItemSet(ResultSet result) throws SQLException {
         this.id = result.getInt("id");
-        this.items = Enumerable.StringToIntArray(result.getString("items"));
+        this.items = Enumerable.stringToIntArray(result.getString("items"));
         this.bonusIsSecret = result.getBoolean("bonus_is_secret");
         IoBuffer buf = IoBuffer.wrap(result.getBytes("effects"));
         this.effects = new EffectInstance[buf.getInt()][];

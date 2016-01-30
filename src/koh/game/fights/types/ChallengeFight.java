@@ -44,49 +44,53 @@ public class ChallengeFight extends Fight {
 
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {
+        try {
 
-        if(this.fightTime == -1){
-            this.myResult = new GameFightEndMessage(0, this.ageBonus, this.lootShareLimitMalus);
+            if (this.fightTime == -1) {
+                this.myResult = new GameFightEndMessage(0, this.ageBonus, this.lootShareLimitMalus);
+                super.endFight();
+                return;
+            }
+
+            this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
+
+            for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
+                super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_VICTORY);
+                final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, winners.getFighters(), loosers.getFighters()));
+
+                int guildXp = FightFormulas.guildXpEarned(fighter.asPlayer(), xpTotal), mountXp = FightFormulas.mountXpEarned(fighter.asPlayer(), xpTotal);
+                fighter.getPlayer().addExperience(xpTotal.get(), false);
+
+                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
+                    {
+                        this.experience = fighter.getPlayer().getExperience();
+                        this.showExperience = true;
+                        this.experienceLevelFloor = DAO.getExps().getPlayerMinExp(fighter.getLevel());
+                        this.showExperienceLevelFloor = true;
+                        this.experienceNextLevelFloor = DAO.getExps().getPlayerMaxExp(fighter.getLevel());
+                        this.showExperienceNextLevelFloor = fighter.getLevel() < 200;
+                        this.experienceFightDelta = xpTotal.get();
+                        this.showExperienceFightDelta = true;
+                        this.experienceForGuild = guildXp;
+                        this.showExperienceForGuild = guildXp > 0;
+                        this.experienceForMount = mountXp;
+                        this.showExperienceForMount = mountXp > 0;
+
+                    }
+                }}));
+            }
+
+            for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
+                super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_LOST);
+                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
+            }
+
+
             super.endFight();
-            return;
         }
-        
-        this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
-        
-         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
-             super.addNamedParty(((CharacterFighter) fighter), FightOutcomeEnum.RESULT_VICTORY);
-             final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, winners.getFighters(), loosers.getFighters()));
-
-            int guildXp = FightFormulas.guildXpEarned((CharacterFighter) fighter, xpTotal), mountXpountXp = FightFormulas.mountXpEarned((CharacterFighter) fighter, xpTotal);
-            ((CharacterFighter) fighter).getCharacter().addExperience(xpTotal.get(), false);
-
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
-                {
-                    this.experience = ((CharacterFighter) fighter).getCharacter().getExperience();
-                    this.showExperience = true;
-                    this.experienceLevelFloor = DAO.getExps().getPlayerMinExp(fighter.getLevel());
-                    this.showExperienceLevelFloor = true;
-                    this.experienceNextLevelFloor = DAO.getExps().getPlayerMaxExp(fighter.getLevel());
-                    this.showExperienceNextLevelFloor = fighter.getLevel() < 200;
-                    this.experienceFightDelta = xpTotal.get();
-                    this.showExperienceFightDelta = true;
-                    this.experienceForGuild =  guildXp;
-                    this.showExperienceForGuild = guildXp > 0;
-                    this.experienceForMount = mountXpountXp;
-                    this.showExperienceForMount = mountXpountXp > 0;
-
-                }
-            }}));
+        catch(Exception e){
+            e.printStackTrace();
         }
-
-        for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
-            super.addNamedParty(((CharacterFighter) fighter), FightOutcomeEnum.RESULT_LOST);
-            this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
-        }
-
-       
-
-        super.endFight();
     }
 
     @Override

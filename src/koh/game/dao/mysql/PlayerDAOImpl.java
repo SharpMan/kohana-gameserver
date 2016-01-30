@@ -177,7 +177,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .kamas(result.getInt("kamas"))
                             .savedMap(Integer.parseInt(result.getString("savedpos").split(",")[0]))
                             .savedCell(Short.parseShort(result.getString("savedpos").split(",")[1]))
-                            .emotes(Enumerable.StringToByteArray(result.getString("emotes")))
+                            .emotes(Enumerable.stringToByteArray(result.getString("emotes")))
                             .mountInfo(new MountInformations().deserialize(result.getBytes("mount_informations")))
                             .moodSmiley((byte)-1)
                             .build();
@@ -194,11 +194,11 @@ public class PlayerDAOImpl extends PlayerDAO {
                         p.setEntityLook(EntityLookParser.fromString(result.getString("entity_look")));
                     }
                     if (result.getString("tinsel").split(";").length == 1) {
-                        p.setOrnaments(Enumerable.StringToIntArray(result.getString("tinsel").split(";")[0]));
+                        p.setOrnaments(Enumerable.stringToIntArray(result.getString("tinsel").split(";")[0]));
                         p.setTitles(new int[0]);
                     } else if (result.getString("tinsel").split(";").length >= 2) {
-                        p.setOrnaments(Enumerable.StringToIntArray(result.getString("tinsel").split(";")[0]));
-                        p.setTitles(Enumerable.StringToIntArray(result.getString("tinsel").split(";")[1]));
+                        p.setOrnaments(Enumerable.stringToIntArray(result.getString("tinsel").split(";")[0]));
+                        p.setTitles(Enumerable.stringToIntArray(result.getString("tinsel").split(";")[1]));
                     } else {
                         p.setTitles(new int[0]);
                         p.setOrnaments(new int[0]);

@@ -15,10 +15,11 @@ public abstract class StaticFighter extends Fighter {
     @Getter
     protected MonsterGrade grade;
 
-    public StaticFighter(koh.game.fights.Fight Fight, Fighter Summoner) {
-        super(Fight, Summoner);
+    public StaticFighter(koh.game.fights.Fight Fight, Fighter summoner, MonsterGrade grade) {
+        super(Fight, summoner);
+        this.grade = grade;
     }
-    
+
     public void adjustStats() {
         this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
@@ -27,6 +28,7 @@ public abstract class StaticFighter extends Fighter {
         this.stats.addBase(StatsEnum.AGILITY, (short) ((double) this.stats.getEffect(StatsEnum.AGILITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.WISDOM, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
     }
+    
 
     @Override
     public int getMaxAP() {

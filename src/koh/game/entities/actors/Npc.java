@@ -1,7 +1,6 @@
 package koh.game.entities.actors;
 
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.NpcDAOImpl;
 import koh.game.entities.actors.npc.NpcTemplate;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayNpcInformations;
@@ -9,7 +8,6 @@ import koh.protocol.types.game.context.roleplay.GameRolePlayNpcWithQuestInformat
 import koh.protocol.types.game.context.roleplay.quest.GameRolePlayNpcQuestFlag;
 import koh.protocol.types.game.look.EntityLook;
 import koh.utils.Enumerable;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.sql.ResultSet;
@@ -36,8 +34,8 @@ public class Npc extends IGameActor {
         this.sex = result.getBoolean("sex");
         this.npcId = result.getInt("id");
         this.artwork = result.getInt("artwork");
-        this.questsToStart = Enumerable.StringToIntArray(result.getString("quests_to_start"));
-        this.questsToValid = Enumerable.StringToIntArray(result.getString("quests_to_valid"));
+        this.questsToStart = Enumerable.stringToIntArray(result.getString("quests_to_start"));
+        this.questsToValid = Enumerable.stringToIntArray(result.getString("quests_to_valid"));
     }
 
     //Todo QuestTODO:

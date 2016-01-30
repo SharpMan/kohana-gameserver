@@ -185,9 +185,9 @@ public class NpcDAOImpl extends NpcDAO {
 
                 templates.put(result.getInt("id"), NpcTemplate.builder()
                         .id(result.getInt("id"))
-                        .dialogMessages(Enumerable.StringToMultiArray(result.getString("dialog_messages")))
-                        .dialogReplies(Enumerable.StringToMultiArray(result.getString("dialog_replies")))
-                        .actions(Enumerable.StringToIntArray(result.getString("actions")))
+                        .dialogMessages(Enumerable.stringToMultiArray(result.getString("dialog_messages")))
+                        .dialogReplies(Enumerable.stringToMultiArray(result.getString("dialog_replies")))
+                        .actions(Enumerable.stringToIntArray(result.getString("actions")))
                         .gender(result.getInt("gender"))
                         .look(result.getString("look"))
                         .fastAnimsFun(result.getBoolean("fast_anims_fun"))

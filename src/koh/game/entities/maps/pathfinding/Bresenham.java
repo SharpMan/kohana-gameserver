@@ -26,7 +26,7 @@ public class Bresenham {
     }
 
 
-    public static List<Point> findLine(int x0, int y0, int x1, int y1)
+    public static final List<Point> findLine(int x0, int y0, int x1, int y1)
     {
         List<Point> line = new ArrayList<Point>();
 

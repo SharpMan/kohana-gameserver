@@ -64,7 +64,7 @@ public class PetTemplate {
         } else {
             this.monsterBoosts = new MonsterBooster[result.getString("monster_food").split(",").length];
             for (int i = 0; i < this.monsterBoosts.length; ++i) {
-                this.monsterBoosts[i] = new MonsterBooster(Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[0]), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[1]), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[2]), Enumerable.StringToIntArray(result.getString("monster_food").split(",")[i].split(";")[3], ":"), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[4]), result.getString("monster_food").split(",")[i].split(";").length > 5 ? result.getString("monster_food").split(",")[i].split(";")[5] : null);
+                this.monsterBoosts[i] = new MonsterBooster(Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[0]), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[1]), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[2]), Enumerable.stringToIntArray(result.getString("monster_food").split(",")[i].split(";")[3], ":"), Integer.parseInt(result.getString("monster_food").split(",")[i].split(";")[4]), result.getString("monster_food").split(",")[i].split(";").length > 5 ? result.getString("monster_food").split(",")[i].split(";")[5] : null);
             }
         }
         this.minDurationBeforeMeal = result.getInt("min_duration_before_meal");

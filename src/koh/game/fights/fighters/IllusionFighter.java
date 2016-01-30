@@ -24,11 +24,11 @@ import koh.protocol.types.game.look.EntityLook;
 public class IllusionFighter extends StaticFighter {
 
     public IllusionFighter(koh.game.fights.Fight fight, Fighter summoner) {
-        super(fight, summoner);
+        super(fight, summoner,null);
         this.stats = new GenericStats();
         this.stats.merge(summoner.getStats());
         super.initFighter(this.stats, fight.getNextContextualId());
-        this.entityLook = EntityLookParser.Copy(summoner.getEntityLook());
+        this.entityLook = EntityLookParser.copy(summoner.getEntityLook());
         super.setLife(summoner.getLife());
         super.setLifeMax(summoner.getMaxLife());
     }

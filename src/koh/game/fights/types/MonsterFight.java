@@ -45,12 +45,12 @@ public class MonsterFight extends Fight {
         logger.debug("PVM_FIGHT Launched : Player={} MapId={}", player.getCharacter().getNickName(), map.getId());
 
         final Fighter attFighter = new CharacterFighter(this, player);
-        final Fighter defFighter = new MonsterFighter(this, group.getMainCreature(), this.nextID(), group);
+        final Fighter defFighter = new MonsterFighter(this, group.getMainCreature(), this.getNextContextualId(), group);
         player.addGameAction(new GameFight(attFighter, this));
 
         super.initFight(attFighter, defFighter);
 
-        this.monsterGroup.getMonsters().forEach(mob -> super.joinFightTeam(new MonsterFighter(this, mob, this.nextID(), group), this.myTeam2, false, (short) -1, true));
+        this.monsterGroup.getMonsters().forEach(mob -> super.joinFightTeam(new MonsterFighter(this, mob, this.getNextContextualId(), group), this.myTeam2, false, (short) -1, true));
     }
 
 

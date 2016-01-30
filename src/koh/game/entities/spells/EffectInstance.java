@@ -262,11 +262,11 @@ public class EffectInstance implements Serializable {
                         break;
                     case 'f':
                         verify = !((monsterInfo != null) && ((pEffect.targetMask.contains("f" + monsterInfo.creatureGenericId))));
-                       
+
                         break;
                     case 'F':
                         verify = ((monsterInfo != null) && ((pEffect.targetMask.contains("F" + monsterInfo.creatureGenericId))));
-                       
+
                         /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
                          return true;
                          }*/
@@ -284,11 +284,13 @@ public class EffectInstance implements Serializable {
                         verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.getID() == pTriggeringSpellCasterId)));
                         break;
                     case 'p':
+                        verify = !pTargetId.hasSummoner();
                         break;
                     case 'P':
-                        if (pTargetId instanceof BombFighter) { //TEmpororaire = bug
+                        /*if (pTargetId instanceof BombFighter || t) { //TEmpororaire = bug
                             verify = true;
-                        }
+                        }*/
+                        verify = pTargetId.hasSummoner();
                         break;
                     case 'T':
                         break;

@@ -42,11 +42,11 @@ public class BombFighter extends StaticFighter {
 
 
     private static final Logger logger = LogManager.getLogger(BombFighter.class);
-    public BombFighter(Fight Fight, Fighter Summoner, MonsterGrade Monster) {
-        super(Fight, Summoner);
-        this.grade = Monster;
-        super.initFighter(this.grade.getStats(), Fight.getNextContextualId());
-        this.entityLook = EntityLookParser.Copy(this.grade.getMonster().getEntityLook());
+
+    public BombFighter(Fight fight, Fighter summoner, MonsterGrade monster) {
+        super(fight, summoner,monster);
+        super.initFighter(this.grade.getStats(), fight.getNextContextualId());
+        this.entityLook = EntityLookParser.copy(this.grade.getMonster().getEntityLook());
         this.adjustStats();
         this.stats.merge(this.summoner.getStats());
         this.stats.unMerge(StatsEnum.VITALITY,this.summoner.getStats().getEffect(StatsEnum.VITALITY));

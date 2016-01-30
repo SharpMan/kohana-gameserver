@@ -12,11 +12,14 @@ public class EffectCastSpell extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        SpellLevel spell = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide);
+        final SpellLevel spell = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide);
 
-        for(Fighter target : castInfos.targets){
-            target.getFight().affectSpellTo(castInfos.caster,target, castInfos.effect.diceSide, castInfos.effect.diceNum);
-        }
+        /*if (castInfos.effect.targetMask.equalsIgnoreCase("a,A,U")) //Arbre sadi daamn the mask
+            castInfos.getFight().launchSpell(castInfos.caster, spell, castInfos.cellId, true, true, false);
+        else*/
+            for (Fighter target : castInfos.targets)
+                target.getFight().affectSpellTo(castInfos.caster, target, castInfos.effect.diceSide, castInfos.effect.diceNum);
+
         return -1;
     }
 }

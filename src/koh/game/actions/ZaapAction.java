@@ -27,7 +27,7 @@ public class ZaapAction extends GameAction {
     @Override
     public void execute() {
         //Stream<Entry<Integer, DofusZaap>> zaaps = MapDAOImpl.zaaps.entrySet().stream().filter(x -> x.getValue().mapid != ((player) actor).currentMap.id);
-        this.actor.send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), costs(), Enumerable.DuplicatedKey(DAO.getMaps().getZaapsLength() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) actor).getCurrentMap().getId()));
+        this.actor.send(new ZaapListMessage(TeleporterTypeEnum.TELEPORTER_ZAAP, mapIds(), subAreaIds(), costs(), Enumerable.duplicatedKey(DAO.getMaps().getZaapsLength() - 1, TeleporterTypeEnum.TELEPORTER_ZAAP), ((Player) actor).getCurrentMap().getId()));
     }
 
     @Override

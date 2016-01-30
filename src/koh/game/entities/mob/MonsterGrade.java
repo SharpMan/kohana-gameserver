@@ -4,6 +4,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.actors.character.GenericStats;
 import koh.game.entities.spells.SpellLevel;
 import koh.protocol.client.enums.StatsEnum;
+import koh.utils.Enumerable;
 import lombok.Getter;
 
 import java.sql.ResultSet;
@@ -28,6 +29,7 @@ public class MonsterGrade {
     @Getter
     private int gradeXp, damageReflect, hiddenLevel;
     private GenericStats myStats;
+
 
     public MonsterGrade(ResultSet result) throws SQLException {
         grade = result.getByte("grade");
@@ -61,6 +63,7 @@ public class MonsterGrade {
         }
         Arrays.stream(this.getMonster().getSpells())
                 .mapToObj(id -> DAO.getSpells().findSpell(id).getLevelOrNear(this.grade))
+                //.filter(fr -> fr != null)
                 .forEach(spell ->  this.spells.add(spell) );
         return spells;
     }
@@ -69,10 +72,10 @@ public class MonsterGrade {
         this.myStats = new GenericStats();
 
         this.myStats.addBase(StatsEnum.VITALITY, this.lifePoints);
-        this.myStats.addBase(StatsEnum.ACTION_POINTS, this.actionPoints);
-        this.myStats.addBase(StatsEnum.MOVEMENT_POINTS, this.movementPoints);
-        this.myStats.addBase(StatsEnum.DODGE_PA_LOST_PROBABILITY, this.paDodge);
-        this.myStats.addBase(StatsEnum.DODGE_PM_LOST_PROBABILITY, this.pmDodge);
+        this.myStats.addBase(StatsEnum.ACTION_POINTS, this.actionPoints < 0 ? 0 : this.actionPoints );
+        this.myStats.addBase(StatsEnum.MOVEMENT_POINTS, this.movementPoints < 0 ? 0 : this.movementPoints);
+        this.myStats.addBase(StatsEnum.DODGE_PA_LOST_PROBABILITY, this.paDodge < 0 ? 0 : paDodge);
+        this.myStats.addBase(StatsEnum.DODGE_PM_LOST_PROBABILITY, this.pmDodge < 0 ? 0 : pmDodge);
         this.myStats.addBase(StatsEnum.WISDOM, this.wisdom);
 
         this.myStats.addBase(StatsEnum.ADD_TACKLE_EVADE, this.tackleEvade);

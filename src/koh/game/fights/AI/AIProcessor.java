@@ -3,10 +3,13 @@ package koh.game.fights.AI;
 import koh.concurrency.ImprovedCachedThreadPool;
 import koh.game.actions.GameMapMovement;
 import koh.game.dao.DAO;
+import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.Pathfunction;
+import koh.game.entities.environments.Pathmaker;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.maps.pathfinding.MapPoint;
+import koh.game.entities.maps.pathfinding.Pathfinding;
 import koh.game.entities.mob.IAMind;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -17,8 +20,10 @@ import koh.game.fights.IFightObject;
 import koh.game.fights.exceptions.FightException;
 import koh.game.fights.exceptions.FighterException;
 import koh.game.fights.exceptions.StopAIException;
+import koh.game.fights.fighters.DoubleFighter;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.fights.fighters.VirtualFighter;
+import koh.game.fights.utils.Path;
 import koh.game.paths.PathNotFoundException;
 import koh.game.paths.Pathfinder;
 import koh.protocol.client.enums.IAMindEnum;
@@ -54,6 +59,7 @@ public class AIProcessor {
 
     public AIProcessor(Fight fight, VirtualFighter fighter) {
         this.type = IAMindOf(fighter);
+        logger.debug("AI {} instanced",this.type);
         this.fight = fight;
         this.fighter = fighter;
         this.mySpells = fighter.getSpells();
@@ -66,10 +72,10 @@ public class AIProcessor {
         } else if (fr instanceof MonsterFighter) {
             return ((MonsterFighter) fr).getGrade().getMonster().getMonsterAI();
         }
-        /*else if (f instanceof DoubleFighter)
+        else if (fr instanceof DoubleFighter)
         {
             return IAMindEnum.BLOCKER;
-        }
+        }/*
         else if (f instanceof PercepteurFighter)
         {
             return IAMindEnum.TAXCOLLECTOR;
@@ -89,6 +95,7 @@ public class AIProcessor {
     }
 
     public void runAI() {
+
         whenIStartIA = System.currentTimeMillis();
         usedNeurons = 0;
         IAMind mind = getMindOf(type);
@@ -99,6 +106,7 @@ public class AIProcessor {
                 }
 
                 neuron = new AINeuron();
+                logger.debug("IA runned");
 
                 usedNeurons++;
                 try {
@@ -172,13 +180,15 @@ public class AIProcessor {
         if (neuron.myBestSpell != null) {
             if (neuron.myBestMoveCell != this.fighter.getCellId() && neuron.myBestMoveCell != 0) {
                 try {
-                    final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), neuron.myBestMoveCell, false, fighter);
-                    path.find();
+
+                    //final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), neuron.myBestMoveCell, false, fighter);
+                    //path.find();
+                    final Path path = new koh.game.fights.utils.Pathfinder(fighter.getFight().getMap(), fight, true, false).findPath(fight.getMap().getCell(fighter.getCellId()), fight.getMap().getCell(neuron.myBestMoveCell), false,fighter.getMP());
                     GameMapMovement action = this.fight.tryMove(this.fighter, path);
                     if (action != null) {
                         BACKGROUND_WORKER.execute(() -> {
                             try {
-                                Thread.sleep(path.getPath().estimateTimeOn());
+                                Thread.sleep(path.getMovementTime());
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -262,21 +272,25 @@ public class AIProcessor {
     protected double getSpellScore(AIAction action, SpellLevel spell, short currentCellId, short castCell) {
         double score = 0;
         for (EffectInstanceDice effect : spell.getEffects()) {
-            List<Fighter> targets = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castCell), true), this.fight.getMap()))
+            final List<Fighter> targets = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castCell), true), this.fight.getMap()))
                     .getCells(castCell))
                     .map(cell -> fight.getCell(cell))
                     .filter(cell -> cell != null && cell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER, IFightObject.FightObjectType.OBJECT_STATIC))
                     .map(fightCell -> fightCell.getObjectsAsFighter()[0]).collect(Collectors.toList());
+
 
             targets.removeIf(target -> !((((ArrayUtils.contains(BLACKLISTED_EFFECTS, effect.effectUid)
                     || EffectHelper.verifyEffectTrigger(fighter, target, spell.getEffects(), effect, false, effect.triggers, castCell))
                     && effect.isValidTarget(fighter, target)
                     && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)))));
 
-            if (targets.size() > 0 || (spell.isNeedFreeCell() && targets.size() == 0)) {
+            if (targets.size() > 0 || ((spell.isNeedFreeCell() || spell.isNeedFreeTrapCell()) && targets.size() == 0)) {
                 score += Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));
             }
+
         }
+        if(score > 0)
+        System.out.println("finalscore"+score);
         return score;
     }
 
@@ -302,29 +316,20 @@ public class AIProcessor {
                     }
                 }
             }
-            System.out.println(baseDistance +" a "+ maxDistance + " b"+bestCell + " "+this.fighter.getCellId());
-
             if (bestCell != -1 && bestCell != this.fighter.getCellId()) {
-                final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), bestCell, false, fighter);
-                try {
-                    path.find();
-                    GameMapMovement action = this.fight.tryMove(this.fighter, path);
-                    if (action != null) {
-                        BACKGROUND_WORKER.execute(() -> {
-                            try {
-                                Thread.sleep(path.getPath().estimateTimeOn());
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                        fighter.setDirection(path.getPath().last().getOrientation());
-                        return true;
-                    }
-                } catch (PathNotFoundException ee) {
-                    ee.printStackTrace();
-                    //TODO search another cell
-                    return false;
+                final Path path = new koh.game.fights.utils.Pathfinder(fighter.getFight().getMap(), fight, true, false).findPath(fight.getMap().getCell(fighter.getCellId()), fight.getMap().getCell(bestCell), false,fighter.getMP());
+                GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                if (action != null) {
+                    BACKGROUND_WORKER.execute(() -> {
+                        try {
+                            Thread.sleep(path.getMovementTime());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    action.execute();
                 }
+                return true;
             }
         }
         return false;
@@ -364,26 +369,20 @@ public class AIProcessor {
 
             if (bestCell != -1 && bestCell != this.fighter.getCellId())
             {
-                final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), bestCell, false, fighter);
-                try {
-                    path.find();
-                    GameMapMovement action = this.fight.tryMove(this.fighter, path);
-                    if (action != null) {
-                        BACKGROUND_WORKER.execute(() -> {
-                            try {
-                                Thread.sleep(path.getPath().estimateTimeOn());
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                        fighter.setDirection(path.getPath().last().getOrientation());
-                        return true;
-                    }
-                } catch (PathNotFoundException ee) {
-                    ee.printStackTrace();
-                    //TODO search another cell
-                    return false;
+                final Path path = new koh.game.fights.utils.Pathfinder(fighter.getFight().getMap(), fight, true, false).findPath(fight.getMap().getCell(fighter.getCellId()), fight.getMap().getCell(bestCell), false,fighter.getMP());
+                GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                if (action != null) {
+                    BACKGROUND_WORKER.execute(() -> {
+                        try {
+                            Thread.sleep(path.getMovementTime());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    action.execute();
                 }
+                return true;
+
             }
         }
         return false;
@@ -403,10 +402,30 @@ public class AIProcessor {
                 bestEnnemy = ennemy;
             }
         }
-        System.out.println("b"+(bestEnnemy == null));
         if (bestEnnemy != null)
         {
             return moveTo(bestEnnemy, 64);
+        }
+        else return false;
+    }
+
+    public boolean moveToEnnemyByCell(int minDistance,int maxDistance)
+    {
+        int bestDistance = 64;
+        Fighter bestEnnemy = null;
+        for (Fighter ennemy : (Iterable<Fighter>) this.fight.getEnnemyTeam(this.fighter.getTeam()).getAliveFighters()::iterator)
+        {
+            int distance = Pathfunction.goalDistance(this.fight.getMap(),this.fighter.getCellId(), ennemy.getCellId());
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestEnnemy = ennemy;
+            }
+        }
+        if (bestEnnemy != null)
+        {
+            return moveTo(bestEnnemy, minDistance, maxDistance);
         }
         else return false;
     }
@@ -468,32 +487,25 @@ public class AIProcessor {
 
             if (bestCell != -1 && bestCell != this.fighter.getCellId())
             {
-                final Pathfinder path = new Pathfinder(this.fighter.getDirection(), this.fighter.getCellId(), bestCell, false, fighter);
-                try {
-                    path.find();
-                    GameMapMovement action = this.fight.tryMove(this.fighter, path);
-                    if (action != null) {
-                        BACKGROUND_WORKER.execute(() -> {
-                            try {
-                                Thread.sleep(path.getPath().estimateTimeOn());
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                        fighter.setDirection(path.getPath().last().getOrientation());
-                        return true;
-                    }
-                } catch (PathNotFoundException ee) {
-                    ee.printStackTrace();
-                    //TODO search another cell
-                    return false;
+                final Path path = new koh.game.fights.utils.Pathfinder(fighter.getFight().getMap(), fight, true, false).findPath(fight.getMap().getCell(fighter.getCellId()), fight.getMap().getCell(bestCell), false,fighter.getMP());
+                GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                if (action != null) {
+                    BACKGROUND_WORKER.execute(() -> {
+                        try {
+                            Thread.sleep(path.getMovementTime());
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    action.execute();
                 }
+                return true;
             }
         }
         return false;
     }
 
-    public void wait(int millis)
+    public void Wait(int millis) //upper bcs wait exist
     {
         BACKGROUND_WORKER.execute(() -> {
             try {

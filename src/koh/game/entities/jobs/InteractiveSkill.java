@@ -35,9 +35,9 @@ public class InteractiveSkill {
         type = result.getString("name");
         parentJobId = result.getByte("parent_job");
         isForgemagus = result.getBoolean("is_forgemagus");
-        modifiableItemTypeId = Enumerable.StringToIntArray(result.getString("modifiable_item_ids"));
+        modifiableItemTypeId = Enumerable.stringToIntArray(result.getString("modifiable_item_ids"));
         gatheredRessourceItem = result.getInt("gathered_ressource_item");
-        craftableItemIds = Enumerable.StringToIntArray(result.getString("craftable_item_ids"));
+        craftableItemIds = Enumerable.stringToIntArray(result.getString("craftable_item_ids"));
         interactiveId = result.getInt("interactive_id");
         useAnimation = result.getString("use_animation");
         elementActionId = result.getInt("element_action_id");

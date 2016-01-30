@@ -41,7 +41,8 @@ public class MonsterMindDAOImpl extends MonsterMindDAO {
     }
 
     @Override
-    public IAMind find(int id) {
+    public IAMind find(int id)
+    {
         return this.AI_MINDS.get(id);
     }
 

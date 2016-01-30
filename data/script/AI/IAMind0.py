@@ -8,5 +8,5 @@ from koh.game.fights.AI import AIProcessor
 class IAMind0(IAMind):
 
     def play(self,IA):
-            IA.wait(250)
+            IA.Wait(250)
             IA.stop()
