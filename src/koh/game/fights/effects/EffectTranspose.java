@@ -2,7 +2,7 @@ package koh.game.fights.effects;
 
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
-import koh.game.fights.fighters.StaticFighter;
+import koh.game.fights.IFightObject;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
 
@@ -15,13 +15,13 @@ public class EffectTranspose extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        for (Fighter target : castInfos.targets.stream()
-                .filter(fr -> !(fr instanceof StaticFighter)
+        for (Fighter target : (Iterable<Fighter>) castInfos.targets.stream()
+                .filter(fr -> !(fr.getObjectType() != IFightObject.FightObjectType.OBJECT_STATIC)
                         && !fr.getStates().hasState(FightStateEnum.CARRIED)
-                        && !fr.getStates().hasState(FightStateEnum.Inébranlable)
+                        && !fr.getStates().hasState(FightStateEnum.INÉBRANLABLE)
                         && !fr.getStates().hasState(FightStateEnum.ENRACINÉ)
                         && !fr.getStates().hasState(FightStateEnum.Indéplaçable))
-                .toArray(Fighter[]::new)) {
+                ::iterator) {
             if (castInfos.spellId == 445) {
                 if (target.getTeam() == castInfos.caster.getTeam()) {
                     continue;
@@ -31,12 +31,12 @@ public class EffectTranspose extends EffectBase {
                     continue;
                 }
             }
-            FightCell CasterCell = castInfos.caster.getMyCell(), TargetCell = target.getMyCell();
+            final FightCell casterCell = castInfos.caster.getMyCell(), TargetCell = target.getMyCell();
             castInfos.caster.getFight().sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, castInfos.caster.getID(), target.getID(), target.getCellId(), castInfos.caster.getCellId()));
             castInfos.caster.setCell(null);
             target.setCell(null);
 
-            if (castInfos.caster.setCell(TargetCell, false) == -3 || target.setCell(CasterCell, false) == -3) {
+            if (castInfos.caster.setCell(TargetCell, false) == -3 || target.setCell(casterCell, false) == -3) {
                 return -3;
             }
 

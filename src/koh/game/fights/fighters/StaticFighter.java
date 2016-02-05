@@ -4,6 +4,7 @@ import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.protocol.client.enums.StatsEnum;
+import koh.utils.Enumerable;
 import lombok.Getter;
 
 /**

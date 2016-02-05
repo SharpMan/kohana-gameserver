@@ -267,6 +267,8 @@ public class EffectInstance implements Serializable {
                         break;
                     case 'F':
                         verify = ((monsterInfo != null) &&((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
+                        if(pTargetId instanceof BombFighter && DAO.getSpells().findBomb(Integer.parseInt(exclusiveMaskParam)) != null)
+                            verify = true;
 
                         /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
                          return true;

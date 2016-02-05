@@ -2,7 +2,7 @@ package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffEffect;
-import koh.game.fights.effects.buff.BuffState;
+import koh.game.fights.effects.buff.buffState;
 import koh.protocol.client.enums.FightStateEnum;
 
 /**
@@ -15,7 +15,7 @@ public class EffectAddState extends EffectBase {
     public int applyEffect(EffectCast castInfos) {
         BuffEffect buff;
         for (Fighter target : castInfos.targets) {
-            buff = new BuffState(castInfos, target);
+            buff = new buffState(castInfos, target);
             if (target.getStates().canState(FightStateEnum.valueOf(castInfos.effect.value)) && !target.getBuff().buffMaxStackReached(buff)) {
                 target.getBuff().addBuff(buff);
                 if (buff.applyEffect(null, null) == -3) {

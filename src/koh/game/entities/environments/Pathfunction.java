@@ -143,7 +143,7 @@ public class Pathfunction {
         ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfunction.FIGHT_DIRECTIONS) {
-            Fighter ennemy = Fight.hasEnnemyInCell((short) Pathfunction.nextCell(CellId, Direction), Team);
+            Fighter ennemy = Fight.hasEnnemyInCell(Pathfunction.nextCell(CellId, Direction), Team);
             if (ennemy != null) {
                 if (!ennemy.isDead() && !(ennemy instanceof BombFighter) && !ennemy.getStates().hasState(FightStateEnum.ENRACINÉ) && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
                     ennemies.add(ennemy);

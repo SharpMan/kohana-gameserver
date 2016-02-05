@@ -12,9 +12,9 @@ import org.apache.commons.lang3.mutable.MutableInt;
  *
  * @author Neo-Craft
  */
-public class BuffState extends BuffEffect {
+public class buffState extends BuffEffect {
 
-    public BuffState(EffectCast CastInfos, Fighter Target) {
+    public buffState(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
     }
 

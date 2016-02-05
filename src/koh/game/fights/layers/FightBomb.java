@@ -100,6 +100,13 @@ public class FightBomb extends FightActivableObject {
     }
 
     @Override
+    public synchronized void loadTargets(Fighter target) {
+        if (!targets.contains(target)) {
+            targets.add(target);
+        }
+    }
+
+    @Override
     public synchronized int activate(Fighter activator) {
         targets.removeIf(Fighter -> Fighter instanceof BombFighter);
         if (targets.isEmpty()) {

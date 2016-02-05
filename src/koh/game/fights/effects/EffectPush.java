@@ -27,7 +27,7 @@ public class EffectPush extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         byte direction = 0;
-        for (Fighter target : castInfos.targets.stream().filter(Tarrget -> /*!(target instanceof StaticFighter) &&*/ !Tarrget.getStates().hasState(FightStateEnum.CARRIED) && !Tarrget.getStates().hasState(FightStateEnum.Inébranlable) && !Tarrget.getStates().hasState(FightStateEnum.ENRACINÉ) && !Tarrget.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter target : castInfos.targets.stream().filter(Tarrget -> /*!(target instanceof StaticFighter) &&*/ !Tarrget.getStates().hasState(FightStateEnum.CARRIED) && !Tarrget.getStates().hasState(FightStateEnum.INÉBRANLABLE) && !Tarrget.getStates().hasState(FightStateEnum.ENRACINÉ) && !Tarrget.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
             System.out.println(castInfos.effectType);
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:

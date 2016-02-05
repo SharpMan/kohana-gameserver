@@ -20,10 +20,10 @@ public class EffectSummonBomb extends EffectBase {
     public int applyEffect(EffectCast castInfos) {
         // Possibilité de spawn une creature sur la case ?
 
-        MonsterTemplate Monster = DAO.getMonsters().find(castInfos.effect.diceNum);
+        MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
         // getTemplate de monstre existante
-        if (Monster != null) {
-            MonsterGrade MonsterLevel = Monster.getLevelOrNear(castInfos.effect.diceSide);
+        if (monster != null) {
+            MonsterGrade MonsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
             if (MonsterLevel != null) {
                 if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
                     BombFighter Bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, MonsterLevel);
