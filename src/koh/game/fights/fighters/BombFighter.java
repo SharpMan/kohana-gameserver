@@ -101,15 +101,15 @@ public class BombFighter extends StaticFighter {
         int TotalCombo = 0;
         ArrayList<BombFighter> Targets = new ArrayList<>(6);
         for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.getCellId()).advancedOrientationTo(MapPoint.fromCellId(this.getCellId()), true), this.fight.getMap())).getCells(this.getCellId())) {
-            FightCell FightCell = fight.getCell(aCell);
-            if (FightCell != null) {
-                if (FightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC)) {
-                    for (Fighter Target : FightCell.getObjectsAsFighter()) {
-                        if (Target.getID() == this.ID) {
+            FightCell fightCell = fight.getCell(aCell);
+            if (fightCell != null) {
+                if (fightCell.hasFighter()) {
+                    for (Fighter target : fightCell.getObjectsAsFighter()) {
+                        if (target.getID() == this.ID) {
                             continue;
                         }
-                        if (Target instanceof BombFighter /*&& ((BombFighter) target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) Target).summoner == this.summoner && !((BombFighter) Target).boosted) {
-                            Targets.add((BombFighter) Target);
+                        if (target instanceof BombFighter /*&& ((BombFighter) target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) target).summoner == this.summoner && !((BombFighter) target).boosted) {
+                            Targets.add((BombFighter) target);
                             TotalCombo += 40;
                         }
                     }
@@ -231,6 +231,11 @@ public class BombFighter extends StaticFighter {
     @Override
     public EntityLook getEntityLook() {
         return this.entityLook;
+    }
+
+    @Override
+    public FightObjectType getObjectType() {
+        return FightObjectType.OBJECT_FIGHTER;
     }
 
 }

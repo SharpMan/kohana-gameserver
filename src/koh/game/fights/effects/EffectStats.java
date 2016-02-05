@@ -33,15 +33,16 @@ public class EffectStats extends EffectBase {
 
             if(ArrayUtils.contains(BLACKLISTED_EFFECTS, castInfos.effect.effectUid)){ //Feca special spell
                 target.getBuff().addBuff(new BuffStatsByHit(subInfos, target));
-                return -1;
+            }
+            else if (!target.getBuff().buffMaxStackReached(subInfos)) {
+                BuffStats buffStats = new BuffStats(subInfos, target);
+                if (buffStats.applyEffect(null, null) == -3) {
+                    return -3;
+                }
+                target.getBuff().addBuff(buffStats);
             }
 
-            BuffStats buffStats = new BuffStats(subInfos, target);
-            if (buffStats.applyEffect(null, null) == -3) {
-                return -3;
-            }
 
-            target.getBuff().addBuff(buffStats);
         }
 
         return -1;

@@ -45,6 +45,7 @@ public class ItemDAOImpl extends ItemDAO {
             pStatement.setInt(1, -1);
             pStatement.execute();
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -89,6 +90,7 @@ public class ItemDAOImpl extends ItemDAO {
                 ));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -118,7 +120,7 @@ public class ItemDAOImpl extends ItemDAO {
             try (ConnectionResult conn = dbSource.executeQuery("SELECT template,owner FROM `character_items` WHERE id = "+item.getID()+";")) {
                 ResultSet result = conn.getResult();
                 if(result.first()){
-                    logger.error("Duplicate {} item oldTemplate,owner {} {} ,new {} {}",item.getID(),result.getInt("template"),result.getInt("owner"),item.getTemplate(),item.getOwner());
+                    logger.error("Duplicate {} item oldTemplate,owner {} {} ,new {} {}",item.getID(),result.getInt("template"),result.getInt("owner"),item.getTemplateId(),item.getOwner());
                 }
                 e1.printStackTrace();
             }
@@ -128,6 +130,7 @@ public class ItemDAOImpl extends ItemDAO {
             }
         }
         catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -190,6 +193,7 @@ public class ItemDAOImpl extends ItemDAO {
 
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -205,6 +209,7 @@ public class ItemDAOImpl extends ItemDAO {
 
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

@@ -28,12 +28,7 @@ import koh.game.fights.layers.FightGlyph;
 import koh.game.fights.layers.FightPortal;
 import koh.game.fights.types.AgressionFight;
 import koh.protocol.client.Message;
-import koh.protocol.client.enums.FightStateEnum;
-import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
-import koh.protocol.client.enums.GameActionTypeEnum;
-import koh.protocol.client.enums.SequenceTypeEnum;
-import koh.protocol.client.enums.SpellShapeEnum;
-import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.actions.fight.GameActionFightDeathMessage;
 import koh.protocol.messages.game.context.ShowCellMessage;
 import koh.protocol.types.game.context.EntityDispositionInformations;
@@ -213,26 +208,37 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int tryDie(int casterId, boolean force) {
-        if (force) {
+        /*if (force) {
             this.setLife(0);
-        }
-        if (this.getLife() <= 0) {
+        }*/
+        if (this.getLife() <= 0 || force) {
             this.fight.startSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH);
             //SendGameFightLeaveMessage
-            this.fight.sendToField(new GameActionFightDeathMessage(GameActionTypeEnum.FIGHT_KILLFIGHTER.value, casterId, this.ID));
+            this.fight.sendToField(new GameActionFightDeathMessage(ActionIdEnum.ACTION_CHARACTER_DEATH, casterId, this.ID));
 
-            this.team.getAliveFighters().filter(x -> x.summoner != null && x.summoner.getID() == this.ID).forEach(Fighter -> Fighter.tryDie(this.ID, true));
+            this.team.getAliveFighters()
+                    .filter(x -> x.getSummonerID() == this.ID)
+                    .forEachOrdered(fighter -> fighter.tryDie(this.ID, true));
 
             if (this.fight.getActivableObjects().containsKey(this)) {
                 this.fight.getActivableObjects().get(this).stream().forEach(y -> y.remove());
+            }
 
+            for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
+                fr.getBuff().getBuffsDec().values().forEach(list -> {
+                            for(BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator){
+                                if(buff.caster == this)
+                                    fr.getBuff().debuff(buff);
+                            }
+                });
             }
 
             myCell.removeObject(this);
 
             this.fight.endSequence(SequenceTypeEnum.SEQUENCE_CHARACTER_DEATH, false);
+            this.dead = true;
 
-            if (this.fight.tryEndFight()) {
+            if (!hasSummoner() && this.fight.tryEndFight()) {
                 return -3;
             }
             if (this.fight.getCurrentFighter() == this) {
@@ -270,9 +276,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public int endTurn() {
         this.fight.getActivableObjects().values().stream().forEach((Objects) -> {
-            Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) -> {
-                ((FightPortal) Object).enable(this);
-            });
+            Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) ->
+                ((FightPortal) Object).enable(this)
+            );
         });
         this.spellsController.endTurn();
         int buffResult = this.buff.endTurn();
@@ -291,7 +297,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public boolean isDead() {
-        return this.getLife() <= 0;
+        return this.getLife() <= 0 || dead;
     }
 
     public int currentLife, currentLifeMax;

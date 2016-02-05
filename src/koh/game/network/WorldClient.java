@@ -102,7 +102,7 @@ public class WorldClient {
 
     public boolean canGameAction(GameActionTypeEnum ActionType) {
         synchronized (this.myActions) {
-            this.myActions.values().stream().forEach(x -> System.out.println(x.actionType));
+            //this.myActions.values().stream().forEach(x -> System.out.println(x.actionType));
             return this.myActions.values().stream().allMatch(x -> x.canSubAction(ActionType));
         }
     }

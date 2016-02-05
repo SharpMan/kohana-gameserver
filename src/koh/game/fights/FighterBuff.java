@@ -3,6 +3,7 @@ package koh.game.fights;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
@@ -12,6 +13,7 @@ import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.effects.buff.BuffDecrementType;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffState;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.utils.Couple;
 import lombok.Getter;
@@ -28,11 +30,11 @@ public class FighterBuff {
     public List<Couple<EffectCast, Integer>> delayedEffects = new CopyOnWriteArrayList<>();
     private static final Logger logger = LogManager.getLogger(FighterBuff.class);
 
-    private HashMap<BuffActiveType, ArrayList<BuffEffect>> buffsAct = new HashMap<BuffActiveType, ArrayList<BuffEffect>>() {
+    private ConcurrentHashMap<BuffActiveType, ArrayList<BuffEffect>> buffsAct = new ConcurrentHashMap<BuffActiveType, ArrayList<BuffEffect>>() {
         {
             this.put(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET, new ArrayList<>());
-             this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET_TRAP, new ArrayList<>());
+            this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET_TRAP, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_POST_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_HEAL_AFTER_JET, new ArrayList<>());
@@ -45,11 +47,11 @@ public class FighterBuff {
     };
 
     @Getter
-    private HashMap<BuffDecrementType, ArrayList<BuffEffect>> buffsDec = new HashMap<BuffDecrementType, ArrayList<BuffEffect>>() {
+    private ConcurrentHashMap<BuffDecrementType, CopyOnWriteArrayList<BuffEffect>> buffsDec = new ConcurrentHashMap<BuffDecrementType, CopyOnWriteArrayList<BuffEffect>>(3) {
         {
-            this.put(BuffDecrementType.TYPE_BEGINTURN, new ArrayList<>());
-            this.put(BuffDecrementType.TYPE_ENDTURN, new ArrayList<>());
-            this.put(BuffDecrementType.TYPE_ENDMOVE, new ArrayList<>());
+            this.put(BuffDecrementType.TYPE_BEGINTURN, new CopyOnWriteArrayList<>());
+            this.put(BuffDecrementType.TYPE_ENDTURN, new CopyOnWriteArrayList<>());
+            this.put(BuffDecrementType.TYPE_ENDMOVE, new CopyOnWriteArrayList<>());
 
         }
     };
@@ -58,12 +60,20 @@ public class FighterBuff {
         return Stream.concat(Stream.concat(this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).stream(), this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).stream()), this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE).stream());
     }
 
-    public boolean buffMaxStackReached(BuffEffect Buff) { //CLEARCODE : Distinct state ?
-        return Buff.castInfos.spellLevel != null && Buff.castInfos.spellLevel.getMaxStack() > 0
-                && Buff.castInfos.spellLevel.getMaxStack()
-                <= (Buff instanceof BuffState
-                        ? this.getAllBuffs().filter(x -> x.castInfos.spellId == Buff.castInfos.spellId && x instanceof BuffState && ((BuffState) x).castInfos.effect.value == Buff.castInfos.effect.value).count()
-                        : this.getAllBuffs().filter(x -> x.castInfos.spellId == Buff.castInfos.spellId && x.castInfos.effectType == Buff.castInfos.effectType).count());
+    public boolean buffMaxStackReached(BuffEffect buff) { //CLEARCODE : Distinct state ?
+        return buff.castInfos.spellLevel != null && buff.castInfos.spellLevel.getMaxStack() > 0
+                && buff.castInfos.spellLevel.getMaxStack()
+                <= (buff instanceof BuffState
+                        ? this.getAllBuffs().filter(x -> x.castInfos.spellId == buff.castInfos.spellId && x instanceof BuffState && ((BuffState) x).castInfos.effect.value == buff.castInfos.effect.value).count()
+                        : this.getAllBuffs().filter(x -> x.castInfos.spellId == buff.castInfos.spellId && x.castInfos.effectType == buff.castInfos.effectType).count());
+    }
+
+    public boolean buffMaxStackReached(EffectCast castInfos) {
+        return castInfos.spellLevel != null && castInfos.spellLevel.getMaxStack() > 0
+                && castInfos.spellLevel.getMaxStack()
+                <= (castInfos.effectType == StatsEnum.ADD_STATE
+                ? this.getAllBuffs().filter(x -> x.castInfos.spellId == castInfos.spellId && x instanceof BuffState && ((BuffState) x).castInfos.effect.value == castInfos.effect.value).count()
+                : this.getAllBuffs().filter(x -> x.castInfos.spellId == castInfos.spellId && x.castInfos.effectType == castInfos.effectType).count());
     }
 
     public void addBuff(BuffEffect buff) {
@@ -269,8 +279,18 @@ public class FighterBuff {
             }
         }
 
+        for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE)) {
+            if (Buff.isDebuffable() && Buff.decrementDuration(duration) <= 0) {
+                if (Buff.removeEffect() == -3) {
+                    return -3;
+                }
+            }
+        }
+
         this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.isDebuffable() && x.duration <= 0);
         this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.isDebuffable() && x.duration <= 0);
+        this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE).removeIf(x -> x.isDebuffable() && x.duration <= 0);
+
 
         this.buffsAct.values().stream().forEach((BuffList) -> {
             BuffList.removeIf(x -> x.isDebuffable() && x.duration <= 0);
@@ -296,28 +316,45 @@ public class FighterBuff {
             }
         }
 
-        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
-        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
-
-        this.buffsAct.values().stream().forEach((BuffList) -> {
-            BuffList.removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
-        });
-
-        return -1;
-    }
-
-    public int debuff() {
-        for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
-            if (Buff.isDebuffable()) {
+        for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE)) {
+            if (Buff.castInfos != null && Buff.castInfos.spellId == spell) {
                 if (Buff.removeEffect() == -3) {
                     return -3;
                 }
             }
         }
 
-        for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN)) {
-            if (Buff.isDebuffable()) {
-                if (Buff.removeEffect() == -3) {
+        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
+        this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
+        this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
+
+        this.buffsAct.values().stream().forEach((buffList) -> {
+            buffList.removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
+        });
+
+        return -1;
+    }
+
+    public int debuff() {
+        for (BuffEffect buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
+            if (buff.isDebuffable()) {
+                if (buff.removeEffect() == -3) {
+                    return -3;
+                }
+            }
+        }
+
+        for (BuffEffect buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN)) {
+            if (buff.isDebuffable()) {
+                if (buff.removeEffect() == -3) {
+                    return -3;
+                }
+            }
+        }
+
+        for (BuffEffect buff : this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE)) {
+            if (buff.isDebuffable()) {
+                if (buff.removeEffect() == -3) {
                     return -3;
                 }
             }
@@ -325,10 +362,21 @@ public class FighterBuff {
 
         this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.isDebuffable());
         this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.isDebuffable());
+        this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE).removeIf(x -> x.isDebuffable());
 
-        this.buffsAct.values().stream().forEach((BuffList) -> {
-            BuffList.removeIf(x -> x.isDebuffable());
+        this.buffsAct.values().stream().forEach((buffList) -> {
+            buffList.removeIf(x -> x.isDebuffable());
         });
+
+        return -1;
+    }
+
+    public int debuff(BuffEffect buff){
+        if (buff.removeEffect() == -3)
+            return -3;
+
+        this.buffsDec.get(buff.decrementType).remove(buff);
+        this.buffsAct.get(buff.activeType).remove(buff);
 
         return -1;
     }

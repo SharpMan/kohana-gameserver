@@ -10,7 +10,7 @@ public interface IFightObject {
 
    
 
-    public enum FightObjectType {
+    enum FightObjectType {
 
         OBJECT_FIGHTER(1),
         OBJECT_TRAP(2),

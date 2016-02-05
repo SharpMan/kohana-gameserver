@@ -97,7 +97,7 @@ public class CharacterFighter extends Fighter {
         return super.endTurn();
     }
 
-    public void CleanClone() {
+    public void cleanClone() {
         boolean updated = false;
         for (Fighter Clone : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.getSummoner() == this)::iterator) {
             Clone.tryDie(this.ID);
@@ -118,18 +118,18 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public int beginTurn() {
-        this.CleanClone();
+        this.cleanClone();
         if (this.character.getClient() == null && this.turnRunning <= 0) {
-            return this.tryDie(this.ID, true);
+            return super.tryDie(this.ID, true);
         }
         return super.beginTurn();
     }
 
     @Override
-    public int tryDie(int casterId, boolean Force) {
+    public int tryDie(int casterId, boolean force) {
 
-        this.CleanClone();
-        return super.tryDie(casterId, Force);
+        this.cleanClone();
+        return super.tryDie(casterId, force);
     }
 
     @Override
@@ -174,7 +174,9 @@ public class CharacterFighter extends Fighter {
                 this.character.send(new GameContextCreateMessage((byte) 1));
                 this.character.setFight(null);
                 this.character.refreshStats(false, true);
-                if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && this.team.id == this.fight.getLoosers().id) {
+                if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
+                        && this.team.id == this.fight.getLoosers().id
+                        && this.character.getSavedMap() != this.character.getCurrentMap().getId()) {
                     this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
                 } else {
                     this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));

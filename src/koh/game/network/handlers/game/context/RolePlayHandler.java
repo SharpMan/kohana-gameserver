@@ -171,7 +171,7 @@ public class RolePlayHandler {
     public static void HandleChangeMapMessage(WorldClient client, ChangeMapMessage Message) {
 
         if (client.getCharacter().getCell() == null || !client.getCharacter().getCell().affectMapChange()) {
-            System.out.println("undefined cell");
+            log.error("undefined cell");
             client.send(new BasicNoOperationMessage());
             return;
         }

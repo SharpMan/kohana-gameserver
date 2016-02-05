@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class CharacterInventory {
 
-    public final static int[] unMergeableType = new int[]{97, 121, 18};
+    public final static int[] UN_MERGEABLE_TYPE = new int[]{97, 121, 18};
     //TODO : Updater PartyEntityLook if Dissociate/Associate livingObject
     private Player player;
     private Map<Integer, InventoryItem> itemsCache = new ConcurrentHashMap<>();
@@ -115,7 +115,13 @@ public class CharacterInventory {
     }
 
     public int getItemSetCount() {
-        return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().count();
+        return (int) this.itemsCache.values()
+                .stream()
+                .filter(it -> it.getPosition() != 63 && it.getTemplate().getItemSet() != null)
+                .mapToInt(it -> it.getTemplate().getItemSet().getId())
+                .filter(set -> this.countItemSetEquiped(set) > 1)
+                .distinct()
+                .count();
     }
 
     public void generalItemSetApply() {
@@ -126,7 +132,7 @@ public class CharacterInventory {
 
     public boolean add(InventoryItem item, boolean merge) //muste be true
     {
-        if (merge && !Ints.contains(unMergeableType, item.getTemplate().getTypeId()) && tryMergeItem(item.getTemplateId(), item.getEffects(), item.getSlot(), item.getQuantity(), item, false)) {
+        if (merge && !Ints.contains(UN_MERGEABLE_TYPE, item.getTemplate().getTypeId()) && tryMergeItem(item.getTemplateId(), item.getEffects(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
         }
         if (item.getOwner() != this.player.getID()) {
@@ -285,13 +291,14 @@ public class CharacterInventory {
         player.refreshEntitie();
     }
 
-    public void moveItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
-        InventoryItem item = this.itemsCache.get(guid);
+    public synchronized void moveItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
+        final InventoryItem item = this.itemsCache.get(guid);
         if (item == null || slot == null || item.getSlot() == slot) {
             player.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_UNEQUIP));
             return;
         }
         int count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
+        System.out.println("first count "+count);
         if (slot != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             if (item.getTemplate().getTypeId() == 113) {
                 this.moveLivingItem(guid, slot, quantity);
@@ -303,8 +310,10 @@ public class CharacterInventory {
                 return;
             }
             this.unEquipItem(this.getItemInSlot(slot));
+            count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
+            System.out.println("sec count "+count);
             this.unEquipedDouble(item);
-
+            System.out.println("th count "+count);
             if (item.getTemplate().getLevel() > player.getLevel()) {
                 player.send(new ObjectErrorMessage(ObjectErrorEnum.LEVEL_TOO_LOW));
                 return;
@@ -393,7 +402,7 @@ public class CharacterInventory {
                         } catch (Exception e) {
                         }
                     } else {
-                        this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
+                        this.player.getEntityLook().subentities.removeIf(sub -> sub.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
                     }
                 } else {
                     this.removeApparence(item.getApparrance());
@@ -406,6 +415,7 @@ public class CharacterInventory {
                 this.applyItemSetEffects(item.getTemplate().getItemSet(), count, false, true);
             }
             count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
+            System.out.println("last count "+count);
             if (count > 0) {
                 this.applyItemSetEffects(item.getTemplate().getItemSet(), count, true, false);
             }
@@ -441,7 +451,10 @@ public class CharacterInventory {
     }
 
     private int countItemSetEquiped(int id) {
-        return (int) this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSetId() == id).count();
+        return (int) this.itemsCache.values()
+                .stream()
+                .filter(item -> item.getPosition() != 63 && item.getTemplate().getItemSetId() == id)
+                .count();
     }
 
     private void applyItemSetEffects(ItemSet itemSet, int count, boolean apply, boolean send) {
@@ -492,6 +505,10 @@ public class CharacterInventory {
 
     public InventoryItem getItemInTemplate(int template) {
         return this.itemsCache.values().stream().filter(obj -> obj.getTemplateId() == template).findFirst().orElse(null);
+    }
+
+    public boolean hasItemInSlot(CharacterInventoryPositionEnum slot) {
+        return this.itemsCache.values().stream().anyMatch(x -> x.getSlot() == slot);
     }
 
     public InventoryItem getItemInSlot(CharacterInventoryPositionEnum slot) {
@@ -654,19 +671,19 @@ public class CharacterInventory {
         }
     }
 
-    public void save(boolean Clear) {
-        this.itemsCache.values().parallelStream().forEach(Item -> {
-            if (Item.isNeedRemove()) {
-                DAO.getItems().delete(Item, "character_items");
-            } else if (Item.isNeedInsert()) {
-                DAO.getItems().create(Item, Clear, "character_items");
-            } else if (Item.columsToUpdate != null && !Item.columsToUpdate.isEmpty()) {
-                DAO.getItems().create(Item, Clear, "character_items");
-            } else if (Clear) {
-                Item.totalClear();
+    public void save(boolean clear) {
+        this.itemsCache.values().parallelStream().forEach(item -> {
+            if (item.isNeedRemove()) {
+                DAO.getItems().delete(item, "character_items");
+            } else if (item.isNeedInsert()) {
+                DAO.getItems().create(item, clear, "character_items");
+            } else if (item.columsToUpdate != null && !item.columsToUpdate.isEmpty()) {
+                DAO.getItems().save(item, clear, "character_items");
+            } else if (clear) {
+                item.totalClear();
             }
         });
-        if (!Clear) {
+        if (!clear) {
             return;
         }
         this.player = null;

@@ -12,6 +12,9 @@ import koh.game.network.handlers.Handler;
 import koh.patterns.services.ServicesProvider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.PrintStream;
+
 /**
  * @author Neo-Craft
  */
@@ -35,9 +38,19 @@ public class Main {
         return $InterClient;
     }
 
+    public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
+        return new PrintStream(realPrintStream) {
+            public void print(final String string) {
+                realPrintStream.print(string);
+                logger.error(string);
+            }
+        };
+    }
+
     public static void main(String[] args) {
         try {
             long time = System.currentTimeMillis();
+            System.setErr(createLoggingProxy(System.err));
             Runtime.getRuntime().addShutdownHook(new Thread() {
 
                 @Override
@@ -70,6 +83,7 @@ public class Main {
             logger.error(e.getMessage());
         }
     }
+
     private static void close() {
         try {
             //$RealmServer.stop();

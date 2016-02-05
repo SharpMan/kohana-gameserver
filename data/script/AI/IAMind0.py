@@ -1,7 +1,3 @@
-#
-#		Passive IA Mind
-#		@author: alleos13
-#		@date: 08/06/2013
 from koh.game.entities.mob import IAMind
 from koh.game.fights.AI import AIProcessor
 

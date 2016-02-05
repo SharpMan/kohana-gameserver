@@ -70,9 +70,9 @@ public class SpellLevel {
                 if (this.spellId == 126) {//To patch in DAO After
                     this.effects[i].targetMask = "a";
                 }
-                if(this.spellId == 5567 && this.grade == 3){
+                /*if(this.spellId == 5567 && this.grade == 3){
                     System.out.println(this.effects[i].toString());
-                }
+                }*/
                             /* if(this.effects[i].effectId == 165)
                              System.out.println("hn"+this.spellId);*/
             }

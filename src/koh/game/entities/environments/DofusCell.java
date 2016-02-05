@@ -8,7 +8,6 @@ import java.util.Map;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.maps.pathfinding.MapPoint;
-import koh.game.entities.maps.pathfinding.Pathfinding;
 import koh.protocol.client.enums.DirectionsEnum;
 import lombok.Getter;
 import org.apache.mina.core.buffer.IoBuffer;

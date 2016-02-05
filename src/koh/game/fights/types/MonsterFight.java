@@ -80,8 +80,8 @@ public class MonsterFight extends Fight {
 
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {
-        final MonsterFighter[] deadMobs = this.myTeam2.getFighters()
-                .filter(Fighter -> Fighter instanceof MonsterFighter)
+        final MonsterFighter[] deadMobs = this.myTeam2.getDeadFighters()
+                .filter(fighter -> fighter instanceof MonsterFighter && !fighter.hasSummoner())
                 .map(Fighter -> ((MonsterFighter) Fighter))
                 .toArray(MonsterFighter[]::new);
 

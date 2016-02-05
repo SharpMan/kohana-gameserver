@@ -27,54 +27,60 @@ public class EffectPush extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         byte direction = 0;
-        for (Fighter Target : castInfos.targets.stream().filter(target -> /*!(target instanceof StaticFighter) &&*/ !target.getStates().hasState(FightStateEnum.CARRIED) && !target.getStates().hasState(FightStateEnum.Inébranlable) && !target.getStates().hasState(FightStateEnum.ENRACINÉ) && !target.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+        for (Fighter target : castInfos.targets.stream().filter(Tarrget -> /*!(target instanceof StaticFighter) &&*/ !Tarrget.getStates().hasState(FightStateEnum.CARRIED) && !Tarrget.getStates().hasState(FightStateEnum.Inébranlable) && !Tarrget.getStates().hasState(FightStateEnum.ENRACINÉ) && !Tarrget.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
+            System.out.println(castInfos.effectType);
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
-                    if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId())){
-                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
+                    if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId())){
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
                     }
-                    else if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
-                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
-                    } else if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
-                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
+                    else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId()) && castInfos.cellId != target.getCellId()) {
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.cellId, target.getCellId());
+                    } else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId())) {
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
                     } else {
                         return -1;
                     }
                     break;
                 case ADVANCE_CELL:
                     Fighter pp = castInfos.caster;
-                    castInfos.caster = Target;
-                    Target = pp;
+                    castInfos.caster = target;
+                    target = pp;
                     castInfos.targets.remove(0);
-                    direction = Pathfunction.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
+                    direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId());
                     break;
                 case PULL_FORWARD:
-                    direction = Pathfunction.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.caster.getCellId());
+                    direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId());
+                    if(castInfos.isTrap){
+                        if(target.getCellId() == castInfos.targetKnownCellId)
+                            continue;
+                        direction = Pathfunction.getDirection(target.getFight().getMap(),target.getCellId(),castInfos.cellId);
+                    }
                     if(castInfos.spellId == 5382 || castInfos.spellId == 5475){
-                        direction = Pathfunction.getDirection(Target.getFight().getMap(), Target.getCellId(), castInfos.targetKnownCellId);
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
                     }
                     break;
                 case BACK_CELL:
                     Fighter p = castInfos.caster;
-                    castInfos.caster = Target;
-                    Target = p;
+                    castInfos.caster = target;
+                    target = p;
                     castInfos.targets.remove(0);
-                    if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.cellId, Target.getCellId()) && castInfos.cellId != Target.getCellId()) {
-                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.cellId, Target.getCellId());
-                    } else if (Pathfunction.inLine(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId())) {
-                        direction = Pathfunction.getDirection(Target.getFight().getMap(), castInfos.caster.getCellId(), Target.getCellId());
+                    if (Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId()) && castInfos.cellId != target.getCellId()) {
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.cellId, target.getCellId());
+                    } else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId())) {
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
                     }
                     break;
             }
-            if (EffectPush.ApplyPush(castInfos, Target, direction, castInfos.randomJet(Target)) == -3) {
+            if (EffectPush.applyPush(castInfos, target, direction, castInfos.randomJet(target)) == -3) {
                 return -3;
             }
         }
         return -1;
     }
 
-    public static int ApplyPush(EffectCast CastInfos, Fighter target, byte direction, int length) {
+    public static int applyPush(EffectCast CastInfos, Fighter target, byte direction, int length) {
         FightCell currentCell = target.getMyCell();
         short StartCell = target.getCellId();
         for (int i = 0; i < length; i++) {
@@ -88,7 +94,7 @@ public class EffectPush extends EffectBase {
             } else {
                 int pushResult = -1;
                 if (CastInfos.effectType == StatsEnum.PUSH_BACK) {
-                    pushResult = EffectPush.ApplyPushBackDamages(CastInfos, target, length, i);
+                    pushResult = EffectPush.applyPushBackDamages(CastInfos, target, length, i);
                     if (pushResult != -1) {
                         return pushResult;
                     }
@@ -120,7 +126,7 @@ public class EffectPush extends EffectBase {
         return result;
     }
 
-    public static int ApplyPushBackDamages(EffectCast CastInfos, Fighter Target, int Length, int CurrentLength) {
+    public static int applyPushBackDamages(EffectCast CastInfos, Fighter Target, int Length, int CurrentLength) {
         int DamageCoef = 0;
         if (Target.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
             DamageCoef = 7;

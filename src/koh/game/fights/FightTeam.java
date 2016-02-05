@@ -10,6 +10,7 @@ import koh.game.fights.fighters.DoubleFighter;
 import koh.game.fights.fighters.MonsterFighter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Stream;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
@@ -40,7 +41,7 @@ public class FightTeam {
 
     public AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_WITHOUT;
 
-    private ArrayList<Fighter> myFighters = new ArrayList<>(8);
+    private List<Fighter> myFighters = new ArrayList<>(8);
     public byte id;
     public int LeaderId;
     public Fighter leader;
@@ -145,7 +146,7 @@ public class FightTeam {
     }
 
     public void endFight() {
-        this.myFighters.removeIf(fr -> fr.getSummoner() != null || fr instanceof DoubleFighter); // On delete les invocations
+        this.myFighters.removeIf(fr -> fr.hasSummoner() || fr instanceof DoubleFighter); // On delete les invocations
     }
 
     public void dispose() {

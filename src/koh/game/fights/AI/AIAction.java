@@ -149,6 +149,9 @@ public abstract class AIAction {
             case ADD_VITALITY_PERCENT:
             case ADD_RANGE:
             case PROSPECTING:
+            case ADD_RETRAIT_PA:
+            case ADD_RETRAIT_PM:
+            case ADD_CRITICAL_HIT:
             case ADD_DAMAGE_MAGIC:
             case ADD_HEAL_BONUS:
             case ALL_DAMAGES_BONUS:
@@ -360,7 +363,7 @@ public abstract class AIAction {
 
             default:
             {
-                logger.info("Effect[{}] non defini pour l'IA", effect.getEffectType());
+                logger.error("Effect[{}] non defini pour l'IA", effect.getEffectType());
                 return scoreDamage_I(AI, effect,targets, reverse);
             }
         }

@@ -56,6 +56,7 @@ public class GenericStats {
             put(StatsEnum.SUB_WATER_ELEMENT_REDUCTION, StatsEnum.WATER_ELEMENT_REDUCTION);
             put(StatsEnum.SUB_PUSH_DAMAGES_BONUS, StatsEnum.ADD_PUSH_DAMAGES_BONUS);
             put(StatsEnum.SUB_RANGE, StatsEnum.ADD_RANGE);
+            put(StatsEnum.SUB_RANGE_LAUNCHER, StatsEnum.ADD_RANGE_LAUNCHER);
             put(StatsEnum.SUB_DAMAGE, StatsEnum.ADD_DAMAGE_MAGIC);
             put(StatsEnum.SUB_AIR_ELEMENT_REDUCTION, StatsEnum.AIR_ELEMENT_REDUCTION);
             put(StatsEnum.SUB_AIR_DAMAGES_BONUS, StatsEnum.ADD_AIR_DAMAGES_BONUS);

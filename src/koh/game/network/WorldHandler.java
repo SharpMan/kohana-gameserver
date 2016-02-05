@@ -102,10 +102,11 @@ public class WorldHandler extends IoHandlerAdapter {
         Object objClient = session.getAttribute("session");
         if (objClient != null && objClient instanceof WorldClient) {
             WorldClient client = (WorldClient) objClient;
-            logger.error("(client->proxy->server)[ip:{}]::Error: {}",client.getIP(),ExceptionUtils.getStackTrace(cause));
+            //if(cause.getMessage().contains("java.io.IOException"))
+            logger.error("(client->server)[ip:{}]::Error: {}",client.getIP(), ExceptionUtils.getStackTrace(cause));
             client.close();
         } else {
-            logger.error("(client->proxy->server)::Error:{}" , ExceptionUtils.getStackTrace(cause));
+            logger.error("(client->server)::Error:{}" , ExceptionUtils.getStackTrace(cause));
             session.close(false);
         }
     }

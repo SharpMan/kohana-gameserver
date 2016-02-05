@@ -52,7 +52,6 @@ public class EffectActivableObject extends EffectBase {
     }
 
     public static GameActionMarkCellsTypeEnum GetMarkType(SpellShapeEnum Shape) {
-        System.out.println(Shape);
         switch (Shape) {
             case C:
             case Q:

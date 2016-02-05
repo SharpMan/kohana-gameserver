@@ -35,7 +35,7 @@ public class EffectPerception extends EffectBase {
                         Fighter fighter = (Fighter) fightObject;
                         if (fighter.isEnnemyWith(castInfos.caster)) {
                             if (fighter instanceof CharacterFighter && fighter.getTeam().getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.getSummoner() == fighter)) {
-                                ((CharacterFighter) fighter).CleanClone();
+                                ((CharacterFighter) fighter).cleanClone();
                             } else if (fighter.getVisibleState() == GameActionFightInvisibilityStateEnum.INVISIBLE) {
                                 fighter.setVisibleState(GameActionFightInvisibilityStateEnum.DETECTED);
                                 castInfos.caster.getFight().sendToField(new GameActionFightInvisibleDetectedMessage(ACTION_CHARACTER_MAKE_INVISIBLE, castInfos.caster.getID(), fighter.getID(), fighter.getCellId()));

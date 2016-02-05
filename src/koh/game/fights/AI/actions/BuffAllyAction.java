@@ -743,7 +743,7 @@ public class BuffAllyAction extends AIAction {
     @Override
     protected double scoreRemStateBad(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         double score = 0;
-        int baseScore = 11;
+        final int baseScore = 11;
         for (Fighter fighter : targets)
         {
             int currScore = baseScore;
@@ -785,7 +785,7 @@ public class BuffAllyAction extends AIAction {
             return 0;
         }
         double score = 0;
-        int baseScore = 11;
+        final int baseScore = 11;
 
         //BaseScore *= effect.randomJet();
 
@@ -794,7 +794,7 @@ public class BuffAllyAction extends AIAction {
             int currScore = baseScore;
             List<Fighter> cible = new ArrayList<>();
             cible.add(target);
-            for(ArrayList<BuffEffect> buffs : target.getBuff().getBuffsDec().values()){
+            for(List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()){
                 for(BuffEffect buff : buffs){
                     currScore += (int)this.getEffectScore(AI, (short)-1, (short)-1, buff.castInfos.effect, cible, true,false);
                 }

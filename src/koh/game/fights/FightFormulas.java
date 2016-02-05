@@ -177,15 +177,15 @@ public class FightFormulas {
         if (fighter.getCharacter().getMountInfo() == null) {
             logger.error("mountInfo Null {} ", fighter.getCharacter().toString());
         }
-        if (!fighter.getCharacter().getMountInfo().isToogled) {
+        if (!fighter.getCharacter().getMountInfo().isToogled || fighter.getCharacter().getMountInfo().mount == null) {
             return 0;
         }
 
         int diff = Math.abs(fighter.getLevel() - fighter.getCharacter().getMountInfo().mount.level);
 
         double coeff = 0;
-        double xp = (double) xpWin.get();
-        double pToMount = (double) fighter.getCharacter().getMountInfo().ratio / 100 + 0.2;
+        final double xp =  xpWin.get();
+        double pToMount = fighter.getCharacter().getMountInfo().ratio / 100f + 0.2;
 
         if (diff >= 0 && diff <= 9) {
             coeff = 0.1;

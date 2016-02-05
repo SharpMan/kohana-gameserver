@@ -134,7 +134,7 @@ public class ChallengeFight extends Fight {
 
     @Override
     public int getTurnTime() {
-        return 30000;
+        return 45000;
     }
 
     @Override

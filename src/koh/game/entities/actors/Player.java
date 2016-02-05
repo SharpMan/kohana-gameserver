@@ -683,7 +683,18 @@ public class Player extends IGameActor implements Observer {
     }
 
     public ActorExtendedAlignmentInformations getActorAlignmentExtendInformations() {
-        return new ActorExtendedAlignmentInformations(this.alignmentSide.value, this.alignmentValue, this.PvPEnabled == AggressableStatusEnum.NON_AGGRESSABLE ? 0 : this.alignmentGrade, this.getCharacterPower(), this.honor, DAO.getExps().getLevel(this.alignmentGrade).getPvP(), DAO.getExps().getLevel(this.alignmentGrade == 10 ? 10 : this.alignmentGrade + 1).getPvP(), this.PvPEnabled);
+        if(DAO.getExps().getLevel(this.alignmentGrade) == null)
+            logger.error("lga1");
+        else if(alignmentSide == null)
+            logger.error("lga2");
+        return new ActorExtendedAlignmentInformations(this.alignmentSide.value,
+                this.alignmentValue,
+                this.PvPEnabled == AggressableStatusEnum.NON_AGGRESSABLE ? 0 : this.alignmentGrade,
+                this.getCharacterPower(),
+                this.honor,
+                DAO.getExps().getLevel(this.alignmentGrade).getPvP(),
+                DAO.getExps().getLevel(this.alignmentGrade == 10 ? 10 : this.alignmentGrade + 1).getPvP(),
+                this.PvPEnabled);
     }
 
     public CharacterBaseInformations toBaseInformations() {

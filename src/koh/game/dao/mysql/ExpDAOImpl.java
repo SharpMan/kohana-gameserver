@@ -22,11 +22,11 @@ public class ExpDAOImpl extends ExpDAO {
     @Inject
     private DatabaseSource dbSource;
 
-    private TabMap<ExpLevel> ExpLevels;
+    private TabMap<ExpLevel> expLevels;
     private int maxLevel;
 
     private void computeMaxLevel() {
-        for (ExpLevel e : ExpLevels.toTab())
+        for (ExpLevel e : expLevels.toTab())
             if (e.getLevel() > maxLevel)
                 maxLevel = e.getLevel();
     }
@@ -47,9 +47,9 @@ public class ExpDAOImpl extends ExpDAO {
 
     private void loadAll() {
         ArrayList<ExpLevel> arr_levels = loadExp();
-        ExpLevels = new TabMap<>(ExpLevel.class, arr_levels.size(), 1);
+        expLevels = new TabMap<>(ExpLevel.class, arr_levels.size(), 1);
         for (ExpLevel lev : arr_levels) {
-            ExpLevels.add(lev.getLevel(), lev);
+            expLevels.add(lev.getLevel(), lev);
         }
         arr_levels.clear();
         computeMaxLevel();
@@ -63,7 +63,7 @@ public class ExpDAOImpl extends ExpDAO {
         if (level < 1)
             level = 1;
 
-        return ExpLevels.get(level);
+        return expLevels.get(level);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ExpDAOImpl extends ExpDAO {
         if (level < 1)
             level = 1;
 
-        return ExpLevels.get(level).getPlayer();
+        return expLevels.get(level).getPlayer();
     }
 
     @Override
@@ -85,7 +85,7 @@ public class ExpDAOImpl extends ExpDAO {
         if (level <= 1)
             level = 1;
 
-        return ExpLevels.get(++level).getPlayer();
+        return expLevels.get(++level).getPlayer();
     }
 
     @Override

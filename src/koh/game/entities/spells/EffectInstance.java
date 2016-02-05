@@ -261,11 +261,12 @@ public class EffectInstance implements Serializable {
                         }
                         break;
                     case 'f':
-                        verify = !((monsterInfo != null) && ((pEffect.targetMask.contains("f" + monsterInfo.creatureGenericId))));
+                        //verify = !((monsterInfo != null) && ((pEffect.targetMask.contains("f" + monsterInfo.creatureGenericId))));
+                        verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
 
                         break;
                     case 'F':
-                        verify = ((monsterInfo != null) && ((pEffect.targetMask.contains("F" + monsterInfo.creatureGenericId))));
+                        verify = ((monsterInfo != null) &&((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
 
                         /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
                          return true;

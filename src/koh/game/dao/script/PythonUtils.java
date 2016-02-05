@@ -16,7 +16,8 @@ public class PythonUtils {
 
         PythonInterpreter interpreter = new PythonInterpreter();
         interpreter.execfile(pathToJythonModule);
-        String tempName = pathToJythonModule.substring(pathToJythonModule.lastIndexOf("/") + 1);
+
+        String tempName = pathToJythonModule.substring(pathToJythonModule.lastIndexOf(isWindows() ? "\\" : "/") + 1);
         tempName = tempName.substring(0, tempName.indexOf("."));
         String instanceName = tempName.toLowerCase();
         String javaClassName = tempName.substring(0, 1).toUpperCase() + tempName.substring(1);
@@ -118,4 +119,16 @@ public class PythonUtils {
         }
         return builder.toString().trim();
     }
+
+    private static String OS = null;
+    public static String getOsName()
+    {
+        if(OS == null) { OS = System.getProperty("os.name"); }
+        return OS;
+    }
+    public static boolean isWindows()
+    {
+        return getOsName().startsWith("Windows");
+    }
+
 }

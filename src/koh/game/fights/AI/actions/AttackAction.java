@@ -689,7 +689,7 @@ public class AttackAction extends AIAction {
             int currScore = baseScore;
             List<Fighter> cible = new ArrayList<>();
             cible.add(target);
-            for (ArrayList<BuffEffect> buffs : target.getBuff().getBuffsDec().values()) {
+            for (List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()) {
                 for (BuffEffect buff : buffs) {
                     currScore += (int) this.getEffectScore(AI, (short) -1, (short) -1, buff.castInfos.effect, cible, true, false);
                 }

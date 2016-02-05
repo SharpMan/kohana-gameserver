@@ -28,7 +28,7 @@ public class Account {
         right = message.rights;
         secretQuestion = message.secretQuestion;
         secretAnswer = message.secretAnswer;
-        lastIP = message.lastAddress;
+        lastIP = message.lastAddress == null ? "" : message.lastAddress;
         last_login = message.lastLogin;
     }
 

@@ -60,10 +60,9 @@ public class Pathfunction {
         short transitCell = 0;
         do {
             transitCell = decodePath.transitCells.get(index);
-            System.out.println(Enumerable.join(encodedPath));
+            //System.out.println(Enumerable.join(encodedPath));
             int length = Pathfunction.isValidLine(fight, fighter, finalPath, transitCell, decodePath.getDirection(index), decodePath.transitCells.get(decodePath.transitCells.size() == 1 ? index : index + 1));
             if (length == -1) {
-                System.out.println(transitCell +" "+decodePath.transitCells.get(decodePath.transitCells.size() == 1 ? index : index + 1));
                 return null;
             } else if (length == -2) {
                 break;

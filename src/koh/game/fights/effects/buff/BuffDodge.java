@@ -32,7 +32,7 @@ public class BuffDodge extends BuffEffect {
         byte Direction = Pathfunction.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
 
         // Application du push
-        return EffectPush.ApplyPush(SubInfos, this.target, Direction, 1);
+        return EffectPush.applyPush(SubInfos, this.target, Direction, 1);
     }
 
     @Override

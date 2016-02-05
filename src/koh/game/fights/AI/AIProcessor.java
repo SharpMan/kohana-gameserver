@@ -3,13 +3,10 @@ package koh.game.fights.AI;
 import koh.concurrency.ImprovedCachedThreadPool;
 import koh.game.actions.GameMapMovement;
 import koh.game.dao.DAO;
-import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.Pathfunction;
-import koh.game.entities.environments.Pathmaker;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.maps.pathfinding.MapPoint;
-import koh.game.entities.maps.pathfinding.Pathfinding;
 import koh.game.entities.mob.IAMind;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -24,8 +21,6 @@ import koh.game.fights.fighters.DoubleFighter;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.fights.fighters.VirtualFighter;
 import koh.game.fights.utils.Path;
-import koh.game.paths.PathNotFoundException;
-import koh.game.paths.Pathfinder;
 import koh.protocol.client.enums.IAMindEnum;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -218,7 +213,7 @@ public class AIProcessor {
         }
     }
 
-    protected void selectBestSpell(AIAction Action, SpellLevel spell, short currentCell) {
+    protected void selectBestSpell(AIAction action, SpellLevel spell, short currentCell) {
         Short[] cells = fighter.getCastZone(spell, currentCell);
         for (Short cell : cells) {
             FightCell fightCell = this.fight.getCell(cell);
@@ -226,7 +221,7 @@ public class AIProcessor {
             if (fightCell != null) {
                 Fighter firstTarget = fightCell.getFighter();
                 if (this.fight.canLaunchSpell(this.fighter, spell, currentCell, cell, firstTarget == null ? -1 : firstTarget.getID())) {
-                    double score = this.getSpellScore(Action, spell, currentCell, cell);
+                    double score = this.getSpellScore(action, spell, currentCell, cell);
 
                     int distance = (Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), currentCell) * 5);
                     if (score > 0)
@@ -289,8 +284,6 @@ public class AIProcessor {
             }
 
         }
-        if(score > 0)
-        System.out.println("finalscore"+score);
         return score;
     }
 
@@ -411,7 +404,7 @@ public class AIProcessor {
 
     public boolean moveToEnnemyByCell(int minDistance,int maxDistance)
     {
-        int bestDistance = 64;
+        int bestDistance = 74;
         Fighter bestEnnemy = null;
         for (Fighter ennemy : (Iterable<Fighter>) this.fight.getEnnemyTeam(this.fighter.getTeam()).getAliveFighters()::iterator)
         {

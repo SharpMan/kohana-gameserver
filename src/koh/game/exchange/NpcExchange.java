@@ -4,9 +4,8 @@ import com.google.common.primitives.Ints;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.mysql.ItemTemplateDAOImpl;
 import koh.game.entities.actors.Npc;
-import static koh.game.entities.actors.character.CharacterInventory.unMergeableType;
+import static koh.game.entities.actors.character.CharacterInventory.UN_MERGEABLE_TYPE;
 import koh.game.entities.actors.npc.NpcItem;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -64,7 +63,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        if (Ints.contains(unMergeableType, DAO.getItemTemplates().getTemplate(templateId).getTypeId())) {
+        if (Ints.contains(UN_MERGEABLE_TYPE, DAO.getItemTemplates().getTemplate(templateId).getTypeId())) {
             quantity = 1;
         }
 

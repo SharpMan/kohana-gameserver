@@ -49,7 +49,6 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
                     .filter(file -> file.toString().endsWith(".py"))
                     .forEach((Path file) ->
                     {
-                        System.out.println(file.toAbsolutePath().toString());
                         this.chatCommands.put(file.getFileName()
                                         .toString()
                                         .substring(0, file.getFileName().toString().length() - 10)

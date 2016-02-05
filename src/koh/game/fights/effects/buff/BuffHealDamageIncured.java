@@ -16,9 +16,9 @@ public class BuffHealDamageIncured extends BuffEffect {
 
     private final int JET;
 
-    public BuffHealDamageIncured(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
-        this.JET = CastInfos.randomJet(Target);
+    public BuffHealDamageIncured(EffectCast castInfos, Fighter target) {
+        super(castInfos, target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+        this.JET = castInfos.randomJet(target);
     }
 
     @Override
