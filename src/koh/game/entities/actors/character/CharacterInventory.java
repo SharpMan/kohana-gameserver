@@ -298,7 +298,6 @@ public class CharacterInventory {
             return;
         }
         int count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
-        System.out.println("first count "+count);
         if (slot != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             if (item.getTemplate().getTypeId() == 113) {
                 this.moveLivingItem(guid, slot, quantity);
@@ -311,9 +310,7 @@ public class CharacterInventory {
             }
             this.unEquipItem(this.getItemInSlot(slot));
             count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
-            System.out.println("sec count "+count);
             this.unEquipedDouble(item);
-            System.out.println("th count "+count);
             if (item.getTemplate().getLevel() > player.getLevel()) {
                 player.send(new ObjectErrorMessage(ObjectErrorEnum.LEVEL_TOO_LOW));
                 return;
@@ -334,9 +331,21 @@ public class CharacterInventory {
             }
 
             if (item.getQuantity() > 1) {
-                /*InventoryItem NewItem = */
-                tryCreateItem(item.getTemplateId(), this.player, 1, slot.value(), item.getEffectsCopy());
+                final InventoryItem newItem = tryCreateItem(item.getTemplateId(), this.player, 1, slot.value(), item.getEffectsCopy());
                 this.updateObjectquantity(item, item.getQuantity() - 1);
+                this.checkItemsCriterias();
+                if ( newItem.getTemplate().getItemSet() != null) {
+                    if (count >= 0) {
+                        this.applyItemSetEffects( newItem.getTemplate().getItemSet(), count, false, true);
+                    }
+                    count = this.countItemSetEquiped( newItem.getTemplate().getItemSetId());
+                    if (count > 0) {
+                        this.applyItemSetEffects( newItem.getTemplate().getItemSet(), count, true, false);
+                    }
+                    this.sendSetUpdateMessage( newItem.getTemplate().getItemSet(), count);
+                }
+                player.refreshStats();
+                player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
                 return;
             }
             if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
@@ -415,7 +424,6 @@ public class CharacterInventory {
                 this.applyItemSetEffects(item.getTemplate().getItemSet(), count, false, true);
             }
             count = this.countItemSetEquiped(item.getTemplate().getItemSetId());
-            System.out.println("last count "+count);
             if (count > 0) {
                 this.applyItemSetEffects(item.getTemplate().getItemSet(), count, true, false);
             }
