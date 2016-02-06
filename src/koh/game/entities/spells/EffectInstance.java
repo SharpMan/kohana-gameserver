@@ -287,13 +287,13 @@ public class EffectInstance implements Serializable {
                         verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.getID() == pTriggeringSpellCasterId)));
                         break;
                     case 'p':
-                        verify = !pTargetId.hasSummoner();
+                        verify = pTargetId.hasSummoner();
                         break;
                     case 'P':
                         /*if (pTargetId instanceof BombFighter || t) { //TEmpororaire = bug
                             verify = true;
                         }*/
-                        verify = pTargetId.hasSummoner();
+                        verify = !pTargetId.hasSummoner();
                         break;
                     case 'T':
                         break;

@@ -2,6 +2,8 @@ package koh.game.fights.AI.actions;
 
 import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfunction;
+import koh.game.entities.environments.cells.Zone;
+import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.entities.spells.EffectInstanceDice;
@@ -20,6 +22,7 @@ import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -1199,25 +1202,22 @@ public class HealHimselfAction extends AIAction {
         final int spellLevel = effect.diceSide;
 
         if (!AI.getNeuron().myScoreSpells.containsKey(spellId)) {
-            MonsterTemplate monster = DAO.getMonsters().find(spellId);
-            // Template de monstre existante
-            if (monster != null) {
-                final SpellLevel spell = DAO.getSpells().findSpell(spellId).getSpellLevels()[spellLevel == 0 ? 0 : spellLevel - 1];
+           final SpellLevel spell = DAO.getSpells().findSpell(spellId).getSpellLevels()[spellLevel == 0 ? 0 : spellLevel - 1];
                 // Level de monstre existant
                 if (spell != null) {
-                    final List<Fighter> possibleTargets = new ArrayList<Fighter>() {{
+                    final List<Fighter> possibleTargets = new ArrayList<Fighter>(1) {{
                         add(AI.getFighter());
                     }};
 
                     for (EffectInstanceDice spellEffect : spell.getEffects()) {
-                        int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
-                        if (currScore > 0) {
-                            score += currScore;
-                        }
-                    }
-
-                    for (EffectInstanceDice spellEffect : spell.getEffects()) {
-                        int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                        final List<Fighter> targetsOnZone = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(AI.getFighter().getCellId()).advancedOrientationTo(MapPoint.fromCellId(AI.getFighter().getCellId()), true), AI.getFight().getMap()))
+                                .getCells(AI.getFighter().getCellId()))
+                                .map(cell -> AI.getFight().getCell(AI.getFighter().getCellId()))
+                                .filter(cell -> cell != null && cell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER, IFightObject.FightObjectType.OBJECT_STATIC))
+                                .map(fightCell -> fightCell.getObjectsAsFighter()[0])
+                                .collect(Collectors.toList());
+                        int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, targetsOnZone, false, true);
+                        System.out.println(currScore);
                         if (currScore > 0) {
                             score += currScore;
                         }
@@ -1227,7 +1227,7 @@ public class HealHimselfAction extends AIAction {
                     AI.getNeuron().myScoreSpells.put(spellId, score);
                     return score;
                 }
-            }
+
         } else {
             return AI.getNeuron().myScoreSpells.get(spellId);
         }

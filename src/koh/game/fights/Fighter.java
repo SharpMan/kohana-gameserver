@@ -395,7 +395,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfunction.GetEnnemyNear(fight, team, this.getCellId(), true)) {
+        for (Fighter Tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId(), true)) {
             if (num1 == 0.0) {
                 num1 = this.getTacklePercent(Tackler);
             } else {
@@ -464,7 +464,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfunction.GetEnnemyNear(fight, team, this.getCellId())) {
+        for (Fighter Tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId())) {
             {
                 if (num1 == 0.0) {
                     num1 = this.getTacklePercent(Tackler);

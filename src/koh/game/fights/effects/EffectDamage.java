@@ -1,5 +1,6 @@
 package koh.game.fights.effects;
 
+import koh.game.entities.environments.Paddock;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffDamage;
 import koh.game.fights.effects.buff.BuffReflectSpell;
@@ -8,6 +9,8 @@ import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.*;
 import org.apache.commons.lang3.mutable.MutableInt;
+
+import java.util.Iterator;
 
 /**
  *
@@ -28,12 +31,34 @@ public class EffectDamage extends EffectBase {
             });
         } else // Dommage direct
         {
-            for (Fighter Target : castInfos.targets) {
+            if(castInfos.targets.stream().anyMatch(target -> target.getStates().hasState(FightStateEnum.ECOLOGISTE) || target.getStates().hasState(FightStateEnum.ÉCOLOGISTE) )){
+                final Iterator<Fighter> iTarget = castInfos.targets.iterator();
+                while (iTarget.hasNext()){
+                    final Fighter victim = iTarget.next();
+                    if((victim.getStates().hasState(FightStateEnum.ECOLOGISTE) || victim.getStates().hasState(FightStateEnum.ÉCOLOGISTE))
+                            && !castInfos.targets.contains(victim) ){
+                        castInfos.targets.add(victim);
+                    }
+                }
+            }
+            for (Fighter target : castInfos.targets) {
                 //Eppe de iop ?
-                MutableInt DamageValue = new MutableInt(castInfos.randomJet(Target));
+                MutableInt damageValue = new MutableInt(castInfos.randomJet(target));
 
-                if (EffectDamage.applyDamages(castInfos, Target, DamageValue) == -3) {
+                if (EffectDamage.applyDamages(castInfos, target, damageValue) == -3) {
                     return -3;
+                }
+
+                if(target.getStates().hasState(FightStateEnum.ECOLOGISTE) || target.getStates().hasState(FightStateEnum.ÉCOLOGISTE)){
+                    target.getTeam().getAliveFighters()
+                            .filter(fr -> !castInfos.targets.contains(fr))
+                            .forEach(fighter -> {
+                                MutableInt DamageValue = new MutableInt(castInfos.randomJet(target));
+
+                                if (EffectDamage.applyDamages(castInfos, target, DamageValue) == -3) {
+                                    return -3;
+                                }
+                            });
                 }
             }
         }

@@ -1,7 +1,6 @@
 package koh.game.entities.environments;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import koh.game.entities.maps.pathfinding.MapPoint;
@@ -15,7 +14,6 @@ import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.utils.Enumerable;
 
 /**
  *
@@ -114,23 +112,23 @@ public class Pathfunction {
             return true;
         }
         if (team != null) {
-            return GetEnnemyNear(fight, team, cellId, true).size() > 0;
+            return getEnnemyNear(fight, team, cellId, true).size() > 0;
         } else {
             return false;
         }
     }
 
-    public static ArrayList<Fighter> GetEnnemyNear(Fight fight, FightTeam team, short cellId) {
-        return GetEnnemyNear(fight, team, cellId, false);
+    public static ArrayList<Fighter> getEnnemyNear(Fight fight, FightTeam team, short cellId) {
+        return getEnnemyNear(fight, team, cellId, false);
     }
 
-    public static ArrayList<Fighter> GetEnnemyNear(Fight fight, FightTeam team, short cellId, boolean notVisible) {
+    public static ArrayList<Fighter> getEnnemyNear(Fight fight, FightTeam team, short cellId, boolean notVisible) {
         ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfunction.FIGHT_DIRECTIONS) {
-            Fighter Ennemy = fight.hasEnnemyInCell((short) Pathfunction.nextCell(cellId, Direction), team);
+            Fighter Ennemy = fight.hasEnnemyInCell(Pathfunction.nextCell(cellId, Direction), team);
             if (Ennemy != null) {
-                if (!Ennemy.isDead() && !(notVisible && Ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE)) {
+                if (!Ennemy.isDead() && !(notVisible && Ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) && !(Ennemy instanceof BombFighter)) {
                     ennemies.add(Ennemy);
                 }
             }

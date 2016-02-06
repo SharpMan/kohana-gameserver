@@ -37,6 +37,13 @@ public class FighterState {
         return this.myStates.containsKey(State);
     }
 
+    public boolean hasState(FightStateEnum... states) {
+        for(FightStateEnum state : states)
+            if(!this.myStates.containsKey(state))
+                return false;
+        return true;
+    }
+
     public BuffEffect getBuffByState(FightStateEnum fse) {
         return myStates.get(fse);
     }

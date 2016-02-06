@@ -119,14 +119,11 @@ public class AIProcessor {
                         neuron = null;
                     }
                 }
-                BACKGROUND_WORKER.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                BACKGROUND_WORKER.execute(() -> {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 });
             } while (canPlay());
@@ -234,7 +231,6 @@ public class AIProcessor {
                         if (score > 0)
                             score += 50;
                     }
-
                     if (score > neuron.myBestScore) {
                         neuron.myBestScore = (int) score;
                         neuron.myBestSpell = spell;
@@ -267,7 +263,7 @@ public class AIProcessor {
     protected double getSpellScore(AIAction action, SpellLevel spell, short currentCellId, short castCell) {
         double score = 0;
         for (EffectInstanceDice effect : spell.getEffects()) {
-            final List<Fighter> targets = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castCell), true), this.fight.getMap()))
+            final List<Fighter> targets = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(currentCellId).advancedOrientationTo(MapPoint.fromCellId(castCell), true), this.fight.getMap()))
                     .getCells(castCell))
                     .map(cell -> fight.getCell(cell))
                     .filter(cell -> cell != null && cell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER, IFightObject.FightObjectType.OBJECT_STATIC))

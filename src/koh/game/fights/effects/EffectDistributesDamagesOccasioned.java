@@ -14,7 +14,7 @@ public class EffectDistributesDamagesOccasioned extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        int Apply = -1;
+        int apply = -1;
         for (Fighter target : castInfos.targets) {
             int damageJet = (castInfos.damageValue * castInfos.randomJet(target)) / 100;
             if (damageJet < 0 || (castInfos.caster.hasState(FightStateEnum.PACIFISTE.value) && !castInfos.isGlyph)) {
@@ -51,11 +51,11 @@ public class EffectDistributesDamagesOccasioned extends EffectBase {
                 }
             }
             int newValue = target.tryDie(castInfos.caster.getID());
-            if (newValue < Apply) {
-                Apply = newValue;
+            if (newValue < apply) {
+                apply = newValue;
             }
         }
-        return Apply;
+        return apply;
     }
 
 }

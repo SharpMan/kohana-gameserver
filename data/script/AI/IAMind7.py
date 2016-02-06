@@ -11,9 +11,13 @@ class IAMind7(IAMind):
         if IA.getUsedNeurons() == 1:
             IA.initCells()
             IA.attack()
+            if IA.getNeuron().isAttacked() is False :
+                IA.moveToEnnemy()
         elif IA.getUsedNeurons() == 2:
             IA.initCells()
             IA.attack()
+            if IA.getNeuron().isAttacked() is False :
+                IA.moveToEnnemy()
         elif IA.getUsedNeurons() == 3:
             IA.initCells()
             IA.attack()
