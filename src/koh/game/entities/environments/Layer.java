@@ -1,12 +1,15 @@
 package koh.game.entities.environments;
 
 import koh.protocol.client.BufUtils;
+import koh.utils.Enumerable;
+import lombok.ToString;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  *
  * @author Neo-Craft
  */
+@ToString
 public class Layer {
 
     private DofusMap map;

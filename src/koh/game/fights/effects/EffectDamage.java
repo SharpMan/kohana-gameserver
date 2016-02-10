@@ -32,33 +32,21 @@ public class EffectDamage extends EffectBase {
         } else // Dommage direct
         {
             if(castInfos.targets.stream().anyMatch(target -> target.getStates().hasState(FightStateEnum.ECOLOGISTE) || target.getStates().hasState(FightStateEnum.ÉCOLOGISTE) )){
-                final Iterator<Fighter> iTarget = castInfos.targets.iterator();
-                while (iTarget.hasNext()){
-                    final Fighter victim = iTarget.next();
-                    if((victim.getStates().hasState(FightStateEnum.ECOLOGISTE) || victim.getStates().hasState(FightStateEnum.ÉCOLOGISTE))
-                            && !castInfos.targets.contains(victim) ){
+                final Iterator<Fighter> targertsIterator = castInfos.targets.stream()
+                        .filter(target -> target.getStates().hasState(FightStateEnum.ECOLOGISTE) || target.getStates().hasState(FightStateEnum.ÉCOLOGISTE) )
+                        .iterator();
+                while (targertsIterator.hasNext()){
+                    final Fighter victim = targertsIterator.next();
+                    if(!castInfos.targets.contains(victim) ){
                         castInfos.targets.add(victim);
                     }
                 }
             }
             for (Fighter target : castInfos.targets) {
-                //Eppe de iop ?
                 MutableInt damageValue = new MutableInt(castInfos.randomJet(target));
 
                 if (EffectDamage.applyDamages(castInfos, target, damageValue) == -3) {
                     return -3;
-                }
-
-                if(target.getStates().hasState(FightStateEnum.ECOLOGISTE) || target.getStates().hasState(FightStateEnum.ÉCOLOGISTE)){
-                    target.getTeam().getAliveFighters()
-                            .filter(fr -> !castInfos.targets.contains(fr))
-                            .forEach(fighter -> {
-                                MutableInt DamageValue = new MutableInt(castInfos.randomJet(target));
-
-                                if (EffectDamage.applyDamages(castInfos, target, DamageValue) == -3) {
-                                    return -3;
-                                }
-                            });
                 }
             }
         }

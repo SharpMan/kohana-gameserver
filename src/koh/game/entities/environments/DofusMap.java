@@ -401,21 +401,21 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public InteractiveElement[] toInteractiveElements(Player Actor) {
+    public InteractiveElement[] toInteractiveElements(Player actor) {
         return this.interactiveElements.stream().map(Element -> new InteractiveElementWithAgeBonus(Element.elementId,
                 Element.elementTypeId,
-                Element.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId)).toArray(InteractiveElementSkill[]::new),
-                Element.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Element.elementId))).toArray(InteractiveElementSkill[]::new),
+                Element.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, actor) && staticElementIsOpened(Element.elementId)).toArray(InteractiveElementSkill[]::new),
+                Element.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, actor) && staticElementIsOpened(Element.elementId))).toArray(InteractiveElementSkill[]::new),
                 Element.ageBonus)
         ).toArray(InteractiveElement[]::new);
     }
 
-    public InteractiveElement toInteractiveElement(Player Actor, int elementId) {
+    public InteractiveElement toInteractiveElement(Player actor, int elementId) {
         InteractiveElementStruct Struct = this.getInteractiveElementStruct(elementId);
         return new InteractiveElementWithAgeBonus(Struct.elementId,
                 Struct.elementTypeId,
-                Struct.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId)).toArray(InteractiveElementSkill[]::new),
-                Struct.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, Actor) && staticElementIsOpened(Struct.elementId))).toArray(InteractiveElementSkill[]::new),
+                Struct.skills.stream().filter(Skill -> InteractiveElementAction.canDoAction(Skill.skillId, actor) && staticElementIsOpened(Struct.elementId)).toArray(InteractiveElementSkill[]::new),
+                Struct.skills.stream().filter(Skill -> !(InteractiveElementAction.canDoAction(Skill.skillId, actor) && staticElementIsOpened(Struct.elementId))).toArray(InteractiveElementSkill[]::new),
                 Struct.ageBonus
         );
     }
