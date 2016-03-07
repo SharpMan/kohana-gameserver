@@ -205,8 +205,12 @@ public class WorldClient {
         }
     }
 
+    public InetSocketAddress getRemoteAddress() {
+        return (InetSocketAddress) session.getRemoteAddress();
+    }
+
     public String getIP() {
-        return ((InetSocketAddress) this.session.getRemoteAddress()).getAddress().toString();
+        return this.getRemoteAddress().getAddress().getHostAddress();
     }
 
     public Account getAccount() {

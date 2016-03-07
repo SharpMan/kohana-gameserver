@@ -20,41 +20,31 @@ import org.reflections.util.ConfigurationBuilder;
  */
 public class Handler {
 
-    public static Set<Method> methods;
-    public static Set<Class<?>> classes;
     public static Map<Integer, Method> handlers = new HashMap<>();
     public static Map<Integer, Class<? extends Message>> messages = new HashMap<>();
 
-    public static int initialize() {
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
+    public static final int initialize() {
+        final Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("koh.game.network.handlers"))
                 .setScanners(new MethodAnnotationsScanner()));
 
-        methods = reflections.getMethodsAnnotatedWith(HandlerAttribute.class);
-        methods.stream().forEach((method) ->
+        reflections.getMethodsAnnotatedWith(HandlerAttribute.class).forEach((method) ->
                 handlers.put(method.getDeclaredAnnotation(HandlerAttribute.class).ID(), method)
         );
-        methods.clear();
         return handlers.size();
     }
 
     public static Method getMethodByMessage(Integer id) {
-        //if (HANDLERS.containsKey(id)) {
-           return handlers.get(id);
-        /*}
-        return null;*/
+        return handlers.get(id);
     }
 
-    public static int initializeMessage() throws NoSuchFieldException, InstantiationException, IllegalAccessException {
+    public static final int initializeMessage() throws NoSuchFieldException, InstantiationException, IllegalAccessException {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("koh.protocol.messages"))
                 .setScanners(new TypeAnnotationsScanner()));
-        classes = reflections.getTypesAnnotatedWith(MessageAttribute.class);
 
-        for (Class<?> aClass : classes)
-            messages.put(aClass.getDeclaredAnnotation(MessageAttribute.class).ID(), (Class<? extends Message>) aClass);
+        reflections.getTypesAnnotatedWith(MessageAttribute.class).forEach(aClass -> messages.put(aClass.getDeclaredAnnotation(MessageAttribute.class).ID(), (Class<? extends Message>) aClass));
 
-        classes.clear();
         return messages.size();
     }
 

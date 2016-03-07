@@ -46,6 +46,7 @@ class InterHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession is, Object object) throws Exception {
         if (object instanceof PlayerComingMessage) {
+
             AccountTicketDAO.addWaitingCompte(new Account((PlayerComingMessage) object), ((PlayerComingMessage) object).authenticationAddress, ((PlayerComingMessage) object).authenticationTicket);
         }
         if (object instanceof ExpulseAccountMessage) {

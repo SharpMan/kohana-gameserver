@@ -382,6 +382,13 @@ public class PlayerDAOImpl extends PlayerDAO {
     }
 
     @Override
+    public Stream<Player> getByAccount(int account){
+        return this.myCharacterById.values()
+                .parallelStream()
+                .filter(pl -> pl.getOwner() == account);
+    }
+
+    @Override
     public void start() {
         this.scheduleLoader();
     }

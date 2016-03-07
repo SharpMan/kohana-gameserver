@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteToClosedSessionException;
 
 /**
  *
@@ -94,19 +95,21 @@ public class WorldHandler extends IoHandlerAdapter {
     /**
      *
      * @param session
-     * @param cause
+     * @param exception
      * @throws Exception
      */
     @Override
-    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+    public void exceptionCaught(IoSession session, Throwable exception) throws Exception {
+        if(exception instanceof WriteToClosedSessionException)
+            return; //ignore
         Object objClient = session.getAttribute("session");
         if (objClient != null && objClient instanceof WorldClient) {
             WorldClient client = (WorldClient) objClient;
             //if(cause.getMessage().contains("java.io.IOException"))
-            logger.error("(client->server)[ip:{}]::Error: {}",client.getIP(), ExceptionUtils.getStackTrace(cause));
+            logger.error("(client->server)[ip:{}]::Error: {}",client.getIP(), ExceptionUtils.getStackTrace(exception));
             client.close();
         } else {
-            logger.error("(client->server)::Error:{}" , ExceptionUtils.getStackTrace(cause));
+            logger.error("(client->server)::Error:{}" , ExceptionUtils.getStackTrace(exception));
             session.close(false);
         }
     }

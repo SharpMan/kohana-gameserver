@@ -81,6 +81,10 @@ public class WorldServer {
         return client;
     }
 
+    public int size(){
+        return this.acceptor.getManagedSessionCount();
+    }
+
     public WorldClient getClient(int guid) {
         for (IoSession session : acceptor.getManagedSessions().values()) {
             if (session.getAttribute("session") instanceof WorldClient) {

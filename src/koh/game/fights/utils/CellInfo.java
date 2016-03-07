@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class CellInfo {
 
-    @Getter @Setter
+    @Setter
     private Double heuristic;
     @Getter @Setter
     private int[] parent;

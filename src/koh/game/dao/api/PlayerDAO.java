@@ -39,4 +39,6 @@ public abstract class PlayerDAO implements Service {
     public abstract int getCharacterOwner(String name);
 
     public abstract Player[] getByIp(String ip);
+
+    public abstract Stream<Player> getByAccount(int account);
 }

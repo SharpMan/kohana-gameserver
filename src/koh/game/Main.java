@@ -3,6 +3,7 @@ package koh.game;
 import koh.game.app.AppModule;
 import koh.game.app.Loggers;
 import koh.game.app.MemoryService;
+import koh.game.app.WebSocketService;
 import koh.game.dao.DAO;
 import koh.game.dao.DatabaseSource;
 import koh.game.inter.InterClient;
@@ -64,6 +65,7 @@ public class Main {
             AppModule app = new AppModule();
             ServicesProvider services = app.create(
                     new DatabaseSource(),
+                    new WebSocketService(),
                     new MemoryService(),
                     new Loggers()
             );
