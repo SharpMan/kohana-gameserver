@@ -2,16 +2,14 @@ package koh.game.actions;
 
 import java.util.Arrays;
 
-import koh.game.Main;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-import koh.game.dao.api.AccountDataDAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
 import koh.game.entities.actors.Player;
-import koh.game.entities.actors.npc.NpcMessage;
-import koh.game.entities.actors.npc.NpcReply;
-import koh.game.entities.actors.npc.replies.TalkReply;
+import koh.game.entities.actors.pnj.NpcMessage;
+import koh.game.entities.actors.pnj.NpcReply;
+import koh.game.entities.actors.pnj.replies.TalkReply;
 import koh.protocol.client.enums.DialogTypeEnum;
 import koh.protocol.messages.game.context.roleplay.npc.NpcDialogCreationMessage;
 import koh.protocol.messages.game.context.roleplay.npc.NpcDialogQuestionMessage;

@@ -6,6 +6,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.*;
 import koh.game.entities.item.animal.MountInventoryItem;
+import koh.look.EntityLookParser;
 import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
@@ -222,9 +223,14 @@ public class CharacterInventory {
             if (this.player.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
                 if (this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(appearence) != -1) {
                     this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.remove(this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(appearence));
+                    if(player.getFighter() != null)
+                        player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.remove(this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(appearence));
+
                 }
             } else if (this.player.getEntityLook().skins.indexOf(appearence) != -1) {
                 this.player.getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(appearence));
+                if(player.getFighter() != null)
+                    player.getFighter().getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(appearence));
             }
         }
     }
@@ -233,22 +239,26 @@ public class CharacterInventory {
         if (appearence != 0) {
             if (this.player.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
                 this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.add(appearence);
+                if(player.getFighter() != null)
+                    player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.add(appearence);
             } else {
                 this.player.getEntityLook().skins.add(appearence);
+                if(player.getFighter() != null)
+                    player.getFighter().getEntityLook().skins.add(appearence);
             }
         }
     }
 
     public void moveLivingItem(int guid, CharacterInventoryPositionEnum slot, int quantity) {
-        InventoryItem Item = this.itemsCache.get(guid);
+        final InventoryItem Item = this.itemsCache.get(guid);
         slot = this.getLivingObjectSlot(Item.getTemplateId());
-        InventoryItem exItem = this.getItemInSlot(slot);
+        final InventoryItem exItem = this.getItemInSlot(slot);
         if (exItem == null) {
             player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 161, new String[0]));
             return;
         }
-        ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972);
-        ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808), exchangeTime = (ObjectEffectDate) Item.getEffect(983);
+        final ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972);
+        final ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808), exchangeTime = (ObjectEffectDate) Item.getEffect(983);
         if (exItem.getEffect(970) != null) {
             PlayerController.sendServerMessage(player.getClient(), "action Impossible : cet objet est déjà associé à un objet d'apparance.");
             return;
@@ -377,6 +387,8 @@ public class CharacterInventory {
                                 }
                             }, new ArrayList<>())));
                         }
+                        if(player.getFighter() != null)
+                            player.getFighter().setEntityLook(EntityLookParser.copy(this.player.getEntityLook()));
                     } else {
                         this.addApparence(item.getApparrance());
                     }
@@ -413,6 +425,8 @@ public class CharacterInventory {
                     } else {
                         this.player.getEntityLook().subentities.removeIf(sub -> sub.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
                     }
+                    if(player.getFighter() != null)
+                        player.getFighter().setEntityLook(EntityLookParser.copy(this.player.getEntityLook()));
                 } else {
                     this.removeApparence(item.getApparrance());
                 }
@@ -645,6 +659,8 @@ public class CharacterInventory {
                 } else {
                     this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
                 }
+                if(player.getFighter() != null)
+                    player.getFighter().setEntityLook(EntityLookParser.copy(this.player.getEntityLook()));
             } else {
                 this.removeApparence(equipedItem.getApparrance());
             }

@@ -35,6 +35,7 @@ public class Settings {
         for(int i =0; i < registredChannels.length; i++){
             this.registredChannels[i] = Byte.parseByte(getStringElement("Register.Channels").split(",")[i]);
         }
+        TutorialText.init();
     }
 
     public Map<String, String> getGroup(String group) {
@@ -82,9 +83,9 @@ public class Settings {
                         currentGroup = new HashMap<>();
                         elements.put(line.replace("[", "").replace("]", ""), currentGroup);
                     } else if (currentGroup != null) {
-                        String[] data = line.trim().split("=");
-                        String key = data[0].trim();
-                        String value = data.length <= 1 ? "" : data[1].trim();
+                        final String[] data = line.trim().split("=");
+                        final String key = data[0].trim();
+                        final String value = data.length <= 1 ? "" : data[1].trim();
                         currentGroup.put(key, value);
                     }
                 }

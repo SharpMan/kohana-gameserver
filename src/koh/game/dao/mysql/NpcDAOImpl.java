@@ -1,17 +1,19 @@
 package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
+import koh.game.dao.DAO;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.NpcDAO;
 import koh.game.entities.actors.Npc;
-import koh.game.entities.actors.npc.NpcItem;
-import koh.game.entities.actors.npc.NpcMessage;
-import koh.game.entities.actors.npc.NpcReply;
-import koh.game.entities.actors.npc.NpcTemplate;
-import koh.game.entities.actors.npc.replies.BankReply;
-import koh.game.entities.actors.npc.replies.CloseReply;
-import koh.game.entities.actors.npc.replies.TalkReply;
-import koh.game.entities.actors.npc.replies.TeleportReply;
+import koh.game.entities.actors.pnj.NpcItem;
+import koh.game.entities.actors.pnj.NpcMessage;
+import koh.game.entities.actors.pnj.NpcReply;
+import koh.game.entities.actors.pnj.NpcTemplate;
+import koh.game.entities.actors.pnj.replies.BankReply;
+import koh.game.entities.actors.pnj.replies.CloseReply;
+import koh.game.entities.actors.pnj.replies.TalkReply;
+import koh.game.entities.actors.pnj.replies.TeleportReply;
+import koh.game.entities.item.ItemTemplate;
 import koh.game.utils.sql.ConnectionResult;
 import koh.utils.Enumerable;
 import org.apache.logging.log4j.LogManager;
@@ -153,6 +155,7 @@ public class NpcDAOImpl extends NpcDAO {
                 i++;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

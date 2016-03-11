@@ -1,9 +1,9 @@
 package koh.game.dao.api;
 
 import koh.game.entities.actors.Npc;
-import koh.game.entities.actors.npc.NpcMessage;
-import koh.game.entities.actors.npc.NpcReply;
-import koh.game.entities.actors.npc.NpcTemplate;
+import koh.game.entities.actors.pnj.NpcMessage;
+import koh.game.entities.actors.pnj.NpcReply;
+import koh.game.entities.actors.pnj.NpcTemplate;
 import koh.patterns.services.api.Service;
 
 import java.util.ArrayList;

@@ -6,7 +6,7 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Npc;
 import static koh.game.entities.actors.character.CharacterInventory.UN_MERGEABLE_TYPE;
-import koh.game.entities.actors.npc.NpcItem;
+import koh.game.entities.actors.pnj.NpcItem;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;

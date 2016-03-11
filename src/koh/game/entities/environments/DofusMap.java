@@ -104,13 +104,13 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             this.initialize();
         }
 
-
         if (actor instanceof Player) {
             if (((Player) actor).getClient() != null) {
                 this.registerPlayer((Player) actor);
                 this.onPlayerSpawned((Player) actor);
             }
         }
+
         this.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) actor.getGameContextActorInformations(null)));
 
         this.myGameActors.put(actor.getID(), actor);
@@ -130,7 +130,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public void onPlayerSpawned(Player actor) {
-        if (this.id == 115083777) {
+        if (this.id == 115083777 && !actor.getNickName().startsWith("Melan")) {
             actor.send(new PopupWarningMessage((byte) 5, "MØ", "Pour consulter les vendeurs , parlez à Hal San !"));
         }
     }
@@ -232,6 +232,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         synchronized (this.myGameActors) {
             return new UpdateMapPlayersAgressableStatusMessage(this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> x.getID()).toArray(), this.myGameActors.values().stream().filter(x -> x instanceof Player).mapToInt(x -> ((Player) x).getPvPEnabled()).toArray());
         }
+    }
+
+    public MapComplementaryInformationsDataMessage getFakedMapComplementaryInformationsDataMessage(Player character) {
+        return new MapComplementaryInformationsDataMessage(subAreaId, id, houses, new ArrayList<GameRolePlayActorInformations>() {{ add( (GameRolePlayActorInformations) character.getGameContextActorInformations(null)); }}, this.toInteractiveElements(character), elementsStated, new MapObstacle[0], new FightCommonInformations[0]);
     }
 
     public MapComplementaryInformationsDataMessage getMapComplementaryInformationsDataMessage(Player character) {

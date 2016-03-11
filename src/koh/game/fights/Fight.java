@@ -1411,6 +1411,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
             });
         }
+        if (this.fightState == fightState.STATE_PLACE)
+            this.fightWorker.initTurns();
         if(this.fightState == FightState.STATE_ACTIVE && fighter.getObjectType() != FightObjectType.OBJECT_STATIC)
             this.sendToField(this.getFightTurnListMessage());
     }
@@ -1805,12 +1807,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     public GameFightTurnListMessage getFightTurnListMessage() {
         if(this.isStarted()){
             return new GameFightTurnListMessage(this.fightWorker.fighters().stream().filter(x -> !(x instanceof StaticFighter))
-                    .sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false)))
+                    //.sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false)))
                     .mapToInt(x -> x.getID()).toArray(), this.getDeadFighters().filter(x -> !(x instanceof StaticFighter))
                     .mapToInt(x -> x.getID()).toArray());
         }
         return new GameFightTurnListMessage(this.getAliveFighters().filter(x -> !(x instanceof StaticFighter))
-                .sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false)))
+               // .sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false)))
                 .mapToInt(x -> x.getID()).toArray(), this.getDeadFighters().filter(x -> !(x instanceof StaticFighter))
                 .mapToInt(x -> x.getID()).toArray());
     }

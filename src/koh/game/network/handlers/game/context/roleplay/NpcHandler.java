@@ -35,41 +35,45 @@ public class NpcHandler {
 
     /*LeaveDialogRequestMessage*/
     @HandlerAttribute(ID = NpcGenericActionRequestMessage.MESSAGE_ID)
-    public static void HandleNpcGenericActionRequestMessage(WorldClient Client, NpcGenericActionRequestMessage Message) {
-        Npc PNJ = Client.getCharacter().getCurrentMap().getNpc(Message.npcId);
+    public static void handleNpcGenericActionRequestMessage(WorldClient client, NpcGenericActionRequestMessage message) {
+        final Npc PNJ = client.getCharacter().getCurrentMap().getNpc(message.npcId);
         if (PNJ == null) {
-            Client.send(new BasicNoOperationMessage());
-            throw new Error("Le pnj " + Message.npcId + " est absent");
+            if(client.getCharacter().isOnTutorial())
+                return;
+            client.send(new BasicNoOperationMessage());
+            throw new Error("Le pnj " + message.npcId + " est absent");
         }
         // ExchangeStartedBidBuyerMessage
         //ExchangeTypesExchangerDescriptionForUserMessage
-        if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            PlayerController.sendServerMessage(Client, "You're always in a exchange...");
+        if (client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
+            PlayerController.sendServerMessage(client, "You're always in a exchange...");
             return;
         }
-        final NpcActionTypeEnum Action = NpcActionTypeEnum.valueOf(Message.npcActionId);
-        if (Action == null) {
-            logger.error("Unknow action {} by character {}", Message.npcActionId, Client.getCharacter().getNickName());
+        final NpcActionTypeEnum action = NpcActionTypeEnum.valueOf(message.npcActionId);
+        if (action == null) {
+            logger.error("Unknow action {} by character {}", message.npcActionId, client.getCharacter().getNickName());
             return;
-        } else if (!ArrayUtils.contains(PNJ.getTemplate().getActions(), Message.npcActionId)) {
-            PlayerController.sendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
+        } else if (!ArrayUtils.contains(PNJ.getTemplate().getActions(), message.npcActionId)) {
+            PlayerController.sendServerMessage(client, "Ce type de transaction n'est pas encore disponnible");
             return;
         }
-        switch (Action) {
+        switch (action) {
+            case ACTION_BUY2:
+            //case ACTION_BUY:
             case ACTION_BUY_SELL:
-                if (Client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
-                    Client.setMyExchange(new NpcExchange(Client, PNJ));
-                    Client.addGameAction(new GameExchange(Client.getCharacter(), Client.getMyExchange()));
-                    Client.send(new ExchangeStartOkNpcShopMessage(PNJ.getID(), PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems$Array()));
+                if (client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
+                    client.setMyExchange(new NpcExchange(client, PNJ));
+                    client.addGameAction(new GameExchange(client.getCharacter(), client.getMyExchange()));
+                    client.send(new ExchangeStartOkNpcShopMessage(PNJ.getID(), PNJ.getTemplate().getCommonTokenId(), PNJ.getTemplate().getItems$Array()));
                 }
                 break;
             case ACTION_TALK:
-                if (Client.canGameAction(GameActionTypeEnum.NPC_DAILOG)) {
-                    Client.addGameAction(new NpcDialog(PNJ, Client.getCharacter()));
+                if (client.canGameAction(GameActionTypeEnum.NPC_DAILOG)) {
+                    client.addGameAction(new NpcDialog(PNJ, client.getCharacter()));
                 }
                 break;
             default:
-                PlayerController.sendServerMessage(Client, "Ce type de transaction n'est pas encore disponnible");
+                PlayerController.sendServerMessage(client, "Ce type de transaction n'est pas encore disponnible");
                 return;
         }
 

@@ -178,6 +178,8 @@ public class GenericStats {
         }
 
         switch (effectType) {
+            case ADD_PODS:
+                total += (5 * this.getTotal(StatsEnum.STRENGTH)); //TODO JOBlvl *5
             /*case getInitiative:
              Total += getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
             case DODGE_PA_LOST_PROBABILITY:

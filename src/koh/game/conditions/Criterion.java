@@ -65,7 +65,7 @@ public abstract class Criterion extends ConditionExpression {
     }
 
     public static Criterion CreateCriterionByName(String name) {
-        if (StatsCriterion.IsStatsIdentifier(name)) {
+        if (StatsCriterion.isStatsIdentifier(name)) {
             return (Criterion) new StatsCriterion(name);
         }
         switch (name) {

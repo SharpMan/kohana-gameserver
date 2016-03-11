@@ -17,6 +17,7 @@ public enum GameActionTypeEnum {
     NPC_DAILOG,
     CHALLENGE_ACCEPT,
     CHALLENGE_DENY,
+    TUTORIAL,
     FIGHT;
 
 }

@@ -10,7 +10,7 @@ from koh.game.network import WorldClient;
 class ShopCommand(PlayerCommand):
 
     def getDescription(self):
-        return None;
+        return "Téléporte à la map shop";
 
     def apply(self,client,args):
         client.getCharacter().teleport(115082755,473);

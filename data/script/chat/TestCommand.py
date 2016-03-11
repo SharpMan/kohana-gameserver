@@ -8,7 +8,7 @@ from koh.game.network import WorldClient;
 class TestCommand(PlayerCommand):
 
     def getDescription(self):
-        return "It's a test command";
+        return None;
 
     def apply(self,client,args):
         PlayerController.sendServerMessage(client,"parfait");

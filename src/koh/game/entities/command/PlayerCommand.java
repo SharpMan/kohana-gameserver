@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  */
 public interface PlayerCommand {
 
-    public static final Logger logger = LogManager.getLogger(PlayerCommand.class);
+    static final Logger logger = LogManager.getLogger(PlayerCommand.class);
 
     public String getDescription();
 

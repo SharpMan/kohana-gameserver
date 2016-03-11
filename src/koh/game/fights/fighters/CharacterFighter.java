@@ -99,8 +99,8 @@ public class CharacterFighter extends Fighter {
 
     public void cleanClone() {
         boolean updated = false;
-        for (Fighter Clone : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.getSummoner() == this)::iterator) {
-            Clone.tryDie(this.ID);
+        for (final Fighter clone : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.getSummoner() == this)::iterator) {
+            clone.tryDie(this.ID);
             updated = true;
         }
         if (updated) {

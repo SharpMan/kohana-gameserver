@@ -35,14 +35,16 @@ public class DAO {
     @Inject @Getter
     private static PaddockDAO paddocks;
 
-    @Inject @Getter
-    private static NpcDAO npcs;
 
     @Inject @Getter
     private static ItemDAO items;
 
     @Inject @Getter
     private static ItemTemplateDAO itemTemplates;
+
+    @Inject @Getter
+    private static NpcDAO npcs;
+
 
     @Inject @Getter
     private static MapDAO maps;

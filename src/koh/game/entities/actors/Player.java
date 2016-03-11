@@ -1,26 +1,12 @@
 package koh.game.entities.actors;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-
 import koh.d2o.Couple;
-import koh.game.actions.*;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
-
 import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
-import koh.game.entities.actors.character.CharacterInventory;
-import koh.game.entities.actors.character.FieldNotification;
-import koh.game.entities.environments.DofusMap;
-import koh.game.network.WorldClient;
-import koh.game.network.handlers.game.approach.CharacterHandler;
 import koh.game.entities.actors.character.*;
+import koh.game.entities.environments.DofusMap;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.spells.LearnableSpell;
@@ -29,25 +15,27 @@ import koh.game.fights.FightState;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.ChatChannel;
-import koh.protocol.client.enums.*;
-import koh.protocol.messages.game.character.stats.*;
-import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
+import koh.game.network.WorldClient;
+import koh.game.network.handlers.game.approach.CharacterHandler;
 import koh.game.utils.Observable;
 import koh.game.utils.Observer;
 import koh.protocol.client.Message;
+import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.atlas.compass.CompassUpdatePartyMemberMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
+import koh.protocol.messages.game.character.stats.*;
 import koh.protocol.messages.game.character.status.PlayerStatus;
 import koh.protocol.messages.game.context.GameContextRefreshEntityLookMessage;
-import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
 import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
+import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
+import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
 import koh.protocol.messages.game.pvp.AlignmentRankUpdateMessage;
-import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
 import koh.protocol.types.game.character.alignment.ActorExtendedAlignmentInformations;
 import koh.protocol.types.game.choice.CharacterBaseInformations;
+import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.*;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Builder;
@@ -58,8 +46,15 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+
 /**
- *
  * @author Neo-Craft
  */
 @Builder
@@ -67,94 +62,120 @@ import org.apache.logging.log4j.Logger;
 public class Player extends IGameActor implements Observer {
 
     private static final Logger logger = LogManager.getLogger(Player.class);
-
-    @Getter @Setter
+    private static final int[] TAVERNE_MAP = new int[]{ 146233, 148796, 146237, 148786, 144698, 145208, 145714 };
+    public Object $FighterLook = new Object();
+    protected boolean myInitialized = false;
+    @Getter
+    @Setter
     private int owner;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String nickName;
-    @Getter @Setter
+    @Getter
+    @Setter
     private int sexe;
-    @Getter @Setter
+    @Getter
+    @Setter
     private byte breed;
-    @Getter @Setter
+    @Getter
+    @Setter
     private ArrayList<Short> skins;
     private ArrayList<Integer> indexedColors;
-    @Getter @Setter
+    @Getter
+    @Setter
     private ArrayList<Short> scales;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Account account;
-    @Getter @Setter
-    private int achievementPoints,level;
-    @Getter @Setter
+    @Getter
+    @Setter
+    private int achievementPoints, level;
+    @Getter
+    @Setter
     private WorldClient client;
-    @Getter @Setter
+    @Getter
+    @Setter
     private long regenStartTime;
-    @Getter @Setter
+    @Getter
+    @Setter
     private volatile DofusMap currentMap;
     private List<Byte> enabledChannels;
     @Getter
     private List<Byte> disabledChannels;
-    @Getter @Setter
+    @Getter
+    @Setter
     private ShortcutBook shortcuts;
-    @Getter @Setter
+    @Getter
+    @Setter
     private volatile MountInformations mountInfo;
-    @Getter @Setter
+    @Getter
+    @Setter
     private int savedMap;
-    @Getter @Setter
+    @Getter
+    @Setter
     private short savedCell;
-    @Getter @Setter
+    @Getter
+    @Setter
     private volatile SpellBook mySpells;
-    @Getter @Setter
+    @Getter
+    @Setter
     private volatile JobBook myJobs;
-    @Getter @Setter
+    @Getter
+    @Setter
     private CharacterInventory inventoryCache;
     @Setter
     private PlayerStatusEnum status;
     @Setter
     private HashMap<ScoreType, Integer> scores;
-    //GenericStats
-    /*public int getAP;
-     public int getMP;*/
-    @Setter @Getter
-    private int chance, life, vitality,wisdom, strength, intell, agility;
-    @Getter @Setter
+    @Setter
+    @Getter
+    private int chance, life, vitality, wisdom, strength, intell, agility;
+    @Getter
+    @Setter
     private short activableTitle, activableOrnament;
-    @Getter @Setter
+    @Getter
+    @Setter
     private byte regenRate;
-    @Getter @Setter
+    @Getter
+    @Setter
     private byte[] emotes;
-    @Getter @Setter
+    @Getter
+    @Setter
     private int[] ornaments, titles;
-    @Getter @Setter
+    @Getter
+    @Setter
     private GenericStats stats;
-
     //stats
-    @Getter @Setter
+    @Getter
+    @Setter
     private long experience;
-    @Getter @Setter
+    @Getter
+    @Setter
     private int kamas, statPoints, spellPoints;
-    @Getter @Setter
+    @Getter
+    @Setter
     private byte alignmentValue, alignmentGrade, PvPEnabled;
-    @Getter @Setter
+    @Getter
+    @Setter
     private AlignmentSideEnum alignmentSide;
-    @Getter @Setter
+    @Getter
+    @Setter
     private int honor, dishonor, energy;
-
-    @Getter @Setter
+    @Getter
+    @Setter
     private CopyOnWriteArrayList<Player> followers;
-
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean inWorld;
-    protected boolean myInitialized = false;
     private HumanInformations cachedHumanInformations;
-
     //Other
-    @Getter @Setter
+    @Getter
+    @Setter
     private byte moodSmiley;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Guild guild;
     private boolean wasSitted = false; //only for regen life
-
     private Fight myFight;
     private Fighter myFighter;
 
@@ -186,10 +207,12 @@ public class Player extends IGameActor implements Observer {
 
         this.inventoryCache = new CharacterInventory(this);
 
-        this.inventoryCache.getItems().filter(x -> x.getPosition() != 63).forEach(Item -> {
-            this.stats.merge(Item.getStats());
-            //this.life += item.getStats().getTotal(StatsEnum.vitality);
-        });
+        this.inventoryCache.getItems()
+                .filter(x -> x.getPosition() != 63)
+                .forEach(Item -> {
+                    this.stats.merge(Item.getStats());
+                    //this.life += item.getStats().getTotal(StatsEnum.vitality);
+                });
 
         this.inventoryCache.generalItemSetApply();
 
@@ -208,7 +231,7 @@ public class Player extends IGameActor implements Observer {
     @Override
     public boolean canBeSeen(IGameActor Actor) {
         if (this.account == null) {
-            logger.error("NPE can be seen {} {}",this.nickName,this.ID);
+            logger.error("NPE can be seen {} {}", this.nickName, this.ID);
             return false;
         }
         return true;
@@ -217,7 +240,7 @@ public class Player extends IGameActor implements Observer {
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
         if (this.account == null) {
-            logger.error("NPE GameContext {}" , this.nickName);
+            logger.error("NPE GameContext {}", this.nickName);
         }
         return new GameRolePlayCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.nickName, this.getHumanInformations(), this.account.id, this.getActorAlignmentInformations());
     }
@@ -240,31 +263,30 @@ public class Player extends IGameActor implements Observer {
         return this.cachedHumanInformations;
     }
 
-    public synchronized void removeHumanOption(Class<? extends HumanOption> klass){
+    public synchronized void removeHumanOption(Class<? extends HumanOption> klass) {
         Arrays.stream(this.getHumanInformations().options)
                 .filter(opt -> opt.getClass().isAssignableFrom(klass))
                 .findFirst()
-                .ifPresent(ho -> this.getHumanInformations().options = ArrayUtils.removeElement(this.getHumanInformations().options,ho));
+                .ifPresent(ho -> this.getHumanInformations().options = ArrayUtils.removeElement(this.getHumanInformations().options, ho));
 
     }
 
-
     public void refreshEntitie() {
         if (getFighter() != null) {
-            getFight().sendToField(new GameContextRefreshEntityLookMessage(this.ID, this.getEntityLook()));
+            this.myFight.sendToField(new GameContextRefreshEntityLookMessage(this.ID, this.getEntityLook()));
         } else {
             this.currentMap.sendToField(new GameContextRefreshEntityLookMessage(this.ID, this.getEntityLook()));
         }
     }
 
-    public List<Integer> getIndexedColors(){
-        if(this.indexedColors == null)
+    public List<Integer> getIndexedColors() {
+        if (this.indexedColors == null)
             this.indexedColors = new ArrayList<>(5);
         return this.indexedColors;
     }
 
-    public List<Byte> getEnabledChannels(){
-        if(this.enabledChannels == null)
+    public List<Byte> getEnabledChannels() {
+        if (this.enabledChannels == null)
             this.enabledChannels = new ArrayList<>(20);
         return this.enabledChannels;
     }
@@ -276,14 +298,14 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public HashMap<ScoreType, Integer> getScores(){
-        if(this.scores == null)
+    public HashMap<ScoreType, Integer> getScores() {
+        if (this.scores == null)
             this.scores = new HashMap<>(7);
         return this.scores;
     }
 
-    public PlayerStatusEnum getStatus(){
-        if(this.status == null)
+    public PlayerStatusEnum getStatus() {
+        if (this.status == null)
             this.status = PlayerStatusEnum.PLAYER_STATUS_AVAILABLE;
         return this.status;
     }
@@ -297,7 +319,7 @@ public class Player extends IGameActor implements Observer {
             this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
             return;
         }
-        DofusMap nextMap = DAO.getMaps().findTemplate(newMapID);
+        final DofusMap nextMap = DAO.getMaps().findTemplate(newMapID);
         if (nextMap == null) {
             logger.error("Nulled map on {}", newMapID);
             return;
@@ -318,7 +340,7 @@ public class Player extends IGameActor implements Observer {
             this.currentMap.sendToField(new TeleportOnSameMapMessage(ID, cell.getId()));
             return;
         }
-        DofusMap nextMap = DAO.getMaps().findTemplate(newMapID);
+        final DofusMap nextMap = DAO.getMaps().findTemplate(newMapID);
         if (nextMap == null) {
             logger.error("Nulled map on {}", newMapID);
             PlayerController.sendServerMessage(client, "Signal on the bugTracker nulled map -> " + newMapID);
@@ -347,16 +369,22 @@ public class Player extends IGameActor implements Observer {
         this.scores.put(Type, this.scores.get(Type) + 1);
     }
 
-    public void addKamas(int val){
+    public void addKamas(int val) {
         this.kamas += val;
     }
+
+    @Getter @Setter
+    private boolean onTutorial = false;
 
     public synchronized void onLogged() {
         try {
             if (!this.inWorld) {
                 this.inWorld = true;
                 this.account.currentIP = client.getIP();
-                if (this.getFighter() == null) {
+                if(this.onTutorial){
+
+                }
+                else if (this.getFighter() == null) {
                     this.spawnToMap();
                     client.send(this.currentMap.getAgressableActorsStatus(this));
                 }
@@ -400,7 +428,7 @@ public class Player extends IGameActor implements Observer {
                     logger.error(this.toString());
                 }
                 for (Player p : this.account.characters) { //TODO: ALleos
-                    if(DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x != null && p.nickName.equalsIgnoreCase(x.second.nickName))){
+                    if (DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x != null && p.nickName.equalsIgnoreCase(x.second.nickName))) {
                         logger.debug(p.nickName + " already aded");
                     }
                     DAO.getPlayers().addCharacterInQueue(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
@@ -418,11 +446,11 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void refreshStats() {
-        refreshStats(true,true);
+        refreshStats(true, true);
     }
 
     public void refreshStats(boolean logged, boolean stopRegen) {
-        if(this.life > this.getMaxLife()){
+        if (this.life > this.getMaxLife()) {
             this.setLife(this.getMaxLife());
         }
         this.updateRegenedLife(stopRegen);
@@ -430,49 +458,47 @@ public class Player extends IGameActor implements Observer {
             if (client.getParty() != null) {
                 client.getParty().updateMember(this);
             }
-            if (logged && getFighter() != null && getFight().getFightState() == FightState.STATE_PLACE) {
+            if (logged && this.myFighter != null && getFight().getFightState() == FightState.STATE_PLACE) {
                 this.myFighter.getStats().reset();
                 this.myFighter.getStats().merge(this.stats);
-                client.send(((CharacterFighter) getFighter()).FighterStatsListMessagePacket());
+                this.myFighter.setLife(this.getLife());
+                client.send(this.myFighter.asPlayer().FighterStatsListMessagePacket());
+                CharacterHandler.sendCharacterStatsListMessage(this.client);
             } else {
                 CharacterHandler.sendCharacterStatsListMessage(this.client);
             }
         }
     }
 
-    private static final int[] TAVERNE_MAP = new int[] { 146233,148796,146237,148786,144698,145208,145714};
-
-    public void updateRegenedEnergy(){
-        if(this.energy < PlayerEnum.MAX_ENERGY && this.regenStartTime != 0){
+    public void updateRegenedEnergy() {
+        if (this.energy < PlayerEnum.MAX_ENERGY && this.regenStartTime != 0) {
             long timeElapsed = TimeUnit.MILLISECONDS.toHours(Instant.now().minusMillis(this.regenStartTime).toEpochMilli());
-            if(timeElapsed > 0){
+            if (timeElapsed > 0) {
                 timeElapsed *= ArrayUtils.contains(TAVERNE_MAP, this.mapid) ? 100 : 50;
                 if (this.energy + timeElapsed > PlayerEnum.MAX_ENERGY) {
                     timeElapsed = PlayerEnum.MAX_ENERGY - this.energy;
                 }
                 this.energy += timeElapsed;
-                this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,7, String.valueOf(timeElapsed)));
+                this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 7, String.valueOf(timeElapsed)));
             }
 
         }
     }
 
     public void updateRegenedLife(boolean stopRegen) {
-        if(this.getLife() == this.getMaxLife()){
-            if(this.regenStartTime != 0){
+        if (this.getLife() == this.getMaxLife()) {
+            if (this.regenStartTime != 0) {
                 this.stopRegen(stopRegen);
                 this.regenStartTime = 0;
             }
-        }
-        else if(this.myFight != null){
+        } else if (this.myFight != null) {
             return;
-        }
-        else if(this.regenStartTime == 0){
+        } else if (this.regenStartTime == 0) {
             this.regenStartTime = Instant.now().toEpochMilli();
             this.send(new LifePointsRegenBeginMessage(this.regenRate));
-        }else{
+        } else {
             this.stopRegen(stopRegen);
-            if(this.getLife() >= this.getMaxLife()){
+            if (this.getLife() >= this.getMaxLife()) {
                 this.regenStartTime = 0;
                 return;
             }
@@ -481,55 +507,60 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public void stopRegen(){
+    public void stopRegen() {
         stopRegen(true);
     }
 
     public void stopRegen(boolean stopRegen) {
 
-        if(this.regenStartTime != 0) {
+        if (this.regenStartTime != 0) {
             int timeElapsed = (int) Instant.now().minusMillis(this.regenStartTime).getEpochSecond();
-            if(this.regenRate == 5){
+            if (this.regenRate == 5) {
                 timeElapsed *= 2;
             }
             if (this.life + timeElapsed > this.getMaxLife()) {
                 timeElapsed = this.getMaxLife() - this.life;
             }
             logger.debug("Player {} regens {} lifepoints", this.nickName, timeElapsed);
-            this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,1, String.valueOf(timeElapsed)));
+            this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 1, String.valueOf(timeElapsed)));
 
-            this.addLife(timeElapsed);
-            if(stopRegen)
+            this.healLife(timeElapsed);
+            if (stopRegen)
                 this.send(new LifePointsRegenEndMessage(this.life, this.getMaxLife(), timeElapsed));
         }
-        if(stopRegen)
+        if (stopRegen)
             this.regenRate = 10;
     }
 
-    public synchronized void stopSitEmote(){
-        if(client.getCharacter().getRegenRate() == 5){
+    public synchronized void stopSitEmote() {
+        if (client.getCharacter().getRegenRate() == 5) {
             client.getCharacter().removeHumanOption(HumanOptionEmote.class);
             client.getCharacter().stopRegen();
             client.getCharacter().updateRegenedLife(true);
-            client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(),client.getCharacter().getMaxLife()));
+            client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(), client.getCharacter().getMaxLife()));
         }
     }
 
-    public void addLife(int val){
+    public void addLife(int val) {
+        if((this.life + val) >= this.getMaxLife())
+            this.life += val;
+    }
+
+    public void healLife(int val){
         this.life += val;
     }
 
-    public void addStatPoints(int val){
+    public void addStatPoints(int val) {
         this.statPoints += val;
     }
 
-    public int getInitiative(boolean Base) {
+    public int getInitiative(boolean base) {
 
         return 1 + (int) Math.floor((this.stats.getTotal(StatsEnum.STRENGTH)
                 + this.stats.getTotal(StatsEnum.CHANCE)
                 + this.stats.getTotal(StatsEnum.INTELLIGENCE)
                 + this.stats.getTotal(StatsEnum.AGILITY)
-                + (Base ? this.stats.getTotal(StatsEnum.INITIATIVE) : this.stats.getTotal(StatsEnum.INITIATIVE)))
+                + (base ? this.stats.getTotal(StatsEnum.INITIATIVE) : this.stats.getTotal(StatsEnum.INITIATIVE)))
                 * ((double) life / getMaxLife())
         );
 
@@ -582,6 +613,7 @@ public class Player extends IGameActor implements Observer {
     public int getMaxLife() {
         return this.stats.getTotal(StatsEnum.VITALITY) + ((int) level * 5) + DAO.getD2oTemplates().getBreed(this.breed).getHealPoint();
     }
+    /*byte alignmentSide, byte alignmentValue, byte alignmentGrade, int characterPower, int honor, int honorGradeFloor, int honorNextGradeFloor, byte aggressable*/
 
     @Override
     public EntityLook getEntityLook() {
@@ -602,7 +634,6 @@ public class Player extends IGameActor implements Observer {
         }
         return entityLook;
     }
-    /*byte alignmentSide, byte alignmentValue, byte alignmentGrade, int characterPower, int honor, int honorGradeFloor, int honorNextGradeFloor, byte aggressable*/
 
     public void changeAlignementSide(AlignmentSideEnum side) {
         if (this.myFight != null) {
@@ -683,9 +714,9 @@ public class Player extends IGameActor implements Observer {
     }
 
     public ActorExtendedAlignmentInformations getActorAlignmentExtendInformations() {
-        if(DAO.getExps().getLevel(this.alignmentGrade) == null)
+        if (DAO.getExps().getLevel(this.alignmentGrade) == null)
             logger.error("lga1");
-        else if(alignmentSide == null)
+        else if (alignmentSide == null)
             logger.error("lga2");
         return new ActorExtendedAlignmentInformations(this.alignmentSide.value,
                 this.alignmentValue,
@@ -724,7 +755,7 @@ public class Player extends IGameActor implements Observer {
 
             ExpLevel floor;
 
-            Integer lastLevel = this.level;
+            final int lastLevel = this.level;
             do {
                 floor = DAO.getExps().getLevel(this.level + 1);
                 if (floor.getPlayer() < this.experience) {
@@ -760,7 +791,6 @@ public class Player extends IGameActor implements Observer {
             }
         }
     }
-
 
     public void destroyFromMap() {
         if (this.currentMap != null) {
@@ -798,7 +828,6 @@ public class Player extends IGameActor implements Observer {
         return this.sexe == 1;
     }
 
-
     @Override
     public void Observer$update(Observable o, Object... args) {
     }
@@ -807,19 +836,19 @@ public class Player extends IGameActor implements Observer {
     public void Observer$reset(Observable o) {
     }
 
-    public void save(boolean Clear) {
+    public void save(boolean clear) {
         if (this.myInitialized) {
             if (this.inventoryCache != null) {
-                this.inventoryCache.save(Clear);
+                this.inventoryCache.save(clear);
             }
-            DAO.getPlayers().update(this, Clear);
-            if (!Clear && this.account != null && this.account.accountData != null) {
+            DAO.getPlayers().update(this, clear);
+            if (!clear && this.account != null && this.account.accountData != null) {
                 this.account.accountData.save(false);
             }
         }
     }
 
-    public void initScore(String result){
+    public void initScore(String result) {
         this.getScores().put(ScoreType.PVP_WIN, Integer.parseInt(result.split(",")[0]));
         this.scores.put(ScoreType.PVP_LOOSE, Integer.parseInt(result.split(",")[1]));
         this.scores.put(ScoreType.ARENA_WIN, Integer.parseInt(result.split(",")[2]));
@@ -830,7 +859,7 @@ public class Player extends IGameActor implements Observer {
 
     }
 
-    public void initScore(){
+    public void initScore() {
         this.getScores().put(ScoreType.PVP_WIN, 0);
         this.scores.put(ScoreType.PVP_LOOSE, 0);
         this.scores.put(ScoreType.ARENA_WIN, 0);
@@ -840,28 +869,34 @@ public class Player extends IGameActor implements Observer {
         this.scores.put(ScoreType.PVP_TOURNAMENT, 0);
     }
 
-    public int computeLife(float percent){
+    public int computeLife(float percent) {
         return (int) (this.getMaxLife() * percent / 100.00f);
     }
 
     public double getExpBonus() {
         double bonusXp = 1;
-        for(Player cbi2 : this.account.characters)
-        {
-            if (((((!((cbi2.getID() == this.ID))) && ((cbi2.level > level)))) && ((bonusXp < 4))))
-            {
+        for (Player cbi2 : this.account.characters) {
+            if (((((!((cbi2.getID() == this.ID))) && ((cbi2.level > level)))) && ((bonusXp < 4)))) {
                 bonusXp = (bonusXp + 1);
-            };
-        };
+            }
+            ;
+        }
+        ;
         return bonusXp * DAO.getSettings().getDoubleElement("Rate.PvM");
     }
 
-    public Object $FighterLook = new Object();
+    public Fight getFight() {
+        return this.myFight;
+    }
 
     public void setFight(Fight Fight) {
         synchronized ($FighterLook) {
             this.myFight = Fight;
         }
+    }
+
+    public Fighter getFighter() {
+        return this.myFighter;
     }
 
     public void setFighter(Fighter Fighter) {
@@ -870,19 +905,11 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public Fight getFight() {
-        return this.myFight;
-    }
-
-    public Fighter getFighter() {
-        return this.myFighter;
-    }
-
     public PlayerStatus getPlayerStatus() {
         return new PlayerStatus(this.getStatus().value());
     }
 
-    public String serializeStats(){
+    public String serializeStats() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.vitality).append(',');
         sb.append(this.wisdom).append(',');

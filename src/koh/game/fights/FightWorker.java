@@ -42,28 +42,28 @@ public class FightWorker {
     public void initTurns() {
         this.myFightersTurn.clear();
 
-        List<Fighter> Team1 = fight.fighters().filter(x -> x.getTeam().id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
-        List<Fighter> Team2 = fight.fighters().filter(x -> x.getTeam().id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
+        final List<Fighter> team1 = fight.fighters().filter(x -> x.getTeam().id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
+        final List<Fighter> team2 = fight.fighters().filter(x -> x.getTeam().id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
 
-        for (Fighter Fighter : Team1) {
-            int FIndex = Team1.indexOf(Fighter);
+        for (final Fighter fighter : team1) {
+            int FIndex = team1.indexOf(fighter);
 
-            if (Team2.size() - 1 >= FIndex) {
-                Fighter OppositeFighter = Team2.get(FIndex);
+            if (team2.size() - 1 >= FIndex) {
+                final Fighter oppositeFighter = team2.get(FIndex);
 
-                if (OppositeFighter.getInitiative(false) > Fighter.getInitiative(false)) {
-                    myFightersTurn.add(OppositeFighter);
-                    myFightersTurn.add(Fighter);
+                if (oppositeFighter.getInitiative(false) > fighter.getInitiative(false)) {
+                    myFightersTurn.add(oppositeFighter);
+                    myFightersTurn.add(fighter);
                 } else {
-                    myFightersTurn.add(Fighter);
-                    myFightersTurn.add(OppositeFighter);
+                    myFightersTurn.add(fighter);
+                    myFightersTurn.add(oppositeFighter);
                 }
             } else {
-                myFightersTurn.add(Fighter);
+                myFightersTurn.add(fighter);
             }
         }
 
-        for (Fighter Fighter : Team2) {
+        for (Fighter Fighter : team2) {
             if (!this.myFightersTurn.contains(Fighter)) {
                 myFightersTurn.add(Fighter);
             }

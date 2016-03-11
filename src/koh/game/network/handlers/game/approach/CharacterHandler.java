@@ -61,7 +61,7 @@ public class CharacterHandler {
     private static final Logger logger = LogManager.getLogger(CharacterHandler.class);
 
     @HandlerAttribute(ID = 6072)
-    public static void HandleCharacterSelectedForceReadyMessage(WorldClient Client, CharacterSelectedForceReadyMessage Message) {
+    public static void handleCharacterSelectedForceReadyMessage(WorldClient Client, CharacterSelectedForceReadyMessage Message) {
         Player inFight = Client.getAccount().getPlayerInFight();
         if (inFight != null) {
             characterSelectionMessage(Client, inFight.getID());
@@ -70,12 +70,12 @@ public class CharacterHandler {
     }
 
     @HandlerAttribute(ID = SetEnablePVPRequestMessage.M_ID)
-    public static void HandleSetEnablePVPRequestMessage(WorldClient Client, SetEnablePVPRequestMessage Message) {
+    public static void handleSetEnablePVPRequestMessage(WorldClient Client, SetEnablePVPRequestMessage Message) {
         Client.getCharacter().setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
     }
 
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)
-    public static void HandleAuthenticationTicketMessage(WorldClient Client, Message message) {
+    public static void handleAuthenticationTicketMessage(WorldClient Client, Message message) {
         Player inFight = Client.getAccount().getPlayerInFight();
         Client.send(new CharactersListMessage(false, Client.getAccount().toBaseInformations()));
         if (inFight != null) {
@@ -84,7 +84,7 @@ public class CharacterHandler {
     }
 
     @HandlerAttribute(ID = CharacterNameSuggestionRequestMessage.MESSAGE_ID)
-    public static void HandleCharacterNameSuggestionRequestMessage(WorldClient Client, Message message) {
+    public static void handleCharacterNameSuggestionRequestMessage(WorldClient Client, Message message) {
         Client.send(new CharacterNameSuggestionSuccessMessage(PlayerController.GenerateName()));
     }
 
@@ -192,41 +192,41 @@ public class CharacterHandler {
     }
 
     @HandlerAttribute(ID = CharacterCreationRequestMessage.MESSAGE_ID)
-    public static void HandleCharacterCreationRequestMessage(WorldClient client, CharacterCreationRequestMessage message) {
+    public static void handleCharacterCreationRequestMessage(WorldClient client, CharacterCreationRequestMessage message) {
         try {
             if (client.getAccount().characters.size() >= PlayerDAOImpl.MAX_CHARACTER_SLOT) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_TOO_MANY_CHARACTERS.value()));
-            } else if (!PlayerController.isValidName(((CharacterCreationRequestMessage) message).Name)) {
+            } else if (!PlayerController.isValidName(((CharacterCreationRequestMessage) message).name)) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
 
-            } else if (DAO.getPlayers().containsName(((CharacterCreationRequestMessage) message).Name)) {
+            } else if (DAO.getPlayers().containsName(((CharacterCreationRequestMessage) message).name)) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
             } else {
-                Breed breedTemplate = DAO.getD2oTemplates().getBreed(((CharacterCreationRequestMessage) message).Breed);
+                final Breed breedTemplate = DAO.getD2oTemplates().getBreed(((CharacterCreationRequestMessage) message).breed);
                 if (breedTemplate == null) {
                     client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NOT_ALLOWED.value()));
                     return;
                 }
-                Head head = DAO.getD2oTemplates().getHead(((CharacterCreationRequestMessage) message).cosmeticId);
-                if (head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != ((CharacterCreationRequestMessage) message).Sex) {
+                final Head head = DAO.getD2oTemplates().getHead(((CharacterCreationRequestMessage) message).cosmeticId);
+                if (head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != ((CharacterCreationRequestMessage) message).sex) {
                     client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
                     return;
                 }
                 Player character = Player.builder()
-                        .nickName(message.Name)
+                        .nickName(message.name)
                         .regenRate((byte)10)
-                        .breed((byte) message.Breed)
+                        .breed((byte) message.breed)
                         .owner(client.getAccount().id)
-                        .sexe(message.Sex ? 1 : 0)
-                        .skins(new ArrayList<Short>(Arrays.asList(message.Sex ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook(), Short.parseShort(head.skinstype))))
-                        .scales(new ArrayList<Short>(Arrays.asList(message.Sex ? breedTemplate.getFemaleSize() : breedTemplate.getMaleSize())))
+                        .sexe(message.sex ? 1 : 0)
+                        .skins(new ArrayList<>(Arrays.asList(message.sex ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook(), Short.parseShort(head.skinstype))))
+                        .scales(new ArrayList<>(Arrays.asList(message.sex ? breedTemplate.getFemaleSize() : breedTemplate.getMaleSize())))
                         .indexedColors(new ArrayList<Integer>(5) {
                             {
                                 for (byte i = 0; i < 5; i++) {
-                                    if (message.Colors.get(i) == -1) {
-                                        add(breedTemplate.getColors(message.Sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
+                                    if (message.colors.get(i) == -1) {
+                                        add(breedTemplate.getColors(message.sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
                                     } else {
-                                        add(message.Colors.get(i) | (i + 1) * 0x1000000);
+                                        add(message.colors.get(i) | (i + 1) * 0x1000000);
                                     }
                                 }
                             }
@@ -254,6 +254,7 @@ public class CharacterHandler {
                 character.initScore();
                 character.setMapid(DAO.getSettings().getIntElement("Register.StartMap")); //Abstract can not be called from builder
                 character.setActorCell(character.getCurrentMap().getCell(DAO.getSettings().getShortElement("Register.StartCell")));
+                character.setOnTutorial(true);
                 character.initialize();
 
                 if (!DAO.getPlayers().add(character)) {

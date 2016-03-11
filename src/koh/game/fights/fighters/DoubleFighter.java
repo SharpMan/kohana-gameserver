@@ -30,8 +30,8 @@ public class DoubleFighter extends VirtualFighter {
                     stats.addItem(st.getKey(),st.getValue().objectsAndMountBonus);
                 });
         super.initFighter(stats,this.fight.getNextContextualId());
-        super.setLife(summoner.getLife());
-        super.setLifeMax(summoner.getMaxLife());
+        super.setLife(summoner.asPlayer().getMaxLife());
+        super.setLifeMax(summoner.asPlayer().getMaxLife());
         this.entityLook = EntityLookParser.copy(summoner.getEntityLook());
     }
 

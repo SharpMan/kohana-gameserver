@@ -143,7 +143,7 @@ public class RolePlayHandler {
 
             case StatsBoostEnum.VITALITY:
                 client.getCharacter().setVitality(base);
-                client.getCharacter().addLife(base - oldbase); // on boost la life
+                client.getCharacter().healLife(base - oldbase); // on boost la life
                 break;
 
             case StatsBoostEnum.WISDOM:

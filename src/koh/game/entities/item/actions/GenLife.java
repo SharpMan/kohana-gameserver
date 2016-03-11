@@ -34,7 +34,7 @@ public class GenLife  extends ItemAction {
 
     @Override
     public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
+        if(!super.execute(p, cell))
             return false;
         final int val = EffectHelper.randomValue(min,max);
         final int copy = p.getLife() + val > p.getMaxLife() ? p.getMaxLife() - p.getLife() : val;
@@ -63,7 +63,7 @@ public class GenLife  extends ItemAction {
 
     public void gen(Player p ,final int copy){
         p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,1, String.valueOf(copy)));
-        p.addLife(copy);
+        p.healLife(copy);
         p.refreshStats();
     }
 }

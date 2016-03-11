@@ -3,6 +3,7 @@ package koh.game.network.handlers.game.context;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameFight;
 import koh.game.actions.GameMapMovement;
+import koh.game.actions.GameTutorial;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.CharacterInventory;
@@ -143,21 +144,25 @@ public class ContextHandler {
     }
 
     @HandlerAttribute(ID = MapInformationsRequestMessage.MESSAGE_ID)
-    public static void HandleMapInformationsRequestMessage(WorldClient Client, Message message) {
+    public static void handleMapInformationsRequestMessage(WorldClient client, Message message) {
         //client.sequenceMessage();
-        Client.send(Client.getCharacter().getCurrentMap().getMapComplementaryInformationsDataMessage(Client.getCharacter()));
-        Client.getCharacter().getCurrentMap().sendMapInfo(Client);
+        if(client.getCharacter().isOnTutorial()){
+            client.send(client.getCharacter().getCurrentMap().getFakedMapComplementaryInformationsDataMessage(client.getCharacter()));
+            client.addGameAction(new GameTutorial(client.getCharacter()));
+        }else
+            client.send(client.getCharacter().getCurrentMap().getMapComplementaryInformationsDataMessage(client.getCharacter()));
+        client.getCharacter().getCurrentMap().sendMapInfo(client);
 
     }
 
     @HandlerAttribute(ID = GameMapMovementCancelMessage.MESSAGE_ID)
-    public static void HandleGameMapMovementCancelMessage(WorldClient Client, GameMapMovementCancelMessage Message) {
+    public static void handleGameMapMovementCancelMessage(WorldClient Client, GameMapMovementCancelMessage Message) {
         Client.abortGameAction(GameActionTypeEnum.MAP_MOVEMENT, new Object[]{Message.cellId});
         Client.endGameAction(GameActionTypeEnum.MAP_MOVEMENT);
     }
 
     @HandlerAttribute(ID = GameMapMovementConfirmMessage.MESSAGE_ID)
-    public static void HandleGameMapMovementConfirmMessage(WorldClient Client, GameMapMovementConfirmMessage message) {
+    public static void handleGameMapMovementConfirmMessage(WorldClient Client, GameMapMovementConfirmMessage message) {
         try {
             Client.endGameAction(GameActionTypeEnum.MAP_MOVEMENT);
             Client.send(new BasicNoOperationMessage());

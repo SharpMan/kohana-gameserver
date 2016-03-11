@@ -56,6 +56,12 @@ public class MountInformations {
         this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
         this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
         this.player.getEntityLook().skins.clear();
+        if(player.getFighter() != null){
+            player.getFighter().getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
+            player.getFighter().getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
+            player.getFighter().getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
+            player.getFighter().getEntityLook().skins.clear();
+        }
         /*if (item.templateId != ItemsEnum.KRAMKRAM) { //Todo KAMELEONE
          this.player.getEntityLook().indexedColors.clear();
          }*/
@@ -73,6 +79,15 @@ public class MountInformations {
             this.player.getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
             this.player.getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
             this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
+            if(player.getFighter() != null){
+                player.getFighter().getEntityLook().bonesId = (short) 1;
+                player.getFighter().getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
+                player.getFighter().getEntityLook().indexedColors = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
+                player.getFighter().getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
+                player.getFighter().getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
+                player.getFighter().getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
+
+            }
             this.player.refreshEntitie();
         }
     }

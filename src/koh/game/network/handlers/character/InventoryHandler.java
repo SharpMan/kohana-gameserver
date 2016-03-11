@@ -8,6 +8,7 @@ import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.ItemLivingObject;
 import koh.game.entities.item.animal.PetsInventoryItem;
+import koh.game.fights.FightState;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
@@ -81,11 +82,11 @@ public class InventoryHandler {
 
     @HandlerAttribute(ID = ObjectUseMessage.MESSAGE_ID)
     public static void handleObjectUseMessage(WorldClient client,ObjectUseMessage message){
-        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
             client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        final InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
         if(item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
@@ -107,7 +108,7 @@ public class InventoryHandler {
     @HandlerAttribute(ID = ObjectSetPositionMessage.MESSAGE_ID)
     public static void HandleObjectSetPositionMessage(WorldClient client, ObjectSetPositionMessage Message) {
         synchronized (client.get$mutex()) {
-            if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            if (client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
                 client.send(new BasicNoOperationMessage());
                 return;
             }
