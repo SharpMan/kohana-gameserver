@@ -46,7 +46,7 @@ public class FightFormulas {
         if (droppersResults.length == 0) {
             result = 0;
         } else {
-            int num = fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).sum();
+            final int num = fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).sum();
             byte maxPlayerLevel = (byte) fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).max().orElse(0);
             int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).sum();
             byte b = (byte) Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).max().orElse(0);
@@ -70,6 +70,9 @@ public class FightFormulas {
             double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
             double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
             result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.WISDOM)) / 100.0) * num8 * fighter.getCharacter().getExpBonus());
+        }
+        if(result < 0){
+            logger.error("exp {} ",result);
         }
         return result;
     }

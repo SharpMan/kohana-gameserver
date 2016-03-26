@@ -7,6 +7,7 @@ import koh.protocol.client.enums.FightStateEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +116,8 @@ public abstract class AIAction {
 
     protected abstract double scoreLaunchSpell(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse);
 
+    private static final ArrayList<String> effects = new ArrayList<>();
+
     public double getEffectScore(AIProcessor AI, short casterCell, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean invokPreview) {
        try {
            switch (effect.getEffectType()) {
@@ -131,7 +134,8 @@ public abstract class AIAction {
                    return targets.contains(AI.getFighter()) ? (scoreBuff_I(AI, effect, targets, reverse, false)) : (-scoreBuff_I(AI, effect, targets, reverse, false));
 
              /* BUFFS LEVEL 1*/
-               case COMBO_DAMMAGES:
+               case ADD_DAMAGE_PERCENT:
+               case COMBO_DAMMAGES: //TODO roub
                case ADD_DAMAGE_PHYSIC:
                case ADD_DAMAGE_FINAL_PERCENT:
                case ADD_PUSH_DAMAGES_BONUS:
@@ -218,6 +222,10 @@ public abstract class AIAction {
                case DAMAGE_FIRE_PER_PM_PERCENT:
                case DAMAGE_EARTH_PER_PM_PERCENT:
                case LIFE_LEFT_TO_THE_ATTACKER_WATER_DAMAGES:
+               case LIFE_LEFT_TO_THE_ATTACKER_AIR_DAMAGES:
+               case LIFE_LEFT_TO_THE_ATTACKER_FIRE_DAMAGES:
+               case LIFE_LEFT_TO_THE_ATTACKER_EARTH_DAMAGES:
+               case LIFE_LEFT_TO_THE_ATTACKER_NEUTRAL_DAMAGES:
                    return scoreDamage_I(AI, effect, targets, reverse);
 
                case DAMAGE_TO_LAUNCHER:
@@ -367,7 +375,10 @@ public abstract class AIAction {
                    return scoreLaunchSpell(AI, effect, targets, reverse);
 
                default: {
-                   logger.error("Effect[{}] non defini pour l'IA", effect.getEffectType());
+                   if(!effects.contains(effect.getEffectType().toString())) {
+                       logger.error("Effect[{}] non defini pour l'IA", effect.getEffectType());
+                       effects.add(effect.getEffectType().toString());
+                   }
                    return scoreDamage_I(AI, effect, targets, reverse);
                }
            }

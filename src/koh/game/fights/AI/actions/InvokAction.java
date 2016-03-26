@@ -768,10 +768,12 @@ public class InvokAction extends AIAction {
         for (Fighter target : targets)
         {
             int currScore = baseScore;
-            List<Fighter> cible = new ArrayList<>();
+            final List<Fighter> cible = new ArrayList<>();
             cible.add(target);
             for(List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()){
                 for(BuffEffect buff : buffs){
+                    if(buff.castInfos.effect == null)
+                        continue;
                     currScore += (int)this.getEffectScore(AI, (short)-1, (short)-1, buff.castInfos.effect, cible, true,false);
                 }
             }

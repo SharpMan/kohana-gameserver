@@ -761,18 +761,20 @@ public class DebuffAllyAction extends AIAction {
             return 0;
         }
         double score = 0;
-        int baseScore = 25;
+        final int baseScore = 25;
 
         //BaseScore *= effect.randomJet();
 
         for (Fighter target : targets)
         {
             int currScore = baseScore;
-            List<Fighter> cible = new ArrayList<>();
+            final List<Fighter> cible = new ArrayList<>();
             cible.add(target);
             for(List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()){
                 for(BuffEffect buff : buffs){
-                    int boucleScore = (int)this.getEffectScore(AI, (short)-1, (short)-1, buff.castInfos.effect, cible, true,false);
+                    if(buff.castInfos.effect == null)
+                        continue;
+                    final int boucleScore = (int)this.getEffectScore(AI, (short)-1, (short)-1, buff.castInfos.effect, cible, true,false);
                     if(target.getTeam() == AI.getFighter().getTeam()){
                         currScore += (boucleScore * 4);
                     }else{

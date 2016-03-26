@@ -788,17 +788,19 @@ public class BuffHimselfAction extends AIAction {
             return 0;
         }
         double score = 0;
-        int baseScore = 11;
+        final int baseScore = 11;
 
         //BaseScore *= effect.randomJet();
 
         for (Fighter target : targets)
         {
             int currScore = baseScore;
-            List<Fighter> cible = new ArrayList<>();
+            final List<Fighter> cible = new ArrayList<>();
             cible.add(target);
             for(List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()){
                 for(BuffEffect buff : buffs){
+                    if(buff.castInfos.effect == null)
+                        continue;
                     currScore += (int)this.getEffectScore(AI, (short)-1, (short)-1, buff.castInfos.effect, cible, true,false);
                 }
             }

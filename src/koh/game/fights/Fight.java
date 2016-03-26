@@ -120,7 +120,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     @Getter
     protected Map<Short, FightCell> fightCells = new HashMap<>();
     protected Map<FightTeam, Map<Short, FightCell>> myFightCells = new HashMap<>();
-    protected short ageBonus = -1, lootShareLimitMalus = -1;
+    protected short ageBonus = 0, lootShareLimitMalus = -1;
     protected Map<String, CancellableScheduledRunnable> myTimers = new HashMap<>();
     @Getter
     protected Map<Fighter, CopyOnWriteArrayList<FightActivableObject>> activableObjects = Collections.synchronizedMap(new HashMap<>());
