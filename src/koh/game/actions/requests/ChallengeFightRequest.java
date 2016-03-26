@@ -4,8 +4,8 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.fights.Fight;
 import koh.game.fights.types.ChallengeFight;
 import koh.game.network.WorldClient;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayPlayerFightFriendlyAnsweredMessage;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayPlayerFightFriendlyRequestedMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFightFriendlyAnsweredMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFightFriendlyRequestedMessage;
 
 /**
  *

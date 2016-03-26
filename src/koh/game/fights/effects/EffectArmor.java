@@ -12,11 +12,11 @@ public class EffectArmor extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        BuffEffect Buf = null;
+        BuffEffect buf;
         for (Fighter Target : castInfos.targets) {
-            Buf = new BuffArmor(castInfos, Target);
-            if (!Target.getBuff().buffMaxStackReached(Buf)) {
-                Target.getBuff().addBuff(Buf);
+            buf = new BuffArmor(castInfos, Target);
+            if (!Target.getBuff().buffMaxStackReached(buf)) {
+                Target.getBuff().addBuff(buf);
             }
         }
         return -1;

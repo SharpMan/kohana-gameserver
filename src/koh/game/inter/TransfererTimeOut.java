@@ -1,64 +1,39 @@
 package koh.game.inter;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import koh.inter.messages.PingMessage;
 
-import koh.game.dao.DAO;
-import koh.game.utils.Settings;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
- *
- * @author Alleos13
+ * @author Melancholia
  */
 public class TransfererTimeOut {
 
-    private Timer timer;
 
-    public TransfererTimeOut() {
-        timer = new Timer("TRANSFERER_TIMEOUT");
-    }
+    private final ScheduledExecutorService executor;
+    private final InterClient client;
+    private final PingMessage message;
 
-    public void addTimeOut(InterClient connector) {
-        timer.schedule(new TimeOut(connector), 5000, 5000);
-    }
+    public TransfererTimeOut(InterClient client) {
+        this.executor = Executors.newSingleThreadScheduledExecutor();
+        this.client = client;
+        this.message = new PingMessage();
 
-    private class TimeOut extends TimerTask {
-
-        private InterClient connector;
-
-        public TimeOut(InterClient connector) {
-            this.connector = connector;
-        }
-
-        @Override
-        public void run() {
-            try {
-                if (!connector.isConnected()) {
-                    connector.RetryConnect(DAO.getSettings().getIntElement("Inter.Port"));
-                }
-            } catch (Exception e) {
-            } finally {
-                //cancel();
+        this.executor.scheduleWithFixedDelay((Runnable) () -> {
+            if (!client.isConnected()) {
+                client.retryConnect();
             }
-        }
+        }, 7, 7, TimeUnit.SECONDS);
 
-        @Override
-        public boolean cancel() {
-            connector = null;
-            try {
-                return super.cancel();
-            } finally {
-                try {
-                    this.finalize();
-                } catch (Throwable e) {
-                }
-            }
-        }
+        this.executor.scheduleWithFixedDelay((Runnable) () -> {
+            client.send(this.message);
+        }, 2, 2, TimeUnit.MINUTES);
+
     }
 
     public void stop() {
-        if (this.timer != null) {
-            timer.cancel();
-        }
+        this.executor.shutdownNow();
     }
 }

@@ -14,6 +14,7 @@ import koh.game.entities.actors.character.ShortcutBook;
 import koh.game.entities.actors.character.SpellBook;
 import koh.game.utils.sql.ConnectionResult;
 import koh.game.utils.sql.ConnectionStatement;
+import koh.glicko.Glicko2Player;
 import koh.look.EntityLookParser;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.utils.Enumerable;
@@ -41,67 +42,77 @@ public class PlayerDAOImpl extends PlayerDAO {
     private MapDAO maps;
 
 
-    private final void scheduleLoader(){
-        Timer thread = new Timer();
+    @Override
+    public Collection<Player> getPlayers() {
+        return this.myCharacterByName.values();
+    }
+
+
+    private final void scheduleLoader() {
+        final Timer thread = new Timer();
         thread.schedule(new TimerTask() {
 
             @Override
             public void run() {
-                List<Couple<Long, Player>> copy = new ArrayList<>();
+                final List<Couple<Long, Player>> copy = new ArrayList<>();
                 synchronized (characterUnloadQueue) {
                     copy.addAll(characterUnloadQueue);
                 }
-                for (Couple<Long, Player> ref : copy) {
-                    if (System.currentTimeMillis() > ref.first && !(ref.second.getAccount().characters != null && ref.second.getAccount().characters.stream().anyMatch(Character -> Character.getFighter() != null))) { //On décharge pas les combattants.
-                        synchronized (accountInUnload) {
-                            delCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
-                            accountInUnload.add(ref.second.getAccount().id);
-                            cleanMap(ref.second);
-                            logger.debug("player " + ref.second.getNickName() + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
-                            ref.second.save(true);
-                            MySQL.needCommit = true;
+                try {
+                    lock.lock();
+
+                    for (Couple<Long, Player> ref : copy) {
+                        if (System.currentTimeMillis() > ref.first && !(ref.second.getAccount().characters != null && ref.second.getAccount().characters.stream().anyMatch(Character -> Character.getFighter() != null))) { //On décharge pas les combattants.
+                            synchronized (accountInUnload) {
+                                delCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
+                                accountInUnload.add(ref.second.getAccount().id);
+                                cleanMap(ref.second);
+                                logger.debug("player " + ref.second.getNickName() + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
+                                ref.second.save(true);
+                            }
                         }
                     }
+                    accountInUnload.clear();
+                    copy.clear();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    lock.unlock();
                 }
-                accountInUnload.clear(); //Should be done after commit
-                copy.clear();
-                copy = null;
             }
         }, 5 * 1000 * 60, 5 * 1000 * 60);
     }
 
-    public final List<Integer> accountInUnload = Collections.synchronizedList(new ArrayList<Integer>()); //TO : CopyOnWriteArrayList ?
+    public final List<Integer> accountInUnload = Collections.synchronizedList(new ArrayList<>()); //TO : CopyOnWriteArrayList ?
     private final Map<Integer, Player> myCharacterById = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, Player> myCharacterByName = Collections.synchronizedMap(new HashMap<>());
     private final ConcurrentLinkedQueue<Couple<Long, Player>> characterUnloadQueue = new ConcurrentLinkedQueue();
-
 
 
     @Inject
     private DatabaseSource dbSource;
 
     @Override
-    public Stream<Couple<Long, Player>> getQueueAsSteam(){
+    public Stream<Couple<Long, Player>> getQueueAsSteam() {
         return this.characterUnloadQueue.stream();
     }
 
     @Override
-    public void addCharacterInQueue(Couple<Long, Player> charr){
+    public void addCharacterInQueue(final Couple<Long, Player> charr) {
         this.characterUnloadQueue.add(charr);
     }
 
     @Override
-    public boolean isCurrentlyOnProcess(int accountId){
-        return accountInUnload.contains(accountId);
+    public boolean isCurrentlyOnProcess(int accountId) {
+        return characterUnloadQueue
+                .stream()
+                .anyMatch(fr -> fr.second.getAccount() != null && fr.second.getAccount().id == accountId);
     }
 
 
     private void cleanMap(Player p) {
-        for (Couple<Long, Player> cp : characterUnloadQueue) {
-            if (cp.second == p) {
-                characterUnloadQueue.remove(cp);
-            }
-        }
+        this.characterUnloadQueue.removeIf(player -> player.second.getID() == p.getID());
     }
 
     private ArrayList<Short> stringToShortArray(String tr) {
@@ -129,16 +140,17 @@ public class PlayerDAOImpl extends PlayerDAO {
                     if (myCharacterById.containsKey(result.getInt("id"))) {
                         p = myCharacterById.get(result.getInt("id"));
                         cleanMap(p);
-                        if (p.getAccount() != null && p.getAccount().accountData != null) {
+                        if (p.getAccount().accountData != null) {
                             account.accountData = p.getAccount().accountData;
                         }
+                        p.setAccount(account);
                         account.characters.add(p);
                         continue;
                     }
                     p = Player.builder()
                             .nickName(result.getString("nickname"))
                             .breed((byte) result.getInt("breed"))
-                            .regenRate((byte)10)
+                            .regenRate((byte) 10)
                             .sexe(result.getInt("sex"))
                             .skins(stringToShortArray(result.getString("skins")))
                             .scales(stringToShortArray(result.getString("scales")))
@@ -173,13 +185,14 @@ public class PlayerDAOImpl extends PlayerDAO {
                                     this.deserializeEffects(result.getBytes("job_informations"));
                                 }
                             })
+                            .kolizeumRate(Glicko2Player.defaultValue())
                             .shortcuts(ShortcutBook.deserialize(result.getBytes("shortcuts")))
                             .kamas(result.getInt("kamas"))
                             .savedMap(Integer.parseInt(result.getString("savedpos").split(",")[0]))
                             .savedCell(Short.parseShort(result.getString("savedpos").split(",")[1]))
                             .emotes(Enumerable.stringToByteArray(result.getString("emotes")))
                             .mountInfo(new MountInformations().deserialize(result.getBytes("mount_informations")))
-                            .moodSmiley((byte)-1)
+                            .moodSmiley((byte) -1)
                             .build();
                     Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
                     p.setMapid(result.getInt("map"));
@@ -207,11 +220,9 @@ public class PlayerDAOImpl extends PlayerDAO {
                     account.characters.add(p);
                     addCharacter(p);
                 }
-            }
-            catch(AccountOccupedException ex){
+            } catch (AccountOccupedException ex) {
                 throw new AccountOccupedException(ex.getMessage());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 logger.error(e);
                 logger.warn(e.getMessage());
@@ -298,6 +309,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             if (!resultSet.first())//character not created ?
                 return false;
             character.setID(resultSet.getInt(1));
+            this.addCharacter(character);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);
@@ -354,17 +366,16 @@ public class PlayerDAOImpl extends PlayerDAO {
 
 
     @Override
-    public int getCharacterOwner(String name){
+    public int getCharacterOwner(String name) {
         Player target = this.getCharacter(name);
-        if(target != null){
+        if (target != null) {
             return target.getOwner();
-        }
-        else{
+        } else {
             try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("SELECT owner FROM `character` WHERE LOWER(nickname) = LOWER(?);")) {
                 PreparedStatement pStatement = conn.getStatement();
                 pStatement.setString(1, name);
                 ResultSet set = pStatement.executeQuery();
-                if(set.first())
+                if (set.first())
                     return set.getInt("owner");
             } catch (Exception e) {
                 logger.error(e);
@@ -375,14 +386,14 @@ public class PlayerDAOImpl extends PlayerDAO {
     }
 
     @Override
-    public Player[] getByIp(String ip){ //No strean in Jython
+    public Player[] getByIp(String ip) { //No strean in Jython
         return this.myCharacterById.values().stream()
                 .filter(pl -> pl.isInWorld() && pl.getClient().getIP().equalsIgnoreCase(ip))
                 .toArray(Player[]::new);
     }
 
     @Override
-    public Stream<Player> getByAccount(int account){
+    public Stream<Player> getByAccount(int account) {
         return this.myCharacterById.values()
                 .parallelStream()
                 .filter(pl -> pl.getOwner() == account);

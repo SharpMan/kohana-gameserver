@@ -5,12 +5,16 @@ import koh.game.entities.Account;
 import koh.game.entities.actors.Player;
 import koh.patterns.services.api.Service;
 
+import java.util.Collection;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
  * Created by Melancholia on 11/29/15.
  */
 public abstract class PlayerDAO implements Service {
+
+    protected final ReentrantLock lock = new ReentrantLock();
 
     public abstract void addCharacter(Player character);
 
@@ -26,9 +30,11 @@ public abstract class PlayerDAO implements Service {
 
     public abstract boolean containsName(String name);
 
+    public abstract Collection<Player> getPlayers();
+
     public abstract Stream<Couple<Long, Player>> getQueueAsSteam();
 
-    public abstract void addCharacterInQueue(Couple<Long, Player> charr);
+    public abstract void addCharacterInQueue(final Couple<Long, Player> charr);
 
     public abstract boolean isCurrentlyOnProcess(int accountId);
 
@@ -41,4 +47,8 @@ public abstract class PlayerDAO implements Service {
     public abstract Player[] getByIp(String ip);
 
     public abstract Stream<Player> getByAccount(int account);
+
+    public boolean isLocked(){
+        return lock.isLocked();
+    }
 }

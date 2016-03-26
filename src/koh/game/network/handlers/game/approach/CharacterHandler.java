@@ -8,9 +8,12 @@ import koh.game.dao.DAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.MountInformations;
+import koh.game.entities.actors.character.PlayerInst;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.actors.character.ShortcutBook;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
+import koh.glicko.Glicko2Player;
 import koh.inter.messages.PlayerCreatedMessage;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.*;
@@ -110,11 +113,12 @@ public class CharacterHandler {
                 character.initialize();
                 client.getAccount().currentCharacter = character;
                 client.sequenceMessage();
+                final PlayerInst inst = PlayerInst.getPlayerInst(character.getID());
                 //client.send(new ComicReadingBeginMessage(79));
                 client.send(new EnabledChannelsMessage(character.getEnabledChannels(), character.getDisabledChannels()));
-                client.send(new NotificationListMessage(new int[]{2147483647}));
+                client.send(new NotificationListMessage(new int[] { 2147483647 }));
                 client.send(new CharacterSelectedSuccessMessage(character.toBaseInformations(), false));
-                client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(0, 0, 0, 0, 0));
+                client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
                 client.send(new InventoryContentMessage(character.getInventoryCache().toObjectsItem(), character.getKamas()));
                 client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, character.getShortcuts().toShortcuts(character)));
                 client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, character.getMySpells().toShortcuts()));
@@ -122,7 +126,6 @@ public class CharacterHandler {
                 client.send(new JobDescriptionMessage(character.getMyJobs().getDescriptions()));
                 client.send(new JobExperienceMultiUpdateMessage(character.getMyJobs().getExperiences()));
                 client.send(new JobCrafterDirectorySettingsMessage(character.getMyJobs().getSettings()));
-
                 client.send(new SpellListMessage(true, character.getMySpells().toSpellItems()));
                 client.send(new SetCharacterRestrictionsMessage(new ActorRestrictionsInformations(false, false, false, false, false, false, false, false, true, false, false, false, false, true, true, true, false, false, false, false, false), character.getID()));
                 client.send(new InventoryWeightMessage(character.getInventoryCache().getWeight(), character.getInventoryCache().getTotalWeight()));
@@ -212,7 +215,7 @@ public class CharacterHandler {
                     client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
                     return;
                 }
-                Player character = Player.builder()
+                final Player character = Player.builder()
                         .nickName(message.name)
                         .regenRate((byte)10)
                         .breed((byte) message.breed)
@@ -247,6 +250,7 @@ public class CharacterHandler {
                         .emotes(new byte[]{1, 8, 19})
                         .ornaments(new int[0])
                         .titles(new int[0])
+                        .kolizeumRate(Glicko2Player.defaultValue())
                         .moodSmiley((byte)-1)
                         .alignmentSide(AlignmentSideEnum.ALIGNMENT_NEUTRAL)
                         .build();
@@ -264,7 +268,7 @@ public class CharacterHandler {
 
 
                 client.getAccount().characters.add(0, character);
-                Main.interClient().send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
+                Main.getInterClient().send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.OK.value()));
                 client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
             }

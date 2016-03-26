@@ -14,6 +14,8 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.core.write.WriteToClosedSessionException;
 
+import java.io.IOException;
+
 /**
  *
  * @author Neo-Craft
@@ -100,9 +102,9 @@ public class WorldHandler extends IoHandlerAdapter {
      */
     @Override
     public void exceptionCaught(IoSession session, Throwable exception) throws Exception {
-        if(exception instanceof WriteToClosedSessionException)
+        if(exception instanceof WriteToClosedSessionException || exception instanceof IOException)
             return; //ignore
-        Object objClient = session.getAttribute("session");
+        final Object objClient = session.getAttribute("session");
         if (objClient != null && objClient instanceof WorldClient) {
             WorldClient client = (WorldClient) objClient;
             //if(cause.getMessage().contains("java.io.IOException"))

@@ -101,7 +101,7 @@ public class ItemTemplate {
                 if (Strings.isNullOrEmpty(criteria) || this.criteria.equalsIgnoreCase("null")) {
                     return null;
                 } else {
-                    this.m_criteriaExpression = ConditionExpression.parse(this.criteria);
+                    this.m_criteriaExpression = ConditionExpression.parse(this.criteria.trim());
                 }
             }
             return m_criteriaExpression;

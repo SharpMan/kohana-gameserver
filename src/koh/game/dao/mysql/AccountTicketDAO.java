@@ -35,20 +35,20 @@ public class AccountTicketDAO {
         }
     }
 
-    public static AccountTicket addWaitingCompte(Account _compte, String ip, String ticket) {
+    public static AccountTicket addWaitingCompte(Account compte, String ip, String ticket) {
 
-        if (accountGuid.containsKey(_compte.id)) {
+        if (accountGuid.containsKey(compte.id)) {
             try {
-                // ActualCharacted accountGuid.get(_compte.get_GUID()).valid().getGameThread().closeSocket(false);
+                accountGuid.get(compte.id).valid().currentCharacter.getClient().close();
             } catch (Exception e) {
             } finally {
-                accountGuid.remove(_compte.id);
+                accountGuid.remove(compte.id);
             }
-            return null;
+            return null; //TODO ticket null....
         }
         synchronized (_waitings) {
-            AccountTicket t = new AccountTicket(_compte, ip, ticket);
-            accountGuid.put(_compte.id, t);
+            final AccountTicket t = new AccountTicket(compte, ip, ticket);
+            accountGuid.put(compte.id, t);
             _waitings.put(ticket, t);
             return t;
         }

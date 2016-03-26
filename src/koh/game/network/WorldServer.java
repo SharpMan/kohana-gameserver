@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import koh.game.Main;
+import koh.game.actions.GameKolissium;
 import koh.game.dao.DAO;
+import koh.game.entities.kolissium.KolizeumExecutor;
 import koh.game.executors.GameLoader;
 import koh.game.network.codec.ProtocolDecoder;
 import koh.protocol.client.Message;
 import koh.protocol.client.codec.Dofus2ProtocolEncoder;
+import lombok.Getter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -22,6 +25,8 @@ public class WorldServer {
     private final NioSocketAcceptor acceptor;
     private final InetSocketAddress address;
     public static GameLoader gameLoader = new GameLoader();
+    @Getter
+    private static final KolizeumExecutor koli = new KolizeumExecutor();
 
     /**
      * 2 * estimated client optimal size (64)
@@ -88,7 +93,7 @@ public class WorldServer {
     public WorldClient getClient(int guid) {
         for (IoSession session : acceptor.getManagedSessions().values()) {
             if (session.getAttribute("session") instanceof WorldClient) {
-                WorldClient client = (WorldClient) session.getAttribute("session");
+                final WorldClient client = (WorldClient) session.getAttribute("session");
                 if (client.getAccount() != null && client.getAccount().id == guid) {
                     return client;
                 }

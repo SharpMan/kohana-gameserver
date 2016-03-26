@@ -46,7 +46,7 @@ public class FightTeam {
     public int LeaderId;
     public Fighter leader;
     public Fight Fight;
-    public ArrayList<SwapPositionRequest> swapRequests = new ArrayList<>();
+    public ArrayList<SwapPositionRequest> swapRequests = new ArrayList<>(2);
 
     public FightTeam(byte Id, Fight f) {
         this.id = Id;

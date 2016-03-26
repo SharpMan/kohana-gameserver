@@ -43,8 +43,8 @@ import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.*;
 import koh.protocol.messages.game.context.fight.*;
 import koh.protocol.messages.game.context.fight.character.GameFightShowFighterMessage;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayRemoveChallengeMessage;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayShowChallengeMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayRemoveChallengeMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayShowChallengeMessage;
 import koh.protocol.types.game.action.fight.FightDispellableEffectExtendedInformations;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import koh.protocol.types.game.actions.fight.GameActionMark;
@@ -523,7 +523,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         for (EffectInstanceDice effect : spellEffects) {
             logger.debug(effect.toString());
             targets.put(effect, new ArrayList<>());
-            //.
             final Fighter[] targetsOnZone = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(fighter.getCellId()).advancedOrientationTo(MapPoint.fromCellId(cellId), true), this.map))
                     .getCells(cellId))
                     .map(cell -> this.getCell(cell))
@@ -544,9 +543,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
             }
             for (Fighter target : targetsOnZone) {
-                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}",effect.effectId,target.getID(),EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId),effect.isValidTarget(fighter, target),EffectInstanceDice.verifySpellEffectMask(fighter, target, effect));
+                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}",effect.effectId,target.getID(),EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId,true),effect.isValidTarget(fighter, target),EffectInstanceDice.verifySpellEffectMask(fighter, target, effect));
                 if ((ArrayUtils.contains(BLACKLISTED_EFFECTS,effect.effectUid)
-                        || EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId))
+                        || EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId,true))
                         && effect.isValidTarget(fighter, target)
                         && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)) {
                     if ((effect.targetMask.equals("C") && fighter.getCarriedActor() == target.getID())
@@ -563,10 +562,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         }
         double num1 = Fight.RANDOM.nextDouble();
-        double num2 = (double) Arrays.stream(spellEffects).mapToInt(x -> x.random).sum();
+        final double num2 = (double) Arrays.stream(spellEffects).mapToInt(x -> x.random).sum();
         boolean flag = false;
-        for (Iterator<EffectInstanceDice> effectI = ((Arrays.stream(spellEffects).sorted((e2, e1) -> ((e1.getEffectType() == StatsEnum.DISPELL_SPELL || e1.getEffectType() == StatsEnum.SUMMON) ? 0 : ((e2.getEffectType() == StatsEnum.DISPELL_SPELL || e2.getEffectType() == StatsEnum.SUMMON ) ? -1 : 1))).iterator())); effectI.hasNext(); ) {
-            final EffectInstanceDice effect = effectI.next();
+        for (Iterator<EffectInstanceDice> effectIterator = ((Arrays.stream(spellEffects).sorted((e2, e1) -> ((e1.getEffectType() == StatsEnum.DISPELL_SPELL || e1.getEffectType() == StatsEnum.SUMMON) ? 0 : ((e2.getEffectType() == StatsEnum.DISPELL_SPELL || e2.getEffectType() == StatsEnum.SUMMON ) ? -1 : 1))).iterator())); effectIterator.hasNext(); ) {
+            final EffectInstanceDice effect = effectIterator.next();
             if (effect.random > 0) {
                 if (!flag) {
                     if (num1 > (double) effect.random / num2) {
@@ -1148,7 +1147,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public synchronized GameMapMovement tryMove(Fighter fighter, koh.game.fights.utils.Path path) {
-        if (fighter != this.currentFighter) {
+        if (fighter != this.currentFighter || path.isEmptyRide()) {
             return null;
         }
 

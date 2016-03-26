@@ -11,6 +11,7 @@ import koh.game.dao.api.SpellDAO;
 import koh.game.entities.spells.*;
 import koh.game.utils.sql.ConnectionResult;
 import koh.protocol.client.enums.SpellTargetType;
+import koh.protocol.client.enums.StatsEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -77,11 +78,11 @@ public class SpellDAOImpl extends SpellDAO {
             while (result.next()) {
                 levels.put(result.getInt("id"), new SpellLevel(result));
                 /*Arrays.stream(levels.get(result.getInt("id")).getEffects())
-                        .filter(x -> x.targetMask.equals("c"))
+                        .filter(x -> x.getEffectType() == StatsEnum.CHATIMENT)
                         .forEach(x -> {
                             try {
-                                System.out.println(result.getInt("spell_id"));
-                            } catch (SQLException e) {
+                                System.out.print(x.effectUid+",");
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         });*/

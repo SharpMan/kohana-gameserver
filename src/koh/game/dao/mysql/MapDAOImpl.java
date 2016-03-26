@@ -1,6 +1,7 @@
 package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
+import koh.game.Logs;
 import koh.game.Main;
 import koh.game.MySQL;
 import koh.game.dao.DAO;
@@ -96,7 +97,7 @@ public class MapDAOImpl extends MapDAO {
 
                     subWays.get(DAO.getAreas().getSubArea(result.getInt("subarea")).getArea().getId()).add(new DofusZaap(result));
                 } catch (Exception e) {
-                    logger.warn("{} nulled ", result.getInt("subarea"));
+                        logger.warn("{} nulled ", result.getInt("subarea"));
                 }
                 i++;
             }
@@ -132,7 +133,7 @@ public class MapDAOImpl extends MapDAO {
                     dofusMaps.get(result.getInt("old_map")).initialize();
                     dofusMaps.get(result.getInt("old_map")).getCell(result.getShort("old_cell")).myAction = new DofusTrigger(result);
                 } catch (Exception e) {
-                    logger.warn("map {} trigger null", result.getInt("map"));
+                    logger.debug("map {} trigger null", result.getInt("map"));
                 }
                 i++;
             }
@@ -214,27 +215,33 @@ public class MapDAOImpl extends MapDAO {
 
     @Override
     public DofusMap findMapByPos(int X, int Y) {
-        return dofusMaps.values().stream().filter(x -> x.getPosition() != null && x.getPosition().getPosX() == X && x.getPosition().getPosY() == Y)
-                .findFirst().orElse(null);
+        return dofusMaps.values().stream()
+                .filter(x -> x.getPosition() != null && x.getPosition().getPosX() == X && x.getPosition().getPosY() == Y)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public MapPosition[] getSubAreaOfPos(int X, int Y) {
-        return dofusMaps.values().stream().filter(x -> x.getPosition() != null && x.getPosition().getPosX() == X && x.getPosition().getPosY() == Y).map(x -> x.getPosition()).toArray(MapPosition[]::new);
+        return dofusMaps.values().stream()
+                .filter(x -> x.getPosition() != null && x.getPosition().getPosX() == X && x.getPosition().getPosY() == Y)
+                .map(x -> x.getPosition())
+                .toArray(MapPosition[]::new);
     }
 
     @Override
     public DofusMap findMapByPos(int X, int Y, int subArea) {
         return dofusMaps.values().stream()
                 .filter(x -> x.getPosition() != null && x.getPosition().getPosX() == X && x.getPosition().getPosY() == Y && x.getPosition().getSubAreaId() == subArea).
-                        findFirst().orElse(null);
+                        findFirst()
+                .orElse(null);
 
     }
 
     private int loadAllPositions() {
         int i = 0, i2 = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from map_positions", 0)) {
-            ResultSet result = conn.getResult();
+            final ResultSet result = conn.getResult();
 
 
             while (result.next()) {
@@ -259,7 +266,7 @@ public class MapDAOImpl extends MapDAO {
     private int loadAllInteractiveElements() {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from maps_interactive_elements;", 0)) {
-            ResultSet result = conn.getResult();
+            final ResultSet result = conn.getResult();
 
             while (result.next()) {
                 try {

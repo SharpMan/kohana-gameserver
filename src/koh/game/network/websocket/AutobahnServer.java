@@ -117,7 +117,7 @@ public class AutobahnServer extends WebSocketServer {
 
     @Override
     public void onWebsocketMessageFragment( WebSocket conn, Framedata frame ) {
-        FrameBuilder builder = (FrameBuilder) frame;
+        final FrameBuilder builder = (FrameBuilder) frame;
         builder.setTransferemasked( false );
         conn.sendFrame(frame);
     }

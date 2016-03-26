@@ -31,8 +31,8 @@ public class EffectInstanceDice extends EffectInstanceInteger {
 
     public short randomJet() {
 
-        int num1 = this.diceNum >= (int) this.diceSide ? this.diceNum : this.diceSide;
-        int num2 = this.diceNum <= (int) this.diceSide ? this.diceNum : this.diceSide;
+        final int num1 = this.diceNum >= (int) this.diceSide ? this.diceNum : this.diceSide;
+        final int num2 = this.diceNum <= (int) this.diceSide ? this.diceNum : this.diceSide;
 
         if (num2 == 0) {
             return (short) num1;

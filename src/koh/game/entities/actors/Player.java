@@ -13,12 +13,12 @@ import koh.game.entities.spells.LearnableSpell;
 import koh.game.fights.Fight;
 import koh.game.fights.FightState;
 import koh.game.fights.Fighter;
-import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
 import koh.game.utils.Observable;
 import koh.game.utils.Observer;
+import koh.glicko.Glicko2Player;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.atlas.compass.CompassUpdatePartyMemberMessage;
@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 public class Player extends IGameActor implements Observer {
 
     private static final Logger logger = LogManager.getLogger(Player.class);
-    private static final int[] TAVERNE_MAP = new int[]{ 146233, 148796, 146237, 148786, 144698, 145208, 145714 };
+    private static final int[] TAVERNE_MAP = new int[]{146233, 148796, 146237, 148786, 144698, 145208, 145714};
     public Object $FighterLook = new Object();
     protected boolean myInitialized = false;
     @Getter
@@ -126,6 +126,7 @@ public class Player extends IGameActor implements Observer {
     @Setter
     private PlayerStatusEnum status;
     @Setter
+    @Getter
     private HashMap<ScoreType, Integer> scores;
     @Setter
     @Getter
@@ -175,6 +176,10 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private Guild guild;
+    @Getter
+    @Setter
+    private Glicko2Player kolizeumRate;
+
     private boolean wasSitted = false; //only for regen life
     private Fight myFight;
     private Fighter myFighter;
@@ -300,7 +305,7 @@ public class Player extends IGameActor implements Observer {
 
     public HashMap<ScoreType, Integer> getScores() {
         if (this.scores == null)
-            this.scores = new HashMap<>(7);
+            this.scores = new HashMap<>(8);
         return this.scores;
     }
 
@@ -373,7 +378,8 @@ public class Player extends IGameActor implements Observer {
         this.kamas += val;
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean onTutorial = false;
 
     public synchronized void onLogged() {
@@ -381,10 +387,9 @@ public class Player extends IGameActor implements Observer {
             if (!this.inWorld) {
                 this.inWorld = true;
                 this.account.currentIP = client.getIP();
-                if(this.onTutorial){
+                if (this.onTutorial) {
 
-                }
-                else if (this.getFighter() == null) {
+                } else if (this.getFighter() == null) {
                     this.spawnToMap();
                     client.send(this.currentMap.getAgressableActorsStatus(this));
                 }
@@ -424,18 +429,18 @@ public class Player extends IGameActor implements Observer {
             this.client = null;
             if (this.account != null) {
                 if (this.account.characters == null) {
-                    logger.error("NulledAccountCharacters {} ", this.nickName); //pas sence arriver
+                    logger.error("nulledAccountCharacters {} ", this.nickName); //pas sence arriver
                     logger.error(this.toString());
-                }
-                for (Player p : this.account.characters) { //TODO: ALleos
-                    if (DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x != null && p.nickName.equalsIgnoreCase(x.second.nickName))) {
-                        logger.debug(p.nickName + " already aded");
+                } else
+                    for (Player p : this.account.characters) { //TODO: ALleos
+                        if (DAO.getPlayers().getQueueAsSteam().anyMatch(x -> x != null && p.nickName.equalsIgnoreCase(x.second.nickName))) {
+                            logger.error("{} already added", p.nickName);
+                        }
+                        DAO.getPlayers().addCharacterInQueue(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
+                        logger.debug("{} added {}", p.nickName, this.account.characters.size());
                     }
-                    DAO.getPlayers().addCharacterInQueue(new Couple<>(System.currentTimeMillis() + DAO.getSettings().getIntElement("Account.DeleteMemoryTime") * 60 * 1000, p));
-                    logger.debug(p.nickName + " added" + this.account.characters.size());
-                }
             } else {
-                logger.error(nickName + " nulled account on disconnection");
+                logger.error("{} nulled account on disconnection", nickName);
             }
 
         } catch (Exception e) {
@@ -542,11 +547,11 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void addLife(int val) {
-        if((this.life + val) >= this.getMaxLife())
+        if ((this.life + val) >= this.getMaxLife())
             this.life += val;
     }
 
-    public void healLife(int val){
+    public void healLife(int val) {
         this.life += val;
     }
 
@@ -856,6 +861,7 @@ public class Player extends IGameActor implements Observer {
         this.scores.put(ScoreType.PVM_WIN, Integer.parseInt(result.split(",")[4]));
         this.scores.put(ScoreType.PVM_LOOSE, Integer.parseInt(result.split(",")[5]));
         this.scores.put(ScoreType.PVP_TOURNAMENT, Integer.parseInt(result.split(",")[6]));
+        this.scores.put(ScoreType.BEST_COTE, Integer.parseInt(result.split(",")[7]));
 
     }
 
@@ -867,6 +873,7 @@ public class Player extends IGameActor implements Observer {
         this.scores.put(ScoreType.PVM_WIN, 0);
         this.scores.put(ScoreType.PVM_LOOSE, 0);
         this.scores.put(ScoreType.PVP_TOURNAMENT, 0);
+        this.scores.put(ScoreType.BEST_COTE, 0);
     }
 
     public int computeLife(float percent) {
@@ -875,13 +882,12 @@ public class Player extends IGameActor implements Observer {
 
     public double getExpBonus() {
         double bonusXp = 1;
-        for (Player cbi2 : this.account.characters) {
-            if (((((!((cbi2.getID() == this.ID))) && ((cbi2.level > level)))) && ((bonusXp < 4)))) {
-                bonusXp = (bonusXp + 1);
+        if (this.account.characters != null)
+            for (Player cbi2 : this.account.characters) {
+                if (((((!((cbi2.getID() == this.ID))) && ((cbi2.level > level)))) && ((bonusXp < 4)))) {
+                    bonusXp = (bonusXp + 1);
+                }
             }
-            ;
-        }
-        ;
         return bonusXp * DAO.getSettings().getDoubleElement("Rate.PvM");
     }
 

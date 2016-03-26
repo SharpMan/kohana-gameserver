@@ -83,6 +83,8 @@ public class DatabaseSource implements Service {
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("leakDetectionThreshold","20000");
+        config.addDataSourceProperty("validationTimeout","5000");
         config.setMaximumPoolSize(50);
 
         this.dataSource = new HikariDataSource(config);

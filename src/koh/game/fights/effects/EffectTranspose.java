@@ -16,11 +16,11 @@ public class EffectTranspose extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         for (Fighter target : (Iterable<Fighter>) castInfos.targets.stream()
-                .filter(fr -> !(fr.getObjectType() != IFightObject.FightObjectType.OBJECT_STATIC)
+                .filter(fr -> (fr.getObjectType() != IFightObject.FightObjectType.OBJECT_STATIC)
                         && !fr.getStates().hasState(FightStateEnum.CARRIED)
                         && !fr.getStates().hasState(FightStateEnum.INÉBRANLABLE)
                         && !fr.getStates().hasState(FightStateEnum.ENRACINÉ)
-                        && !fr.getStates().hasState(FightStateEnum.Indéplaçable))
+                        && !fr.getStates().hasState(FightStateEnum.INDÉPLAÇABLE))
                 ::iterator) {
             if (castInfos.spellId == 445) {
                 if (target.getTeam() == castInfos.caster.getTeam()) {

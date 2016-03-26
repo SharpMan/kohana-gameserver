@@ -64,6 +64,10 @@ public class Path {
         return cellsPath == null || cellsPath.length <= 1; // if end == start the path is also empty
     }
 
+    public boolean isEmptyRide(){
+        return cellsPath == null || cellsPath.length == 0;
+    }
+
     public byte getEndCellDirection()
     {
         if (cellsPath.length <= 1)

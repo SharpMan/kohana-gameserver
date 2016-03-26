@@ -21,7 +21,7 @@ public class BuffSubPmAfterHealed extends BuffEffect {
     @Override
     public int applyEffect(MutableInt HealValue, EffectCast DamageInfos) {
         
-        return EffectBase.getEffect(StatsEnum.SubPMEsquive).applyEffect(castInfos);
+        return EffectBase.getEffect(StatsEnum.SUB_PM_ESQUIVE).applyEffect(castInfos);
     }
 
     @Override

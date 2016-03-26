@@ -76,7 +76,7 @@ public class Account {
         }
     }
 
-    public void totalClear() {
+    public synchronized void totalClear() {
         if (this.accountData != null && accountData.columsToUpdate != null) {
             if (accountData.columsToUpdate != null) {
                 DAO.getAccountDatas().save(this.accountData,this);

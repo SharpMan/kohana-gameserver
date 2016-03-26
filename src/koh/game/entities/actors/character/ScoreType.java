@@ -12,6 +12,7 @@ public enum ScoreType {
     ARENA_LOOSE,
     PVM_WIN,
     PVM_LOOSE,
+    BEST_COTE,
     PVP_TOURNAMENT;
 
 }

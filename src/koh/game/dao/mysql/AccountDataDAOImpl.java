@@ -35,6 +35,8 @@ public class AccountDataDAOImpl extends AccountDataDAO {
     @Override
     public void save(AccountData data, Account account) {
         //TODO extract them to Entity-Side (they pollute 1feature-per-class logic...)
+        if(data.columsToUpdate.isEmpty())
+            return;
         int i = 1;
         String query = "UPDATE `accounts_data` set ";
         query = data.columsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);

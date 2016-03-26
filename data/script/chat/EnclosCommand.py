@@ -7,13 +7,13 @@ from koh.game.network import WorldClient;
 
 
 
-class ShopCommand(PlayerCommand):
+class EnclosCommand(PlayerCommand):
 
     def getDescription(self):
-        return "Téléporte à la map shop"
+        return "Téléporte à la map enclos"
 
     def apply(self,client,args):
-        client.getCharacter().teleport(115082755,473)
+        client.getCharacter().teleport(149817,282)
 
     def can(self,client):
         if not client.canGameAction(GameActionTypeEnum.MAP_MOVEMENT):

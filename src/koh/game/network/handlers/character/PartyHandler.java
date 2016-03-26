@@ -7,6 +7,7 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.Party;
+import koh.game.entities.kolissium.ArenaParty;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.Message;
@@ -26,163 +27,163 @@ import koh.protocol.messages.game.context.roleplay.party.*;
 public class PartyHandler {
     
     @HandlerAttribute(ID = DungeonPartyFinderAvailableDungeonsRequestMessage.MESSAGE_ID)
-    public static void HandleDungeonPartyFinderAvailableDungeonsRequestMessage(WorldClient Client , DungeonPartyFinderAvailableDungeonsRequestMessage Message){
-        Client.send(new DungeonPartyFinderAvailableDungeonsMessage(new int[0]));
+    public static void handleDungeonPartyFinderAvailableDungeonsRequestMessage(WorldClient client , DungeonPartyFinderAvailableDungeonsRequestMessage message){
+        client.send(new DungeonPartyFinderAvailableDungeonsMessage(new int[0]));
     }
 
     //TODO : GameFightOptionToggleMessage Just to group
     @HandlerAttribute(ID = PartyPledgeLoyaltyRequestMessage.M_ID)
-    public static void HandlePartyPledgeLoyaltyRequestMessage(WorldClient Client, PartyPledgeLoyaltyRequestMessage Message) {
-        if (Client.getParty() == null) {
-            Client.send(new BasicNoOperationMessage());
+    public static void handlePartyPledgeLoyaltyRequestMessage(WorldClient worldClient, PartyPledgeLoyaltyRequestMessage message) {
+        if (worldClient.getParty() == null) {
+            worldClient.send(new BasicNoOperationMessage());
             return;
         }
         //TODO : AutoDecliner
-        Client.send(new PartyLoyaltyStatusMessage(Client.getParty().id, Message.loyal));
+        worldClient.send(new PartyLoyaltyStatusMessage(worldClient.getParty().id, message.loyal));
     }
 
     @HandlerAttribute(ID = PartyNameSetRequestMessage.M_ID)
-    public static void HandlePartyNameSetRequestMessage(WorldClient Client, PartyNameSetRequestMessage Message) {
-        if (Client.getParty() == null) {
-            Client.send(new BasicNoOperationMessage());
+    public static void handlePartyNameSetRequestMessage(WorldClient client, PartyNameSetRequestMessage message) {
+        if (client.getParty() == null) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.getCharacter())) {
-            Client.send(new PartyNameSetErrorMessage(Client.getParty().id, PartyNameErrorEnum.PARTY_NAME_UNALLOWED_RIGHTS));
+        if (!client.getParty().isChief(client.getCharacter())) {
+            client.send(new PartyNameSetErrorMessage(client.getParty().id, PartyNameErrorEnum.PARTY_NAME_UNALLOWED_RIGHTS));
             return;
         }
-        if (Message.partyName.length() < 3 || Message.partyName.length() > 20) {
-            Client.send(new PartyNameSetErrorMessage(Client.getParty().id, PartyNameErrorEnum.PARTY_NAME_INVALID));
+        if (message.partyName.length() < 3 || message.partyName.length() > 20) {
+            client.send(new PartyNameSetErrorMessage(client.getParty().id, PartyNameErrorEnum.PARTY_NAME_INVALID));
             return;
         }
-        Client.getParty().partyName = Message.partyName;
-        Client.getParty().sendToField(new PartyNameUpdateMessage(Client.getParty().id, Client.getParty().partyName));
+        client.getParty().partyName = message.partyName;
+        client.getParty().sendToField(new PartyNameUpdateMessage(client.getParty().id, client.getParty().partyName));
     }
 
     @HandlerAttribute(ID = PartyStopFollowRequestMessage.M_ID)
-    public static void HandlePartyStopFollowRequestMessage(WorldClient Client, PartyStopFollowRequestMessage Message) {
-        if (Client.getParty() == null) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandlePartyStopFollowRequestMessage(WorldClient client, PartyStopFollowRequestMessage message) {
+        if (client.getParty() == null) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.getCharacter())) {
-            PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
+        if (!client.getParty().isChief(client.getCharacter())) {
+            PlayerController.sendServerMessage(client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
 
     }
 
     @HandlerAttribute(ID = PartyFollowThisMemberRequestMessage.MESSAGE_ID)
-    public static void HandlePartyFollowThisMemberRequestMessage(WorldClient Client, PartyFollowThisMemberRequestMessage Message) {
+    public static void HandlePartyFollowThisMemberRequestMessage(WorldClient client, PartyFollowThisMemberRequestMessage message) {
 
-        if (Client.getParty() == null) {
-            Client.send(new BasicNoOperationMessage());
+        if (client.getParty() == null) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.getCharacter())) {
-            PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
+        if (!client.getParty().isChief(client.getCharacter())) {
+            PlayerController.sendServerMessage(client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
-        if (Client.getParty().getPlayerById(Message.playerId) == null) {
-            PlayerController.sendServerMessage(Client, "Erreur : Ce joueur ne fait pas partie du groupe");
+        if (client.getParty().getPlayerById(message.playerId) == null) {
+            PlayerController.sendServerMessage(client, "Erreur : Ce joueur ne fait pas partie du groupe");
             return;
         }
-        if (Message.enabled) {
-            Client.getParty().followAll(Client.getParty().getPlayerById(Message.playerId));
+        if (message.enabled) {
+            client.getParty().followAll(client.getParty().getPlayerById(message.playerId));
         } else {
-            Client.getParty().unFollowAll(Client.getParty().getPlayerById(Message.playerId));
+            client.getParty().unFollowAll(client.getParty().getPlayerById(message.playerId));
         }
 
     }
 
     @HandlerAttribute(ID = PartyFollowMemberRequestMessage.MESSAGE_ID)
-    public static void HandlePartyFollowMemberRequestMessage(WorldClient Client, PartyFollowMemberRequestMessage Message) {
-        if (Client.getParty() == null) {
-            Client.send(new BasicNoOperationMessage());
+    public static void handlePartyFollowMemberRequestMessage(WorldClient client, PartyFollowMemberRequestMessage message) {
+        if (client.getParty() == null) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        if (Client.getParty().getPlayerById(Message.playerId) == null) {
-            PlayerController.sendServerMessage(Client, "Erreur : Ce joueur ne fait pas partie du groupe");
+        if (client.getParty().getPlayerById(message.playerId) == null) {
+            PlayerController.sendServerMessage(client, "Erreur : Ce joueur ne fait pas partie du groupe");
             return;
         }
-        Client.getParty().getPlayerById(Message.playerId).addFollower(Client.getCharacter());
+        client.getParty().getPlayerById(message.playerId).addFollower(client.getCharacter());
     }
 
     @HandlerAttribute(ID = PartyAbdicateThroneMessage.M_ID)
-    public static void HandlePartyAbdicateThroneMessage(WorldClient Client, PartyAbdicateThroneMessage Message) {
-        if (Client.getParty() == null) {
-            Client.send(new BasicNoOperationMessage());
+    public static void handlePartyAbdicateThroneMessage(WorldClient client, PartyAbdicateThroneMessage message) {
+        if (client.getParty() == null) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.getCharacter())) {
-            PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
+        if (!client.getParty().isChief(client.getCharacter())) {
+            PlayerController.sendServerMessage(client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
-        if (Client.getParty().getPlayerById(Message.playerId) == null) {
-            PlayerController.sendServerMessage(Client, "Erreur : Ce joueur ne fait pas partie du groupe");
+        if (client.getParty().getPlayerById(message.playerId) == null) {
+            PlayerController.sendServerMessage(client, "Erreur : Ce joueur ne fait pas partie du groupe");
             return;
         }
-        Client.getParty().updateLeader(Client.getParty().getPlayerById(Message.playerId));
+        client.getParty().updateLeader(client.getParty().getPlayerById(message.playerId));
     }
 
     @HandlerAttribute(ID = PartyKickRequestMessage.M_ID)
-    public static void HandlePartyKickRequestMessage(WorldClient Client, PartyKickRequestMessage Message) {
-        if (Client.getParty() == null) {
-            Client.send(new BasicNoOperationMessage());
+    public static void handlePartyKickRequestMessage(WorldClient client, PartyKickRequestMessage message) {
+        if (client.getParty() == null) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        if (!Client.getParty().isChief(Client.getCharacter())) {
-            PlayerController.sendServerMessage(Client, "Erreur : Vous n'êtes pas chef du groupe");
+        if (!client.getParty().isChief(client.getCharacter())) {
+            PlayerController.sendServerMessage(client, "Erreur : Vous n'êtes pas chef du groupe");
             return;
         }
-        if (Client.getParty().getPlayerById(Message.playerId) == null) {
-            PlayerController.sendServerMessage(Client, "Erreur : Ce joueur ne fait pas partie du groupe");
+        if (client.getParty().getPlayerById(message.playerId) == null) {
+            PlayerController.sendServerMessage(client, "Erreur : Ce joueur ne fait pas partie du groupe");
             return;
         }
-        Client.getParty().leave(Client.getParty().getPlayerById(Message.playerId), true);
-        Client.getParty().sendToField(new PartyMemberEjectedMessage(Client.getParty().id, Message.playerId, Client.getCharacter().getID()));
+        client.getParty().leave(client.getParty().getPlayerById(message.playerId), true);
+        client.getParty().sendToField(new PartyMemberEjectedMessage(client.getParty().id, message.playerId, client.getCharacter().getID()));
 
     }
 
     @HandlerAttribute(ID = PartyLeaveRequestMessage.M_ID)
-    public static void HandlePartyLeaveRequestMessage(WorldClient Client, PartyLeaveRequestMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.GROUP)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void handlePartyLeaveRequestMessage(WorldClient client, PartyLeaveRequestMessage message) {
+        if (!client.isGameAction(GameActionTypeEnum.GROUP)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
         try {
-            Client.endGameAction(GameActionTypeEnum.GROUP);
+            client.endGameAction(GameActionTypeEnum.GROUP);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @HandlerAttribute(ID = 5580)
-    public static void HandlePartyAcceptInvitationMessage(WorldClient Client, PartyAcceptInvitationMessage Message) {
-        if (Client.isGameAction(GameActionTypeEnum.GROUP)) {
-            PlayerController.sendServerMessage(Client, "Vous faites déjà partie d'un groupe ...");
+    public static void handlePartyAcceptInvitationMessage(WorldClient client, PartyAcceptInvitationMessage message) {
+        if (client.isGameAction(GameActionTypeEnum.GROUP)) {
+            PlayerController.sendServerMessage(client, "Vous faites déjà partie d'un groupe ...");
             return;
         }
-        PartyRequest GameParty = null;
+        PartyRequest gameParty = null;
         try {
-            GameParty = Client.getPartyRequest(Message.partyId);
+            gameParty = client.getPartyRequest(message.partyId);
         } catch (Exception e) {
         }
-        if (GameParty == null || !GameParty.accept()) {
-            Client.send(new BasicNoOperationMessage());
+        if (gameParty == null || !gameParty.accept()) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
     }
 
     @HandlerAttribute(ID = 6254)
-    public static void HandlePartyCancelInvitationMessage(WorldClient Client, PartyCancelInvitationMessage Message) {
-        PartyRequest Req = Client.getPartyRequest(Message.partyId, Message.guestId);
-        if (Req != null) {
-            Req.abort();
-            Client.removePartyRequest(Req);
+    public static void handlePartyCancelInvitationMessage(WorldClient Client, PartyCancelInvitationMessage message) {
+        final PartyRequest request = Client.getPartyRequest(message.partyId, message.guestId);
+        if (request != null) {
+            request.abort();
+            Client.removePartyRequest(request);
         } else if (Client.getParty() != null && Client.getParty().isChief(Client.getCharacter())) {
-            Client.getParty().abortRequest(Client, Message.guestId);
+            Client.getParty().abortRequest(Client, message.guestId);
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -190,12 +191,12 @@ public class PartyHandler {
 
     @HandlerAttribute(ID = PartyRefuseInvitationMessage.M_ID)
     public static void HandlePartyRefuseInvitationMessage(WorldClient Client, PartyRefuseInvitationMessage Message) {
-        Party GameParty = null;
+        Party party = null;
         try {
-            GameParty = Client.getPartyRequest(Message.partyId).requester.getParty();
+            party = Client.getPartyRequest(Message.partyId).requester.getParty();
         } catch (Exception e) {
         }
-        if (GameParty == null) {
+        if (party == null) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
@@ -212,64 +213,67 @@ public class PartyHandler {
         if (GameParty == null) {
             return;
         }
-        Client.send(new PartyInvitationDetailsMessage(GameParty.id, GameParty.type, GameParty.partyName, Client.getPartyRequest(Message.partyId).requester.getCharacter().getID(), Client.getPartyRequest(Message.partyId).requester.getCharacter().getNickName(), GameParty.chief.getID(), GameParty.toPartyInvitationMemberInformations(), GameParty.toPartyGuestInformations()));
+        Client.send(new PartyInvitationDetailsMessage(GameParty.id, GameParty.getType(), GameParty.partyName, Client.getPartyRequest(Message.partyId).requester.getCharacter().getID(), Client.getPartyRequest(Message.partyId).requester.getCharacter().getNickName(), GameParty.getChief().getID(), GameParty.toPartyInvitationMemberInformations(), GameParty.toPartyGuestInformations()));
     }
 
     @HandlerAttribute(ID = 5585)
-    public static void HandlePartyInvitationRequestMessage(WorldClient Client, Message Message) {
+    public static void handlePartyInvitationRequestMessage(WorldClient client, PartyInvitationRequestMessage message) {
 
-        Player target = DAO.getPlayers().getCharacter(((PartyInvitationRequestMessage) Message).name);
+        Player target = DAO.getPlayers().getCharacter(message.name);
         if (target == null) {
-            Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_NOT_FOUND));
+            client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_NOT_FOUND));
             return;
         }
         if (target.getClient() == null || target.getStatus() == PlayerStatusEnum.PLAYER_STATUS_AFK) {
-            Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_BUSY));
+            client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_BUSY));
             return;
         }
 
         if (!target.getClient().canGameAction(GameActionTypeEnum.GROUP)) {
-            Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_ALREADY_INVITED));
+            client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_ALREADY_INVITED));
             return;
         }
 
-        if (!Client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-            Client.send(new BasicNoOperationMessage());
+        if (!client.canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
         if (!target.getClient().canGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-            Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_ALREADY_INVITED));
+            client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_ALREADY_INVITED));
             return;
         }
 
-        if (Client.getParty() != null && Client.getParty().isFull()) {
-            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 302, new String[0]));
-            Client.send(new PartyCannotJoinErrorMessage(((GameParty) Client.getGameAction(GameActionTypeEnum.GROUP)).party.id, PartyJoinErrorEnum.PARTY_JOIN_ERROR_NOT_ENOUGH_ROOM));
+        if (client.getParty() != null && client.getParty().isFull()) {
+            client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 302, new String[0]));
+            client.send(new PartyCannotJoinErrorMessage(((GameParty) client.getGameAction(GameActionTypeEnum.GROUP)).party.id, PartyJoinErrorEnum.PARTY_JOIN_ERROR_NOT_ENOUGH_ROOM));
             return;
         }
-        if (target.getAccount().accountData.ignore(Client.getAccount().id)) {
-            Client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_BUSY));
+        if (target.getAccount().accountData.ignore(client.getAccount().id)) {
+            client.send(new PartyCannotJoinErrorMessage(0, PartyJoinErrorEnum.PARTY_JOIN_ERROR_PLAYER_BUSY));
             return;
         }
 
-        PartyRequest Request = new PartyRequest(Client, target.getClient());
+        final PartyRequest request = new PartyRequest(client, target.getClient());
 
-        Client.addPartyRequest(Request);
-        target.getClient().addPartyRequest(Request);
+        client.addPartyRequest(request);
+        target.getClient().addPartyRequest(request);
 
-        if (Client.getParty() == null) {
-            new Party(Client.getCharacter(), target);
+        if (client.getParty() == null) {
+            if(message instanceof PartyInvitationArenaRequestMessage)
+                new ArenaParty(client.getCharacter(), target);
+            else
+                new Party(client.getCharacter(), target, PartyTypeEnum.PARTY_TYPE_CLASSICAL);
         } else {
-            if (Client.getParty().restricted && !Client.getParty().isChief(Client.getCharacter())) {
-                PlayerController.sendServerMessage(Client, "Impossible d'inviter ce joueur, le groupe ne peut pas être modifié actuellement.");
+            if (client.getParty().isRestricted() && !client.getParty().isChief(client.getCharacter())) {
+                PlayerController.sendServerMessage(client, "Impossible d'inviter ce joueur, le groupe ne peut pas être modifié actuellement.");
                 return;
             } else {
-                Client.getParty().addGuest(target);
+                client.getParty().addGuest(target);
             }
         }
 
-        target.send(new PartyInvitationMessage(Client.getParty().id, PartyTypeEnum.PARTY_TYPE_CLASSICAL, Client.getParty().partyName, Party.MAX_PARTICIPANTS, Client.getCharacter().getID(), Client.getCharacter().getNickName(), target.getID()));
+        target.send(new PartyInvitationMessage(client.getParty().id, client.getParty().getType(), client.getParty().partyName, Party.MAX_PARTICIPANTS, client.getCharacter().getID(), client.getCharacter().getNickName(), target.getID()));
 
     }
 

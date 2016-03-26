@@ -253,7 +253,7 @@ public class GuildHandler {
             client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_ALREADY_IN_GROUP));
         } else if (!client.getCharacter().getInventoryCache().hasItemId(1575)) {
             client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_REQUIREMENT_UNMET));
-            PlayerController.sendServerMessage(client, "La crétion d'une guilde nécessite une guildalogemme qui est commerciable en <b>Boutique</b>");
+            PlayerController.sendServerMessage(client, "La création d'une guilde nécessite une guildalogemme qui est commerciable en <b>Boutique</b>");
         } else if (DAO.getGuilds().alreadyTakenEmblem(message.guildEmblem)) {
             client.send(new GuildCreationResultMessage(SocialGroupCreationResultEnum.SOCIAL_GROUP_CREATE_ERROR_EMBLEM_ALREADY_EXISTS));
         } else if (!client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {

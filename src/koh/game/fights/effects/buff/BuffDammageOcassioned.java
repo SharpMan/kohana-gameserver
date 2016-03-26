@@ -1,5 +1,6 @@
 package koh.game.fights.effects.buff;
 
+import koh.game.entities.item.EffectHelper;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
@@ -8,7 +9,6 @@ import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
- *
  * @author Neo-Craft
  */
 public class BuffDammageOcassioned extends BuffEffect {
@@ -21,9 +21,10 @@ public class BuffDammageOcassioned extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        DamageValue.setValue((DamageValue.intValue() * this.JET) / 100);
-        return super.applyEffect(DamageValue, DamageInfos);
+    public int applyEffect(MutableInt DamageValue, EffectCast damageInfos) {
+        if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId))
+            DamageValue.setValue((DamageValue.intValue() * this.JET) / 100);
+        return super.applyEffect(DamageValue, damageInfos);
     }
 
     @Override

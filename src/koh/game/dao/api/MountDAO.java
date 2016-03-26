@@ -9,6 +9,8 @@ import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
  */
 public abstract class MountDAO implements Service {
 
+    public abstract MountTemplate findTemplate(int model);
+
     public abstract MountTemplate find(int id);
 
     public abstract ObjectEffectInteger[] getMountByEffect(int model, int level);

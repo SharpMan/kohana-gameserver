@@ -171,13 +171,15 @@ public class FightFormulas {
     }
 
     public static int mountXpEarned(CharacterFighter fighter, AtomicInteger xpWin) {
-        if (fighter == null || xpWin.get() == 0) {
+        if (fighter == null || xpWin.get() <= 0) {
             return 0;
         }
         if (fighter.getCharacter().getMountInfo() == null) {
             logger.error("mountInfo Null {} ", fighter.getCharacter().toString());
         }
-        if (!fighter.getCharacter().getMountInfo().isToogled || fighter.getCharacter().getMountInfo().mount == null) {
+        if (!fighter.getCharacter().getMountInfo().isToogled
+                || fighter.getCharacter().getMountInfo().mount == null
+                || fighter.getCharacter().getMountInfo().ratio <= 0) {
             return 0;
         }
 
@@ -344,7 +346,7 @@ public class FightFormulas {
                         double num2 = (double) looter.getRANDOM().nextInt(100) + looter.getRANDOM().nextDouble();
                         double num3 = adjustDropChance(looter, current, mob, (int) looter.getFight().ageBonus);
                         if (num3 >= num2) {
-                            Optional<DroppedItem> item = list.stream()
+                            final Optional<DroppedItem> item = list.stream()
                                     .filter(dr -> dr.getItem() == current.getObjectId())
                                     .findFirst();
                             if (item.isPresent()) {

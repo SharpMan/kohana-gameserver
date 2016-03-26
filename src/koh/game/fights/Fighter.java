@@ -113,6 +113,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return this.setCell(cell, true);
     }
 
+
     public int setCell(FightCell cell, boolean runEvent) {
         if (this.myCell != null) {
             this.myCell.removeObject(this); // On vire le fighter de la cell:
@@ -129,21 +130,25 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
         }
         int addResult;
-        this.myCell = cell;
-        if(cell.hasObject(FightObjectType.OBJECT_GLYPHE)){
-            for (IFightObject Glyph : cell.getObjects(IFightObject.FightObjectType.OBJECT_GLYPHE)) {
-                if((!previousCellPos.isEmpty() &&
-                        !this.fight.getCell(previousCellPos.get(previousCellPos.size() -1)).hasGameObject(Glyph))
-                        || ((FightGlyph) Glyph).getLastTurnActivated() == this.fight.getFightWorker().fightTurn){
+
+
+        if(cell != null && cell.hasObject(FightObjectType.OBJECT_GLYPHE)){
+            for (FightGlyph glyph : cell.getGlyphes()) {
+
+                if(myCell.contains(glyph) ||
+                        (!previousCellPos.isEmpty() && !this.fight.getCell(previousCellPos.get(previousCellPos.size() -1)).hasGameObject(glyph))
+                        || glyph.getLastTurnActivated() == this.fight.getFightWorker().fightTurn){
                     continue;
                 }
-                ((FightGlyph) Glyph).setLastTurnActivated(this.fight.getFightWorker().fightTurn);
-                addResult = ((FightGlyph) Glyph).loadEnnemyTargetsAndActive(this);
+                this.myCell = cell;
+                glyph.setLastTurnActivated(this.fight.getFightWorker().fightTurn);
+                addResult = glyph.loadEnnemyTargetsAndActive(this);
                 if (addResult == -3 || addResult == -2) {
                     return addResult;
                 }
             }
         }
+        this.myCell = cell;
 
         if (this.myCell != null) {
             this.mapPointCache.set_cellId(myCell.Id);
@@ -216,22 +221,40 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             //SendGameFightLeaveMessage
             this.fight.sendToField(new GameActionFightDeathMessage(ActionIdEnum.ACTION_CHARACTER_DEATH, casterId, this.ID));
 
-            this.team.getAliveFighters()
+            final Fighter[] aliveFighters = this.team.getAliveFighters()
+                    .filter(x -> x.getSummonerID() == this.ID).toArray(Fighter[]::new);
+
+            for (final Fighter fighter : aliveFighters) {
+                if(fighter.getSummonerID() == this.ID){
+                    fighter.tryDie(this.ID,true);
+                }
+            }
+
+            /*this.team.getAliveFighters()
                     .filter(x -> x.getSummonerID() == this.ID)
-                    .forEachOrdered(fighter -> fighter.tryDie(this.ID, true));
+                    .forEachOrdered(fighter -> fighter.tryDie(this.ID, true));*/
 
             if (this.fight.getActivableObjects().containsKey(this)) {
                 this.fight.getActivableObjects().get(this).stream().forEach(y -> y.remove());
             }
 
-            for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
-                fr.getBuff().getBuffsDec().values().forEach(list -> {
-                            for(BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator){
-                                if(buff.caster == this)
-                                    fr.getBuff().debuff(buff);
-                            }
+            for (final Fighter fighter : aliveFighters) {
+                fighter.getBuff().getBuffsDec().values().forEach(list -> {
+                    for(BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator){
+                        if(buff.caster == this)
+                            fighter.getBuff().debuff(buff);
+                    }
                 });
             }
+
+            /*for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
+                fr.getBuff().getBuffsDec().values().forEach(list -> {
+                    for(BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator){
+                        if(buff.caster == this)
+                            fr.getBuff().debuff(buff);
+                    }
+                });
+            }*/
 
             myCell.removeObject(this);
 

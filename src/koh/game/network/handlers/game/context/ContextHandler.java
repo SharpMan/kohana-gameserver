@@ -48,24 +48,24 @@ public class ContextHandler {
     private static final Logger logger = LogManager.getLogger(ContextHandler.class);
 
     @HandlerAttribute(ID = GameMapChangeOrientationRequestMessage.M_ID)
-    public static void HandleGameMapChangeOrientationRequestMessage(WorldClient Client, GameMapChangeOrientationRequestMessage Message) {
-        if (Client.getCharacter().getFight() == null) {
-            Client.getCharacter().setDirection(Message.direction);
-            Client.getCharacter().getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(Client.getCharacter().getID(), Client.getCharacter().getDirection())));
-            logger.debug("New direction for actor {}~{}" , Client.getCharacter().getID() , Message.direction);
+    public static void handleGameMapChangeOrientationRequestMessage(WorldClient client, GameMapChangeOrientationRequestMessage message) {
+        if (client.getCharacter().getFight() == null) {
+            client.getCharacter().setDirection(message.direction);
+            client.getCharacter().getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(client.getCharacter().getID(), client.getCharacter().getDirection())));
+            logger.debug("New direction for actor {}~{}" , client.getCharacter().getID() , message.direction);
         }
     }
 
     @HandlerAttribute(ID = ShowCellRequestMessage.M_ID)
-    public static void HandleShowCellRequestMessage(WorldClient Client, ShowCellRequestMessage Message) {
+    public static void handleShowCellRequestMessage(WorldClient Client, ShowCellRequestMessage message) {
         if (Client.getCharacter().getFighter() != null) {
-            Client.getCharacter().getFighter().showCell(Message.cellId, true);
+            Client.getCharacter().getFighter().showCell(message.cellId, true);
         }
         //Spectator
     }
 
     @HandlerAttribute(ID = GameContextReadyMessage.M_ID)
-    public static void HandleGameContextReadyMessage(WorldClient client, GameContextReadyMessage Message) {
+    public static void handleGameContextReadyMessage(WorldClient client, GameContextReadyMessage message) {
         if (client.getCharacter().getFighter() != null) {
             client.addGameAction(new GameFight(client.getCharacter().getFighter(), client.getCharacter().getFight()));
             client.send(client.getCharacter().getCurrentMap().getMapComplementaryInformationsDataMessage(client.getCharacter()));
@@ -74,7 +74,7 @@ public class ContextHandler {
     }
 
     @HandlerAttribute(ID = GameContextCreateRequestMessage.MESSAGE_ID)
-    public static void HandleGameContextCreateRequestMessage(WorldClient Client, Message message) {
+    public static void handleGameContextCreateRequestMessage(WorldClient Client, Message message) {
         if (Client.getCharacter().isInWorld()) {
             PlayerController.sendServerMessage(Client, "You are already Logged !");
         } else {
@@ -88,9 +88,9 @@ public class ContextHandler {
     }
 
     @HandlerAttribute(ID = ObjectDropMessage.MESSAGE_ID)
-    public static void HandleObjectDropMessage(WorldClient client, ObjectDropMessage Message) {
-        InventoryItem Item = client.getCharacter().getInventoryCache().find(Message.objectUID);
-        if (Item == null || Item.getQuantity() < Message.quantity) {
+    public static void handleObjectDropMessage(WorldClient client, ObjectDropMessage message) {
+        InventoryItem Item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        if (Item == null || Item.getQuantity() < message.quantity) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
             return;
         } else if (Item.getEffect(983) != null) {
@@ -126,17 +126,17 @@ public class ContextHandler {
             }
             break;
         }
-        if (cellID == -1 || Message.quantity <= 0) {
+        if (cellID == -1 || message.quantity <= 0) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP_NO_PLACE));
             return;
         }
-        int newQua = Item.getQuantity() - Message.quantity;
+        int newQua = Item.getQuantity() - message.quantity;
         if (newQua <= 0) {
             client.getCharacter().getInventoryCache().removeItemFromInventory(Item);
             DAO.getItems().save(Item, false, "character_items");
         } else {
             client.getCharacter().getInventoryCache().updateObjectquantity(Item, newQua);
-            Item = CharacterInventory.tryCreateItem(Item.getTemplateId(), null, Message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
+            Item = CharacterInventory.tryCreateItem(Item.getTemplateId(), null, message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
         }
 
         client.getCharacter().getCurrentMap().addItem(cellID, Item);
@@ -174,7 +174,7 @@ public class ContextHandler {
     }
 
     @HandlerAttribute(ID = GameMapMovementRequestMessage.MESSAGE_ID)
-    public static void HandleGameMapMovementRequestMessage(WorldClient client, GameMapMovementRequestMessage message) {
+    public static void handleGameMapMovementRequestMessage(WorldClient client, GameMapMovementRequestMessage message) {
 
         if (message.keyMovements.length <= 0) {
             logger.error("Empty Path{}" , client.getIP());

@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 public abstract class EffectBase {
 
     private static final Logger logger = LogManager.getLogger(EffectBase.class);
+    //TODO ADD_PA_BIS + IA
 
     //TODO effect 406
     private static final HashMap<StatsEnum, EffectBase> EFFECTS = new HashMap<StatsEnum, EffectBase>() {
@@ -147,9 +148,9 @@ public abstract class EffectBase {
             this.put(StatsEnum.ADD_DAMAGE_PHYSIC, new EffectStats());
 
             this.put(StatsEnum.SUB_PA_ESQUIVE_2, new EffectSubPAEsquive());
-            this.put(StatsEnum.SubPAEsquive, new EffectSubPAEsquive());
+            this.put(StatsEnum.SUB_PA_ESQUIVE, new EffectSubPAEsquive());
             this.put(StatsEnum.SUB_PM_ESQUIVE_2, new EffectSubPMEsquive());
-            this.put(StatsEnum.SubPMEsquive, new EffectSubPMEsquive());
+            this.put(StatsEnum.SUB_PM_ESQUIVE, new EffectSubPMEsquive());
 
             //DommageSubis
             this.put(StatsEnum.DAMMAGES_OCASSIONED, new EffectDammageOcassioned());

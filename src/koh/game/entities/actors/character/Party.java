@@ -25,6 +25,7 @@ import koh.protocol.types.game.context.roleplay.party.PartyCompanionMemberInform
 import koh.protocol.types.game.context.roleplay.party.PartyGuestInformations;
 import koh.protocol.types.game.context.roleplay.party.PartyInvitationMemberInformations;
 import koh.protocol.types.game.context.roleplay.party.PartyMemberInformations;
+import lombok.Getter;
 
 /**
  *
@@ -34,23 +35,28 @@ public class Party extends IWorldEventObserver {
 
     public static volatile int nextID = 0;
     public static final byte MAX_PARTICIPANTS = 8;
-    public final byte type = PartyTypeEnum.PARTY_TYPE_CLASSICAL;
-
-    public boolean restricted;
-    public volatile ChatChannel chatChannel = new ChatChannel(); //CHANNEL_PARTY
-    private CopyOnWriteArrayList<Player> players = new CopyOnWriteArrayList<>();
+    @Getter
+    protected byte type = PartyTypeEnum.PARTY_TYPE_CLASSICAL;
+    @Getter
+    private boolean restricted;
+    //public volatile ChatChannel chatChannel = new ChatChannel(); //CHANNEL_PARTY
+    @Getter
+    protected CopyOnWriteArrayList<Player> players = new CopyOnWriteArrayList<>();
     public CopyOnWriteArrayList<Player> guests = new CopyOnWriteArrayList<>();
 
     public final int id;
     public String partyName = "";
 
-    public Player chief;
+    @Getter
+    private Player chief;
 
-    public Party(Player character, Player p2) {
+    public Party(Player character, Player p2, byte type) {
         this.id = nextID++;
+        this.type = type;
         chief = character;
         guests.add(p2);
         this.addPlayer(character);
+
     }
     
     public boolean containsPlayer(Player p){
@@ -94,12 +100,12 @@ public class Party extends IWorldEventObserver {
         }
     }
 
-    public PartyMemberInformations toMemberInformations(Player x) {
-        return new PartyMemberInformations(x.getID(), (byte) x.getLevel(), x.getNickName(), x.getEntityLook(), x.getBreed(), x.hasSexe(), x.getLife(), x.getMaxLife(), x.getProspection(), x.getRegenRate(), x.getInitiative(false), x.getAlignmentSide().value, x.getCurrentMap().getPosition().getPosX(), x.getCurrentMap().getPosition().getPosY(), x.getCurrentMap().getId(), x.getCurrentMap().getSubAreaId(), new PlayerStatus(x.getStatus().value()), new PartyCompanionMemberInformations[0]);
+    public PartyMemberInformations toMemberInformations(Player pl) {
+        return new PartyMemberInformations(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0]);
     }
 
     public PartyMemberInformations[] toMemberInformations() {
-        return this.players.stream().map(x -> new PartyMemberInformations(x.getID(), (byte) x.getLevel(), x.getNickName(), x.getEntityLook(), x.getBreed(), x.hasSexe(), x.getLife(), x.getMaxLife(), x.getProspection(), x.getRegenRate(), x.getInitiative(false), x.getAlignmentSide().value, x.getCurrentMap().getPosition().getPosX(), x.getCurrentMap().getPosition().getPosY(), x.getCurrentMap().getId(), x.getCurrentMap().getSubAreaId(), new PlayerStatus(x.getStatus().value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformations[]::new);
+        return this.players.stream().map(pl -> new PartyMemberInformations(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformations[]::new);
     }
 
     public PartyInvitationMemberInformations[] toPartyInvitationMemberInformations() {
@@ -118,6 +124,19 @@ public class Party extends IWorldEventObserver {
 
     public boolean isFull() {
         return players.size() >= MAX_PARTICIPANTS;
+    }
+
+    public int getRating(){
+        return this.players.stream()
+                .mapToInt(pl -> pl.getKolizeumRate().getRating())
+                .sum();
+    }
+
+    public int getMoyLevel(){
+         return (int) this.players.stream()
+                .mapToInt(Player::getLevel)
+                .average()
+                .getAsDouble();
     }
 
     public void leave(Player player, boolean kicked) {
@@ -160,8 +179,8 @@ public class Party extends IWorldEventObserver {
     public void abortRequest(WorldClient client, int guestId) {
         //TODO: send ChiefName if isn't the owner of invitation
         try {
-            WorldClient klient = this.players.stream().filter(x -> x.getClient().getPartyRequest(this.id, guestId) != null).findFirst().get().getClient();
-            PartyRequest req = klient.getPartyRequest(this.id, guestId);
+            final WorldClient klient = this.players.stream().filter(x -> x.getClient().getPartyRequest(this.id, guestId) != null).findFirst().get().getClient();
+            final PartyRequest req = klient.getPartyRequest(this.id, guestId);
             req.abort();
             klient.removePartyRequest(req);
         } catch (Exception e) {

@@ -162,14 +162,15 @@ public abstract class FightActivableObject implements IFightObject {
         }
         m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(getGameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.caster.getID(), this.ID, activator.getID(), this.m_spellId));
         activator.getFight().startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        ArrayList<Fighter> targetsPerEffect = new ArrayList<>();
+        final ArrayList<Fighter> targetsPerEffect = new ArrayList<>();
         for (EffectInstanceDice effect : castSpell.getEffects()) {
+            //System.out.println(castSpell.getSpellId() + " "+effect);
             targetsPerEffect.addAll(targets);
             targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, castSpell.getEffects(), effect, false, effect.triggers, target.getCellId())
                     && effect.isValidTarget(caster, target)
                     && EffectInstanceDice.verifySpellEffectMask(caster, target, effect)));
 
-            EffectCast castInfos = new EffectCast(effect.getEffectType(), this.castSpell.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.castSpell);
+            final EffectCast castInfos = new EffectCast(effect.getEffectType(), this.castSpell.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.castSpell);
             castInfos.isTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;
             castInfos.isGlyph = this.getObjectType() == FightObjectType.OBJECT_GLYPHE;
             if (EffectBase.tryApplyEffect(castInfos) == -3) {

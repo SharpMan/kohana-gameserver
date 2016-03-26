@@ -34,8 +34,8 @@ import koh.protocol.messages.game.context.fight.GameFightPlacementSwapPositionsR
 import koh.protocol.messages.game.context.fight.GameFightReadyMessage;
 import koh.protocol.messages.game.context.fight.GameFightTurnFinishMessage;
 import koh.protocol.messages.game.context.fight.GameFightTurnReadyMessage;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayPlayerFightFriendlyAnswerMessage;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayPlayerFightRequestMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFightFriendlyAnswerMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFightRequestMessage;
 import koh.protocol.messages.game.guild.ChallengeFightJoinRefusedMessage;
 
 /**

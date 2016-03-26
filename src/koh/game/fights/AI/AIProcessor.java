@@ -307,7 +307,7 @@ public class AIProcessor {
             }
             if (bestCell != -1 && bestCell != this.fighter.getCellId()) {
                 final Path path = new koh.game.fights.utils.Pathfinder(fighter.getFight().getMap(), fight, true, false).findPath(fight.getMap().getCell(fighter.getCellId()), fight.getMap().getCell(bestCell), false,fighter.getMP());
-                GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                final GameMapMovement action = this.fight.tryMove(this.fighter, path);
                 if (action != null) {
                     BACKGROUND_WORKER.execute(() -> {
                         try {
@@ -359,7 +359,7 @@ public class AIProcessor {
             if (bestCell != -1 && bestCell != this.fighter.getCellId())
             {
                 final Path path = new koh.game.fights.utils.Pathfinder(fighter.getFight().getMap(), fight, true, false).findPath(fight.getMap().getCell(fighter.getCellId()), fight.getMap().getCell(bestCell), false,fighter.getMP());
-                GameMapMovement action = this.fight.tryMove(this.fighter, path);
+                final GameMapMovement action = this.fight.tryMove(this.fighter, path);
                 if (action != null) {
                     BACKGROUND_WORKER.execute(() -> {
                         try {

@@ -12,8 +12,8 @@ import koh.protocol.messages.game.context.roleplay.party.PartyRefuseInvitationNo
  */
 public class PartyRequest extends GameBaseRequest {
 
-    public PartyRequest(WorldClient Requester, WorldClient Requested) {
-        super(Requester, Requested);
+    public PartyRequest(WorldClient requester, WorldClient requested) {
+        super(requester, requested);
     }
 
     @Override

@@ -51,14 +51,14 @@ public class MountInventoryItem extends InventoryItem {
             this.mount.id = (double) this.entity.animalID;
             this.mount.isRideable = true;
             this.mount.level = 1;
-            this.mount.model = DAO.getMounts().find(this.templateId).getId();
+            this.mount.model = DAO.getMounts().findTemplate(this.templateId).getId();
             this.mount.effectList = DAO.getMounts().getMountByEffect(this.mount.model, this.mount.level);
             this.serializeInformations();
 
             this.removeEffect(995);
             this.removeEffect(998);
 
-            this.effects.add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(),DAO.getMounts().find(this.templateId).getId(), this.entity.animalID));
+            this.effects.add(new ObjectEffectMount(995, (double) Instant.now().toEpochMilli(),DAO.getMounts().findTemplate(this.templateId).getId(), this.entity.animalID));
             this.effects.add(new ObjectEffectDuration(998, 37, (byte) 0, (byte) 0));
             this.notifyColumn("effects");
 

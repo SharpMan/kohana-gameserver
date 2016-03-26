@@ -26,7 +26,7 @@ public class WebSocketService implements Service {
     @Override
     public void start() {
         try {
-            this.server = new AutobahnServer(settings.getIntElement("WebSocket.Port"), new Draft_17(),settings );
+            this.server = new AutobahnServer(settings.getIntElement("WebSocket.Port"), new Draft_17(), settings);
             this.server.start();
             log.info("WebSocket server stated on port {}",settings.getIntElement("WebSocket.Port"));
         } catch (Exception e) {

@@ -11,6 +11,7 @@ import koh.game.inter.TransfererTimeOut;
 import koh.game.network.WorldServer;
 import koh.game.network.handlers.Handler;
 import koh.patterns.services.ServicesProvider;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,20 +24,17 @@ public class Main {
 
     public static final int MIN_TIMEOUT = 30;
     private static final Logger logger = LogManager.getLogger(Main.class);
-    private volatile static TransfererTimeOut $TransfererTimeOut;
-    private volatile static InterClient $InterClient;
-    private volatile static WorldServer $WorldServer;
+    @Getter
+    private volatile static TransfererTimeOut transfererTimeOut;
+    private volatile static InterClient interClient;
+    private volatile static WorldServer worldServer;
 
-    public static WorldServer worldServer() {
-        return $WorldServer;
+    public static WorldServer getWorldServer() {
+        return worldServer;
     }
 
-    public static TransfererTimeOut transfererTimeOut() {
-        return $TransfererTimeOut;
-    }
-
-    public static InterClient interClient() {
-        return $InterClient;
+    public static InterClient getInterClient() {
+        return interClient;
     }
 
     public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
@@ -75,9 +73,9 @@ public class Main {
 
             logger.info("{} messageHandlers loaded", Handler.initialize());
             logger.info("{} messages loaded", Handler.initializeMessage());
-            $TransfererTimeOut = new TransfererTimeOut();
-            $InterClient = new InterClient().bind();
-            $WorldServer = new WorldServer(DAO.getSettings().getIntElement("World.Port")).configure().launch();
+            interClient = new InterClient().bind();
+            transfererTimeOut = new TransfererTimeOut(interClient);
+            worldServer = new WorldServer(DAO.getSettings().getIntElement("World.Port")).configure().launch();
             logger.info("WorldServer start in {} ms.", (System.currentTimeMillis() - time));
 
         } catch (Exception e) {

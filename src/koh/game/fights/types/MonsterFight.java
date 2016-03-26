@@ -106,6 +106,7 @@ public class MonsterFight extends Fight {
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
                     FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots);
                 });
+                final int kamasWin = FightFormulas.computeKamas(fighter, baseKamas, teamPP);
                 final int[] serializedLoots = new int[loots.size() * 2];
                 for (int i = 0; i < serializedLoots.length; i += 2) {
                     serializedLoots[i] = loots.get(i / 2).getItem();
@@ -119,7 +120,7 @@ public class MonsterFight extends Fight {
                 });
                 loots.clear();
 
-                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(serializedLoots, FightFormulas.computeKamas(fighter, baseKamas, teamPP)), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
+                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(serializedLoots, kamasWin), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                     {
                         this.experience = fighter.getPlayer().getExperience();
                         this.showExperience = true;
@@ -135,6 +136,8 @@ public class MonsterFight extends Fight {
                         this.showExperienceForMount = mountXp > 0;
                     }
                 }}));
+
+                fighter.getPlayer().addKamas(kamasWin);
 
             } else {
                 this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));

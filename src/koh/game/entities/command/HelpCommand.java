@@ -27,7 +27,7 @@ public class HelpCommand implements PlayerCommand {
     public void apply(WorldClient client, String[] args) {
         final StringBuilder sb = new StringBuilder("Commandes disponnibles : \n");
         commands.entrySet().stream()
-                .filter(co -> co.getValue().getDescription() != null && client.getAccount().right > co.getValue().roleRestrained())
+                .filter(co -> co.getValue().getDescription() != null && client.getAccount().right >= co.getValue().roleRestrained())
                 .forEach(co ->
                     sb.append(".").append(co.getKey()).append(" ").append(co.getValue().getDescription()).append("\n")
                 );

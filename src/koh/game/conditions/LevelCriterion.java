@@ -8,7 +8,7 @@ import koh.game.entities.actors.Player;
  */
 public class LevelCriterion extends Criterion {
 
-    public static String Identifier = "PL";
+    public static final String IDENTIIDENTIFIERIER = "PL";
     public Integer level;
 
     @Override
@@ -18,7 +18,7 @@ public class LevelCriterion extends Criterion {
 
     @Override
     public void Build() {
-        this.level = Integer.parseInt(literal);
+        this.level = Integer.parseInt(literal.trim());
     }
 
     @Override

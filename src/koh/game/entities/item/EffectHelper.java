@@ -12,6 +12,7 @@ import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.EffectGenerationType;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.*;
 import koh.utils.Couple;
@@ -72,6 +73,13 @@ public class EffectHelper {
         108//HEAL
     };
 
+    private static final StatsEnum[] UNVERIFIED_EFFECTS = new StatsEnum[]{
+            StatsEnum.CHATIMENT,
+            StatsEnum.DAMAGE_REDUCTION,
+            StatsEnum.DAMMAGES_OCASSIONED,
+            StatsEnum.DAMAGE_ARMOR_REDUCTION,
+    };
+
     public static IoBuffer serializeEffectInstanceDice(EffectInstance[] Effects) {
         IoBuffer buff = IoBuffer.allocate(65535);
         buff.setAutoExpand(true);
@@ -99,11 +107,20 @@ public class EffectHelper {
         return DAO.getD2oTemplates().getEffect(eff);
     }
 
+
+
     public static boolean verifyEffectTrigger(Fighter pCasterId, Fighter pTargetId, EffectInstance[] pSpellEffects, EffectInstance pEffect, boolean pWeaponEffect, String pTriggers, int pSpellImpactCell) {
+        return verifyEffectTrigger(pCasterId, pTargetId, pSpellEffects, pEffect, pWeaponEffect, pTriggers, pSpellImpactCell,false);
+    }
+
+    public static boolean verifyEffectTrigger(Fighter pCasterId, Fighter pTargetId, EffectInstance[] pSpellEffects, EffectInstance pEffect, boolean pWeaponEffect, String pTriggers, int pSpellImpactCell,boolean direct) {
+        if(direct && ArrayUtils.contains(UNVERIFIED_EFFECTS, pEffect.getEffectType())){
+            return true;
+        }
 
         boolean verify = true;
-        boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
-        int distance = Pathfunction.getDistance( pCasterId.getCellId(), pTargetId.getCellId());
+        final boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
+        final int distance = Pathfunction.getDistance( pCasterId.getCellId(), pTargetId.getCellId());
         
         for (String trigger : pTriggers.split("\\|")) {
             switch (trigger) {

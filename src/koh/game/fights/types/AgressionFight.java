@@ -18,7 +18,7 @@ import koh.protocol.messages.game.context.fight.GameFightJoinMessage;
 import koh.protocol.messages.game.context.fight.GameFightLeaveMessage;
 import koh.protocol.messages.game.context.fight.GameFightRemoveTeamMemberMessage;
 import koh.protocol.messages.game.context.fight.GameFightUpdateTeamMessage;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayAggressionMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayAggressionMessage;
 import koh.protocol.types.game.context.fight.FightLoot;
 import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
 import koh.protocol.types.game.context.fight.FightResultPvpData;

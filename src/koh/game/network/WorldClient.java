@@ -2,15 +2,16 @@ package koh.game.network;
 
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import koh.d2o.Couple;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameParty;
+import koh.game.actions.GameWaiting;
 import koh.game.actions.requests.GameBaseRequest;
 import koh.game.actions.requests.PartyRequest;
 import koh.game.dao.DAO;
@@ -22,7 +23,7 @@ import koh.game.entities.actors.character.Party;
 import koh.game.entities.environments.DofusTrigger;
 import koh.game.entities.environments.IWorldEventObserver;
 import koh.game.exchange.Exchange;
-import koh.game.executors.Waiter;
+import koh.game.fights.FightTypeEnum;
 import koh.game.network.handlers.Handler;
 import koh.protocol.client.Message;
 import static koh.protocol.client.enums.ChatActivableChannelsEnum.*;
@@ -60,23 +61,22 @@ public class WorldClient {
     private Object $mutex = new Object();
     @Setter
     private String clientKey;
-    private final Map<GameActionTypeEnum, GameAction> myActions = Collections.synchronizedMap(new HashMap<GameActionTypeEnum, GameAction>());
-    private int lastPacketId, sequenceMessage = 0;
-    //public boolean firstCheck = true;
+    private final Map<GameActionTypeEnum, GameAction> myActions = new ConcurrentHashMap<>();
+    private int lastPacketId, sequenceMessage;
     @Setter
     private BasicLatencyStatsMessage latency;
     @Getter @Setter
     private volatile Couple<IWorldEventObserver, Message> callBacks;
     @Getter @Setter
-    private volatile DofusTrigger onMouvementConfirm = null;
+    private volatile DofusTrigger onMouvementConfirm;
     @Getter @Setter
-    public Exchange myExchange = null;
-    private GameBaseRequest myBaseRequest = null;
+    public Exchange myExchange;
+    private GameBaseRequest myBaseRequest;
     private CopyOnWriteArrayList<PartyRequest> partyRequests;
     private static final Logger logger = LogManager.getLogger(WorldClient.class);
 
     @Getter
-    public Map<Byte, Long> lastChannelMessage = new HashMap<Byte, Long>() {
+    public Map<Byte, Long> lastChannelMessage = new HashMap<Byte, Long>(7) {
         {
             put(CHANNEL_SALES, 0L);
             put(CHANNEL_SEEK, 0L);
@@ -177,6 +177,8 @@ public class WorldClient {
         }
     }
 
+
+
     public void abortGameAction(GameActionTypeEnum Action, Object[] Args) {
         synchronized (this.myActions) {
             if (this.myActions.containsKey(Action)) {
@@ -229,7 +231,7 @@ public class WorldClient {
 
             this.lastPacketId = message.getMessageId();
             this.sequenceMessage++;
-            Method messageIdentifier = Handler.getMethodByMessage(message.getMessageId());
+            final Method messageIdentifier = Handler.getMethodByMessage(message.getMessageId());
             if (messageIdentifier != null) {
                 messageIdentifier.invoke(null, this, message);
             } else {
@@ -266,8 +268,18 @@ public class WorldClient {
         close();
     }
 
+    private final ConsoleCommandsListMessage consolePregenMessage = new ConsoleCommandsListMessage(new String[0], new String[0], new String[0]);
+
+
     public void threatWaiting() {
         try {
+            if(DAO.getPlayers().isLocked()){
+                if (DAO.getPlayers().isCurrentlyOnProcess(this.getAccount().id)
+                        || this.getAccount().characters.parallelStream().anyMatch(Player -> Player.getFighter() != null && Player.getFight() != null && Player.getFight().getFightType() == FightTypeEnum.FIGHT_TYPE_CHALLENGE)) {
+                    throw new AccountOccupedException("");
+                }
+            }
+
             DAO.getPlayers().getByAccount(this.getAccount());
             if (this.getAccount().accountData == null) {
                 this.getAccount().accountData = DAO.getAccountDatas().get(this.getAccount().id);
@@ -281,10 +293,10 @@ public class WorldClient {
             this.send(new AccountCapabilitiesMessage(getAccount().id, false, (short) Integer.MAX_VALUE, (short) Integer.MAX_VALUE, this.getAccount().right));
             this.send(new TrustStatusMessage(true));
             if (this.getAccount().right > 0) {
-                this.send(new ConsoleCommandsListMessage(new String[]{"infos"}, new String[]{"infos"}, new String[]{"infos"}));
+                this.send(consolePregenMessage);
             }
         } catch (AccountOccupedException ex) {
-            new Waiter(this);
+           this.addGameAction(new GameWaiting(this));
         } catch (Exception e) {
             e.printStackTrace();
         }

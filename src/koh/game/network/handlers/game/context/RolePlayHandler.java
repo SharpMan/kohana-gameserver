@@ -23,7 +23,7 @@ import koh.protocol.messages.game.character.stats.UpdateLifePointsMessage;
 import koh.protocol.messages.game.context.roleplay.ChangeMapMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayRequestMessage;
-import koh.protocol.messages.game.context.roleplay.figh.GameRolePlayAttackMonsterRequestMessage;
+import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayAttackMonsterRequestMessage;
 import koh.protocol.messages.game.context.roleplay.stats.StatsUpgradeResultMessage;
 import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import lombok.extern.log4j.Log4j2;

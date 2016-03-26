@@ -25,7 +25,7 @@ public class PlayerController {
     };
 
     public static void sendServerMessage(String message, String color) {
-        Main.worldServer().sendPacket(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{
+        Main.getWorldServer().sendPacket(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{
                 "<font color=\"#" + color + "\">" + message + "</font>"
         }));
     }

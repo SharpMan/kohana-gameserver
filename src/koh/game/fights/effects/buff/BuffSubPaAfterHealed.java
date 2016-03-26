@@ -20,7 +20,7 @@ public class BuffSubPaAfterHealed extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt HealValue, EffectCast DamageInfos) {
-        return EffectBase.getEffect(StatsEnum.SubPAEsquive).applyEffect(castInfos);
+        return EffectBase.getEffect(StatsEnum.SUB_PA_ESQUIVE).applyEffect(castInfos);
     }
 
     @Override

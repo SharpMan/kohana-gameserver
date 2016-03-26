@@ -27,8 +27,7 @@ public class EffectPush extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         byte direction = 0;
-        for (Fighter target : castInfos.targets.stream().filter(Tarrget -> /*!(target instanceof StaticFighter) &&*/ !Tarrget.getStates().hasState(FightStateEnum.CARRIED) && !Tarrget.getStates().hasState(FightStateEnum.INÉBRANLABLE) && !Tarrget.getStates().hasState(FightStateEnum.ENRACINÉ) && !Tarrget.getStates().hasState(FightStateEnum.Indéplaçable)).toArray(Fighter[]::new)) {
-            System.out.println(castInfos.effectType);
+        for (Fighter target : castInfos.targets.stream().filter(Tarrget -> /*!(target instanceof StaticFighter) &&*/ !Tarrget.getStates().hasState(FightStateEnum.CARRIED) && !Tarrget.getStates().hasState(FightStateEnum.INÉBRANLABLE) && !Tarrget.getStates().hasState(FightStateEnum.ENRACINÉ) && !Tarrget.getStates().hasState(FightStateEnum.INDÉPLAÇABLE)).toArray(Fighter[]::new)) {
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
@@ -55,14 +54,17 @@ public class EffectPush extends EffectBase {
                     if(castInfos.isTrap){
                         if(target.getCellId() == castInfos.targetKnownCellId)
                             continue;
-                        direction = Pathfunction.getDirection(target.getFight().getMap(),target.getCellId(),castInfos.cellId);
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
                     }
-                    if(castInfos.spellId == 5382 || castInfos.spellId == 5475){
+                    else if(castInfos.isGlyph){
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
+                    }
+                    else if(castInfos.spellId == 5382 || castInfos.spellId == 5475){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
                     }
                     break;
                 case BACK_CELL:
-                    Fighter p = castInfos.caster;
+                    final Fighter p = castInfos.caster;
                     castInfos.caster = target;
                     target = p;
                     castInfos.targets.remove(0);
@@ -127,26 +129,26 @@ public class EffectPush extends EffectBase {
     }
 
     public static int applyPushBackDamages(EffectCast CastInfos, Fighter Target, int Length, int CurrentLength) {
-        int DamageCoef = 0;
+        int damageCoef = 0;
         if (Target.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
-            DamageCoef = 7;
+            damageCoef = 7;
         } else if (CastInfos.caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
-            DamageCoef = 4;
+            damageCoef = 4;
         } else {
-            DamageCoef = 4 + EffectPush.RANDOM_PUSHDAMAGE.nextInt(3);
+            damageCoef = 4 + EffectPush.RANDOM_PUSHDAMAGE.nextInt(3);
         }
 
-        double LevelCoef = CastInfos.caster.getLevel() / 50;
-        if (LevelCoef < 0.1) {
-            LevelCoef = 0.1;
+        double levelCoef = CastInfos.caster.getLevel() / 50;
+        if (levelCoef < 0.1) {
+            levelCoef = 0.1;
         }
         double pushDmg = (CastInfos.caster.getLevel() / 2 + (CastInfos.caster.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS) - Target.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS)) + 32) * CastInfos.effect.diceNum / (4 * Math.pow(2, CurrentLength));
-        MutableInt DamageValue = new MutableInt(pushDmg);
+        final MutableInt damageValue = new MutableInt(pushDmg);
         //MutableInt damageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 
-        EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.spellId, CastInfos.cellId, 0, null, Target, null, false, StatsEnum.NONE, 0, null);
+        final EffectCast subInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.spellId, CastInfos.cellId, 0, null, Target, null, false, StatsEnum.NONE, 0, null);
 
-        return EffectDamage.applyDamages(SubInfos, Target, DamageValue);
+        return EffectDamage.applyDamages(subInfos, Target, damageValue);
     }
 
 }

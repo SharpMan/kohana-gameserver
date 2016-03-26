@@ -10,6 +10,7 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightBomb;
+import koh.game.fights.layers.FightGlyph;
 import lombok.Getter;
 
 /**
@@ -114,8 +115,15 @@ public class FightCell {
         return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType || x.getObjectType() == objectTyp2);
     }
 
-    public <T extends IFightObject> T[] getObjecs(FightObjectType ObjectType) { //TODO use this shit
-        return (T[]) this.myFightObjects.stream().filter(x -> x.getObjectType() == ObjectType).map(e -> (T)e).toArray();
+    public <T> T[] getObjectsAs(FightObjectType objecttype) {
+        return (T[]) this.myFightObjects.stream().filter(x -> x.getObjectType() == objecttype).map(e -> (T)e).toArray();
+    }
+
+    public FightGlyph[] getGlyphes(){
+        return myFightObjects.stream()
+                .filter(x -> x.getObjectType() == FightObjectType.OBJECT_GLYPHE)
+                .map(f -> (FightGlyph) f)
+                .toArray(FightGlyph[]::new);
     }
 
     public boolean hasGameObject(IFightObject objectType) {
@@ -127,8 +135,10 @@ public class FightCell {
                 .map(obj -> ((FightActivableObject)obj)).toArray(FightActivableObject[]::new);
     }
 
-    public IFightObject[] getObjects(FightObjectType ObjectType) {
-        return this.myFightObjects.stream().filter(x -> x.getObjectType() == ObjectType).toArray(IFightObject[]::new);
+
+
+    public IFightObject[] getObjects(FightObjectType objectType) {
+        return this.myFightObjects.stream().filter(x -> x.getObjectType() == objectType).toArray(IFightObject[]::new);
     }
 
     public List<IFightObject> getObjectsAsList(FightObjectType ObjectType) {
@@ -210,8 +220,12 @@ public class FightCell {
         return -1;
     }
 
-    public void removeObject(IFightObject Object) {
-        this.myFightObjects.remove(Object);
+    public boolean contains(IFightObject object){
+        return this.myFightObjects.contains(object);
+    }
+
+    public void removeObject(IFightObject object) {
+        this.myFightObjects.remove(object);
     }
 
     public void clear() {

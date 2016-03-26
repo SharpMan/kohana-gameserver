@@ -43,6 +43,11 @@ public class MountDAOImpl extends MountDAO {
     }
 
     @Override
+    public MountTemplate findTemplate(int model) {
+        return cache.get(model);
+    }
+
+    @Override
     public MountTemplate find(int model) {
         return cache.values().stream().filter(x -> x.getId() == model).findFirst().orElse(null);
     }
