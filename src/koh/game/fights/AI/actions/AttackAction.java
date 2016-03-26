@@ -802,6 +802,8 @@ public class AttackAction extends AIAction {
 
         for (FightActivableObject layer : target.getMyCell().getObjectsLayer())//On cherche à savoir si décaller de cette cellule est utile
         {
+            if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null)
+                continue;
             int layerScore = 0;
             for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
                 layerScore = (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, true, true));

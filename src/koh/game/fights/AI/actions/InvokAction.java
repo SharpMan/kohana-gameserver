@@ -904,6 +904,8 @@ public class InvokAction extends AIAction {
 
         for (FightActivableObject layer : target.getMyCell().getObjectsLayer())//On cherche à savoir si décaller de cette cellule est utile
         {
+            if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null)
+                continue;
             int layerScore = 0;
             for (EffectInstanceDice effect : layer.getCastSpell().getEffects())
             {

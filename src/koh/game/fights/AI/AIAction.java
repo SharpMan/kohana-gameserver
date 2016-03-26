@@ -124,6 +124,7 @@ public abstract class AIAction {
 
                /*TODO TELEPORT_4*/
 
+
                case HEAL:
                case HEAl_OR_DAMAGE:
                case HEAL_PDV_RENDUS:
@@ -134,6 +135,7 @@ public abstract class AIAction {
                    return targets.contains(AI.getFighter()) ? (scoreBuff_I(AI, effect, targets, reverse, false)) : (-scoreBuff_I(AI, effect, targets, reverse, false));
 
              /* BUFFS LEVEL 1*/
+               case MAXIMIZE_EFFECTS:
                case ADD_DAMAGE_PERCENT:
                case COMBO_DAMMAGES: //TODO roub
                case ADD_DAMAGE_PHYSIC:
@@ -301,6 +303,7 @@ public abstract class AIAction {
                case SUB_WATER_ELEMENT_REDUCTION:
                case SUB_AIR_ELEMENT_REDUCTION:
                case SUB_NEUTRAL_ELEMENT_REDUCTION:
+               case MINIMIZE_EFFECTS:
                    return scoreSubBuff_I(AI, effect, targets, reverse, false);
 
 
