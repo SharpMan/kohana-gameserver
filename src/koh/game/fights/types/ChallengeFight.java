@@ -106,7 +106,7 @@ public class ChallengeFight extends Fight {
         switch (this.fightState) {
             case STATE_PLACE:
                 if (fighter == fighter.getTeam().leader) {
-                    fighter.getTeam().getFighters().forEach(TeamFighter -> TeamFighter.setLife(0));
+                    fighter.getTeam().getFighters().forEach(teamFighter -> teamFighter.setLife(0));
                     fighter.setLeft(true);
                     this.endFight(this.getEnnemyTeam(fighter.getTeam()), fighter.getTeam());
                 } else {
@@ -115,7 +115,6 @@ public class ChallengeFight extends Fight {
                     this.sendToField(new GameFightRemoveTeamMemberMessage(this.fightId, fighter.getTeam().id, fighter.getID()));
 
                     fighter.leaveFight();
-
                     //Fighter.send(new GameLeaveMessage());
                 }
                 break;

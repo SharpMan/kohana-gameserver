@@ -31,19 +31,21 @@ public class TeleporterAction extends GameAction {
     }
 
     @Override
-    public void abort(Object[] Args) {
+    public void abort(Object[] args) {
         try {
-            int map = (int) Args[0];
-            DofusZaap subway = DAO.getMaps().findSubWay(((Player) actor).getCurrentMap().getSubArea().getArea().getId(), map);
-            if (subway == null) {
-                return;
+            if(args.length > 0) {
+                int map = (int) args[0];
+                final DofusZaap subway = DAO.getMaps().findSubWay(((Player) actor).getCurrentMap().getSubArea().getArea().getId(), map);
+                if (subway == null) {
+                    return;
+                }
+                if (((Player) actor).getKamas() < getCostTo(null)) {
+                    actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
+                    return;
+                }
+                ((Player) actor).getInventoryCache().substractKamas(getCostTo(null));
+                ((Player) actor).teleport(map, subway.getCell());
             }
-            if (((Player) actor).getKamas() < getCostTo(null)) {
-                actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
-                return;
-            }
-            ((Player) actor).getInventoryCache().substractKamas(getCostTo(null));
-            ((Player) actor).teleport(map, subway.getCell());
 
             this.endExecute();
         } catch (Exception e) {

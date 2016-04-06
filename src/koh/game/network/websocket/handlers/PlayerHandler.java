@@ -36,6 +36,7 @@ public class PlayerHandler {
             conn.send("NO");
         } else {
             final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), TOKEN.getId(), 63, perso.getID(), message.getTokens(), EffectHelper.generateIntegerEffect(TOKEN.getPossibleEffects(), EffectGenerationType.NORMAL, TOKEN.isWeapon()));
+            item.setNeedInsert(true);
             if (perso.getInventoryCache().add(item, true))
                 conn.send("OK");
             else

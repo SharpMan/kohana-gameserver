@@ -9,10 +9,7 @@ import koh.game.entities.actors.pnj.NpcItem;
 import koh.game.entities.actors.pnj.NpcMessage;
 import koh.game.entities.actors.pnj.NpcReply;
 import koh.game.entities.actors.pnj.NpcTemplate;
-import koh.game.entities.actors.pnj.replies.BankReply;
-import koh.game.entities.actors.pnj.replies.CloseReply;
-import koh.game.entities.actors.pnj.replies.TalkReply;
-import koh.game.entities.actors.pnj.replies.TeleportReply;
+import koh.game.entities.actors.pnj.replies.*;
 import koh.game.entities.item.ItemTemplate;
 import koh.game.utils.sql.ConnectionResult;
 import koh.utils.Enumerable;
@@ -60,7 +57,7 @@ public class NpcDAOImpl extends NpcDAO {
     private int loadAllReplies() {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from npcs_replies", 0)) {
-            ResultSet result = conn.getResult();
+            final ResultSet result = conn.getResult();
             NpcReply npcReply = null;
             ArrayList<String> params = new ArrayList<>();
             while (result.next()) {
@@ -76,6 +73,9 @@ public class NpcDAOImpl extends NpcDAO {
                         break;
                     case "continue":
                         npcReply = new TalkReply();
+                        break;
+                    case "restat":
+                        npcReply = new RestatReply();
                         break;
                     default:
                         continue;

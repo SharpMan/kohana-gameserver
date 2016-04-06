@@ -7,9 +7,11 @@ import koh.game.fights.effects.EffectCast;
 
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_CHANGE_LOOK;
 import koh.protocol.client.enums.FightDispellableEnum;
+import koh.protocol.client.enums.SubEntityBindingPointCategoryEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightChangeLookMessage;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
+import koh.protocol.types.game.look.EntityLook;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -20,6 +22,7 @@ public class BuffSkin extends BuffEffect {
 
     private short oldBonesID, skinToRemove;
     private List<Short> oldScales;
+    private EntityLook look;
 
     public BuffSkin(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
@@ -27,41 +30,46 @@ public class BuffSkin extends BuffEffect {
 
     /**
      *
-     * @param DamageValue
-     * @param DamageInfos
+     * @param damageValue
+     * @param damageInfos
      * @return
      */
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        this.oldBonesID = target.getEntityLook().bonesId;
-        this.oldScales = target.getEntityLook().scales;
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
+        if (target.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
+            look = target.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook;
+        } else {
+            look = target.getEntityLook();
+        }
+        this.oldBonesID = look.bonesId;
+        this.oldScales = look.scales;
         switch (this.castInfos.spellId) {
             case 2879: //Masque pleutre
-                this.target.getEntityLook().bonesId = 1576;
+                look.bonesId = 1576;
                 break;
             case 686: //Picole
-                this.target.getEntityLook().bonesId = 44;
+                look.bonesId = 44;
                 break;
             case 2880: //Masque du Psychopathe
-                this.target.getEntityLook().bonesId = 1575;
+                look.bonesId = 1575;
                 this.skinToRemove = (short) 1443;
-                this.target.getEntityLook().skins.add(skinToRemove);
+                look.skins.add(skinToRemove);
                 break;
             case 99: //Momi
-                this.target.getEntityLook().bonesId = 113;
+                look.bonesId = 113;
                 break;
             case 701: //Colére
-                this.target.getEntityLook().bonesId = 453;
-                this.target.getEntityLook().scales = new ArrayList<Short>() {
+                look.bonesId = 453;
+                look.scales = new ArrayList<Short>() {
                     {
                         this.add((short) 80);
                     }
                 };
                 break;
             case 3202: //Scaphandre
-                this.target.getEntityLook().bonesId = 1;
+                look.bonesId = 1;
                 this.skinToRemove = (short) 1955;
-                this.target.getEntityLook().skins.add(skinToRemove);
+                look.skins.add(skinToRemove);
                 break;
             default:
                 return -1;
@@ -69,18 +77,18 @@ public class BuffSkin extends BuffEffect {
 
         //this.target.getEntityLook().bonesId = (short) Math.abs((this.castInfos.effect.value * 44) / 666);
         this.caster.getFight().sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
-        return super.applyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(damageValue, damageInfos);
     }
 
     @Override
     public int removeEffect() {
-        if (this.target.getEntityLook().bonesId == this.oldBonesID && (skinToRemove == 0 || oldScales == null)) {
+        if (look.bonesId == this.oldBonesID && (skinToRemove == 0 || oldScales == null)) {
             return super.removeEffect();
         }
-        this.target.getEntityLook().bonesId = this.oldBonesID;
-        this.target.getEntityLook().scales = this.oldScales;
+        look.bonesId = this.oldBonesID;
+        look.scales = this.oldScales;
         if (this.skinToRemove != 0) {
-            this.target.getEntityLook().skins.remove(this.target.getEntityLook().skins.indexOf(this.skinToRemove));
+            look.skins.remove(look.skins.indexOf(this.skinToRemove));
         }
         this.caster.getFight().sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));
         return super.removeEffect();

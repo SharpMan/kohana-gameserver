@@ -24,12 +24,12 @@ public class NpcHandler {
     private static final Logger logger = LogManager.getLogger(NpcHandler.class);
 
     @HandlerAttribute(ID = NpcDialogReplyMessage.MESSAGE_ID)
-    public static void HandleNpcDialogReplyMessage(WorldClient Client, NpcDialogReplyMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.NPC_DAILOG)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleNpcDialogReplyMessage(WorldClient client, NpcDialogReplyMessage Message) {
+        if (!client.isGameAction(GameActionTypeEnum.NPC_DAILOG)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        ((NpcDialog) Client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).reply(Message.replyId);
+        ((NpcDialog) client.getGameAction(GameActionTypeEnum.NPC_DAILOG)).reply(Message.replyId);
 
     }
 

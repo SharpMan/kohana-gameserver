@@ -49,9 +49,20 @@ public class BombFighter extends StaticFighter {
         this.entityLook = EntityLookParser.copy(this.grade.getMonster().getEntityLook());
         this.adjustStats();
         this.stats.merge(this.summoner.getStats());
-        this.stats.unMerge(StatsEnum.VITALITY,this.summoner.getStats().getEffect(StatsEnum.VITALITY));
+        this.stats.addBoost(StatsEnum.VITALITY, -this.summoner.getStats().getBoost(StatsEnum.VITALITY));
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());
+    }
+
+
+    @Override
+    public void adjustStats() {
+        this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.AGILITY, (short) ((double) this.stats.getEffect(StatsEnum.AGILITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.WISDOM, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
     }
 
     @Override
@@ -143,7 +154,7 @@ public class BombFighter extends StaticFighter {
         }
         if (this.getLife() <= 0 || force) {
             selfMurder(casterId);
-            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false);
+            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false,-1);
             if (this.FightBombs != null) {
                 this.FightBombs.forEach(Bomb -> Bomb.remove());
             }

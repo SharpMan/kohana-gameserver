@@ -259,7 +259,8 @@ public class WorldClient {
         this.send(new BasicAckMessage(sequenceMessage, lastPacketId));
     }
 
-    public void sequenceMessage(Message Dofus) {
+    public void sequenceMessage(Message msg) {
+        this.send(msg);
         //TODO: SequenceMessage BASIC + Dofus blinded
         //this.send(new BasicAckMessage(sequenceMessage, lastPacketId, Dofus));
     }

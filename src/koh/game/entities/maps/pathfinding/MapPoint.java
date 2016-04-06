@@ -51,14 +51,14 @@ public class MapPoint {
     private int _nY;
 
     public static MapPoint fromCellId(int cellId) {
-        MapPoint mp = new MapPoint();
+        final MapPoint mp = new MapPoint();
         mp._nCellId = cellId;
         mp.setFromCellId();
         return (mp);
     }
 
     public static MapPoint fromCoords(int x, int y) {
-        MapPoint mp = new MapPoint();
+        final MapPoint mp = new MapPoint();
         mp._nX = x;
         mp._nY = y;
         mp.setFromCoords();

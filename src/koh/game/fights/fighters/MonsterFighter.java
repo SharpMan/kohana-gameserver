@@ -15,6 +15,7 @@ import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
 
 import java.util.List;
 
@@ -88,6 +89,10 @@ public class MonsterFighter extends VirtualFighter {
     @Override
     public List<SpellLevel> getSpells() {
         return this.grade.getSpells();
+    }
+
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 

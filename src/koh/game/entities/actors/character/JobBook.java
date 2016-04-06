@@ -116,18 +116,18 @@ public class JobBook {
     public void deserializeEffects(byte[] binary) {
         if (binary.length <= 0) {
             for (JobEnum Job : JobEnum.values()) {
-                this.AddJob(new JobInfo(Job.value));
+                this.addJob(new JobInfo(Job.value));
             }
             return;
         }
         IoBuffer buf = IoBuffer.wrap(binary);
         int len = buf.getInt();
         for (int i = 0; i < len; i++) {
-            this.AddJob(new JobInfo(buf));
+            this.addJob(new JobInfo(buf));
         }
     }
 
-    public void AddJob(JobInfo info) {
+    public void addJob(JobInfo info) {
         this.myJobs.put(info.id, info);
     }
 

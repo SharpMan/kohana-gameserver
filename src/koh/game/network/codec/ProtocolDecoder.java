@@ -64,10 +64,10 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
             return false;
         }
 
-        Message message;
+        final Message message;
 
         try {
-            message = (Message) Handler.messages.get(getMessageId(header)).newInstance();
+            message = Handler.messages.get(getMessageId(header)).newInstance();
         } catch (Exception e) {
             logger.error("[ERROR] Unknown Message Header Handler {} {}" , (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) , session.getRemoteAddress().toString());
             session.write(new BasicNoOperationMessage());

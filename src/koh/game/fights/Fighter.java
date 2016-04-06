@@ -42,6 +42,7 @@ import koh.protocol.types.game.context.fight.GameFightMinimalStatsPreparation;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -49,6 +50,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
  *
  * @author Neo-Craft
  */
+@ToString
 public abstract class Fighter extends IGameActor implements IFightObject {
 
     public Fighter(Fight fight, Fighter summoner) {
@@ -114,7 +116,13 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
 
+    public Stream<Fighter> getSummonedCreature(){
+        return this.team.getAliveFighters()
+                .filter(fighter -> fighter.getSummonerID() == this.getID());
+    }
+
     public int setCell(FightCell cell, boolean runEvent) {
+        int addResult;
         if (this.myCell != null) {
             this.myCell.removeObject(this); // On vire le fighter de la cell:
             if (this.myCell.hasGameObject(FightObjectType.OBJECT_PORTAL)) {
@@ -124,30 +132,31 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 if (!ArrayUtils.contains(previousPositions, myCell.Id)) {
                     this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
                 }
-            } else {
+            } /*else {
                 this.previousCellPos.add(this.myCell.Id);
+            }*/
+            if(cell != null && cell.hasObject(FightObjectType.OBJECT_GLYPHE)){
+                for (FightGlyph glyph : cell.getGlyphes()) {
+
+                    if(myCell.contains(glyph) ||
+                            (!previousCellPos.isEmpty() && !this.fight.getCell(previousCellPos.get(previousCellPos.size() -1)).hasGameObject(glyph))
+                            || glyph.getLastTurnActivated() == this.fight.getFightWorker().fightTurn){
+                        continue;
+                    }
+                    this.myCell = cell;
+                    glyph.setLastTurnActivated(this.fight.getFightWorker().fightTurn);
+                    addResult = glyph.loadEnnemyTargetsAndActive(this);
+                    if (addResult == -3 || addResult == -2) {
+                        return addResult;
+                    }
+                }
             }
 
         }
-        int addResult;
 
 
-        if(cell != null && cell.hasObject(FightObjectType.OBJECT_GLYPHE)){
-            for (FightGlyph glyph : cell.getGlyphes()) {
 
-                if(myCell.contains(glyph) ||
-                        (!previousCellPos.isEmpty() && !this.fight.getCell(previousCellPos.get(previousCellPos.size() -1)).hasGameObject(glyph))
-                        || glyph.getLastTurnActivated() == this.fight.getFightWorker().fightTurn){
-                    continue;
-                }
-                this.myCell = cell;
-                glyph.setLastTurnActivated(this.fight.getFightWorker().fightTurn);
-                addResult = glyph.loadEnnemyTargetsAndActive(this);
-                if (addResult == -3 || addResult == -2) {
-                    return addResult;
-                }
-            }
-        }
+
         this.myCell = cell;
 
         if (this.myCell != null) {
@@ -200,6 +209,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (this.fight.getFightState() == FightState.STATE_PLACE) {
             // On le vire de l'equipe
             team.fighterLeave(this);
+            fight.tryStartFight();
         }
 
         this.left = true;
@@ -222,12 +232,14 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             this.fight.sendToField(new GameActionFightDeathMessage(ActionIdEnum.ACTION_CHARACTER_DEATH, casterId, this.ID));
 
             final Fighter[] aliveFighters = this.team.getAliveFighters()
-                    .filter(x -> x.getSummonerID() == this.ID).toArray(Fighter[]::new);
+                    .filter(fighter -> fighter.getSummonerID() == this.ID)
+                    .toArray(Fighter[]::new);
 
             for (final Fighter fighter : aliveFighters) {
-                if(fighter.getSummonerID() == this.ID){
+                if(fighter instanceof SummonedFighter)
+                    ((SummonedFighter)fighter).tryDieSilencious(this.ID,true);
+                else
                     fighter.tryDie(this.ID,true);
-                }
             }
 
             /*this.team.getAliveFighters()
@@ -589,7 +601,14 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     @Override
     public short getCellId() {
-        return this.myCell.Id;
+        try {
+            return this.myCell.Id;
+        }
+        catch (NullPointerException e){
+            this.fight.getLogger().error(this.toString());
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Override
@@ -679,7 +698,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
         for (CopyOnWriteArrayList<FightActivableObject> Objects : fight.getActivableObjects().values()) {
             for (FightActivableObject Object : Objects) {
-                if (Object instanceof FightPortal && ((FightPortal) Object).Enabled) {
+                if (Object instanceof FightPortal && ((FightPortal) Object).enabled) {
                     _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
                     if (Object.getCellId() == param1) {
                         _loc3_ = true;

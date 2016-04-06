@@ -200,7 +200,7 @@ public class ContextHandler {
         }
         if (client.getCharacter().getCurrentMap() == null) {
             client.send(new GameMapNoMovementMessage());
-            PlayerController.SendServerErrorMessage(client, "Votre map est absente veuillez le signalez au staff ");
+            PlayerController.sendServerErrorMessage(client, "Votre map est absente veuillez le signalez au staff ");
             logger.error("Vacant map {} " , client.getCharacter().toString());
             return;
         }

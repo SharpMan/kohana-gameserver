@@ -47,10 +47,10 @@ public class FightFormulas {
             result = 0;
         } else {
             final int num = fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).sum();
-            byte maxPlayerLevel = (byte) fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).max().orElse(0);
-            int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).sum();
-            byte b = (byte) Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).max().orElse(0);
-            int num3 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getGrade().getGradeXp()).sum();
+            final int maxPlayerLevel = fighter.getTeam().getFighters().mapToInt(entry -> entry.getLevel()).max().orElse(0);
+            final int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).sum();
+            final int b = Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).max().orElse(0);
+            final int num3 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getGrade().getGradeXp()).sum();
             double num4 = 1.0;
             if (num - 5 > num2) {
                 num4 = (double) num2 / (double) num;
@@ -59,7 +59,7 @@ public class FightFormulas {
                     num4 = (double) (num + 10) / (double) num2;
                 }
             }
-            double num5 = Math.min((double) fighter.getLevel(), truncate(2.5 * (double) b)) / (double) num * 100.0;
+            final double num5 = Math.min((double) fighter.getLevel(), truncate(2.5 * (double) b)) / (double) num * 100.0;
             int num6 = Arrays.stream(droppersResults).
                     filter(mob -> mob.getLevel() >= maxPlayerLevel / 3)
                     .mapToInt(x -> 1)
@@ -70,10 +70,11 @@ public class FightFormulas {
             double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
             double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
             result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.WISDOM)) / 100.0) * num8 * fighter.getCharacter().getExpBonus());
+            if(result < 0){
+                logger.error(num7+" "+num8+" "+num6+" "+num5+" "+num4+" "+num3+" "+num2+" "+num);
+            }
         }
-        if(result < 0){
-            logger.error("exp {} ",result);
-        }
+
         return result;
     }
 
@@ -186,7 +187,7 @@ public class FightFormulas {
             return 0;
         }
 
-        int diff = Math.abs(fighter.getLevel() - fighter.getCharacter().getMountInfo().mount.level);
+        final int diff = Math.abs(fighter.getLevel() - fighter.getCharacter().getMountInfo().mount.level);
 
         double coeff = 0;
         final double xp =  xpWin.get();

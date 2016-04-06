@@ -33,8 +33,8 @@ public class MountInformations {
 
     public MountInformations() {}
 
-    public MountInformations(Player P) {
-        this.player = P;
+    public MountInformations(Player p) {
+        this.player = p;
     }
 
     public void save() {
@@ -45,54 +45,60 @@ public class MountInformations {
     }
 
     public void onRiding() {
-        if (this.isToogled) {
-            throw new Error("player" + player.getNickName() + " try to ride a rided mount");
-        } else if (this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null) {
-            this.player.getInventoryCache().unEquipItem(this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS));
-        }
-        this.isToogled = true;
-        this.enableStats(true);
-        this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
-        this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
-        this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
-        this.player.getEntityLook().skins.clear();
-        if(player.getFighter() != null){
-            player.getFighter().getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
-            player.getFighter().getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
-            player.getFighter().getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
-            player.getFighter().getEntityLook().skins.clear();
-        }
+        synchronized (entity) { //FIXME inappropriate object
+            if (this.isToogled) {
+                throw new Error("player" + player.getNickName() + " try to ride a rided mount");
+            } else if (this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS) != null) {
+                this.player.getInventoryCache().unEquipItem(this.player.getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS));
+            }
+            this.isToogled = true;
+            this.enableStats(true);
+            this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
+            this.player.getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
+            this.player.getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
+            this.player.getEntityLook().skins = DAO.getMounts().find(this.mount.model).getEntityLook().skins;
+            this.player.getEntityLook().scales = DAO.getMounts().find(this.mount.model).getEntityLook().scales;
+            if (player.getFighter() != null) {
+                player.getFighter().getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, 0, new EntityLook(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER, this.player.getEntityLook().SkinsCopy(), this.player.getEntityLook().ColorsCopy(), this.player.getEntityLook().ScalesCopy(), this.player.getEntityLook().SubEntityCopy())));
+                player.getFighter().getEntityLook().bonesId = DAO.getMounts().find(this.mount.model).getEntityLook().bonesId;
+                player.getFighter().getEntityLook().indexedColors = DAO.getMounts().find(this.mount.model).getEntityLook().indexedColors;
+                player.getFighter().getEntityLook().skins= DAO.getMounts().find(this.mount.model).getEntityLook().skins;
+                player.getFighter().getEntityLook().scales = DAO.getMounts().find(this.mount.model).getEntityLook().scales;
+            }
         /*if (item.templateId != ItemsEnum.KRAMKRAM) { //Todo KAMELEONE
          this.player.getEntityLook().indexedColors.clear();
          }*/
-        this.player.getEntityLook().scales = DAO.getMounts().find(this.mount.model).getEntityLook().scales;
-        this.player.refreshEntitie();
-    }
 
-    public void onGettingOff() {
-        if (this.isToogled) {
-            this.isToogled = false;
-            this.enableStats(false);
-            this.player.getEntityLook().bonesId = (short) 1;
-            this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
-            this.player.getEntityLook().indexedColors = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
-            this.player.getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
-            this.player.getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
-            this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
-            if(player.getFighter() != null){
-                player.getFighter().getEntityLook().bonesId = (short) 1;
-                player.getFighter().getEntityLook().skins = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
-                player.getFighter().getEntityLook().indexedColors = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
-                player.getFighter().getEntityLook().scales = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
-                player.getFighter().getEntityLook().subentities = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
-                player.getFighter().getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
-
-            }
             this.player.refreshEntitie();
         }
     }
 
-    private void ParseStats() {
+    public void onGettingOff() {
+        synchronized (entity) {
+            if (this.isToogled) {
+                this.isToogled = false;
+                this.enableStats(false);
+                this.player.getEntityLook().bonesId = (short) 1;
+                this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
+                this.player.getEntityLook().indexedColors = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
+                this.player.getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
+                this.player.getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
+                this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
+                if (player.getFighter() != null) {
+                    player.getFighter().getEntityLook().bonesId = (short) 1;
+                    player.getFighter().getEntityLook().skins = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
+                    player.getFighter().getEntityLook().indexedColors = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
+                    player.getFighter().getEntityLook().scales = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
+                    player.getFighter().getEntityLook().subentities = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
+                    player.getFighter().getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
+
+                }
+                this.player.refreshEntitie();
+            }
+        }
+    }
+
+    private void parseStats() {
         this.myStats = new GenericStats();
 
         StatsEnum Stat;
@@ -111,7 +117,7 @@ public class MountInformations {
 
     public GenericStats getStats() {
         if (this.myStats == null) {
-            this.ParseStats();
+            this.parseStats();
         }
         return myStats;
     }
@@ -174,7 +180,7 @@ public class MountInformations {
 
         this.entity = DAO.getMountInventories().get(id);
         if (this.entity != null) {
-            IoBuffer buf = IoBuffer.wrap(this.entity.informations);
+            final IoBuffer buf = IoBuffer.wrap(this.entity.informations);
             this.mount = new MountClientData();
             this.mount.deserialize(buf);
         }
@@ -190,7 +196,7 @@ public class MountInformations {
         if (binary == null || binary.length <= 0) {
             return this;
         }
-        IoBuffer buf = IoBuffer.wrap(binary);
+        final IoBuffer buf = IoBuffer.wrap(binary);
         this.initialize(buf.getInt());
         this.ratio = buf.get();
         this.isToogled = BufUtils.readBoolean(buf);

@@ -62,14 +62,14 @@ public class NpcDialog extends GameAction {
     }
 
     public void reply(int rep) {
-        NpcReply[] Stream = DAO.getNpcs().repliesAsStream().filter(x -> x.getReplyID() == rep).toArray(NpcReply[]::new);
-        if (!Arrays.stream(Stream).anyMatch(x -> x instanceof TalkReply)) {
+        final NpcReply[] stream = DAO.getNpcs().repliesAsStream().filter(x -> x.getReplyID() == rep).toArray(NpcReply[]::new);
+        if (!Arrays.stream(stream).anyMatch(x -> x instanceof TalkReply)) {
             this.getClient().endGameAction(GameActionTypeEnum.NPC_DAILOG);
         }
-        for (NpcReply x : Stream) {
+        for (NpcReply x : stream) {
             x.execute(((Player) actor));
         }
-        if (Stream.length == 0) {
+        if (stream.length == 0) {
             logger.debug("Undefined reponse ID {} ", rep);
             PlayerController.sendServerMessage(((Player)actor).getClient(), "Ce discours n'est pas encore parametré...");
         }

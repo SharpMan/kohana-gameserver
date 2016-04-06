@@ -25,21 +25,21 @@ public class InteractiveHandler {
             client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
-        InteractiveElementStruct Element = client.getCharacter().getCurrentMap().getInteractiveElementStruct(Message.elemId);
-        if (Element == null) {
+        final InteractiveElementStruct element = client.getCharacter().getCurrentMap().getInteractiveElementStruct(Message.elemId);
+        if (element == null) {
             client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
-        InteractiveElementSkill Skill = Element.getSkill(Message.skillInstanceUid);
-        if (Skill == null) {
+        final InteractiveElementSkill skill = element.getSkill(Message.skillInstanceUid);
+        if (skill == null) {
             client.send(new InteractiveUseErrorMessage(Message.elemId, Message.skillInstanceUid));
             return;
         }
 
-        client.addGameAction(new InteractiveElementAction(client.getCharacter(), Skill, Message.elemId));
+        client.addGameAction(new InteractiveElementAction(client.getCharacter(), skill, Message.elemId));
 
         try {
-            if (InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(Skill.skillId)) != null && InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(Skill.skillId)).getDuration() == 0) {
+            if (InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(skill.skillId)) != null && InteractiveElementAction.HANDLERS.get(InteractiveActionEnum.valueOf(skill.skillId)).getDuration() == 0) {
                 client.endGameAction(GameActionTypeEnum.INTERACTIVE_ELEMENT);
             }
         } catch (Exception ex) {

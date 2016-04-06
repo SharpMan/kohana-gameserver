@@ -23,32 +23,32 @@ public class FighterSpell {
         this.Buffs = FighterBuffs;
     }
 
-    public boolean canLaunchSpell(SpellLevel Spell, int TargetId) {
-        if (Spell.getMinCastInterval() > 0) {
-            if (this.initialCooldown.containsKey(Spell.getSpellId())) {
-                if (this.initialCooldown.get(Spell.getSpellId()) != null) {
-                    int newCoolDown = minCastInterval(Spell.getSpellId());
-                    if ((newCoolDown == 0 ? this.initialCooldown.get(Spell.getSpellId()).initialCooldown : newCoolDown) > 0) {
+    public boolean canLaunchSpell(SpellLevel spell, int targetId) {
+        if (spell.getMinCastInterval() > 0) {
+            if (this.initialCooldown.containsKey(spell.getSpellId())) {
+                if (this.initialCooldown.get(spell.getSpellId()) != null) {
+                    int newCoolDown = minCastInterval(spell.getSpellId());
+                    if ((newCoolDown == 0 ? this.initialCooldown.get(spell.getSpellId()).initialCooldown : newCoolDown) > 0) {
                         return false;
                     }
                 }
             }
         }
-        if (Spell.getMaxCastPerTurn() == 0 && Spell.getMaxCastPerTarget() == 0) {
+        if (spell.getMaxCastPerTurn() == 0 && spell.getMaxCastPerTarget() == 0) {
             return true;
         }
 
-        if (Spell.getMaxCastPerTurn() > 0) {
-            if (this.myTargets.containsKey(Spell.getSpellId())) {
-                if (this.myTargets.get(Spell.getSpellId()).size() >= Spell.getMaxCastPerTurn()) {
+        if (spell.getMaxCastPerTurn() > 0) {
+            if (this.myTargets.containsKey(spell.getSpellId())) {
+                if (this.myTargets.get(spell.getSpellId()).size() >= spell.getMaxCastPerTurn()) {
                     return false;
                 }
             }
         }
 
-        if (Spell.getMaxCastPerTarget() > 0) {
-            if (this.myTargets.containsKey(Spell.getSpellId())) {
-                if (this.myTargets.get(Spell.getSpellId()).stream().filter(x -> x.targetId == TargetId).count() >= Spell.getMaxCastPerTarget()) {
+        if (spell.getMaxCastPerTarget() > 0) {
+            if (this.myTargets.containsKey(spell.getSpellId())) {
+                if (this.myTargets.get(spell.getSpellId()).stream().filter(x -> x.targetId == targetId).count() >= spell.getMaxCastPerTarget()) {
                     return false;
                 }
             }

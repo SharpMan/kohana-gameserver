@@ -4,7 +4,9 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.requests.ExchangeRequest;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
+import koh.protocol.client.enums.DialogTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
+import koh.protocol.messages.game.dialog.LeaveDialogMessage;
 import koh.protocol.messages.game.dialog.LeaveDialogRequestMessage;
 
 /**
@@ -14,28 +16,29 @@ import koh.protocol.messages.game.dialog.LeaveDialogRequestMessage;
 public class DialogHandler {
 
     @HandlerAttribute(ID = LeaveDialogRequestMessage.MESSAGE_ID)
-    public static void HandleLeaveDialogRequestMessage(WorldClient Client, LeaveDialogRequestMessage Message) {
+    public static void handleLeaveDialogRequestMessage(WorldClient client, LeaveDialogRequestMessage message) {
         try {
-            if (Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-                if (!Client.getMyExchange().closeExchange()) {
-                    Client.endGameAction(GameActionTypeEnum.EXCHANGE);
+            if (client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
+                if (!client.getMyExchange().closeExchange()) {
+                    client.endGameAction(GameActionTypeEnum.EXCHANGE);
                 }
-            } else if (Client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {
-                Client.endGameAction(GameActionTypeEnum.CREATE_GUILD);
-                Client.send(new BasicNoOperationMessage());
-            } else if (Client.isGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
-                if (!(Client.getBaseRequest() instanceof ExchangeRequest)) {
-                    Client.send(new BasicNoOperationMessage());
+            } else if (client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {
+                client.endGameAction(GameActionTypeEnum.CREATE_GUILD);
+                client.send(new BasicNoOperationMessage());
+            } else if (client.isGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
+                if (!(client.getBaseRequest() instanceof ExchangeRequest)) {
+                    client.send(new BasicNoOperationMessage());
                 }
-                if (!Client.getBaseRequest().declin()) {
-                    Client.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
+                if (!client.getBaseRequest().declin()) {
+                    client.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
                 }
-            } else if (Client.isGameAction(GameActionTypeEnum.ZAAP)) {
-                Client.endGameAction(GameActionTypeEnum.ZAAP);
-            } else if (Client.isGameAction(GameActionTypeEnum.NPC_DAILOG)) {
-                Client.endGameAction(GameActionTypeEnum.NPC_DAILOG);
+            } else if (client.isGameAction(GameActionTypeEnum.ZAAP)) {
+                client.endGameAction(GameActionTypeEnum.ZAAP);
+            } else if (client.isGameAction(GameActionTypeEnum.NPC_DAILOG)) {
+                client.endGameAction(GameActionTypeEnum.NPC_DAILOG);
             } else {
-                Client.send(new BasicNoOperationMessage());
+                client.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_DIALOG));
+                client.send(new BasicNoOperationMessage());
             }
         } catch (Exception ex) {
             ex.printStackTrace();

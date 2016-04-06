@@ -15,6 +15,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
+import koh.game.fights.fighters.BombFighter;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
@@ -31,8 +32,11 @@ public class BuffPoutch extends BuffEffect {
 
     private static final Logger logger = LogManager.getLogger(BuffPoutch.class);
 
-    public BuffPoutch(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+    public BuffPoutch(EffectCast CastInfos, Fighter target) {
+        super(CastInfos, target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+        if(target instanceof BombFighter && target.getSummoner() == castInfos.caster){
+            this.duration++;
+        }
     }
 
     @Override

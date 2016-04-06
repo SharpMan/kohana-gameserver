@@ -5,7 +5,10 @@ import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
+import lombok.Getter;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -24,8 +27,11 @@ public abstract class BuffEffect {
     public static final int[] TRIGGERED_EFFECTS_IDS = new int[]{138, 1040};
     public static final int[] NO_BOOST_EFFECTS_IDS = new int[]{144, 82};
 
+    protected static final Logger logger = LogManager.getLogger(BuffEffect.class);
+
     public BuffDecrementType decrementType;
     public BuffActiveType activeType;
+    @Getter
     public EffectCast castInfos;
     public Fighter caster;
     public Fighter target;

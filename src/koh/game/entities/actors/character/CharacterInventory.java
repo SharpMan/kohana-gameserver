@@ -51,13 +51,13 @@ public class CharacterInventory {
     public static InventoryItem tryCreateItem(int templateId, Player character, int quantity, byte position, List<ObjectEffect> Stats, boolean Merge) {
 
         // Recup template
-        ItemTemplate template = DAO.getItemTemplates().getTemplate(templateId);
+        final ItemTemplate template = DAO.getItemTemplates().getTemplate(templateId);
 
         if (template == null)
             return null;
 
         // Creation
-        InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.NORMAL, template instanceof Weapon) : Stats));
+        final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, position, character != null ? character.getID() : -1, quantity, (Stats == null ? EffectHelper.generateIntegerEffect(template.getPossibleEffects(), EffectGenerationType.NORMAL, template instanceof Weapon) : Stats));
         item.setNeedInsert(true);
         item.getStats();
         if (character != null) {
@@ -126,9 +126,13 @@ public class CharacterInventory {
     }
 
     public void generalItemSetApply() {
-        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null).map(x -> x.getTemplate().getItemSet()).distinct().forEach(set ->
-                this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false)
-        );
+        this.itemsCache.values().stream()
+                .filter(x -> x.getPosition() != 63 && x.getTemplate().getItemSet() != null)
+                .map(x -> x.getTemplate().getItemSet())
+                .distinct()
+                .forEach(set ->
+                        this.applyItemSetEffects(set, this.countItemSetEquiped(set.getId()), true, false)
+                );
     }
 
     public boolean add(InventoryItem item, boolean merge) //muste be true
@@ -227,12 +231,13 @@ public class CharacterInventory {
                         player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.remove(this.player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.indexOf(appearence));
 
                     }
-                } else if (this.player.getEntityLook().skins.indexOf(appearence) != -1) {
-                    this.player.getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(appearence));
-                    if (player.getFighter() != null)
-                        player.getFighter().getEntityLook().skins.remove(this.player.getFighter().getEntityLook().skins.indexOf(appearence));
                 }
+            } else if (this.player.getEntityLook().skins.indexOf(appearence) != -1) {
+                this.player.getEntityLook().skins.remove(this.player.getEntityLook().skins.indexOf(appearence));
+                if (player.getFighter() != null)
+                    player.getFighter().getEntityLook().skins.remove(this.player.getFighter().getEntityLook().skins.indexOf(appearence));
             }
+
         }
     }
 
@@ -240,11 +245,11 @@ public class CharacterInventory {
         if (appearence != 0) {
             if (this.player.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
                 this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.add(appearence);
-                if(player.getFighter() != null)
+                if (player.getFighter() != null)
                     player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.add(appearence);
             } else {
                 this.player.getEntityLook().skins.add(appearence);
-                if(player.getFighter() != null)
+                if (player.getFighter() != null)
                     player.getFighter().getEntityLook().skins.add(appearence);
             }
         }
@@ -345,15 +350,15 @@ public class CharacterInventory {
                 final InventoryItem newItem = tryCreateItem(item.getTemplateId(), this.player, 1, slot.value(), item.getEffectsCopy());
                 this.updateObjectquantity(item, item.getQuantity() - 1);
                 this.checkItemsCriterias();
-                if ( newItem.getTemplate().getItemSet() != null) {
+                if (newItem.getTemplate().getItemSet() != null) {
                     if (count >= 0) {
-                        this.applyItemSetEffects( newItem.getTemplate().getItemSet(), count, false, true);
+                        this.applyItemSetEffects(newItem.getTemplate().getItemSet(), count, false, true);
                     }
-                    count = this.countItemSetEquiped( newItem.getTemplate().getItemSetId());
+                    count = this.countItemSetEquiped(newItem.getTemplate().getItemSetId());
                     if (count > 0) {
-                        this.applyItemSetEffects( newItem.getTemplate().getItemSet(), count, true, false);
+                        this.applyItemSetEffects(newItem.getTemplate().getItemSet(), count, true, false);
                     }
-                    this.sendSetUpdateMessage( newItem.getTemplate().getItemSet(), count);
+                    this.sendSetUpdateMessage(newItem.getTemplate().getItemSet(), count);
                 }
                 player.refreshStats();
                 player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
@@ -388,7 +393,7 @@ public class CharacterInventory {
                                 }
                             }, new ArrayList<>())));
                         }
-                        if(player.getFighter() != null)
+                        if (player.getFighter() != null)
                             player.getFighter().setEntityLook(EntityLookParser.copy(this.player.getEntityLook()));
                     } else {
                         this.addApparence(item.getApparrance());
@@ -426,7 +431,7 @@ public class CharacterInventory {
                     } else {
                         this.player.getEntityLook().subentities.removeIf(sub -> sub.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
                     }
-                    if(player.getFighter() != null)
+                    if (player.getFighter() != null)
                         player.getFighter().setEntityLook(EntityLookParser.copy(this.player.getEntityLook()));
                 } else {
                     this.removeApparence(item.getApparrance());
@@ -551,7 +556,7 @@ public class CharacterInventory {
     }
 
     public int getTotalWeight() {
-        return 1000 + this.player.getStats().getTotal(StatsEnum.ADD_PODS) + (5 * this.player.getStats().getTotal(StatsEnum.STRENGTH));
+        return 1000 + this.player.getStats().getTotal(StatsEnum.ADD_PODS) + Math.min(0, 5 * this.player.getStats().getTotal(StatsEnum.STRENGTH));
     }
 
     public Stream<Stream<ObjectEffectDice>> getEffects(int id) {
@@ -660,7 +665,7 @@ public class CharacterInventory {
                 } else {
                     this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET);
                 }
-                if(player.getFighter() != null)
+                if (player.getFighter() != null)
                     player.getFighter().setEntityLook(EntityLookParser.copy(this.player.getEntityLook()));
             } else {
                 this.removeApparence(equipedItem.getApparrance());

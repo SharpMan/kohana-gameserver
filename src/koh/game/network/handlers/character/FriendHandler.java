@@ -44,7 +44,7 @@ public class FriendHandler {
 
     @HandlerAttribute(ID = IgnoredAddRequestMessage.M_ID)
     public static void HandleIgnoredAddRequestMessage(WorldClient Client, IgnoredAddRequestMessage message) {
-        Player target = DAO.getPlayers().getCharacter(message.name);
+        final Player target = DAO.getPlayers().getCharacter(message.name);
         if (target == null || target.getClient() == null) {
             Client.send(new IgnoredAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
         } else if (Client.getAccount().accountData.ignore(target.getAccount().id)) {
@@ -64,7 +64,7 @@ public class FriendHandler {
 
     @HandlerAttribute(ID = FriendAddRequestMessage.ID)
     public static void HandleFriendAddRequestMessage(WorldClient Client, FriendAddRequestMessage Message) {
-        Player target = DAO.getPlayers().getCharacter(Message.Name);
+        final Player target = DAO.getPlayers().getCharacter(Message.Name);
         if (target == null || target.getClient() == null) {
             Client.send(new FriendAddFailureMessage(ListAddFailureEnum.LIST_ADD_FAILURE_NOT_FOUND));
         } else if (target.getAccount() == null || target.getAccount().accountData == null) {
@@ -92,12 +92,12 @@ public class FriendHandler {
 
     @HandlerAttribute(ID = IgnoredDeleteRequestMessage.M_ID)
     public static void HandleIgnoredDeleteRequestMessage(WorldClient Client, IgnoredDeleteRequestMessage Message) {
-        IgnoredContact Contact = Client.getAccount().accountData.getIgnored(Message.accountId);
-        if (Contact == null) {
+        final IgnoredContact contact = Client.getAccount().accountData.getIgnored(Message.accountId);
+        if (contact == null) {
             Client.send(new IgnoredDeleteResultMessage(false, "", Message.session));
         } else {
-            Client.getAccount().accountData.removeIgnored(Contact);
-            Client.send(new IgnoredDeleteResultMessage(true, Contact.accountName, Message.session));
+            Client.getAccount().accountData.removeIgnored(contact);
+            Client.send(new IgnoredDeleteResultMessage(true, contact.accountName, Message.session));
         }
     }
 
@@ -131,7 +131,7 @@ public class FriendHandler {
     }
 
     @HandlerAttribute(ID = FriendsGetListMessage.MESSAGE_ID)
-    public static void HandleFriendsGetListMessage(WorldClient Client, Message message) {
+    public static void handleFriendsGetListMessage(WorldClient Client, Message message) {
         Client.sequenceMessage(new FriendsListMessage(Client.getAccount().accountData.getFriendsInformations()));
     }
 

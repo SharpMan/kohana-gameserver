@@ -9,6 +9,7 @@ import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightInvisibilityMessage;
 import koh.protocol.messages.game.context.fight.character.GameFightRefreshFighterMessage;
+import lombok.Getter;
 
 /**
  *
@@ -16,6 +17,7 @@ import koh.protocol.messages.game.context.fight.character.GameFightRefreshFighte
  */
 public class FighterState {
 
+    @Getter
     private HashMap<FightStateEnum, BuffEffect> myStates = new HashMap<>();
 
     private Fighter myFighter;

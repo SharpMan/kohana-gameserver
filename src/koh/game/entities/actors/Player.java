@@ -13,6 +13,7 @@ import koh.game.entities.spells.LearnableSpell;
 import koh.game.fights.Fight;
 import koh.game.fights.FightState;
 import koh.game.fights.Fighter;
+import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
@@ -182,7 +183,7 @@ public class Player extends IGameActor implements Observer {
 
     private boolean wasSitted = false; //only for regen life
     private Fight myFight;
-    private Fighter myFighter;
+    private CharacterFighter myFighter;
 
     public synchronized void initialize() {
         if (myInitialized) {
@@ -209,6 +210,15 @@ public class Player extends IGameActor implements Observer {
         this.guild = DAO.getGuilds().getForPlayer(this.ID);
 
         this.stats = new GenericStats(this);
+
+        try {
+            if (this.mountInfo.isToogled) {
+                this.stats.merge(mountInfo.getStats());
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
         this.inventoryCache = new CharacterInventory(this);
 
@@ -467,10 +477,10 @@ public class Player extends IGameActor implements Observer {
                 this.myFighter.getStats().reset();
                 this.myFighter.getStats().merge(this.stats);
                 this.myFighter.setLife(this.getLife());
-                client.send(this.myFighter.asPlayer().FighterStatsListMessagePacket());
-                CharacterHandler.sendCharacterStatsListMessage(this.client);
+                client.send(this.myFighter.asPlayer().getCharacterStatsListMessagePacket());
+                CharacterHandler.sendCharacterStatsListMessage(this.client,true);
             } else {
-                CharacterHandler.sendCharacterStatsListMessage(this.client);
+                CharacterHandler.sendCharacterStatsListMessage(this.client,false);
             }
         }
     }
@@ -616,7 +626,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public int getMaxLife() {
-        return this.stats.getTotal(StatsEnum.VITALITY) + ((int) level * 5) + DAO.getD2oTemplates().getBreed(this.breed).getHealPoint();
+        return this.stats.getTotal(StatsEnum.VITALITY) + (level * 5) + DAO.getD2oTemplates().getBreed(this.breed).getHealPoint();
     }
     /*byte alignmentSide, byte alignmentValue, byte alignmentGrade, int characterPower, int honor, int honorGradeFloor, int honorNextGradeFloor, byte aggressable*/
 
@@ -901,11 +911,11 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public Fighter getFighter() {
+    public CharacterFighter getFighter() {
         return this.myFighter;
     }
 
-    public void setFighter(Fighter Fighter) {
+    public void setFighter(CharacterFighter Fighter) {
         synchronized ($FighterLook) {
             this.myFighter = Fighter;
         }

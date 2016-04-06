@@ -1,5 +1,6 @@
 package koh.game.dao.mysql;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -8,10 +9,13 @@ import com.google.inject.Inject;
 import koh.d2o.entities.SpellBomb;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.SpellDAO;
+import koh.game.entities.item.EffectHelper;
 import koh.game.entities.spells.*;
 import koh.game.utils.sql.ConnectionResult;
+import koh.game.utils.sql.ConnectionStatement;
 import koh.protocol.client.enums.SpellTargetType;
 import koh.protocol.client.enums.StatsEnum;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,7 +30,6 @@ public class SpellDAOImpl extends SpellDAO {
     private final Map<Integer, ArrayList<LearnableSpell>> learnableSpells = Collections.synchronizedMap(new HashMap<>(1179));
     private final Map<Integer, SpellBomb> bombs = Collections.synchronizedMap(new HashMap<>(5));
 
-    private static final Logger logger = LogManager.getLogger(AreaDAOImpl.class);
 
     @Inject
     private DatabaseSource dbSource;
@@ -77,15 +80,27 @@ public class SpellDAOImpl extends SpellDAO {
 
             while (result.next()) {
                 levels.put(result.getInt("id"), new SpellLevel(result));
-                /*Arrays.stream(levels.get(result.getInt("id")).getEffects())
-                        .filter(x -> x.getEffectType() == StatsEnum.CHATIMENT)
-                        .forEach(x -> {
-                            try {
-                                System.out.print(x.effectUid+",");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });*/
+                /*if(result.getInt("spell_id") == 5403){
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        if(effect.effectId == 111 || effect.effectId == 1109){
+                            levels.get(result.getInt("id")).setEffects(ArrayUtils.removeElement(levels.get(result.getInt("id")).getEffects(),effect));
+                            levels.get(result.getInt("id")).setCriticalEffect(ArrayUtils.removeElement(levels.get(result.getInt("id")).getCriticalEffect(),effect));
+
+                        }
+                    }
+                    try (ConnectionStatement<PreparedStatement> connn = dbSource.prepareStatement("UPDATE `spell_levels` set effects= ?,critical_effects =?  WHERE id = ?;")) {
+                        PreparedStatement pStatemente =  connn.getStatement();
+                        pStatemente.setBytes(1, EffectHelper.serializeEffectInstanceDice(levels.get(result.getInt("id")).getEffects()).array());
+                        pStatemente.setBytes(2, EffectHelper.serializeEffectInstanceDice(levels.get(result.getInt("id")).getCriticalEffect()).array());
+                        pStatemente.setInt(3,result.getInt("id"));
+
+                        pStatemente.execute();
+                    }
+                    catch (Exception e) {
+                        logger.error(e);
+                        logger.warn(e.getMessage());
+                    }
+                }*/
                 i++;
             }
         } catch (Exception e) {

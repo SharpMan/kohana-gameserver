@@ -128,9 +128,17 @@ public class EffectHelper {
                     verify = true;
                     break;
                 case "D":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (pEffect.category() == DAMAGE_EFFECT_CATEGORY);
                     break;
                 case "DA":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == AIR_ELEMENT)));
                     break;
                 case "DBA":
@@ -143,9 +151,17 @@ public class EffectHelper {
                     verify = pWeaponEffect;
                     break;
                 case "DE":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == EARTH_ELEMENT)));
                     break;
                 case "DF":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == FIRE_ELEMENT)));
                     break;
                 case "DG":
@@ -156,6 +172,10 @@ public class EffectHelper {
                     verify = (distance <= 1);
                     break;
                 case "DN":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == NEUTRAL_ELEMENT)));
                     break;
                 case "DP":
@@ -173,6 +193,10 @@ public class EffectHelper {
                 case "DTE":
                     break;
                 case "DW":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (((pEffect.category() == DAMAGE_EFFECT_CATEGORY)) && ((getEffect(pEffect.effectId).elementId == WATER_ELEMENT)));
                     break;
                 case "MD":
@@ -184,9 +208,17 @@ public class EffectHelper {
                 case "MDP":
                     break;
                 case "A":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (pEffect.effectId == 101);
                     break;
                 case "m":
+                    if(pEffect == null){
+                        verify = false;
+                        continue;
+                    }
                     verify = (pEffect.effectId == 127);
                     break;
             };
@@ -252,7 +284,8 @@ public class EffectHelper {
                 }
 
                 if (ArrayUtils.contains(DATE_EFFECT, e.effectId)) {
-                    Calendar now = Calendar.getInstance();
+                    final Calendar now = Calendar.getInstance();
+                    now.add(Calendar.MONTH,1);
                     effects[i] = (new EffectInstanceDate(e, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE)));
                     continue;
                 }
@@ -265,8 +298,8 @@ public class EffectHelper {
                     continue;
                 }
 
-                short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
-                short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
+                short num1 = (short) (((EffectInstanceDice) e).diceNum >= ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
+                short num2 = (short) ( ((EffectInstanceDice) e).diceNum <=  ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
                 if (genType == EffectGenerationType.MAX_EFFECTS) {
                     effects[i] = (new EffectInstanceInteger(e, !e.getTemplate().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;

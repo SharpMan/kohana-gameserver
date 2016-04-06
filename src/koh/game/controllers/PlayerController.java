@@ -39,11 +39,11 @@ public class PlayerController {
         }));
     }
     
-    public static void SendServerErrorMessage(WorldClient c, String message) {
+    public static void sendServerErrorMessage(WorldClient c, String message) {
         if (c == null) {
             return;
         }
-        c.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 0, new String[]{
+        c.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 16, new String[]{ "Melan" ,
             message
         }));
     }

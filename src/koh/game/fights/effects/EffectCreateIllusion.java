@@ -4,7 +4,7 @@ import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfunction;
 import koh.game.fights.FightCell;
 import koh.game.fights.effects.buff.BuffDecrementType;
-import koh.game.fights.effects.buff.buffState;
+import koh.game.fights.effects.buff.BuffState;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_TELEPORT_ON_SAME_MAP;
@@ -29,7 +29,7 @@ public class EffectCreateIllusion extends EffectBase {
         final byte ignoredDirection = Pathfunction.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
         final short startCell = castInfos.caster.getCellId();
 
-        final buffState buff = new buffState(new EffectCast(StatsEnum.INVISIBILITY, castInfos.spellId, castInfos.cellId, castInfos.chance, null, castInfos.caster, null), castInfos.caster);
+        final BuffState buff = new BuffState(new EffectCast(StatsEnum.INVISIBILITY, castInfos.spellId, castInfos.cellId, castInfos.chance, null, castInfos.caster, null), castInfos.caster);
         buff.duration = 1;
         buff.decrementType = BuffDecrementType.TYPE_BEGINTURN;
         castInfos.caster.getBuff().addBuff(buff);

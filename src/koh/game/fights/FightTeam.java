@@ -43,14 +43,14 @@ public class FightTeam {
 
     private List<Fighter> myFighters = new ArrayList<>(8);
     public byte id;
-    public int LeaderId;
+    public int leaderId;
     public Fighter leader;
-    public Fight Fight;
+    public Fight fight;
     public ArrayList<SwapPositionRequest> swapRequests = new ArrayList<>(2);
 
     public FightTeam(byte Id, Fight f) {
         this.id = Id;
-        this.Fight = f;
+        this.fight = f;
     }
 
     public Stream<Fighter> getFighters() {
@@ -79,7 +79,7 @@ public class FightTeam {
         if (this.leader instanceof MonsterFighter) {
             return FighterRefusedReasonEnum.WRONG_ALIGNMENT;
         }
-        if (this.Fight.getFightState() != FightState.STATE_PLACE) {
+        if (this.fight.getFightState() != FightState.STATE_PLACE) {
             return FighterRefusedReasonEnum.TOO_LATE;
         }
         if (this.myFighters.size() >= 8) {
@@ -106,7 +106,7 @@ public class FightTeam {
 
     public void setLeader(Fighter fighter) {
         this.leader = fighter;
-        this.LeaderId = fighter.getID();
+        this.leaderId = fighter.getID();
     }
 
     public FightTeamInformations getFightTeamInformations() {
@@ -119,10 +119,10 @@ public class FightTeam {
 
     public short bladePosition = -1;
 
-    public void fighterJoin(Fighter Fighter) {
-        Fighter.setTeam(this);
+    public void fighterJoin(Fighter fighter) {
+        fighter.setTeam(this);
 
-        this.myFighters.add(Fighter);
+        this.myFighters.add(fighter);
     }
 
     public void fighterLeave(Fighter Fighter) {
@@ -161,7 +161,7 @@ public class FightTeam {
     }
 
     public void sendToField(Message Message) { //TODO : clean this fucking code
-        this.Fight.sendToField(new FieldNotification(Message) {
+        this.fight.sendToField(new FieldNotification(Message) {
             @Override
             public boolean can(Player perso) {
                 return perso.getClient() != null && perso.getFighter() != null && perso.getFighter().getTeam().id == id;

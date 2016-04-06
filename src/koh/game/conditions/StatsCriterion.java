@@ -49,16 +49,16 @@ public class StatsCriterion extends Criterion {
 
     private final static String[] EXTRA_CRITERIONS = new String[]{"Ce", "CE", "CD", "CH"};
 
-    public String Identifier;
+    public String identifier;
 
-    public StatsEnum Field;
+    public StatsEnum field;
 
-    public boolean Base;
+    public boolean base;
 
-    public Integer Comparand;
+    public Integer comparand;
 
     public StatsCriterion(String identifier) {
-        this.Identifier = identifier;
+        this.identifier = identifier;
     }
 
     public static boolean isStatsIdentifier(String identifier) {
@@ -68,38 +68,38 @@ public class StatsCriterion extends Criterion {
     @Override
     public boolean eval(Player character) {
 
-        if (this.Field != null) {
-            return this.Compare((Comparable<Integer>) (this.Base ? character.getStats().getBase(Field) : character.getStats().getTotal(Field)), this.Comparand);
+        if (this.field != null) {
+            return this.Compare((Comparable<Integer>) (this.base ? character.getStats().getBase(field) : character.getStats().getTotal(field)), this.comparand);
         }
-        //return this.Compare<Integer>((Comparable<Integer>) (this.base ? character.stats.getBase(Field) : character.stats.getTotal(Field)), this.Comparand);
-        switch (this.Identifier) {
+        //return this.Compare<Integer>((Comparable<Integer>) (this.base ? character.stats.getBase(field) : character.stats.getTotal(field)), this.comparand);
+        switch (this.identifier) {
             case "Ce":
-                return this.Compare((Comparable<Integer>) character.getEnergy(), this.Comparand);
+                return this.Compare((Comparable<Integer>) character.getEnergy(), this.comparand);
             case "CE":
-                //return this.Compare((Comparable<Integer>) character.EnergyMax, (Short) this.Comparand);
+                //return this.Compare((Comparable<Integer>) character.EnergyMax, (Short) this.comparand);
                 return true;
             case "CD":
                 return true;
             case "CH":
                 return true;
             default:
-                throw new Error(String.format("Cannot eval StatsCriterion {0}, {1} is not a stats identifier", this, this.Identifier));
+                throw new Error(String.format("Cannot eval StatsCriterion {0}, {1} is not a stats identifier", this, this.identifier));
         }
     }
 
     @Override
     public void Build() {
-        if (StatsCriterion.CRITERIONS_BINDS.containsKey(this.Identifier)) {
-            this.Field = StatsCriterion.CRITERIONS_BINDS.get(this.Identifier);
-        } else if (StatsCriterion.CRITERIONS_STATS_BASE_BINDS.containsKey(this.Identifier)) {
-            this.Field = StatsCriterion.CRITERIONS_STATS_BASE_BINDS.get(this.Identifier);
-            this.Base = true;
-        } else if (!Arrays.stream(StatsCriterion.EXTRA_CRITERIONS).anyMatch(x -> x.equalsIgnoreCase(this.Identifier))) //else if (!Enumerable.Any<string>((IEnumerable<string>) StatsCriterion.EXTRA_CRITERIONS, (Func<string, bool>) (entry => entry == this.IDENTIFIER)))
+        if (StatsCriterion.CRITERIONS_BINDS.containsKey(this.identifier)) {
+            this.field = StatsCriterion.CRITERIONS_BINDS.get(this.identifier);
+        } else if (StatsCriterion.CRITERIONS_STATS_BASE_BINDS.containsKey(this.identifier)) {
+            this.field = StatsCriterion.CRITERIONS_STATS_BASE_BINDS.get(this.identifier);
+            this.base = true;
+        } else if (!Arrays.stream(StatsCriterion.EXTRA_CRITERIONS).anyMatch(x -> x.equalsIgnoreCase(this.identifier))) //else if (!Enumerable.Any<string>((IEnumerable<string>) StatsCriterion.EXTRA_CRITERIONS, (Func<string, bool>) (entry => entry == this.IDENTIFIER)))
         {
-            throw new Error(String.format("Cannot build StatsCriterion, {0} is not a stats identifier", this.Identifier));
+            throw new Error(String.format("Cannot build StatsCriterion, {0} is not a stats identifier", this.identifier));
         }
         try {
-            this.Comparand = Integer.parseInt(literal);
+            this.comparand = Integer.parseInt(literal);
         } catch (Exception e) {
             throw new Error(String.format("Cannot build StatsCriterion, {0} is not a valid integer", this.literal));
         }
@@ -107,7 +107,7 @@ public class StatsCriterion extends Criterion {
 
     @Override
     public String toString() {
-        return this.FormatToString(this.Identifier);
+        return this.FormatToString(this.identifier);
     }
 
 }

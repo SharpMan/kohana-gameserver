@@ -2,6 +2,7 @@ package koh.game.entities.spells;
 
 import koh.utils.Enumerable;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -29,7 +30,7 @@ public class SpellLevel {
     private boolean criticalFailureEndsTurn, hideEffects, hidden;
     @Getter
     private int[] statesRequired, statesForbidden;
-    @Getter
+    @Getter @Setter
     private EffectInstanceDice[] effects, criticalEffect;
 
     public SpellLevel(ResultSet result) throws SQLException {

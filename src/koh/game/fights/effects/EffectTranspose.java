@@ -4,6 +4,7 @@ import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.protocol.client.enums.FightStateEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
 
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_EXCHANGE_PLACES;
@@ -15,6 +16,12 @@ public class EffectTranspose extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
+        if(castInfos.effectType == StatsEnum.SWITCH_POSITIONS){ //Transko
+            castInfos.targets.clear();
+            castInfos.getFight().getAliveFighters()
+                    .filter(fr -> fr.getStates().hasState(FightStateEnum.Longuevue))
+                    .forEach(fr -> castInfos.targets.add(fr));
+        }
         for (Fighter target : (Iterable<Fighter>) castInfos.targets.stream()
                 .filter(fr -> (fr.getObjectType() != IFightObject.FightObjectType.OBJECT_STATIC)
                         && !fr.getStates().hasState(FightStateEnum.CARRIED)
@@ -31,12 +38,12 @@ public class EffectTranspose extends EffectBase {
                     continue;
                 }
             }
-            final FightCell casterCell = castInfos.caster.getMyCell(), TargetCell = target.getMyCell();
+            final FightCell casterCell = castInfos.caster.getMyCell(), targetCell = target.getMyCell();
             castInfos.caster.getFight().sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, castInfos.caster.getID(), target.getID(), target.getCellId(), castInfos.caster.getCellId()));
             castInfos.caster.setCell(null);
             target.setCell(null);
 
-            if (castInfos.caster.setCell(TargetCell, false) == -3 || target.setCell(casterCell, false) == -3) {
+            if (castInfos.caster.setCell(targetCell, false) == -3 || target.setCell(casterCell, false) == -3) {
                 return -3;
             }
 
@@ -45,13 +52,13 @@ public class EffectTranspose extends EffectBase {
                 return -3;
             }
 
-            int Result = castInfos.caster.getMyCell().onObjectAdded(castInfos.caster);
-            if (Result == -3) {
-                return Result;
+            int result = castInfos.caster.getMyCell().onObjectAdded(castInfos.caster);
+            if (result == -3) {
+                return result;
             }
-            Result = target.getMyCell().onObjectAdded(target);
-            if (Result == -3) {
-                return Result;
+            result = target.getMyCell().onObjectAdded(target);
+            if (result == -3) {
+                return result;
             }
         }
         return -1;

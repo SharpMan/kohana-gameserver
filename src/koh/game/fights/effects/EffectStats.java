@@ -29,13 +29,13 @@ public class EffectStats extends EffectBase {
             if(target.getCarriedActor() != 0){
                 target = target.getCarrierActor();
             }
-            EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
+            final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
 
             if(ArrayUtils.contains(BLACKLISTED_EFFECTS, castInfos.effect.effectUid)){ //Feca special spell
                 target.getBuff().addBuff(new BuffStatsByHit(subInfos, target));
             }
             else if (!target.getBuff().buffMaxStackReached(subInfos)) {
-                BuffStats buffStats = new BuffStats(subInfos, target);
+                final BuffStats buffStats = new BuffStats(subInfos, target);
                 if (buffStats.applyEffect(null, null) == -3) {
                     return -3;
                 }

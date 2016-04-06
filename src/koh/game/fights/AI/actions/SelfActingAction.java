@@ -708,6 +708,9 @@ public class SelfActingAction extends AIAction {
         {
             return 0;
         }
+        else if(AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
+            return 0;
+        }
         double baseScore = 11;
         double score = baseScore;
 
@@ -818,7 +821,7 @@ public class SelfActingAction extends AIAction {
         int pathScore = 4;
         int finalLength = 0;
         for (int i = 0; i < length; i++) {
-            FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(lastCell.getId(), direction));
+            final FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(lastCell.getId(), direction));
             if (nextCell != null) {
                 lastCell = nextCell;
             }
@@ -838,7 +841,6 @@ public class SelfActingAction extends AIAction {
             } else {
                 if (!fear) {
                     pathScore *= EffectPush.getRANDOM_PUSHDAMAGE().nextInt(4) + 4;
-                    ;
                     if (isAlly) {
                         pathScore *= -1;
                     }
@@ -850,9 +852,12 @@ public class SelfActingAction extends AIAction {
         score += finalLength * pathScore;
         if (lastCell != target.getMyCell()) {
             for (FightActivableObject layer : target.getMyCell().getObjectsLayer()) {
+                if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null){
+                    continue;
+                }
                 int layerScore = 0;
-                for (EffectInstanceDice Effect : layer.getCastSpell().getEffects()) {
-                    layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, Effect, fighterList, false, true));
+                for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
+                    layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, false, true));
                 }
                 if (layer instanceof FightTrap)// TODO : Calculate if traplayer others targets
                 {
@@ -876,9 +881,9 @@ public class SelfActingAction extends AIAction {
         }
         double score = 0;
         if (isFear) {
-            byte d = Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell);
-            FightCell startCell = AI.getFight().getCell(Pathfunction.nextCell(AI.getFighter().getCellId(), d));
-            FightCell endCell = AI.getFight().getCell(castCell);
+            final byte d = Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell);
+            final FightCell startCell = AI.getFight().getCell(Pathfunction.nextCell(AI.getFighter().getCellId(), d));
+            final FightCell endCell = AI.getFight().getCell(castCell);
             if (startCell != null && endCell != null) {
                 Fighter target = startCell.getFighter();
                 if (target != null) {
@@ -887,9 +892,9 @@ public class SelfActingAction extends AIAction {
                 }
             }
         } else {
-            FightCell startCell = AI.getFight().getCell(castCell);
+            final FightCell startCell = AI.getFight().getCell(castCell);
             if (startCell != null) {
-                Fighter target = startCell.getFighter();
+                final Fighter target = startCell.getFighter();
                 if (target != null) {
                     score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell), effect.randomJet(), false);
                 }

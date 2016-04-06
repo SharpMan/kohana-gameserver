@@ -39,6 +39,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.TRIGGERS_GLYPHS, new EffectTriggersGlyph());
 
             //Echange de places
+            this.put(StatsEnum.SWITCH_POSITIONS, new EffectTranspose());
             this.put(StatsEnum.SWITCH_POSITION, new EffectTranspose());
             this.put(StatsEnum.SACRIFICE, new EffectSacrifice());
 
@@ -100,7 +101,7 @@ public abstract class EffectBase {
 
             this.put(StatsEnum.REFLECT_SPELL, new EffectReflectSpell());
             this.put(StatsEnum.DESENVOUTEMENT, new EffectDebuff());
-            this.put(StatsEnum.INCREASE_EFFECT_DURATION, new EffectDispellEffectDuration());
+            this.put(StatsEnum.DECREASE_EFFECT_DURATION, new EffectDispellEffectDuration());
 
             // Vol de statistique
             this.put(StatsEnum.STEAL_VITALITY, new EffectStatsSteal());
@@ -287,6 +288,9 @@ public abstract class EffectBase {
             this.put(StatsEnum.CREATE_ILLUSION, new EffectCreateIllusion());
             this.put(StatsEnum.REFOULLAGE, new EffectPoutch());
 
+            //Steamer
+            this.put(StatsEnum.TRANSKO, new EffectPoutch());
+
             //Eliatrope
             this.put(StatsEnum.LOST_PDV_PERCENT, new EffectLostPdvPercent());
             this.put(StatsEnum.PORTAL_TELEPORTATION, new EffectPortalTeleportation());
@@ -303,7 +307,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.SUB_ALl_RESISTANCES_PERCENT, new EffectSubAllResist());
 
             //Sadida
-            this.put(StatsEnum.CAST_SPELL_ALL_ENEMY , new EffectCastSpell());
+            this.put(StatsEnum.CAST_SPELL, new EffectCastSpell());
 
             //Arbre de vie
             this.put(StatsEnum.HEAL_ATTACKER_DAMAGE_PERCENT_INCURED, new EffectHealDamageIncured());

@@ -4,10 +4,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
-import koh.game.fights.fighters.MonsterFighter;
-import koh.game.fights.fighters.StaticSummonedFighter;
-import koh.game.fights.fighters.SummonedFighter;
-import koh.game.fights.fighters.SummonedReplacerFighter;
+import koh.game.fights.fighters.*;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
@@ -29,8 +26,11 @@ public class EffectSummon extends EffectBase {
             castInfos.targets.forEach(target -> target.tryDie(castInfos.caster.getID(),true));
             //Now mask
         }
+        else if(castInfos.caster.getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
+            return -1;
+        }
 
-        MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
+        final MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
         // getTemplate de monstre existante
         if (monster != null) {
             final MonsterGrade monsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
@@ -46,12 +46,17 @@ public class EffectSummon extends EffectBase {
 
 
                     summon.joinFight();
+                    castInfos.caster.getFight().getFightWorker().summonFighter(summon);
                     summon.getFight().joinFightTeam(summon, castInfos.caster.getTeam(), false, castInfos.cellId, true);
                     castInfos.caster.getFight().sendToField(Pl -> new GameActionFightSummonMessage(ActionIdEnum.ACTION_SUMMON_CREATURE, castInfos.caster.getID(), (GameFightFighterInformations) summon.getGameContextActorInformations(Pl)));
-                    castInfos.caster.getFight().getFightWorker().summonFighter(summon);
+
                     Arrays.stream(monster.getSpellsOnSummons())
                             .mapToObj(sp -> DAO.getSpells().findSpell(sp).getLevelOrNear(1))
-                            .forEach(sp -> castInfos.getFight().launchSpell(summon, sp, castInfos.cellId, true, true, true));
+                            .forEach(sp -> castInfos.getFight().launchSpell(summon, sp, castInfos.cellId, true, true, true,-1));
+
+                    castInfos.caster.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base--;
+                    if(castInfos.caster instanceof CharacterFighter)
+                        castInfos.caster.send(castInfos.caster.asPlayer().getCharacterStatsListMessagePacket());
                 }
             }
         }

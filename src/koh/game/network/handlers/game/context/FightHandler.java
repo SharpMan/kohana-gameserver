@@ -116,7 +116,7 @@ public class FightHandler {
             return;
         }
 
-        Client.getCharacter().getFight().SetFighterReady(Client.getCharacter().getFighter());
+        Client.getCharacter().getFight().setFighterReady(Client.getCharacter().getFighter());
     }
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsRequestMessage.M_ID)

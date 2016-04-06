@@ -31,12 +31,12 @@ public class WorldServer {
     /**
      * 2 * estimated client optimal size (64)
      */
-    private static final int DEFAULT_READ_SIZE = 128;
+    private static final int DEFAULT_READ_SIZE = 1024;
 
     /**
      * max used client packet size + additional size for infos of the next packet
      */
-    private static final int MAX_READ_SIZE = 0xFFFF + 0xFF;
+    private static final int MAX_READ_SIZE = 4096 + 0xFF;
 
     public WorldServer(int port) {
         this.acceptor = new NioSocketAcceptor(Runtime.getRuntime().availableProcessors() * 4);
@@ -52,9 +52,10 @@ public class WorldServer {
         this.acceptor.setHandler(new WorldHandler());
 
         this.acceptor.getSessionConfig().setMaxReadBufferSize(MAX_READ_SIZE);
+        //this.acceptor.getSessionConfig().setReceiveBufferSize(MAX_READ_SIZE);
         this.acceptor.getSessionConfig().setMinReadBufferSize(DEFAULT_READ_SIZE);
         this.acceptor.getSessionConfig().setReaderIdleTime(Main.MIN_TIMEOUT * 60);
-        this.acceptor.getSessionConfig().setTcpNoDelay(true);
+        this.acceptor.getSessionConfig().setTcpNoDelay(false);
         this.acceptor.getSessionConfig().setKeepAlive(true);
 
         return this;

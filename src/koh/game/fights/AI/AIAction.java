@@ -129,6 +129,7 @@ public abstract class AIAction {
                case HEAl_OR_DAMAGE:
                case HEAL_PDV_RENDUS:
                case Heal_PV:
+               case PDV_PERCENT_REPORTED: //Not sure
                    return scoreHeal(AI, effect, targets, reverse);
 
                case DAMAGE_BECOME_HEAL:
@@ -201,7 +202,6 @@ public abstract class AIAction {
                    return scoreDamage_III(AI, effect, targets, reverse);
 
              /* DAMAGE LEVEL 2*/
-               case PDV_PERCENT_REPORTED: //Not sure
                case STEAL_PV_FIX:
                case DAMAGE_LIFE_NEUTRE:
                case DAMAGE_LIFE_WATER:
@@ -307,6 +307,9 @@ public abstract class AIAction {
                    return scoreSubBuff_I(AI, effect, targets, reverse, false);
 
 
+               //TODO SPELL_COOLDOWN if caster == target
+
+               case CHANGE_LOOK:
                case EXPAND_SIZE:
                case CHANGE_APPEARANCE:
                    return scoreAddStateGood(AI, effect, targets, reverse);
@@ -347,10 +350,12 @@ public abstract class AIAction {
                case LAUNCHER_ENTITY:
                    return scoreDeplace(AI, castCell, effect, targets, invokPreview, true);
 
+               case SWITCH_POSITIONS:
                case SWITCH_POSITION:
                    return scoreExchangePlace(AI, casterCell, castCell, effect, targets, invokPreview);
 
                case DESENVOUTEMENT:
+               case DECREASE_EFFECT_DURATION:
                    return scoreDebuff(AI, effect, targets, reverse);
 
                case STATIC_SUMMON:
@@ -372,9 +377,10 @@ public abstract class AIAction {
                case DO_NOTHING:
                    return 0;
 
+               case TRANSKO:
                case POUTCH:
                case REFOULLAGE:
-               case CAST_SPELL_ALL_ENEMY: // shoult not be there
+               case CAST_SPELL: // shoult not be there
                    return scoreLaunchSpell(AI, effect, targets, reverse);
 
                default: {

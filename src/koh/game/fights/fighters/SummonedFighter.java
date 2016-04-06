@@ -38,5 +38,24 @@ public class SummonedFighter extends MonsterFighter {
         this.stats.addBase(StatsEnum.WISDOM, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
     }
 
+    public int tryDieSilencious(int casterId, boolean force) {
+        final int result = super.tryDie(casterId,force);
+        if(result == -2 || result == -3){
+            this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
+        }
+        return  result;
+    }
 
+
+    @Override
+    public int tryDie(int casterId, boolean force) {
+       final int result = super.tryDie(casterId,force);
+        if(result == -2 || result == -3){
+            this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
+            if(summoner instanceof CharacterFighter){
+                summoner.send(summoner.asPlayer().getCharacterStatsListMessagePacket());
+            }
+        }
+        return  result;
+    }
 }

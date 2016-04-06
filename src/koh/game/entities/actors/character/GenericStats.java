@@ -174,14 +174,12 @@ public class GenericStats {
 
         // existant ?
         if (stats.containsKey(effectType)) {
-            total += stats.get(effectType).Total();
+            total += stats.get(effectType).getTotal();
         }
 
         switch (effectType) {
-            case ADD_PODS:
-                total += (5 * this.getTotal(StatsEnum.STRENGTH)); //TODO JOBlvl *5
             /*case getInitiative:
-             Total += getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
+             getTotal += getTotal(StatsEnum.strength) + getTotal(StatsEnum.chance) + getTotal(StatsEnum.intelligence) + getTotal(StatsEnum.agility);*/
             case DODGE_PA_LOST_PROBABILITY:
             case DODGE_PM_LOST_PROBABILITY:
             case ADD_RETRAIT_PA:
@@ -200,8 +198,11 @@ public class GenericStats {
                 }
                 total += getTotal(StatsEnum.ADD_PM);
                 break;
+            case ADD_TACKLE_BLOCK:
+            case ADD_TACKLE_EVADE:
+                total += getTotal(StatsEnum.AGILITY) / 10;
             /*case Reflect:
-             Total += getTotal(StatsEnum.AddRenvoiDamageItem);
+             getTotal += getTotal(StatsEnum.AddRenvoiDamageItem);
              break;*/
         }
 

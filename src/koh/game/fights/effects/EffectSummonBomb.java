@@ -26,13 +26,13 @@ public class EffectSummonBomb extends EffectBase {
             MonsterGrade MonsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
             if (MonsterLevel != null) {
                 if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
-                    BombFighter Bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, MonsterLevel);
-                    Bomb.joinFight();
-                    Bomb.getFight().joinFightTeam(Bomb, castInfos.caster.getTeam(), false, castInfos.cellId, true);
-                    castInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, castInfos.caster.getID(), (GameFightFighterInformations) Bomb.getGameContextActorInformations(null)));
-                    castInfos.caster.getFight().getFightWorker().summonFighter(Bomb);
+                    final BombFighter bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, MonsterLevel);
+                    bomb.joinFight();
+                    bomb.getFight().joinFightTeam(bomb, castInfos.caster.getTeam(), false, castInfos.cellId, true);
+                    castInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, castInfos.caster.getID(), (GameFightFighterInformations) bomb.getGameContextActorInformations(null)));
+                    castInfos.caster.getFight().getFightWorker().summonFighter(bomb);
                     castInfos.caster.getActivableObjects().filter(Object -> Object instanceof FightBomb)
-                            .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).owner,Bomb))
+                            .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).owner,bomb))
                             .forEach(Bombe -> ((FightBomb)Bombe).getFightCells()
                                               .filter(Cell -> Cell.hasFighter())
                                               .forEach(C -> {
@@ -43,7 +43,7 @@ public class EffectSummonBomb extends EffectBase {
                                               }));
                 } else {
                     //castInfos.caster.fight.affectSpellTo(castInfos.caster, castInfos.caster.fight.getCell(castInfos.getCellId).getObjectsAsFighter()[0] , castInfos.effect.diceSide, SpellDAOImpl.bombs.get(castInfos.effect.diceNum).instantSpellId);
-                    castInfos.caster.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(castInfos.effect.diceNum).instantSpellId).getSpellLevel(castInfos.effect.diceSide), (short) castInfos.targetKnownCellId, true,true,true);
+                    castInfos.caster.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(DAO.getSpells().findBomb(castInfos.effect.diceNum).instantSpellId).getSpellLevel(castInfos.effect.diceSide), (short) castInfos.targetKnownCellId, true,true,true,-1);
                 }
             }
         }

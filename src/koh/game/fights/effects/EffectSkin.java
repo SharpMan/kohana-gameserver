@@ -12,12 +12,12 @@ public class EffectSkin extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        BuffEffect Buff = null;
+        BuffEffect buff = null;
         for (Fighter Target : castInfos.targets) {
-            Buff = new BuffSkin(castInfos, Target);
-            if (!Target.getBuff().buffMaxStackReached(Buff)) {
-                Target.getBuff().addBuff(Buff);
-                if (Buff.applyEffect(null, null) == -3) {
+            buff = new BuffSkin(castInfos, Target);
+            if (!Target.getBuff().buffMaxStackReached(buff)) {
+                Target.getBuff().addBuff(buff);
+                if (buff.applyEffect(null, null) == -3) {
                     return -3;
                 }
             }

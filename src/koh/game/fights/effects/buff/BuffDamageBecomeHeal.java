@@ -19,7 +19,7 @@ public class BuffDamageBecomeHeal extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
         if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
             return -1;
         }
@@ -29,13 +29,13 @@ public class BuffDamageBecomeHeal extends BuffEffect {
             return -1;
         }
         
-        DamageValue.setValue(DamageValue.getValue() * this.castInfos.effect.value);
+        damageValue.setValue((damageValue.getValue() * this.castInfos.effect.value) /100);
 
-        if (EffectHeal.applyHeal(castInfos, target, DamageValue, false) == -3) {
+        if (EffectHeal.applyHeal(castInfos, target, damageValue, false) == -3) {
             return -3;
         }
-        DamageValue.setValue(0);
-        return super.applyEffect(DamageValue, DamageInfos);
+        damageValue.setValue(0);
+        return super.applyEffect(damageValue, DamageInfos);
     }
 
     @Override

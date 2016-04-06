@@ -31,7 +31,7 @@ public class FightWorker {
         this.fight = Fight;
     }
 
-    public void summonFighter(Fighter fighter) {
+    public synchronized void summonFighter(Fighter fighter) {
         int index = myFightersTurn.indexOf(fighter.getSummoner()) + 1;
         if (index == 0) {
             index = myFightersTurn.size();

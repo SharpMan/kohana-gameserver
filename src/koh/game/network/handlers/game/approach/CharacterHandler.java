@@ -168,10 +168,10 @@ public class CharacterHandler {
         }
     }
 
-    public static void sendCharacterStatsListMessage(WorldClient client) {
+    public static void sendCharacterStatsListMessage(WorldClient client, boolean fight) {
         client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.getCharacter().getExperience(), (double) DAO.getExps().getPlayerMinExp(client.getCharacter().getLevel()), (double) DAO.getExps().getPlayerMaxExp(client.getCharacter().getLevel()), client.getCharacter().getKamas(), client.getCharacter().getStatPoints(), 0, client.getCharacter().getSpellPoints(), client.getCharacter().getActorAlignmentExtendInformations(),
                 client.getCharacter().getLife(), client.getCharacter().getMaxLife(), client.getCharacter().getEnergy(), PlayerEnum.MAX_ENERGY,
-                (short) client.getCharacter().getStats().getTotal(StatsEnum.ACTION_POINTS), (short) client.getCharacter().getStats().getTotal(StatsEnum.MOVEMENT_POINTS),
+                (short) client.getCharacter().getStats().getTotal(StatsEnum.ACTION_POINTS,fight), (short) client.getCharacter().getStats().getTotal(StatsEnum.MOVEMENT_POINTS,fight),
                 new CharacterBaseCharacteristic(client.getCharacter().getInitiative(true), 0, client.getCharacter().getStats().getItem(StatsEnum.INITIATIVE), 0, 0), client.getCharacter().getStats().getEffect(StatsEnum.PROSPECTING), client.getCharacter().getStats().getEffect(StatsEnum.ACTION_POINTS),
                 client.getCharacter().getStats().getEffect(StatsEnum.MOVEMENT_POINTS), client.getCharacter().getStats().getEffect(StatsEnum.STRENGTH), client.getCharacter().getStats().getEffect(StatsEnum.VITALITY),
                 client.getCharacter().getStats().getEffect(StatsEnum.WISDOM), client.getCharacter().getStats().getEffect(StatsEnum.CHANCE), client.getCharacter().getStats().getEffect(StatsEnum.AGILITY),

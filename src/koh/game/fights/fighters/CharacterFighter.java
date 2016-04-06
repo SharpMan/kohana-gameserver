@@ -13,6 +13,7 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightVanishMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
+import koh.protocol.messages.game.character.stats.CharacterStatsListMessage;
 import koh.protocol.messages.game.character.stats.FighterStatsListMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
@@ -83,7 +84,7 @@ public class CharacterFighter extends Fighter {
     @Override
     public void middleTurn() {
         /*if (this.character.client != null) {
-         this.character.client.send(this.FighterStatsListMessagePacket());
+         this.character.client.send(this.getFighterStatsListMessagePacket());
          }*/
         super.middleTurn();
     }
@@ -113,7 +114,7 @@ public class CharacterFighter extends Fighter {
         this.fakeContextualId = -1000;
         this.buff.dispell(2763);
 
-        this.send(this.FighterStatsListMessagePacket());
+        this.send(this.getFighterStatsListMessagePacket());
     }
 
     @Override
@@ -208,8 +209,34 @@ public class CharacterFighter extends Fighter {
         this.character.send(packet);
     }
 
-    public FighterStatsListMessage FighterStatsListMessagePacket() {
+    public FighterStatsListMessage getFighterStatsListMessagePacket() {
         return new FighterStatsListMessage(new CharacterCharacteristicsInformations((double) character.getExperience(), (double) DAO.getExps().getPlayerMinExp(character.getLevel()), (double) DAO.getExps().getPlayerMaxExp(character.getLevel()), character.getKamas(), character.getStatPoints(), 0, character.getSpellPoints(), character.getActorAlignmentExtendInformations(),
+                getLife(), getMaxLife(), character.getEnergy(), PlayerEnum.MAX_ENERGY,
+                (short) this.getAP(), (short) this.getMP(),
+                new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.INITIATIVE), 0, 0), stats.getEffect(StatsEnum.PROSPECTING), stats.getEffect(StatsEnum.ACTION_POINTS),
+                stats.getEffect(StatsEnum.MOVEMENT_POINTS), stats.getEffect(StatsEnum.STRENGTH), stats.getEffect(StatsEnum.VITALITY),
+                stats.getEffect(StatsEnum.WISDOM), stats.getEffect(StatsEnum.CHANCE), stats.getEffect(StatsEnum.AGILITY),
+                stats.getEffect(StatsEnum.INTELLIGENCE), stats.getEffect(StatsEnum.ADD_RANGE), stats.getEffect(StatsEnum.ADD_SUMMON_LIMIT),
+                stats.getEffect(StatsEnum.DAMAGE_REFLECTION), stats.getEffect(StatsEnum.ADD_CRITICAL_HIT), character.getInventoryCache().weaponCriticalHit(),
+                stats.getEffect(StatsEnum.CRITICAL_MISS), stats.getEffect(StatsEnum.ADD_HEAL_BONUS), stats.getEffect(StatsEnum.ALL_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT), stats.getEffect(StatsEnum.ADD_DAMAGE_PERCENT), stats.getEffect(StatsEnum.TRAP_BONUS),
+                stats.getEffect(StatsEnum.TRAP_DAMAGE_PERCENT), stats.getEffect(StatsEnum.GLYPH_BONUS_PERCENT), stats.getEffect(StatsEnum.PERMANENT_DAMAGE_PERCENT), stats.getEffect(StatsEnum.ADD_TACKLE_BLOCK),
+                stats.getEffect(StatsEnum.ADD_TACKLE_EVADE), stats.getEffect(StatsEnum.ADD_RETRAIT_PA), stats.getEffect(StatsEnum.ADD_RETRAIT_PM), stats.getEffect(StatsEnum.ADD_PUSH_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.ADD_CRITICAL_DAMAGES), stats.getEffect(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_EARTH_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.ADD_WATER_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_AIR_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_FIRE_DAMAGES_BONUS),
+                stats.getEffect(StatsEnum.DODGE_PA_LOST_PROBABILITY), stats.getEffect(StatsEnum.DODGE_PM_LOST_PROBABILITY), stats.getEffect(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.AIR_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.EARTH_ELEMENT_REDUCTION),
+                stats.getEffect(StatsEnum.WATER_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.AIR_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.FIRE_ELEMENT_REDUCTION),
+                stats.getEffect(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), stats.getEffect(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), stats.getEffect(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT),
+                stats.getEffect(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT), stats.getEffect(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION),
+                stats.getEffect(StatsEnum.PVP_WATER_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.PVP_AIR_ELEMENT_REDUCTION), stats.getEffect(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION),
+                new CharacterSpellModification[0], (short) 0));
+    }
+
+    public CharacterStatsListMessage getCharacterStatsListMessagePacket() {
+        return new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) character.getExperience(), (double) DAO.getExps().getPlayerMinExp(character.getLevel()), (double) DAO.getExps().getPlayerMaxExp(character.getLevel()), character.getKamas(), character.getStatPoints(), 0, character.getSpellPoints(), character.getActorAlignmentExtendInformations(),
                 getLife(), getMaxLife(), character.getEnergy(), PlayerEnum.MAX_ENERGY,
                 (short) this.getAP(), (short) this.getMP(),
                 new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.INITIATIVE), 0, 0), stats.getEffect(StatsEnum.PROSPECTING), stats.getEffect(StatsEnum.ACTION_POINTS),

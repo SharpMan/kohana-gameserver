@@ -8,6 +8,7 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.effects.buff.BuffPorteur;
+import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -27,12 +28,22 @@ public class EffectPush extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         byte direction = 0;
-        for (Fighter target : castInfos.targets.stream().filter(Tarrget -> /*!(target instanceof StaticFighter) &&*/ !Tarrget.getStates().hasState(FightStateEnum.CARRIED) && !Tarrget.getStates().hasState(FightStateEnum.INÉBRANLABLE) && !Tarrget.getStates().hasState(FightStateEnum.ENRACINÉ) && !Tarrget.getStates().hasState(FightStateEnum.INDÉPLAÇABLE)).toArray(Fighter[]::new)) {
+        for (Fighter target : castInfos.targets.stream().filter(tarrget -> /*!(target instanceof StaticFighter) &&*/
+                !tarrget.getStates().hasState(FightStateEnum.CARRIED)
+                        && !tarrget.getStates().hasState(FightStateEnum.INÉBRANLABLE)
+                        && !tarrget.getStates().hasState(FightStateEnum.ENRACINÉ)
+                        && !tarrget.getStates().hasState(FightStateEnum.INDÉPLAÇABLE))
+                .toArray(Fighter[]::new)) {
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
                     if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId())){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
+                    }
+                    else if(castInfos.caster instanceof SummonedFighter
+                            && castInfos.caster.asSummon().getGrade().getMonsterId() == 3289 //Tactirelle
+                            && target == castInfos.caster ){
+                        continue;
                     }
                     else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId()) && castInfos.cellId != target.getCellId()) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.cellId, target.getCellId());
@@ -43,7 +54,7 @@ public class EffectPush extends EffectBase {
                     }
                     break;
                 case ADVANCE_CELL:
-                    Fighter pp = castInfos.caster;
+                    final Fighter pp = castInfos.caster;
                     castInfos.caster = target;
                     target = pp;
                     castInfos.targets.remove(0);
@@ -61,6 +72,9 @@ public class EffectPush extends EffectBase {
                     }
                     else if(castInfos.spellId == 5382 || castInfos.spellId == 5475){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
+                    }
+                    else if(castInfos.spellId == 2801 && castInfos.caster == target){
+                        continue;
                     }
                     break;
                 case BACK_CELL:
@@ -128,9 +142,9 @@ public class EffectPush extends EffectBase {
         return result;
     }
 
-    public static int applyPushBackDamages(EffectCast CastInfos, Fighter Target, int Length, int CurrentLength) {
+    public static int applyPushBackDamages(EffectCast CastInfos, Fighter target, int Length, int CurrentLength) {
         int damageCoef = 0;
-        if (Target.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
+        if (target.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
             damageCoef = 7;
         } else if (CastInfos.caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {
             damageCoef = 4;
@@ -142,13 +156,14 @@ public class EffectPush extends EffectBase {
         if (levelCoef < 0.1) {
             levelCoef = 0.1;
         }
-        double pushDmg = (CastInfos.caster.getLevel() / 2 + (CastInfos.caster.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS) - Target.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS)) + 32) * CastInfos.effect.diceNum / (4 * Math.pow(2, CurrentLength));
+        double pushDmg = (CastInfos.caster.getLevel() / 2 + (CastInfos.caster.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS) - target.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS)) + 32) * CastInfos.effect.diceNum / (4 * Math.pow(2, CurrentLength));
         final MutableInt damageValue = new MutableInt(pushDmg);
         //MutableInt damageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 
-        final EffectCast subInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.spellId, CastInfos.cellId, 0, null, Target, null, false, StatsEnum.NONE, 0, null);
+        final EffectCast subInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.spellId, CastInfos.cellId, 0, null, target, null, false, StatsEnum.NONE, 0, null);
 
-        return EffectDamage.applyDamages(subInfos, Target, damageValue);
+
+        return EffectDamage.applyDamages(subInfos, target, damageValue);
     }
 
 }

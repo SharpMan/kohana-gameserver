@@ -213,10 +213,10 @@ public class AIProcessor {
     protected void selectBestSpell(AIAction action, SpellLevel spell, short currentCell) {
         Short[] cells = fighter.getCastZone(spell, currentCell);
         for (Short cell : cells) {
-            FightCell fightCell = this.fight.getCell(cell);
+            final FightCell fightCell = this.fight.getCell(cell);
 
             if (fightCell != null) {
-                Fighter firstTarget = fightCell.getFighter();
+                final Fighter firstTarget = fightCell.getFighter();
                 if (this.fight.canLaunchSpell(this.fighter, spell, currentCell, cell, firstTarget == null ? -1 : firstTarget.getID())) {
                     double score = this.getSpellScore(action, spell, currentCell, cell);
 
@@ -245,6 +245,9 @@ public class AIProcessor {
                         //}
                         neuron.myBestMoveCell = currentCell;
                     }
+                }
+                else{
+                    //System.out.println(spell.toString());
                 }
             }
         }
@@ -277,6 +280,9 @@ public class AIProcessor {
 
             if (targets.size() > 0 || ((spell.isNeedFreeCell() || spell.isNeedFreeTrapCell()) && targets.size() == 0)) {
                 score += Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));
+                //logger.debug("effect {} score {}",effect.getEffectType(), Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false)));
+            }else{
+                //logger.debug("effect {} mask{} trigger {} ",effect.getEffectType(),effect.targetMask,effect.triggers);
             }
 
         }

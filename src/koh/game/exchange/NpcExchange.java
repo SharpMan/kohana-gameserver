@@ -59,7 +59,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
         if((npcItem.getTemplate().getRealWeight() * quantity) + Client.getCharacter().getInventoryCache().getWeight() > Client.getCharacter().getInventoryCache().getTotalWeight()){
-            PlayerController.SendServerErrorMessage(Client, "Erreur : Votre poids depasse les bornes...");
+            PlayerController.sendServerErrorMessage(Client, "Erreur : Votre poids depasse les bornes...");
             return false;
         }
 
@@ -67,7 +67,7 @@ public class NpcExchange extends Exchange {
             quantity = 1;
         }
 
-        int amount1 = (int) ((double) npcItem.getPrice() * (double) quantity);
+        final int amount1 = (int) ((double) npcItem.getPrice() * (double) quantity);
 
         InventoryItem playerItem = null;
         
@@ -89,9 +89,9 @@ public class NpcExchange extends Exchange {
             Client.getCharacter().getInventoryCache().substractKamas(amount1);
         }
 
-        final InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.getCharacter().getID(), quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).getPossibleEffects(), npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
-        if (this.myClient.getCharacter().getInventoryCache().add(Item, true)) {
-            Item.setNeedInsert(true);
+        final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templateId, 63, Client.getCharacter().getID(), quantity, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(templateId).getPossibleEffects(), npcItem.genType(), DAO.getItemTemplates().getTemplate(templateId) instanceof Weapon));
+        if (this.myClient.getCharacter().getInventoryCache().add(item, true)) {
+            item.setNeedInsert(true);
         }
 
         Client.send(new ExchangeBuyOkMessage());

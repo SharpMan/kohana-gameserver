@@ -11,7 +11,7 @@ import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.effects.buff.BuffDecrementType;
 import koh.game.fights.effects.buff.BuffEffect;
-import koh.game.fights.effects.buff.buffState;
+import koh.game.fights.effects.buff.BuffState;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.utils.Couple;
@@ -62,8 +62,8 @@ public class FighterBuff {
     public boolean buffMaxStackReached(BuffEffect buff) { //CLEARCODE : Distinct state ?
         return buff.castInfos.spellLevel != null && buff.castInfos.spellLevel.getMaxStack() > 0
                 && buff.castInfos.spellLevel.getMaxStack()
-                <= (buff instanceof buffState
-                        ? this.getAllBuffs().filter(x -> x.castInfos.spellId == buff.castInfos.spellId && x instanceof buffState && ((buffState) x).castInfos.effect.value == buff.castInfos.effect.value).count()
+                <= (buff instanceof BuffState
+                        ? this.getAllBuffs().filter(x -> x.castInfos.spellId == buff.castInfos.spellId && x instanceof BuffState && ((BuffState) x).castInfos.effect.value == buff.castInfos.effect.value).count()
                         : this.getAllBuffs().filter(x -> x.castInfos.spellId == buff.castInfos.spellId && x.castInfos.effectType == buff.castInfos.effectType).count());
     }
 
@@ -71,7 +71,7 @@ public class FighterBuff {
         return castInfos.spellLevel != null && castInfos.spellLevel.getMaxStack() > 0
                 && castInfos.spellLevel.getMaxStack()
                 <= (castInfos.effectType == StatsEnum.ADD_STATE
-                ? this.getAllBuffs().filter(x -> x.castInfos.spellId == castInfos.spellId && x instanceof buffState && ((buffState) x).castInfos.effect.value == castInfos.effect.value).count()
+                ? this.getAllBuffs().filter(x -> x.castInfos.spellId == castInfos.spellId && x instanceof BuffState && ((BuffState) x).castInfos.effect.value == castInfos.effect.value).count()
                 : this.getAllBuffs().filter(x -> x.castInfos.spellId == castInfos.spellId && x.castInfos.effectType == castInfos.effectType).count());
     }
 
@@ -141,7 +141,7 @@ public class FighterBuff {
     }
 
     public int endTurn() {
-        MutableInt Damage = new MutableInt(0);
+        final MutableInt Damage = new MutableInt(0);
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ENDTURN)) {
             if (Buff.applyEffect(Damage, null) == -3) {
                 return -3;

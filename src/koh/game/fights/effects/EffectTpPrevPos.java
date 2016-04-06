@@ -14,16 +14,16 @@ public class EffectTpPrevPos extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         int toReturn = -1;
-        for (Fighter Target : castInfos.targets) {
-            if (Target.getPreviousCellPos().isEmpty()) {
+        for (final Fighter target : castInfos.targets) {
+            if (target.getPreviousCellPos().isEmpty()) {
                 continue;
             }
-            FightCell cell = Target.getFight().getCell(Target.getPreviousCellPos().get(Target.getPreviousCellPos().size() - 1));
+            final FightCell cell = target.getFight().getCell(target.getPreviousCellPos().get(target.getPreviousCellPos().size() - 1));
 
             if (cell != null && cell.canWalk()) {
-                Target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), Target.getID(), cell.Id));
+                target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), target.getID(), cell.Id));
 
-                toReturn = Target.setCell(cell);
+                toReturn = target.setCell(cell);
             }
             if (toReturn != -1) {
                 break;

@@ -117,6 +117,7 @@ public class MonsterGrade {
         this.myStats.addBase(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, this.waterResistance);
         this.myStats.addBase(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, this.neutralResistance);
         this.myStats.addBase(StatsEnum.DAMAGE_REFLECTION, this.damageReflect);
+        this.myStats.addBase(StatsEnum.ADD_SUMMON_LIMIT, this.getMonster().isUseSummonSlot() ? 3 : 7);
 
     }
 
@@ -124,7 +125,7 @@ public class MonsterGrade {
         return DAO.getMonsters().find(this.monsterId);
     }
 
-    public GenericStats getStats() {
+    public synchronized GenericStats getStats() {
         if (this.myStats == null) {
             this.parseStats();
         }

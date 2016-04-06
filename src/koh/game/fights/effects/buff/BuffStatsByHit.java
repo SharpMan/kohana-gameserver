@@ -15,18 +15,27 @@ public class BuffStatsByHit extends BuffEffect {
     public BuffStatsByHit(EffectCast castInfos, Fighter target) {
         super(castInfos, target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
         this.JET = castInfos.randomJet(target);
+        this.duration++;
     }
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
-        if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, damageInfos.spellLevel.getEffects(), damageInfos.effect, false, this.castInfos.effect.triggers, damageInfos.cellId)) {
+        try {
+            if(damageInfos== null || damageValue == null)
+                return super.applyEffect(damageValue, damageInfos);
+            if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, damageInfos.spellLevel.getEffects(), damageInfos.effect, false, this.castInfos.effect.triggers, damageInfos.cellId)) {
 
-            BuffStats buffStats = new BuffStats(new EffectCast(castInfos.effectType, this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, JET, null, this.castInfos.effect.duration, this.getId()), this.target);
+                final BuffStats buffStats = new BuffStats(new EffectCast(castInfos.effectType, this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, JET, null, this.castInfos.effect.duration, this.getId()), this.target);
 
-            buffStats.applyEffect(null, null);
+                buffStats.applyEffect(null, null);
 
-            this.target.getBuff().addBuff(buffStats);
+                this.target.getBuff().addBuff(buffStats);
+            }
         }
+        catch (NullPointerException e){
+            logger.error("Wh's null ? 1 {} 2 {} 3 {} 4 {}",damageInfos.caster == null,damageInfos.spellLevel.getEffects() == null,this.castInfos.effect.triggers == null);
+        }
+
 
         return super.applyEffect(damageValue, damageInfos);
     }

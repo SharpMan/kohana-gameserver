@@ -87,9 +87,14 @@ public class InventoryHandler {
             return;
         }
         final InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
-        if(item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
+        if(item == null){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
-            return;
+        }
+        else if(!item.areConditionFilled(client.getCharacter())){
+            client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
+        }
+        else if(!item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
+            client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
         }
 
         //client.getCharacter().getInventoryCache().safeDelete(item,1);
@@ -113,7 +118,7 @@ public class InventoryHandler {
                 return;
             }
             client.getCharacter().getInventoryCache().moveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
-        }
+          }
     }
 
     @HandlerAttribute(ID = LivingObjectMessageRequestMessage.MESSAGE_ID)

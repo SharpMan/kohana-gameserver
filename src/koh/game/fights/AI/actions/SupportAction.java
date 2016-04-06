@@ -822,6 +822,9 @@ public class SupportAction extends AIAction {
         {
             return 0;
         }
+        else if(AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
+            return 0;
+        }
         int baseScore = 11;
         double score = baseScore;
 

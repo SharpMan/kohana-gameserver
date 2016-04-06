@@ -175,24 +175,27 @@ public class EffectInstance implements Serializable {
 
     public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect, int pTriggeringSpellCasterId) {
         Pattern r;
-        String targetMaskPattern;
-        Matcher exclusiveMasks;
+        final String targetMaskPattern;
+        final Matcher exclusiveMasks;
         String exclusiveMask;
         String exclusiveMaskParam;
-        Boolean exclusiveMaskCasterOnly;
-        Boolean verify;
+        boolean exclusiveMaskCasterOnly;
+        boolean verify;
         int maskState;
         if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
             return (false);
         };
-        boolean targetIsCaster = (pTargetId.getID() == pCasterId.getID());
-        boolean targetIsCarried = pTargetId.getCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
+        final boolean targetIsCaster = (pTargetId.getID() == pCasterId.getID());
+        final boolean targetIsCarried = pTargetId.getCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
-        GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
-        GameFightMonsterInformations monsterInfo = pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.getGameContextActorInformations(null) : null;
-        boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
-        
-        if (targetIsCaster) {
+        final GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
+        final GameFightMonsterInformations monsterInfo = pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.getGameContextActorInformations(null) : null;
+        final boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
+
+        if(pEffect.effectUid == 62884){ //62885
+            return true;
+        }
+        else if (targetIsCaster) {
             if (pEffect.effectId == 90) {
                 return (true);
             };
@@ -259,20 +262,32 @@ public class EffectInstance implements Serializable {
                         } else {
                             verify = pTargetId.hasState(maskState);
                         }
+
                         break;
                     case 'f':
                         //verify = !((monsterInfo != null) && ((pEffect.targetMask.contains("f" + monsterInfo.creatureGenericId))));
-                        verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
-
+                        //verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
+                        //verify = !((monsterInfo != null) && ((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
+                        verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt (exclusiveMaskParam)))));
+                        /*if(pTargetId instanceof BombFighter && DAO.getSpells().findBomb(Integer.parseInt(exclusiveMaskParam)) != null)
+                            verify = true;*/
                         break;
                     case 'F':
-                        verify = ((monsterInfo != null) &&((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
+                        //verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
+                        verify = ((monsterInfo != null) && ((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
+                        if(monsterInfo != null && !verify && pEffect.targetMask.contains("F"+monsterInfo.creatureGenericId)){
+                            verify = true;
+                        }
                         if(pTargetId instanceof BombFighter && DAO.getSpells().findBomb(Integer.parseInt(exclusiveMaskParam)) != null)
                             verify = true;
 
                         /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
                          return true;
                          }*/
+                        break;
+                    case 'm':
+                    case 'M':
+                        verify = true;
                         break;
                     case 'z':
                         break;
@@ -287,13 +302,17 @@ public class EffectInstance implements Serializable {
                         verify = ((!((pTriggeringSpellCasterId == 0))) && ((pTargetId.getID() == pTriggeringSpellCasterId)));
                         break;
                     case 'p':
-                        verify = pTargetId.hasSummoner();
+                        verify = !pTargetId.hasSummoner();
                         break;
                     case 'P':
+                        if(pTargetId instanceof  BombFighter)
+                            verify = true;
+                        else
                         /*if (pTargetId instanceof BombFighter || t) { //TEmpororaire = bug
                             verify = true;
                         }*/
-                        verify = !pTargetId.hasSummoner();
+                        verify = pTargetId.hasSummoner();
+                       // verify = true;
                         break;
                     case 'T':
                         break;
@@ -309,6 +328,7 @@ public class EffectInstance implements Serializable {
                         break;
                 };
                 if (!(verify)) {
+                    //System.out.println("Sabab = "+exclusiveMask+" "+exclusiveMaskParam);
                     return (false);
                 };
             };

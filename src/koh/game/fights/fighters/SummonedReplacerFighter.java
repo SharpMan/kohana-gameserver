@@ -36,7 +36,7 @@ public class SummonedReplacerFighter extends SummonedFighter {
             fight.getFightWorker().summonFighter(summon);
             Arrays.stream(replacedMonster.getMonster().getSpellsOnSummons())
                     .mapToObj(sp -> DAO.getSpells().findSpell(sp).getLevelOrNear(1))
-                    .forEach(sp -> fight.launchSpell(summon, sp, this.getCellId(), true, true, true));
+                    .forEach(sp -> fight.launchSpell(summon, sp, this.getCellId(), true, true, true,-1));
 
         }
         return value;

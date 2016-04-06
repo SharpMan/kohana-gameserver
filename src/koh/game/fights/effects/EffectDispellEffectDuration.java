@@ -12,13 +12,13 @@ public class EffectDispellEffectDuration extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        for (Fighter Target : castInfos.targets) {
-            short Jet = castInfos.randomJet(Target);
-            if (Target.getBuff().decrementEffectDuration(Jet) == -3) {
+        for (Fighter target : castInfos.targets) {
+            final short jet = castInfos.randomJet(target);
+            if (target.getBuff().decrementEffectDuration(jet) == -3) {
                 return -3;
             }
 
-            Target.getFight().sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, castInfos.caster.getID(), Target.getID(), (short) -Jet));
+            target.getFight().sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, castInfos.caster.getID(), target.getID(), (short) -jet));
         }
 
         return -1;

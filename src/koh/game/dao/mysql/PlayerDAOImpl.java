@@ -2,7 +2,6 @@ package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
 import koh.d2o.Couple;
-import koh.game.MySQL;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.MapDAO;
 import koh.game.dao.api.PlayerDAO;

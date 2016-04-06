@@ -29,7 +29,7 @@ public class TransfererTimeOut {
 
         this.executor.scheduleWithFixedDelay((Runnable) () -> {
             client.send(this.message);
-        }, 2, 2, TimeUnit.MINUTES);
+        }, 5, 5, TimeUnit.MINUTES);
 
     }
 

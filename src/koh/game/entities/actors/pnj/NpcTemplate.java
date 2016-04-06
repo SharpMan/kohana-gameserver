@@ -33,7 +33,7 @@ public class NpcTemplate {
     private String look;
     private boolean fastAnimsFun, orderItemsByPrice, orderItemsByLevel;
     @Getter @Setter
-    private Map<Integer, NpcItem> Items;
+    private Map<Integer, NpcItem> items;
 
     public int[] getReply(int id) {
         try {
@@ -67,10 +67,10 @@ public class NpcTemplate {
 
     public ObjectItemToSellInNpcShop[] getItems$Array() {
         if (itemList == null) {
-            if (Items == null) {
+            if (items == null) {
                 itemList = new ObjectItemToSellInNpcShop[0];
             } else {
-                Stream<NpcItem> Objects = this.Items.values().stream();
+                Stream<NpcItem> Objects = this.items.values().stream();
                 if (this.id == 816) {
                     Objects = Objects.filter(Item -> Item.getTemplate().getLevel() > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().getTypeId(), e2.getTemplate().getTypeId())), ((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()))));
                 }
@@ -105,10 +105,10 @@ public class NpcTemplate {
     }
 
     public int getCommonTokenId() {
-        if (Items == null) {
+        if (items == null) {
             return 0;
         }
-        return this.Items.values().stream().findFirst().get().getToken();
+        return this.items.values().stream().findFirst().get().getToken();
 
     }
 

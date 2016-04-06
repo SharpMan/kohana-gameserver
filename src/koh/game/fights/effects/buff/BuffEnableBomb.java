@@ -14,13 +14,16 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffEnableBomb  extends BuffEffect {
 
-    public BuffEnableBomb(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ON_DIE, BuffDecrementType.TYPE_ENDTURN);
+    public BuffEnableBomb(EffectCast castInfos, Fighter Target) {
+        super(castInfos, Target, BuffActiveType.ACTIVE_ON_DIE, BuffDecrementType.TYPE_ENDTURN);
+        if(castInfos.effect.triggers.equalsIgnoreCase("TE")){
+            this.activeType = BuffActiveType.ACTIVE_ENDTURN;
+        }
     }
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        return EffectEnableBomb.Explose(target, castInfos);
+        return EffectEnableBomb.explose(target, castInfos);
     }
 
     @Override
