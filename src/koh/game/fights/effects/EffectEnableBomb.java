@@ -7,7 +7,7 @@ import koh.game.fights.layers.FightBomb;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  *
@@ -33,31 +33,31 @@ public class EffectEnableBomb extends EffectBase {
 
     public static int explose(Fighter target, EffectCast castInfos) {
         BombFighter[] futureExplosedBombs = new BombFighter[0];
-        if (((BombFighter) target).FightBombs != null) {
-            int TotalCombo = target.getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
-            for (FightBomb Bomb : ((BombFighter) target).FightBombs) {
-                futureExplosedBombs = (BombFighter[]) ArrayUtils.add(futureExplosedBombs, (BombFighter) ((Bomb.owner[0].getID() == target.getID()) ? Bomb.owner[1] : Bomb.owner[0]));
-                TotalCombo += (Bomb.owner[0].getID() == target.getID()) ? Bomb.owner[1].getStats().getBoost(StatsEnum.COMBO_DAMMAGES) : Bomb.owner[0].getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
+        if (((BombFighter) target).fightBombs != null) {
+            int totalCombo = target.getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
+            for (FightBomb bomb : ((BombFighter) target).fightBombs) {
+                futureExplosedBombs = ArrayUtils.add(futureExplosedBombs, ((bomb.owner[0].getID() == target.getID()) ? bomb.owner[1] : bomb.owner[0]));
+                totalCombo += (bomb.owner[0].getID() == target.getID()) ? bomb.owner[1].getStats().getBoost(StatsEnum.COMBO_DAMMAGES) : bomb.owner[0].getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
             }
-            for (BombFighter Bomb : futureExplosedBombs) {
-                if (Bomb.FightBombs != null) {
-                    for (FightBomb Bomb2 : Bomb.FightBombs) {
-                        if (Bomb2.owner[0].getID() != target.getID() && !ArrayUtils.contains(futureExplosedBombs, Bomb2.owner[0])) {
-                            futureExplosedBombs = (BombFighter[]) ArrayUtils.add(futureExplosedBombs, Bomb2.owner[0]);
-                            TotalCombo += Bomb2.owner[0].getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
+            for (BombFighter bomb : futureExplosedBombs) {
+                if (bomb.fightBombs != null) {
+                    for (FightBomb bomb2 : bomb.fightBombs) {
+                        if (bomb2.owner[0].getID() != target.getID() && !ArrayUtils.contains(futureExplosedBombs, bomb2.owner[0])) {
+                            futureExplosedBombs = ArrayUtils.add(futureExplosedBombs, bomb2.owner[0]);
+                            totalCombo += bomb2.owner[0].getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
                         }
-                        if (Bomb2.owner[1].getID() != target.getID() && !ArrayUtils.contains(futureExplosedBombs, Bomb2.owner[1])) {
-                            futureExplosedBombs = (BombFighter[]) ArrayUtils.add(futureExplosedBombs, Bomb2.owner[1]);
-                            TotalCombo += Bomb2.owner[1].getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
+                        if (bomb2.owner[1].getID() != target.getID() && !ArrayUtils.contains(futureExplosedBombs, bomb2.owner[1])) {
+                            futureExplosedBombs = ArrayUtils.add(futureExplosedBombs, bomb2.owner[1]);
+                            totalCombo += bomb2.owner[1].getStats().getBoost(StatsEnum.COMBO_DAMMAGES);
                         }
                     }
                 }
             }
-            castInfos.caster.getFight().sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
-            target.getStats().getEffect(StatsEnum.COMBO_DAMMAGES).additionnal = TotalCombo;
-            for (BombFighter Bomb : futureExplosedBombs) {
-                Bomb.getStats().getEffect(StatsEnum.COMBO_DAMMAGES).additionnal = TotalCombo;
-                Bomb.tryDie(castInfos.caster.getID(), true);
+            castInfos.caster.getFight().sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + totalCombo + "% dommages d'explosion"}));
+            target.getStats().getEffect(StatsEnum.COMBO_DAMMAGES).additionnal += totalCombo;
+            for (BombFighter bomb : futureExplosedBombs) {
+                bomb.getStats().getEffect(StatsEnum.COMBO_DAMMAGES).additionnal += totalCombo;
+                bomb.tryDie(castInfos.caster.getID(), true);
             }
         }
         return target.tryDie(castInfos.caster.getID(), true);

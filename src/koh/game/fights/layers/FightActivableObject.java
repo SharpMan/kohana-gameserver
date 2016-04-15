@@ -121,11 +121,11 @@ public abstract class FightActivableObject implements IFightObject {
 
         switch (activationType) {
             case ACTIVE_ENDMOVE:
-                FightCell fCell = null;
+                FightCell fCell;
                 for (short cell : affectedCells) {
                     fCell = m_fight.getCell(cell);
                     if (fCell != null) {
-                        targets.addAll(fCell.getObjectsAsFighterList(obj -> (obj.getObjectType() == FightObjectType.OBJECT_FIGHTER || obj.getObjectType() == FightObjectType.OBJECT_STATIC) && !targets.contains(obj)));
+                        targets.addAll(fCell.getObjectsAsFighterList(obj -> (obj instanceof Fighter) && !targets.contains(obj)));
                         //targets.AddRange(cell.FightObjects.OfType < FighterBase > ().Where(fighter =  > !targets.Contains(fighter)));
                     }
                 }
@@ -137,15 +137,15 @@ public abstract class FightActivableObject implements IFightObject {
 
     }
 
-    public int loadEnnemyTargetsAndActive(Fighter target) {
-        FightCell myCell = null;
+    public int loadEnnemyTargetsAndActive(Fighter target,BuffActiveType activationType) {
+        FightCell myCell;
         for (short cell : affectedCells) {
             myCell = m_fight.getCell(cell);
             if (myCell != null) {
-                targets.addAll(myCell.getObjectsAsFighterList(obj -> (obj.getObjectType() == FightObjectType.OBJECT_FIGHTER || obj.getObjectType() == FightObjectType.OBJECT_STATIC) && !targets.contains(obj) /*&& ((Fighter) obj).isEnnemyWith(target)*/));
+                targets.addAll(myCell.getObjectsAsFighterList(obj -> (obj instanceof Fighter) && !targets.contains(obj) /*&& ((Fighter) obj).isEnnemyWith(target)*/));
             }
         }
-        return this.activate(target);
+        return this.activate(target,activationType);
     }
 
     public MapPoint getMapPoint() {
@@ -155,7 +155,7 @@ public abstract class FightActivableObject implements IFightObject {
         return this.cachedMapPoints;
     }
 
-    public synchronized int activate(Fighter activator) {
+    public synchronized int activate(Fighter activator, BuffActiveType activationType) {
         this.activated = true;
         if (this.getObjectType() == FightObjectType.OBJECT_TRAP) {
             remove();

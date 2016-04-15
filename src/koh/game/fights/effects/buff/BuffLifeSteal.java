@@ -20,9 +20,9 @@ public class BuffLifeSteal extends BuffEffect {
     //SendGameActionFightDispellEffectMessag
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        MutableInt Damage = new MutableInt(this.castInfos.randomJet(target));
+        final MutableInt damage = new MutableInt(this.castInfos.randomJet(target));
 
-        return EffectLifeSteal.applyLifeSteal(this.castInfos, this.target, Damage);
+        return EffectLifeSteal.applyLifeSteal(this.castInfos, this.target, damage);
     }
 
     @Override

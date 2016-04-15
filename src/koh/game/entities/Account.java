@@ -47,7 +47,7 @@ public class Account {
     }
     
     public Player getPlayerInFight(){
-        return characters.stream().filter(x -> x.getFighter() != null).findAny().orElse(null);
+        return characters.stream().filter(x -> x.getFighter() != null && x.getFight() != null).findAny().orElse(null);
     }
 
     public Player getPlayer(int id) {

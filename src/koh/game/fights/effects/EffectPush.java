@@ -8,6 +8,7 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.effects.buff.BuffPorteur;
+import koh.game.fights.fighters.MonsterFighter;
 import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.SpellIDEnum;
@@ -49,7 +50,11 @@ public class EffectPush extends EffectBase {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.cellId, target.getCellId());
                     } else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId())) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
-                    } else {
+                    }
+                    else if(target instanceof MonsterFighter && target.asMonster().getGrade().getMonster().isCanBePushed()){
+                        continue;
+                    }
+                    else {
                         return -1;
                     }
                     break;
@@ -73,8 +78,10 @@ public class EffectPush extends EffectBase {
                     else if(castInfos.spellId == 5382 || castInfos.spellId == 5475){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
                     }
-                    else if(castInfos.spellId == 2801 && castInfos.caster == target){
-                        continue;
+                    else if(castInfos.spellId == 2801 ){
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
+                         if(/*castInfos.caster == target || */castInfos.targetKnownCellId == target.getCellId())
+                            continue;
                     }
                     break;
                 case BACK_CELL:

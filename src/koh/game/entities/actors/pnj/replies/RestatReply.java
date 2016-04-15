@@ -2,6 +2,7 @@ package koh.game.entities.actors.pnj.replies;
 
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.pnj.NpcReply;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 
@@ -21,7 +22,13 @@ public class RestatReply extends NpcReply {
         p.setIntell(0);
         p.setAgility(0);
         p.setChance(0);
-        p.getStats().resetBase();
+        //p.getStats().resetBase();
+        p.getStats().getStats().get(StatsEnum.VITALITY).base = 0;
+        p.getStats().getStats().get(StatsEnum.WISDOM).base = 0;
+        p.getStats().getStats().get(StatsEnum.STRENGTH).base = 0;
+        p.getStats().getStats().get(StatsEnum.INTELLIGENCE).base = 0;
+        p.getStats().getStats().get(StatsEnum.AGILITY).base = 0;
+        p.getStats().getStats().get(StatsEnum.CHANCE).base = 0;
         p.setStatPoints((p.getLevel() - 1) * 5);
         p.refreshStats();
         p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,470));

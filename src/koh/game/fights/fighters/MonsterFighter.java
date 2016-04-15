@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class MonsterFighter extends VirtualFighter {
 
-    @Getter @Setter private MonsterGrade grade;
+    @Getter @Setter protected MonsterGrade grade;
     @Getter @Setter private MonsterGroup monsterGroup;
 
     public MonsterFighter(Fight fight, MonsterGrade monster, int monsterGuid, MonsterGroup monsterGroup) {

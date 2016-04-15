@@ -107,12 +107,12 @@ public class FightBomb extends FightActivableObject {
     }
 
     @Override
-    public synchronized int activate(Fighter activator) {
+    public synchronized int activate(Fighter activator,BuffActiveType buffActiveType) {
         targets.removeIf(Fighter -> Fighter instanceof BombFighter);
         if (targets.isEmpty()) {
             return -1;
         }
-        return super.activate(activator);
+        return super.activate(activator,buffActiveType);
     }
 
     @Override

@@ -4,6 +4,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
+import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.layers.FightBomb;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
@@ -20,7 +21,7 @@ public class EffectSummonBomb extends EffectBase {
     public int applyEffect(EffectCast castInfos) {
         // Possibilité de spawn une creature sur la case ?
 
-        MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
+        final MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
         // getTemplate de monstre existante
         if (monster != null) {
             MonsterGrade MonsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
@@ -38,7 +39,7 @@ public class EffectSummonBomb extends EffectBase {
                                               .forEach(C -> {
                                                   for(Fighter F : C.getObjectsAsFighter()){
                                                       ((FightBomb)Bombe).loadTargets(F);
-                                                      ((FightBomb)Bombe).activate(F);
+                                                      ((FightBomb)Bombe).activate(F, BuffActiveType.ACTIVE_ENDMOVE);
                                                   }
                                               }));
                 } else {

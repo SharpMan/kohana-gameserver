@@ -16,17 +16,17 @@ public class EffectSubPAEsquive extends EffectBase {
         MutableInt DamageValue = new MutableInt();
         if (castInfos.duration > 1) {
             for (Fighter Target : castInfos.targets) {
-                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
-
-                BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
-                Buff.applyEffect(DamageValue, null);
-                Target.getBuff().addBuff(Buff);
+                final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
+                subInfos.glyphId = castInfos.glyphId;
+                final BuffSubPAEsquive buff = new BuffSubPAEsquive(subInfos, Target);
+                buff.applyEffect(DamageValue, null);
+                Target.getBuff().addBuff(buff);
             }
         } else {
             for (Fighter Target : castInfos.targets) {
-                EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, 0, 0);
-
-                BuffSubPAEsquive Buff = new BuffSubPAEsquive(SubInfos, Target);
+                final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, 0, 0);
+                subInfos.glyphId = castInfos.glyphId;
+                BuffSubPAEsquive Buff = new BuffSubPAEsquive(subInfos, Target);
                 Buff.applyEffect(DamageValue, null);
 
                 Target.getBuff().addBuff(Buff);

@@ -65,7 +65,7 @@ public class CharacterHandler {
 
     @HandlerAttribute(ID = 6072)
     public static void handleCharacterSelectedForceReadyMessage(WorldClient Client, CharacterSelectedForceReadyMessage Message) {
-        Player inFight = Client.getAccount().getPlayerInFight();
+        final Player inFight = Client.getAccount().getPlayerInFight();
         if (inFight != null) {
             characterSelectionMessage(Client, inFight.getID());
         }
@@ -79,7 +79,7 @@ public class CharacterHandler {
 
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)
     public static void handleAuthenticationTicketMessage(WorldClient Client, Message message) {
-        Player inFight = Client.getAccount().getPlayerInFight();
+        final Player inFight = Client.getAccount().getPlayerInFight();
         Client.send(new CharactersListMessage(false, Client.getAccount().toBaseInformations()));
         if (inFight != null) {
             Client.send(new CharacterSelectedForceMessage(inFight.getID()));

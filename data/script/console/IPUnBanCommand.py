@@ -17,7 +17,7 @@ class IPUnBanCommand(PlayerCommand):
         if target == -1 :
             client.send(ConsoleMessage(0, "The target is missing"));
         else:
-            Main.interClient().send(AddressTookAwayMessage(target));
+            Main.getInterClient().send(AddressTookAwayMessage(target));
             client.send(ConsoleMessage(0, "The target's ip has been unsuspended"));
 
     def can(self,client):

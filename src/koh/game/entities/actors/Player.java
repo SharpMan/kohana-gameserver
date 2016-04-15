@@ -571,13 +571,13 @@ public class Player extends IGameActor implements Observer {
 
     public int getInitiative(boolean base) {
 
-        return 1 + (int) Math.floor((this.stats.getTotal(StatsEnum.STRENGTH)
+        return Math.max(1, 1 + (int) Math.floor((this.stats.getTotal(StatsEnum.STRENGTH)
                 + this.stats.getTotal(StatsEnum.CHANCE)
                 + this.stats.getTotal(StatsEnum.INTELLIGENCE)
                 + this.stats.getTotal(StatsEnum.AGILITY)
                 + (base ? this.stats.getTotal(StatsEnum.INITIATIVE) : this.stats.getTotal(StatsEnum.INITIATIVE)))
                 * ((double) life / getMaxLife())
-        );
+        ));
 
     }
 

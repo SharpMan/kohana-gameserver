@@ -3,6 +3,7 @@ package koh.game.fights.effects;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
+import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
@@ -38,6 +39,10 @@ public class EffectTranspose extends EffectBase {
                     continue;
                 }
             }
+            else if(target instanceof MonsterFighter && target.asMonster().getGrade().getMonster().isCanSwitchPos()){
+                continue;
+            }
+
             final FightCell casterCell = castInfos.caster.getMyCell(), targetCell = target.getMyCell();
             castInfos.caster.getFight().sendToField(new GameActionFightExchangePositionsMessage(ACTION_CHARACTER_EXCHANGE_PLACES, castInfos.caster.getID(), target.getID(), target.getCellId(), castInfos.caster.getCellId()));
             castInfos.caster.setCell(null);

@@ -3,6 +3,7 @@ from koh.game.actions import GameActionTypeEnum
 from koh.game.network import WorldClient
 from koh.game.dao import DAO
 from koh.protocol.messages.authorized import ConsoleMessage
+from koh.game.entities.actors import Player
 
 
 class GoToCommand(PlayerCommand):
@@ -15,7 +16,7 @@ class GoToCommand(PlayerCommand):
         if target is None:
             client.send(ConsoleMessage(0, "The target is missing"));
         else:
-            client.getCharacter().teleport(target.getMapid(),target.getCell().getId());
+            client.teleport(target.getMapid(),target.getCell().getId());
 
     def can(self,client):
         return True;

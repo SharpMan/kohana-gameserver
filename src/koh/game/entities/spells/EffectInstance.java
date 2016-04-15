@@ -15,6 +15,8 @@ import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.BufUtils;
 import static koh.protocol.client.BufUtils.writeBoolean;
 import static koh.protocol.client.BufUtils.writeUTF;
+
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.SpellTargetType;
 import koh.protocol.client.enums.StatsEnum;
@@ -186,7 +188,7 @@ public class EffectInstance implements Serializable {
             return (false);
         };
         final boolean targetIsCaster = (pTargetId.getID() == pCasterId.getID());
-        final boolean targetIsCarried = pTargetId.getCarriedActor() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
+        final boolean targetIsCarried = pTargetId.getCarrierActorId() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
         final GameFightFighterInformations targetInfos = (GameFightFighterInformations) pTargetId.getGameContextActorInformations(null);
         final GameFightMonsterInformations monsterInfo = pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.getGameContextActorInformations(null) : null;
@@ -228,7 +230,6 @@ public class EffectInstance implements Serializable {
         };
         r = new Pattern("[" + targetMaskPattern + "]", REFlags.DOTALL);
         verify = r.matcher(pEffect.targetMask).find();
-
         if (verify) {
             exclusiveMasks = exclusiveTargetMasks.matcher(pEffect.targetMask);
             boolean verifyInitialized = false;
@@ -294,6 +295,7 @@ public class EffectInstance implements Serializable {
                     case 'Z':
                         break;
                     case 'K':
+                        verify = pTargetId.getStates().hasState(FightStateEnum.CARRIED) || pTargetId.getStates().hasState(FightStateEnum.CARRIER);
                         break;
                     case 'o':
                         verify = true;
@@ -328,7 +330,6 @@ public class EffectInstance implements Serializable {
                         break;
                 };
                 if (!(verify)) {
-                    //System.out.println("Sabab = "+exclusiveMask+" "+exclusiveMaskParam);
                     return (false);
                 };
             };

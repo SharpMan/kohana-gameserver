@@ -73,13 +73,55 @@ public class AgressionFight extends Fight {
         }
     }
 
+   public void withdrawEnd(FightTeam winners, FightTeam loosers){
+       for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
+           super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_LOST);
+           this.myResult.results.add(
+                   new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST,
+                           fighter.getWave(),
+                           new FightLoot(new int[0], 0),
+                           fighter.getID(),
+                           fighter.isAlive(),
+                           (byte) fighter.getLevel(),
+                           new FightResultPvpData[]{
+                                   new FightResultPvpData(fighter.getPlayer().getAlignmentGrade(),
+                                           DAO.getExps().getLevel(fighter.getPlayer().getAlignmentGrade()).getPvP(),
+                                           DAO.getExps().getLevel(fighter.getPlayer().getAlignmentGrade() == 10 ? 10 : fighter.getPlayer().getAlignmentGrade() + 1).getPvP(),
+                                           fighter.getPlayer().getHonor(),
+                                           0)}));
+       }
+
+       for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
+           super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_VICTORY);
+           this.myResult.results.add(
+                   new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY,
+                           fighter.getWave(),
+                           new FightLoot(new int[0], 0),
+                           fighter.getID(),
+                           fighter.isAlive(),
+                           (byte) fighter.getLevel(),
+                           new FightResultPvpData[]{
+                                   new FightResultPvpData(fighter.getPlayer().getAlignmentGrade(),
+                                           DAO.getExps().getLevel(fighter.getPlayer().getAlignmentGrade()).getPvP(),
+                                           DAO.getExps().getLevel(fighter.getPlayer().getAlignmentGrade() == 10 ? 10 : fighter.getPlayer().getAlignmentGrade() + 1).getPvP(),
+                                           fighter.getPlayer().getHonor(),
+                                          0)}));
+       }
+       super.endFight();
+   }
+
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {
         this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
 
+        if(Math.abs(loosers.getLevel() - winners.getLevel()) > 25){ //TODO vpn Config
+             this.withdrawEnd(winners,loosers);
+             return;
+        }
+
         for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_LOST);
-            final short loosedHonor = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters(), fighter, false));
+            final short loosedHonor = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false));
             fighter.getPlayer().addHonor(loosedHonor, true);
             fighter.getPlayer().addDishonor(FightFormulas.calculateEarnedDishonor(fighter),true);
             this.myResult.results.add(
@@ -99,8 +141,14 @@ public class AgressionFight extends Fight {
 
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_VICTORY);
-            final short loosedHonor = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters(), fighter, true));
-            fighter.getPlayer().addHonor(loosedHonor, true);
+            short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true));
+            final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
+            if(count == getEnnemyTeam(getWinners()).getFighters().count()){
+                honorWon = 0;
+            }else if(count != 0 && (getEnnemyTeam(getWinners()).getFighters().count() - count) >= 1){
+                honorWon /= (count * 4);
+            }
+            fighter.getPlayer().addHonor(honorWon, true);
             fighter.getPlayer().addDishonor(FightFormulas.calculateEarnedDishonor(fighter),true);
             this.myResult.results.add(
                     new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY,
@@ -114,7 +162,7 @@ public class AgressionFight extends Fight {
                                             DAO.getExps().getLevel(fighter.getPlayer().getAlignmentGrade()).getPvP(),
                                             DAO.getExps().getLevel(fighter.getPlayer().getAlignmentGrade() == 10 ? 10 : fighter.getPlayer().getAlignmentGrade() + 1).getPvP(),
                                             fighter.getPlayer().getHonor(),
-                                            loosedHonor)}));
+                                            honorWon)}));
         }
         super.endFight();
     }

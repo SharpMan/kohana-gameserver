@@ -10,6 +10,7 @@ import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.fighters.BombFighter;
+import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
@@ -138,12 +139,16 @@ public class Pathfunction {
     }
 
     public static ArrayList<Fighter> getEnnemyNearToTakle(Fight Fight, FightTeam Team, short CellId) {
-        ArrayList<Fighter> ennemies = new ArrayList<>();
+        final ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfunction.FIGHT_DIRECTIONS) {
             Fighter ennemy = Fight.hasEnnemyInCell(Pathfunction.nextCell(CellId, Direction), Team);
             if (ennemy != null) {
-                if (!ennemy.isDead() && !(ennemy instanceof BombFighter) && !ennemy.getStates().hasState(FightStateEnum.ENRACINÉ) && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                if (!ennemy.isDead()
+                        && !(ennemy instanceof BombFighter)
+                        && !ennemy.getStates().hasState(FightStateEnum.ENRACINÉ)
+                        && !(ennemy instanceof MonsterFighter && ennemy.asMonster().getGrade().getMonster().isCanTackle())
+                        && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
                     ennemies.add(ennemy);
                 }
             }

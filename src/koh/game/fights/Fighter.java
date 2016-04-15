@@ -1,14 +1,10 @@
 package koh.game.fights;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.GenericStats;
-import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.CrossZone;
+import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.IZone;
 import koh.game.entities.environments.cells.Lozenge;
 import koh.game.entities.maps.pathfinding.LinkedCellsManager;
@@ -16,13 +12,8 @@ import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight.FightLoopState;
-import koh.game.fights.effects.buff.BuffEffect;
-import koh.game.fights.effects.buff.BuffPorter;
-import koh.game.fights.effects.buff.BuffAddSpellRange;
-import koh.game.fights.fighters.CharacterFighter;
-import koh.game.fights.fighters.IllusionFighter;
-import koh.game.fights.fighters.SummonedFighter;
-import koh.game.fights.fighters.VirtualFighter;
+import koh.game.fights.effects.buff.*;
+import koh.game.fights.fighters.*;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightGlyph;
 import koh.game.fights.layers.FightPortal;
@@ -30,6 +21,7 @@ import koh.game.fights.types.AgressionFight;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.actions.fight.GameActionFightDeathMessage;
+import koh.protocol.messages.game.actions.fight.GameActionFightDispellSpellMessage;
 import koh.protocol.messages.game.context.ShowCellMessage;
 import koh.protocol.types.game.context.EntityDispositionInformations;
 import koh.protocol.types.game.context.FightEntityDispositionInformations;
@@ -46,8 +38,15 @@ import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
 /**
- *
  * @author Neo-Craft
  */
 @ToString
@@ -65,21 +64,27 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     private static final Random RANDOM = new Random();
 
     protected boolean dead;
-    @Setter @Getter
+    @Setter
+    @Getter
     protected boolean left;
-    @Getter @Setter
+    @Getter
+    @Setter
     protected FightTeam team;
-    @Getter @Setter
+    @Getter
+    @Setter
     protected Fight fight;
-    @Getter @Setter
+    @Getter
+    @Setter
     protected FightCell myCell;
-    @Getter @Setter
+    @Getter
+    @Setter
     protected int usedAP, usedMP, turnRunning = 19, shieldPoints;
     @Getter
     protected GenericStats stats;
     @Getter
     protected Fighter summoner;
-    @Getter @Setter
+    @Getter
+    @Setter
     protected GameActionFightInvisibilityStateEnum visibleState = GameActionFightInvisibilityStateEnum.VISIBLE;
     protected int[] previousPositions = new int[0];
     @Getter
@@ -97,7 +102,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     protected AtomicInteger nextBuffUid = new AtomicInteger();
     protected short nextCell;
     protected byte nextDir;
-    @Getter @Setter
+    @Getter
+    @Setter
     protected boolean turnReady = true;
 
     /**
@@ -116,7 +122,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
 
-    public Stream<Fighter> getSummonedCreature(){
+    public Stream<Fighter> getSummonedCreature() {
         return this.team.getAliveFighters()
                 .filter(fighter -> fighter.getSummonerID() == this.getID());
     }
@@ -135,26 +141,36 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             } /*else {
                 this.previousCellPos.add(this.myCell.Id);
             }*/
-            if(cell != null && cell.hasObject(FightObjectType.OBJECT_GLYPHE)){
-                for (FightGlyph glyph : cell.getGlyphes()) {
+            if (cell != null) {
+                myCell.getGlyphStream(gl -> !cell.contains(gl)).forEach(gl -> {
+                    //Osef du result ils ne peux pas mourir
+                    this.getBuff().getAllBuffs().filter(bf -> bf.getCastInfos().glyphId == gl.ID).forEach(buff -> {
+                        buff.removeEffect();
+                        fight.sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, buff.castInfos.caster.getID(), getID(), buff.getCastInfos().spellId));
+                    });
+                });
 
-                    if(myCell.contains(glyph) ||
-                            (!previousCellPos.isEmpty() && !this.fight.getCell(previousCellPos.get(previousCellPos.size() -1)).hasGameObject(glyph))
-                            || glyph.getLastTurnActivated() == this.fight.getFightWorker().fightTurn){
-                        continue;
-                    }
+                if (cell.hasObject(FightObjectType.OBJECT_GLYPHE)) {
+                    final FightGlyph[] glyphes = cell.getGlyphes(gl -> !myCell.contains(gl));
+
                     this.myCell = cell;
-                    glyph.setLastTurnActivated(this.fight.getFightWorker().fightTurn);
-                    addResult = glyph.loadEnnemyTargetsAndActive(this);
-                    if (addResult == -3 || addResult == -2) {
-                        return addResult;
+                    for (FightGlyph glyph : glyphes) {
+
+                        if ((!previousCellPos.isEmpty() && this.fight.getCell(previousCellPos.get(previousCellPos.size() - 1)).hasGameObject(glyph))
+                                || glyph.getLastTurnActivated() == this.fight.getFightWorker().fightTurn) {
+                            continue;
+                        }
+                        glyph.setLastTurnActivated(this.fight.getFightWorker().fightTurn);
+                        glyph.targets.add(this);
+                        addResult = glyph.loadEnnemyTargetsAndActive(this, BuffActiveType.ACTIVE_ENDMOVE);
+                        if (addResult == -3 || addResult == -2) {
+                            return addResult;
+                        }
                     }
                 }
             }
 
         }
-
-
 
 
         this.myCell = cell;
@@ -191,7 +207,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         this.ID = ID;
     }
 
-    public boolean isMarkedDead(){
+    public boolean isMarkedDead() {
         return this.isDead(); //TODO delete above dead function
     }
 
@@ -236,10 +252,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                     .toArray(Fighter[]::new);
 
             for (final Fighter fighter : aliveFighters) {
-                if(fighter instanceof SummonedFighter)
-                    ((SummonedFighter)fighter).tryDieSilencious(this.ID,true);
+                if (fighter instanceof SummonedFighter)
+                    ((SummonedFighter) fighter).tryDieSilencious(this.ID, true);
                 else
-                    fighter.tryDie(this.ID,true);
+                    fighter.tryDie(this.ID, true);
             }
 
             /*this.team.getAliveFighters()
@@ -252,8 +268,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
             for (final Fighter fighter : aliveFighters) {
                 fighter.getBuff().getBuffsDec().values().forEach(list -> {
-                    for(BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator){
-                        if(buff.caster == this)
+                    for (BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator) {
+                        if (buff.caster == this)
                             fighter.getBuff().debuff(buff);
                     }
                 });
@@ -296,7 +312,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
         }
 
-        int buffResult = this.buff.beginTurn();
+        final int buffResult = this.buff.beginTurn();
         if (buffResult != -1) {
             return buffResult;
         }
@@ -312,7 +328,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int endTurn() {
         this.fight.getActivableObjects().values().stream().forEach((Objects) -> {
             Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) ->
-                ((FightPortal) Object).enable(this)
+                    ((FightPortal) Object).enable(this)
             );
         });
         this.spellsController.endTurn();
@@ -371,7 +387,6 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public abstract short getMapCell();
 
 
-
     public boolean canBeginTurn() {
         if (this.isDead()) {
             return false; // Mort    
@@ -407,7 +422,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     /*public EntityDispositionInformations getEntityDispositionInformations(player character) {
-     return new FightEntityDispositionInformations(character != null ? (this.isVisibleFor(character) ? this.getCellId() : -1) : this.getCellId(), this.direction, getCarriedActor());
+     return new FightEntityDispositionInformations(character != null ? (this.isVisibleFor(character) ? this.getCellId() : -1) : this.getCellId(), this.direction, getCarrierActorId());
      }*/
     public int getAPCancelling() {
         return (int) Math.floor((double) this.stats.getTotal(StatsEnum.WISDOM) / 4) + this.stats.getTotal(StatsEnum.ADD_RETRAIT_PA);
@@ -463,7 +478,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             }
             num = Math.min(val1, 280);
         }
-       return this.getCastZone(num,spellLevel,cell);
+        return this.getCastZone(num, spellLevel, cell);
     }
 
     public Short[] getCastZone(final int num, SpellLevel spellLevel, short cell) {
@@ -530,16 +545,21 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     @Override
     public EntityDispositionInformations getEntityDispositionInformations(Player character) {
-        return new FightEntityDispositionInformations(character != null ? (this.isVisibleFor(character) ? this.getCellId() : -1) : this.getCellId(), this.direction, getCarriedActor());
+        return new FightEntityDispositionInformations(character != null ? (this.isVisibleFor(character) ? this.getCellId() : -1) : this.getCellId(), this.direction, getCarrierActorId());
     }
 
-    public int getCarriedActor() {
-        Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).findFirst();
+    public int getCarrierActorId() {
+        final Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).findFirst();
         return Option.isPresent() ? Option.get().caster.getID() : 0;
     }
 
+    public Fighter getCarriedActor() {
+        final Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).findFirst();
+        return Option.isPresent() ? Option.get().target : null;
+    }
+
     public Fighter getCarrierActor() {
-        Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).findFirst();
+        final Optional<BuffEffect> Option = this.buff.getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).findFirst();
         return Option.isPresent() ? Option.get().caster : null;
     }
 
@@ -575,9 +595,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public GameFightMinimalStats getGameFightMinimalStats(Player character) {
         if (this.fight.getFightState() == FightState.STATE_PLACE) {
-            return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.VITALITY), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY),0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY),0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
+            return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.VITALITY), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
         }
-        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.VITALITY), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY),0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY),0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
+        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.VITALITY), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
     }
 
     public IdentifiedEntityDispositionInformations GetIdentifiedEntityDispositionInformations() {
@@ -603,8 +623,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public short getCellId() {
         try {
             return this.myCell.Id;
-        }
-        catch (NullPointerException e){
+        } catch (NullPointerException e) {
             this.fight.getLogger().error(this.toString());
             e.printStackTrace();
             return 0;
@@ -633,45 +652,45 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         switch (effect) {
             case DAMAGE_EARTH:
             case STEAL_EARTH:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
                 break;
             case DAMAGE_EARTH_PER_PM_PERCENT:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)) * (((double) (this.getMP() / this.getMaxMP())) * 100));
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)));
                 break;
             case DAMAGE_NEUTRAL_PER_PM_PERCENT:
-                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)) * (((double) (this.getMP() / this.getMaxMP())) * 100)));
                 break;
             case DAMAGE_FIRE:
             case STEAL_FIRE:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)));
                 break;
             case DAMAGE_FIRE_PER_PM_PERCENT:
-                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue(Math.floor((jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS))) * ((((double) this.getMP() / (double) this.getMaxMP()))));
-               break;
+                break;
             case DAMAGE_AIR:
             case STEAL_AIR:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)));
                 break;
             case DAMAGE_AIR_PER_PM_PERCENT:
-                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
             case DAMAGE_WATER:
             case STEAL_WATER:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
                 break;
             case DAMAGE_WATER_PER_PM_PERCENT:
-                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.AddDamageMultiplicator)) / 100
+                jet.setValue(((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)) / 100
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS))) * (((double) (this.getMP() / this.getMaxMP())) * 100));
                 break;
         }
@@ -922,26 +941,32 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return false;
     }
 
-    public boolean isPlayer(){
-        return this instanceof  CharacterFighter;
+    public boolean isPlayer() {
+        return this instanceof CharacterFighter;
     }
 
-    public CharacterFighter asPlayer(){
+    public CharacterFighter asPlayer() {
         return (CharacterFighter) this;
     }
 
-    public VirtualFighter asVirtual(){
+    public VirtualFighter asVirtual() {
         return (VirtualFighter) this;
     }
 
-    public SummonedFighter asSummon(){
+    public SummonedFighter asSummon() {
         return (SummonedFighter) this;
     }
 
-    public Player getPlayer(){
+    public MonsterFighter asMonster() {
+        return (MonsterFighter) this;
+    }
+
+    public Player getPlayer() {
         return ((CharacterFighter) this).getCharacter();
     }
 
-    public boolean hasSummoner() { return this.summoner !=null; }
+    public boolean hasSummoner() {
+        return this.summoner != null;
+    }
 
 }

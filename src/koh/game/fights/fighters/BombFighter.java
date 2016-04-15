@@ -14,7 +14,6 @@ import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
-import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectActivableObject;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.layers.FightBomb;
@@ -57,7 +56,7 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public void adjustStats() {
-        this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.summoner.getStats().getTotal(StatsEnum.VITALITY) * (20 / 100.0)));
         this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
@@ -109,8 +108,8 @@ public class BombFighter extends StaticFighter {
         if (boosted) {
             return;
         }
-        int TotalCombo = 0;
-        ArrayList<BombFighter> Targets = new ArrayList<>(6);
+        int totalCombo = 0;
+        final ArrayList<BombFighter> targets = new ArrayList<>(6);
         for (short aCell : (new Zone(SpellShapeEnum.C, (byte) 2, MapPoint.fromCellId(this.getCellId()).advancedOrientationTo(MapPoint.fromCellId(this.getCellId()), true), this.fight.getMap())).getCells(this.getCellId())) {
             FightCell fightCell = fight.getCell(aCell);
             if (fightCell != null) {
@@ -120,24 +119,25 @@ public class BombFighter extends StaticFighter {
                             continue;
                         }
                         if (target instanceof BombFighter /*&& ((BombFighter) target).grade.monsterId == this.grade.monsterId*/ && ((BombFighter) target).summoner == this.summoner && !((BombFighter) target).boosted) {
-                            Targets.add((BombFighter) target);
-                            TotalCombo += 40;
+                            targets.add((BombFighter) target);
+                            totalCombo += 40;
                         }
                     }
                 }
             }
         }
-        if (TotalCombo == 0) {
+        if (totalCombo == 0) {
             return;
         }
-        fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + TotalCombo + "% dommages d'explosion"}));
-        stats.addBoost(StatsEnum.COMBO_DAMMAGES, TotalCombo);
+        fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + totalCombo + "% dommages d'explosion"}));
+        stats.addBoost(StatsEnum.COMBO_DAMMAGES, totalCombo);
         this.boosted = true;
-        for (Fighter bomb : Targets) {
-            bomb.getStats().addBoost(StatsEnum.COMBO_DAMMAGES, TotalCombo);
+        for (Fighter bomb : targets) {
+            bomb.getStats().addBoost(StatsEnum.COMBO_DAMMAGES, totalCombo);
             boosted = true;
         }
-        Targets.forEach(Bomb -> Bomb.tryDie(Caster, true));
+        targets.forEach(Bomb -> Bomb.tryDie(Caster, true));
+        targets.clear();
     }
 
     @Override
@@ -146,8 +146,8 @@ public class BombFighter extends StaticFighter {
             if (this.buff.getAllBuffs().anyMatch(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE)) {
                 return this.buff.getAllBuffs().filter(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().applyEffect(null, null);
             } else {
-                if (this.FightBombs != null) {
-                    this.FightBombs.forEach(Bomb -> Bomb.remove());
+                if (this.fightBombs != null) {
+                    this.fightBombs.forEach(Bomb -> Bomb.remove());
                 }
                 return super.tryDie(casterId, force);
             }
@@ -155,20 +155,20 @@ public class BombFighter extends StaticFighter {
         if (this.getLife() <= 0 || force) {
             selfMurder(casterId);
             fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false,-1);
-            if (this.FightBombs != null) {
-                this.FightBombs.forEach(Bomb -> Bomb.remove());
+            if (this.fightBombs != null) {
+                this.fightBombs.forEach(Bomb -> Bomb.remove());
             }
         }
         return super.tryDie(casterId, force);
     }
 
-    public ArrayList<FightBomb> FightBombs;
+    public ArrayList<FightBomb> fightBombs;
 
     public void addBomb(FightBomb Bomb) {
-        if (FightBombs == null) {
-            FightBombs = new ArrayList<>(4);
+        if (fightBombs == null) {
+            fightBombs = new ArrayList<>(4);
         }
-        this.FightBombs.add(Bomb);
+        this.fightBombs.add(Bomb);
     }
 
     @Override
@@ -177,22 +177,22 @@ public class BombFighter extends StaticFighter {
             if (this.isDead()) {
                 return -2;
             }
-            if (this.FightBombs != null) {
-                this.FightBombs.forEach(Bomb -> Bomb.remove());
+            if (this.fightBombs != null) {
+                this.fightBombs.forEach(Bomb -> Bomb.remove());
             }
             if (this.myCell.hasGameObject(FightObjectType.OBJECT_BOMB)) {
                 Arrays.stream(this.myCell.getObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
-            Short[] Cells;
+            Short[] cells;
             for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfunction.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
                 int Distance = Pathfunction.goalDistance(null, getCellId(), Friend.getCellId());
                 logger.debug("Bomb Distance = {}" , Distance);
                 if (Distance >= 2 && Distance <= 7) {
-                    Cells = Pathfunction.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfunction.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
-                    if (Cells != null) {
-                        Cells =  ArrayUtils.removeElement(Cells, this.getCellId());
-                        Cells =  ArrayUtils.removeElement(Cells, Friend.getCellId());
-                        FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), Cells, new BombFighter[]{this, (BombFighter) Friend});
+                    cells = Pathfunction.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfunction.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
+                    if (cells != null) {
+                        cells =  ArrayUtils.removeElement(cells, this.getCellId());
+                        cells =  ArrayUtils.removeElement(cells, Friend.getCellId());
+                        FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), cells, new BombFighter[]{this, (BombFighter) Friend});
                         fight.addActivableObject(this, Bomb);
                     }
                 }

@@ -14,6 +14,8 @@ import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectPush;
 import koh.game.fights.effects.buff.BuffEffect;
+import koh.game.fights.fighters.StaticFighter;
+import koh.game.fights.fighters.SummonedFighter;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightTrap;
 import koh.protocol.client.enums.FightStateEnum;
@@ -109,7 +111,7 @@ public class SelfActingAction extends AIAction {
                 if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
-                    score += currScore;
+                    score += score += currScore * ((!(target instanceof StaticFighter || target instanceof SummonedFighter)) ? 1 : 0.5);
             }
         }
 
@@ -152,7 +154,7 @@ public class SelfActingAction extends AIAction {
                 if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
-                    score += currScore;
+                    score += currScore * ((!(target instanceof StaticFighter || target instanceof SummonedFighter)) ? 1 : 0.5);
             }
         }
 
@@ -195,7 +197,7 @@ public class SelfActingAction extends AIAction {
                 if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
-                    score += currScore;
+                    score += score += currScore * ((!(target instanceof StaticFighter || target instanceof SummonedFighter)) ? 1 : 0.5);
             }
         }
 

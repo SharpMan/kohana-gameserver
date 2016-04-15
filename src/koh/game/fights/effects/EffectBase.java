@@ -136,6 +136,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.DAMAGE_DROP_LIFE, new EffectDamageDropLife());
 
             //Ajout ou reduction PA/PM/PO/Dommages
+
             this.put(StatsEnum.ACTION_POINTS, new EffectStats());
             this.put(StatsEnum.MOVEMENT_POINTS, new EffectStats());
             this.put(StatsEnum.SUB_PM, new EffectStats());
@@ -157,6 +158,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.DAMMAGES_OCASSIONED, new EffectDammageOcassioned());
             this.put(StatsEnum.REDUCE_FINAl_DAMAGE_PERCENT, new EffectDamagePercentReduced());
             this.put(StatsEnum.INCREASE_FINAL_DAMAGES_PERCENT, new EffectDammageOcassioned());
+
 
             //Enleve les effets du sort
             this.put(StatsEnum.DISPELL_SPELL, new EffectDispellSpell());
@@ -207,6 +209,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.ADD_RETRAIT_PM, new EffectStats());
             this.put(StatsEnum.SUB_RETRAIT_PA, new EffectStats());
             this.put(StatsEnum.SUB_RETRAIT_PM, new EffectStats());
+            this.put(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT, new EffectStats());
 
             //Soins
             this.put(StatsEnum.ADD_HEAL_BONUS, new EffectStats());
@@ -272,6 +275,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.SUMMON, new EffectSummon());
             this.put(StatsEnum.SUMMON_DOUBLE , new EffectSummonDouble());
             this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION, new EffectSummon());
+            this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2, new EffectSummon());
 
 
             //Roublard

@@ -15,15 +15,14 @@ public class BuffIncreaseSpellJet extends BuffEffect {
 
     public BuffIncreaseSpellJet(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACK_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
-
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (DamageInfos.spellId == castInfos.effect.diceNum) {
-            DamageValue.add(castInfos.effect.value);
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
+        if (damageInfos.spellId == castInfos.effect.diceNum) {
+            damageValue.add(castInfos.effect.value);
         }
-        return super.applyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(damageValue, damageInfos);
     }
 
     @Override

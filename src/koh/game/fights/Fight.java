@@ -440,6 +440,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private static final int[] BLACKLISTED_EFFECTS = DAO.getSettings().getIntArray("Effect.BlacklistedByTriggers");
     private static final StatsEnum[] FIRST_EFFECTS = new StatsEnum[]{
             StatsEnum.DISPELL_SPELL,
+            StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2,
             KILL_TARGET_TO_REPLACE_INVOCATION,
             StatsEnum.SUMMON,
             StatsEnum.KILL
@@ -485,7 +486,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (Fight.RANDOM.nextInt(TauxCC) == 0) {
                 isCc = true;
             }
-            logger.debug("CC: " + isCc + " TauxCC " + TauxCC + " getSpellLevel.criticalHitProbability " + spellLevel.getCriticalHitProbability());
+            logger.debug("CC: {} TauxCC {} getSpellLevel.criticalHitProbability {}",isCc,TauxCC,spellLevel.getCriticalHitProbability());
         }
         isCc &= !fighter.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
         if (isCc && !fakeLaunch && fighter.getStats().getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Turquoise
@@ -550,15 +551,18 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 if (effect.isValidTarget(fighter, fighter) && (EffectInstanceDice.verifySpellEffectMask(fighter, fighter, effect))) {
                     targets.get(effect).add(fighter);
                 }
+            }else if(effect.targetMask.equalsIgnoreCase("A,K") && fighter.getCarriedActor() != null){ //Vertigo
+                targets.get(effect).add(fighter.getCarriedActor());
             }
+
             for (Fighter target : targetsOnZone) {
                 logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}",effect.effectId,target.getID(),EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId,true),effect.isValidTarget(fighter, target),EffectInstanceDice.verifySpellEffectMask(fighter, target, effect));
                 if ((ArrayUtils.contains(BLACKLISTED_EFFECTS,effect.effectUid)
                         || EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId,true))
                         && effect.isValidTarget(fighter, target)
                         && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)) {
-                    if ((effect.targetMask.equals("C") && fighter.getCarriedActor() == target.getID())
-                            || (effect.targetMask.equals("a,A") && fighter.getCarriedActor() != 0 & fighter.getID() == target.getID())
+                    if ((effect.targetMask.equals("C") && fighter.getCarrierActorId() == target.getID())
+                            || (effect.targetMask.equals("a,A") && fighter.getCarrierActorId() != 0 & fighter.getID() == target.getID())
                             || (!imTargeted && target.getID() == fighter.getID())) {
                         continue;
                     }
@@ -617,7 +621,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 && fighter.getVisibleState() == GameActionFightInvisibilityStateEnum.INVISIBLE
                 && silentCast
                 && spellLevel.getSpellId() != 2763) {
-            //this.sendToField(new ShowCellMessage(fighter.getID(), fighter.getCellId()));
+            this.sendToField(new ShowCellMessage(fighter.getID(), fighter.getCellId()));
         }
 
         if (!fakeLaunch) {
@@ -1093,10 +1097,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     protected void onTackled(Fighter fighter, int movementLength) {
-        ArrayList<Fighter> tacklers = Pathfunction.getEnnemyNearToTakle(this, fighter.getTeam(), fighter.getCellId());
+        final ArrayList<Fighter> tacklers = Pathfunction.getEnnemyNearToTakle(this, fighter.getTeam(), fighter.getCellId());
 
-        int tackledMp = fighter.getTackledMP();
-        int tackledAp = fighter.getTackledAP();
+        final int tackledMp = fighter.getTackledMP();
+        final int tackledAp = fighter.getTackledAP();
         if (fighter.getMP() - tackledMp < 0) {
             logger.error("Cannot apply tackle : mp tackled ({0}) > available mp ({1})", tackledMp, fighter.getMP());
         } else {
@@ -1124,8 +1128,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             for (EffectInstanceDice effect : spell.getEffects()) {
                 if( !(effect.isValidTarget(caster, target)
                         && EffectInstanceDice.verifySpellEffectMask(caster, target, effect)) ||
-                        ((effect.targetMask.equals("C") && caster.getCarriedActor() == target.getID())
-                            || (effect.targetMask.equals("a,A") && caster.getCarriedActor() != 0 & caster.getID() == target.getID()))) {
+                        ((effect.targetMask.equals("C") && caster.getCarrierActorId() == target.getID())
+                            || (effect.targetMask.equals("a,A") && caster.getCarrierActorId() != 0 & caster.getID() == target.getID()))) {
                         continue;
                     }
                 if (effect.random > 0) {
@@ -1514,8 +1518,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     public GameActionMark[] getAllGameActionMark() {
         GameActionMark[] gameActionMarks = new GameActionMark[0];
         for (CopyOnWriteArrayList<FightActivableObject> objs : this.activableObjects.values()) {
-            for (FightActivableObject Object : objs) {
-                gameActionMarks = ArrayUtils.add(gameActionMarks, Object.getHiddenGameActionMark());
+            for (FightActivableObject object : objs) {
+                if(object.getHiddenGameActionMark() != null)
+                    gameActionMarks = ArrayUtils.add(gameActionMarks, object.getHiddenGameActionMark());
             }
         }
         return gameActionMarks;
@@ -1824,6 +1829,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public GameFightTurnListMessage getFightTurnListMessage() {
+        System.out.println(this.isStarted());
         if(this.isStarted()){
             return new GameFightTurnListMessage(this.fightWorker.fighters().stream().sequential().filter(x -> !(x instanceof StaticFighter))
                     //.sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false)))

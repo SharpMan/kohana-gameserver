@@ -11,11 +11,13 @@ import koh.game.conditions.ConditionExpression;
 import koh.game.dao.DAO;
 import koh.game.dao.api.ItemTemplateDAO;
 import koh.game.entities.actors.Player;
+import koh.game.entities.item.actions.LearnSpell;
 import koh.game.entities.spells.EffectInstance;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.exception.ExceptionContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -208,6 +210,11 @@ public class ItemTemplate {
             this.actions = new ArrayList<>(2);
         this.actions.add(action);
     }
+
+    public boolean hasAction(Class<? extends ItemAction> klass){
+        return actions != null && actions.stream().anyMatch(ac -> ac.getClass().isAssignableFrom(klass));
+    }
+
 
     public boolean use(Player plr,int cell){
         if(this.actions == null) {

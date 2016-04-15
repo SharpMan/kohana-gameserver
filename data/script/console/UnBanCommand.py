@@ -17,7 +17,7 @@ class UnBanCommand(PlayerCommand):
         if target == -1 :
             client.send(ConsoleMessage(0, "The target is missing"));
         else:
-            Main.interClient().send(AccountTookAwayMessage(target));
+            Main.getInterClient().send(AccountTookAwayMessage(target));
             client.send(ConsoleMessage(0, "The target has been unsuspended"));
 
     def can(self,client):

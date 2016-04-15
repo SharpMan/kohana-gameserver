@@ -14,6 +14,7 @@ public class EffectSubLifePercent extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
+        int toReturn = -1;
         for (Fighter target : castInfos.targets) {
             if(castInfos.duration > 0){
                 final EffectCast subInfos = new EffectCast(StatsEnum.SUB_VITALITY, castInfos.spellId, castInfos.cellId, castInfos.chance, null, castInfos.caster, castInfos.targets, castInfos.spellLevel);
@@ -28,9 +29,13 @@ public class EffectSubLifePercent extends EffectBase {
             }
             final int value = (int)(target.getLife() * castInfos.randomJet(target) / 100f);
             target.setLife(value);
+            toReturn = target.tryDie(castInfos.caster.getID());
+            if (toReturn != -1) {
+                return toReturn;
+            }
             target.getFight().sendToField(new GameActionFightLifePointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, castInfos.caster.getID(), target.getID(), value, 0));
 
         }
-        return -1;
+        return toReturn;
     }
 }

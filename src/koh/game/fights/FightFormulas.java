@@ -90,7 +90,7 @@ public class FightFormulas {
         return honorPoint(Fighter, Winners, Lossers, isLosser, true);
     }
 
-    public static short honorPoint(Fighter fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser, boolean End) {
+    public static short honorPoint(Fighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers, boolean isLosser, boolean end) {
 
         if (fighter.getFight().getEnnemyTeam(fighter.getTeam()).alignmentSide == AlignmentSideEnum.ALIGNMENT_NEUTRAL) {
             return (short) 0;
@@ -100,12 +100,14 @@ public class FightFormulas {
             ((CharacterFighter) fighter).getCharacter().addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
         }
 
-        if (End && fighter.getFight().getWinners().getFighters().count() == 1L && fighter.getFight().getWinners().getFighters().count() == fighter.getFight().getEnnemyTeam(fighter.getFight().getWinners()).getFighters().count()) {
-            return isLosser ? calculLooseHonor(Winners, Lossers) : calculWinHonor(Winners, Lossers);
+       //if(winners.get)
+
+        if (end && fighter.getFight().getWinners().getFighters().count() == 1L && fighter.getFight().getWinners().getFighters().count() == fighter.getFight().getEnnemyTeam(fighter.getFight().getWinners()).getFighters().count()) {
+            return isLosser ? computeHonorLost(winners, lossers) : computeHonorWon(winners, lossers);
         }
 
-        double num1 = (double) Winners.mapToInt(x -> x.getLevel()).sum();
-        double num2 = (double) Lossers.mapToInt(x -> x.getLevel()).sum();
+        final double num1 = (double) winners.mapToInt(x -> x.getLevel()).sum();
+        final double num2 = (double) lossers.mapToInt(x -> x.getLevel()).sum();
         double num3 = Math.floor(Math.sqrt((double) fighter.getLevel()) * 10.0 * (num2 / num1));
         if (isLosser) {
             if (num3 > fighter.getPlayer().getHonor()) {
@@ -150,7 +152,7 @@ public class FightFormulas {
             return 0;
         }
 
-        GuildMember gm = Fighter.getCharacter().getGuildMember();
+        final GuildMember gm = Fighter.getCharacter().getGuildMember();
 
         double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.getCharacter().getGuild().entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
@@ -180,6 +182,7 @@ public class FightFormulas {
         }
         if (fighter.getCharacter().getMountInfo() == null) {
             logger.error("mountInfo Null {} ", fighter.getCharacter().toString());
+            return 0;
         }
         if (!fighter.getCharacter().getMountInfo().isToogled
                 || fighter.getCharacter().getMountInfo().mount == null
@@ -224,7 +227,7 @@ public class FightFormulas {
         return (int) Math.round(xp * pToMount * coeff);
     }
 
-    public static short calculWinHonor(Stream<Fighter> winners, Stream<Fighter> loosers) {
+    public static short computeHonorWon(Stream<Fighter> winners, Stream<Fighter> loosers) {
         try {
             int totalGradeWinner = 0;
             int totalGradeLooser = 0;
@@ -235,7 +238,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeWinner += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
+                    totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
@@ -247,7 +250,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeLooser += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
+                    totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
@@ -264,7 +267,7 @@ public class FightFormulas {
         }
     }
 
-    public static short calculLooseHonor(Stream<Fighter> loosers, Stream<Fighter> winners) {
+    public static short computeHonorLost(Stream<Fighter> loosers, Stream<Fighter> winners) {
         try {
             int totalGradeWinner = 0;
             int totalGradeLooser = 0;
@@ -275,7 +278,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeWinner += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
+                    totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
@@ -287,7 +290,7 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeLooser += ((CharacterFighter) fighter).getCharacter().getAlignmentGrade();
+                    totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/

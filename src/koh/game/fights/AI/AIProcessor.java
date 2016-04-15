@@ -111,6 +111,7 @@ public class AIProcessor {
                 } catch (FighterException fe) {
                     throw fe;
                 } catch (Exception e) {
+                    logger.error(this.fighter.asMonster().getGrade().toString());
                     e.printStackTrace();
                     logger.error(e);
                 } finally {

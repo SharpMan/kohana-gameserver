@@ -294,7 +294,7 @@ public class GuildHandler {
                             this.sex = client.getCharacter().hasSexe();
                             this.achievementPoints = client.getCharacter().getAchievementPoints();
                             this.alignmentSide = client.getCharacter().getAlignmentSide().value;
-                            DAO.getGuildMembers().update(this);
+                            DAO.getGuildMembers().insert(this);
                         }
                     }, client.getCharacter());
                     this.registerPlayer(client.getCharacter());

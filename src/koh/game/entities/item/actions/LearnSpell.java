@@ -9,7 +9,7 @@ import koh.game.entities.item.ItemAction;
  */
 public class LearnSpell  extends ItemAction {
 
-    private int id;
+    private final int id;
 
     public LearnSpell(String[] args, String criteria, int template) {
         super(args, criteria, template);

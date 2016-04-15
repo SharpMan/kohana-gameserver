@@ -13,6 +13,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.effects.buff.BuffCastSpellOnPortal;
+import koh.game.fights.effects.buff.BuffStatsByPortalTeleport;
 import koh.protocol.client.enums.ActionIdEnum;
 import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_TELEPORT_ON_SAME_MAP;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
@@ -108,7 +109,7 @@ public class FightPortal extends FightActivableObject {
     }
 
     @Override
-    public synchronized int activate(Fighter activator) {
+    public synchronized int activate(Fighter activator,BuffActiveType buffActiveType) {
         if (Arrays.stream(new Exception().getStackTrace()).filter(Method -> Method.getMethodName().equalsIgnoreCase("FightPortal.activate")).count() > 1) { //Il viens de rejoindre la team rofl on le tue pas
             return -1;
         }
@@ -138,7 +139,7 @@ public class FightPortal extends FightActivableObject {
 
         final int[] Links = LinkedCellsManager.getLinks(this.getMapPoint(), Arrays.stream(portals).map(Portail -> Portail.getMapPoint()).toArray(MapPoint[]::new));
         //System.out.println(Enumerable.join(Links));
-        FightPortal lastPortal = Arrays.stream(portals).filter(x -> x.getCellId() == (short) Links[Links.length - 1]).findFirst().get();
+        final FightPortal lastPortal = Arrays.stream(portals).filter(x -> x.getCellId() == (short) Links[Links.length - 1]).findFirst().get();
 
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.getID(), ID, false));
         m_fight.sendToField(new GameActionFightActivateGlyphTrapMessage(1181, activator.getID(), lastPortal.ID, false));
@@ -160,6 +161,10 @@ public class FightPortal extends FightActivableObject {
         lastPortal.turnUsed = m_fight.getFightWorker().fightTurn;
 
         targets.clear();
+
+        activator.getBuff().getAllBuffs()
+                .filter(buff -> buff instanceof BuffStatsByPortalTeleport)
+                .forEach(bf-> bf.applyEffect(null,null));
 
         activator.getFight().endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         return activator.setCell(lastPortal.cell);

@@ -12,7 +12,6 @@ import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
-import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.fighters.BombFighter;
@@ -72,9 +71,9 @@ public class BuffPoutch extends BuffEffect {
                                 continue;
                             }
                             if (Effect.isValidTarget(this.target, target2) && EffectInstanceDice.verifySpellEffectMask(this.target, target2, Effect,target2.getID())) {
-                                if (Effect.targetMask.equals("C") && this.target.getCarriedActor() == target2.getID()) {
+                                if (Effect.targetMask.equals("C") && this.target.getCarrierActorId() == target2.getID()) {
                                     continue;
-                                } else if (Effect.targetMask.equals("a,A") && this.target.getCarriedActor() != 0 & this.target.getID() == target2.getID()) {
+                                } else if (Effect.targetMask.equals("a,A") && this.target.getCarrierActorId() != 0 & this.target.getID() == target2.getID()) {
                                     continue;
                                 }
                                 targets.add(target2);

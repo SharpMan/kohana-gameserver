@@ -37,7 +37,7 @@ public class InventoryItem {
     @Getter
     private int position,quantity,owner;
     @Getter
-    protected List<ObjectEffect> effects; //FIXME : Think if we should migrate to Array or not , trought newArray = ArraysUtils.add(T[] Array,T Element);
+    protected List<ObjectEffect> effects;
     @Getter @Setter
     private boolean needInsert, needRemove;
     public List<String> columsToUpdate = null;

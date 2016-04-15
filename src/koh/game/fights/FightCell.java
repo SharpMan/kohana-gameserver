@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.layers.FightActivableObject;
@@ -45,14 +47,14 @@ public class FightCell {
     }
 
     public int beginTurn(Fighter fighter) {
-        for (IFightObject Object : myFightObjects) {
-            if (Object instanceof FightActivableObject) {
-                FightActivableObject activableObject = (FightActivableObject) Object;
+        for (IFightObject obj : myFightObjects) {
+            if (obj instanceof FightActivableObject) {
+                final FightActivableObject activableObject = (FightActivableObject) obj;
                 if (activableObject.activationType == BuffActiveType.ACTIVE_BEGINTURN || activableObject instanceof FightBomb) {
                     activableObject.loadTargets(fighter);
-                    int Result = activableObject.activate(fighter);
-                    if(Result == -3){
-                        return -3;
+                    final int result = activableObject.activate(fighter,BuffActiveType.ACTIVE_BEGINTURN);
+                    if(result != -1){
+                        return result;
                     }
                 }
             }
@@ -67,7 +69,7 @@ public class FightCell {
                 FightActivableObject activableObject = (FightActivableObject) Object;
                 if (activableObject.activationType == BuffActiveType.ACTIVE_ENDTURN || activableObject instanceof FightBomb) {
                     activableObject.loadTargets(fighter);
-                    int Result = activableObject.activate(fighter);
+                    int Result = activableObject.activate(fighter,BuffActiveType.ACTIVE_ENDTURN);
                     if(Result == -3){
                         return -3;
                     }
@@ -125,6 +127,25 @@ public class FightCell {
                 .map(f -> (FightGlyph) f)
                 .toArray(FightGlyph[]::new);
     }
+
+    public Stream<FightGlyph> getGlyphStream(Predicate<? super IFightObject> prdct){
+        return myFightObjects.stream()
+                .filter(x -> x.getObjectType() == FightObjectType.OBJECT_GLYPHE)
+                .filter(prdct)
+                .map(f -> (FightGlyph) f);
+    }
+
+
+    public FightGlyph[] getGlyphes(Predicate<? super IFightObject> prdct){
+        return myFightObjects.stream()
+                .filter(x -> x.getObjectType() == FightObjectType.OBJECT_GLYPHE)
+                .filter(prdct)
+                .map(f -> (FightGlyph) f)
+                .toArray(FightGlyph[]::new);
+    }
+
+
+
 
     public boolean hasGameObject(IFightObject objectType) {
         return myFightObjects.contains(objectType);
@@ -201,17 +222,17 @@ public class FightCell {
 
     public int onObjectAdded(IFightObject fightObject) {
         if (fightObject instanceof Fighter) {
-            Fighter fighter = (Fighter) fightObject;
+            final Fighter fighter = (Fighter) fightObject;
             for (IFightObject Object : myFightObjects) {
                 if (Object instanceof FightActivableObject) {
-                    FightActivableObject activableObject = (FightActivableObject) Object;
+                    final FightActivableObject activableObject = (FightActivableObject) Object;
 
                     if (activableObject.activationType == BuffActiveType.ACTIVE_ENDMOVE) {
                         if (!fighter.isDead()) {
                             activableObject.loadTargets(fighter);
-                            int Result = activableObject.activate(fighter);
-                            if(Result == -3)
-                                return Result;
+                            final int result = activableObject.activate(fighter, BuffActiveType.ACTIVE_ENDMOVE);
+                            if(result != -1)
+                                return result;
                         }
                     }
                 }

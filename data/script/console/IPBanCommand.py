@@ -20,7 +20,7 @@ class IPBanCommand(PlayerCommand):
             client.send(ConsoleMessage(0, "The target is missing"));
         else:
             time = Instant.now().plus(int(args[1]), ChronoUnit.HOURS).toEpochMilli();
-            Main.interClient().send(PlayerAddressSuspendedMessage(time,target.getAccount().getId(),target.getClient().getIP()));
+            Main.getInterClient().send(PlayerAddressSuspendedMessage(time,target.getAccount().getId(),target.getClient().getIP()));
 
             for player in DAO.getPlayers().getByIp(target.getClient().getIP()):
                 player.getClient().timeOut();

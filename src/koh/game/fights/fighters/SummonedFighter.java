@@ -29,8 +29,79 @@ public class SummonedFighter extends MonsterFighter {
         super.setLifeMax(this.getMaxLife());
     }
 
+    private double getCoefficient(){ //Steamer
+        switch (this.grade.getLevel()){
+            case 1:
+                switch (this.grade.getMonsterId()){
+                    case 3287:
+                        return 0.3;
+                    case 3288:
+                        return 0.2;
+                    case 3289:
+                        return 0.25;
+                }
+                break;
+            case 2:
+                switch (this.grade.getMonsterId()){
+                    case 3287:
+                        return 0.32;
+                    case 3288:
+                        return 0.22;
+                    case 3289:
+                        return 0.27;
+                }
+                break;
+            case 3:
+                switch (this.grade.getMonsterId()){
+                    case 3287:
+                        return 0.34;
+                    case 3288:
+                        return 0.24;
+                    case 3289:
+                        return 0.29;
+                }
+                break;
+            case 4:
+                switch (this.grade.getMonsterId()){
+                    case 3287:
+                        return 0.36;
+                    case 3288:
+                        return 0.24;
+                    case 3289:
+                        return 0.29;
+                }
+                break;
+            case 5:
+                switch (this.grade.getMonsterId()){
+                    case 3287:
+                        return 0.38;
+                    case 3288:
+                        return 0.28;
+                    case 3289:
+                        return 0.33;
+                }
+                break;
+            case 6:
+                switch (this.grade.getMonsterId()){
+                    case 3287:
+                        return 0.4;
+                    case 3288:
+                        return 0.3;
+                    case 3289:
+                        return 0.35;
+                }
+                break;
+        }
+        return 0.3;
+    }
+
     public void adjustStats() {
-        this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        if(this.grade.getMonsterId() == 3287 || this.grade.getMonsterId() == 3288 || this.grade.getMonsterId() == 3289){
+            this.stats.addBase(StatsEnum.VITALITY, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getLife() * this.getCoefficient())));
+        }
+        else
+            this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+
         this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
@@ -41,7 +112,9 @@ public class SummonedFighter extends MonsterFighter {
     public int tryDieSilencious(int casterId, boolean force) {
         final int result = super.tryDie(casterId,force);
         if(result == -2 || result == -3){
-            this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
+            if(this.grade.getMonster().isUseSummonSlot()) {
+                this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
+            }
         }
         return  result;
     }
@@ -51,9 +124,11 @@ public class SummonedFighter extends MonsterFighter {
     public int tryDie(int casterId, boolean force) {
        final int result = super.tryDie(casterId,force);
         if(result == -2 || result == -3){
-            this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
-            if(summoner instanceof CharacterFighter){
-                summoner.send(summoner.asPlayer().getCharacterStatsListMessagePacket());
+            if(this.grade.getMonster().isUseSummonSlot()) {
+                this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
+                if (summoner instanceof CharacterFighter) {
+                    summoner.send(summoner.asPlayer().getCharacterStatsListMessagePacket());
+                }
             }
         }
         return  result;

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import koh.game.actions.GameActionTypeEnum;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.character.CharacterInventory;
 import koh.game.entities.item.InventoryItem;
 import koh.game.network.WorldClient;
@@ -259,32 +260,35 @@ public class PlayerExchange extends Exchange {
                 + "\n          -- P2(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient1).entrySet()) {
-            InventoryItem Item = this.myClient1.getCharacter().getInventoryCache().find(ItemData.getKey());
-            if (Item == null) {
+            final InventoryItem item = this.myClient1.getCharacter().getInventoryCache().find(ItemData.getKey());
+            if (item == null) {
                 logger.error(this.myClient1.getCharacter().getNickName() + " - " + this.myClient2.getCharacter().getNickName() + " " + ItemData.getKey() + " item not Found");
                 continue;
             }
 
-            if (ItemData.getValue() >= Item.getQuantity()) {
-                this.myClient1.getCharacter().getInventoryCache().changeOwner(Item, this.myClient2.getCharacter());
+            if (ItemData.getValue() >= item.getQuantity()) {
+                this.myClient1.getCharacter().getInventoryCache().changeOwner(item, this.myClient2.getCharacter());
+                DAO.getItems().save(item, false, "character_items");
             } else {
-                this.myClient1.getCharacter().getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient2.getCharacter(), ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                this.myClient1.getCharacter().getInventoryCache().updateObjectquantity(item, item.getQuantity() - ItemData.getValue());
+                CharacterInventory.tryCreateItem(item.getTemplateId(), this.myClient2.getCharacter(), ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), item.getEffectsCopy(), true);
             }
         }
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient2).entrySet()) {
-            InventoryItem Item = this.myClient2.getCharacter().getInventoryCache().find(ItemData.getKey());
-            if (Item == null) {
+            final InventoryItem item = this.myClient2.getCharacter().getInventoryCache().find(ItemData.getKey());
+            if (item == null) {
                 logger.error(this.myClient2.getCharacter().getNickName() + " - " + this.myClient1.getCharacter().getNickName() + " " + ItemData.getKey() + " item not Found");
                 continue;
             }
 
-            if (ItemData.getValue() >= Item.getQuantity()) {
-                this.myClient2.getCharacter().getInventoryCache().changeOwner(Item, this.myClient1.getCharacter());
+            if (ItemData.getValue() >= item.getQuantity()) {
+                this.myClient2.getCharacter().getInventoryCache().changeOwner(item, this.myClient1.getCharacter());
+                DAO.getItems().save(item, false, "character_items");
+
             } else {
-                this.myClient2.getCharacter().getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - ItemData.getValue());
-                CharacterInventory.tryCreateItem(Item.getTemplateId(), this.myClient1.getCharacter(), ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy(), true);
+                this.myClient2.getCharacter().getInventoryCache().updateObjectquantity(item, item.getQuantity() - ItemData.getValue());
+                CharacterInventory.tryCreateItem(item.getTemplateId(), this.myClient1.getCharacter(), ItemData.getValue(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), item.getEffectsCopy(), true);
             }
         }
 
@@ -293,6 +297,11 @@ public class PlayerExchange extends Exchange {
 
         this.myClient1.getCharacter().getInventoryCache().addKamas(this.myKamasToTrade.get(this.myClient2), false);
         this.myClient2.getCharacter().getInventoryCache().addKamas(this.myKamasToTrade.get(this.myClient1), false);
+
+        /*if(!this.myItemsToTrade.get(this.myClient1).isEmpty() || !this.myItemsToTrade.get(this.myClient2).isEmpty()){
+            this.myClient1.getCharacter().getInventoryCache().save(false);
+            this.myClient2.getCharacter().getInventoryCache().save(false);
+        }*/
 
         return true;
     }

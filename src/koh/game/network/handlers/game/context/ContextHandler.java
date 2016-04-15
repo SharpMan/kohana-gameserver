@@ -66,10 +66,10 @@ public class ContextHandler {
 
     @HandlerAttribute(ID = GameContextReadyMessage.M_ID)
     public static void handleGameContextReadyMessage(WorldClient client, GameContextReadyMessage message) {
-        if (client.getCharacter().getFighter() != null) {
+        if (client.getCharacter().getFighter() != null && client.getCharacter().getFight() != null) {
             client.addGameAction(new GameFight(client.getCharacter().getFighter(), client.getCharacter().getFight()));
             client.send(client.getCharacter().getCurrentMap().getMapComplementaryInformationsDataMessage(client.getCharacter()));
-            client.getCharacter().getFight().onReconnect((CharacterFighter) client.getCharacter().getFighter());
+            client.getCharacter().getFight().onReconnect(client.getCharacter().getFighter().asPlayer());
         }
     }
 

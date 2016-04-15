@@ -21,6 +21,8 @@ import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.connection.StatsUpgradeRequestMessage;
 import koh.protocol.messages.game.character.stats.UpdateLifePointsMessage;
 import koh.protocol.messages.game.context.roleplay.ChangeMapMessage;
+import koh.protocol.messages.game.context.roleplay.MapRunningFightListMessage;
+import koh.protocol.messages.game.context.roleplay.MapRunningFightListRequestMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayRequestMessage;
 import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayAttackMonsterRequestMessage;
@@ -47,6 +49,12 @@ public class RolePlayHandler {
             put(StatsBoostEnum.INTELLIGENCE, StatsEnum.INTELLIGENCE);
         }
     };
+
+    @HandlerAttribute(ID = MapRunningFightListRequestMessage.M_ID)
+    public static void handleMapRunningFightListRequestMessage(WorldClient client, MapRunningFightListRequestMessage message){
+        client.send(new MapRunningFightListMessage());
+
+    }
 
     @HandlerAttribute(ID = GameRolePlayAttackMonsterRequestMessage.M_ID)
     public static void handleGameRolePlayAttackMonsterRequestMessage(WorldClient client , GameRolePlayAttackMonsterRequestMessage message){

@@ -10,7 +10,7 @@ import koh.game.entities.actors.Player;
 public class ServerCriterion extends Criterion {
 
     public static String Identifier = "SI";
-    public int Server;
+    public int server;
 
     @Override
     public String toString() {
@@ -19,11 +19,11 @@ public class ServerCriterion extends Criterion {
 
     @Override
     public void Build() {
-        Server = Integer.parseInt(literal);
+        server = Integer.parseInt(literal);
     }
 
     @Override
     public boolean eval(Player character) {
-        return DAO.getSettings().getIntElement("World.id") == this.Server;
+        return DAO.getSettings().getIntElement("World.ID") == this.server;
     }
 }

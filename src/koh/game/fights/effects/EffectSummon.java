@@ -20,8 +20,8 @@ public class EffectSummon extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         // Possibilité de spawn une creature sur la case ?
-        if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION){
-            if(castInfos.targets.isEmpty())
+        if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION || castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2){
+            if(castInfos.targets.isEmpty() || castInfos.targets.stream().noneMatch(bf -> bf instanceof SummonedFighter || bf instanceof StaticFighter))
                 return -1;
             castInfos.targets.forEach(target -> target.tryDie(castInfos.caster.getID(),true));
             //Now mask
@@ -40,9 +40,9 @@ public class EffectSummon extends EffectBase {
                     if(monster.isStatic())
                         summon = new StaticSummonedFighter(castInfos.getFight(),castInfos.caster,monsterLevel);
                     else
-                        summon = (castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION) ?
+                        summon = (castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION && castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2) ?
                             new SummonedFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster)
-                            : new SummonedReplacerFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster,castInfos.targets.get(0).asSummon().getGrade());
+                            : new SummonedReplacerFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster, castInfos.targets.stream().filter(bf -> bf instanceof SummonedFighter).findFirst().get().asSummon().getGrade());
 
 
                     summon.joinFight();
@@ -54,9 +54,11 @@ public class EffectSummon extends EffectBase {
                             .mapToObj(sp -> DAO.getSpells().findSpell(sp).getLevelOrNear(1))
                             .forEach(sp -> castInfos.getFight().launchSpell(summon, sp, castInfos.cellId, true, true, true,-1));
 
-                    castInfos.caster.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base--;
-                    if(castInfos.caster instanceof CharacterFighter)
-                        castInfos.caster.send(castInfos.caster.asPlayer().getCharacterStatsListMessagePacket());
+                    if(monster.isUseSummonSlot()) {
+                        castInfos.caster.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base--;
+                        if (castInfos.caster instanceof CharacterFighter)
+                            castInfos.caster.send(castInfos.caster.asPlayer().getCharacterStatsListMessagePacket());
+                    }
                 }
             }
         }

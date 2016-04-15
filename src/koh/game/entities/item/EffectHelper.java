@@ -11,6 +11,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.spells.*;
 import koh.game.fights.Fighter;
+import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.data.items.ObjectEffect;
@@ -58,6 +59,9 @@ public class EffectHelper {
         293, //Augmente les dégâts de base du sort #1 de #3
         294, //Diminue la portée du sort #1 de #3
     };
+    public static final int[] DAMAGE_EFFECTS_IDS = {1012, 1013, 1014, 1015, 1016,672, 85, 86, 87, 88, 89,1067, 1068, 1069, 1070, 1071, 96,97,98,99,100,91,92,93,94, 95,101,108 };
+    public static final int[] HP_BASED_DAMAGE_EFFECTS_IDS= {672, 85, 86, 87, 88, 89};
+    public static final int[] TARGET_HP_BASED_DAMAGE_EFFECTS_IDS= {1067, 1068, 1069, 1070, 1071};
     public static final int[] UN_RANDOMABLES_EFFECTS = new int[]{
         96,//Effect_DamageWater
         97,//Effect_DamageEarth
@@ -322,7 +326,7 @@ public class EffectHelper {
     }
 
     public static List<ObjectEffect> generateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
-        List<ObjectEffect> effects = new ArrayList<>();
+        final List<ObjectEffect> effects = new ArrayList<>();
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
                 logger.debug(e.toString());
@@ -349,6 +353,10 @@ public class EffectHelper {
                 }
                 if (ArrayUtils.contains(LADDER_EFFECTS, e.effectId)) {
                     effects.add(new ObjectEffectLadder(e.effectId, ((EffectInstanceDice) e).diceNum, 0));
+                    continue;
+                }
+                if(e.effectId == ActionIdEnum.ACTION_CHARACTER_LEARN_SPELL){
+                    effects.add(new ObjectEffectInteger(e.effectId, ((EffectInstanceDice) e).value));
                     continue;
                 }
 

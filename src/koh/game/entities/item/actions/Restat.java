@@ -3,6 +3,7 @@ package koh.game.entities.item.actions;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.ItemAction;
+import koh.protocol.client.enums.StatsEnum;
 
 /**
  * Created by Melancholia on 12/13/15.
@@ -23,7 +24,12 @@ public class Restat  extends ItemAction {
         p.setIntell(0);
         p.setAgility(0);
         p.setChance(0);
-        p.getStats().resetBase();
+        p.getStats().getStats().get(StatsEnum.VITALITY).base = 0;
+        p.getStats().getStats().get(StatsEnum.WISDOM).base = 0;
+        p.getStats().getStats().get(StatsEnum.STRENGTH).base = 0;
+        p.getStats().getStats().get(StatsEnum.INTELLIGENCE).base = 0;
+        p.getStats().getStats().get(StatsEnum.AGILITY).base = 0;
+        p.getStats().getStats().get(StatsEnum.CHANCE).base = 0;
         p.setStatPoints((p.getLevel() - 1) * 5);
         p.refreshStats();
         return true;

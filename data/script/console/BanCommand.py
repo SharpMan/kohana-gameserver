@@ -20,7 +20,7 @@ class BanCommand(PlayerCommand):
             client.send(ConsoleMessage(0, "The target is missing"));
         else:
             time = Instant.now().plus(int(args[1]), ChronoUnit.HOURS).toEpochMilli();
-            Main.interClient().send(PlayerSuspendedMessage(time,target.getAccount().getId()));
+            Main.getInterClient().send(PlayerSuspendedMessage(time,target.getAccount().getId()));
             target.getClient().timeOut();
             client.send(ConsoleMessage(0, "The target has been banned for "+ args[1] +" hours"));
 

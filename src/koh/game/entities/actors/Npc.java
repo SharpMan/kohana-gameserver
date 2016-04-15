@@ -19,6 +19,7 @@ import java.sql.SQLException;
  */
 public class Npc extends IGameActor {
 
+    @Getter
     private int npcId, artwork;
     @Getter
     private short cellID;

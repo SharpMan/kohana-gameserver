@@ -5,12 +5,15 @@ import koh.game.entities.item.InventoryItem;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public abstract class Exchange {
+    protected static final Logger logger = LogManager.getLogger(Exchange.class);
 
     protected boolean myEnd = false;
 

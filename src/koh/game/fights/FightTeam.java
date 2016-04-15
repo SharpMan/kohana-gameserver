@@ -133,6 +133,12 @@ public class FightTeam {
         return this.myFighters.stream().anyMatch(x -> x.isAlive());
     }
 
+    public int getLevel(){
+        return this.myFighters.stream()
+                .mapToInt(fr -> fr.getLevel())
+                .sum();
+    }
+
     public void toggle(FightOptionsEnum ToggleType, boolean Value) {
         synchronized (this.myToggleLocks) {
             this.myToggleLocks.put(ToggleType, Value);

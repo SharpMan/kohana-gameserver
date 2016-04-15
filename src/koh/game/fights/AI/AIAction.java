@@ -122,7 +122,12 @@ public abstract class AIAction {
        try {
            switch (effect.getEffectType()) {
 
-               /*TODO TELEPORT_4*/
+               /*TODO TELEPORT_4* LIFE_PERCENT_ERODED_AIR* DISPELL_SPELL
+               17:37:48.255 [pool-61-thread-45] ERROR fights.AI.AIAction -     Effect[DODGE] non defini pour l'IA
+17:39:04.716 [pool-61-thread-38] ERROR fights.AI.AIAction -     Effect[DAMAGE_NEUTRAL_FIX] non defini pour l'IA
+EROSION
+TELEPORT_STARTING_TURN_CELL
+               * */
 
 
                case HEAL:
@@ -174,6 +179,8 @@ public abstract class AIAction {
                    return scoreBuff_II(AI, effect, targets, reverse, false);
 
              /* BUFFS LEVEL 3*/
+               case DAMAGE_ARMOR_REDUCTION:
+               case DAMMAGES_OCASSIONED:
                case ADD_CRITICAL_DAMAGES_REDUCTION:
                case ADD_PUSH_DAMAGES_REDUCTION:
                case BOOST_SHIELD_BASED_ON_CASTER_LIFE:
@@ -358,6 +365,7 @@ public abstract class AIAction {
                case DECREASE_EFFECT_DURATION:
                    return scoreDebuff(AI, effect, targets, reverse);
 
+               case SUMMON_DOUBLE:
                case STATIC_SUMMON:
                    return scoreInvocationStatic(AI, effect, targets, reverse, invokPreview);
                case SUMMON:

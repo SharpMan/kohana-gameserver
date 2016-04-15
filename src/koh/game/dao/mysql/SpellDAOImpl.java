@@ -80,6 +80,16 @@ public class SpellDAOImpl extends SpellDAO {
 
             while (result.next()) {
                 levels.put(result.getInt("id"), new SpellLevel(result));
+                //A,K,
+              /* Arrays.stream(levels.get(result.getInt("id")).getEffects())
+                       .filter(x -> x.effectId == 666)
+                       .forEach(x -> {
+                           try {
+                               System.out.println(result.getInt("spell_id"));
+                           } catch (SQLException e) {
+                               e.printStackTrace();
+                           }
+                       });*/
                 /*if(result.getInt("spell_id") == 5403){
                     for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
                         if(effect.effectId == 111 || effect.effectId == 1109){

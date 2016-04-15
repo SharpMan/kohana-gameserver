@@ -80,12 +80,18 @@ public class EffectDamage extends EffectBase {
                 return -3; // Fin du combat
             }
         }
+        if(castInfos.isCAC)
+            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT));
         // Calcul jet
         caster.computeDamages(castInfos.effectType, damageJet);
         //Calcul Bonus Negatif Zone ect ...
         if (castInfos.effect != null) {
             caster.calculBonusDamages(castInfos.effect, damageJet,castInfos.cellId, target.getCellId(),castInfos.oldCell);
         }
+
+        if(castInfos.isCAC)
+            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, -caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT));
+
 
         if(castInfos.caster.hasState(FightStateEnum.PACIFISTE.value) && !castInfos.isGlyph){
             damageJet.setValue(0);

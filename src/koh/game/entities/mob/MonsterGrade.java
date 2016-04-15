@@ -6,6 +6,7 @@ import koh.game.entities.spells.SpellLevel;
 import koh.protocol.client.enums.StatsEnum;
 import koh.utils.Enumerable;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import java.util.List;
 /**
  * @author Neo-Craft
  */
+@ToString
 public class MonsterGrade {
 
 
@@ -57,7 +59,7 @@ public class MonsterGrade {
         hiddenLevel = result.getInt("hidden_level");
     }
 
-    public List<SpellLevel> getSpells(){
+    public synchronized List<SpellLevel> getSpells(){
         if(this.spells == null){
             this.spells = new ArrayList<>(5);
         }
