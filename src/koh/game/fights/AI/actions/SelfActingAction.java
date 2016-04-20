@@ -773,8 +773,13 @@ public class SelfActingAction extends AIAction {
             return baseScore * invocationLevel;
         }
         if (!AI.getNeuron().myScoreInvocations.containsKey(invocationId)) {
-
-            MonsterGrade monsterLevel = DAO.getMonsters().find(invocationId).getLevelOrNear(invocationLevel);
+            final MonsterGrade monsterLevel;
+            try {
+                monsterLevel = DAO.getMonsters().find(invocationId).getLevelOrNear(invocationLevel);
+            }
+            catch (NullPointerException e){
+                return 0;
+            }
             // Level de monstre existant
             if (monsterLevel != null) {
                 List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isDead()).collect(Collectors.toList());

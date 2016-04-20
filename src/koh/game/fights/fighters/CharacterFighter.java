@@ -105,11 +105,11 @@ public class CharacterFighter extends Fighter {
             updated = true;
         }
         if (updated) {
-            this.onCloneCleared();
+            this.onCloneDisposed();
         }
     }
 
-    public void onCloneCleared() {
+    public void onCloneDisposed() {
         this.fight.observers.stream().filter(x -> !this.isMyFriend(((Player) x))).forEach(o -> ((Player) o).send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
         this.fakeContextualId = -1000;
         this.buff.dispell(2763);
@@ -137,6 +137,11 @@ public class CharacterFighter extends Fighter {
     public void leaveFight() {
         super.leaveFight();
         this.endFight();
+    }
+
+    @Override
+    public GameFightFighterLightInformations getGameFightFighterLightInformations() {
+        return new GameFightFighterNamedLightInformations(this.getID(),wave, getLevel(), character.getBreed(), character.hasSexe(), isAlive(), character.getNickName());
     }
 
     @Override

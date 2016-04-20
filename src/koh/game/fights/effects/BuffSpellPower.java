@@ -1,33 +1,31 @@
-package koh.game.fights.effects.buff;
+package koh.game.fights.effects;
 
 import koh.game.entities.item.EffectHelper;
 import koh.game.fights.Fighter;
-import koh.game.fights.effects.EffectCast;
+import koh.game.fights.effects.buff.BuffActiveType;
+import koh.game.fights.effects.buff.BuffDecrementType;
+import koh.game.fights.effects.buff.BuffEffect;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
- * @author Neo-Craft
+ * Created by Melancholia on 4/15/16.
  */
-public class BuffDammageOcassioned extends BuffEffect {
+public class BuffSpellPower extends BuffEffect {
 
     private final int JET;
 
-    public BuffDammageOcassioned(EffectCast CastInfos, Fighter Target) {
+    public BuffSpellPower(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
         this.JET = CastInfos.randomJet(Target);
-        if(castInfos.spellId == 103){ // Chance eca
-            this.duration++;
-            //this.decrementType = BuffDecrementType.TYPE_BEGINTURN;
-        }
     }
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast damageInfos) {
-        if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId))
-            DamageValue.setValue((DamageValue.intValue() * this.JET) / 100);
+        if (!castInfos.isCAC)
+            DamageValue.add((DamageValue.intValue() * this.JET) / 100);
         return super.applyEffect(DamageValue, damageInfos);
     }
 

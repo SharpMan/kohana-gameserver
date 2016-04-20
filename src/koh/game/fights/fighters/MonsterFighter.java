@@ -9,9 +9,7 @@ import koh.game.fights.IFightObject;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
 import koh.protocol.types.game.context.GameContextActorInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberMonsterInformations;
-import koh.protocol.types.game.context.fight.GameFightMonsterInformations;
+import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,6 +46,10 @@ public class MonsterFighter extends VirtualFighter {
         super.endFight();
     }
 
+    @Override
+    public GameFightFighterLightInformations getGameFightFighterLightInformations() {
+        return new GameFightFighterMonsterLightInformations(getID(), wave, getLevel(), (byte) 0, false, isAlive(), grade.getMonsterId());
+    }
 
 
     @Override

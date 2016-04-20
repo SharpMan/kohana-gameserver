@@ -163,6 +163,7 @@ public abstract class FightActivableObject implements IFightObject {
         m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage(getGameActionMarkType() == GameActionMarkTypeEnum.GLYPH ? ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH : ActionIdEnum.ACTION_FIGHT_TRIGGER_TRAP, this.caster.getID(), this.ID, activator.getID(), this.m_spellId));
         activator.getFight().startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         final ArrayList<Fighter> targetsPerEffect = new ArrayList<>();
+        int bestResult = -1;
         for (EffectInstanceDice effect : castSpell.getEffects()) {
             //System.out.println(castSpell.getSpellId() + " "+effect);
             targetsPerEffect.addAll(targets);
@@ -173,7 +174,11 @@ public abstract class FightActivableObject implements IFightObject {
             final EffectCast castInfos = new EffectCast(effect.getEffectType(), this.castSpell.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.castSpell);
             castInfos.isTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;
             castInfos.isGlyph = this.getObjectType() == FightObjectType.OBJECT_GLYPHE;
-            if (EffectBase.tryApplyEffect(castInfos) == -3) {
+            final int result = EffectBase.tryApplyEffect(castInfos);
+            if(result < bestResult){
+                bestResult = result;
+            }
+            if (result == -3) {
                 targetsPerEffect.clear();
                 targets.clear();
                 activator.getFight().endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
@@ -185,7 +190,7 @@ public abstract class FightActivableObject implements IFightObject {
         targets.clear();
 
         activator.getFight().endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        return -1;
+        return bestResult;
     }
 
     public void decrementDuration() {

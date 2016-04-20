@@ -145,7 +145,7 @@ TELEPORT_STARTING_TURN_CELL
                case ADD_DAMAGE_PERCENT:
                case COMBO_DAMMAGES: //TODO roub
                case ADD_DAMAGE_PHYSIC:
-               case ADD_DAMAGE_FINAL_PERCENT:
+               case WEAPON_DAMAGE_PERCENT:
                case ADD_PUSH_DAMAGES_BONUS:
                case ADD_CRITICAL_DAMAGES:
                case ADD_TACKLE_BLOCK:

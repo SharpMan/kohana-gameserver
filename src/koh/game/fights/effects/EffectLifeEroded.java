@@ -31,6 +31,12 @@ public class EffectLifeEroded extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
+        System.out.println("as");
+        System.out.println("as");
+        System.out.println("as");
+        System.out.println("as");
+        System.out.println("as");
+        System.out.println("as");
         int toReturn;
         for (Fighter target : castInfos.targets) {
             final int totalErosion = target.getBuff()
@@ -93,7 +99,7 @@ public class EffectLifeEroded extends EffectBase {
                             reflectDamage.setValue(damageJet.getValue());
                         }
 
-                        EffectCast subInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
+                        EffectCast subInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
                         subInfos.isReflect = true;
 
                         // Si le renvoi de dommage entraine la fin de combat on stop

@@ -30,7 +30,7 @@ public class FightGlyph extends FightActivableObject {
     private int lastTurnActivated;
 
     public FightGlyph(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum Shape) {
-        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
+        super(BuffActiveType.ACTIVE_ENDTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
     }
 
     @Override
@@ -54,11 +54,12 @@ public class FightGlyph extends FightActivableObject {
         m_fight.sendToField(new GameActionFightTriggerGlyphTrapMessage( ActionIdEnum.ACTION_FIGHT_TRIGGER_GLYPH, this.caster.getID(), this.ID, activator.getID(), this.m_spellId));
         activator.getFight().startSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
         final ArrayList<Fighter> targetsPerEffect = new ArrayList<>(3);
+        int bestResult = -1;
         for (EffectInstanceDice effect : castSpell.getEffects()) {
-            if(activationType != BuffActiveType.ACTIVE_BEGINTURN && ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
+            if(activationType != BuffActiveType.ACTIVE_ENDTURN && ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
                 continue;
             }
-            else if (activationType == BuffActiveType.ACTIVE_BEGINTURN && !ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
+            else if (activationType == BuffActiveType.ACTIVE_ENDTURN && !ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
                 continue;
             }
             targetsPerEffect.addAll(targets);
@@ -69,11 +70,15 @@ public class FightGlyph extends FightActivableObject {
             final EffectCast castInfos = new EffectCast(effect.getEffectType(), this.castSpell.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.castSpell);
             castInfos.isGlyph = true;
             castInfos.glyphId = this.ID;
-            if (EffectBase.tryApplyEffect(castInfos) == -3) {
+            final int result = EffectBase.tryApplyEffect(castInfos);
+            if(result < bestResult){
+                bestResult = result;
+            }
+            if (result == -3) {
                 targetsPerEffect.clear();
                 targets.clear();
                 activator.getFight().endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-                return -3;
+                return result;
             }
             targetsPerEffect.clear();
 
@@ -81,7 +86,7 @@ public class FightGlyph extends FightActivableObject {
         targets.clear();
 
         activator.getFight().endSequence(SequenceTypeEnum.SEQUENCE_GLYPH_TRAP);
-        return -1;
+        return bestResult;
     }
 
     @Override

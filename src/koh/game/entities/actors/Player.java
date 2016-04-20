@@ -48,10 +48,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -128,7 +125,7 @@ public class Player extends IGameActor implements Observer {
     private PlayerStatusEnum status;
     @Setter
     @Getter
-    private HashMap<ScoreType, Integer> scores;
+    private LinkedHashMap<ScoreType, Integer> scores;
     @Setter
     @Getter
     private int chance, life, vitality, wisdom, strength, intell, agility;
@@ -315,7 +312,7 @@ public class Player extends IGameActor implements Observer {
 
     public HashMap<ScoreType, Integer> getScores() {
         if (this.scores == null)
-            this.scores = new HashMap<>(8);
+            this.scores = new LinkedHashMap<>(8);
         return this.scores;
     }
 

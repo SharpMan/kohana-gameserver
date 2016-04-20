@@ -148,6 +148,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.SUB_DODGE_PA_PROBABILITY, new EffectStats());
             this.put(StatsEnum.SUB_DODGE_PM_PROBABILITY, new EffectStats());
             this.put(StatsEnum.ADD_DAMAGE_PHYSIC, new EffectStats());
+            this.put(StatsEnum.SPELL_POWER, new EffectStats());
 
             this.put(StatsEnum.SUB_PA_ESQUIVE_2, new EffectSubPAEsquive());
             this.put(StatsEnum.SUB_PA_ESQUIVE, new EffectSubPAEsquive());
@@ -158,6 +159,8 @@ public abstract class EffectBase {
             this.put(StatsEnum.DAMMAGES_OCASSIONED, new EffectDammageOcassioned());
             this.put(StatsEnum.REDUCE_FINAl_DAMAGE_PERCENT, new EffectDamagePercentReduced());
             this.put(StatsEnum.INCREASE_FINAL_DAMAGES_PERCENT, new EffectDammageOcassioned());
+            //this.put(StatsEnum.SPELL_POWER, new EffectSpellPower());
+
 
 
             //Enleve les effets du sort
@@ -189,7 +192,7 @@ public abstract class EffectBase {
 
             this.put(StatsEnum.PROSPECTING, new EffectStats());
             this.put(StatsEnum.ADD_DAMAGE_MAGIC, new EffectStats());
-            this.put(StatsEnum.ADD_DAMAGE_FINAL_PERCENT, new EffectStats());
+            this.put(StatsEnum.WEAPON_DAMAGE_PERCENT, new EffectStats());
             this.put(StatsEnum.ADD_PUSH_DAMAGES_BONUS, new EffectStats());
             this.put(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION, new EffectStats());
             this.put(StatsEnum.ADD_CRITICAL_DAMAGES, new EffectStats());
@@ -250,8 +253,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.DAMAGE_RETURN, new EffectStats());
             this.put(StatsEnum.SUB_CRITICAL_HIT, new EffectStats());
             this.put(StatsEnum.ADD_GLOBAL_DAMAGE_REDUCTION, new EffectStats());
-            this.put(StatsEnum.ADD_DAMAGE_FINAL_PERCENT, new EffectStats());
-            this.put(StatsEnum.SUB_DAMAGE_BONUS_PERCENT, new EffectStats());
+            this.put(StatsEnum.WEAPON_DAMAGE_PERCENT, new EffectStats());
             this.put(StatsEnum.ADD_DAMAGE_PERCENT, new EffectStats());
             this.put(StatsEnum.ADD_SUMMON_LIMIT, new EffectStats());
             this.put(StatsEnum.ADD_DAMAGE_MAGIC, new EffectStats());

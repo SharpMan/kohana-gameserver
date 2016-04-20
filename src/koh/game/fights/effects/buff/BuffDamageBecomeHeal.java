@@ -15,7 +15,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class BuffDamageBecomeHeal extends BuffEffect {
 
     public BuffDamageBecomeHeal(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
     }
 
     @Override

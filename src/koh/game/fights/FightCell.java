@@ -64,13 +64,13 @@ public class FightCell {
     }
     
     public int endTurn(Fighter fighter){
-        for (IFightObject Object : myFightObjects) {
-            if (Object instanceof FightActivableObject) {
-                FightActivableObject activableObject = (FightActivableObject) Object;
+        for (IFightObject object : myFightObjects) {
+            if (object instanceof FightActivableObject) {
+                final FightActivableObject activableObject = (FightActivableObject) object;
                 if (activableObject.activationType == BuffActiveType.ACTIVE_ENDTURN || activableObject instanceof FightBomb) {
                     activableObject.loadTargets(fighter);
-                    int Result = activableObject.activate(fighter,BuffActiveType.ACTIVE_ENDTURN);
-                    if(Result == -3){
+                    final int result = activableObject.activate(fighter,BuffActiveType.ACTIVE_ENDTURN);
+                    if(result == -3){
                         return -3;
                     }
                 }

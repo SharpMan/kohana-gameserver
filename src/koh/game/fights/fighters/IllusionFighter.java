@@ -12,9 +12,7 @@ import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
 import koh.protocol.messages.game.actions.fight.GameActionFightVanishMessage;
 import koh.protocol.types.game.context.GameContextActorInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberCharacterInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
-import koh.protocol.types.game.context.fight.GameFightCharacterInformations;
+import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.look.EntityLook;
 
 /**
@@ -49,7 +47,7 @@ public class IllusionFighter extends StaticFighter {
         myCell.removeObject(this);
 
         if (!this.team.getAliveFighters().anyMatch(teamMate -> teamMate instanceof IllusionFighter && teamMate.getSummonerID() == this.getSummonerID())) {
-            summoner.asPlayer().onCloneCleared();
+            summoner.asPlayer().onCloneDisposed();
         }
 
         if (this.fight.tryEndFight()) {
@@ -74,6 +72,11 @@ public class IllusionFighter extends StaticFighter {
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
         return new GameFightCharacterInformations(this.ID, this.getEntityLook(), this.getEntityDispositionInformations(character), this.team.id, this.wave, this.isAlive(), this.getGameFightMinimalStats(character), this.previousPositions, summoner.getPlayer().getNickName(), summoner.getPlayer().getPlayerStatus(), (byte) this.getLevel(), summoner.getPlayer().getActorAlignmentInformations(), summoner.getPlayer().getBreed(), summoner.getPlayer().hasSexe());
+    }
+
+    @Override
+    public GameFightFighterLightInformations getGameFightFighterLightInformations() {
+        return new GameFightFighterNamedLightInformations(this.ID,wave, getLevel(), summoner.getPlayer().getBreed(), summoner.getPlayer().hasSexe(), isAlive(), summoner.getPlayer().getNickName());
     }
 
     @Override

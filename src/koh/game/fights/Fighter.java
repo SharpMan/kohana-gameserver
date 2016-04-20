@@ -27,10 +27,7 @@ import koh.protocol.types.game.context.EntityDispositionInformations;
 import koh.protocol.types.game.context.FightEntityDispositionInformations;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.IdentifiedEntityDispositionInformations;
-import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
-import koh.protocol.types.game.context.fight.GameFightFighterInformations;
-import koh.protocol.types.game.context.fight.GameFightMinimalStats;
-import koh.protocol.types.game.context.fight.GameFightMinimalStatsPreparation;
+import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
 import lombok.Setter;
@@ -105,6 +102,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     @Getter
     @Setter
     protected boolean turnReady = true;
+    public Object temperoryLook = new Object();
+    @Getter @Setter
+    private short lastCellSeen;
 
     /**
      * Virtual Method
@@ -112,7 +112,6 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public void endFight() {
 
     }
-
     public MapPoint getMapPoint() {
         return mapPointCache;
     }
@@ -237,6 +236,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int tryDie(int casterId) {
         return tryDie(casterId, false);
     }
+
+    public abstract GameFightFighterLightInformations getGameFightFighterLightInformations();
 
     public int tryDie(int casterId, boolean force) {
         /*if (force) {
@@ -445,11 +446,11 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId(), true)) {
+        for (Fighter tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId(), true)) {
             if (num1 == 0.0) {
-                num1 = this.getTacklePercent(Tackler);
+                num1 = this.getTacklePercent(tackler);
             } else {
-                num1 *= this.getTacklePercent(Tackler);
+                num1 *= this.getTacklePercent(tackler);
             }
         }
         if (num1 == 0.0) {
@@ -514,12 +515,12 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter Tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId())) {
+        for (Fighter tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId())) {
             {
                 if (num1 == 0.0) {
-                    num1 = this.getTacklePercent(Tackler);
+                    num1 = this.getTacklePercent(tackler);
                 } else {
-                    num1 *= this.getTacklePercent(Tackler);
+                    num1 *= this.getTacklePercent(tackler);
                 }
             }
         }
@@ -545,7 +546,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     @Override
     public EntityDispositionInformations getEntityDispositionInformations(Player character) {
-        return new FightEntityDispositionInformations(character != null ? (this.isVisibleFor(character) ? this.getCellId() : -1) : this.getCellId(), this.direction, getCarrierActorId());
+        return new FightEntityDispositionInformations(character == null || this.isVisibleFor(character) ? this.getCellId() : -1, this.direction, getCarrierActorId());
     }
 
     public int getCarrierActorId() {
@@ -565,6 +566,16 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public boolean isVisibleFor(Player character) {
         return this.getVisibleStateFor(character) != GameActionFightInvisibilityStateEnum.INVISIBLE.value;
+    }
+
+    public boolean isVisibleFor(Fighter fighter){
+        if (this.team.getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner.getID() == this.ID)) {
+            return true;
+        } else if (fighter == null) {
+            return this.visibleState != GameActionFightInvisibilityStateEnum.INVISIBLE;
+        } else {
+            return !fighter.isFriendlyWith(this) || this.visibleState == GameActionFightInvisibilityStateEnum.VISIBLE ? this.visibleState != GameActionFightInvisibilityStateEnum.INVISIBLE : true;
+        }
     }
 
 
@@ -597,10 +608,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (this.fight.getFightState() == FightState.STATE_PLACE) {
             return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.VITALITY), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
         }
-        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), (int) this.stats.getBase(StatsEnum.VITALITY), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
+        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), this.stats.getBase(StatsEnum.VITALITY), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
     }
 
-    public IdentifiedEntityDispositionInformations GetIdentifiedEntityDispositionInformations() {
+    public IdentifiedEntityDispositionInformations getIdentifiedEntityDispositionInformations() {
         return new IdentifiedEntityDispositionInformations(this.getCellId(), this.direction, this.ID);
     }
 
@@ -748,9 +759,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public void calculBonusDamages(EffectInstanceDice effect, MutableInt jet, short castCell, short targetCell, short truedCell) {
 
-        double bonus = this.stats.getTotal(StatsEnum.ADD_DAMAGE_FINAL_PERCENT);
+        //double bonus = 0;
 
-        bonus += getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.zoneSize() != -100000 ? effect.zoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
+        double bonus = getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.zoneSize() != -100000 ? effect.zoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
         bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
 

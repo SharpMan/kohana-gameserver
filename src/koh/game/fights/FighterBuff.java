@@ -92,7 +92,7 @@ public class FighterBuff {
 
     //Le -1 definie l'infini
     public int beginTurn() {
-        MutableInt Damage = new MutableInt(0);
+        final MutableInt damage = new MutableInt(0);
         for (Couple<EffectCast, Integer> EffectCast : this.delayedEffects) {
             EffectCast.second--;
             if (EffectCast.second <= 0) {
@@ -118,7 +118,7 @@ public class FighterBuff {
          }
          }*/
         for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_BEGINTURN)) {
-            if (Buff.applyEffect(Damage, null) == -3) {
+            if (Buff.applyEffect(damage, null) == -3) {
                 return -3;
             }
         }

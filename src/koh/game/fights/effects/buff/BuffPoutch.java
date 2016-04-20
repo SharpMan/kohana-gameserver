@@ -60,20 +60,24 @@ public class BuffPoutch extends BuffEffect {
         double num1 = Fight.RANDOM.nextDouble();
         double num2 = (double) Arrays.stream(SpellLevel.getEffects()).mapToInt(x -> x.random).sum();
         boolean flag = false;
-        for (EffectInstanceDice Effect : SpellLevel.getEffects()) {
-            logger.debug(Effect.toString());
+        for (EffectInstanceDice effect : SpellLevel.getEffects()) {
+            if(effect.getEffectType() == StatsEnum.POUTCH || effect.getEffectType() == StatsEnum.REFOULLAGE || effect.getEffectType() == StatsEnum.TRANSKO){
+                logger.error(effect.toString() +" "+castInfos.effect.diceNum);
+                logger.info(effect.toString() +" "+castInfos.effect.diceNum);
+            }
+            logger.debug(effect.toString());
             final ArrayList<Fighter> targets = new ArrayList<>();
-            for (short Cell : (new Zone(Effect.getZoneShape(), Effect.zoneSize(), MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true), this.caster.getFight().getMap())).getCells(target.getCellId())) {
+            for (short Cell : (new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(target.getCellId()).advancedOrientationTo(MapPoint.fromCellId(target.getCellId()), true), this.caster.getFight().getMap())).getCells(target.getCellId())) {
                 final FightCell FightCell = target.getFight().getCell(Cell);
                 if (FightCell != null) {
                     for (final Fighter target2 : FightCell.getObjectsAsFighter()) {
                             if (castInfos.spellId == 2809 && target2 == target) {
                                 continue;
                             }
-                            if (Effect.isValidTarget(this.target, target2) && EffectInstanceDice.verifySpellEffectMask(this.target, target2, Effect,target2.getID())) {
-                                if (Effect.targetMask.equals("C") && this.target.getCarrierActorId() == target2.getID()) {
+                            if (effect.isValidTarget(this.target, target2) && EffectInstanceDice.verifySpellEffectMask(this.target, target2, effect,target2.getID())) {
+                                if (effect.targetMask.equals("C") && this.target.getCarrierActorId() == target2.getID()) {
                                     continue;
-                                } else if (Effect.targetMask.equals("a,A") && this.target.getCarrierActorId() != 0 & this.target.getID() == target2.getID()) {
+                                } else if (effect.targetMask.equals("a,A") && this.target.getCarrierActorId() != 0 & this.target.getID() == target2.getID()) {
                                     continue;
                                 }
                                 targets.add(target2);
@@ -87,10 +91,10 @@ public class BuffPoutch extends BuffEffect {
                 targets.clear();
                 targets.add(DamageInfos.caster);
             }
-            if (Effect.random > 0) {
+            if (effect.random > 0) {
                 if (!flag) {
-                    if (num1 > (double) Effect.random / num2) {
-                        num1 -= (double) Effect.random / num2;
+                    if (num1 > (double) effect.random / num2) {
+                        num1 -= (double) effect.random / num2;
                         continue;
                     } else {
                         flag = true;
@@ -99,7 +103,7 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            final EffectCast cast = new EffectCast(Effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, Effect, this.target, targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            final EffectCast cast = new EffectCast(effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, effect, this.target, targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
             cast.targetKnownCellId = target.getCellId();
             if (EffectBase.tryApplyEffect(cast) == -3) {
                 return -3;

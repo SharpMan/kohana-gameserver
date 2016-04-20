@@ -20,7 +20,9 @@ import static koh.protocol.client.enums.AggressableStatusEnum.NON_AGGRESSABLE;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.FightOptionsEnum;
 import koh.protocol.client.enums.FighterRefusedReasonEnum;
+import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
+import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.GameContextKickMessage;
 import koh.protocol.messages.game.context.GameContextQuitMessage;
 import koh.protocol.messages.game.context.fight.GameFightJoinRequestMessage;
@@ -96,27 +98,30 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = 255)
-    public static void HandleGameContextQuitMessage(WorldClient Client, GameContextQuitMessage Message) {
-        if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.getCharacter().getFight().leaveFight(Client.getCharacter().getFighter());
+    public static void HandleGameContextQuitMessage(WorldClient client, GameContextQuitMessage Message) {
+        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            if(client.getCharacter().getFighter() != null)
+                client.getCharacter().getFight().leaveFight(client.getCharacter().getFighter());
+            else
+                client.getCharacter().getFight().leaveSpectator(client);
         } else {
-
+            client.send(new BasicNoOperationMessage());
         }
     }
 
     @HandlerAttribute(ID = 708)
-    public static void HandleGameFightReadyMessage(WorldClient Client, GameFightReadyMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleGameFightReadyMessage(WorldClient client, GameFightReadyMessage message) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
-            Client.send(new BasicNoOperationMessage());
+        if (client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        Client.getCharacter().getFight().setFighterReady(Client.getCharacter().getFighter());
+        client.getCharacter().getFight().setFighterReady(client.getCharacter().getFighter());
     }
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsRequestMessage.M_ID)
@@ -187,29 +192,33 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = GameFightJoinRequestMessage.M_ID)
-    public static void HandleGameFightJoinRequestMessage(WorldClient Client, GameFightJoinRequestMessage Message) {
-        Fight Fight = Client.getCharacter().getCurrentMap().getFight(Message.fightId);
-        if (Fight == null) {
-            Client.send(new BasicNoOperationMessage());
-        } else if (Fight.getFightState() != FightState.STATE_PLACE) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleGameFightJoinRequestMessage(WorldClient client, GameFightJoinRequestMessage message) {
+        final Fight fight = client.getCharacter().getCurrentMap().getFight(message.fightId);
+        if (fight == null) {
+            client.send(new BasicNoOperationMessage());
+        } else if (fight.getFightState() != FightState.STATE_PLACE) {
+            if(fight.canJoinSpectator()){
+                fight.joinFightSpectator(client);
+            }else{
+                client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,57));
+            }
         } else {
-            FightTeam Team = Fight.getTeam(Message.fighterId);
-            if (Team == null) { //Ne doit pas arriver
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.getCharacter().getID(), FighterRefusedReasonEnum.JUST_RESPAWNED));
+            final FightTeam team = fight.getTeam(message.fighterId);
+            if (team == null) { //Ne doit pas arriver
+                client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.JUST_RESPAWNED));
                 return;
             }
-            FighterRefusedReasonEnum Answer = Fight.canJoin(Team, Client.getCharacter());
-            if (Answer == FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
-                Fighter Fighter = new CharacterFighter(Fight, Client);
+            final FighterRefusedReasonEnum answer = fight.canJoin(team, client.getCharacter());
+            if (answer == FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
+                Fighter Fighter = new CharacterFighter(fight, client);
 
-                GameAction FightAction = new GameFight(Fighter, Fight);
+                GameAction FightAction = new GameFight(Fighter, fight);
 
-                Client.addGameAction(FightAction);
+                client.addGameAction(FightAction);
 
-                Fight.joinFightTeam(Fighter, Team, false, (short) -1, true);
+                fight.joinFightTeam(Fighter, team, false, (short) -1, true);
             } else {
-                Client.send(new ChallengeFightJoinRefusedMessage(Client.getCharacter().getID(), Answer));
+                client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), answer));
             }
         }
     }

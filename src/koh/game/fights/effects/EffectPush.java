@@ -167,7 +167,7 @@ public class EffectPush extends EffectBase {
         final MutableInt damageValue = new MutableInt(pushDmg);
         //MutableInt damageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 
-        final EffectCast subInfos = new EffectCast(StatsEnum.DamageBrut, CastInfos.spellId, CastInfos.cellId, 0, null, target, null, false, StatsEnum.NONE, 0, null);
+        final EffectCast subInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, CastInfos.spellId, CastInfos.cellId, 0, null, target, null, false, StatsEnum.NONE, 0, null);
 
 
         return EffectDamage.applyDamages(subInfos, target, damageValue);

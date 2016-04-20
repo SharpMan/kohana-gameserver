@@ -183,14 +183,14 @@ public class ContextHandler {
         }
 
         if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            MovementPath path = Pathfunction.isValidPath(client.getCharacter().getFight(), client.getCharacter().getFighter(), client.getCharacter().getFighter().getCellId(), client.getCharacter().getFighter().getDirection(), message.keyMovements);
+            final MovementPath path = Pathfunction.isValidPath(client.getCharacter().getFight(), client.getCharacter().getFighter(), client.getCharacter().getFighter().getCellId(), client.getCharacter().getFighter().getDirection(), message.keyMovements);
             if (path != null) {
                 if (client.getCharacter().getFighter().isDead()) {
                     client.send(new BasicNoOperationMessage());
                     client.getCharacter().getFight().endTurn();
                     return;
                 }
-                GameMapMovement GameMovement = client.getCharacter().getFight().tryMove(client.getCharacter().getFighter(), path);
+                final GameMapMovement GameMovement = client.getCharacter().getFight().tryMove(client.getCharacter().getFighter(), path);
 
                 if (GameMovement != null) {
                     GameMovement.execute();

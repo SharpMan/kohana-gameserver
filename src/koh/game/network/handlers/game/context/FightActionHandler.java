@@ -16,15 +16,19 @@ import koh.protocol.messages.game.actions.fight.GameActionFightCastRequestMessag
 public class FightActionHandler {
 
     @HandlerAttribute(ID = GameActionFightCastOnTargetRequestMessage.M_ID)
-    public static void HandleGameActionFightCastOnTargetRequestMessage(WorldClient Client, GameActionFightCastOnTargetRequestMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleGameActionFightCastOnTargetRequestMessage(WorldClient client, GameActionFightCastOnTargetRequestMessage message) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        SpellLevel spell = Client.getCharacter().getMySpells().getSpellLevel(Message.spellId);
-        Fighter Fighter = Client.getCharacter().getFight().getFighter(Message.targetId);
-        if (spell != null && Fighter != null) {
-            Client.getCharacter().getFight().launchSpell(Client.getCharacter().getFighter(), spell, Fighter.getCellId(), true);
+        final SpellLevel spell = client.getCharacter().getMySpells().getSpellLevel(message.spellId);
+        final Fighter fighter = client.getCharacter().getFight().getFighter(message.targetId);
+        if (spell != null && fighter != null) {
+            if(!fighter.isVisibleFor(client.getCharacter())){
+                client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), spell, fighter.getLastCellSeen(), true);
+                return;
+            }
+            client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), spell, fighter.getCellId(), true);
         }
     }
 

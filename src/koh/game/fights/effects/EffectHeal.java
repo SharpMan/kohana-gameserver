@@ -3,6 +3,7 @@ package koh.game.fights.effects;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffHeal;
 import koh.protocol.client.enums.ActionIdEnum;
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMessage;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
@@ -22,11 +23,13 @@ public class EffectHeal extends EffectBase {
     }
 
     public static int applyHeal(EffectCast castInfos, Fighter target, MutableInt heal, boolean calculate) {
-        Fighter Caster = castInfos.caster;
+        if(target.hasState(FightStateEnum.INSOIGNABLE.value)){
+            return -1;
+        }
 
         // boost soin etc
         if (calculate) {
-            Caster.calculheal(heal);
+            castInfos.caster.calculheal(heal);
         }
         
         if (target.getBuff().onHealPostJet(castInfos, heal) == -3) {
@@ -46,10 +49,10 @@ public class EffectHeal extends EffectBase {
 
         // Envoi du packet
         if(heal.getValue() != 0)
-            target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), target.getID(), Math.abs(heal.getValue())));
+            target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, castInfos.caster.getID(), target.getID(), Math.abs(heal.getValue())));
 
         // Le soin entraine la fin du combat ?
-        return target.tryDie(Caster.getID());
+        return target.tryDie(castInfos.caster.getID());
     }
 
     @Override

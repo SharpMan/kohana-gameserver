@@ -4,6 +4,8 @@ import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.types.game.context.fight.GameFightFighterLightInformations;
+import koh.protocol.types.game.context.fight.GameFightFighterMonsterLightInformations;
 import koh.utils.Enumerable;
 import lombok.Getter;
 
@@ -59,6 +61,11 @@ public abstract class StaticFighter extends Fighter {
             this.fight.affectSpellTo(this, this, this.grade.getGrade(), this.grade.getMonster().getSpells());
             this.firstTurn = false;
         }
+    }
+
+    @Override
+    public GameFightFighterLightInformations getGameFightFighterLightInformations() {
+        return new GameFightFighterMonsterLightInformations(getID(), wave, getLevel(), (byte) 0, false, isAlive(), grade.getMonsterId());
     }
 
     @Override

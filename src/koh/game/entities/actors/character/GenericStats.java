@@ -69,7 +69,7 @@ public class GenericStats {
             put(StatsEnum.SUB_PVP_NEUTRAL_RESIST_PERCENT, StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT);
             put(StatsEnum.SUB_HEAL_BONUS, StatsEnum.ADD_HEAL_BONUS);
             put(StatsEnum.SUB_CHANCE, StatsEnum.CHANCE);
-            put(StatsEnum.SUB_DAMAGE_BONUS_PERCENT, StatsEnum.ADD_DAMAGE_FINAL_PERCENT);
+            put(StatsEnum.SUB_DAMAGE_BONUS_PERCENT, StatsEnum.ADD_DAMAGE_PERCENT);
         }
     };
 

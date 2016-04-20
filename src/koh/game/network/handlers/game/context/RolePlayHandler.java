@@ -1,16 +1,12 @@
 package koh.game.network.handlers.game.context;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.MonsterGroup;
 import koh.game.fights.Fight;
+import koh.game.fights.Fighter;
 import koh.game.fights.types.MonsterFight;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
@@ -20,19 +16,23 @@ import koh.protocol.client.enums.StatsUpgradeResultEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.connection.StatsUpgradeRequestMessage;
 import koh.protocol.messages.game.character.stats.UpdateLifePointsMessage;
-import koh.protocol.messages.game.context.roleplay.ChangeMapMessage;
-import koh.protocol.messages.game.context.roleplay.MapRunningFightListMessage;
-import koh.protocol.messages.game.context.roleplay.MapRunningFightListRequestMessage;
+import koh.protocol.messages.game.context.roleplay.*;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayMessage;
 import koh.protocol.messages.game.context.roleplay.emote.EmotePlayRequestMessage;
 import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayAttackMonsterRequestMessage;
 import koh.protocol.messages.game.context.roleplay.stats.StatsUpgradeResultMessage;
+import koh.protocol.types.game.context.fight.FightExternalInformations;
+import koh.protocol.types.game.context.fight.GameFightFighterLightInformations;
 import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- *
  * @author Neo-Craft
  */
 @Log4j2
@@ -50,24 +50,43 @@ public class RolePlayHandler {
         }
     };
 
-    @HandlerAttribute(ID = MapRunningFightListRequestMessage.M_ID)
-    public static void handleMapRunningFightListRequestMessage(WorldClient client, MapRunningFightListRequestMessage message){
-        client.send(new MapRunningFightListMessage());
+    @HandlerAttribute(ID = MapRunningFightDetailsRequestMessage.M_ID)
+    public static void handleMapRunningFightDetailsRequestMessage(WorldClient client, MapRunningFightDetailsRequestMessage message) {
+        final Fight fight = client.getCharacter().getCurrentMap().getFight(message.fightId);
+        if (fight == null) {
+            client.send(new BasicNoOperationMessage());
+            return;
+        }
+        client.send(new MapRunningFightDetailsMessage(
+                fight.getFightId(),
+                fight.getTeam1().getFighters()
+                        .filter(fr -> !(fr.hasSummoner() && !fr.isDead()))
+                        .map(Fighter::getGameFightFighterLightInformations)
+                        .toArray(GameFightFighterLightInformations[]::new),
+                fight.getTeam2().getFighters()
+                        .filter(fr -> !(fr.hasSummoner() && !fr.isDead()))
+                        .map(Fighter::getGameFightFighterLightInformations)
+                        .toArray(GameFightFighterLightInformations[]::new)
+        ));
+    }
 
+    @HandlerAttribute(ID = MapRunningFightListRequestMessage.M_ID)
+    public static void handleMapRunningFightListRequestMessage(WorldClient client, MapRunningFightListRequestMessage message) {
+        client.send(new MapRunningFightListMessage(client.getCharacter().getCurrentMap().getFights().parallelStream().map(f -> f.getFightExternalInformations(client.getCharacter())).toArray(FightExternalInformations[]::new)));
     }
 
     @HandlerAttribute(ID = GameRolePlayAttackMonsterRequestMessage.M_ID)
-    public static void handleGameRolePlayAttackMonsterRequestMessage(WorldClient client , GameRolePlayAttackMonsterRequestMessage message){
-        if(client.isGameAction(GameActionTypeEnum.FIGHT) || !client.canGameAction(GameActionTypeEnum.FIGHT)){
-            PlayerController.sendServerMessage(client,"Impossible : Vous êtes occupé(e)");
-        }else {
+    public static void handleGameRolePlayAttackMonsterRequestMessage(WorldClient client, GameRolePlayAttackMonsterRequestMessage message) {
+        if (client.isGameAction(GameActionTypeEnum.FIGHT) || !client.canGameAction(GameActionTypeEnum.FIGHT)) {
+            PlayerController.sendServerMessage(client, "Impossible : Vous êtes occupé(e)");
+        } else {
             final IGameActor target = client.getCharacter().getCurrentMap().getActor(message.monsterGroupId);
-            if(target == null || ! (target instanceof MonsterGroup)){
+            if (target == null || !(target instanceof MonsterGroup)) {
                 client.send(new BasicNoOperationMessage());
                 return;
             }
             client.abortGameActions();
-            final Fight fight = new MonsterFight(client.getCharacter().getCurrentMap(), client,(MonsterGroup) target);
+            final Fight fight = new MonsterFight(client.getCharacter().getCurrentMap(), client, (MonsterGroup) target);
             client.getCharacter().getCurrentMap().addFight(fight);
         }
 
@@ -75,24 +94,24 @@ public class RolePlayHandler {
 
     @HandlerAttribute(ID = EmotePlayRequestMessage.MESSAGE_ID)
     public static void EmotePlayRequestMessage(WorldClient client, EmotePlayRequestMessage message) {
-        if(client.isGameAction(GameActionTypeEnum.FIGHT)){
+        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
             client.send(new BasicNoOperationMessage());
             return;
         }
-        if(message.emoteId == 1 || message.emoteId == 19){
-            if(client.getCharacter().getRegenRate() != 5) {
+        if (message.emoteId == 1 || message.emoteId == 19) {
+            if (client.getCharacter().getRegenRate() != 5) {
                 client.getCharacter().stopRegen();
                 client.getCharacter().setRegenRate((byte) 5);
                 client.getCharacter().updateRegenedLife(false);
-                client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(),client.getCharacter().getMaxLife()));
+                client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(), client.getCharacter().getMaxLife()));
             }
             client.getCharacter().removeHumanOption(HumanOptionEmote.class);
-            client.getCharacter().getHumanInformations().options = ArrayUtils.add(client.getCharacter().getHumanInformations().options, new HumanOptionEmote(message.emoteId,Instant.now().toEpochMilli()));
-         }else if(client.getCharacter().getRegenRate() == 5){
+            client.getCharacter().getHumanInformations().options = ArrayUtils.add(client.getCharacter().getHumanInformations().options, new HumanOptionEmote(message.emoteId, Instant.now().toEpochMilli()));
+        } else if (client.getCharacter().getRegenRate() == 5) {
             client.getCharacter().removeHumanOption(HumanOptionEmote.class);
             client.getCharacter().stopRegen();
             client.getCharacter().updateRegenedLife(true);
-            client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(),client.getCharacter().getMaxLife()));
+            client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(), client.getCharacter().getMaxLife()));
         }
         client.getCharacter().getCurrentMap().sendToField(new EmotePlayMessage(message.emoteId, Instant.now().getEpochSecond(), client.getCharacter().getID(), client.getAccount().id));
     }
@@ -100,7 +119,7 @@ public class RolePlayHandler {
 
     @HandlerAttribute(ID = StatsUpgradeRequestMessage.MESSAGE_ID)
     public static void HandleStatsUpgradeRequestMessage(WorldClient client, StatsUpgradeRequestMessage message) {
-        if(client.isGameAction(GameActionTypeEnum.FIGHT)){
+        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
             PlayerController.sendServerMessage(client, "Tes statistiques ne seront affectés qu'aprés la fin du combat.");
         }
         if (message.useAdditionnal) {
@@ -108,7 +127,7 @@ public class RolePlayHandler {
             PlayerController.sendServerMessage(client, "Not implanted yet");
             return;
         }
-        StatsEnum Stat = BOOST_ID_TO_STATS.get((int)message.statId);
+        StatsEnum Stat = BOOST_ID_TO_STATS.get((int) message.statId);
         if (Stat == null) {
             log.error("Wrong statsid {}", message.statId);
             return;
@@ -170,7 +189,7 @@ public class RolePlayHandler {
                 client.getCharacter().setAgility(base);
                 break;
         }
-        client.getCharacter().addStatPoints(- (int) message.boostPoint - num1);
+        client.getCharacter().addStatPoints(-(int) message.boostPoint - num1);
         client.send(new StatsUpgradeResultMessage(StatsUpgradeResultEnum.SUCCESS, message.boostPoint));
         client.getCharacter().refreshStats();
     }
@@ -194,7 +213,7 @@ public class RolePlayHandler {
             client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[3].getMapid() : Message.mapId, client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[3].getCellid() : (client.getCharacter().getCell().getId() - 13));
         } else {
             // Client.getCharacter().teleport(Message.mapId, -1);
-            log.error("client {} teleport from {} to {}" ,client.getCharacter().getNickName(),client.getCharacter().getCurrentMap().getId(), Message.mapId);
+            log.error("client {} teleport from {} to {}", client.getCharacter().getNickName(), client.getCharacter().getCurrentMap().getId(), Message.mapId);
             client.send(new BasicNoOperationMessage());
             //System.out.println("undefinied map");
         }

@@ -5,15 +5,11 @@
  */
 package koh.game.fights;
 
+import koh.game.entities.actors.Player;
+import koh.game.entities.actors.character.FieldNotification;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.DoubleFighter;
 import koh.game.fights.fighters.MonsterFighter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
-import koh.game.entities.actors.Player;
-import koh.game.entities.actors.character.FieldNotification;
 import koh.game.fights.utils.SwapPositionRequest;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.AlignmentSideEnum;
@@ -22,10 +18,15 @@ import koh.protocol.client.enums.FighterRefusedReasonEnum;
 import koh.protocol.client.enums.TeamTypeEnum;
 import koh.protocol.types.game.context.fight.FightOptionsInformations;
 import koh.protocol.types.game.context.fight.FightTeamInformations;
+import koh.protocol.types.game.context.fight.FightTeamLightInformations;
 import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
 /**
- *
  * @author Neo-Craft
  */
 public class FightTeam {
@@ -47,6 +48,7 @@ public class FightTeam {
     public Fighter leader;
     public Fight fight;
     public ArrayList<SwapPositionRequest> swapRequests = new ArrayList<>(2);
+    //private TeamTypeEnum teamType; //TODO
 
     public FightTeam(byte Id, Fight f) {
         this.id = Id;
@@ -69,10 +71,10 @@ public class FightTeam {
         return this.myFighters.stream().filter(x -> !x.isAlive());
     }
 
-    public Stream<MonsterFighter> getAsMonster(){
+    public Stream<MonsterFighter> getAsMonster() {
         return this.getFighters()
                 .filter(fr -> fr instanceof MonsterFighter)
-                .map(fr -> ((MonsterFighter)fr));
+                .map(fr -> ((MonsterFighter) fr));
     }
 
     public FighterRefusedReasonEnum canJoin(Player Character) {
@@ -133,21 +135,21 @@ public class FightTeam {
         return this.myFighters.stream().anyMatch(x -> x.isAlive());
     }
 
-    public int getLevel(){
+    public int getLevel() {
         return this.myFighters.stream()
                 .mapToInt(fr -> fr.getLevel())
                 .sum();
     }
 
-    public void toggle(FightOptionsEnum ToggleType, boolean Value) {
+    public void toggle(FightOptionsEnum toggleType, boolean value) {
         synchronized (this.myToggleLocks) {
-            this.myToggleLocks.put(ToggleType, Value);
+            this.myToggleLocks.put(toggleType, value);
         }
     }
 
-    public boolean isToggled(FightOptionsEnum ToggleType) {
+    public boolean isToggled(FightOptionsEnum toggleType) {
         synchronized (this.myToggleLocks) {
-            return this.myToggleLocks.get(ToggleType);
+            return this.myToggleLocks.get(toggleType);
         }
     }
 
@@ -182,5 +184,23 @@ public class FightTeam {
     public synchronized int getNextRequestId() {
         return swapRequests.stream().mapToInt(x -> x.requestId).max().orElse(0);
     }
+
+    public FightTeamLightInformations getFightTeamLightInformations(Player visitor) {
+        //byte teamId, int leaderId, byte teamSide, byte teamTypeId, byte nbWaves, byte teamMembersCount, int meanLevel, boolean hasFriend, boolean hasGuildMember, boolean hasAllianceMember, boolean hasGroupMember, boolean hasMyTaxCollector
+        return new FightTeamLightInformations(this.id,
+                this.leaderId,
+                this.alignmentSide.value,
+                getTeamType(),
+                leader.wave,
+                (byte) this.myFighters.size(),
+                (int) this.getFighters().mapToInt(Fighter::getLevel).average().orElse(0),
+                this.getFighters().filter(fr -> fr instanceof CharacterFighter).map(Fighter::getPlayer).anyMatch(pl -> pl.getAccount() != null && pl.getAccount().accountData.hasFriend(visitor.getOwner())),
+                this.getFighters().filter(fr -> fr instanceof CharacterFighter).map(Fighter::getPlayer).anyMatch(pl -> pl.getGuild() == visitor.getGuild()),
+                false,
+                this.getFighters().filter(fr -> fr instanceof CharacterFighter).map(Fighter::getPlayer).anyMatch(pl -> visitor.getClient().getParty() != null && visitor.getClient().getParty().containsPlayer(pl)),
+                false
+        );
+    }
+
 
 }

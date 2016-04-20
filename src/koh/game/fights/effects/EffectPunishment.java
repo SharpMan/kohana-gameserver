@@ -138,7 +138,7 @@ public class EffectPunishment extends EffectBase {
                         reflectDamage.setValue(damageJet.getValue());
                     }
 
-                    EffectCast SubInfos = new EffectCast(StatsEnum.DamageBrut, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
+                    EffectCast SubInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, 0, (short) 0, 0, null, target, null, false, StatsEnum.NONE, 0, null);
                     SubInfos.isReflect = true;
 
                     // Si le renvoi de dommage entraine la fin de combat on stop

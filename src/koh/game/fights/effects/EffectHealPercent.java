@@ -34,27 +34,27 @@ public class EffectHealPercent extends EffectBase {
         return -1;
     }
 
-    public static int ApplyHealPercent(EffectCast CastInfos, Fighter Target, int Heal) {
+    public static int ApplyHealPercent(EffectCast CastInfos, Fighter Target, int heal) {
         Fighter Caster = CastInfos.caster;
 
         // boost soin etc
-        Heal = Heal * (Target.getLife() / 100);
+        heal = heal * (Target.getLife() / 100);
 
         // Si le soin est superieur a sa vie actuelle
-        if ((Target.getLife() + Heal) > Target.getMaxLife()) {
-            Heal = Target.getMaxLife() - Target.getLife();
+        if ((Target.getLife() + heal) > Target.getMaxLife()) {
+            heal = Target.getMaxLife() - Target.getLife();
         }
 
-        if (Heal < 0) {
-            Heal = 0;
+        if (heal < 0) {
+            heal = 0;
         }
 
         // Affectation
-        Target.setLife(Target.getLife() + Heal);
+        Target.setLife(Target.getLife() + heal);
 
         // Envoi du packet
-        if (Heal != 0) {
-            Target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), Heal));
+        if (heal != 0) {
+            Target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), heal));
         }
 
         // Le soin entraine la fin du combat ?
