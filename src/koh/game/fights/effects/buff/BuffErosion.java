@@ -39,7 +39,7 @@ public class BuffErosion extends BuffEffect {
 
     @Override
     public int removeEffect(){
-        this.target.setLifeMax(this.target.getMaxLife() + score);
+        //this.target.setLifeMax(this.target.getMaxLife() + score);
         return super.removeEffect();
     }
 

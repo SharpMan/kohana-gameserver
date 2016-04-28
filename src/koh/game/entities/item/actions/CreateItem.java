@@ -34,7 +34,7 @@ public class CreateItem  extends ItemAction {
         }
 
         if(count > 0) {
-            InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templat.getId(), 63, p.getID(), count, EffectHelper.generateIntegerEffect(templat.getPossibleEffects(), EffectGenerationType.NORMAL, templat instanceof Weapon));
+            final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templat.getId(), 63, p.getID(), count, EffectHelper.generateIntegerEffect(templat.getPossibleEffects(), EffectGenerationType.NORMAL, templat instanceof Weapon));
             if (p.getInventoryCache().add(item, true)) {
                 item.setNeedInsert(true);
             }

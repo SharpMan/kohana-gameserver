@@ -8,12 +8,12 @@ import koh.game.entities.actors.Player;
  */
 public class BreedCriterion extends Criterion {
 
-    public Byte Breed;
+    public Byte breed;
 
     @Override
     public void Build() {
         try {
-            this.Breed = Byte.parseByte(literal);
+            this.breed = Byte.parseByte(literal);
         } catch (Exception e) {
             throw new Error(String.format("Cannot build  BreedCriterion, {0} is not a valid alignement level", this.literal));
         }
@@ -21,7 +21,7 @@ public class BreedCriterion extends Criterion {
 
     @Override
     public boolean eval(Player character) {
-        return this.Compare((Comparable<Byte>) this.Breed, character.getBreed());
+        return this.Compare(this.breed, character.getBreed());
     }
 
     @Override

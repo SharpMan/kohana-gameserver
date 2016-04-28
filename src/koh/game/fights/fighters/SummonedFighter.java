@@ -98,15 +98,21 @@ public class SummonedFighter extends MonsterFighter {
     public void adjustStats() {
         if(this.grade.getMonsterId() == 3287 || this.grade.getMonsterId() == 3288 || this.grade.getMonsterId() == 3289){
             this.stats.addBase(StatsEnum.VITALITY, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getLife() * this.getCoefficient())));
-        }
-        else
-            this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+            this.stats.addBase(StatsEnum.INTELLIGENCE, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.INTELLIGENCE) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.CHANCE, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.CHANCE) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.STRENGTH, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.STRENGTH) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.AGILITY, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.AGILITY) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.WISDOM, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.WISDOM) * this.getCoefficient())));
 
-        this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
-        this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
-        this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
-        this.stats.addBase(StatsEnum.AGILITY, (short) ((double) this.stats.getEffect(StatsEnum.AGILITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
-        this.stats.addBase(StatsEnum.WISDOM, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        }
+        else {
+            this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.stats.getEffect(StatsEnum.VITALITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+            this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+            this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+            this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+            this.stats.addBase(StatsEnum.AGILITY, (short) ((double) this.stats.getEffect(StatsEnum.AGILITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+            this.stats.addBase(StatsEnum.WISDOM, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        }
     }
 
     public int tryDieSilencious(int casterId, boolean force) {

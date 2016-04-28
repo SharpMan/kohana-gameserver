@@ -30,7 +30,7 @@ public class FightGlyph extends FightActivableObject {
     private int lastTurnActivated;
 
     public FightGlyph(EffectCast castInfos, int duration, Color color, byte size, GameActionMarkCellsTypeEnum Shape) {
-        super(BuffActiveType.ACTIVE_ENDTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
+        super(BuffActiveType.ACTIVE_BEGINTURN, castInfos.caster.getFight(), castInfos.caster, castInfos, castInfos.cellId, duration, color, GameActionFightInvisibilityStateEnum.VISIBLE, size, Shape);
     }
 
     @Override
@@ -56,10 +56,10 @@ public class FightGlyph extends FightActivableObject {
         final ArrayList<Fighter> targetsPerEffect = new ArrayList<>(3);
         int bestResult = -1;
         for (EffectInstanceDice effect : castSpell.getEffects()) {
-            if(activationType != BuffActiveType.ACTIVE_ENDTURN && ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
+            if(activationType != BuffActiveType.ACTIVE_BEGINTURN && ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
                 continue;
             }
-            else if (activationType == BuffActiveType.ACTIVE_ENDTURN && !ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
+            else if (activationType == BuffActiveType.ACTIVE_BEGINTURN && !ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
                 continue;
             }
             targetsPerEffect.addAll(targets);

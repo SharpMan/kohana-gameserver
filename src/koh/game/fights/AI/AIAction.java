@@ -130,17 +130,18 @@ TELEPORT_STARTING_TURN_CELL
                * */
 
 
+               case PDV_PERCENT_REPORTED:
                case HEAL:
                case HEAl_OR_DAMAGE:
                case HEAL_PDV_RENDUS:
                case Heal_PV:
-               case PDV_PERCENT_REPORTED: //Not sure
                    return scoreHeal(AI, effect, targets, reverse);
 
                case DAMAGE_BECOME_HEAL:
                    return targets.contains(AI.getFighter()) ? (scoreBuff_I(AI, effect, targets, reverse, false)) : (-scoreBuff_I(AI, effect, targets, reverse, false));
 
              /* BUFFS LEVEL 1*/
+               case CHATIMENT:
                case MAXIMIZE_EFFECTS:
                case ADD_DAMAGE_PERCENT:
                case COMBO_DAMMAGES: //TODO roub
@@ -161,6 +162,7 @@ TELEPORT_STARTING_TURN_CELL
                    return scoreBuff_II(AI, effect, targets, reverse, true);
 
              /* BUFFS LEVEL 2*/
+               case WEAPON_DAMAGES_BONUS_PERCENT:
                case MOVEMENT_POINTS:
                case ACTION_POINTS:
                case VITALITY:
@@ -179,6 +181,7 @@ TELEPORT_STARTING_TURN_CELL
                    return scoreBuff_II(AI, effect, targets, reverse, false);
 
              /* BUFFS LEVEL 3*/
+               case DAMAGE_REDUCTION:
                case DAMAGE_ARMOR_REDUCTION:
                case DAMMAGES_OCASSIONED:
                case ADD_CRITICAL_DAMAGES_REDUCTION:

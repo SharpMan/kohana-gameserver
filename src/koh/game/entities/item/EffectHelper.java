@@ -82,14 +82,16 @@ public class EffectHelper {
             StatsEnum.DAMAGE_REDUCTION,
             StatsEnum.DAMMAGES_OCASSIONED,
             StatsEnum.DAMAGE_ARMOR_REDUCTION,
+            StatsEnum.DODGE,
+
     };
 
-    public static IoBuffer serializeEffectInstanceDice(EffectInstance[] Effects) {
-        IoBuffer buff = IoBuffer.allocate(65535);
+    public static IoBuffer serializeEffectInstanceDice(EffectInstance[] effects) {
+        IoBuffer buff = IoBuffer.allocate(effects.length * 25);
         buff.setAutoExpand(true);
 
-        buff.putInt(Effects.length);
-        for (EffectInstance e : Effects) {
+        buff.putInt(effects.length);
+        for (EffectInstance e : effects) {
             buff.put(e.serializationIdentifier());
             e.toBinary(buff);
         }

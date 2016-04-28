@@ -43,7 +43,7 @@ public class EffectLifeSteal extends EffectBase {
             return -3;
         }
 
-        MutableInt healJet = new MutableInt(DamageJet.intValue() / 2);
+        final MutableInt healJet = new MutableInt(DamageJet.intValue() / 2);
 
         if (EffectHeal.applyHeal(CastInfos, CastInfos.caster, healJet,false) == -3) {
             return -3;

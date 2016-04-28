@@ -241,7 +241,7 @@ public class PlayerExchange extends Exchange {
                 ex.printStackTrace();
             }
 
-            this.Dispose();
+            this.dispose();
 
             return true;
         }
@@ -307,20 +307,18 @@ public class PlayerExchange extends Exchange {
     }
 
     @Override
-    public synchronized boolean closeExchange(boolean Success) {
+    public synchronized boolean closeExchange(boolean success) {
         this.myClient1.setMyExchange(null);
         this.myClient2.setMyExchange(null);
 
-        this.send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, Success));
+        this.send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, success));
 
         this.myEnd = true;
 
         this.myClient1.endGameAction(GameActionTypeEnum.EXCHANGE);
         this.myClient2.endGameAction(GameActionTypeEnum.EXCHANGE);
-        System.out.print("action ended");
-
-        if (!Success) {
-            this.Dispose();
+        if (!success) {
+            this.dispose();
         }
 
         return true;
@@ -332,7 +330,7 @@ public class PlayerExchange extends Exchange {
         this.myClient2.send(Packet);
     }
 
-    public void Dispose() {
+    public void dispose() {
         this.myItemsToTrade.clear();
         this.myKamasToTrade.clear();
         this.myValidate.clear();

@@ -111,7 +111,7 @@ public class AIProcessor {
                 } catch (FighterException fe) {
                     throw fe;
                 } catch (Exception e) {
-                    logger.error(this.fighter.asMonster().getGrade().toString());
+                    logger.error("bugged grade {}",this.fighter.asMonster().getGrade().getMonsterId());
                     e.printStackTrace();
                     logger.error(e);
                 } finally {
@@ -229,7 +229,10 @@ public class AIProcessor {
                             score -= distance;
 
                     if (fightCell.hasEnnemy(this.fighter.getTeam()) != null) {
-                        if (score > 0)
+                        if(firstTarget != null && !firstTarget.isVisibleFor(this.fighter)){
+                            score = 0;
+                        }
+                        else if (score > 0)
                             score += 50;
                     }
                     if (score > neuron.myBestScore) {

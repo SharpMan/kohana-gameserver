@@ -4,6 +4,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.FightStateEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostStateEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -16,7 +17,7 @@ public class BuffState extends BuffEffect {
 
     public BuffState(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
-        if(this.duration != -1)
+        if(this.duration != -1 && castInfos.effectType != StatsEnum.INVISIBILITY)
             this.duration++;
     }
 

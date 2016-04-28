@@ -121,6 +121,8 @@ public class AgressionFight extends Fight {
 
         for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_LOST);
+            if(fighter.isLeft())
+                continue;
             final short loosedHonor = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false));
             fighter.getPlayer().addHonor(loosedHonor, true);
             fighter.getPlayer().addDishonor(FightFormulas.calculateEarnedDishonor(fighter),true);
@@ -141,6 +143,8 @@ public class AgressionFight extends Fight {
 
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_VICTORY);
+            if(fighter.isLeft())
+                continue;
             short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true));
             final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
             if(count == getEnnemyTeam(getWinners()).getFighters().count()){

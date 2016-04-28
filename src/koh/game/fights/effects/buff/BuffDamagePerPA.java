@@ -20,11 +20,11 @@ public class BuffDamagePerPA extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
         int pas = this.castInfos.effect.diceNum;
         int val = this.castInfos.effect.diceSide;
         int nbr = (int) Math.floor((double) target.getUsedAP() / (double) pas);
-        DamageValue.setValue(val * nbr);
+        damageValue.setValue(val * nbr);
         //Poison Paralysant
 
         int inte = 0;
@@ -43,9 +43,9 @@ public class BuffDamagePerPA extends BuffEffect {
         // on applique le boost
         // Ancienne formule : dgt = (int)(((100+inte+pdom)/100) *
         // dgt);
-        DamageValue.setValue((((100 + inte + pdom) / 100) * DamageValue.getValue() * 1.5));
+        damageValue.setValue((((100 + inte + pdom) / 100) * damageValue.getValue() * 1.5));
 
-        return EffectDamage.applyDamages(this.castInfos, this.target, DamageValue);
+        return EffectDamage.applyDamages(this.castInfos, this.target, damageValue);
     }
 
     @Override

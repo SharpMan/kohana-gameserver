@@ -61,12 +61,15 @@ public class PlayerDAOImpl extends PlayerDAO {
                     lock.lock();
 
                     for (Couple<Long, Player> ref : copy) {
-                        if (System.currentTimeMillis() > ref.first && !(ref.second.getAccount().characters != null && ref.second.getAccount().characters.stream().anyMatch(Character -> Character.getFighter() != null))) { //On décharge pas les combattants.
+                        if (System.currentTimeMillis() > ref.first
+                                && ref.second.getAccount().characters != null
+                                && (ref.second.getFightsRegistred()== null
+                                || ref.second.getFightsRegistred().isEmpty())
+                                && ref.second.getAccount().characters.stream().allMatch(cr -> cr.getFighter() == null)) { //On décharge pas les combattants.
                             synchronized (accountInUnload) {
                                 delCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
                                 accountInUnload.add(ref.second.getAccount().id);
                                 cleanMap(ref.second);
-                                logger.debug("player " + ref.second.getNickName() + " is going to be cleared" + DateFormat.getInstance().format(ref.first));
                                 ref.second.save(true);
                             }
                         }

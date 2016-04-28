@@ -443,12 +443,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         // La cible si elle existe
-        Fighter TargetE = this.hasEnnemyInCell(cellId, fighter.getTeam());
-        if (friend && TargetE == null) {
-            TargetE = this.hasFriendInCell(cellId, fighter.getTeam());
+        Fighter targetE = this.hasEnnemyInCell(cellId, fighter.getTeam());
+        if (friend && targetE == null) {
+            targetE = this.hasFriendInCell(cellId, fighter.getTeam());
         }
 
-        final int targetId = TargetE == null ? -1 : TargetE.getID();
+        final int targetId = targetE == null ? -1 : targetE.getID();
 
         // Peut lancer le sort ?
         if (!fakeLaunch && !this.canLaunchSpell(fighter, spellLevel, fighter.getCellId(), cellId, targetId)) {
@@ -1536,8 +1536,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected abstract void sendGameFightJoinMessage(Fighter fighter);
 
     public boolean onlyOneTeam() {
-        boolean Team1 = this.myTeam1.getFighters().anyMatch(Player -> !Player.isMarkedDead() && (!Player.isLeft()));
-        boolean Team2 = this.myTeam2.getFighters().anyMatch(Player -> !Player.isMarkedDead() && (!Player.isLeft()));
+        final boolean team1 = this.myTeam1.getFighters().anyMatch(Player -> !Player.isMarkedDead() && (!Player.isLeft()));
+        final boolean team2 = this.myTeam2.getFighters().anyMatch(Player -> !Player.isMarkedDead() && (!Player.isLeft()));
         /*for (Fighter player : fighters()) {
          if ((player.team.id == 0) && (!player.dead) && (!player.left)) {
          Team1 = true;
@@ -1546,7 +1546,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
          Team2 = true;
          }
          }*/
-        return !(Team1 && Team2);
+        return !(team1 && team2);
     }
 
     public synchronized boolean tryEndFight() {
@@ -1630,6 +1630,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 case STATE_FINISH:
                     return;
             }
+
+            this.myTeam1.getFighters().filter(fr -> fr.isLeft() && fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
+            this.myTeam2.getFighters().filter(fr -> fr.isLeft() && fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
 
             this.stopTimer("gameLoop");
 
@@ -1863,7 +1866,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public GameFightTurnListMessage getFightTurnListMessage() {
-        System.out.println(this.isStarted());
         if (this.isStarted()) {
             return new GameFightTurnListMessage(this.fightWorker.fighters().stream().sequential().filter(x -> !(x instanceof StaticFighter))
                     //.sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false)))

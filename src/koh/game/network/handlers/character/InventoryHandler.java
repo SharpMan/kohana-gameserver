@@ -22,11 +22,13 @@ import koh.protocol.messages.game.inventory.items.*;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
+import lombok.extern.log4j.Log4j2;
 
 /**
  *
  * @author Neo-Craft
  */
+@Log4j2
 public class InventoryHandler {
 
     @HandlerAttribute(ID = ObjectUseMultipleMessage.MESSAGE_ID)
@@ -91,9 +93,11 @@ public class InventoryHandler {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
         }
         else if(!item.areConditionFilled(client.getCharacter())){
+            log.error("Wrond conditions");
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
         }
         else if(!item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
+            log.error("Item action criterias invalid");
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
         }
 

@@ -1223,7 +1223,6 @@ public class BuffHimselfAction extends AIAction {
 
         final int spellId = effect.diceNum;
         final int spellLevel = effect.diceSide;
-        System.out.println(effect.toString());
 
         if (!AI.getNeuron().myScoreSpells.containsKey(spellId)) {
             final SpellLevel spell = DAO.getSpells().findSpell(spellId).getSpellLevels()[spellLevel == 0 ? 0 : spellLevel - 1];
@@ -1240,8 +1239,7 @@ public class BuffHimselfAction extends AIAction {
                             .filter(cell -> cell != null && cell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER, IFightObject.FightObjectType.OBJECT_STATIC))
                             .map(fightCell -> fightCell.getObjectsAsFighter()[0])
                             .collect(Collectors.toList());
-                    int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, targetsOnZone, false, true);
-                    System.out.println(currScore);
+                    final int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, targetsOnZone, false, true);
                     if (currScore > 0) {
                         score += currScore;
                     }

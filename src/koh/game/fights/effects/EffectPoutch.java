@@ -19,7 +19,15 @@ public class EffectPoutch extends EffectBase {
         if(castInfos.effect.diceNum == 3281 || castInfos.effect.diceNum == 3282){
             for (Fighter target : castInfos.targets) {
                 if(castInfos.caster.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getID())){
-                    castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, true, true,castInfos.spellId);
+                    castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, false, true,castInfos.spellId);
+                }
+            }
+            return -1;
+        }
+        else if(castInfos.spellId == 3277){ //Convergence
+            for (Fighter target : castInfos.targets) {
+                if(target.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getID())){
+                    castInfos.getFight().launchSpell(target, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, false, false,castInfos.spellId);
                 }
             }
             return -1;
@@ -30,7 +38,7 @@ public class EffectPoutch extends EffectBase {
                 target.getBuff().addBuff(new BuffPoutch(castInfos, target));
         else {
             if(castInfos.caster.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getID())){
-                castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getCellId(), true, true, true,castInfos.spellId);
+                castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getCellId(), true, false, true,castInfos.spellId);
             }
         }
         log.debug("{} duration {} ",castInfos.effectType,castInfos.duration);

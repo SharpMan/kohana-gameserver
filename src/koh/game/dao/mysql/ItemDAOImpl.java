@@ -139,6 +139,9 @@ public class ItemDAOImpl extends ItemDAO {
 
     @Override
     public boolean save(InventoryItem item, boolean clear, String table) {
+        if(item.columsToUpdate == null){
+            return true;
+        }
         int i = 1;
         String query = "UPDATE `" + table + "` set ";
         query = item.columsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);

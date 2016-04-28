@@ -31,12 +31,6 @@ public class EffectLifeEroded extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        System.out.println("as");
-        System.out.println("as");
-        System.out.println("as");
-        System.out.println("as");
-        System.out.println("as");
-        System.out.println("as");
         int toReturn;
         for (Fighter target : castInfos.targets) {
             final int totalErosion = target.getBuff()

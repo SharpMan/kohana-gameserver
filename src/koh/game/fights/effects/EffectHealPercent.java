@@ -25,7 +25,7 @@ public class EffectHealPercent extends EffectBase {
         } else // HEAL direct
         {
             for (Fighter Target : castInfos.targets) {
-                if (EffectHealPercent.ApplyHealPercent(castInfos, Target, castInfos.randomJet(Target)) == -3) {
+                if (EffectHealPercent.applyHealPercent(castInfos, Target, castInfos.randomJet(Target)) == -3) {
                     return -3;
                 }
             }
@@ -34,15 +34,15 @@ public class EffectHealPercent extends EffectBase {
         return -1;
     }
 
-    public static int ApplyHealPercent(EffectCast CastInfos, Fighter Target, int heal) {
-        Fighter Caster = CastInfos.caster;
+    public static int applyHealPercent(EffectCast CastInfos, Fighter target, int heal) {
+        final Fighter caster = CastInfos.caster;
 
         // boost soin etc
-        heal = heal * (Target.getLife() / 100);
+        heal = heal * (target.getMaxLife() / 100);
 
         // Si le soin est superieur a sa vie actuelle
-        if ((Target.getLife() + heal) > Target.getMaxLife()) {
-            heal = Target.getMaxLife() - Target.getLife();
+        if ((target.getLife() + heal) > target.getMaxLife()) {
+            heal = target.getMaxLife() - target.getLife();
         }
 
         if (heal < 0) {
@@ -50,15 +50,15 @@ public class EffectHealPercent extends EffectBase {
         }
 
         // Affectation
-        Target.setLife(Target.getLife() + heal);
+        target.setLife(target.getLife() + heal);
 
         // Envoi du packet
         if (heal != 0) {
-            Target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, Caster.getID(), Target.getID(), heal));
+            target.getFight().sendToField(new GameActionFightLifePointsGainMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, caster.getID(), target.getID(), heal));
         }
 
         // Le soin entraine la fin du combat ?
-        return Target.tryDie(Caster.getID());
+        return target.tryDie(caster.getID());
     }
 
 }

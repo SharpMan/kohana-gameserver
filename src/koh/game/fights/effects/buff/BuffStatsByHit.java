@@ -33,7 +33,7 @@ public class BuffStatsByHit extends BuffEffect {
             }
         }
         catch (NullPointerException e){
-            logger.error("Wh's null ? 1 {} 2 {} 3 {} 4 {}",damageInfos.caster == null,damageInfos.spellLevel.getEffects() == null,this.castInfos.effect.triggers == null);
+            logger.error("Wh's null ? 1 {} 2 {} 3 {}",damageInfos.caster == null,damageInfos.spellLevel == null,this.castInfos.effect == null);
         }
 
 

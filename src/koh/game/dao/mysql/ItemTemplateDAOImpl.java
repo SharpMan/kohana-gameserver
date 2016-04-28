@@ -139,6 +139,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                 ++i;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }

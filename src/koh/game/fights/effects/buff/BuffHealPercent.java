@@ -26,7 +26,7 @@ public class BuffHealPercent extends BuffEffect {
      */
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (EffectHealPercent.ApplyHealPercent(castInfos, target, castInfos.randomJet(target)) == -3) {
+        if (EffectHealPercent.applyHealPercent(castInfos, target, castInfos.randomJet(target)) == -3) {
             return -3;
         }
         return -1;

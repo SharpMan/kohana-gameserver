@@ -177,6 +177,8 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private Glicko2Player kolizeumRate;
+    @Getter @Setter
+    private ArrayList<Fight> fightsRegistred;
 
     private boolean wasSitted = false; //only for regen life
     private Fight myFight;
@@ -216,6 +218,8 @@ public class Player extends IGameActor implements Observer {
         catch (Exception e){
             e.printStackTrace();
         }
+
+        this.fightsRegistred = new ArrayList<>(2);
 
         this.inventoryCache = new CharacterInventory(this);
 
@@ -939,7 +943,12 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void totalClear() {
+        /*TODO
+        cachedHumanInformations
+        kolizeumRate
+         */
         owner = 0;
+        moodSmiley = 0;
         nickName = null;
         breed = 0;
         sexe = 0;
@@ -991,6 +1000,12 @@ public class Player extends IGameActor implements Observer {
         if (stats != null) {
             stats.totalClear();
         }
+        if(disabledChannels != null && !disabledChannels.isEmpty()){
+            disabledChannels.clear();
+            disabledChannels = null;
+        }
+        savedMap = savedCell = 0;
+        regenRate = 0;
         stats = null;
         experience = 0;
         kamas = 0;

@@ -19,7 +19,7 @@ public class BuffSacrifice extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
         if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
             return -1;
         }
@@ -29,7 +29,7 @@ public class BuffSacrifice extends BuffEffect {
             return -1;
         }
 
-        DamageValue.setValue(0);
+        damageValue.setValue(0);
 
         DamageInfos.isReturnedDamages = true;
 

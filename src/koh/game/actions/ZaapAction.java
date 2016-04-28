@@ -31,19 +31,20 @@ public class ZaapAction extends GameAction {
     }
 
     @Override
-    public void abort(Object[] Args) {
+    public void abort(Object[] args) {
         try {
-            int map = (int) Args[0];
-            final DofusZaap zaap = DAO.getMaps().getZaap(map);
-            if (zaap == null) {
-                return;
+            if(args.length != 0) {
+                final DofusZaap zaap = DAO.getMaps().getZaap((int) args[0]);
+                if (zaap == null) {
+                    return;
+                }
+                if (((Player) actor).getKamas() < getCostTo(zaap.getMap())) {
+                    actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
+                    return;
+                }
+                ((Player) actor).getInventoryCache().substractKamas(getCostTo(zaap.getMap()));
+                ((Player) actor).teleport((int) args[0], zaap.getCell());
             }
-            if (((Player) actor).getKamas() < getCostTo(zaap.getMap())) {
-                actor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 6, new String[0]));
-                return;
-            }
-            ((Player) actor).getInventoryCache().substractKamas(getCostTo(zaap.getMap()));
-            ((Player) actor).teleport(map, zaap.getCell());
 
             this.endExecute();
         } catch (Exception e) {

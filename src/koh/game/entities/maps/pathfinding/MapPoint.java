@@ -314,7 +314,7 @@ public class MapPoint {
         return (mp);
     }
 
-    public MapPoint pointSymetry(MapPoint pCentralPoint) {
+    public final MapPoint pointSymetry(MapPoint pCentralPoint) {
         int destX = ((2 * pCentralPoint.get_x()) - this.get_x());
         int destY = ((2 * pCentralPoint.get_y()) - this.get_y());
         if (isInMap(destX, destY)) {

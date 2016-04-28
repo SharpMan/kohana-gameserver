@@ -722,7 +722,7 @@ public class SelfActingAction extends AIAction {
             return baseScore * invocationLevel;
         }
         if (!AI.getNeuron().myScoreInvocations.containsKey(invocationId)) {
-            MonsterTemplate monster = DAO.getMonsters().find(invocationId);
+            final MonsterTemplate monster = DAO.getMonsters().find(invocationId);
             // Template de monstre existante
             if (monster != null) {
                 final MonsterGrade monsterLevel = monster.getLevelOrNear(invocationLevel);
@@ -731,7 +731,10 @@ public class SelfActingAction extends AIAction {
                     List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
                     for (SpellLevel spell : monsterLevel.getSpells()) {
                         for (EffectInstanceDice spellEffect : spell.getEffects()) {
-                            int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                            if(spellEffect.getEffectType() == StatsEnum.SUMMON){
+                                continue;
+                            }
+                            final int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
                             if (currScore > 0) {
                                 score += currScore;
                             }
@@ -740,7 +743,10 @@ public class SelfActingAction extends AIAction {
                     possibleTargets = AI.getFight().getEnnemyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
                     for (SpellLevel spell : monsterLevel.getSpells()) {
                         for (EffectInstanceDice spellEffect : spell.getEffects()) {
-                            int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                            if(spellEffect.getEffectType() == StatsEnum.SUMMON){
+                                continue;
+                            }
+                            final int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
                             if (currScore > 0) {
                                 score += currScore;
                             }
@@ -999,6 +1005,9 @@ public class SelfActingAction extends AIAction {
                 targetList = new ArrayList<Fighter>();
                 targetList.add(target);
                 for (FightActivableObject layer : launchCell.getObjectsLayer()) {
+                    if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null){
+                        continue;
+                    }
                     int layerScore = 0;
                     for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects()) {
                         layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, targetList, false, true));

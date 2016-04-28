@@ -84,6 +84,15 @@ public class EffectDamage extends EffectBase {
             caster.computeDamages(castInfos.effectType, damageJet);
             //Calcul Bonus Negatif Zone ect ...
 
+            if(castInfos.isTrap && damageJet.getValue() <= 5){
+                castInfos.getFight().getLogger().info("BUGSHIT {} {} {} {} {}",
+                        caster.getStats().getTotal(StatsEnum.ADD_DAMAGE_PERCENT),
+                        caster.getStats().getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR),
+                        caster.getStats().getTotal(StatsEnum.ADD_DAMAGE_PHYSIC),
+                        caster.getStats().getTotal(StatsEnum.ALL_DAMAGES_BONUS),
+                        caster.getStats().getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS));
+            }
+
             if (castInfos.effect != null) {
                 caster.calculBonusDamages(castInfos.effect, damageJet, castInfos.cellId, target.getCellId(), castInfos.oldCell);
             }

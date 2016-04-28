@@ -22,10 +22,15 @@ public class BuffSkin extends BuffEffect {
 
     private short oldBonesID, skinToRemove;
     private List<Short> oldScales;
-    private EntityLook look;
+    private final EntityLook look;
 
     public BuffSkin(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
+        if (target.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
+            look = target.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook;
+        } else {
+            look = target.getEntityLook();
+        }
     }
 
     /**
@@ -36,11 +41,6 @@ public class BuffSkin extends BuffEffect {
      */
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
-        if (target.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER)) {
-            look = target.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook;
-        } else {
-            look = target.getEntityLook();
-        }
         this.oldBonesID = look.bonesId;
         this.oldScales = look.scales;
         switch (this.castInfos.spellId) {

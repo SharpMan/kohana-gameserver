@@ -3,10 +3,7 @@ package koh.game.fights.effects;
 import javafx.scene.paint.Color;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.layers.FightActivableObject;
-import koh.game.fights.layers.FightGlyph;
-import koh.game.fights.layers.FightPortal;
-import koh.game.fights.layers.FightTrap;
+import koh.game.fights.layers.*;
 import koh.protocol.client.enums.GameActionMarkCellsTypeEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
 
@@ -20,8 +17,12 @@ public class EffectActivableObject extends EffectBase {
     public int applyEffect(EffectCast castInfos) {
         FightActivableObject obj = null;
         switch (castInfos.effectType) {
-            case LAYING_GLYPH_RANKED:
             case LAYING_BLYPH:
+                obj = new FightBlyph(castInfos, castInfos.duration, getColor(castInfos.spellId), castInfos.effect.zoneSize(), getMarkType(castInfos.effect.getZoneShape()));
+                obj.loadEnnemyTargetsAndActive(castInfos.caster, BuffActiveType.ACTIVE_ENDMOVE);
+                //obj.activate(castInfos.caster, BuffActiveType.ACTIVE_ENDMOVE);
+                break;
+            case LAYING_GLYPH_RANKED:
             case LAYING_GLYPH:
                 obj = new FightGlyph(castInfos, castInfos.duration, getColor(castInfos.spellId), castInfos.effect.zoneSize(), getMarkType(castInfos.effect.getZoneShape()));
                 obj.loadEnnemyTargetsAndActive(castInfos.caster, BuffActiveType.ACTIVE_ENDMOVE);

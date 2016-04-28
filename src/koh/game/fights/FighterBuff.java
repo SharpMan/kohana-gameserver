@@ -55,7 +55,7 @@ public class FighterBuff {
         }
     };
 
-    public Stream<BuffEffect> getAllBuffs() {
+    public final Stream<BuffEffect> getAllBuffs() {
         return Stream.concat(Stream.concat(this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).stream(), this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).stream()), this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE).stream());
     }
 

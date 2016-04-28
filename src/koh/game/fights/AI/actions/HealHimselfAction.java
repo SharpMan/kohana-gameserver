@@ -1223,8 +1223,7 @@ public class HealHimselfAction extends AIAction {
                                 .filter(cell -> cell != null && cell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER, IFightObject.FightObjectType.OBJECT_STATIC))
                                 .map(fightCell -> fightCell.getObjectsAsFighter()[0])
                                 .collect(Collectors.toList());
-                        int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, targetsOnZone, false, true);
-                        System.out.println(currScore);
+                        final int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, targetsOnZone, false, true);
                         if (currScore > 0) {
                             score += currScore;
                         }

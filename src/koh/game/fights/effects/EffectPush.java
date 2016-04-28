@@ -103,7 +103,7 @@ public class EffectPush extends EffectBase {
         return -1;
     }
 
-    public static int applyPush(EffectCast CastInfos, Fighter target, byte direction, int length) {
+    public static int applyPush(EffectCast castInfos, Fighter target, byte direction, int length) {
         FightCell currentCell = target.getMyCell();
         short StartCell = target.getCellId();
         for (int i = 0; i < length; i++) {
@@ -111,13 +111,13 @@ public class EffectPush extends EffectBase {
 
             if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
+                    castInfos.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
                     return target.setCell(nextCell);
                 }
             } else {
                 int pushResult = -1;
-                if (CastInfos.effectType == StatsEnum.PUSH_BACK) {
-                    pushResult = EffectPush.applyPushBackDamages(CastInfos, target, length, i);
+                if (castInfos.effectType == StatsEnum.PUSH_BACK) {
+                    pushResult = EffectPush.applyPushBackDamages(castInfos, target, length, i);
                     if (pushResult != -1) {
                         return pushResult;
                     }
@@ -125,7 +125,7 @@ public class EffectPush extends EffectBase {
 
                 if (i != 0) {
                     target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
-                    target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+                    target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
                 }
 
@@ -142,7 +142,7 @@ public class EffectPush extends EffectBase {
 
         int result = target.setCell(currentCell);
 
-        target.getFight().sendToField(new GameActionFightSlideMessage(CastInfos.effect == null ? 5 : CastInfos.effect.effectId, CastInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+        target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
         target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
 
