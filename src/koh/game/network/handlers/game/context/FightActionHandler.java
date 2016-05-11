@@ -16,7 +16,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightCastRequestMessag
 public class FightActionHandler {
 
     @HandlerAttribute(ID = GameActionFightCastOnTargetRequestMessage.M_ID)
-    public static void HandleGameActionFightCastOnTargetRequestMessage(WorldClient client, GameActionFightCastOnTargetRequestMessage message) {
+    public static void handleGameActionFightCastOnTargetRequestMessage(WorldClient client, GameActionFightCastOnTargetRequestMessage message) {
         if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
             client.send(new BasicNoOperationMessage());
             return;
@@ -24,25 +24,42 @@ public class FightActionHandler {
         final SpellLevel spell = client.getCharacter().getMySpells().getSpellLevel(message.spellId);
         final Fighter fighter = client.getCharacter().getFight().getFighter(message.targetId);
         if (spell != null && fighter != null) {
-            if(!fighter.isVisibleFor(client.getCharacter())){
-                client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), spell, fighter.getLastCellSeen(), true);
-                return;
+            try {
+                fighter.getSpellLock().lock();
+                if (!fighter.isVisibleFor(client.getCharacter())) {
+                    client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), spell, fighter.getLastCellSeen(), true);
+                    return;
+                }
+                client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), spell, fighter.getCellId(), true);
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), spell, fighter.getCellId(), true);
+            finally {
+                fighter.getSpellLock().unlock();
+            }
         }
     }
 
     @HandlerAttribute(ID = GameActionFightCastRequestMessage.M_ID)
-    public static void HandleGameActionFightCastRequestMessage(WorldClient Client, GameActionFightCastRequestMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void handleGameActionFightCastRequestMessage(WorldClient client, GameActionFightCastRequestMessage message) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        SpellLevel Spell = Client.getCharacter().getMySpells().getSpellLevel(Message.spellId);
+        final SpellLevel Spell = client.getCharacter().getMySpells().getSpellLevel(message.spellId);
 
         // Sort existant ?
         if (Spell != null) {
-            Client.getCharacter().getFight().launchSpell(Client.getCharacter().getFighter(), Spell, Message.cellId, true);
+            try {
+                client.getCharacter().getFighter().getSpellLock().lock();
+                client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), Spell, message.cellId, true);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            finally {
+                client.getCharacter().getFighter().getSpellLock().unlock();
+            }
         }
 
     }

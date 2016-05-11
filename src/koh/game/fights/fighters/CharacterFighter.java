@@ -5,6 +5,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.*;
+import koh.game.fights.types.AgressionFight;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
@@ -61,9 +62,56 @@ public class CharacterFighter extends Fighter {
     @Override
     public GameFightMinimalStats getGameFightMinimalStats(Player character) {
         if (this.fight.getFightState() == FightState.STATE_PLACE) {
-            return new GameFightMinimalStatsPreparation(this.getLife(), this.getMaxLife(), this.character.getMaxLife(), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION),  Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY),0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY),0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character), this.getInitiative(false));
+            return new GameFightMinimalStatsPreparation(this.getLife(),
+                    this.getMaxLife(),
+                    this.character.getMaxLife(),
+                    this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT),
+                    this.shieldPoints,
+                    this.getAP(), this.getMaxAP(),
+                    this.getMP(), this.getMaxMP(),
+                    getSummonerID(), getSummonerID() != 0,
+                    (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0) + this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT),
+                    (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0) + this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT),
+                    (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0) + this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT),
+                    (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0) + this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT),
+                    (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0) + this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT),
+                    (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION),
+                    (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0)  + this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION),
+                    (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION),
+                    (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION),
+                    (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION),
+                    this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION),
+                    this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION),
+                    Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY),0),
+                    Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY),0),
+                    this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE),
+                    character == null ? this.visibleState.value : this.getVisibleStateFor(character),
+                    this.getInitiative(false));
         }
-        return new GameFightMinimalStats(this.getLife(), this.getMaxLife(), this.character.getMaxLife(), this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT), this.shieldPoints, this.getAP(), this.getMaxAP(), this.getMP(), this.getMaxMP(), getSummonerID(), getSummonerID() != 0, this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT), this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION), this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION), this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION), Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0), Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0), this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE), character == null ? this.visibleState.value : this.getVisibleStateFor(character));
+        return new GameFightMinimalStats(this.getLife(),
+                this.getMaxLife(),
+                this.character.getMaxLife(),
+                this.stats.getTotal(StatsEnum.PERMANENT_DAMAGE_PERCENT),
+                this.shieldPoints,
+                this.getAP(), this.getMaxAP(),
+                this.getMP(), this.getMaxMP(),
+                getSummonerID(), getSummonerID() != 0,
+                this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT),
+                this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT),
+                this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT),
+                this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT),
+                this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT),
+                this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION),
+                this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION),
+                this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION),
+                this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION),
+                this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION),
+                this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION),
+                this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION),
+                Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0),
+                Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0),
+                this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK),this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE),
+                character == null ? this.visibleState.value : this.getVisibleStateFor(character));
 
     }
 

@@ -6,6 +6,7 @@ import koh.game.entities.actors.pnj.NpcTemplate;
 import koh.game.utils.TutorialText;
 import koh.protocol.messages.game.chat.ChatServerMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
+import koh.protocol.messages.game.moderation.PopupWarningMessage;
 
 import java.time.Instant;
 import java.util.Map;
@@ -25,6 +26,8 @@ public class GameTutorial extends GameAction {
 
     private final static NpcTemplate npc = DAO.getNpcs().findTemplate(309);
     private final static ExecutorService executor = Executors.newFixedThreadPool(45);
+    private static final boolean CAN_CHOOSE_LEVEL = DAO.getSettings().getBoolElement("Register.ChooseLevel");
+    private static final String LEVEL = DAO.getSettings().getStringElement("Register.Text");
 
     public GameTutorial(Player actor) {
         super(GameActionTypeEnum.TUTORIAL, actor);
@@ -38,9 +41,16 @@ public class GameTutorial extends GameAction {
     @Override
     public void execute() {
         character.send(new GameRolePlayShowActorMessage(npc.getProjection((short) 415, (byte) 1)));
+        if(CAN_CHOOSE_LEVEL){
+            say(LEVEL);
+            return;
+        }
+        this.keepGoing();
+    }
+
+    public void keepGoing(){
         this.future = executor.submit((Runnable) () -> {
             try {
-
                 for (Map.Entry<Integer, String> text : TutorialText.getTexts()) {
                     say(text.getValue());
                     Thread.sleep(text.getKey());
@@ -63,6 +73,7 @@ public class GameTutorial extends GameAction {
         }
         character.setOnTutorial(false);
         character.teleport(115083777, 474);
+        actor.send(new PopupWarningMessage((byte) 11, "Melan", "Pour consulter les vendeurs , parlez à Hal San !. \nPour joindre la boutique prennez le portail bleu"));
         try {
             super.endExecute();
         } catch (Exception e) {

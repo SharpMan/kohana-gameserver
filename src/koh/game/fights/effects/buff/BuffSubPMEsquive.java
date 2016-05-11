@@ -23,7 +23,7 @@ public class BuffSubPMEsquive extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         final MutableInt lostPM = new MutableInt(castInfos.randomJet(target));
-        lostPM.setValue(lostPM.getValue() > target.getAP() ? target.getAP() : lostPM.getValue());
+        lostPM.setValue(lostPM.getValue() > target.getMP() ? target.getMP() : lostPM.getValue());
         castInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, lostPM.intValue(), true, castInfos.duration > 0);
 
         if (castInfos.damageValue != lostPM.intValue()) {

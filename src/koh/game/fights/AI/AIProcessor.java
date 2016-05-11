@@ -158,7 +158,7 @@ public class AIProcessor {
     }
 
     public void selectBestAction() {
-        AIAction action = AIAction.AI_ACTIONS.get(mode);
+        final AIAction action = AIAction.AI_ACTIONS.get(mode);
         if (action != null) {
             for (short cell : neuron.myReachableCells) {
                 for (SpellLevel spell : this.mySpells) {
@@ -229,10 +229,10 @@ public class AIProcessor {
                             score -= distance;
 
                     if (fightCell.hasEnnemy(this.fighter.getTeam()) != null) {
-                        if(firstTarget != null && !firstTarget.isVisibleFor(this.fighter)){
+                        /*if(firstTarget != null && !firstTarget.isVisibleFor(this.fighter)){
                             score = 0;
                         }
-                        else if (score > 0)
+                        else*/ if (score > 0)
                             score += 50;
                     }
                     if (score > neuron.myBestScore) {
@@ -280,6 +280,7 @@ public class AIProcessor {
             targets.removeIf(target -> !((((ArrayUtils.contains(BLACKLISTED_EFFECTS, effect.effectUid)
                     || EffectHelper.verifyEffectTrigger(fighter, target, spell.getEffects(), effect, false, effect.triggers, castCell))
                     && effect.isValidTarget(fighter, target)
+                    && target.isVisibleFor(fighter)
                     && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)))));
 
             if (targets.size() > 0 || ((spell.isNeedFreeCell() || spell.isNeedFreeTrapCell()) && targets.size() == 0)) {
@@ -393,6 +394,9 @@ public class AIProcessor {
         Fighter bestEnnemy = null;
         for (Fighter ennemy : (Iterable<Fighter>) this.fight.getEnnemyTeam(this.fighter.getTeam()).getAliveFighters()::iterator)
         {
+            if(!ennemy.isVisibleFor(this.fighter)){
+                continue;
+            }
            int distance = Pathfunction.goalDistance(this.fight.getMap(),this.fighter.getCellId(), ennemy.getCellId());
 
             if (distance < bestDistance)
@@ -414,7 +418,10 @@ public class AIProcessor {
         Fighter bestEnnemy = null;
         for (Fighter ennemy : (Iterable<Fighter>) this.fight.getEnnemyTeam(this.fighter.getTeam()).getAliveFighters()::iterator)
         {
-            int distance = Pathfunction.goalDistance(this.fight.getMap(),this.fighter.getCellId(), ennemy.getCellId());
+            if(!ennemy.isVisibleFor(fighter)){
+                continue;
+            }
+            final int distance = Pathfunction.goalDistance(this.fight.getMap(),this.fighter.getCellId(), ennemy.getCellId());
 
             if (distance < bestDistance)
             {
@@ -504,7 +511,7 @@ public class AIProcessor {
         return false;
     }
 
-    public void Wait(int millis) //upper bcs wait exist
+    public void wait(int millis) //upper bcs wait exist
     {
         BACKGROUND_WORKER.execute(() -> {
             try {

@@ -20,6 +20,7 @@ public class BuffSacrifice extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
+        //TODO trigger
         if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
             return -1;
         }

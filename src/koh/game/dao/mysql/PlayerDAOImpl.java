@@ -2,6 +2,7 @@ package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
 import koh.d2o.Couple;
+import koh.game.dao.DAO;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.MapDAO;
 import koh.game.dao.api.PlayerDAO;
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
  */
 public class PlayerDAOImpl extends PlayerDAO {
 
-    public static final int MAX_CHARACTER_SLOT = 5;
+    public static final int MAX_CHARACTER_SLOT = DAO.getSettings().getIntElement("Account.MaxPlayer");
 
     private static final Logger logger = LogManager.getLogger(PlayerDAO.class);
 

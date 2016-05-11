@@ -141,7 +141,7 @@ public class FightFormulas {
     }
 
     private static long xpNeededAtLevel(int lvl) {
-        return (DAO.getExps().getPlayerMaxExp(lvl) - DAO.getExps().getPlayerMinExp(lvl == 200 ? 199 : lvl));
+        return (DAO.getExps().getPlayerMaxExp(lvl) - DAO.getExps().getPlayerMinExp(lvl == 200 ? 198 : lvl));
     }
 
     public static int guildXpEarned(CharacterFighter Fighter, AtomicInteger xpWin) {

@@ -16,7 +16,7 @@ public class BuffShieldLifePoint extends BuffEffect {
 
     public BuffShieldLifePoint(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
-
+        this.duration++;
     }
 
     @Override
@@ -25,7 +25,6 @@ public class BuffShieldLifePoint extends BuffEffect {
         this.jet = castInfos.randomJet(target);
         this.value1 = (jet * this.target.getLife()) / 100;
         this.target.setShieldPoints(target.getShieldPoints() + value1);
-
         this.target.getStats().addBoost(this.castInfos.effectType, this.value1);
 
         return super.applyEffect(damageValue, damageInfos);

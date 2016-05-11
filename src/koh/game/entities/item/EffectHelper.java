@@ -83,6 +83,7 @@ public class EffectHelper {
             StatsEnum.DAMMAGES_OCASSIONED,
             StatsEnum.DAMAGE_ARMOR_REDUCTION,
             StatsEnum.DODGE,
+            StatsEnum.SACRIFICE,
 
     };
 

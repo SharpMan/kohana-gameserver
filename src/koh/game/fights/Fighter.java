@@ -41,6 +41,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
@@ -55,6 +57,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         this.spellsController = new FighterSpell(buff);
         this.states = new FighterState(this);
         this.summoner = summoner;
+        this.spellLock = new ReentrantLock();
     }
 
     @Getter
@@ -105,6 +108,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public Object temperoryLook = new Object();
     @Getter @Setter
     private short lastCellSeen;
+    @Getter
+    private Lock spellLock;
 
     /**
      * Virtual Method
@@ -446,7 +451,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return 0;
         }
         double num1 = 0.0;
-        for (Fighter tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId(), true)) {
+        for (Fighter tackler : Pathfunction.getEnnemyNear(fight, team, this.getCellId(), false)) {
             if (num1 == 0.0) {
                 num1 = this.getTacklePercent(tackler);
             } else {
@@ -879,24 +884,24 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 if (realAP == 0) {
                     realAP = 1;
                 }
-                double PercentLastAP = ActualAP / realAP;
-                double Chance = 0.5 * (dodgeAPCaster / dodgeAPTarget) * PercentLastAP;
-                int PercentChance = (int) (Chance * 100);
+                final double percentLastAP = ActualAP / realAP;
+                final double chance = 0.5 * (dodgeAPCaster / dodgeAPTarget) * percentLastAP;
+                int percentChance = (int) (chance * 100);
 
-                if (PercentChance > 100) {
-                    PercentChance = 90;
+                if (percentChance > 100) {
+                    percentChance = 90;
                 }
-                if (PercentChance < 10) {
-                    PercentChance = 10;
+                if (percentChance < 10) {
+                    percentChance = 10;
                 }
 
-                if (RANDOM.nextInt(99) < PercentChance) {
+                if (RANDOM.nextInt(99) < percentChance) {
                     realLostPoint++;
                 }
             }
         } else {
-            int dodgeMPCaster = caster.getMPCancelling() + 1;
-            int dodgeMPTarget = this.getMPDodge() + 1;
+            final int dodgeMPCaster = caster.getMPCancelling() + 1;
+            final int dodgeMPTarget = this.getMPDodge() + 1;
 
             for (int i = 0; i < lostPoint; i++) {
                 int ActualMP = (isBuff && this.ID == this.fight.getCurrentFighter().ID ? this.getMaxMP() : this.getMP()) - realLostPoint;
@@ -904,18 +909,18 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 if (realMP == 0) {
                     realMP = 1;
                 }
-                double PercentLastMP = ActualMP / realMP;
-                double Chance = 0.5 * (dodgeMPCaster / dodgeMPTarget) * PercentLastMP;
-                int PercentChance = (int) (Chance * 100);
+                final double percentLastMP = ActualMP / realMP;
+                final double chance = 0.5 * (dodgeMPCaster / dodgeMPTarget) * percentLastMP;
+                int percentChance = (int) (chance * 100);
 
-                if (PercentChance > 100) {
-                    PercentChance = 90;
+                if (percentChance > 100) {
+                    percentChance = 90;
                 }
-                if (PercentChance < 10) {
-                    PercentChance = 10;
+                if (percentChance < 10) {
+                    percentChance = 10;
                 }
 
-                if (RANDOM.nextInt(99) < PercentChance) {
+                if (RANDOM.nextInt(99) < percentChance) {
                     realLostPoint++;
                 }
             }

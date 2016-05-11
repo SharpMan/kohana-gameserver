@@ -199,19 +199,19 @@ public class CharacterHandler {
         try {
             if (client.getAccount().characters.size() >= PlayerDAOImpl.MAX_CHARACTER_SLOT) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_TOO_MANY_CHARACTERS.value()));
-            } else if (!PlayerController.isValidName(((CharacterCreationRequestMessage) message).name)) {
+            } else if (!PlayerController.isValidName((message.name))) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
 
-            } else if (DAO.getPlayers().containsName(((CharacterCreationRequestMessage) message).name)) {
+            } else if (DAO.getPlayers().containsName((message.name))) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
             } else {
-                final Breed breedTemplate = DAO.getD2oTemplates().getBreed(((CharacterCreationRequestMessage) message).breed);
+                final Breed breedTemplate = DAO.getD2oTemplates().getBreed((message.breed));
                 if (breedTemplate == null) {
                     client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NOT_ALLOWED.value()));
                     return;
                 }
-                final Head head = DAO.getD2oTemplates().getHead(((CharacterCreationRequestMessage) message).cosmeticId);
-                if (head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != ((CharacterCreationRequestMessage) message).sex) {
+                final Head head = DAO.getD2oTemplates().getHead(message.cosmeticId);
+                if (head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != message.sex) {
                     client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NO_REASON.value()));
                     return;
                 }

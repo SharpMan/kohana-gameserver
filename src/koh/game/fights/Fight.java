@@ -1080,6 +1080,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         final int tackledMp = fighter.getTackledMP();
         final int tackledAp = fighter.getTackledAP();
+        logger.debug(tackledAp+" "+tackledMp);
         if (fighter.getMP() - tackledMp < 0) {
             logger.error("Cannot apply tackle : mp tackled ({0}) > available mp ({1})", tackledMp, fighter.getMP());
         } else {

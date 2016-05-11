@@ -26,10 +26,10 @@ public class EffectSubPAEsquive extends EffectBase {
             for (Fighter Target : castInfos.targets) {
                 final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, 0, 0);
                 subInfos.glyphId = castInfos.glyphId;
-                BuffSubPAEsquive Buff = new BuffSubPAEsquive(subInfos, Target);
-                Buff.applyEffect(DamageValue, null);
+                final BuffSubPAEsquive buff = new BuffSubPAEsquive(subInfos, Target);
+                buff.applyEffect(DamageValue, null);
 
-                Target.getBuff().addBuff(Buff);
+                Target.getBuff().addBuff(buff);
             }
         }
 

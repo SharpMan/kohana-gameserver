@@ -130,9 +130,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public void onPlayerSpawned(Player actor) {
-        if (this.id == 115083777 && !actor.getNickName().startsWith("Melan")) {
+        /*if (this.id == 115083777 && !actor.getNickName().startsWith("Melan")) {
             actor.send(new PopupWarningMessage((byte) 5, "MØ", "Pour consulter les vendeurs , parlez à Hal San !"));
-        }
+        }*/
     }
 
     public SubArea getSubArea() {
