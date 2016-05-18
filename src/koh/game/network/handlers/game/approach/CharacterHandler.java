@@ -104,7 +104,7 @@ public class CharacterHandler {
     public static void characterSelectionMessage(WorldClient client, int id) {
         try {
 
-            Player character = client.getAccount().getPlayer(id);
+            final Player character = client.getAccount().getPlayer(id);
             if (character == null) {
                 client.send(new CharacterSelectedErrorMessage());
             } else {
@@ -194,6 +194,9 @@ public class CharacterHandler {
                 new CharacterSpellModification[0], (short) 0)));
     }
 
+
+    private static final byte REGEN_RATE = 10;
+
     @HandlerAttribute(ID = CharacterCreationRequestMessage.MESSAGE_ID)
     public static void handleCharacterCreationRequestMessage(WorldClient client, CharacterCreationRequestMessage message) {
         try {
@@ -217,8 +220,8 @@ public class CharacterHandler {
                 }
                 final Player character = Player.builder()
                         .nickName(message.name)
-                        .regenRate((byte)10)
-                        .breed((byte) message.breed)
+                        .regenRate(REGEN_RATE)
+                        .breed(message.breed)
                         .owner(client.getAccount().id)
                         .sexe(message.sex ? 1 : 0)
                         .skins(new ArrayList<>(Arrays.asList(message.sex ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook(), Short.parseShort(head.skinstype))))
@@ -235,7 +238,7 @@ public class CharacterHandler {
                             }
                         })
                         .account(client.getAccount())
-                        .level((byte) DAO.getSettings().getIntElement("Register.StartLevel"))
+                        .level(DAO.getSettings().getByteElement("Register.StartLevel"))
                         .savedMap(DAO.getSettings().getIntElement("Register.StartMap"))
                         .savedCell(DAO.getSettings().getShortElement("Register.StartCell"))
                         .currentMap(DAO.getMaps().findTemplate(DAO.getSettings().getIntElement("Register.StartMap")).init$Return())
@@ -251,7 +254,9 @@ public class CharacterHandler {
                         .ornaments(new int[0])
                         .titles(new int[0])
                         .kolizeumRate(Glicko2Player.defaultValue())
+                        .fighterLook(new Object())
                         .moodSmiley((byte)-1)
+                        .fighterLook(new Object())
                         .alignmentSide(AlignmentSideEnum.ALIGNMENT_NEUTRAL)
                         .build();
                 character.setMountInfo(new MountInformations(character));

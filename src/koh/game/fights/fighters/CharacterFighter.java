@@ -185,9 +185,9 @@ public class CharacterFighter extends Fighter {
     @Override
     public void leaveFight() {
         super.leaveFight();
-        if (this.fight.getFightState() != FightState.STATE_PLACE) {
+       // if (this.fight.getFightState() != FightState.STATE_PLACE) {
             this.character.getFightsRegistred().add(this.fight);
-        }
+        //}
         this.endFight();
     }
 

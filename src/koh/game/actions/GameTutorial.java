@@ -42,7 +42,8 @@ public class GameTutorial extends GameAction {
     public void execute() {
         character.send(new GameRolePlayShowActorMessage(npc.getProjection((short) 415, (byte) 1)));
         if(CAN_CHOOSE_LEVEL){
-            say(LEVEL);
+            actor.send(new PopupWarningMessage((byte) 4, "Melan", LEVEL));
+
             return;
         }
         this.keepGoing();

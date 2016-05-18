@@ -39,8 +39,8 @@ public class BuffPoutch extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
+        if (damageInfos.isReflect || damageInfos.isReturnedDamages || damageInfos.isPoison || damageInfos.isPoutch) {
             return -1;
         }
         // mort
@@ -50,7 +50,7 @@ public class BuffPoutch extends BuffEffect {
         }
 
         if (castInfos.spellId == 2809) {
-            if(Pathfunction.goalDistance(null, DamageInfos.caster.getCellId(), target.getCellId()) > 1){
+            if(Pathfunction.goalDistance(null, damageInfos.caster.getCellId(), target.getCellId()) > 1){
                 return -1;
             }
             //target = DamageInfos.caster;
@@ -89,7 +89,7 @@ public class BuffPoutch extends BuffEffect {
             }
             if(castInfos.spellId == 94){
                 targets.clear();
-                targets.add(DamageInfos.caster);
+                targets.add(damageInfos.caster);
             }
             if (effect.random > 0) {
                 if (!flag) {
@@ -103,7 +103,8 @@ public class BuffPoutch extends BuffEffect {
                     continue;
                 }
             }
-            final EffectCast cast = new EffectCast(effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, effect, this.target, targets, false, StatsEnum.NONE, DamageValue.intValue(), SpellLevel);
+            final EffectCast cast = new EffectCast(effect.getEffectType(), SpellLevel.getSpellId(), (castInfos.effectType == StatsEnum.REFOULLAGE) ? caster.getCellId() : this.target.getCellId(), num1, effect, this.target, targets, false, StatsEnum.NONE, damageValue.intValue(), SpellLevel);
+            cast.isPoutch = true;
             cast.targetKnownCellId = target.getCellId();
             if (EffectBase.tryApplyEffect(cast) == -3) {
                 return -3;
@@ -126,7 +127,7 @@ public class BuffPoutch extends BuffEffect {
          }
          return apply;*/
         //return EffectDamage.applyDamages(DamageInfos, target, new MutableInt((DamageInfos.randomJet(target) * 20) / 100)); //TIDO: ChangeRandom Jet to DamageJet direct
-        return super.applyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(damageValue, damageInfos);
     }
 
     @Override

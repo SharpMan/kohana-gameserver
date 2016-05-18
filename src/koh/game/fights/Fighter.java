@@ -332,20 +332,20 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int endTurn() {
-        this.fight.getActivableObjects().values().stream().forEach((Objects) -> {
-            Objects.stream().filter((Object) -> (Object instanceof FightPortal)).forEach((Object) ->
-                    ((FightPortal) Object).enable(this)
+        this.fight.getActivableObjects().values().stream().forEach((objects) -> {
+            objects.stream().filter((objs) -> (objs instanceof FightPortal)).forEach((obj) ->
+                    ((FightPortal) obj).enable(this)
             );
         });
         this.spellsController.endTurn();
-        int buffResult = this.buff.endTurn();
+        final int buffResult = this.buff.endTurn();
         if (buffResult != -1) {
             return buffResult;
         }
         return myCell.endTurn(this);
     }
 
-    public Stream<FightActivableObject> getActivableObjects() {
+    public Stream<FightActivableObject> getActivatedObjects() {
         try {
             return this.fight.getActivableObjects().get(this).stream();
         } catch (Exception e) {

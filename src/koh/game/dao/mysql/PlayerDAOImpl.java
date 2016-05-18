@@ -64,9 +64,8 @@ public class PlayerDAOImpl extends PlayerDAO {
                     for (Couple<Long, Player> ref : copy) {
                         if (System.currentTimeMillis() > ref.first
                                 && ref.second.getAccount().characters != null
-                                && (ref.second.getFightsRegistred()== null
-                                || ref.second.getFightsRegistred().isEmpty())
-                                && ref.second.getAccount().characters.stream().allMatch(cr -> cr.getFighter() == null)) { //On décharge pas les combattants.
+                                && (ref.second.getFightsRegistred()== null || ref.second.getFightsRegistred().isEmpty())
+                                && ref.second.getAccount().characters.stream().allMatch(cr -> cr.getFighter() == null && cr.getFight() == null)) { //On décharge pas les combattants.
                             synchronized (accountInUnload) {
                                 delCharacter(ref.second); // We sould rethink of this if their commit clear this field and they wasn't finishied clearing ..
                                 accountInUnload.add(ref.second.getAccount().id);
@@ -133,7 +132,7 @@ public class PlayerDAOImpl extends PlayerDAO {
         synchronized (characterUnloadQueue) {
             account.characters = new ArrayList<>(5);
             try (ConnectionResult conn = dbSource.executeQuery("SELECT * FROM `character` WHERE owner = '" + account.id + "';", 0)) {
-                ResultSet result = conn.getResult();
+                final ResultSet result = conn.getResult();
 
                 while (result.next()) {
                     final Player p;
@@ -196,6 +195,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .emotes(Enumerable.stringToByteArray(result.getString("emotes")))
                             .mountInfo(new MountInformations().deserialize(result.getBytes("mount_informations")))
                             .moodSmiley((byte) -1)
+                            .fighterLook(new Object())
                             .build();
                     Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
                     p.setMapid(result.getInt("map"));

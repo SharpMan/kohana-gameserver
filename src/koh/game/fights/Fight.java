@@ -997,7 +997,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.sendToField(new GameFightTurnStartMessage(this.currentFighter.getID(), this.getTurnTime() / 100));
 
         if (this.currentFighter instanceof CharacterFighter) {
-            this.currentFighter.send(((CharacterFighter) this.currentFighter).getFighterStatsListMessagePacket());
+            this.currentFighter.send(this.currentFighter.asPlayer().getFighterStatsListMessagePacket());
         }
 
         this.sendToField((o) -> {
@@ -1010,8 +1010,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.myLoopTimeOut = System.currentTimeMillis() + this.getTurnTime();
 
         // status en attente de fin de tour
-        if ((this.currentFighter instanceof CharacterFighter &&
-                currentFighter.getPlayer().getClient() == null && this.currentFighter.getTeam().getAliveFighters().count() > 1L)
+        if ((this.currentFighter instanceof CharacterFighter
+                && currentFighter.getPlayer().getClient() == null
+                && this.currentFighter.getTeam().getAliveFighters().count() > 1L)
                 || this.currentFighter.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffEndTurn)) {
             this.fightLoopState = fightLoopState.STATE_END_TURN;
         } else {
@@ -1080,7 +1081,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         final int tackledMp = fighter.getTackledMP();
         final int tackledAp = fighter.getTackledAP();
-        logger.debug(tackledAp+" "+tackledMp);
         if (fighter.getMP() - tackledMp < 0) {
             logger.error("Cannot apply tackle : mp tackled ({0}) > available mp ({1})", tackledMp, fighter.getMP());
         } else {
@@ -1467,6 +1467,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
             });
             fighter.send(new GameEntitiesDispositionMessage(this.getAliveFighters().map(x -> x.getIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
+            //fighter.getSpellsController().getInitialCooldown().entrySet()
+             //       .stream().forEach(f-> System.out.println(f.getKey()+" "+f.getValue()));
+
             fighter.send(new GameFightResumeMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.fightWorker.fightTurn, (int) (System.currentTimeMillis() - this.fightTime), getIdols(),
                     fighter.getSpellsController().getInitialCooldown().entrySet()
                             .stream()

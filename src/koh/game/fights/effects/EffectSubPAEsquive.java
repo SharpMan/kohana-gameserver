@@ -11,15 +11,20 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class EffectSubPAEsquive extends EffectBase {
 
+    private static final EffectSubPaAfterHealed CAENGAL = new EffectSubPaAfterHealed();
+
     @Override
     public int applyEffect(EffectCast castInfos) {
-        MutableInt DamageValue = new MutableInt();
-        if (castInfos.duration > 1) {
+        if(castInfos.spellLevel.getSpellId() == 112){
+            return CAENGAL.applyEffect(castInfos);
+        }
+        final MutableInt damageValue = new MutableInt();
+        if (castInfos.duration >= 1) {
             for (Fighter Target : castInfos.targets) {
                 final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, castInfos.duration, 0);
                 subInfos.glyphId = castInfos.glyphId;
                 final BuffSubPAEsquive buff = new BuffSubPAEsquive(subInfos, Target);
-                buff.applyEffect(DamageValue, null);
+                buff.applyEffect(damageValue, null);
                 Target.getBuff().addBuff(buff);
             }
         } else {
@@ -27,7 +32,7 @@ public class EffectSubPAEsquive extends EffectBase {
                 final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, (short) 0, 0, castInfos.effect, castInfos.caster, null, false, StatsEnum.NONE, 0, castInfos.spellLevel, 0, 0);
                 subInfos.glyphId = castInfos.glyphId;
                 final BuffSubPAEsquive buff = new BuffSubPAEsquive(subInfos, Target);
-                buff.applyEffect(DamageValue, null);
+                buff.applyEffect(damageValue, null);
 
                 Target.getBuff().addBuff(buff);
             }

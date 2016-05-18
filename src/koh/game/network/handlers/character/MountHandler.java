@@ -114,6 +114,7 @@ public class MountHandler {
                          client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 19, new String[0]));
                          break;
                     }
+                    client.getCharacter().getMountInfo().disposeStats();
                     client.getCharacter().getMountInfo().mount = ((MountInventoryItem) dragodinde).getMount();
                     client.getCharacter().getMountInfo().entity = ((MountInventoryItem) dragodinde).getEntity();
                     client.send(new MountRidingMessage(true));

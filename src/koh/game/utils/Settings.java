@@ -58,6 +58,10 @@ public class Settings {
         return Integer.parseInt(fastElement(e));
     }
 
+    public int getByteElement(String e) {
+        return Byte.parseByte(fastElement(e));
+    }
+
     public short getShortElement(String e){
         return Short.parseShort(fastElement(e));
     }

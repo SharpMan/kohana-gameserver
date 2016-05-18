@@ -61,7 +61,8 @@ public class Player extends IGameActor implements Observer {
 
     private static final Logger logger = LogManager.getLogger(Player.class);
     private static final int[] TAVERNE_MAP = new int[]{146233, 148796, 146237, 148786, 144698, 145208, 145714};
-    public Object $FighterLook = new Object();
+    @Getter
+    private Object fighterLook;
     protected boolean myInitialized = false;
     @Getter
     @Setter
@@ -907,7 +908,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void setFight(Fight Fight) {
-        synchronized ($FighterLook) {
+        synchronized (fighterLook) {
             this.myFight = Fight;
         }
     }
@@ -917,7 +918,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void setFighter(CharacterFighter Fighter) {
-        synchronized ($FighterLook) {
+        synchronized (fighterLook) {
             this.myFighter = Fighter;
         }
     }
@@ -962,7 +963,7 @@ public class Player extends IGameActor implements Observer {
         client = null;
         regenStartTime = 0;
         currentMap = null;
-        $FighterLook = null;
+        fighterLook = null;
         if (enabledChannels != null) {
             enabledChannels.clear();
         }

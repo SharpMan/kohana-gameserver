@@ -6,6 +6,7 @@ import koh.game.app.MemoryService;
 import koh.game.app.WebSocketService;
 import koh.game.dao.DAO;
 import koh.game.dao.DatabaseSource;
+import koh.game.entities.actors.Player;
 import koh.game.inter.InterClient;
 import koh.game.inter.TransfererTimeOut;
 import koh.game.network.WorldServer;
@@ -45,6 +46,7 @@ public class Main {
             }
         };
     }
+
 
     public static void main(String[] args) {
         try {
@@ -86,8 +88,8 @@ public class Main {
 
     private static void close() {
         try {
-            //$RealmServer.stop();
-            //MySQL.disconnectDatabase();
+            System.out.println("World save...");
+            DAO.getPlayers().getPlayers().forEach(pl -> pl.save(false));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

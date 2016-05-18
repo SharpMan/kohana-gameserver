@@ -58,7 +58,7 @@ public class FighterSpell {
     }
 
     public byte minCastInterval(int spell) {
-        BuffEffect buff = this.Buffs.getAllBuffs().filter(x -> x instanceof BuffSpellCoolDown && ((BuffSpellCoolDown) x).spell == spell).findFirst().orElse(null);
+        final BuffEffect buff = this.Buffs.getAllBuffs().filter(x -> x instanceof BuffSpellCoolDown && ((BuffSpellCoolDown) x).spell == spell).findFirst().orElse(null);
         if (buff == null) {
             return 0;
         } else {
@@ -86,14 +86,8 @@ public class FighterSpell {
     }
 
     public void endTurn() {
-        myTargets.values().stream().forEach((Targets) -> {
-            Targets.clear();
-        });
-
-        this.initialCooldown.values().stream().forEach((initialCooldown) -> {
-            initialCooldown.decrement();
-        });
-
+        this.myTargets.values().stream().forEach(ArrayList::clear);
+        this.initialCooldown.values().stream().forEach(SpellinitialCooldown::decrement);
     }
 
     public class SpellinitialCooldown {

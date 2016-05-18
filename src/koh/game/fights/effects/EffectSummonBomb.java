@@ -24,15 +24,15 @@ public class EffectSummonBomb extends EffectBase {
         final MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
         // getTemplate de monstre existante
         if (monster != null) {
-            MonsterGrade MonsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
-            if (MonsterLevel != null) {
+            final MonsterGrade monsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
+            if (monsterLevel != null) {
                 if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
-                    final BombFighter bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, MonsterLevel);
+                    final BombFighter bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, monsterLevel);
                     bomb.joinFight();
                     bomb.getFight().joinFightTeam(bomb, castInfos.caster.getTeam(), false, castInfos.cellId, true);
                     castInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1008, castInfos.caster.getID(), (GameFightFighterInformations) bomb.getGameContextActorInformations(null)));
                     castInfos.caster.getFight().getFightWorker().summonFighter(bomb);
-                    castInfos.caster.getActivableObjects().filter(Object -> Object instanceof FightBomb)
+                    castInfos.caster.getActivatedObjects().filter(Object -> Object instanceof FightBomb)
                             .filter(Bombe -> ArrayUtils.contains(((FightBomb)Bombe).owner,bomb))
                             .forEach(Bombe -> ((FightBomb)Bombe).getFightCells()
                                               .filter(Cell -> Cell.hasFighter())

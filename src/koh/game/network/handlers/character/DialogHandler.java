@@ -6,6 +6,7 @@ import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.DialogTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
+import koh.protocol.messages.game.context.roleplay.StopToListenRunningFightRequestMessage;
 import koh.protocol.messages.game.dialog.LeaveDialogMessage;
 import koh.protocol.messages.game.dialog.LeaveDialogRequestMessage;
 
@@ -14,6 +15,11 @@ import koh.protocol.messages.game.dialog.LeaveDialogRequestMessage;
  * @author Neo-Craft
  */
 public class DialogHandler {
+
+    @HandlerAttribute(ID = StopToListenRunningFightRequestMessage.M_ID)
+    public static void handleStopToListenRunningFightRequestMessage(WorldClient client,StopToListenRunningFightRequestMessage message){
+//TODO:
+    }
 
     @HandlerAttribute(ID = LeaveDialogRequestMessage.MESSAGE_ID)
     public static void handleLeaveDialogRequestMessage(WorldClient client, LeaveDialogRequestMessage message) {

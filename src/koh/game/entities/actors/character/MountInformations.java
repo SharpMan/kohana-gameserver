@@ -78,14 +78,14 @@ public class MountInformations {
             if (this.isToogled) {
                 this.isToogled = false;
                 this.enableStats(false);
-                this.player.getEntityLook().bonesId = (short) 1;
+                this.player.getEntityLook().bonesId = 1;
                 this.player.getEntityLook().skins = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
                 this.player.getEntityLook().indexedColors = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
                 this.player.getEntityLook().scales = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
                 this.player.getEntityLook().subentities = this.player.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.subentities;
                 this.player.getEntityLook().subentities.removeIf(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER);
                 if (player.getFighter() != null) {
-                    player.getFighter().getEntityLook().bonesId = (short) 1;
+                    player.getFighter().getEntityLook().bonesId = 1;
                     player.getFighter().getEntityLook().skins = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins;
                     player.getFighter().getEntityLook().indexedColors = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.indexedColors;
                     player.getFighter().getEntityLook().scales = player.getFighter().getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.scales;
@@ -101,18 +101,18 @@ public class MountInformations {
     private void parseStats() {
         this.myStats = new GenericStats();
 
-        StatsEnum Stat;
+        StatsEnum stat;
         for (ObjectEffectInteger e : this.mount.effectList) {
 
-            Stat = StatsEnum.valueOf(e.actionId);
-            if (Stat == null) {
+            stat = StatsEnum.valueOf(e.actionId);
+            if (stat == null) {
                 logger.error("Undefined MountStat id {} ", e.actionId);
                 continue;
             }
-            this.myStats.addItem(Stat, e.value);
+            this.myStats.addItem(stat, e.value);
 
         }
-        Stat = null;
+        stat = null;
     }
 
     public GenericStats getStats() {
@@ -202,6 +202,14 @@ public class MountInformations {
         this.isToogled = BufUtils.readBoolean(buf);
         return this;
     }
+
+    public void disposeStats(){
+        if(this.myStats != null){
+            this.myStats.totalClear();
+            this.myStats = null;
+        }
+    }
+
 
     public void totalClear() {
         //this.mount.clear();

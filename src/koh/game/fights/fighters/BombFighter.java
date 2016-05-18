@@ -10,6 +10,7 @@ import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.mob.MonsterGrade;
+import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.FightCell;
@@ -61,38 +62,63 @@ public class BombFighter extends StaticFighter {
         this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.AGILITY, (short) ((double) this.stats.getEffect(StatsEnum.AGILITY).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
-        this.stats.addBase(StatsEnum.WISDOM, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.DAMAGE_AIR, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.DAMAGE_EARTH, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.DAMAGE_FIRE, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.DAMAGE_EARTH, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.DAMAGE_NEUTRAL, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.DAMAGE_WATER, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.ADD_DAMAGE_PHYSIC, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+        this.stats.addBase(StatsEnum.ALL_DAMAGES_BONUS, (short) ((double) this.stats.getEffect(StatsEnum.WISDOM).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
+
     }
+
+    /*@Override
+    public void calculBonusDamages(EffectInstanceDice effect, MutableInt jet, short castCell, short targetCell, short truedCell) {
+
+        //double bonus = 0;
+
+        double bonus = getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.zoneSize() != -100000 ? effect.zoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
+
+        //bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
+
+        bonus += this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 200;
+
+        System.out.println("Final bonus "+bonus);
+
+        jet.setValue((jet.floatValue() * bonus));
+    }*/
 
     @Override
     public void computeDamages(StatsEnum effect, MutableInt jet) {
+        //System.out.println(this.stats.getTotal(StatsEnum.COMBO_DAMMAGES));
         switch (effect) {
             case DAMAGE_EARTH:
             case STEAL_EARTH:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)));
+                jet.setValue(Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_EARTH_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100));
                 break;
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)));
+                jet.setValue(Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.STRENGTH) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PHYSIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100));
                 break;
 
             case DAMAGE_FIRE:
             case STEAL_FIRE:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)));
+                jet.setValue( Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100));
                 break;
 
             case DAMAGE_AIR:
             case STEAL_AIR:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)));
+                jet.setValue( Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100) );
                 break;
 
             case DAMAGE_WATER:
             case STEAL_WATER:
-                jet.setValue((int) Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES)) / 100
-                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)));
+                jet.setValue( Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100) );
                 break;
         }
     }
@@ -130,13 +156,13 @@ public class BombFighter extends StaticFighter {
             return;
         }
         fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + totalCombo + "% dommages d'explosion"}));
-        stats.addBoost(StatsEnum.COMBO_DAMMAGES, totalCombo);
+        stats.addBase(StatsEnum.COMBO_DAMMAGES, totalCombo);
         this.boosted = true;
         for (Fighter bomb : targets) {
-            bomb.getStats().addBoost(StatsEnum.COMBO_DAMMAGES, totalCombo);
+            bomb.getStats().addBase(StatsEnum.COMBO_DAMMAGES, totalCombo);
             boosted = true;
         }
-        targets.forEach(Bomb -> Bomb.tryDie(Caster, true));
+        targets.forEach(bomb -> bomb.tryDie(Caster, true));
         targets.clear();
     }
 

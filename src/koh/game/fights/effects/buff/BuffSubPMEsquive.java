@@ -31,9 +31,11 @@ public class BuffSubPMEsquive extends BuffEffect {
         }
 
         if (castInfos.damageValue > 0) {
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.SUB_PM, this.castInfos.spellId, (short) this.castInfos.spellId, 0, null, this.castInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, castInfos.damageValue, castInfos.spellLevel, duration, 0), this.target);
-            BuffStats.applyEffect(lostPM, null);
-            this.target.getBuff().addBuff(BuffStats);
+            final BuffStats buff = new BuffStats(new EffectCast(StatsEnum.SUB_PM, this.castInfos.spellId, (short) this.castInfos.spellId, 0, null, this.castInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, castInfos.damageValue, castInfos.spellLevel, duration, 0), this.target);
+            if (!target.getBuff().buffMaxStackReached(buff.castInfos)) {
+                buff.applyEffect(lostPM, null);
+                this.target.getBuff().addBuff(buff);
+            }
             if (target.getID() == target.getFight().getCurrentFighter().getID()) {
                 // target.fight.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_LOST, this.caster.getID(), target.getID(), (short) -castInfos.damageValue));
             }

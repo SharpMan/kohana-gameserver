@@ -83,8 +83,8 @@ public class DatabaseSource implements Service {
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        config.addDataSourceProperty("leakDetectionThreshold","20000");
-        config.addDataSourceProperty("validationTimeout","5000");
+        /*config.addDataSourceProperty("leakDetectionThreshold","20000");
+        config.addDataSourceProperty("validationTimeout","5000");*/
         config.setMaximumPoolSize(50);
 
         this.dataSource = new HikariDataSource(config);
@@ -102,6 +102,8 @@ public class DatabaseSource implements Service {
            }
         }
     }
+
+
 
     @Override
     public void stop() {
@@ -125,7 +127,24 @@ public class DatabaseSource implements Service {
     }
 
     public Connection getConnectionOfPool() throws SQLException {
-        return dataSource.getConnection();
+        try {
+            return dataSource.getConnection();
+        }
+        catch (java.sql.SQLException e){
+            e.printStackTrace();
+            log.error("Connection restarted due to the pool closed");
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl("jdbc:mysql://" + settings.getStringElement("Database.Host") + "/" + settings.getStringElement("Database.Name"));
+            config.setUsername(settings.getStringElement("Database.User"));
+            config.setPassword(settings.getStringElement("Database.Password"));
+            config.addDataSourceProperty("cachePrepStmts", "true");
+            config.addDataSourceProperty("prepStmtCacheSize", "250");
+            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+            config.setMaximumPoolSize(50);
+
+            this.dataSource = new HikariDataSource(config);
+            return dataSource.getConnection();
+        }
     }
 
     public ConnectionStatement<Statement> createStatement() throws SQLException {

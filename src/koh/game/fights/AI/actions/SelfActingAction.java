@@ -989,6 +989,9 @@ public class SelfActingAction extends AIAction {
                 targetList.add(AI.getFighter());
                 for (FightActivableObject layer : targetCell.getObjectsLayer()) {
                     int layerScore = 0;
+                    if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null){
+                        continue;
+                    }
                     for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects()) {
                         layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, targetList, false, true));
                     }
