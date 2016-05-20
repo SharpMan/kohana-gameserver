@@ -130,9 +130,9 @@ public class BombFighter extends StaticFighter {
 
     public boolean boosted = false;
 
-    public synchronized void selfMurder(int Caster) {
+    public synchronized int selfMurder(int caster) {
         if (boosted) {
-            return;
+            return -1;
         }
         int totalCombo = 0;
         final ArrayList<BombFighter> targets = new ArrayList<>(6);
@@ -153,17 +153,26 @@ public class BombFighter extends StaticFighter {
             }
         }
         if (totalCombo == 0) {
-            return;
+            return -1;
         }
         fight.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"Combo : +" + totalCombo + "% dommages d'explosion"}));
         stats.addBase(StatsEnum.COMBO_DAMMAGES, totalCombo);
         this.boosted = true;
+
         for (Fighter bomb : targets) {
             bomb.getStats().addBase(StatsEnum.COMBO_DAMMAGES, totalCombo);
             boosted = true;
         }
-        targets.forEach(bomb -> bomb.tryDie(Caster, true));
+        int bestValue = -1;
+        for (BombFighter bomb : targets) {
+            final int result = bomb.tryDie(caster, true);
+            if(result < bestValue){
+                bestValue = result;
+            }
+
+        }
         targets.clear();
+        return bestValue;
     }
 
     @Override
@@ -179,11 +188,13 @@ public class BombFighter extends StaticFighter {
             }
         }
         if (this.getLife() <= 0 || force) {
-            selfMurder(casterId);
+            final int result = selfMurder(casterId);
             fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false,-1);
             if (this.fightBombs != null) {
                 this.fightBombs.forEach(Bomb -> Bomb.remove());
             }
+            final int result2 = super.tryDie(casterId, force);
+            return result < result2 ? result : result2;
         }
         return super.tryDie(casterId, force);
     }
@@ -211,14 +222,14 @@ public class BombFighter extends StaticFighter {
             }
             Short[] cells;
             for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfunction.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
-                int Distance = Pathfunction.goalDistance(null, getCellId(), Friend.getCellId());
-                logger.debug("Bomb Distance = {}" , Distance);
-                if (Distance >= 2 && Distance <= 7) {
+                final int distance = Pathfunction.goalDistance(null, getCellId(), Friend.getCellId());
+                logger.debug("Bomb Distance = {}" , distance);
+                if (distance >= 2 && distance <= 7) {
                     cells = Pathfunction.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfunction.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
                     if (cells != null) {
                         cells =  ArrayUtils.removeElement(cells, this.getCellId());
                         cells =  ArrayUtils.removeElement(cells, Friend.getCellId());
-                        FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), cells, new BombFighter[]{this, (BombFighter) Friend});
+                        final FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), cells, new BombFighter[]{this, (BombFighter) Friend});
                         fight.addActivableObject(this, Bomb);
                     }
                 }

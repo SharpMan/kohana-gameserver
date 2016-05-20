@@ -66,81 +66,81 @@ public abstract class Criterion extends ConditionExpression {
 
     public static Criterion CreateCriterionByName(String name) {
         if (StatsCriterion.isStatsIdentifier(name)) {
-            return (Criterion) new StatsCriterion(name);
+           return new StatsCriterion(name);
         }
         switch (name) {
             case "PX":
-                return (Criterion) new AdminRightsCriterion();
+                return  new AdminRightsCriterion();
             case "Pa":
-                return (Criterion) new AlignementLevelCriterion();
+                return new AlignementLevelCriterion();
             case "Ps":
-                return (Criterion) new AlignmentCriterion();
+               return new AlignmentCriterion();
             case "PU":
-                return (Criterion) new BonesCriterion();
+               return new BonesCriterion();
             case "PG":
-                return (Criterion) new BreedCriterion();
+               return new BreedCriterion();
             case "PE":
-                return (Criterion) new EmoteCriterion();
+               return new EmoteCriterion();
             case "Pb":
-                return (Criterion) new FriendListCriterion();
+               return new FriendListCriterion();
             case "Pg":
-                return (Criterion) new GiftCriterion();
+               return new GiftCriterion();
             case "PO":
-                return (Criterion) new HasItemCriterion();
+               return new HasItemCriterion();
             case "PJ":
-                return (Criterion) new JobCriterion();
+               return new JobCriterion();
             case "Pk":
-                return (Criterion) new PanoplieBonusCriterion();
+               return new PanoplieBonusCriterion();
             case "PK":
-                return (Criterion) new KamaCriterion();
+               return new KamaCriterion();
             case "PL":
-                return (Criterion) new LevelCriterion();
+               return new LevelCriterion();
             case "MK":
-                return (Criterion) new MapCharactersCriterion();
+               return new MapCharactersCriterion();
             case "PR":
-                return (Criterion) new MariedCriterion();
+               return new MariedCriterion();
             case "P¨Q":
-                return (Criterion) new MaxRankCriterion();
+               return new MaxRankCriterion();
             case "SG":
-                return (Criterion) new MonthCriterion();
+               return new MonthCriterion();
             case "PN":
-                return (Criterion) new NameCriterion();
+               return new NameCriterion();
             case "Pe":
-                return (Criterion) new PreniumAccountCriterion();
+               return new PreniumAccountCriterion();
             case "PP":
             case "Pp":
-                return (Criterion) new PvpRankCriterion();
+               return new PvpRankCriterion();
             case "Qa":
-                return (Criterion) new QuestActiveCriterion();
+               return new QuestActiveCriterion();
             case "Qf":
-                return (Criterion) new QuestDoneCriterion();
+               return new QuestDoneCriterion();
             case "Qc":
-                return (Criterion) new QuestStartableCriterion();
+               return new QuestStartableCriterion();
             case "Pq":
-                return (Criterion) new RankCriterion();
+               return new RankCriterion();
             case "Pf":
-                return (Criterion) new RideCriterion();
+               return new RideCriterion();
             case "SI":
-                return (Criterion) new ServerCriterion();
+               return new ServerCriterion();
             case "PS":
-                return (Criterion) new SexCriterion();
+               return new SexCriterion();
             case "Pi":
             case "PI":
-                return (Criterion) new SkillCriterion();
+               return new SkillCriterion();
             case "PA":
-                return (Criterion) new SoulStoneCriterion();
+               return new SoulStoneCriterion();
             case "Pr":
-                return (Criterion) new SpecializationCriterion();
+               return new SpecializationCriterion();
             case "Sc":
-                return (Criterion) new StaticCriterion();
+               return new StaticCriterion();
             case "PB":
-                return (Criterion) new SubAreaCriterion();
+               return new SubAreaCriterion();
             case "PZ":
-                return (Criterion) new SubscribeCriterion();
+               return new SubscribeCriterion();
             case "BI":
-                return (Criterion) new UnusableCriterion();
+               return new UnusableCriterion();
             case "PW":
-                return (Criterion) new WeightCriterion();
+               return new WeightCriterion();
             default:
                 throw new Error(String.format("Criterion %s doesn't not exist or not handled", name));
         }
@@ -160,7 +160,7 @@ public abstract class Criterion extends ConditionExpression {
     }
 
     protected <T> boolean Compare(Comparable<T> obj, T comparand) {
-        int num = obj.compareTo(comparand);
+        final int num = obj.compareTo(comparand);
         switch (this.Operator) {
             case EQUALS:
                 return num == 0;

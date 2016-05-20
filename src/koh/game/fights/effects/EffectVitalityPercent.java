@@ -24,7 +24,7 @@ public class EffectVitalityPercent extends EffectBase {
                 }
                 target.getBuff().addBuff(buffstats);
             }
-            
+
         }
 
         return -1;

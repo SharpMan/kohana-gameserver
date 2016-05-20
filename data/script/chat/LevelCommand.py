@@ -13,11 +13,15 @@ class LevelCommand(PlayerCommand):
         return None
 
     def apply(self,client,args):
-        level = int(args[0]);
+        try:
+            level = int(args[0])
+        except BaseException:
+            level = 200
+
         if level < 2 or level > 200 :
             layerController.sendServerMessage(client, "Niveau invalide")
         else:
-            client.getCharacter().addExperience((DAO.getExps().getPlayerMinExp(int(args[0])) + 1) - client.getCharacter().getExperience())
+            client.getCharacter().addExperience((DAO.getExps().getPlayerMinExp(level) + 1) - client.getCharacter().getExperience())
             action = client.getGameAction(GameActionTypeEnum.TUTORIAL)
             action.keepGoing()
 

@@ -1,7 +1,10 @@
 package koh.game.fights.effects;
 
+import java.util.Arrays;
 import java.util.Random;
 import koh.game.entities.environments.Pathfunction;
+import koh.game.entities.environments.cells.Zone;
+import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
@@ -38,6 +41,17 @@ public class EffectPush extends EffectBase {
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
+                    if(castInfos.spellId == SpellIDEnum.BOTTE){
+                        final int ID = target.getID();
+                        if(Arrays.stream((new Zone(castInfos.effect.getZoneShape(), castInfos.effect.zoneSize(), MapPoint.fromCellId(castInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castInfos.cellId), true), castInfos.getFight().getMap()))
+                                .getCells(castInfos.cellId))
+                                .map(cell -> castInfos.getFight().getCell(cell))
+                                .filter(cell -> cell != null && cell.hasGameObject(FightObjectType.OBJECT_FIGHTER, FightObjectType.OBJECT_STATIC))
+                                .map(fightCell -> fightCell.getFighter())
+                                .noneMatch(tr -> tr.getID() == ID)){
+                            continue;
+                        }
+                    }
                     if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId())){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
                     }

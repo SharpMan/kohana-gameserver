@@ -68,6 +68,12 @@ public class StatsCriterion extends Criterion {
     @Override
     public boolean eval(Player character) {
 
+        if(this.Operator == ComparaisonOperatorEnum.SUPERIOR){
+            return (this.base ? character.getStats().getBase(field) : character.getStats().getTotal(field)) > this.comparand;
+        }
+        else if(this.Operator == ComparaisonOperatorEnum.INFERIOR){
+            return (this.base ? character.getStats().getBase(field) : character.getStats().getTotal(field)) < this.comparand;
+        }
         if (this.field != null) {
             return this.Compare((Comparable<Integer>) (this.base ? character.getStats().getBase(field) : character.getStats().getTotal(field)), this.comparand);
         }

@@ -127,57 +127,57 @@ public class PlayerExchange extends Exchange {
 
     @Override
     public synchronized boolean moveItem(WorldClient Client, int itemID, int quantity) {
-        InventoryItem Item = Client.getCharacter().getInventoryCache().find(itemID);
-        if (Item == null) {
+        final InventoryItem item = Client.getCharacter().getInventoryCache().find(itemID);
+        if (item == null) {
             return false;
         }
-        if (Item.isLinked() || Item.isEquiped()) {
-            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{Item.getTemplateId() + "", Item.getID() + ""}));
+        if (item.isLinked() || item.isEquiped()) {
+            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{item.getTemplateId() + "", item.getID() + ""}));
             return false;
         }
         this.unValidateAll();
 
-        if (!this.myItemsToTrade.get(Client).containsKey(Item.getID())) {  //add new item
+        if (!this.myItemsToTrade.get(Client).containsKey(item.getID())) {  //add new item
             if (quantity <= 0) {
                 return false;
             }
-            if (quantity > Item.getQuantity()) {
-                quantity = Item.getQuantity();
+            if (quantity > item.getQuantity()) {
+                quantity = item.getQuantity();
             }
-            this.myItemsToTrade.get(Client).put(Item.getID(), quantity);
+            this.myItemsToTrade.get(Client).put(item.getID(), quantity);
 
             if (Client == this.myClient1) {
-                this.myClient1.send(new ExchangeObjectAddedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
-                this.myClient2.send(new ExchangeObjectAddedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                this.myClient1.send(new ExchangeObjectAddedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+                this.myClient2.send(new ExchangeObjectAddedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
             } else {
-                this.myClient2.send(new ExchangeObjectAddedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
-                this.myClient1.send(new ExchangeObjectAddedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                this.myClient2.send(new ExchangeObjectAddedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+                this.myClient1.send(new ExchangeObjectAddedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
             }
         } else {
 
-            if (Item.getQuantity() < (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity) || (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity) < 0) {
+            if (item.getQuantity() < (this.myItemsToTrade.get(Client).get(item.getID()) + quantity) || (this.myItemsToTrade.get(Client).get(item.getID()) + quantity) < 0) {
                 return false;
             }
 
-            if (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity == 0) {
-                this.myItemsToTrade.get(Client).remove(Item.getID());
+            if (this.myItemsToTrade.get(Client).get(item.getID()) + quantity == 0) {
+                this.myItemsToTrade.get(Client).remove(item.getID());
 
                 if (Client == this.myClient1) {
-                    this.myClient1.send(new ExchangeObjectRemovedMessage(false, Item.getID()));
-                    this.myClient2.send(new ExchangeObjectRemovedMessage(true, Item.getID()));
+                    this.myClient1.send(new ExchangeObjectRemovedMessage(false, item.getID()));
+                    this.myClient2.send(new ExchangeObjectRemovedMessage(true, item.getID()));
                 } else {
-                    this.myClient2.send(new ExchangeObjectRemovedMessage(false, Item.getID()));
-                    this.myClient1.send(new ExchangeObjectRemovedMessage(true, Item.getID()));
+                    this.myClient2.send(new ExchangeObjectRemovedMessage(false, item.getID()));
+                    this.myClient1.send(new ExchangeObjectRemovedMessage(true, item.getID()));
                 }
             } else {
-                this.myItemsToTrade.get(Client).put(Item.getID(), (this.myItemsToTrade.get(Client).get(Item.getID()) + quantity));
+                this.myItemsToTrade.get(Client).put(item.getID(), (this.myItemsToTrade.get(Client).get(item.getID()) + quantity));
 
                 if (Client == this.myClient1) {
-                    this.myClient1.send(new ExchangeObjectModifiedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
-                    this.myClient2.send(new ExchangeObjectModifiedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                    this.myClient1.send(new ExchangeObjectModifiedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+                    this.myClient2.send(new ExchangeObjectModifiedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
                 } else {
-                    this.myClient2.send(new ExchangeObjectModifiedMessage(false, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
-                    this.myClient1.send(new ExchangeObjectModifiedMessage(true, Item.getObjectItem(this.myItemsToTrade.get(Client).get(Item.getID()))));
+                    this.myClient2.send(new ExchangeObjectModifiedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+                    this.myClient1.send(new ExchangeObjectModifiedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
                 }
             }
         }
