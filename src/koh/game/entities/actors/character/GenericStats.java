@@ -22,6 +22,7 @@ public class GenericStats {
     @Getter
     private Map<StatsEnum, CharacterBaseCharacteristic> stats = Collections.synchronizedMap(new HashMap<>());
 
+    @Getter
     private static final Map<StatsEnum, StatsEnum> OPPOSITE_STATS = new HashMap<StatsEnum, StatsEnum>() {
         {
             put(StatsEnum.SUB_NEUTRAL_ELEMENT_REDUCTION, StatsEnum.NEUTRAL_ELEMENT_REDUCTION);

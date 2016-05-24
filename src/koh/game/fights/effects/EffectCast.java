@@ -49,7 +49,7 @@ public class EffectCast {
         return 0;
     }
 
-    public int spellId, fakeValue, damageValue, parentUID,glyphId;
+    public int spellId, fakeValue, damageValue, parentUID, glyphId;
     public short cellId,oldCell,targetKnownCellId;
     public boolean isReflect, isPoison, isCAC, isTrap, isGlyph, isReturnedDamages,isPoutch;
     public double chance;
@@ -84,6 +84,9 @@ public class EffectCast {
          if (type == EffectGenerationType.MIN_EFFECTS) {
          return new EffectInteger(this.id, this.getTemplate.Operator != "-" ? num2 : num1, (EffectBase) this);
          }*/
+        if(isCAC && fakeValue == -1){
+            return (short) num1;
+        }
         if ((int) num2 == 0) {
             return (short) num1;
         } else {

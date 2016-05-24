@@ -2,6 +2,8 @@ package koh.game.fights;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import koh.game.entities.item.InventoryItem;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffSpellCoolDown;
@@ -12,6 +14,8 @@ import lombok.Getter;
  * @author Neo-Craft
  */
 public class FighterSpell {
+
+    private static final int WEAPON_ID = -2;
 
     private HashMap<Integer, ArrayList<SpellTarget>> myTargets = new HashMap<>();
     @Getter
@@ -55,6 +59,20 @@ public class FighterSpell {
         }
 
         return true;
+    }
+
+    public boolean canLaunchWeapon(InventoryItem item){
+        if (!this.myTargets.containsKey(WEAPON_ID)) {
+            return true;
+        }
+        return item.getWeaponTemplate().getMaxCastPerTurn() > this.myTargets.get(WEAPON_ID).size();
+    }
+
+    public void actualize(InventoryItem item , int targetId){
+        if (!this.myTargets.containsKey(WEAPON_ID)) {
+            this.myTargets.put(WEAPON_ID, new ArrayList<>());
+        }
+        this.myTargets.get(WEAPON_ID).add(new SpellTarget(targetId));
     }
 
     public byte minCastInterval(int spell) {

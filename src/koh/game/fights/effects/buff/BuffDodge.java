@@ -17,7 +17,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class BuffDodge extends BuffEffect {
 
     public BuffDodge(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_POST_JET, BuffDecrementType.TYPE_ENDTURN);
+        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_POST_JET, BuffDecrementType.TYPE_BEGINTURN);
     }
 
     @Override
@@ -28,8 +28,8 @@ public class BuffDodge extends BuffEffect {
         
         DamageValue.setValue(0);
 
-        EffectCast SubInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
-        byte Direction = Pathfunction.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
+        final EffectCast SubInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
+        final byte Direction = Pathfunction.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
 
         // Application du push
         return EffectPush.applyPush(SubInfos, this.target, Direction, 1);

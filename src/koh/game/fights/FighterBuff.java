@@ -29,6 +29,7 @@ public class FighterBuff {
     public List<Couple<EffectCast, Integer>> delayedEffects = new CopyOnWriteArrayList<>();
     private static final Logger logger = LogManager.getLogger(FighterBuff.class);
 
+    @Getter
     private ConcurrentHashMap<BuffActiveType, ArrayList<BuffEffect>> buffsAct = new ConcurrentHashMap<BuffActiveType, ArrayList<BuffEffect>>() {
         {
             this.put(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, new ArrayList<>());

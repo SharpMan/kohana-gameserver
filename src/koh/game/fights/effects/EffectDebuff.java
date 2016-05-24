@@ -1,6 +1,8 @@
 package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
+import koh.game.fights.effects.buff.BuffDecrementType;
+import koh.game.fights.effects.buff.BuffEffect;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightDispellMessage;
 
@@ -22,5 +24,7 @@ public class EffectDebuff extends EffectBase {
 
         return -1;
     }
+
+
 
 }

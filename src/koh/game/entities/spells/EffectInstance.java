@@ -11,6 +11,7 @@ import koh.d2o.entities.Effect;
 import koh.game.dao.DAO;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
+import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.BufUtils;
 import static koh.protocol.client.BufUtils.writeBoolean;
@@ -317,10 +318,14 @@ public class EffectInstance implements Serializable {
                        // verify = true;
                         break;
                     case 'T':
+                        verify = true;
                         break;
                     case 'W':
                         break;
                     case 'U':
+                        //System.out.println(pTargetId instanceof StaticFighter);
+                        if(pTargetId instanceof StaticFighter || pTargetId instanceof SummonedFighter)
+                            verify = true;
                         break;
                     case 'v':
                         verify = (((targetInfos.stats.lifePoints / targetInfos.stats.maxLifePoints) * 100) > Integer.parseInt(exclusiveMaskParam));

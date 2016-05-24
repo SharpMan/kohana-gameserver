@@ -31,8 +31,8 @@ public class Pathfunction {
     }
 
     public static int getSquareDistance(int param1, int param2) {
-        MapPoint _loc3_ = MapPoint.fromCellId(param1);
-        MapPoint _loc4_ = MapPoint.fromCellId(param2);
+        final MapPoint _loc3_ = MapPoint.fromCellId(param1);
+        final MapPoint _loc4_ = MapPoint.fromCellId(param2);
         return Math.max(Math.abs(_loc3_.get_x() - _loc4_.get_x()), Math.abs(_loc3_.get_y() - _loc4_.get_y()));
     }
 

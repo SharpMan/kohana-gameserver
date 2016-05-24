@@ -47,6 +47,9 @@ public abstract class BuffEffect {
 
     //TODO: Create List in Setting
     public boolean isDebuffable() {
+        if(this.castInfos.spellId == 103){
+            return false;
+        }
         switch (this.castInfos.effectType) {
             case DAMAGE_ARMOR_REDUCTION:
                 return castInfos.spellId != SpellIDEnum.TREVE;

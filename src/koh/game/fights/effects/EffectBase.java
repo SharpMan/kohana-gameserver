@@ -158,7 +158,7 @@ public abstract class EffectBase {
             //DommageSubis
             this.put(StatsEnum.DAMMAGES_OCASSIONED, new EffectDammageOcassioned());
             this.put(StatsEnum.REDUCE_FINAl_DAMAGE_PERCENT, new EffectDamagePercentReduced());
-            this.put(StatsEnum.INCREASE_FINAL_DAMAGES_PERCENT, new EffectDammageOcassioned());
+            this.put(StatsEnum.INCREASE_FINAL_DAMAGES_PERCENT, new EffectIncreaseFinalDamages());
             //this.put(StatsEnum.SPELL_POWER, new EffectSpellPower());
 
 
@@ -306,7 +306,7 @@ public abstract class EffectBase {
 
             //Zobal
             this.put(StatsEnum.ADVANCE_CELL, new EffectPush());
-            this.put(StatsEnum.BOOST_SHIELD_BASED_ON_CASTER_LIFE, new EffectShieldLifePoint());
+            this.put(StatsEnum.BOOST_SHIELD_LIFE_PERCENT, new EffectShieldLifePoint());
 
             //Resistance% ALL
             this.put(StatsEnum.ADD_ALL_RESITANCES_PERCENT, new EffectAddAllResist());

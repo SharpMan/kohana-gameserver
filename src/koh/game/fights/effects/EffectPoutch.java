@@ -19,7 +19,7 @@ public class EffectPoutch extends EffectBase {
         if(castInfos.effect.diceNum == 3281 || castInfos.effect.diceNum == 3282){
             for (Fighter target : castInfos.targets) {
                 if(castInfos.caster.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getID())){
-                    castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, false, true,castInfos.spellId);
+                    castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, true, true,castInfos.spellId);
                 }
             }
             return -1;
@@ -27,7 +27,7 @@ public class EffectPoutch extends EffectBase {
         else if(castInfos.spellId == 3277){ //Convergence
             for (Fighter target : castInfos.targets) {
                 if(target.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getID())){
-                    castInfos.getFight().launchSpell(target, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, false, false,castInfos.spellId);
+                    castInfos.getFight().launchSpell(target, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, true, false,castInfos.spellId);
                 }
             }
             return -1;

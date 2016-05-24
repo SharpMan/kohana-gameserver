@@ -45,6 +45,12 @@ public class EffectSummon extends EffectBase {
                             : new SummonedReplacerFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster, castInfos.targets.stream().filter(bf -> bf instanceof SummonedFighter).findFirst().get().asSummon().getGrade());
 
 
+                    if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2){
+                        System.out.println(castInfos.targets.get(0).getBuff().delayedEffects.size());
+                        summon.getBuff().delayedEffects.addAll(castInfos.targets.get(0).getBuff().delayedEffects);
+                        summon.getBuff().delayedEffects.forEach(e -> e.first.targets.add(summon));
+                    }
+
                     summon.joinFight();
                     castInfos.caster.getFight().getFightWorker().summonFighter(summon);
                     summon.getFight().joinFightTeam(summon, castInfos.caster.getTeam(), false, castInfos.cellId, true);

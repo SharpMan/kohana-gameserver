@@ -186,7 +186,7 @@ TELEPORT_STARTING_TURN_CELL
                case DAMMAGES_OCASSIONED:
                case ADD_CRITICAL_DAMAGES_REDUCTION:
                case ADD_PUSH_DAMAGES_REDUCTION:
-               case BOOST_SHIELD_BASED_ON_CASTER_LIFE:
+               case BOOST_SHIELD_LIFE_PERCENT:
                case ADD_ALL_RESITANCES_PERCENT:
                case DAMAGE_RETURN:
                case NEUTRAL_ELEMENT_REDUCTION:

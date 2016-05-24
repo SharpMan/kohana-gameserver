@@ -35,8 +35,10 @@ public class EffectCastSpell extends EffectBase {
             return -1;
         }
 
-            for (Fighter target : castInfos.targets)
+
+            for (Fighter target : castInfos.targets) {
                 target.getFight().affectSpellTo(castInfos.caster, target, castInfos.effect.diceSide, castInfos.effect.diceNum);
+            }
 
         return -1;
     }

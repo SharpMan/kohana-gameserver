@@ -427,9 +427,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private static final StatsEnum[] FIRST_EFFECTS = new StatsEnum[]{
             StatsEnum.DISPELL_SPELL,
             StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2,
+            //StatsEnum.CAST_SPELL,
             KILL_TARGET_TO_REPLACE_INVOCATION,
+            StatsEnum.KILL,
             StatsEnum.SUMMON,
-            StatsEnum.KILL
+
     };
 
     public void launchSpell(Fighter fighter, SpellLevel spellLevel, short cellId, boolean friend, boolean fakeLaunch, boolean imTargeted, int spellId) {
@@ -483,10 +485,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             });
         }
 
-        EffectInstanceDice[] spellEffects = isCc ? spellLevel.getCriticalEffect() : spellLevel.getEffects();
-        if (spellEffects == null) {
-            spellEffects = spellLevel.getCriticalEffect();
-        }
+        EffectInstanceDice[] spellEffects = isCc || spellLevel.getEffects() == null ? spellLevel.getCriticalEffect() : spellLevel.getEffects();
+
         final int maxGroup = Arrays.stream(spellEffects).mapToInt(ef -> ef.group).max().orElse(0);
         if (maxGroup > 0) {
             Arrays.stream(spellEffects).forEach(e -> e.random = 0); //TODO check 3-4 monsters group spells
@@ -583,12 +583,16 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 targets.get(effect).clear();
                 targets.get(effect).add(fighter);
             }
+            if(effect.getEffectType() == CAST_SPELL && effect.diceNum == 5574 && getCell(cellId).getFighter() != null){
+                targets.get(effect).add(getCell(cellId).getFighter());
+                effect.delay++;
+            }
             if (effect.delay > 0) {
                 //TODO: Set ParentBoost UID
                 fighter.getBuff().delayedEffects.add(new Couple<>(new EffectCast(effect.getEffectType(), spellId == -1 ? spellLevel.getSpellId() : spellId, cellId, num1, effect, fighter, targets.get(effect), false, StatsEnum.NONE, 0, spellLevel), effect.delay));
-                targets.get(effect).stream().forEach((target) -> {
-                    this.sendToField(new GameActionFightDispellableEffectMessage(effect.effectId, fighter.getID(), new FightTriggeredEffect(target.getNextBuffUid().incrementAndGet(), target.getID(), (short) effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), effect.effectUid, 0, (short) effect.diceNum, (short) effect.diceSide, (short) effect.value, (short) effect.delay)));
-                });
+                targets.get(effect).stream().forEach((target) ->
+                    this.sendToField(new GameActionFightDispellableEffectMessage(effect.effectId, fighter.getID(), new FightTriggeredEffect(target.getNextBuffUid().incrementAndGet(), target.getID(), (short) effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), effect.effectUid, 0, (short) effect.diceNum, (short) effect.diceSide, (short) effect.value, (short) effect.delay)))
+                );
                 continue;
             }
             final EffectCast castInfos = new EffectCast(effect.getEffectType(), spellId == -1 ? spellLevel.getSpellId() : spellId, cellId, num1, effect, fighter, targets.get(effect), false, StatsEnum.NONE, 0, spellLevel);
@@ -615,7 +619,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    //TODO : Log number of cac launched in case if he reconnect and useBug
+
     public void launchWeapon(CharacterFighter fighter, short cellId) {
         // Combat encore en cour ?
         if (this.fightState != fightState.STATE_ACTIVE) {
@@ -635,9 +639,16 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             targetE = this.hasFriendInCell(cellId, fighter.getTeam());
         }
         int targetId = targetE == null ? -1 : targetE.getID();
-        if (!(Pathfunction.goalDistance(map, cellId, fighter.getCellId()) <= weapon.getWeaponTemplate().getRange()
+
+        if(!fighter.getSpellsController().canLaunchWeapon(weapon)){
+            fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
+            this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
+            return;
+        }
+
+        if (!/*(Pathfunction.goalDistance(map, cellId, fighter.getCellId()) <= weapon.getWeaponTemplate().getRange()
                 && Pathfunction.goalDistance(map, cellId, fighter.getCellId()) >= weapon.getWeaponTemplate().getMinRange()
-                && fighter.getAP() >= weapon.getWeaponTemplate().getApCost())) {
+                && */(fighter.getAP() >= weapon.getWeaponTemplate().getApCost())) {
             fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
             return;
@@ -704,10 +715,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
             final EffectCast castInfos = new EffectCast(StatsEnum.valueOf(effect.actionId), 0, cellId, num1, effectParent, fighter, targets, true, StatsEnum.NONE, 0, null);
             castInfos.targetKnownCellId = cellId;
+            if(isCc){
+                castInfos.fakeValue = -1;
+            }
             if (EffectBase.tryApplyEffect(castInfos) == -3) {
                 break;
             }
         }
+        fighter.getSpellsController().actualize(weapon,targetId);
 
         this.sendToField(new GameActionFightPointsVariationMessage(!isCc ? ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT : ActionIdEnum.ACTION_FIGHT_CLOSE_COMBAT_CRITICAL_MISS, fighter.getID(), fighter.getID(), (short) weapon.getWeaponTemplate().getApCost()));
         this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
@@ -1100,12 +1115,16 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void affectSpellTo(Fighter caster, Fighter target, int level, int... spells) {
         SpellLevel spell;
+        System.out.println(spells.length);
         for (int spellid : spells) {
             spell = DAO.getSpells().findSpell(spellid).getSpellLevel(level);
             double num1 = Fight.RANDOM.nextDouble();
             double num2 = (double) Arrays.stream(spell.getEffects()).mapToInt(x -> x.random).sum();
             boolean flag = false;
+            System.out.println(spell.getEffects().length);
             for (EffectInstanceDice effect : spell.getEffects()) {
+                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}", effect.effectId, target.getID(), EffectHelper.verifyEffectTrigger(caster, target, spell.getEffects(), effect, false, effect.triggers, target.getCellId(), true), effect.isValidTarget(caster, target), EffectInstanceDice.verifySpellEffectMask(caster, target, effect));
+
                 if (!(effect.isValidTarget(caster, target)
                         && EffectInstanceDice.verifySpellEffectMask(caster, target, effect)) ||
                         ((effect.targetMask.equals("C") && caster.getCarrierActorId() == target.getID())
