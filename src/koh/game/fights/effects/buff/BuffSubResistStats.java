@@ -27,20 +27,20 @@ public class BuffSubResistStats extends BuffEffect {
         this.Value1 = castInfos.randomJet(target);
 
         this.target.getStats().addBoost(StatsEnum.SUB_EARTH_RESIST_PERCENT, this.Value1);
-        this.target.getStats().addBoost(StatsEnum.SUB_WATER_ELEMENT_REDUCTION, this.Value1);
-        this.target.getStats().addBoost(StatsEnum.SUB_FIRE_ELEMENT_REDUCTION, this.Value1);
-        this.target.getStats().addBoost(StatsEnum.SUB_NEUTRAL_ELEMENT_REDUCTION, this.Value1);
-        this.target.getStats().addBoost(StatsEnum.SUB_AIR_ELEMENT_REDUCTION, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.SUB_WATER_RESIST_PERCENT, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.SUB_FIRE_RESIST_PERCENT, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.SUB_NEUTRAL_RESIST_PERCENT, this.Value1);
+        this.target.getStats().addBoost(StatsEnum.SUB_AIR_RESIST_PERCENT, this.Value1);
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int removeEffect() {
         this.target.getStats().getEffect(StatsEnum.SUB_EARTH_RESIST_PERCENT).additionnal -= this.Value1;
-        this.target.getStats().getEffect(StatsEnum.SUB_WATER_ELEMENT_REDUCTION).additionnal -= this.Value1;
-        this.target.getStats().getEffect(StatsEnum.SUB_FIRE_ELEMENT_REDUCTION).additionnal -= this.Value1;
-        this.target.getStats().getEffect(StatsEnum.SUB_NEUTRAL_ELEMENT_REDUCTION).additionnal -= this.Value1;
-        this.target.getStats().getEffect(StatsEnum.SUB_AIR_ELEMENT_REDUCTION).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.SUB_WATER_RESIST_PERCENT).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.SUB_FIRE_RESIST_PERCENT).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.SUB_NEUTRAL_RESIST_PERCENT).additionnal -= this.Value1;
+        this.target.getStats().getEffect(StatsEnum.SUB_AIR_RESIST_PERCENT).additionnal -= this.Value1;
 
         return super.removeEffect();
     }

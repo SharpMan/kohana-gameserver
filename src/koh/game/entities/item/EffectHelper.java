@@ -328,7 +328,7 @@ public class EffectHelper {
         return effects;
     }
 
-    public static List<ObjectEffect> generateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType GenType, boolean isWeapon) {
+    public static List<ObjectEffect> generateIntegerEffect(EffectInstance[] possibleEffects, EffectGenerationType genType, boolean isWeapon) {
         final List<ObjectEffect> effects = new ArrayList<>();
         for (EffectInstance e : possibleEffects) {
             if (e instanceof EffectInstanceDice) {
@@ -363,20 +363,20 @@ public class EffectHelper {
                     continue;
                 }
 
-                short num1 = (short) ((int) ((EffectInstanceDice) e).diceNum >= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
-                short num2 = (short) ((int) ((EffectInstanceDice) e).diceNum <= (int) ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
-                if (GenType == EffectGenerationType.MAX_EFFECTS) {
+                short num1 = (short) (((EffectInstanceDice) e).diceNum >= ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
+                short num2 = (short) (((EffectInstanceDice) e).diceNum <= ((EffectInstanceDice) e).diceSide ? ((EffectInstanceDice) e).diceNum : ((EffectInstanceDice) e).diceSide);
+                if (genType == EffectGenerationType.MAX_EFFECTS && !e.getTemplate().operator.equalsIgnoreCase("-")) {
                     effects.add(new ObjectEffectInteger(e.effectId, !e.getTemplate().operator.equalsIgnoreCase("-") ? num1 : num2));
                     continue;
                 }
-                if (GenType == EffectGenerationType.MIN_EFFECTS) {
+                if (genType == EffectGenerationType.MIN_EFFECTS) {
                     effects.add(new ObjectEffectInteger(e.effectId, !e.getTemplate().operator.equalsIgnoreCase("-") ? num2 : num1));
                     continue;
                 }
                 if ((int) num2 == 0) {
                     effects.add(new ObjectEffectInteger(e.effectId, num1));
                 } else {
-                    effects.add(new ObjectEffectInteger(e.effectId, (short) randomValue((int) num2, (int) num1)));
+                    effects.add(new ObjectEffectInteger(e.effectId, randomValue( num2, num1)));
                 }
             } else {
                 throw new Error("effect not suport" + e.toString());

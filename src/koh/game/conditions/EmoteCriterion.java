@@ -25,7 +25,7 @@ public class EmoteCriterion extends Criterion {
     @Override
     public boolean eval(Player character) {
         //FIXME : See if another operator exist for this
-        switch (this.Operator) {
+        switch (this.operator) {
             case INEQUALS:
                 return !Bytes.contains(character.getEmotes(), emote);
             case EQUALS:

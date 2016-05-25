@@ -27,10 +27,10 @@ public class HasItemCriterion extends Criterion {
 
     @Override
     public boolean eval(Player character) {
-        if (this.Operator == ComparaisonOperatorEnum.EQUALS) {
+        if (this.operator == ComparaisonOperatorEnum.EQUALS) {
             return character.getInventoryCache().hasItemId(this.Item);
         }
-        else if (this.Operator == ComparaisonOperatorEnum.INEQUALS) {
+        else if (this.operator == ComparaisonOperatorEnum.INEQUALS) {
             return !character.getInventoryCache().hasItemId(this.Item);
         } else {
             return true;

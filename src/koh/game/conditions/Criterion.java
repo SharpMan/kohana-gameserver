@@ -8,7 +8,7 @@ import org.apache.commons.lang3.NotImplementedException;
  */
 public abstract class Criterion extends ConditionExpression {
 
-    public ComparaisonOperatorEnum Operator;
+    public ComparaisonOperatorEnum operator;
 
     public String literal;
 
@@ -149,19 +149,19 @@ public abstract class Criterion extends ConditionExpression {
     public abstract void Build();
 
     protected boolean Compare(Object obj, Object comparand) {
-        switch (this.Operator) {
+        switch (this.operator) {
             case EQUALS:
                 return obj.equals(comparand);
             case INEQUALS:
                 return !obj.equals(comparand);
             default:
-                throw new NotImplementedException(String.format("Cannot use {0} comparator on objects {1} and {2}", this.Operator, obj, comparand));
+                throw new NotImplementedException(String.format("Cannot use {0} comparator on objects {1} and {2}", this.operator, obj, comparand));
         }
     }
 
     protected <T> boolean Compare(Comparable<T> obj, T comparand) {
         final int num = obj.compareTo(comparand);
-        switch (this.Operator) {
+        switch (this.operator) {
             case EQUALS:
                 return num == 0;
             case INEQUALS:
@@ -171,12 +171,12 @@ public abstract class Criterion extends ConditionExpression {
             case INFERIOR:
                 return num < 0;
             default:
-                throw new NotImplementedException(String.format("Cannot use {0} comparator on IComparable {1} and {2}", this.Operator, obj, comparand));
+                throw new NotImplementedException(String.format("Cannot use {0} comparator on IComparable {1} and {2}", this.operator, obj, comparand));
         }
     }
 
     protected boolean Compare(String str, String comparand) {
-        switch (this.Operator) {
+        switch (this.operator) {
             case EQUALS:
                 return str.equals(comparand);
             case INEQUALS:
@@ -193,12 +193,12 @@ public abstract class Criterion extends ConditionExpression {
             case ENDWITHLIKE:
                 return str.toLowerCase().endsWith(comparand.toLowerCase());
             default:
-                throw new NotImplementedException(String.format("Cannot use {0} comparator on strings '{1}' and '{2}'", this.Operator, str, comparand));
+                throw new NotImplementedException(String.format("Cannot use {0} comparator on strings '{1}' and '{2}'", this.operator, str, comparand));
         }
     }
 
     protected String FormatToString(String identifier) {
-        return String.format("{0}{1}{2}", identifier, Criterion.GetOperatorChar(this.Operator), this.literal);
+        return String.format("{0}{1}{2}", identifier, Criterion.GetOperatorChar(this.operator), this.literal);
     }
 
 }

@@ -20,19 +20,19 @@ public class ConditionParser {
 
     public ConditionExpression parse() {
         this.trimAllSpaces();
-        PriorityOperator priorityOperator = (PriorityOperator) null;
+        PriorityOperator priorityOperator = null;
         this.parseParentheses();
         while (this.m_parentheses.containsKey(0) && this.m_parentheses.get(0) == this.str.length() - 1) {
-            this.str = this.str.delete(this.str.length() - 1, 1).delete(0, 1);
+            this.str = this.str.deleteCharAt(this.str.length() - 1).deleteCharAt(0);
             if (priorityOperator != null) {
-                priorityOperator.Expression = (ConditionExpression) new PriorityOperator();
+                priorityOperator.Expression =  new PriorityOperator();
                 priorityOperator = (PriorityOperator) priorityOperator.Expression;
             } else {
                 priorityOperator = new PriorityOperator();
             }
             this.parseParentheses();
         }
-        ConditionExpression conditionExpression1 = this.tryParseBoolOperator();
+        final ConditionExpression conditionExpression1 = this.tryParseBoolOperator();
         if (conditionExpression1 != null) {
             if (priorityOperator == null) {
                 return conditionExpression1;
@@ -40,7 +40,7 @@ public class ConditionParser {
             priorityOperator.Expression = conditionExpression1;
             return (ConditionExpression) priorityOperator;
         } else {
-            ConditionExpression conditionExpression2 = this.tryParseComparaisonOperator();
+            final ConditionExpression conditionExpression2 = this.tryParseComparaisonOperator();
             if (conditionExpression2 == null) {
                 throw new Error(String.format("Cannot parse {0} : No operator found", this.str));
             }
@@ -103,14 +103,14 @@ public class ConditionParser {
 
     private void parseParentheses() {
         this.m_parentheses.clear();
-        Stack<Integer> stack = new Stack<>();
-        for (int index = 0; index < this.str.length(); ++index) {
-            if ((int) this.str.charAt(index) == 40) {
+        final Stack<Integer> stack = new Stack<>();
+        for (int index = 0; index < this.str.length(); index++) {
+            if (this.str.charAt(index) == '(') {
                 stack.push(index);
             }
-            if ((int) this.str.charAt(index) == 41 && stack.size() > 0) {
+            if (this.str.charAt(index) == ')' && stack.size() > 0) {
                 this.m_parentheses.put(stack.pop(), index);
-            } else if ((int) this.str.charAt(index) == 41 && stack.size() <= 0) {
+            } else if (this.str.charAt(index) == ')' && stack.size() <= 0) {
                 throw new Error(String.format("Cannot evaluate {0} : Parenthese at index {1} is not binded to an open parenthese", this.str, index));
             }
         }
@@ -145,14 +145,14 @@ public class ConditionParser {
                     if (Strings.isNullOrEmpty(name)) {
                         throw new Error(String.format("Cannot parse {0} : left Expression of comparaison operator index {1} is empty", this.str, length));
                     }
-                    Criterion criterionByName = Criterion.CreateCriterionByName(name);
+                    final Criterion criterionByName = Criterion.CreateCriterionByName(name);
                     String str = this.str.toString().substring(length + 1, (length + 1)+this.str.length() - (length + 1));
                     
                     if (Strings.isNullOrEmpty(str)) {
                         throw new Error(String.format("Cannot parse {0} : right Expression of comparaison operator index {1} is empty", this.str, length));
                     }
                     criterionByName.literal = str;
-                    criterionByName.Operator = operator;
+                    criterionByName.operator = operator;
                     criterionByName.Build();
                     return (ConditionExpression) criterionByName;
                 } else {

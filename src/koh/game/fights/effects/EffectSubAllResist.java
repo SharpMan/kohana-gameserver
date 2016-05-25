@@ -16,8 +16,8 @@ public class EffectSubAllResist extends EffectBase {
             if (Target instanceof IllusionFighter) {
                 continue;//Roulette tue clone ...
             }
-            EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
-            BuffSubResistStats BuffStats = new BuffSubResistStats(SubInfos, Target);
+            final EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
+            final BuffSubResistStats BuffStats = new BuffSubResistStats(SubInfos, Target);
 
             if (Target.getBuff().buffMaxStackReached(BuffStats)) {
                 return -1;

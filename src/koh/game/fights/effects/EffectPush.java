@@ -42,6 +42,9 @@ public class EffectPush extends EffectBase {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
                     if(castInfos.spellId == SpellIDEnum.BOTTE){
+                        if(castInfos.targetKnownCellId == target.getCellId()){
+                            continue;
+                        }
                         final int ID = target.getID();
                         if(Arrays.stream((new Zone(castInfos.effect.getZoneShape(), castInfos.effect.zoneSize(), MapPoint.fromCellId(castInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castInfos.cellId), true), castInfos.getFight().getMap()))
                                 .getCells(castInfos.cellId))
