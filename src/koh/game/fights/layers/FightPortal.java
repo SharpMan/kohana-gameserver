@@ -98,7 +98,10 @@ public class FightPortal extends FightActivableObject {
     }
 
     public void disable(Fighter fighter) {
-        if (!enabled) {
+        /*if (!enabled) {
+            return;
+        }*/
+        if(disabledByCaster){
             return;
         }
         this.enabled = false;

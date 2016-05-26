@@ -2,6 +2,7 @@ package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffLifeSteal;
+import koh.protocol.client.enums.StatsEnum;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -34,6 +35,20 @@ public class EffectLifeSteal extends EffectBase {
         }
 
         return -1;
+    }
+
+    public static boolean isStealingEffect(StatsEnum stat){
+        switch (stat){
+            case STEAL_NEUTRAL:
+            case STEAL_EARTH:
+            case STEAL_AIR:
+            case STEAL_FIRE:
+            case STEAL_WATER:
+            case STEAL_PV_FIX:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public static int applyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {

@@ -1,9 +1,12 @@
 package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
+import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectDamage;
+import koh.game.fights.effects.EffectLifeSteal;
 import koh.protocol.client.enums.FightDispellableEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -19,9 +22,9 @@ public class BuffSacrifice extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
         //TODO trigger
-        if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
+        if (damageInfos.isReflect || damageInfos.isReturnedDamages || damageInfos.isPoison) {
             return -1;
         }
         // mort
@@ -32,9 +35,13 @@ public class BuffSacrifice extends BuffEffect {
 
         damageValue.setValue(0);
 
-        DamageInfos.isReturnedDamages = true;
+        damageInfos.isReturnedDamages = true;
 
-        return EffectDamage.applyDamages(DamageInfos, castInfos.caster, new MutableInt(DamageInfos.randomJet(caster)));
+        if(EffectLifeSteal.isStealingEffect(damageInfos.effectType)){
+            return EffectLifeSteal.applyLifeSteal(damageInfos,castInfos.caster,new MutableInt(damageInfos.randomJet(caster)));
+        }
+
+        return EffectDamage.applyDamages(damageInfos, castInfos.caster, new MutableInt(damageInfos.randomJet(caster)));
 
     }
 

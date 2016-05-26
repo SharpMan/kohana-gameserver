@@ -54,6 +54,8 @@ import org.apache.logging.log4j.Logger;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -251,6 +253,7 @@ public class CharacterHandler {
                         .kamas(DAO.getSettings().getIntElement("Register.KamasStart"))
                         .shortcuts(new ShortcutBook())
                         .emotes(new byte[]{1, 8, 19})
+                        .additionalStats(new ConcurrentHashMap<>(6))
                         .ornaments(new int[0])
                         .titles(new int[0])
                         .kolizeumRate(Glicko2Player.defaultValue())

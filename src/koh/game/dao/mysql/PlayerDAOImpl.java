@@ -196,6 +196,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .mountInfo(new MountInformations().deserialize(result.getBytes("mount_informations")))
                             .moodSmiley((byte) -1)
                             .fighterLook(new Object())
+                            .additionalStats(Enumerable.stringToIntHashMap(result.getString("additional_stat"),6))
                             .build();
                     Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
                     p.setMapid(result.getInt("map"));
@@ -236,7 +237,7 @@ public class PlayerDAOImpl extends PlayerDAO {
 
     @Override
     public boolean update(Player character, boolean clear) {
-        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `character` set breed = ?,skins = ?,scales = ?,sex = ?,level = ?,colors = ?,map = ?,cell = ?,chat_channels = ?,stat_points = ?,spell_points = ?,stats = ?,spells = ?,kamas = ?,shortcuts = ?,savedpos = ? ,entity_look = ?,emotes = ?,tinsel = ?,mount_informations = ?,job_informations = ?,honor_points = ?, alignment_informations = ?, scores = ? WHERE id = ?;")) {
+        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `character` set breed = ?,skins = ?,scales = ?,sex = ?,level = ?,colors = ?,map = ?,cell = ?,chat_channels = ?,stat_points = ?,spell_points = ?,stats = ?,spells = ?,kamas = ?,shortcuts = ?,savedpos = ? ,entity_look = ?,emotes = ?,tinsel = ?,mount_informations = ?,job_informations = ?,honor_points = ?, alignment_informations = ?, scores = ?, additional_stat = ? WHERE id = ?;")) {
             PreparedStatement pStatement = conn.getStatement();
             pStatement.setInt(1, character.getBreed());
             pStatement.setString(2, StringUtils.join(character.getSkins(), ','));
@@ -262,7 +263,8 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setInt(22, character.getHonor());
             pStatement.setString(23, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor());
             pStatement.setString(24, StringUtils.join(character.getScores().values(), ','));
-            pStatement.setInt(25, character.getID());
+            pStatement.setString(25, Enumerable.join(character.getAdditionalStats()));
+            pStatement.setInt(26, character.getID());
 
             pStatement.executeUpdate();
             if (clear) {

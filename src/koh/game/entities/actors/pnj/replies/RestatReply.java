@@ -30,6 +30,36 @@ public class RestatReply extends NpcReply {
         p.getStats().getStats().get(StatsEnum.AGILITY).base = 0;
         p.getStats().getStats().get(StatsEnum.CHANCE).base = 0;
         p.setStatPoints((p.getLevel() - 1) * 5);
+        p.getAdditionalStats().forEach((stat, number) -> {
+            p.getStats().addBase(StatsEnum.valueOf(stat), number);
+            switch (StatsEnum.valueOf(stat)) {
+                case STRENGTH:
+                    p.setStrength(p.getStrength() + number);
+                    break;
+
+                case VITALITY:
+                    p.setVitality(p.getVitality() + number);
+                    p.healLife(p.getLife() + number); // on boost la life
+                    break;
+
+                case WISDOM:
+                    p.setWisdom(p.getWisdom() + number);
+                    break;
+
+                case INTELLIGENCE:
+                    p.setIntell(p.getIntell() + number);
+                    break;
+
+                case CHANCE:
+                    p.setChance(p.getChance() + number);
+                    break;
+
+                case AGILITY:
+                    p.setAgility(p.getAgility() + number);
+                    break;
+            }
+        });
+        p.getAdditionalStats().clear();
         p.refreshStats();
         p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,470));
         return true;

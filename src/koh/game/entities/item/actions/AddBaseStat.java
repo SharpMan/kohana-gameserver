@@ -24,8 +24,14 @@ public class AddBaseStat  extends ItemAction {
     public boolean execute(Player p, int cell) {
         if(!super.execute(p, cell) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
-        //TODO : Boost + LOG it in db column
         p.getStats().addBase(StatsEnum.valueOf(statId),number);
+
+        if(p.getAdditionalStats().containsKey(statId)){
+            p.getAdditionalStats().replace(statId, p.getAdditionalStats().get(statId) + 1);
+        }else{
+            p.getAdditionalStats().put(statId, 1);
+        }
+
         switch (StatsEnum.valueOf(statId)) {
             case STRENGTH:
                 p.setStrength(p.getStrength() + number);

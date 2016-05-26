@@ -127,6 +127,8 @@ public class Player extends IGameActor implements Observer {
     @Setter
     @Getter
     private LinkedHashMap<ScoreType, Integer> scores;
+    @Getter @Setter
+    private Map<Integer,Integer> additionalStats;
     @Setter
     @Getter
     private int chance, life, vitality, wisdom, strength, intell, agility;
