@@ -146,7 +146,11 @@ public class EffectPush extends EffectBase {
 
                 }
 
-                int result = target.setCell(currentCell);
+                if(currentCell.getId() == target.getCellId()){ //StarckOverflow's correction by pushing same cell
+                    return pushResult;
+                }
+
+                final int result = target.setCell(currentCell);
 
                 if (pushResult < result) {
                     return pushResult;

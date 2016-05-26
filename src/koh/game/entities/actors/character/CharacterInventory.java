@@ -362,6 +362,7 @@ public class CharacterInventory {
                 }
                 player.refreshStats();
                 player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
+                this.checkItemsCriterias();
                 return;
             }
             if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
@@ -453,6 +454,7 @@ public class CharacterInventory {
         player.send(new InventoryWeightMessage(getWeight(), getTotalWeight()));
         //System.out.println(this.player.getEntityLook().toString());
         player.refreshEntitie();
+        this.checkItemsCriterias();
     }
 
     public void beforeItemSet(InventoryItem Item) {
@@ -686,10 +688,9 @@ public class CharacterInventory {
     }
 
     private void checkItemsCriterias() {
-        //(!ConditionParser.validConditions(player, x.getTemplate().criteria)))
-        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && !x.areConditionFilled(player)).forEach((Item) -> {
-            this.moveItem(Item.getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1);
-        });
+        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && !x.areConditionFilled(player)).forEach((Item) ->
+            this.moveItem(Item.getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1)
+        );
     }
 
     public short weaponCriticalHit() {

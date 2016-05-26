@@ -30,14 +30,14 @@ public class FighterBuff {
     private static final Logger logger = LogManager.getLogger(FighterBuff.class);
 
     @Getter
-    private ConcurrentHashMap<BuffActiveType, ArrayList<BuffEffect>> buffsAct = new ConcurrentHashMap<BuffActiveType, ArrayList<BuffEffect>>() {
+    private ConcurrentHashMap<BuffActiveType, List<BuffEffect>> buffsAct = new ConcurrentHashMap<BuffActiveType, List<BuffEffect>>() {
         {
             this.put(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACKED_POST_JET_TRAP, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_AFTER_JET, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ATTACK_POST_JET, new ArrayList<>());
-            this.put(BuffActiveType.ACTIVE_HEAL_AFTER_JET, new ArrayList<>());
+            this.put(BuffActiveType.ACTIVE_HEAL_AFTER_JET, new CopyOnWriteArrayList<>());
             this.put(BuffActiveType.ACTIVE_BEGINTURN, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ENDTURN, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_ENDMOVE, new ArrayList<>());
@@ -159,8 +159,8 @@ public class FighterBuff {
 
         this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.duration <= 0 && x.duration != -1);
 
-        for (ArrayList<BuffEffect> BuffList : this.buffsAct.values()) {
-            BuffList.removeIf(Buff -> Buff.decrementType == BuffDecrementType.TYPE_ENDTURN && Buff.duration <= 0);
+        for (List<BuffEffect> buffList : this.buffsAct.values()) {
+            buffList.removeIf(Buff -> Buff.decrementType == BuffDecrementType.TYPE_ENDTURN && Buff.duration <= 0);
         }
 
         return -1;

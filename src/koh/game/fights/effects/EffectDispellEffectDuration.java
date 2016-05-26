@@ -77,7 +77,7 @@ public class EffectDispellEffectDuration extends EffectBase {
 
 
     private static boolean isNotBad(BuffEffect buff){
-        return (buff.getCastInfos().effect.category() != EffectHelper.DAMAGE_EFFECT_CATEGORY)
+        return (buff.getCastInfos().effect != null && buff.getCastInfos().effect.category() != EffectHelper.DAMAGE_EFFECT_CATEGORY)
                 || !(buff instanceof BuffStats && GenericStats.getOPPOSITE_STATS().containsKey(buff.castInfos.effectType));
     }
 

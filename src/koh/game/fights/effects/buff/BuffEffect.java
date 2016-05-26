@@ -59,6 +59,7 @@ public abstract class BuffEffect {
             //Domage de sort
             case TRANSFORMATION:
                 return false;
+
         }
         return this.castInfos.subEffect != StatsEnum.NOT_DISPELLABLE;
 
