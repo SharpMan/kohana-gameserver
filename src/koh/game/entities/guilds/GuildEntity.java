@@ -4,7 +4,6 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import koh.game.dao.DAO;
-import koh.game.dao.sqlite.GuildDAOImpl;
 
 /**
  *
@@ -13,7 +12,7 @@ import koh.game.dao.sqlite.GuildDAOImpl;
 @DatabaseTable(tableName = "guilds")
 public class GuildEntity {
 
-    public void Save() {
+    public void save() {
         DAO.getGuilds().update(this);
     }
 
@@ -69,7 +68,7 @@ public class GuildEntity {
 
     public void addExperience(long value) {
         this.experience = String.valueOf(Long.valueOf(this.experience) + value);
-        this.Save();
+        this.save();
     }
 
 }

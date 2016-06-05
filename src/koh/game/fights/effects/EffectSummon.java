@@ -46,7 +46,7 @@ public class EffectSummon extends EffectBase {
 
 
                     if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2){
-                        System.out.println(castInfos.targets.get(0).getBuff().delayedEffects.size());
+                        //System.out.println(castInfos.targets.get(0).getBuff().delayedEffects.size());
                         summon.getBuff().delayedEffects.addAll(castInfos.targets.get(0).getBuff().delayedEffects);
                         summon.getBuff().delayedEffects.forEach(e -> e.first.targets.add(summon));
                     }

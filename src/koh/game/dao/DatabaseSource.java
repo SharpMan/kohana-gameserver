@@ -10,6 +10,7 @@ import koh.game.dao.mysql.*;
 import koh.game.dao.script.MonsterMindDAOImpl;
 import koh.game.dao.script.PlayerCommandDAOImpl;
 import koh.game.dao.sqlite.*;
+import koh.game.entities.guilds.GuildMember;
 import koh.patterns.services.api.DependsOn;
 import koh.patterns.services.api.Service;
 import koh.game.app.Loggers;
@@ -107,6 +108,14 @@ public class DatabaseSource implements Service {
 
     @Override
     public void stop() {
+        System.out.println("Player saving....");
+        DAO.getPlayers().getPlayers().forEach(pl -> pl.save(false));
+        System.out.println("Guild saving....");
+        DAO.getGuilds().asStream().forEach(Guild ->
+                Guild.memberStream().forEach(GuildMember::save)
+        );
+        System.out.println("GuildMember saving....");
+        DAO.getGuilds().getEntites().forEach(DAO.getGuilds()::update);
 
         Field[] fields = DAO.class.getDeclaredFields();
         for(Field field : fields){

@@ -12,22 +12,22 @@ public class EffectSubAllResist extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        for (Fighter Target : castInfos.targets) {
-            if (Target instanceof IllusionFighter) {
+        for (final Fighter target : castInfos.targets) {
+            if (target instanceof IllusionFighter) {
                 continue;//Roulette tue clone ...
             }
-            final EffectCast SubInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
-            final BuffSubResistStats BuffStats = new BuffSubResistStats(SubInfos, Target);
+            final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets, castInfos.spellLevel);
+            final BuffSubResistStats buffStats = new BuffSubResistStats(subInfos, target);
 
-            if (Target.getBuff().buffMaxStackReached(BuffStats)) {
+            if (target.getBuff().buffMaxStackReached(buffStats)) {
                 return -1;
             }
 
-            if (BuffStats.applyEffect(null, null) == -3) {
+            if (buffStats.applyEffect(null, null) == -3) {
                 return -3;
             }
 
-            Target.getBuff().addBuff(BuffStats);
+            target.getBuff().addBuff(buffStats);
         }
 
         return -1;

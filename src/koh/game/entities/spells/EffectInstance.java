@@ -1,22 +1,17 @@
 package koh.game.entities.spells;
 
 import com.mysql.jdbc.StringUtils;
-
-import java.io.Serializable;
-import java.util.regex.Matcher;
-
 import jregex.Pattern;
 import jregex.REFlags;
 import koh.d2o.entities.Effect;
 import koh.game.dao.DAO;
+import koh.game.entities.maps.pathfinding.MapPoint;
+import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.BufUtils;
-import static koh.protocol.client.BufUtils.writeBoolean;
-import static koh.protocol.client.BufUtils.writeUTF;
-
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
 import koh.protocol.client.enums.SpellTargetType;
@@ -30,8 +25,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
+import java.io.Serializable;
+import java.util.regex.Matcher;
+
+import static koh.protocol.client.BufUtils.writeBoolean;
+import static koh.protocol.client.BufUtils.writeUTF;
+
 /**
- *
  * @author Neo-Craft
  */
 public class EffectInstance implements Serializable {
@@ -68,7 +68,7 @@ public class EffectInstance implements Serializable {
 
     public byte zoneMinSize() {
         this.parseZone();
-        return (byte)this.zoneMinSize;
+        return (byte) this.zoneMinSize;
     }
 
     public byte zoneSize() {
@@ -85,7 +85,6 @@ public class EffectInstance implements Serializable {
         return StatsEnum.valueOf(this.effectId);
     }
 
-    
 
     public boolean isValidTarget(Fighter Caster, Fighter actor) {
         return targets() == SpellTargetType.NONE
@@ -165,8 +164,8 @@ public class EffectInstance implements Serializable {
         this.triggers = "";
     }
 
-    public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect) {
-        return verifySpellEffectMask(pCasterId, pTargetId, pEffect, 0);
+    public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect, short cell) {
+        return verifySpellEffectMask(pCasterId, pTargetId, pEffect, cell, 0);
     }
 
     public int category() {
@@ -176,7 +175,7 @@ public class EffectInstance implements Serializable {
         return DAO.getD2oTemplates().getEffect(this.effectId).category;
     }
 
-    public static Boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect, int pTriggeringSpellCasterId) {
+    public static boolean verifySpellEffectMask(Fighter pCasterId, Fighter pTargetId, EffectInstance pEffect, short cell, int pTriggeringSpellCasterId) {
         Pattern r;
         final String targetMaskPattern;
         final Matcher exclusiveMasks;
@@ -187,7 +186,8 @@ public class EffectInstance implements Serializable {
         int maskState;
         if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
             return (false);
-        };
+        }
+        ;
         final boolean targetIsCaster = (pTargetId.getID() == pCasterId.getID());
         final boolean targetIsCarried = pTargetId.getCarrierActorId() != 0;/*((((target) && (target.parentSprite))) && ((target.parentSprite.carriedEntity == target)));*/
 
@@ -195,22 +195,24 @@ public class EffectInstance implements Serializable {
         final GameFightMonsterInformations monsterInfo = pTargetId.getGameContextActorInformations(null) instanceof GameFightMonsterInformations ? (GameFightMonsterInformations) pTargetId.getGameContextActorInformations(null) : null;
         final boolean isTargetAlly = pCasterId.isFriendlyWith(pTargetId);
 
-        if(pEffect.effectUid == 62884){ //62885
+        if (pEffect.effectUid == 62884 /*|| (pEffect.effectId == 1106 || pEffect.targetMask.equalsIgnoreCase("g,A,f3958"))*/) { //62885 || paradoxe
             return true;
-        }
-        else if (targetIsCaster) {
+        } else if (targetIsCaster) {
             if (pEffect.effectId == 90) {
                 return (true);
-            };
+            }
+            ;
             if (pEffect.targetMask.indexOf("g") == -1) {
                 targetMaskPattern = "caC";
             } else {
                 return (false);
-            };
+            }
+            ;
         } else {
             if (((((targetIsCarried) && (!((pEffect.getZoneShape() == SpellShapeEnum.A))))) && (!((pEffect.getZoneShape() == SpellShapeEnum.a))))) {
                 return (true);
-            };
+            }
+            ;
             if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(DAO.getMonsters().find(monsterInfo.creatureGenericId).isCanPlay())))) {
                 targetMaskPattern = ((isTargetAlly) ? "agsj" : "ASJ");
             } else {
@@ -224,11 +226,16 @@ public class EffectInstance implements Serializable {
                             targetMaskPattern = ((isTargetAlly) ? "agm" : "AM");
                         } else {
                             targetMaskPattern = ((isTargetAlly) ? "gahl" : "AHL");
-                        };
-                    };
-                };
-            };
-        };
+                        }
+                        ;
+                    }
+                    ;
+                }
+                ;
+            }
+            ;
+        }
+        ;
         r = new Pattern("[" + targetMaskPattern + "]", REFlags.DOTALL);
         verify = r.matcher(pEffect.targetMask).find();
         if (verify) {
@@ -270,17 +277,17 @@ public class EffectInstance implements Serializable {
                         //verify = !((monsterInfo != null) && ((pEffect.targetMask.contains("f" + monsterInfo.creatureGenericId))));
                         //verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
                         //verify = !((monsterInfo != null) && ((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
-                        verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt (exclusiveMaskParam)))));
+                        verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
                         /*if(pTargetId instanceof BombFighter && DAO.getSpells().findBomb(Integer.parseInt(exclusiveMaskParam)) != null)
                             verify = true;*/
                         break;
                     case 'F':
                         //verify = (((monsterInfo == null)) || (!((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam)))));
                         verify = ((monsterInfo != null) && ((monsterInfo.creatureGenericId == Integer.parseInt(exclusiveMaskParam))));
-                        if(monsterInfo != null && !verify && pEffect.targetMask.contains("F"+monsterInfo.creatureGenericId)){
+                        if (monsterInfo != null && !verify && pEffect.targetMask.contains("F" + monsterInfo.creatureGenericId)) {
                             verify = true;
                         }
-                        if(pTargetId instanceof BombFighter && DAO.getSpells().findBomb(Integer.parseInt(exclusiveMaskParam)) != null)
+                        if (pTargetId instanceof BombFighter && DAO.getSpells().findBomb(Integer.parseInt(exclusiveMaskParam)) != null)
                             verify = true;
 
                         /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
@@ -308,23 +315,38 @@ public class EffectInstance implements Serializable {
                         verify = !pTargetId.hasSummoner();
                         break;
                     case 'P':
-                        if(pTargetId instanceof  BombFighter)
+                        if (pTargetId instanceof BombFighter)
                             verify = true;
                         else
                         /*if (pTargetId instanceof BombFighter || t) { //TEmpororaire = bug
                             verify = true;
                         }*/
-                        verify = pTargetId.hasSummoner();
-                       // verify = true;
+                            verify = pTargetId.hasSummoner();
+                        // verify = true;
                         break;
                     case 'T':
-                        verify = true;
+                        if(cell > 0) {
+                            final FightCell simetry = targetIsCaster ?
+                                    pCasterId.getFight().getCell(MapPoint.fromCellId(cell).pointSymetry(pCasterId.getMapPoint()).get_cellId()) :
+                                    pCasterId.getFight().getCell(pTargetId.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId());
+                       /* pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pCasterId.getFight().getCell(MapPoint.fromCellId(cell).pointSymetry(pCasterId.getMapPoint()).get_cellId()).getId()));
+                        pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pTargetId.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId()));
+*/
+                            //System.out.println();
+                            if (simetry != null && simetry.hasFighter()) {
+                                verify = true;
+
+                            }
+                        }
+                        else if (monsterInfo != null && monsterInfo.creatureGenericId == 3958) {
+                            verify = true;
+                        }
                         break;
                     case 'W':
                         break;
                     case 'U':
                         //System.out.println(pTargetId instanceof StaticFighter);
-                        if(pTargetId instanceof StaticFighter || pTargetId instanceof SummonedFighter)
+                        if (pTargetId instanceof StaticFighter || pTargetId instanceof SummonedFighter)
                             verify = true;
                         break;
                     case 'v':
@@ -333,13 +355,17 @@ public class EffectInstance implements Serializable {
                     case 'V':
                         verify = (((targetInfos.stats.lifePoints / targetInfos.stats.maxLifePoints) * 100) <= Integer.parseInt(exclusiveMaskParam));
                         break;
-                };
+                }
+                ;
                 if (!(verify)) {
                     return (false);
-                };
-            };
+                }
+                ;
+            }
+            ;
             //};
-        };
+        }
+        ;
         return (verify);
     }
 
@@ -386,7 +412,8 @@ public class EffectInstance implements Serializable {
                         this.zoneEfficiencyPercent = Integer.parseInt(params[2]);
                         this.zoneMaxEfficiency = Integer.parseInt(params[3]);
                         break;
-                };
+                }
+                ;
             } else {
                 try {
                     this.zoneSize = Integer.parseInt(params[0]);
@@ -394,8 +421,9 @@ public class EffectInstance implements Serializable {
                 }
             }
         } else {
-            logger.error("Zone incorrect ({})",this.rawZone);
-        };
+            logger.error("Zone incorrect ({})", this.rawZone);
+        }
+        ;
         if (this.zoneMinSize >= 63) {
             this.zoneMinSize = 63;
         }

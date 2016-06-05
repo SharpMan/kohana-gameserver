@@ -9,8 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * Created by Melancholia on 12/10/15.
@@ -57,6 +55,9 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
 
                     });
             this.chatCommands.put("help", new HelpCommand(this.chatCommands));
+            this.chatCommands.put("fm", new FmCommand());
+            this.chatCommands.put("exo", new ExoCommand());
+            this.chatCommands.put("arme", new WeaponExoCommand());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);

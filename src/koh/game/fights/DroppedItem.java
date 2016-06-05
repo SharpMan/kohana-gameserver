@@ -1,4 +1,4 @@
-package koh.game.fights.fighters;
+package koh.game.fights;
 
 import lombok.Getter;
 

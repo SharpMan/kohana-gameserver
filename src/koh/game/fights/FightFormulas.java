@@ -7,7 +7,6 @@ import koh.game.entities.item.EffectHelper;
 import koh.game.entities.mob.MonsterDrop;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.fighters.CharacterFighter;
-import koh.game.fights.fighters.DroppedItem;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.AlignmentSideEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -154,7 +153,7 @@ public class FightFormulas {
 
         final GuildMember gm = Fighter.getCharacter().getGuildMember();
 
-        double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.getCharacter().getGuild().entity.level, pXpGive = (double) gm.experienceGivenPercent / 100;
+        double xp = (double) xpWin.get(), Lvl = Fighter.getLevel(), LvlGuild = Fighter.getCharacter().getGuild().getEntity().level, pXpGive = (double) gm.experienceGivenPercent / 100;
 
         double maxP = xp * pXpGive * 0.10;    //Le maximum donné à la guilde est 10% du montant prélevé sur l'xp du combat
         double diff = Math.abs(Lvl - LvlGuild);    //Calcul l'écart entre le niveau du personnage et le niveau de la guilde

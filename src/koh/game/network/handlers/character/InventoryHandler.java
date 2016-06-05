@@ -98,7 +98,7 @@ public class InventoryHandler {
         }
         else if(!item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
             log.error("Item action criterias invalid");
-            client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
+            client.send(new ObjectErrorMessage  (ObjectErrorEnum.CRITERIONS));
         }
 
         //client.getCharacter().getInventoryCache().safeDelete(item,1);

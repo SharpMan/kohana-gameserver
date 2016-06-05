@@ -169,7 +169,7 @@ public abstract class FightActivableObject implements IFightObject {
             targetsPerEffect.addAll(targets);
             targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, castSpell.getEffects(), effect, false, effect.triggers, target.getCellId())
                     && effect.isValidTarget(caster, target)
-                    && EffectInstanceDice.verifySpellEffectMask(caster, target, effect)));
+                    && EffectInstanceDice.verifySpellEffectMask(caster, target, effect,target.getCellId())));
 
             final EffectCast castInfos = new EffectCast(effect.getEffectType(), this.castSpell.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.castSpell);
             castInfos.isTrap = this.getObjectType() == FightObjectType.OBJECT_TRAP;

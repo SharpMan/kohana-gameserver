@@ -868,14 +868,15 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void initScore(String result) {
-        this.getScores().put(ScoreType.PVP_WIN, Integer.parseInt(result.split(",")[0]));
-        this.scores.put(ScoreType.PVP_LOOSE, Integer.parseInt(result.split(",")[1]));
-        this.scores.put(ScoreType.ARENA_WIN, Integer.parseInt(result.split(",")[2]));
-        this.scores.put(ScoreType.ARENA_LOOSE, Integer.parseInt(result.split(",")[3]));
-        this.scores.put(ScoreType.PVM_WIN, Integer.parseInt(result.split(",")[4]));
-        this.scores.put(ScoreType.PVM_LOOSE, Integer.parseInt(result.split(",")[5]));
-        this.scores.put(ScoreType.PVP_TOURNAMENT, Integer.parseInt(result.split(",")[6]));
-        this.scores.put(ScoreType.BEST_COTE, Integer.parseInt(result.split(",")[7]));
+        final String[] split = result.split(",");
+        this.getScores().put(ScoreType.PVP_WIN, Integer.parseInt(split[0]));
+        this.scores.put(ScoreType.PVP_LOOSE, Integer.parseInt(split[1]));
+        this.scores.put(ScoreType.ARENA_WIN, Integer.parseInt(split[2]));
+        this.scores.put(ScoreType.ARENA_LOOSE, Integer.parseInt(split[3]));
+        this.scores.put(ScoreType.PVM_WIN, Integer.parseInt(split[4]));
+        this.scores.put(ScoreType.PVM_LOOSE, Integer.parseInt(split[5]));
+        this.scores.put(ScoreType.PVP_TOURNAMENT, Integer.parseInt(split[6]));
+        this.scores.put(ScoreType.BEST_COTE, Integer.parseInt(split[7]));
 
     }
 

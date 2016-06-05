@@ -97,8 +97,8 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public boolean eat(Player p, InventoryItem food) {
-        //Todo refresh stat
-        PetTemplate pet = getAnimal();
+        //TODO : refresh stat of the player
+        final PetTemplate pet = getAnimal();
         if (pet == null) {
             return false;
         } else if (food.getTemplateId() == ItemsEnum.ENERIPSA_POUDER) {
@@ -164,7 +164,7 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public void boost(int effectID, int count) {
-        ObjectEffect Effect = this.getEffect(effectID);
+         final  ObjectEffect Effect = this.getEffect(effectID);
         if (Effect == null) {
             this.effects.add(new ObjectEffectInteger(effectID, count));
         } else {

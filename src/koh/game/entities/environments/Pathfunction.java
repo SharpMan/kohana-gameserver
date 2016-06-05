@@ -138,11 +138,11 @@ public class Pathfunction {
         return ennemies;
     }
 
-    public static ArrayList<Fighter> getEnnemyNearToTakle(Fight Fight, FightTeam Team, short CellId) {
+    public static ArrayList<Fighter> getEnnemyNearToTakle(Fight Fight, FightTeam team, short cellId) {
         final ArrayList<Fighter> ennemies = new ArrayList<>();
 
-        for (byte Direction : Pathfunction.FIGHT_DIRECTIONS) {
-            Fighter ennemy = Fight.hasEnnemyInCell(Pathfunction.nextCell(CellId, Direction), Team);
+        for (byte direction : Pathfunction.FIGHT_DIRECTIONS) {
+            final Fighter ennemy = Fight.hasEnnemyInCell(Pathfunction.nextCell(cellId, direction), team);
             if (ennemy != null) {
                 if (!ennemy.isDead()
                         && !(ennemy instanceof BombFighter)

@@ -54,7 +54,7 @@ public class GuildHandler {
     @HandlerAttribute(ID = GuildSpellUpgradeRequestMessage.M_ID)
     public static void HandleGuildSpellUpgradeRequestMessage(WorldClient Client, GuildSpellUpgradeRequestMessage message) {
         if (Client.getCharacter().getGuild() != null && Client.getCharacter().getGuildMember().manageGuildBoosts()) {
-            if (Client.getCharacter().getGuild().entity.boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, message.spellId)) {
+            if (Client.getCharacter().getGuild().getEntity().boost <= 5 || !ArrayUtils.contains(Guild.TAX_COLLECTOR_SPELLS, message.spellId)) {
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
@@ -65,10 +65,10 @@ public class GuildHandler {
                 return;
             }
             Client.getCharacter().getGuild().spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, message.spellId)]++;
-            Client.getCharacter().getGuild().entity.boost -= 5;
+            Client.getCharacter().getGuild().getEntity().boost -= 5;
             Client.getCharacter().getGuild().sendToField(Client.getCharacter().getGuild().toGuildInfosUpgradeMessage());
-            Client.getCharacter().getGuild().entity.spells = Enumerable.join(Client.getCharacter().getGuild().spellLevel, ',');
-            DAO.getGuilds().update(Client.getCharacter().getGuild().entity);
+            Client.getCharacter().getGuild().getEntity().spells = Enumerable.join(Client.getCharacter().getGuild().spellLevel, ',');
+            DAO.getGuilds().update(Client.getCharacter().getGuild().getEntity());
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -77,54 +77,54 @@ public class GuildHandler {
     @HandlerAttribute(ID = GuildCharacsUpgradeRequestMessage.ID)
     public static void HandleGuildCharacsUpgradeRequestMessage(WorldClient Client, GuildCharacsUpgradeRequestMessage Message) {
         if (Client.getCharacter().getGuild() != null && Client.getCharacter().getGuildMember().manageGuildBoosts()) {
-            if (Client.getCharacter().getGuild().entity.boost <= 0) {
+            if (Client.getCharacter().getGuild().getEntity().boost <= 0) {
                 Client.send(new BasicNoOperationMessage());
                 return;
             }
 
             switch (Message.charaTypeTarget) {
                 case 0:
-                    if (Client.getCharacter().getGuild().entity.pods >= 5000) {
+                    if (Client.getCharacter().getGuild().getEntity().pods >= 5000) {
                         return;
                     }
-                    Client.getCharacter().getGuild().entity.pods += 20;
-                    if (Client.getCharacter().getGuild().entity.pods >= 5000) {
-                        Client.getCharacter().getGuild().entity.pods = 5000;
+                    Client.getCharacter().getGuild().getEntity().pods += 20;
+                    if (Client.getCharacter().getGuild().getEntity().pods >= 5000) {
+                        Client.getCharacter().getGuild().getEntity().pods = 5000;
                     }
                     break;
                 case 1:
-                    if (Client.getCharacter().getGuild().entity.prospecting >= 500) {
+                    if (Client.getCharacter().getGuild().getEntity().prospecting >= 500) {
                         return;
                     }
-                    Client.getCharacter().getGuild().entity.prospecting++;
-                    if (Client.getCharacter().getGuild().entity.prospecting >= 500) {
-                        Client.getCharacter().getGuild().entity.prospecting = 500;
+                    Client.getCharacter().getGuild().getEntity().prospecting++;
+                    if (Client.getCharacter().getGuild().getEntity().prospecting >= 500) {
+                        Client.getCharacter().getGuild().getEntity().prospecting = 500;
                     }
                     break;
                 case 2:
-                    if (Client.getCharacter().getGuild().entity.wisdom >= 400) {
+                    if (Client.getCharacter().getGuild().getEntity().wisdom >= 400) {
                         return;
                     }
-                    Client.getCharacter().getGuild().entity.wisdom++;
-                    if (Client.getCharacter().getGuild().entity.wisdom >= 400) {
-                        Client.getCharacter().getGuild().entity.wisdom = 400;
+                    Client.getCharacter().getGuild().getEntity().wisdom++;
+                    if (Client.getCharacter().getGuild().getEntity().wisdom >= 400) {
+                        Client.getCharacter().getGuild().getEntity().wisdom = 400;
                     }
                     break;
                 case 3:
-                    if (Client.getCharacter().getGuild().entity.maxTaxCollectors >= 500 || Client.getCharacter().getGuild().entity.boost <= 10) {
+                    if (Client.getCharacter().getGuild().getEntity().maxTaxCollectors >= 500 || Client.getCharacter().getGuild().getEntity().boost <= 10) {
                         Client.send(new BasicNoOperationMessage());
                         return;
                     }
-                    Client.getCharacter().getGuild().entity.boost -= 9;
-                    Client.getCharacter().getGuild().entity.maxTaxCollectors++;
-                    if (Client.getCharacter().getGuild().entity.maxTaxCollectors >= 50) {
-                        Client.getCharacter().getGuild().entity.maxTaxCollectors = 50;
+                    Client.getCharacter().getGuild().getEntity().boost -= 9;
+                    Client.getCharacter().getGuild().getEntity().maxTaxCollectors++;
+                    if (Client.getCharacter().getGuild().getEntity().maxTaxCollectors >= 50) {
+                        Client.getCharacter().getGuild().getEntity().maxTaxCollectors = 50;
                     }
                     break;
             }
-            Client.getCharacter().getGuild().entity.boost--;
+            Client.getCharacter().getGuild().getEntity().boost--;
             Client.getCharacter().getGuild().sendToField(Client.getCharacter().getGuild().toGuildInfosUpgradeMessage());
-            DAO.getGuilds().update(Client.getCharacter().getGuild().entity);
+            DAO.getGuilds().update(Client.getCharacter().getGuild().getEntity());
         } else {
             Client.send(new BasicNoOperationMessage());
         }
@@ -280,7 +280,7 @@ public class GuildHandler {
                 }
             }) {
                 {
-                    this.addMember(new GuildMember(this.entity.guildID) {
+                    this.addMember(new GuildMember(this.getEntity().guildID) {
                         {
                             this.accountID = client.getAccount().id;
                             this.breed = client.getCharacter().getBreed();

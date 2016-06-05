@@ -71,8 +71,13 @@ public class EffectPush extends EffectBase {
                     else if(target instanceof MonsterFighter && target.asMonster().getGrade().getMonster().isCanBePushed()){
                         continue;
                     }
+                    else if(castInfos.caster instanceof SummonedFighter
+                            && castInfos.caster.asSummon().getGrade().getMonsterId() == 3289){
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.cellId, target.getCellId());
+                    }
                     else {
-                        return -1;
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
+                        //return -1;
                     }
                     break;
                 case ADVANCE_CELL:

@@ -59,7 +59,6 @@ public class RestatReply extends NpcReply {
                     break;
             }
         });
-        p.getAdditionalStats().clear();
         p.refreshStats();
         p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE,470));
         return true;

@@ -49,6 +49,11 @@ public class GuildDAOImpl extends GuildDAO {
     }
 
     @Override
+    public Stream<GuildEntity> getEntites(){
+        return entitiesById.values().stream().map(g -> g.getEntity());
+    }
+
+    @Override
     public void remove(GuildEntity entity) {
         try {
             entitiesById.remove(entity.guildID);
@@ -63,9 +68,9 @@ public class GuildDAOImpl extends GuildDAO {
     @Override
     public void insert(Guild guild) {
         try {
-            dataSource.create(guild.entity);
-            entitiesById.put(guild.entity.guildID, guild);
-            entitiesByName.put(guild.entity.name.trim().toLowerCase(), guild);
+            dataSource.create(guild.getEntity());
+            entitiesById.put(guild.getEntity().guildID, guild);
+            entitiesByName.put(guild.getEntity().name.trim().toLowerCase(), guild);
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());
@@ -101,7 +106,7 @@ public class GuildDAOImpl extends GuildDAO {
         try {
             int guildId = (int)dataSource.queryRawValue("select guild_id from guilds_members WHERE char_id = " + playerId);
 
-            Guild found = entitiesById.get(guildId);
+            final Guild found = entitiesById.get(guildId);
             return found.memberStream()
                     .anyMatch(x -> x.characterID == playerId) ? found : null;
         } catch (Exception e) {

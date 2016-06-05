@@ -33,7 +33,7 @@ public class GuildJoinRequest extends GameBaseRequest {
             this.requester.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             this.requested.endGameAction(GameActionTypeEnum.BASIC_REQUEST);
             if (this.requester.getCharacter().getGuild() != null) {
-                this.requester.getCharacter().getGuild().addMember(new GuildMember(this.requester.getCharacter().getGuild().entity.guildID) {
+                this.requester.getCharacter().getGuild().addMember(new GuildMember(this.requester.getCharacter().getGuild().getEntity().guildID) {
                     {
                         this.accountID = requested.getAccount().id;
                         this.breed = requested.getCharacter().getBreed();

@@ -270,6 +270,9 @@ public class AIProcessor {
     protected double getSpellScore(AIAction action, SpellLevel spell, short currentCellId, short castCell) {
         double score = 0;
         for (EffectInstanceDice effect : spell.getEffects()) {
+            if(spell.getEffects().length > 10 && ArrayUtils.indexOf(spell.getEffects(), effect) > 7){
+                break;
+            }
             final List<Fighter> targets = Arrays.stream((new Zone(effect.getZoneShape(), effect.zoneSize(), MapPoint.fromCellId(currentCellId).advancedOrientationTo(MapPoint.fromCellId(castCell), true), this.fight.getMap()))
                     .getCells(castCell))
                     .map(cell -> fight.getCell(cell))
@@ -281,7 +284,7 @@ public class AIProcessor {
                     || EffectHelper.verifyEffectTrigger(fighter, target, spell.getEffects(), effect, false, effect.triggers, castCell))
                     && effect.isValidTarget(fighter, target)
                     && target.isVisibleFor(fighter)
-                    && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)))));
+                    && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect,castCell)))));
 
             if (targets.size() > 0 || ((spell.isNeedFreeCell() || spell.isNeedFreeTrapCell()) && targets.size() == 0)) {
                 score += Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));

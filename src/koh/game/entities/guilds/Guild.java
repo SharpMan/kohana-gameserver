@@ -25,6 +25,7 @@ import koh.protocol.types.game.guild.tax.TaxCollectorInformations;
 import koh.protocol.types.game.house.HouseInformationsForGuild;
 import koh.protocol.types.game.paddock.PaddockContentInformations;
 import koh.utils.Enumerable;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,7 +42,8 @@ public class Guild extends IWorldEventObserver {
     private final Map<Integer, Player> characters = new ConcurrentHashMap<>();
     private final Map<Integer, GuildMember> members = new ConcurrentHashMap<>();
 
-    public final GuildEntity entity;
+    @Getter
+    private final GuildEntity entity;
     private GuildMember bossCache;
     private GuildEmblem emblemeCache;
     public byte[] spellLevel;
@@ -53,11 +55,11 @@ public class Guild extends IWorldEventObserver {
 
     public void onFighterAddedExperience(GuildMember member, long XP) {
         member.addExperience(XP);
-        this.entity.addExperience(XP);
-        while (this.entity.getExperience() >= DAO.getExps().getLevel(this.entity.level + 1).getGuild() && this.entity.level < DAO.getSettings().getIntElement("Max.GuildLevel")) {
-            this.entity.level++;
-            this.entity.boost += 5;
-            this.sendToField(new GuildLevelUpMessage(this.entity.level));
+        this.getEntity().addExperience(XP);
+        while (this.getEntity().getExperience() >= DAO.getExps().getLevel(this.getEntity().level + 1).getGuild() && this.getEntity().level < DAO.getSettings().getIntElement("Max.GuildLevel")) {
+            this.getEntity().level++;
+            this.getEntity().boost += 5;
+            this.sendToField(new GuildLevelUpMessage(this.getEntity().level));
         }
     }
 
@@ -65,13 +67,13 @@ public class Guild extends IWorldEventObserver {
         if (this.bossCache == null) {
             this.members.values().stream().filter(GuildMember::isBoss).forEach(GM -> {
                 if (this.bossCache != null) {
-                    logger.error("There is at least two boss in guild {0} ({1}) BossSecond {2}", this.entity.guildID, this.entity.name, GM.name);
+                    logger.error("There is at least two boss in guild {0} ({1}) BossSecond {2}", this.getEntity().guildID, this.getEntity().name, GM.name);
                 }
                 this.bossCache = GM;
             });
             if (this.bossCache == null) {
                 if (this.members.isEmpty()) {
-                    throw new Error(String.format("guild {0} ({1}) is empty", this.entity.guildID, this.entity.name));
+                    throw new Error(String.format("guild {0} ({1}) is empty", this.getEntity().guildID, this.getEntity().name));
                 }
 
             }
@@ -84,7 +86,7 @@ public class Guild extends IWorldEventObserver {
             if (this.bossCache != null) {
                 this.bossCache.rank = 0;
                 this.bossCache.rights = GuildRightsBitEnum.GUILD_RIGHT_NONE;
-                this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 199, new String[]{GuildMember.name, this.bossCache.name, this.entity.name}));
+                this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 199, new String[]{GuildMember.name, this.bossCache.name, this.getEntity().name}));
                 this.updateMember(this.bossCache);
             }
             this.bossCache = GuildMember;
@@ -104,7 +106,7 @@ public class Guild extends IWorldEventObserver {
     public synchronized boolean changeParameters(Player modifier, GuildMember member, int rank, byte xpPercent, int rights) {
         boolean result;
 
-        if (modifier.getGuild().entity.guildID != member.guildID) {
+        if (modifier.getGuild().getEntity().guildID != member.guildID) {
             result = false;
         } else {
             if (modifier.getGuildMember() != member && modifier.getGuildMember().isBoss() && rank == 1) {
@@ -188,7 +190,7 @@ public class Guild extends IWorldEventObserver {
     }
 
     public GuildInfosUpgradeMessage toGuildInfosUpgradeMessage() {
-        return new GuildInfosUpgradeMessage((byte) this.entity.maxTaxCollectors, /*byte taxCollectorsCoun*/ (byte) 0, getTaxCollectorHealth(), gettaxCollectorDamageBonuses(), this.entity.pods, this.entity.prospecting, this.entity.wisdom, this.entity.boost, TAX_COLLECTOR_SPELLS, this.spellLevel);
+        return new GuildInfosUpgradeMessage((byte) this.getEntity().maxTaxCollectors, /*byte taxCollectorsCoun*/ (byte) 0, getTaxCollectorHealth(), gettaxCollectorDamageBonuses(), this.getEntity().pods, this.getEntity().prospecting, this.getEntity().wisdom, this.getEntity().boost, TAX_COLLECTOR_SPELLS, this.spellLevel);
     }
 
     public PaddockContentInformations[] toPaddockContentInformations() {
@@ -200,20 +202,20 @@ public class Guild extends IWorldEventObserver {
     }
 
     public TaxCollectorListMessage toTaxCollectorListMessage() {
-        return new TaxCollectorListMessage(new TaxCollectorInformations[0], (byte) this.entity.maxTaxCollectors, new TaxCollectorFightersInformation[0]);
+        return new TaxCollectorListMessage(new TaxCollectorInformations[0], (byte) this.getEntity().maxTaxCollectors, new TaxCollectorFightersInformation[0]);
     }
 
     public int gettaxCollectorDamageBonuses() {
-        return this.entity.level;
+        return this.getEntity().level;
     }
 
     public int getTaxCollectorHealth() {
-        return TaxCollector.BASE_HEALTH + (int) (20 * this.entity.level);
+        return TaxCollector.BASE_HEALTH + (int) (20 * this.getEntity().level);
 
     }
 
     public GuildInformationsGeneralMessage toGeneralInfos() {
-        return new GuildInformationsGeneralMessage(true, false, (byte) this.entity.level, (long) DAO.getExps().getLevel(this.entity.level).getGuild(), this.entity.getExperience(), (long) DAO.getExps().getLevel(this.entity.level + 1).getGuild(), this.entity.creationDate, this.members.size(), this.characters.size());
+        return new GuildInformationsGeneralMessage(true, false, (byte) this.getEntity().level, (long) DAO.getExps().getLevel(this.getEntity().level).getGuild(), this.getEntity().getExperience(), (long) DAO.getExps().getLevel(this.getEntity().level + 1).getGuild(), this.getEntity().creationDate, this.members.size(), this.characters.size());
     }
 
     protected void updateMember(GuildMember member) {
@@ -249,14 +251,14 @@ public class Guild extends IWorldEventObserver {
 
     public GuildEmblem getGuildEmblem() {
         if (emblemeCache == null) {
-            //EmblemSymbols getTemplate = GuildEmblemDAOImpl.dofusMaps.get(this.entity.emblemForegroundShape);
-            this.emblemeCache = new GuildEmblem(this.entity.emblemForegroundShape, this.entity.emblemForegroundColor, (byte) this.entity.emblemBackgroundShape, this.entity.emblemBackgroundColor);
+            //EmblemSymbols getTemplate = GuildEmblemDAOImpl.dofusMaps.get(this.getEntity().emblemForegroundShape);
+            this.emblemeCache = new GuildEmblem(this.getEntity().emblemForegroundShape, this.getEntity().emblemForegroundColor, (byte) this.getEntity().emblemBackgroundShape, this.getEntity().emblemBackgroundColor);
         }
         return emblemeCache;
     }
 
     public GuildInformations toGuildInformations() {
-        return new GuildInformations(this.entity.guildID, this.entity.name, this.getGuildEmblem());
+        return new GuildInformations(this.getEntity().guildID, this.getEntity().name, this.getGuildEmblem());
     }
 
     @Override
@@ -278,7 +280,7 @@ public class Guild extends IWorldEventObserver {
 
     public BasicGuildInformations getBasicGuildInformations() {
         //TODO cache that !
-        return new BasicGuildInformations(this.entity.guildID, this.entity.name);
+        return new BasicGuildInformations(this.getEntity().guildID, this.getEntity().name);
     }
 
     public void addMember(GuildMember member) {

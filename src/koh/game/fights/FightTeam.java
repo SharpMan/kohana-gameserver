@@ -10,6 +10,7 @@ import koh.game.entities.actors.character.FieldNotification;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.DoubleFighter;
 import koh.game.fights.fighters.MonsterFighter;
+import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.utils.SwapPositionRequest;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.AlignmentSideEnum;
@@ -154,7 +155,7 @@ public class FightTeam {
     }
 
     public void endFight() {
-        this.myFighters.removeIf(fr -> fr.hasSummoner() || fr instanceof DoubleFighter); // On delete les invocations
+        this.myFighters.removeIf(fr -> fr.hasSummoner() || fr instanceof DoubleFighter || fr instanceof StaticFighter); // On delete les invocations
     }
 
     public void dispose() {
@@ -194,7 +195,7 @@ public class FightTeam {
                 leader.wave,
                 (byte) this.myFighters.size(),
                 (int) this.getFighters().mapToInt(Fighter::getLevel).average().orElse(0),
-                this.getFighters().filter(fr -> fr instanceof CharacterFighter).map(Fighter::getPlayer).anyMatch(pl -> pl.getAccount() != null && pl.getAccount().accountData.hasFriend(visitor.getOwner())),
+                this.getFighters().filter(fr -> fr instanceof CharacterFighter).map(Fighter::getPlayer).anyMatch(pl -> pl.getAccount() != null && pl.getAccount().accountData != null && pl.getAccount().accountData.hasFriend(visitor.getOwner())),
                 this.getFighters().filter(fr -> fr instanceof CharacterFighter).map(Fighter::getPlayer).anyMatch(pl -> pl.getGuild() == visitor.getGuild()),
                 false,
                 this.getFighters().filter(fr -> fr instanceof CharacterFighter).map(Fighter::getPlayer).anyMatch(pl -> visitor.getClient().getParty() != null && visitor.getClient().getParty().containsPlayer(pl)),

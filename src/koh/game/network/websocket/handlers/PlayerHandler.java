@@ -19,7 +19,7 @@ import java.util.stream.Stream;
  */
 public class PlayerHandler {
     
-    static final ItemTemplate TOKEN = DAO.getItemTemplates().getTemplate(13470);
+    public static final ItemTemplate TOKEN = DAO.getItemTemplates().getTemplate(13470);
 
     @HandlerAttribute(ID = CommPacketEnum.GET_INFOS)
     public static void handleGetInfosMessage(WebSocket conn, PlayerSeekInfos message){

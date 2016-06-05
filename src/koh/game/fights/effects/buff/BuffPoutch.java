@@ -74,7 +74,7 @@ public class BuffPoutch extends BuffEffect {
                             if (castInfos.spellId == 2809 && target2 == target) {
                                 continue;
                             }
-                            if (effect.isValidTarget(this.target, target2) && EffectInstanceDice.verifySpellEffectMask(this.target, target2, effect,target2.getID())) {
+                            if (effect.isValidTarget(this.target, target2) && EffectInstanceDice.verifySpellEffectMask(this.target, target2, effect, castInfos.cellId,target2.getID())) {
                                 if (effect.targetMask.equals("C") && this.target.getCarrierActorId() == target2.getID()) {
                                     continue;
                                 } else if (effect.targetMask.equals("a,A") && this.target.getCarrierActorId() != 0 & this.target.getID() == target2.getID()) {

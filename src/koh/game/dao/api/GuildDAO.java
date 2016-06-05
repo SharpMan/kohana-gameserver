@@ -11,6 +11,8 @@ public abstract class GuildDAO implements Service {
 
     public abstract void update(GuildEntity entity);
 
+    public abstract Stream<GuildEntity> getEntites();
+
     public abstract void remove(GuildEntity Item);
 
     public abstract void insert(Guild guild);

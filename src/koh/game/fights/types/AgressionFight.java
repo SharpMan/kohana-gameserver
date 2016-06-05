@@ -146,7 +146,7 @@ public class AgressionFight extends Fight {
             if(fighter.isLeft())
                 continue;
             short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true));
-            final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
+            final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() !=null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
             if(count == getEnnemyTeam(getWinners()).getFighters().count()){
                 honorWon = 0;
             }else if(count != 0 && (getEnnemyTeam(getWinners()).getFighters().count() - count) >= 1){

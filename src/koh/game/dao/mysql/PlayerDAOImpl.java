@@ -142,6 +142,9 @@ public class PlayerDAOImpl extends PlayerDAO {
                     if (myCharacterById.containsKey(result.getInt("id"))) {
                         p = myCharacterById.get(result.getInt("id"));
                         cleanMap(p);
+                        if(result.getBoolean("removed")){
+                            continue;
+                        }
                         if (p.getAccount().accountData != null) {
                             account.accountData = p.getAccount().accountData;
                         }
@@ -149,6 +152,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                         account.characters.add(p);
                         continue;
                     }
+
                     p = Player.builder()
                             .nickName(result.getString("nickname"))
                             .breed((byte) result.getInt("breed"))
@@ -233,6 +237,24 @@ public class PlayerDAOImpl extends PlayerDAO {
                 throw new Exception(); //FIXME: something refeer
             }
         }
+    }
+
+
+    @Override
+    public boolean remove(int id){
+        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `character` set removed = ? WHERE id = ?;")) {
+            PreparedStatement pStatement = conn.getStatement();
+            pStatement.setBoolean(1, Boolean.TRUE);
+            pStatement.setInt(2, id);
+
+            pStatement.executeUpdate();
+
+        } catch (Exception e) {
+            logger.error(e);
+            logger.warn(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     @Override

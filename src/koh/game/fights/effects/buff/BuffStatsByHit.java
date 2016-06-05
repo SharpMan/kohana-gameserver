@@ -24,7 +24,6 @@ public class BuffStatsByHit extends BuffEffect {
             if(damageInfos== null || damageValue == null)
                 return super.applyEffect(damageValue, damageInfos);
             if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, damageInfos.spellLevel.getEffects(), damageInfos.effect, false, this.castInfos.effect.triggers, damageInfos.cellId)) {
-
                 final BuffStats buffStats = new BuffStats(new EffectCast(castInfos.effectType, this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, JET, null, this.castInfos.effect.duration, this.getId()), this.target);
 
                 buffStats.applyEffect(null, null);

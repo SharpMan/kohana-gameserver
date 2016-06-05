@@ -54,6 +54,10 @@ public class Account {
         return characters.stream().filter(x -> x.getID() == id).findFirst().orElse(null);
     }
 
+    public boolean remove(int id){
+        return characters.removeIf(c -> c.getID() == id);
+    }
+
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }

@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Neo-Craft
@@ -21,7 +22,7 @@ import java.util.List;
 public class MonsterGrade {
 
 
-    private ArrayList<SpellLevel> spells;
+    private List<SpellLevel> spells;
     @Getter
     private byte grade;
     @Getter
@@ -61,12 +62,14 @@ public class MonsterGrade {
 
     public synchronized List<SpellLevel> getSpells(){
         if(this.spells == null){
-            this.spells = new ArrayList<>(5);
+            this.spells = new CopyOnWriteArrayList<>(
+                    Arrays.stream(this.getMonster().getSpells())
+                    .mapToObj(id -> DAO.getSpells().findSpell(id).getLevelOrNear(this.grade)).toArray(SpellLevel[]::new));
         }
-        Arrays.stream(this.getMonster().getSpells())
+        /*Arrays.stream(this.getMonster().getSpells())
                 .mapToObj(id -> DAO.getSpells().findSpell(id).getLevelOrNear(this.grade))
                 //.filter(fr -> fr != null)
-                .forEach(spell ->  this.spells.add(spell) );
+                .forEach(spell ->  this.spells.add(spell) );*/
         return spells;
     }
 

@@ -89,13 +89,15 @@ public class SpellDAOImpl extends SpellDAO {
                            } catch (SQLException e) {
                                e.printStackTrace();
                            }
-                       });*/
-                /*if(result.getInt("spell_id") == 5403){
+                       });
+                /*if(result.getInt("spell_id") == 197){
                     for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
-                        if(effect.effectId == 111 || effect.effectId == 1109){
-                            levels.get(result.getInt("id")).setEffects(ArrayUtils.removeElement(levels.get(result.getInt("id")).getEffects(),effect));
+                        if(effect.effectId == 1160){
+                            /*levels.get(result.getInt("id")).setEffects(ArrayUtils.removeElement(levels.get(result.getInt("id")).getEffects(),effect));
                             levels.get(result.getInt("id")).setCriticalEffect(ArrayUtils.removeElement(levels.get(result.getInt("id")).getCriticalEffect(),effect));
 
+                            effect.delay = 0;
+                            System.out.println(effect.toString());
                         }
                     }
                     try (ConnectionStatement<PreparedStatement> connn = dbSource.prepareStatement("UPDATE `spell_levels` set effects= ?,critical_effects =?  WHERE id = ?;")) {
@@ -106,6 +108,7 @@ public class SpellDAOImpl extends SpellDAO {
 
                         pStatemente.execute();
                     }
+
                     catch (Exception e) {
                         logger.error(e);
                         logger.warn(e.getMessage());

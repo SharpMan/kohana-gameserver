@@ -508,7 +508,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
             }
             for (Player player : this.Observable$stream()) {
-                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), targetId, cellId, (byte) (isCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) || silentCast), spellLevel.getSpellId(), spellLevel.getGrade(), informations == null ? new int[0] : informations.second));
+                player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), targetId, (spellLevel.getSpellId() == 2763 || (!fighter.isVisibleFor(player) || silentCast)) ? 0 : cellId, (byte) (isCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) || silentCast), spellLevel.getSpellId(), spellLevel.getGrade(), informations == null ? new int[0] : informations.second));
             }
             if (informations != null) {
                 informations.Clear();
@@ -534,7 +534,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     && effect.zoneShape() == 80
                     && effect.zoneSize() == 1
                     && Arrays.stream(targetsOnZone).noneMatch(fr -> fr.getID() == fighter.getID())) {
-                if (effect.isValidTarget(fighter, fighter) && (EffectInstanceDice.verifySpellEffectMask(fighter, fighter, effect))) {
+                if (effect.isValidTarget(fighter, fighter) && (EffectInstanceDice.verifySpellEffectMask(fighter, fighter, effect,cellId))) {
                     targets.get(effect).add(fighter);
                 }
             } else if (effect.targetMask.equalsIgnoreCase("A,K") && fighter.getCarriedActor() != null) { //Vertigo
@@ -542,11 +542,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
 
             for (Fighter target : targetsOnZone) {
-                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}", effect.effectId, target.getID(), EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId, true), effect.isValidTarget(fighter, target), EffectInstanceDice.verifySpellEffectMask(fighter, target, effect));
+                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}", effect.effectId, target.getID(), EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId, true), effect.isValidTarget(fighter, target), EffectInstanceDice.verifySpellEffectMask(fighter, target, effect,cellId));
                 if ((ArrayUtils.contains(BLACKLISTED_EFFECTS, effect.effectUid)
                         || EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId, true))
                         && effect.isValidTarget(fighter, target)
-                        && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect)) {
+                        && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect,cellId)) {
                     if ((effect.targetMask.equals("C") && fighter.getCarrierActorId() == target.getID())
                             || (effect.targetMask.equals("a,A") && fighter.getCarrierActorId() != 0 & fighter.getID() == target.getID())
                             || (!imTargeted && target.getID() == fighter.getID())) {
@@ -629,7 +629,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
         this.startSequence(SequenceTypeEnum.SEQUENCE_WEAPON);
-        InventoryItem weapon = fighter.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
+        final InventoryItem weapon = fighter.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON);
         if (weapon.getTemplate().getTypeId() == 83) { //Pière d'Ame
             return;
         }
@@ -646,9 +646,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
 
-        if (!/*(Pathfunction.goalDistance(map, cellId, fighter.getCellId()) <= weapon.getWeaponTemplate().getRange()
+        //TODO HACHE
+        if (!(Pathfunction.goalDistance(map, cellId, fighter.getCellId()) <= weapon.getWeaponTemplate().getRange()
                 && Pathfunction.goalDistance(map, cellId, fighter.getCellId()) >= weapon.getWeaponTemplate().getMinRange()
-                && */(fighter.getAP() >= weapon.getWeaponTemplate().getApCost())) {
+                && fighter.getAP() >= weapon.getWeaponTemplate().getApCost()))  {
             fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
             return;
@@ -680,28 +681,35 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         }
 
-        targets.removeIf(F -> F.isDead());
+        targets.removeIf(Fighter::isDead);
         targets.remove(fighter);
-        final ObjectEffectDice[] effects = weapon.getEffects$Notify()
+        final ObjectEffectDice[] effects = weapon.getEffects()
                 .stream()
-                .filter(Effect -> Effect instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.UN_RANDOMABLES_EFFECTS, Effect.actionId))
+                .filter(effect1 -> effect1 instanceof ObjectEffectDice && ArrayUtils.contains(EffectHelper.UN_RANDOMABLES_EFFECTS, effect1.actionId))
                 .map(x -> (ObjectEffectDice) x)
                 .toArray(ObjectEffectDice[]::new);
 
         double num1 = Fight.RANDOM.nextDouble();
 
-        double num2 = Arrays.stream(effects)
+        /*double num2 = Arrays.stream(effects)
                 .mapToInt(Effect -> weapon.getTemplate().getEffect(Effect.actionId).random)
-                .sum();
+                .sum();*/
         boolean flag = false;
 
         this.sendToField(new GameActionFightCloseCombatMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), targetId, cellId, (byte) (isCc ? 2 : 1), false, weapon.getTemplate().getId()));
 
         EffectInstanceDice effectParent;
         for (ObjectEffectDice effect : effects) {
-            effectParent = (EffectInstanceDice) weapon.getTemplate().getEffect(effect.actionId);
+            effectParent = (EffectInstanceDice) ( weapon.getTemplate().getEffect(effect.actionId) == null ?
+                    Arrays.stream(weapon.getTemplate().getPossibleEffects())
+                            .parallel()
+                            .filter(x -> x instanceof  EffectInstanceDice)
+                            .map(x -> (EffectInstanceDice) x)
+                            .filter(e -> e.diceNum == effect.diceNum && e.diceSide == effect.diceSide)
+                            .findFirst().get() :
+                    weapon.getTemplate().getEffect(effect.actionId));
             logger.debug(effectParent.toString());
-            if (effectParent.random > 0) {
+            /*if (effectParent.random > 0) {
                 if (!flag) {
                     if (num1 > (double) effectParent.random / num2) {
                         num1 -= (double) effectParent.random / num2;
@@ -712,7 +720,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 } else {
                     continue;
                 }
-            }
+            }*/
             final EffectCast castInfos = new EffectCast(StatsEnum.valueOf(effect.actionId), 0, cellId, num1, effectParent, fighter, targets, true, StatsEnum.NONE, 0, null);
             castInfos.targetKnownCellId = cellId;
             if(isCc){
@@ -1115,18 +1123,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void affectSpellTo(Fighter caster, Fighter target, int level, int... spells) {
         SpellLevel spell;
-        System.out.println(spells.length);
         for (int spellid : spells) {
             spell = DAO.getSpells().findSpell(spellid).getSpellLevel(level);
             double num1 = Fight.RANDOM.nextDouble();
             double num2 = (double) Arrays.stream(spell.getEffects()).mapToInt(x -> x.random).sum();
             boolean flag = false;
-            System.out.println(spell.getEffects().length);
             for (EffectInstanceDice effect : spell.getEffects()) {
-                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}", effect.effectId, target.getID(), EffectHelper.verifyEffectTrigger(caster, target, spell.getEffects(), effect, false, effect.triggers, target.getCellId(), true), effect.isValidTarget(caster, target), EffectInstanceDice.verifySpellEffectMask(caster, target, effect));
+                logger.debug(effect.toString());
+                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}", effect.effectId, target.getID(), EffectHelper.verifyEffectTrigger(caster, target, spell.getEffects(), effect, false, effect.triggers, target.getCellId(), true), effect.isValidTarget(caster, target), EffectInstanceDice.verifySpellEffectMask(caster, target, effect,target.getCellId()));
 
                 if (!(effect.isValidTarget(caster, target)
-                        && EffectInstanceDice.verifySpellEffectMask(caster, target, effect)) ||
+                        && EffectInstanceDice.verifySpellEffectMask(caster, target, effect, target.getCellId())) ||
                         ((effect.targetMask.equals("C") && caster.getCarrierActorId() == target.getID())
                                 || (effect.targetMask.equals("a,A") && caster.getCarrierActorId() != 0 & caster.getID() == target.getID()))) {
                     continue;
@@ -1654,10 +1661,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     return;
             }
 
+            this.stopTimer("gameLoop");
+
             this.myTeam1.getFighters().filter(fr -> fr.isLeft() && fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
             this.myTeam2.getFighters().filter(fr -> fr.isLeft() && fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
 
-            this.stopTimer("gameLoop");
+
 
             this.sendToField(this.myResult);
 
@@ -1665,13 +1674,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.fightTime = 0;
             this.ageBonus = 0;
             this.endAllSequences();
-            this.fighters().forEach(fighter -> fighter.endFight());
+            this.fighters().forEach(Fighter::endFight);
 
             this.kickSpectators(true);
 
-            this.fightCells.values().forEach((c) -> {
-                c.clear();
-            });
+            this.fightCells.values().forEach(FightCell::clear);
             this.fightCells.clear();
             this.myTimers.clear();
             this.fightWorker.dispose();
@@ -1683,7 +1690,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.myTeam1 = null;
             this.myTeam2 = null;
             this.fightWorker = null;
-            this.activableObjects.values().forEach(x -> x.clear());
+            this.activableObjects.values().forEach(CopyOnWriteArrayList::clear);
             this.activableObjects.clear();
             this.activableObjects = null;
             this.myTimers = null;
@@ -1697,9 +1704,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.fightLoopState = fightLoopState.STATE_END_FIGHT;
             if (myTimers != null) {
                 try {
-                    myTimers.values().stream().forEach((CR) -> {
-                        CR.cancel();
-                    });
+                    myTimers.values().stream().forEach(CancellableScheduledRunnable::cancel);
                 } catch (Exception e) {
                 } finally {
                     myTimers.clear();

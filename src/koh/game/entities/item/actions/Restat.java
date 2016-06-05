@@ -60,7 +60,6 @@ public class Restat  extends ItemAction {
                     break;
             }
         });
-        p.getAdditionalStats().clear();
         p.refreshStats();
         return true;
     }

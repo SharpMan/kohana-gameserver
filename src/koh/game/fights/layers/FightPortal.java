@@ -151,7 +151,7 @@ public class FightPortal extends FightActivableObject {
 
         this.caster.getBuff().getAllBuffs()
                 .filter(buff -> buff instanceof BuffCastSpellOnPortal)
-                .filter(buff -> buff.getCastInfos().effect.isValidTarget(caster, activator) && (EffectInstanceDice.verifySpellEffectMask(caster, activator, buff.getCastInfos().effect)))
+                .filter(buff -> buff.getCastInfos().effect.isValidTarget(caster, activator) && (EffectInstanceDice.verifySpellEffectMask(caster, activator, buff.getCastInfos().effect,activator.getCellId())))
                 .forEach(buff -> ((BuffCastSpellOnPortal) buff).applyEffect(activator));
 
         //Portails = Arrays.stream(Portails).sorted((FightPortail b2, FightPortail b1) -> (int) (b2.id) - b1.id).toArray(FightPortail[]::new);

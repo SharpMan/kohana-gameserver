@@ -48,13 +48,16 @@ import koh.protocol.types.game.character.SetCharacterRestrictionsMessage;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
 import koh.protocol.types.game.character.characteristic.CharacterSpellModification;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -93,9 +96,43 @@ public class CharacterHandler {
         Client.send(new CharacterNameSuggestionSuccessMessage(PlayerController.GenerateName()));
     }
 
+    private static MessageDigest md5;
+    static{
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @HandlerAttribute(ID = 165) //Suppresion
-    public static void handleCharacterDeletionRequestMessage(WorldClient Client, CharacterDeletionRequestMessage Message) {
-        Client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
+    public static void handleCharacterDeletionRequestMessage(WorldClient client, CharacterDeletionRequestMessage message) {
+        final Player character = client.getAccount().getPlayer(message.characterId);
+        final StringBuffer answer = new StringBuffer();
+        try {
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update((message.characterId + "~" + client.getAccount().secretAnswer).getBytes());
+            byte byteData[] = md.digest();
+            for (int i = 0; i < byteData.length; i++) {
+                answer.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if(character == null){
+            client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
+        }else if (!answer.toString().equalsIgnoreCase(message.secretAnswerHash)){
+            client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_BAD_SECRET_ANSWER));
+        }
+        else if(!client.getAccount().remove(message.characterId)){
+            client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
+        }else{
+            DAO.getPlayers().remove(message.characterId);
+            client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
+        }
+
     }
 
     @HandlerAttribute(ID = 152)

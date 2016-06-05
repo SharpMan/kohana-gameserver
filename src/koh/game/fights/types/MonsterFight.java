@@ -10,7 +10,7 @@ import koh.game.entities.item.Weapon;
 import koh.game.entities.mob.MonsterDrop;
 import koh.game.fights.*;
 import koh.game.fights.fighters.CharacterFighter;
-import koh.game.fights.fighters.DroppedItem;
+import koh.game.fights.DroppedItem;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.EffectGenerationType;
@@ -67,7 +67,7 @@ public class MonsterFight extends Fight {
             case STATE_ACTIVE:
                 if (fighter.tryDie(fighter.getID(), true) != -3) {
                     if (fighter instanceof CharacterFighter)
-                        fighter.send(leftEndMessage((CharacterFighter) fighter));
+                        fighter.send(leftEndMessage(fighter.asPlayer()));
                     this.sendToField(new GameFightLeaveMessage(fighter.getID()));
                     fighter.leaveFight();
                 }

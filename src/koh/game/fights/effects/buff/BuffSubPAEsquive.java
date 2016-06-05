@@ -23,17 +23,17 @@ public class BuffSubPAEsquive extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
-        final MutableInt LostAP = new MutableInt(castInfos.randomJet(target));
-        LostAP.setValue(LostAP.getValue() > target.getAP() ? target.getAP() : LostAP.getValue());
-        castInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, LostAP.intValue(), false, castInfos.duration > 0);
+        final MutableInt lostAP = new MutableInt(castInfos.randomJet(target));
+        lostAP.setValue(lostAP.getValue() > target.getAP() ? target.getAP() : lostAP.getValue());
+        castInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, lostAP.intValue(), false, castInfos.duration > 0);
 
-        if (castInfos.damageValue != LostAP.intValue()) {
-            target.getFight().sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, caster.getID(), target.getID(), LostAP.getValue() - castInfos.damageValue));
+        if (castInfos.damageValue != lostAP.intValue() && lostAP.getValue() > 0) {
+            target.getFight().sendToField(new GameActionFightDodgePointLossMessage(ActionIdEnum.ACTION_FIGHT_SPELL_DODGED_PA, caster.getID(), target.getID(), lostAP.getValue() - castInfos.damageValue));
         }
 
         if (castInfos.damageValue > 0) {
             BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.SUB_PA, this.castInfos.spellId, (short) this.castInfos.spellId, 0, null, this.castInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, castInfos.damageValue, castInfos.spellLevel, duration, 0), this.target);
-            BuffStats.applyEffect(LostAP, null);
+            BuffStats.applyEffect(lostAP, null);
             this.target.getBuff().addBuff(BuffStats);
             if (target.getID() == target.getFight().getCurrentFighter().getID()) {
                 target.getFight().sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, this.caster.getID(), target.getID(), (short) castInfos.damageValue));

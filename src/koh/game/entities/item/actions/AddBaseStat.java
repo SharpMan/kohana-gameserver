@@ -27,9 +27,9 @@ public class AddBaseStat  extends ItemAction {
         p.getStats().addBase(StatsEnum.valueOf(statId),number);
 
         if(p.getAdditionalStats().containsKey(statId)){
-            p.getAdditionalStats().replace(statId, p.getAdditionalStats().get(statId) + 1);
+            p.getAdditionalStats().replace(statId, p.getAdditionalStats().get(statId) + number);
         }else{
-            p.getAdditionalStats().put(statId, 1);
+            p.getAdditionalStats().put(statId, (int) number);
         }
 
         switch (StatsEnum.valueOf(statId)) {
