@@ -43,7 +43,7 @@ public abstract class IWorldEventObserver extends Observable {
         this.Observable$notify(op);
     }
 
-    public Iterable<Player> Observable$stream() {
+    public Iterable<Player> observable$Stream() {
         return observers.stream()::iterator;
     }
 

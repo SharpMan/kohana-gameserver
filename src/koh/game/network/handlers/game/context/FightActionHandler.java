@@ -25,7 +25,7 @@ public class FightActionHandler {
         final Fighter fighter = client.getCharacter().getFight().getFighter(message.targetId);
         if (spell != null && fighter != null) {
             try {
-                fighter.getSpellLock().lock();
+                fighter.getMutex().lock();
                 if (!fighter.isVisibleFor(client.getCharacter())) {
                     client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), spell, fighter.getLastCellSeen(), true);
                     return;
@@ -35,7 +35,7 @@ public class FightActionHandler {
                 e.printStackTrace();
             }
             finally {
-                fighter.getSpellLock().unlock();
+                fighter.getMutex().unlock();
             }
         }
     }
@@ -51,14 +51,14 @@ public class FightActionHandler {
         // Sort existant ?
         if (Spell != null) {
             try {
-                client.getCharacter().getFighter().getSpellLock().lock();
+                client.getCharacter().getFighter().getMutex().lock();
                 client.getCharacter().getFight().launchSpell(client.getCharacter().getFighter(), Spell, message.cellId, true);
             }
             catch (Exception e){
                 e.printStackTrace();
             }
             finally {
-                client.getCharacter().getFighter().getSpellLock().unlock();
+                client.getCharacter().getFighter().getMutex().unlock();
             }
         }
 

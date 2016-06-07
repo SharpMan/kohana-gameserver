@@ -326,15 +326,20 @@ public class EffectInstance implements Serializable {
                         break;
                     case 'T':
                         if(cell > 0) {
-                            final FightCell simetry = targetIsCaster ?
-                                    pCasterId.getFight().getCell(MapPoint.fromCellId(cell).pointSymetry(pCasterId.getMapPoint()).get_cellId()) :
-                                    pCasterId.getFight().getCell(pTargetId.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId());
+                            try {
+                                final FightCell simetry = targetIsCaster ?
+                                        pCasterId.getFight().getCell(MapPoint.fromCellId(cell).pointSymetry(pCasterId.getMapPoint()).get_cellId()) :
+                                        pCasterId.getFight().getCell(pTargetId.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId());
                        /* pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pCasterId.getFight().getCell(MapPoint.fromCellId(cell).pointSymetry(pCasterId.getMapPoint()).get_cellId()).getId()));
                         pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pTargetId.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId()));
 */
-                            //System.out.println();
-                            if (simetry != null && simetry.hasFighter()) {
-                                verify = true;
+                                //System.out.println();
+                                if (simetry != null && simetry.hasFighter()) {
+                                    verify = true;
+
+                                }
+                            }
+                            catch (NullPointerException e1){
 
                             }
                         }

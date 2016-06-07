@@ -55,7 +55,7 @@ public class FighterState {
             case INVISIBILITY:
                 fighter.setLastCellSeen(fighter.getCellId());
                 fighter.setVisibleState(GameActionFightInvisibilityStateEnum.INVISIBLE);
-                for (Player o : this.fighter.getFight().Observable$stream()) {
+                for (Player o : this.fighter.getFight().observable$Stream()) {
                     o.send(new GameActionFightInvisibilityMessage(ACTION_CHARACTER_MAKE_INVISIBLE, Buff.caster.getID(), fighter.getID(), fighter.getVisibleStateFor(o)));
                 }
                 this.myStates.put(FightStateEnum.INVISIBLE, Buff);

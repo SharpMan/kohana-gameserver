@@ -41,8 +41,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
@@ -57,7 +55,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         this.spellsController = new FighterSpell(buff);
         this.states = new FighterState(this);
         this.summoner = summoner;
-        this.spellLock = new ReentrantLock();
+        this.mutex = new Object();
     }
 
     @Getter
@@ -109,7 +107,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     @Getter @Setter
     private short lastCellSeen;
     @Getter
-    private Lock spellLock;
+    private Object mutex;
 
     /**
      * Virtual Method
