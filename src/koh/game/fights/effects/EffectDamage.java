@@ -96,7 +96,9 @@ public class EffectDamage extends EffectBase {
             }
 
             // Calcul resistances
-            target.calculReduceDamages(castInfos.effectType, damageJet);
+            target.calculReduceDamages(castInfos.effectType, damageJet, castInfos.isCritical());
+
+
             // Reduction des dommages grace a l'armure
             if (damageJet.intValue() > 0) {
                 // Si ce n'est pas des dommages direct on ne reduit pas
@@ -181,7 +183,7 @@ public class EffectDamage extends EffectBase {
                 return target.tryDie(caster.getID());
             }
 
-            target.setLifeMax(Math.max(1, target.getMaxLife() -  (int) Math.floor(damageJet.floatValue() / 100)));
+            target.setLifeMax(Math.max(1, target.getMaxLife() -  (int) Math.floor(damageJet.floatValue() * 0.05f)));
 
             // Deduit la vie
             target.setLife(target.getLife() - damageJet.intValue());

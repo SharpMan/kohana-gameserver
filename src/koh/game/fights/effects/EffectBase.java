@@ -124,6 +124,13 @@ public abstract class EffectBase {
             //HEAL
             this.put(StatsEnum.PDV_PERCENT_REPORTED, new EffectHealPercent());
 
+            //Coffre au tresor
+            this.put(StatsEnum.LIFE_LEFT_TO_THE_ATTACKER_WATER_DAMAGES, new EffectDamageBasedLifeLeft());
+            this.put(StatsEnum.LIFE_LEFT_TO_THE_ATTACKER_FIRE_DAMAGES, new EffectDamageBasedLifeLeft());
+            this.put(StatsEnum.LIFE_LEFT_TO_THE_ATTACKER_AIR_DAMAGES, new EffectDamageBasedLifeLeft());
+            this.put(StatsEnum.LIFE_LEFT_TO_THE_ATTACKER_NEUTRAL_DAMAGES, new EffectDamageBasedLifeLeft());
+            this.put(StatsEnum.LIFE_LEFT_TO_THE_ATTACKER_EARTH_DAMAGES, new EffectDamageBasedLifeLeft());
+
             //AddPdVPercent 
             this.put(StatsEnum.ADD_VITALITY_PERCENT, new EffectVitalityPercent());
 
@@ -250,7 +257,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.ADD_CRITICAL_HIT, new EffectStats());
             this.put(StatsEnum.ALL_DAMAGES_BONUS, new EffectStats());
             this.put(StatsEnum.CRITICAL_MISS1, new EffectStats());
-            this.put(StatsEnum.DAMAGE_RETURN, new EffectStats());
+            this.put(StatsEnum.DAMAGE_RETURN, new EffectStats()); //TODO: attackAfterJet so can handle triger
             this.put(StatsEnum.SUB_CRITICAL_HIT, new EffectStats());
             this.put(StatsEnum.ADD_GLOBAL_DAMAGE_REDUCTION, new EffectStats());
             this.put(StatsEnum.WEAPON_DAMAGE_PERCENT, new EffectStats());

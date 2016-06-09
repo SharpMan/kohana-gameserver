@@ -68,7 +68,7 @@ public class PlayerExchange extends Exchange {
     }
 
     @Override
-    public boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add) {
+    public boolean moveItems(WorldClient client, InventoryItem[] items, boolean add) {
         if (items != null && items.length <= 0) {
             return false;
         }
@@ -78,11 +78,11 @@ public class PlayerExchange extends Exchange {
             List<InventoryItem> modifiedObjects = null;
 
             for (InventoryItem item : items) {
-                if (this.myItemsToTrade.get(Client).containsKey(item.getID())) {
-                    if (item.getQuantity() == this.myItemsToTrade.get(Client).get(item.getID())) {
+                if (this.myItemsToTrade.get(client).containsKey(item.getID())) {
+                    if (item.getQuantity() == this.myItemsToTrade.get(client).get(item.getID())) {
                         items = ArrayUtils.removeElement(items, item);
                     } else {
-                        this.myItemsToTrade.get(Client).put(item.getID(), item.getQuantity());
+                        this.myItemsToTrade.get(client).put(item.getID(), item.getQuantity());
                         if (modifiedObjects == null) {
                             modifiedObjects = new ArrayList<>();
                         }
@@ -90,11 +90,11 @@ public class PlayerExchange extends Exchange {
                         items = ArrayUtils.removeElement(items, item);
                     }
                 } else {
-                    this.myItemsToTrade.get(Client).put(item.getID(), item.getQuantity());
+                    this.myItemsToTrade.get(client).put(item.getID(), item.getQuantity());
                 }
             }
             if (modifiedObjects != null) {
-                if (Client == this.myClient1) {
+                if (client == this.myClient1) {
                     this.myClient1.send(new ExchangeObjectsModifiedMessage(false, modifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
                     this.myClient2.send(new ExchangeObjectsModifiedMessage(true, modifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
                 } else {
@@ -105,7 +105,7 @@ public class PlayerExchange extends Exchange {
                 modifiedObjects = null;
             }
 
-            if (Client == this.myClient1) {
+            if (client == this.myClient1) {
                 this.myClient1.send(new ExchangeObjectsAddedMessage(false, Arrays.stream(items).map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
                 this.myClient2.send(new ExchangeObjectsAddedMessage(true, Arrays.stream(items).map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
             } else {
@@ -113,56 +113,56 @@ public class PlayerExchange extends Exchange {
                 this.myClient1.send(new ExchangeObjectsAddedMessage(true, Arrays.stream(items).map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
             }
         } else {
-            if (Client == this.myClient1) {
-                this.myClient1.send(new ExchangeObjectsRemovedMessage(false, this.myItemsToTrade.get(Client).keySet().stream().mapToInt(x -> x).toArray()));
-                this.myClient2.send(new ExchangeObjectsRemovedMessage(true, this.myItemsToTrade.get(Client).keySet().stream().mapToInt(x -> x).toArray()));
+            if (client == this.myClient1) {
+                this.myClient1.send(new ExchangeObjectsRemovedMessage(false, this.myItemsToTrade.get(client).keySet().stream().mapToInt(x -> x).toArray()));
+                this.myClient2.send(new ExchangeObjectsRemovedMessage(true, this.myItemsToTrade.get(client).keySet().stream().mapToInt(x -> x).toArray()));
             } else {
-                this.myClient2.send(new ExchangeObjectsRemovedMessage(false, this.myItemsToTrade.get(Client).keySet().stream().mapToInt(x -> x).toArray()));
-                this.myClient1.send(new ExchangeObjectsRemovedMessage(true, this.myItemsToTrade.get(Client).keySet().stream().mapToInt(x -> x).toArray()));
+                this.myClient2.send(new ExchangeObjectsRemovedMessage(false, this.myItemsToTrade.get(client).keySet().stream().mapToInt(x -> x).toArray()));
+                this.myClient1.send(new ExchangeObjectsRemovedMessage(true, this.myItemsToTrade.get(client).keySet().stream().mapToInt(x -> x).toArray()));
             }
-            this.myItemsToTrade.get(Client).clear();
+            this.myItemsToTrade.get(client).clear();
         }
         return true;
     }
 
     @Override
-    public synchronized boolean moveItem(WorldClient Client, int itemID, int quantity) {
-        final InventoryItem item = Client.getCharacter().getInventoryCache().find(itemID);
+    public synchronized boolean moveItem(WorldClient client, int itemID, int quantity) {
+        final InventoryItem item = client.getCharacter().getInventoryCache().find(itemID);
         if (item == null) {
             return false;
         }
         if (item.isLinked() || item.isEquiped()) {
-            Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{item.getTemplateId() + "", item.getID() + ""}));
+            client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{item.getTemplateId() + "", item.getID() + ""}));
             return false;
         }
         this.unValidateAll();
 
-        if (!this.myItemsToTrade.get(Client).containsKey(item.getID())) {  //add new item
+        if (!this.myItemsToTrade.get(client).containsKey(item.getID())) {  //add new item
             if (quantity <= 0) {
                 return false;
             }
             if (quantity > item.getQuantity()) {
                 quantity = item.getQuantity();
             }
-            this.myItemsToTrade.get(Client).put(item.getID(), quantity);
+            this.myItemsToTrade.get(client).put(item.getID(), quantity);
 
-            if (Client == this.myClient1) {
-                this.myClient1.send(new ExchangeObjectAddedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
-                this.myClient2.send(new ExchangeObjectAddedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+            if (client == this.myClient1) {
+                this.myClient1.send(new ExchangeObjectAddedMessage(false, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
+                this.myClient2.send(new ExchangeObjectAddedMessage(true, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
             } else {
-                this.myClient2.send(new ExchangeObjectAddedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
-                this.myClient1.send(new ExchangeObjectAddedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+                this.myClient2.send(new ExchangeObjectAddedMessage(false, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
+                this.myClient1.send(new ExchangeObjectAddedMessage(true, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
             }
         } else {
 
-            if (item.getQuantity() < (this.myItemsToTrade.get(Client).get(item.getID()) + quantity) || (this.myItemsToTrade.get(Client).get(item.getID()) + quantity) < 0) {
+            if (item.getQuantity() < (this.myItemsToTrade.get(client).get(item.getID()) + quantity) || (this.myItemsToTrade.get(client).get(item.getID()) + quantity) < 0) {
                 return false;
             }
 
-            if (this.myItemsToTrade.get(Client).get(item.getID()) + quantity == 0) {
-                this.myItemsToTrade.get(Client).remove(item.getID());
+            if (this.myItemsToTrade.get(client).get(item.getID()) + quantity == 0) {
+                this.myItemsToTrade.get(client).remove(item.getID());
 
-                if (Client == this.myClient1) {
+                if (client == this.myClient1) {
                     this.myClient1.send(new ExchangeObjectRemovedMessage(false, item.getID()));
                     this.myClient2.send(new ExchangeObjectRemovedMessage(true, item.getID()));
                 } else {
@@ -170,14 +170,14 @@ public class PlayerExchange extends Exchange {
                     this.myClient1.send(new ExchangeObjectRemovedMessage(true, item.getID()));
                 }
             } else {
-                this.myItemsToTrade.get(Client).put(item.getID(), (this.myItemsToTrade.get(Client).get(item.getID()) + quantity));
+                this.myItemsToTrade.get(client).put(item.getID(), (this.myItemsToTrade.get(client).get(item.getID()) + quantity));
 
-                if (Client == this.myClient1) {
-                    this.myClient1.send(new ExchangeObjectModifiedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
-                    this.myClient2.send(new ExchangeObjectModifiedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+                if (client == this.myClient1) {
+                    this.myClient1.send(new ExchangeObjectModifiedMessage(false, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
+                    this.myClient2.send(new ExchangeObjectModifiedMessage(true, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
                 } else {
-                    this.myClient2.send(new ExchangeObjectModifiedMessage(false, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
-                    this.myClient1.send(new ExchangeObjectModifiedMessage(true, item.getObjectItem(this.myItemsToTrade.get(Client).get(item.getID()))));
+                    this.myClient2.send(new ExchangeObjectModifiedMessage(false, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
+                    this.myClient1.send(new ExchangeObjectModifiedMessage(true, item.getObjectItem(this.myItemsToTrade.get(client).get(item.getID()))));
                 }
             }
         }
@@ -209,12 +209,12 @@ public class PlayerExchange extends Exchange {
     }
 
     @Override
-    public boolean buyItem(WorldClient Client, int templateId, int quantity) {
+    public boolean buyItem(WorldClient client, int templateId, int quantity) {
         return false;
     }
 
     @Override
-    public boolean sellItem(WorldClient Client, InventoryItem item, int quantity) {
+    public boolean sellItem(WorldClient client, InventoryItem item, int quantity) {
         return false;
     }
 
@@ -227,10 +227,10 @@ public class PlayerExchange extends Exchange {
     }
 
     @Override
-    public synchronized boolean validate(WorldClient Client) {
-        this.myValidate.put(Client, this.myValidate.get(Client) == false);
+    public synchronized boolean validate(WorldClient client) {
+        this.myValidate.put(client, this.myValidate.get(client) == false);
 
-        this.send(new ExchangeIsReadyMessage(Client.getCharacter().getID(), this.myValidate.get(Client)));
+        this.send(new ExchangeIsReadyMessage(client.getCharacter().getID(), this.myValidate.get(client)));
         if (this.myValidate.entrySet().stream().allMatch(x -> x.getValue())) {
             this.finish();
 
@@ -325,9 +325,9 @@ public class PlayerExchange extends Exchange {
     }
 
     @Override
-    public void send(Message Packet) {
-        this.myClient1.send(Packet);
-        this.myClient2.send(Packet);
+    public void send(Message packet) {
+        this.myClient1.send(packet);
+        this.myClient2.send(packet);
     }
 
     public void dispose() {
@@ -342,8 +342,8 @@ public class PlayerExchange extends Exchange {
     }
 
     @Override
-    public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
-        return Client.getMyExchange().moveItems(Client, Exchange.getCharactersItems(Client.getCharacter()), false);
+    public boolean transfertAllToInv(WorldClient client, InventoryItem[] items) {
+        return client.getMyExchange().moveItems(client, Exchange.getCharactersItems(client.getCharacter()), false);
     }
 
 }

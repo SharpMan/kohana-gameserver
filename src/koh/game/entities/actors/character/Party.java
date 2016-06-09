@@ -95,7 +95,7 @@ public class Party extends IWorldEventObserver {
     }
 
     public void updateMember(Player character) {
-        if (this.players.contains(character)) {
+        if (this.players != null && this.players.contains(character)) {
             this.sendToField(new PartyUpdateMessage(this.id, toMemberInformations(character)));
         }
     }
@@ -201,9 +201,7 @@ public class Party extends IWorldEventObserver {
 
     public void clear() {
         try {
-            for (Player p : this.players) {
-                p.getClient().endGameAction(GameActionTypeEnum.GROUP);
-            }
+            for (Player p : this.players) p.getClient().endGameAction(GameActionTypeEnum.GROUP);
             this.sendToField(new PartyDeletedMessage(this.id));
             this.chief = null;
             this.guests.clear();
@@ -219,9 +217,9 @@ public class Party extends IWorldEventObserver {
 
     public void followAll(Player playerById) {
         if (playerById != null) {
-            this.players.stream().filter(x -> x.getID() != playerById.getID()).forEach(x -> {
-                playerById.addFollower(x);
-            });
+            this.players.stream().filter(x -> x.getID() != playerById.getID()).forEach(
+                playerById::addFollower
+            );
         }
     }
 

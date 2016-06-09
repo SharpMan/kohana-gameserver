@@ -21,6 +21,10 @@ public class BuffReduceDamage extends BuffEffect {
     public BuffReduceDamage(EffectCast castInfos, Fighter target) {
         super(castInfos, target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
         this.JET = castInfos.randomJet(target);
+        if(castInfos.spellId ==5 || castInfos.spellId == 127){
+            this.duration++;
+            this.decrementType = BuffDecrementType.TYPE_ENDTURN;
+        }
         //this.duration++;
     }
 

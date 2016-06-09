@@ -66,6 +66,8 @@ public class EffectPunishment extends EffectBase {
                 caster.getStates().removeState(FightStateEnum.INVISIBLE);
             }
 
+
+
             // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat
             if (!castInfos.isPoison && !castInfos.isReflect) {
                 if (caster.getBuff().onAttackPostJet(castInfos, damageJet) == -3) {
@@ -91,7 +93,7 @@ public class EffectPunishment extends EffectBase {
             }
 
             // Calcul resistances
-            target.calculReduceDamages(DAMAGE_NEUTRAL, damageJet);
+            target.calculReduceDamages(DAMAGE_NEUTRAL, damageJet, castInfos.isCritical());
             // Reduction des dommages grace a l'armure
             if (damageJet.intValue() > 0) {
                 // Si ce n'est pas des dommages direct on ne reduit pas

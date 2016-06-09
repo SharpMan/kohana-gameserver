@@ -36,10 +36,10 @@ public class FightBomb extends FightActivableObject {
         return this.cells.keySet().stream().map(cellid -> this.m_fight.getCell(cellid));
     }
 
-    public FightBomb(Fighter Caster, SpellLevel Spell, Color color, Short[] Cells, BombFighter[] Members) {
-        m_fight = Caster.getFight();
+    public FightBomb(Fighter caster, SpellLevel Spell, Color color, Short[] Cells, BombFighter[] Members) {
+        m_fight = caster.getFight();
         ID = (short) m_fight.getNextTriggerUid().incrementAndGet();
-        caster = Caster;
+        this.caster = caster;
         m_spellId = Spell.getSpellId();
         m_spell_level = Spell.getGrade();
         castSpell = Spell;

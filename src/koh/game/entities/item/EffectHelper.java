@@ -78,6 +78,7 @@ public class EffectHelper {
     };
 
     private static final StatsEnum[] UNVERIFIED_EFFECTS = new StatsEnum[]{
+            StatsEnum.DAMAGE_RETURN,
             StatsEnum.CHATIMENT,
             StatsEnum.DAMAGE_REDUCTION,
             StatsEnum.DAMMAGES_OCASSIONED,

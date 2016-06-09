@@ -828,37 +828,46 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return Math.max(0, DAMAGE_NOT_BOOSTED - 0.01 * Math.min(param1, param5) * param4);
     }
 
-    public void calculReduceDamages(StatsEnum effect, MutableInt damages) {
+    public void calculReduceDamages(StatsEnum effect, MutableInt damages, boolean cc) {
         switch (effect) {
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:
+            case LIFE_LEFT_TO_THE_ATTACKER_NEUTRAL_DAMAGES:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0)) / 100
                         - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_EARTH:
             case STEAL_EARTH:
+            case LIFE_LEFT_TO_THE_ATTACKER_EARTH_DAMAGES:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0)) / 100
                         - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_FIRE:
             case STEAL_FIRE:
+            case LIFE_LEFT_TO_THE_ATTACKER_FIRE_DAMAGES:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0)) / 100
                         - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_AIR:
             case STEAL_AIR:
+            case LIFE_LEFT_TO_THE_ATTACKER_AIR_DAMAGES:
+            case PA_USED_LOST_X_PDV:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0)) / 100
                         - this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_WATER:
             case STEAL_WATER:
+            case LIFE_LEFT_TO_THE_ATTACKER_WATER_DAMAGES:
                 damages.setValue(damages.intValue() * (100 - this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0)) / 100
                         - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
+        }
+        if(cc){
+            damages.subtract(this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION));
         }
     }
 

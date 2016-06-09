@@ -17,24 +17,24 @@ public abstract class Exchange {
 
     protected boolean myEnd = false;
 
-    public boolean ExchangeFinish() {
+    public boolean exchangeFinish() {
         return this.myEnd;
     }
-    public int ExchangeType;
+    //public int exchangeType;
 
-    public abstract boolean transfertAllToInv(WorldClient Client, InventoryItem[] items);
+    public abstract boolean transfertAllToInv(WorldClient client, InventoryItem[] items);
 
-    public abstract boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add);
+    public abstract boolean moveItems(WorldClient client, InventoryItem[] items, boolean add);
 
-    public abstract boolean moveItem(WorldClient Client, int itemID, int quantity);
+    public abstract boolean moveItem(WorldClient client, int itemID, int quantity);
 
     public abstract boolean moveKamas(WorldClient Client, int quantity);
 
-    public abstract boolean buyItem(WorldClient Client, int templateId, int quantity);
+    public abstract boolean buyItem(WorldClient client, int templateId, int quantity);
 
-    public abstract boolean sellItem(WorldClient Client, InventoryItem item, int quantity);
+    public abstract boolean sellItem(WorldClient client, InventoryItem item, int quantity);
 
-    public abstract boolean validate(WorldClient Client);
+    public abstract boolean validate(WorldClient client);
 
     public abstract boolean finish();
 
@@ -42,16 +42,21 @@ public abstract class Exchange {
         return closeExchange(false);
     }
 
-    public abstract boolean closeExchange(boolean Success);
+    public abstract boolean closeExchange(boolean success);
 
-    public abstract void send(Message Packet);
+    public abstract void send(Message packet);
 
-    public static InventoryItem[] getCharactersItems(Player Character) {
-        return Character.getInventoryCache().getItems().filter(x -> !x.isLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
+    public static InventoryItem[] getCharactersItems(Player character) {
+        return character.getInventoryCache()
+                .getItems()
+                .filter(x -> !x.isLinked() && !x.isEquiped())
+                .toArray(InventoryItem[]::new);
     }
 
-    public static InventoryItem[] getCharactersItems(Player Character, int[] ids) {
-        return Character.getInventoryCache().getItems().filter(x -> ArrayUtils.contains(ids, x.getID()) && !x.isLinked() && !x.isEquiped()).toArray(InventoryItem[]::new);
+    public static InventoryItem[] getCharactersItems(Player character, int[] ids) {
+        return character.getInventoryCache().getItems()
+                .filter(x -> ArrayUtils.contains(ids, x.getID()) && !x.isLinked() && !x.isEquiped())
+                .toArray(InventoryItem[]::new);
     }
 
 }

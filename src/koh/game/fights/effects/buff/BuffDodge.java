@@ -17,22 +17,21 @@ import org.apache.commons.lang3.mutable.MutableInt;
 public class BuffDodge extends BuffEffect {
 
     public BuffDodge(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_POST_JET, BuffDecrementType.TYPE_BEGINTURN);
+        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
         if (target.getCellId() != DamageInfos.targetKnownCellId || Pathfunction.goalDistance(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId()) > 1) {
             return -1;
         }
-        
-        DamageValue.setValue(0);
+        damageValue.setValue(0);
 
-        final EffectCast SubInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
-        final byte Direction = Pathfunction.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
+        final EffectCast subInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
+        final byte direction = Pathfunction.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
 
         // Application du push
-        return EffectPush.applyPush(SubInfos, this.target, Direction, 1);
+        return EffectPush.applyPush(subInfos, this.target, direction, 1);
     }
 
     @Override

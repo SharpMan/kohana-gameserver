@@ -227,15 +227,14 @@ public class EffectInstance implements Serializable {
                         } else {
                             targetMaskPattern = ((isTargetAlly) ? "gahl" : "AHL");
                         }
-                        ;
+
                     }
-                    ;
+
                 }
-                ;
+
             }
-            ;
+
         }
-        ;
         r = new Pattern("[" + targetMaskPattern + "]", REFlags.DOTALL);
         verify = r.matcher(pEffect.targetMask).find();
         if (verify) {

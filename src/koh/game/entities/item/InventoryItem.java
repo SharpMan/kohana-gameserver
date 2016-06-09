@@ -285,6 +285,7 @@ public class InventoryItem {
             position = 0;
             owner = 0;
             quantity = 0;
+            //TODO: redo this algo
             /*for (ObjectEffect e : effects) {
              e.totalClear();
              }*/
@@ -304,7 +305,7 @@ public class InventoryItem {
     }
 
     private boolean isTokenItem() {
-        return false;
+        return this.templateId == 13470;
     }
 
 }

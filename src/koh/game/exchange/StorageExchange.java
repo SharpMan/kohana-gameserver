@@ -27,23 +27,23 @@ public class StorageExchange extends Exchange {
     }
 
     @Override
-    public boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add) {
+    public boolean moveItems(WorldClient client, InventoryItem[] items, boolean add) {
         InventoryItem newItem = null;
         if (add) {
-            for (InventoryItem Item : items) {
-                newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, Client.getAccount().id, Item.getQuantity(), Item.getEffects());
-                if (Client.getAccount().accountData.add(Client.getCharacter(), newItem, true)) {
+            for (InventoryItem item : items) {
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), item.getTemplateId(), 63, client.getAccount().id, item.getQuantity(), item.getEffects());
+                if (client.getAccount().accountData.add(client.getCharacter(), newItem, true)) {
                     newItem.setNeedInsert(true);
                 }
-                Client.getCharacter().getInventoryCache().updateObjectquantity(Item, 0);
+                client.getCharacter().getInventoryCache().updateObjectquantity(item, 0);
             }
         } else {
             for (InventoryItem Item : items) {
-                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, Client.getCharacter().getID(), Item.getQuantity(), Item.getEffects());
-                if (Client.getCharacter().getInventoryCache().add(newItem, true)) {
+                newItem = InventoryItem.getInstance(DAO.getItems().nextItemId(), Item.getTemplateId(), 63, client.getCharacter().getID(), Item.getQuantity(), Item.getEffects());
+                if (client.getCharacter().getInventoryCache().add(newItem, true)) {
                     newItem.setNeedInsert(true);
                 }
-                Client.getAccount().accountData.updateObjectQuantity(Client.getCharacter(), Item, 0);
+                client.getAccount().accountData.updateObjectQuantity(client.getCharacter(), Item, 0);
             }
         }
         return true;
@@ -54,24 +54,25 @@ public class StorageExchange extends Exchange {
         if (quantity == 0) {
             return false;
         } else if (quantity <= 0) { //Remove from Bank
-            InventoryItem BankItem = client.getAccount().accountData.itemscache.get(itemID);
-            if (BankItem == null) {
+            final InventoryItem bankItem = client.getAccount().accountData.itemscache.get(itemID);
+            if (bankItem == null) {
                 return false;
             }
-            client.getAccount().accountData.updateObjectQuantity(client.getCharacter(), BankItem, BankItem.getQuantity() + quantity);
-            InventoryItem Item = InventoryItem.getInstance(DAO.getItems().nextItemId(), BankItem.getTemplateId(), 63, client.getCharacter().getID(), -quantity, BankItem.getEffects());
-            if (client.getCharacter().getInventoryCache().add(Item, true)) {
-                Item.setNeedInsert(true);
+            client.getAccount().accountData.updateObjectQuantity(client.getCharacter(), bankItem, bankItem.getQuantity() + quantity);
+            final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), bankItem.getTemplateId(), 63, client.getCharacter().getID(), -quantity, bankItem.getEffects());
+            if (client.getCharacter().getInventoryCache().add(item, true)) {
+                item.setNeedInsert(true);
             }
         } else { //add In bank
-            InventoryItem Item = client.getCharacter().getInventoryCache().find(itemID);
-            if (Item == null) {
+            final InventoryItem item = client.getCharacter().getInventoryCache().find(itemID);
+            if (item == null) {
                 return false;
             }
-            client.getCharacter().getInventoryCache().updateObjectquantity(Item, Item.getQuantity() - quantity);
-            InventoryItem NewItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), Item.getTemplateId(), 63, client.getAccount().id, quantity, Item.getEffects());
-            if (client.getAccount().accountData.add(client.getCharacter(), NewItem, true)) {
-                NewItem.setNeedInsert(true);
+            client.getCharacter().getInventoryCache().updateObjectquantity(item, item.getQuantity() - quantity);
+            DAO.getItems().save(item, false, "character_items"); //TODO Insecure emplacement
+            final InventoryItem newItem = InventoryItem.getInstance(DAO.getItems().nextItemStorageId(), item.getTemplateId(), 63, client.getAccount().id, quantity, item.getEffects());
+            if (client.getAccount().accountData.add(client.getCharacter(), newItem, true)) {
+                newItem.setNeedInsert(true);
             }
         }
         return true;
@@ -100,17 +101,17 @@ public class StorageExchange extends Exchange {
     }
 
     @Override
-    public boolean buyItem(WorldClient Client, int templateId, int quantity) {
+    public boolean buyItem(WorldClient client, int templateId, int quantity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean sellItem(WorldClient Client, InventoryItem item, int quantity) {
+    public boolean sellItem(WorldClient client, InventoryItem item, int quantity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean validate(WorldClient Client) {
+    public boolean validate(WorldClient client) {
         return false;
     }
 
@@ -122,7 +123,7 @@ public class StorageExchange extends Exchange {
     }
 
     @Override
-    public boolean closeExchange(boolean Success) {
+    public boolean closeExchange(boolean success) {
         this.finish();
         this.myClient.setMyExchange(null);
         this.myClient.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_EXCHANGE));
@@ -132,13 +133,13 @@ public class StorageExchange extends Exchange {
     }
 
     @Override
-    public void send(Message Packet) {
-        this.myClient.send(Packet);
+    public void send(Message packet) {
+        this.myClient.send(packet);
     }
 
     @Override
-    public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
-        return Client.getMyExchange().moveItems(Client, Client.getAccount().accountData.itemscache.values().toArray(new InventoryItem[Client.getAccount().accountData.itemscache.size()]), false);
+    public boolean transfertAllToInv(WorldClient client, InventoryItem[] items) {
+        return client.getMyExchange().moveItems(client, client.getAccount().accountData.itemscache.values().toArray(new InventoryItem[client.getAccount().accountData.itemscache.size()]), false);
     }
 
 }

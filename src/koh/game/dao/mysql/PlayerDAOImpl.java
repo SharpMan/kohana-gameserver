@@ -139,12 +139,13 @@ public class PlayerDAOImpl extends PlayerDAO {
                     if (accountInUnload.contains(account.id)) {
                         throw new AccountOccupedException("player id " + account.id + " are unload handled ");
                     }
+                    if(result.getBoolean("removed")){
+                        continue;
+                    }
                     if (myCharacterById.containsKey(result.getInt("id"))) {
                         p = myCharacterById.get(result.getInt("id"));
                         cleanMap(p);
-                        if(result.getBoolean("removed")){
-                            continue;
-                        }
+
                         if (p.getAccount().accountData != null) {
                             account.accountData = p.getAccount().accountData;
                         }

@@ -165,7 +165,7 @@ public abstract class FightActivableObject implements IFightObject {
         final ArrayList<Fighter> targetsPerEffect = new ArrayList<>();
         int bestResult = -1;
         for (EffectInstanceDice effect : castSpell.getEffects()) {
-            //System.out.println(castSpell.getSpellId() + " "+effect);
+            System.out.println(castSpell.getSpellId() + " "+effect);
             targetsPerEffect.addAll(targets);
             targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, castSpell.getEffects(), effect, false, effect.triggers, target.getCellId())
                     && effect.isValidTarget(caster, target)

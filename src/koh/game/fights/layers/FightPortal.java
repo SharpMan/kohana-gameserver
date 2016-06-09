@@ -207,7 +207,7 @@ public class FightPortal extends FightActivableObject {
 
     @Override
     public boolean canStack() {
-        return false;
+        return true;
     }
 
     @Override

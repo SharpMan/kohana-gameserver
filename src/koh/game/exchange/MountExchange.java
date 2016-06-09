@@ -26,17 +26,17 @@ public class MountExchange extends Exchange {
     }
 
     @Override
-    public boolean transfertAllToInv(WorldClient Client, InventoryItem[] items) {
+    public boolean transfertAllToInv(WorldClient client, InventoryItem[] items) {
         return false;
     }
 
     @Override
-    public boolean moveItems(WorldClient Client, InventoryItem[] items, boolean add) {
+    public boolean moveItems(WorldClient client, InventoryItem[] items, boolean add) {
         return false;
     }
 
     @Override
-    public boolean moveItem(WorldClient Client, int itemID, int quantity) {
+    public boolean moveItem(WorldClient client, int itemID, int quantity) {
         return false;
     }
 
@@ -46,17 +46,17 @@ public class MountExchange extends Exchange {
     }
 
     @Override
-    public boolean buyItem(WorldClient Client, int templateId, int quantity) {
+    public boolean buyItem(WorldClient client, int templateId, int quantity) {
         return false;
     }
 
     @Override
-    public boolean sellItem(WorldClient Client, InventoryItem item, int quantity) {
+    public boolean sellItem(WorldClient client, InventoryItem item, int quantity) {
         return false;
     }
 
     @Override
-    public boolean validate(WorldClient Client) {
+    public boolean validate(WorldClient client) {
         return false;
     }
 
@@ -68,18 +68,18 @@ public class MountExchange extends Exchange {
     }
 
     @Override
-    public boolean closeExchange(boolean Success) {
+    public boolean closeExchange(boolean success) {
         this.finish();
         this.myClient.setMyExchange(null);
-        this.send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, Success));
+        this.send(new ExchangeLeaveMessage(DialogTypeEnum.DIALOG_EXCHANGE, success));
         this.myClient.endGameAction(GameActionTypeEnum.EXCHANGE);
 
         return true;
     }
 
     @Override
-    public void send(Message Packet) {
-        this.myClient.send(Packet);
+    public void send(Message packet) {
+        this.myClient.send(packet);
     }
 
 }

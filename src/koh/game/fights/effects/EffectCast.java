@@ -10,6 +10,8 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.protocol.client.enums.StatsEnum;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -52,6 +54,8 @@ public class EffectCast {
     public int spellId, fakeValue, damageValue, parentUID, glyphId;
     public short cellId,oldCell,targetKnownCellId;
     public boolean isReflect, isPoison, isCAC, isTrap, isGlyph, isReturnedDamages,isPoutch;
+    @Getter @Setter
+    private boolean critical;
     public double chance;
     public SpellLevel spellLevel;
     public Fighter caster;

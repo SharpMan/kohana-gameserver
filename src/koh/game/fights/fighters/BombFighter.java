@@ -48,7 +48,7 @@ public class BombFighter extends StaticFighter {
         super.initFighter(this.grade.getStats(), fight.getNextContextualId());
         this.entityLook = EntityLookParser.copy(this.grade.getMonster().getEntityLook());
         this.adjustStats();
-        this.stats.merge(this.summoner.getStats());
+        this.stats.merge(this.summoner.getStats(),StatsEnum.VITALITY);
         this.stats.addBoost(StatsEnum.VITALITY, -this.summoner.getStats().getBoost(StatsEnum.VITALITY));
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());
@@ -57,7 +57,8 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public void adjustStats() {
-        this.stats.addBase(StatsEnum.VITALITY, (short) ((double) this.summoner.getStats().getTotal(StatsEnum.VITALITY) * (20 / 100.0)));
+
+        this.stats.addBase(StatsEnum.VITALITY, (short) (((double) this.summoner.getStats().getTotal(StatsEnum.VITALITY)) * (0.02f)));
         this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));

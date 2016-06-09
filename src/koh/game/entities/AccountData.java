@@ -84,7 +84,7 @@ public class AccountData {
         this.notifyColumn("friend_warn_on_level_gain");
     }
 
-    public boolean add(Player player, InventoryItem item, boolean merge) //muste be true
+    public synchronized boolean  add(Player player, InventoryItem item, boolean merge) //muste be true
     {
         if (merge && tryMergeItem(player, item.getTemplateId(), item.getEffects$Notify(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
@@ -104,15 +104,15 @@ public class AccountData {
 
     public boolean tryMergeItem(Player player, int templateId, List<ObjectEffect> stats, CharacterInventoryPositionEnum slot, int quantity, InventoryItem removeItem, boolean send) {
         if (slot == CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            for (InventoryItem Item : this.itemscache.values()) {
-                if (Item.getTemplateId() == templateId && Item.getSlot() == slot && !(removeItem != null && removeItem.getID() == Item.getID()) && Item.Equals(stats) ) {
+            for (InventoryItem item : this.itemscache.values()) {
+                if (item.getTemplateId() == templateId && item.getSlot() == slot && !(removeItem != null && removeItem.getID() == item.getID()) && item.Equals(stats) ) {
                     if (removeItem != null) {
                         this.removeFromDic(removeItem.getID());
                         removeItem.setNeedInsert(false);
                         DAO.getItems().delete(removeItem, "storage_items");
                         removeItem.columsToUpdate = null;
                     }
-                    this.updateObjectQuantity(player, Item, Item.getQuantity() + quantity);
+                    this.updateObjectQuantity(player, item, item.getQuantity() + quantity);
                     return true;
                 }
             }
@@ -137,11 +137,8 @@ public class AccountData {
     }
 
     public FriendContact getFriend(int account) {
-        try {
-            return Arrays.stream(friends).filter(x -> x.accountID == account).findFirst().get();
-        } catch (Exception e) {
-            return null;
-        }
+        return Arrays.stream(friends).filter(x -> x.accountID == account).findFirst().orElse(null);
+
     }
 
     public IgnoredContact getIgnored(int account) {
@@ -157,7 +154,7 @@ public class AccountData {
     }
 
     public List<FriendInformations> getFriendsInformations() {
-        List<FriendInformations> friends = new ArrayList<>();
+        final List<FriendInformations> friends = new ArrayList<>();
         for (FriendContact friend : this.friends) {
             Player target = DAO.getPlayers().getCharacterByAccount(friend.accountID);
             if (target == null || target.getClient() == null) {
@@ -177,7 +174,7 @@ public class AccountData {
     }
 
     public List<IgnoredInformations> getIgnoredInformations() {
-        List<IgnoredInformations> friends = new ArrayList<>();
+        final List<IgnoredInformations> friends = new ArrayList<>();
         for (IgnoredContact Friend : this.ignored) {
             Player target = DAO.getPlayers().getCharacterByAccount(Friend.accountID);
             if (target == null || target.getClient() == null) {
@@ -190,7 +187,7 @@ public class AccountData {
     }
 
     public boolean removeIgnored(int id) {
-        IgnoredContact person = person = Arrays.stream(ignored).filter(x -> x.accountID == id).findFirst().orElse(null);
+        final IgnoredContact person = Arrays.stream(ignored).filter(x -> x.accountID == id).findFirst().orElse(null);
         if(person == null)
             return false;
         this.ignored = ArrayUtils.removeElement(ignored, person);
@@ -209,7 +206,7 @@ public class AccountData {
     }
 
     public boolean removeFriend(int id) {
-        FriendContact friend = friend = Arrays.stream(friends).filter(x -> x.accountID == id).findFirst().orElse(null);
+        FriendContact friend = Arrays.stream(friends).filter(x -> x.accountID == id).findFirst().orElse(null);
         if(friend == null)
             return false;
         this.friends = ArrayUtils.removeElement(friends, friend);
@@ -219,15 +216,15 @@ public class AccountData {
 
     public void save(boolean clear) {
         synchronized (itemscache) {
-            this.itemscache.values().parallelStream().forEach(Item -> {
-                if (Item.isNeedRemove()) {
-                    DAO.getItems().delete(Item, "storage_items");
-                } else if (Item.isNeedInsert()) {
-                    DAO.getItems().create(Item, clear, "storage_items");
-                } else if (Item.columsToUpdate != null && !Item.columsToUpdate.isEmpty()) {
-                    DAO.getItems().save(Item, clear, "storage_items");
+            this.itemscache.values().parallelStream().forEach(item -> {
+                if (item.isNeedRemove()) {
+                    DAO.getItems().delete(item, "storage_items");
+                } else if (item.isNeedInsert()) {
+                    DAO.getItems().create(item, clear, "storage_items");
+                } else if (item.columsToUpdate != null && !item.columsToUpdate.isEmpty()) {
+                    DAO.getItems().save(item, clear, "storage_items");
                 } else if (clear) {
-                    Item.totalClear();
+                    item.totalClear();
                 }
             });
             if (!clear && this.columsToUpdate != null) {

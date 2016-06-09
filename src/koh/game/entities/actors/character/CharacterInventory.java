@@ -135,7 +135,7 @@ public class CharacterInventory {
                 );
     }
 
-    public boolean add(InventoryItem item, boolean merge) //muste be true
+    public synchronized boolean add(InventoryItem item, boolean merge) //muste be true
     {
         if (merge && !Ints.contains(UN_MERGEABLE_TYPE, item.getTemplate().getTypeId()) && tryMergeItem(item.getTemplateId(), item.getEffects(), item.getSlot(), item.getQuantity(), item, false)) {
             return false;
@@ -684,12 +684,15 @@ public class CharacterInventory {
     }
 
     public boolean hasItemId(int parseInt, int qua) {
-        return this.itemsCache.values().stream().filter(x -> x.getTemplateId() == parseInt).mapToInt(x -> x.getQuantity()).sum() > qua;
+        return this.itemsCache.values().stream()
+                .filter(x -> x.getTemplateId() == parseInt)
+                .mapToInt(x -> x.getQuantity())
+                .sum() > qua;
     }
 
     private void checkItemsCriterias() {
-        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && !x.areConditionFilled(player)).forEach((Item) ->
-            this.moveItem(Item.getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1)
+        this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && !x.areConditionFilled(player)).forEach((item) ->
+            this.moveItem(item.getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1)
         );
     }
 

@@ -7,6 +7,7 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -119,6 +120,22 @@ public class GenericStats {
 
     public void merge(GenericStats stats) {
         for (Entry<StatsEnum, CharacterBaseCharacteristic> effect : stats.getEffects().entrySet()) {
+            if(OPPOSITE_STATS.containsKey(effect.getKey())){
+                this.stats.get(OPPOSITE_STATS.get(effect.getKey())).unMerge(effect.getValue());
+                continue;
+            }
+            if (!this.stats.containsKey(effect.getKey())) {
+                this.stats.put(effect.getKey(), new CharacterBaseCharacteristic());
+            }
+            this.stats.get(effect.getKey()).merge(effect.getValue());
+        }
+    }
+
+    public void merge(GenericStats stats,StatsEnum... exceptions) {
+        for (Entry<StatsEnum, CharacterBaseCharacteristic> effect : stats.getEffects().entrySet()) {
+            if(ArrayUtils.contains(exceptions,effect.getKey())){
+                continue;
+            }
             if(OPPOSITE_STATS.containsKey(effect.getKey())){
                 this.stats.get(OPPOSITE_STATS.get(effect.getKey())).unMerge(effect.getValue());
                 continue;

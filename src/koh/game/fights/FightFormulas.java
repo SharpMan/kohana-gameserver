@@ -300,7 +300,7 @@ public class FightFormulas {
             int randomPerte = 0;
             switch (totalGradeWinner) {
                 case 1:
-                    randomPerte = EffectHelper.randomValue(40, 50);
+                    randomPerte = EffectHelper.randomValue(30, 40);
                     break;
                 case 2:
                     randomPerte = EffectHelper.randomValue(50, 60);
