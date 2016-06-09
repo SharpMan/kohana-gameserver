@@ -668,8 +668,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
                     this.endSequence(SequenceTypeEnum.SEQUENCE_WEAPON, false);
                     return;
+
                 }
 
+                this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_USE, fighter.getID(), fighter.getID(), (short) -weapon.getWeaponTemplate().getApCost()));
 
                 fighter.setUsedAP(fighter.getUsedAP() + weapon.getWeaponTemplate().getApCost());
 

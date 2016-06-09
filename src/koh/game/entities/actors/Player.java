@@ -266,18 +266,19 @@ public class Player extends IGameActor implements Observer {
 
     public HumanInformations getHumanInformations() {
         if (cachedHumanInformations == null) {
-            HumanOption[] Options = new HumanOption[0];
+            //TODO: compute the size
+            HumanOption[] options = new HumanOption[0];
             if (this.activableTitle != 0) {
-                Options = ArrayUtils.add(Options, new HumanOptionTitle(this.activableTitle, ""));
+                options = ArrayUtils.add(options, new HumanOptionTitle(this.activableTitle, ""));
             }
             if (this.activableOrnament != 0) {
-                Options = ArrayUtils.add(Options, new HumanOptionOrnament(this.activableOrnament));
+                options = ArrayUtils.add(options, new HumanOptionOrnament(this.activableOrnament));
             }
             if (this.guild != null) {
-                Options = ArrayUtils.add(Options, new HumanOptionGuild(this.guild.toGuildInformations()));
+                options = ArrayUtils.add(options, new HumanOptionGuild(this.guild.toGuildInformations()));
             }
             // Options = ArrayUtils.add(Options, new HumanOptionAlliance(this.PvPEnabled, new AllianceInformations(1191, "a", "ta race", this.guild.getGuildEmblem())));
-            this.cachedHumanInformations = new HumanInformations(new ActorRestrictionsInformations(), this.hasSexe(), Options);
+            this.cachedHumanInformations = new HumanInformations(new ActorRestrictionsInformations(), this.hasSexe(), options);
         }
         return this.cachedHumanInformations;
     }

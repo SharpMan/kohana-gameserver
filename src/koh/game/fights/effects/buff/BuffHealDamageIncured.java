@@ -23,7 +23,7 @@ public class BuffHealDamageIncured extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
-        if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId)) {
+        if (!damageInfos.isPoison && EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId)) {
             final MutableInt heal = new MutableInt((damageValue.intValue() * this.JET) / 100f);
             return EffectHeal.applyHeal(castInfos, damageInfos.caster, heal, false);
         }
