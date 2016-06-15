@@ -126,10 +126,10 @@ public class EffectPush extends EffectBase {
     }
 
     public static int applyPush(EffectCast castInfos, Fighter target, byte direction, int length) {
-        FightCell currentCell = target.getMyCell();
+       FightCell currentCell = target.getMyCell();
         short StartCell = target.getCellId();
         for (int i = 0; i < length; i++) {
-            FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(currentCell.Id, direction));
+            final FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {
@@ -194,7 +194,7 @@ public class EffectPush extends EffectBase {
         //MutableInt damageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 
         final EffectCast subInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, castInfos.spellId, castInfos.cellId, 0, null, target, null, false, StatsEnum.NONE, 0, null);
-
+        subInfos.isTrap = castInfos.isTrap;
 
         return EffectDamage.applyDamages(subInfos, target, damageValue);
     }

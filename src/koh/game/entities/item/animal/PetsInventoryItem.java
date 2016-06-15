@@ -82,7 +82,7 @@ public class PetsInventoryItem extends InventoryItem {
         if (myInitialized) {
             return;
         }
-        IoBuffer buf = IoBuffer.wrap(this.entity.informations);
+        final IoBuffer buf = IoBuffer.wrap(this.entity.informations);
         for (int i = 0; i < buf.getInt(); ++i) {
             this.eatedFoods.put(buf.getInt(), buf.getInt());
         }
@@ -106,8 +106,8 @@ public class PetsInventoryItem extends InventoryItem {
             return true;
         } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
             return false;
-        } else if (((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < pet.getMinDurationBeforeMeal()) {
-            PlayerController.sendServerMessage(p.getClient(), "Veuillez patientez " + ((getAnimal().getMinDurationBeforeMeal()) - ((int) TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " heures pour le prochain repas");
+        } else if (((int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < 60 /*pet.getMinDurationBeforeMeal()*/) {
+            PlayerController.sendServerMessage(p.getClient(), "Veuillez patientez " + ((/*getAnimal().getMinDurationBeforeMeal()*/60) - ((int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " minutes pour le prochain repas");
             return false;
         }
 
@@ -124,6 +124,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.checkLastEffect();
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
+                PlayerController.sendServerMessage(p.getClient(),"Next meal in 60 minutes");
                 return true;
             }
         }
@@ -140,6 +141,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.checkLastEffect();
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
+                PlayerController.sendServerMessage(p.getClient(),"Next meal in 60 minutes");
                 return true;
             }
         }

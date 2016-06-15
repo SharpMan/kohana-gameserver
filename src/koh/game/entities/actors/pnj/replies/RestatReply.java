@@ -22,6 +22,7 @@ public class RestatReply extends NpcReply {
         p.setIntell(0);
         p.setAgility(0);
         p.setChance(0);
+        p.setWisdom(0);
         //p.getStats().resetBase();
         p.getStats().getStats().get(StatsEnum.VITALITY).base = 0;
         p.getStats().getStats().get(StatsEnum.WISDOM).base = 0;

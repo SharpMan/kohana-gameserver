@@ -114,7 +114,7 @@ public class AgressionFight extends Fight {
     public void endFight(FightTeam winners, FightTeam loosers) {
         this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
 
-        if(Math.abs(loosers.getLevel() - winners.getLevel()) > 25){ //TODO vpn Config
+        if(winners.getLevel() - loosers.getLevel() > 20){ //TODO vpn Config
              this.withdrawEnd(winners,loosers);
              return;
         }
@@ -123,7 +123,7 @@ public class AgressionFight extends Fight {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_LOST);
             if(fighter.isLeft())
                 continue;
-            final short loosedHonor = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false));
+            final short loosedHonor = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false,FightTypeEnum.FIGHT_TYPE_AGRESSION));
             fighter.getPlayer().addHonor(loosedHonor, true);
             fighter.getPlayer().addDishonor(FightFormulas.calculateEarnedDishonor(fighter),true);
             this.myResult.results.add(
@@ -145,7 +145,7 @@ public class AgressionFight extends Fight {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_VICTORY);
             if(fighter.isLeft())
                 continue;
-            short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true));
+            short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_AGRESSION));
             final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() !=null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
             if(count == getEnnemyTeam(getWinners()).getFighters().count()){
                 honorWon = 0;

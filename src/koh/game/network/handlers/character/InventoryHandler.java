@@ -44,7 +44,7 @@ public class InventoryHandler {
         }
         //int i = 0;
         for(int i = 0; message.quantity > i ; i++){
-            if(!item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
+            if(!item.getTemplate().use(client.getCharacter(),client.getCharacter(),client.getCharacter().getCell().getId())){
                 client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
                 break;
             }
@@ -58,8 +58,8 @@ public class InventoryHandler {
             client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
-        if(item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(),message.cell)){
+        final InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        if(item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(),client.getCharacter(),message.cell)){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
@@ -71,10 +71,10 @@ public class InventoryHandler {
             client.send(new BasicNoOperationMessage());
             return;
         }
-        Player target = client.getCharacter().getCurrentMap().getPlayer(message.characterId);
-        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        final Player target = client.getCharacter().getCurrentMap().getPlayer(message.characterId);
+        final InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
 
-        if(target == null || item == null || !item.areConditionFilled(target) || item.getTemplate().use(target,target.getCell().getId())){
+        if(target == null || item == null || !item.areConditionFilled(target) || item.getTemplate().use(client.getCharacter(),target,target.getCell().getId())){
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
@@ -96,7 +96,7 @@ public class InventoryHandler {
             log.error("Wrond conditions");
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
         }
-        else if(!item.getTemplate().use(client.getCharacter(),client.getCharacter().getCell().getId())){
+        else if(!item.getTemplate().use(client.getCharacter(),client.getCharacter(),client.getCharacter().getCell().getId())){
             log.error("Item action criterias invalid");
             client.send(new ObjectErrorMessage  (ObjectErrorEnum.CRITERIONS));
         }

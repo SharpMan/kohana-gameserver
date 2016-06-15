@@ -83,7 +83,7 @@ public class EffectPunishment extends EffectBase {
             final double rad = (double) 2 * Math.PI * (pVie - 0.5);
             final double cos = Math.cos(rad);
             final double taux = (Math.pow((cos + 1), 2)) / (double) 4;
-            final double dgtMax = val * caster.getPlayer().getMaxLife();
+            final double dgtMax = val * (caster.isPlayer() ? caster.getPlayer().getMaxLife() : caster.getMaxLife());
 
 
             damageJet.setValue(taux * dgtMax);

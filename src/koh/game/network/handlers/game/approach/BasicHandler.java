@@ -18,7 +18,7 @@ public class BasicHandler {
     @HandlerAttribute(ID = BasicWhoIsRequestMessage.MESSAGE_ID)
     public static void HandleBasicWhoIsRequestMessage(WorldClient Client, BasicWhoIsRequestMessage message) {
         //TODO: Maybe anti flood
-        Player victim = DAO.getPlayers().getCharacter(message.search.toLowerCase());
+        final Player victim = DAO.getPlayers().getCharacter(message.search.toLowerCase());
         if (victim == null) {
             Client.send(new BasicWhoIsNoMatchMessage(message.search));
             return;
@@ -30,14 +30,14 @@ public class BasicHandler {
     }
 
     @HandlerAttribute(ID = BasicLatencyStatsMessage.MESSAGE_ID)
-    public static void HandleBasicLatencyStatsMessage(WorldClient Client, BasicLatencyStatsMessage Message) {
-        Client.setLatency(Message);
-        if (Client.getCallBacks() != null) {
-            Client.getCallBacks().first.sendToField(Client.getCallBacks().second);
-            Client.getCallBacks().Clear();
-            Client.setCallBacks(null);
+    public static void HandleBasicLatencyStatsMessage(WorldClient client, BasicLatencyStatsMessage Message) {
+        client.setLatency(Message);
+        if (client.getCallBacks() != null) {
+            client.getCallBacks().first.sendToField(client.getCallBacks().second);
+            client.getCallBacks().Clear();
+            client.setCallBacks(null);
         }
-        Client.sequenceMessage();
+        client.sequenceMessage();
     }
 
     @HandlerAttribute(ID = BasicStatMessage.MESSAGE_ID)

@@ -6,11 +6,17 @@ import koh.game.dao.api.ItemTemplateDAO;
 import koh.game.entities.item.*;
 import koh.game.entities.item.actions.*;
 import koh.game.entities.item.animal.PetTemplate;
+import koh.game.entities.spells.EffectInstance;
+import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.utils.sql.ConnectionResult;
+import koh.game.utils.sql.ConnectionStatement;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -137,6 +143,23 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             while (result.next()) {
                 itemTemplates.put(result.getInt("id"), new ItemTemplate(result));
                 ++i;
+                /*if(result.getInt("id") == 13834){
+                    EffectInstance[] copy = itemTemplates.get(13834).getPossibleEffects();
+                    copy = ArrayUtils.removeElement(copy,Arrays.stream(copy).map(e -> (EffectInstanceDice) e).filter(e -> e.diceNum== 24 || e.diceSide == 24).findFirst().get());
+                    Arrays.stream(copy).map(e -> (EffectInstanceDice) e).forEach(e -> { if(e.diceNum == 0)  e.diceSide = 20; else e.diceNum = 20; });
+                    try (ConnectionStatement<PreparedStatement> connn = dbSource.prepareStatement("UPDATE `item_templates` set possible_effects= ?  WHERE id = ?;")) {
+                        PreparedStatement pStatemente =  connn.getStatement();
+                        pStatemente.setBytes(1, EffectHelper.serializeEffectInstanceDice(copy).array());
+                        pStatemente.setInt(2, 7043);
+
+                        pStatemente.execute();
+                    }
+
+                    catch (Exception e) {
+                        logger.error(e);
+                        logger.warn(e.getMessage());
+                    }
+                }*/
             }
         } catch (Exception e) {
             e.printStackTrace();

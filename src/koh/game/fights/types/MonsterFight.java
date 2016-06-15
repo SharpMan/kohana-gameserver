@@ -3,6 +3,7 @@ package koh.game.fights.types;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.MonsterGroup;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
@@ -106,6 +107,8 @@ public class MonsterFight extends Fight {
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
                     FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots);
                 });
+                fighter.getPlayer().addScore(ScoreType.PVM_WIN);
+
                 final int kamasWin = FightFormulas.computeKamas(fighter, baseKamas, teamPP);
                 final int[] serializedLoots = new int[loots.size() * 2];
                 for (int i = 0; i < serializedLoots.length; i += 2) {
@@ -150,6 +153,7 @@ public class MonsterFight extends Fight {
                 final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs));
                 final int guildXp = FightFormulas.guildXpEarned(fighter.asPlayer(), exp), mountXp = FightFormulas.mountXpEarned(fighter.asPlayer(), exp);
                 fighter.getPlayer().addExperience(exp.get(), false);
+                fighter.getPlayer().addScore(ScoreType.PVM_LOOSE);
 
                 this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                     {

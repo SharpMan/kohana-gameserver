@@ -3,6 +3,9 @@ package koh.game.fights.fighters;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
+import koh.game.entities.actors.character.PlayerInst;
+import koh.game.entities.actors.character.ScoreType;
+import koh.game.entities.kolissium.KolizeumExecutor;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.*;
 import koh.game.fights.types.AgressionFight;
@@ -19,6 +22,7 @@ import koh.protocol.messages.game.character.stats.FighterStatsListMessage;
 import koh.protocol.messages.game.context.GameContextCreateMessage;
 import koh.protocol.messages.game.context.GameContextDestroyMessage;
 import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
+import koh.protocol.messages.game.context.roleplay.fight.arena.GameRolePlayArenaUpdatePlayerInfosMessage;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
 import koh.protocol.types.game.character.characteristic.CharacterSpellModification;
@@ -186,7 +190,7 @@ public class CharacterFighter extends Fighter {
     public void leaveFight() {
         super.leaveFight();
        // if (this.fight.getFightState() != FightState.STATE_PLACE) {
-            this.character.getFightsRegistred().add(this.fight);
+
         //}
         this.endFight();
     }
@@ -214,7 +218,7 @@ public class CharacterFighter extends Fighter {
     @Override
     public void endFight() {
         try {
-            if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE) {
+            if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && fight.getFightType() != FightTypeEnum.FIGHT_TYPE_PVP_ARENA) {
                 if (super.getLife() <= 0) {
                     this.character.setLife(1);
                 } else if (this.character.computeLife(50) > super.getLife()) {
@@ -232,7 +236,13 @@ public class CharacterFighter extends Fighter {
                 this.character.send(new GameContextCreateMessage((byte) 1));
                 this.character.setFight(null);
                 this.character.refreshStats(false, true);
-                if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
+                if(fight.getFightType() == FightTypeEnum.FIGHT_TYPE_PVP_ARENA){
+                    KolizeumExecutor.teleportLastPosition(this.character);
+                    final PlayerInst inst = PlayerInst.getPlayerInst(character.getID());
+                    this.character.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getScreenRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
+
+                }
+                else if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
                         && this.team.id == this.fight.getLoosers().id
                         && this.character.getSavedMap() != this.character.getCurrentMap().getId()) {
                     this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
@@ -246,12 +256,16 @@ public class CharacterFighter extends Fighter {
                     this.character.offlineTeleport(this.character.getSavedMap(), this.character.getSavedCell());
                 }
             }
-            this.character.setFight(null);
-            this.character.setFighter(null);
+
         }catch(Exception e){
             e.printStackTrace();
             this.fight.getLogger().error(e);
             this.fight.getLogger().warn(e.getMessage());
+        }
+        finally {
+            this.character.setFight(null);
+            this.character.setFighter(null);
+            this.character.getFightsRegistred().add(this.fight);
         }
 
     }

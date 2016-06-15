@@ -14,6 +14,8 @@ import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightBomb;
 import koh.game.fights.layers.FightGlyph;
 import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -21,7 +23,7 @@ import lombok.Getter;
  */
 public class FightCell {
 
-
+    protected static final Logger logger = LogManager.getLogger(FightCell.class);
 
     public class FightCellComparator implements Comparator<IFightObject> {
 
@@ -114,7 +116,14 @@ public class FightCell {
 
 
     public boolean hasGameObject(FightObjectType objectType, FightObjectType objectTyp2) {
-        return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType || x.getObjectType() == objectTyp2);
+        try {
+            return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType || x.getObjectType() == objectTyp2);
+        }
+        catch (Exception e){
+            logger.error("myfightObject null {} or object {}",myFightObjects == null,myFightObjects.stream().anyMatch(x-> x == null));
+            e.printStackTrace();
+            return true;
+        }
     }
 
     public <T> T[] getObjectsAs(FightObjectType objecttype) {

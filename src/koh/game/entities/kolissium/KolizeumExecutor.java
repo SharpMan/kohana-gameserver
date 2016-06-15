@@ -1,11 +1,21 @@
 package koh.game.entities.kolissium;
 
+import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.Party;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.kolissium.tasks.StartFightTask;
+import koh.game.fights.FightTypeEnum;
 import koh.game.utils.PeriodicContestExecutor;
+import koh.protocol.client.enums.BreedEnum;
+import koh.protocol.client.enums.PvpArenaStepEnum;
+import koh.protocol.client.enums.PvpArenaTypeEnum;
+import koh.protocol.messages.game.context.roleplay.fight.arena.GameRolePlayArenaRegistrationStatusMessage;
+import koh.utils.Couple;
+import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -39,12 +49,16 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
 
     private CopyOnWriteArrayList<Player> waiting;
     private CopyOnWriteArrayList<ArenaParty> waitingGroups;
+    private static Map<Integer,Couple<Integer,Short>> lastPositions = new HashMap<>();
 
-    private static final int TEAM_SIZE = 2;
+    @Getter
+    private static final int TEAM_SIZE = DAO.getSettings().getIntElement("Koliseo.Size");
     private static final int TEAM_LVL_DIFF_MAX = 40;
 
     private static Comparator<ArenaParty> partySorter;
     private static Comparator<Player> playerSorter;
+
+    public static byte[] PILLAR = new byte[] { BreedEnum.Sacrieur,BreedEnum.Xelor,BreedEnum.Osamodas,BreedEnum.Eniripsa };
 
     static{
         partySorter = Comparator.comparing(party -> party.getMoyLevel());
@@ -113,7 +127,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         }
         group.setInKolizeum(true);
         this.executeTask(() -> {
-            boolean success = waitingGroups.addIfAbsent(group);
+            final boolean success = waitingGroups.addIfAbsent(group);
             if (success) {
                 group.sendMessageToGroup("Votre groupe a été inscrit au Kolizeum.");
             }
@@ -202,7 +216,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
                     break;//all teams are ready
                 }
 
-                Iterator<Player> it = sortedList.iterator();
+                final Iterator<Player> it = sortedList.iterator();
                 if (it.hasNext()) {
                     p = it.next();
                 } else {
@@ -214,22 +228,106 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
             sortedList.clear();
         }
 
-        int teamDiff = Math.abs(lvlTeam1 - lvlTeam2);
+        final int teamDiff = Math.abs(lvlTeam1 - lvlTeam2);
         if (teamDiff > TEAM_LVL_DIFF_MAX) { //TODO check 2 team1's ip vs team2's ip have seen
             return;
         }
-
-        if (team1.size() != TEAM_SIZE || team2.size() != TEAM_SIZE) {
+        else if (team1.size() != TEAM_SIZE || team2.size() != TEAM_SIZE) {
             return;
         }
+        else if(team1.stream().anyMatch(team2::contains)  || team2.stream().anyMatch(team1::contains)){
+            return;
+        }
+        else if(team1.stream().filter(p -> ArrayUtils.contains(PILLAR, p.getBreed())).count() > 1
+                || team2.stream().filter(p -> ArrayUtils.contains(PILLAR, p.getBreed())).count() > 1){
+            return;
+        }
+        final ArenaParty team1Group = team1.stream()
+                .filter(p -> p.getClient().getParty() instanceof ArenaParty)
+                .map(p -> p.getClient().getParty().asArena())
+                .max(Comparator.comparing(ArenaParty::memberCounts))
+                .orElse(null);
+        team1.stream().filter(p-> p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team1Group)
+                .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
+
+        final ArenaParty team2Group = team2.stream()
+                .filter(p -> p.getClient().getParty() instanceof ArenaParty)
+                .map(p -> p.getClient().getParty().asArena())
+                .max(Comparator.comparing(ArenaParty::memberCounts))
+                .orElse(null);
+
+        team2.stream().filter(p-> p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team2Group)
+                .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
+
+        if(team1Group != null){
+            team1Group.setInKolizeum(false);
+            team1.stream().filter(p -> !team1Group.containsPlayer(p)).forEach(team1Group::addPlayer);
+            this.waitingGroups.remove(team1Group);
+        }
+        if(team2Group != null){
+            team1Group.setInKolizeum(false);
+            team2.stream().filter(p -> !team2Group.containsPlayer(p)).forEach(team2Group::addPlayer);
+            this.waitingGroups.remove(team2Group);
+        }
+
+        final ArenaParty party = team1Group != null ? team1Group :new ArenaParty(team1), party1 = team2Group != null ? team2Group :new ArenaParty(team2);
+
+
+
+        team1.forEach(waiting::remove);
+        team2.forEach(waiting::remove);
+
+
+        party1.setInKolizeum(true);
+        party.setInKolizeum(true);
+        party.sendToField(new GameRolePlayArenaRegistrationStatusMessage(true, PvpArenaStepEnum.ARENA_STEP_WAITING_FIGHT, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+        party1.sendToField(new GameRolePlayArenaRegistrationStatusMessage(true, PvpArenaStepEnum.ARENA_STEP_WAITING_FIGHT, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+
+
+        final ArenaBattle battle = new ArenaBattle(party1,party);
+        DAO.getArenas().add(battle);
+
+
+        party.sendFightProposition(battle.getId());
+        party1.sendFightProposition(battle.getId());
+
 
         //Invitation
 
     }
 
-    private void startFight(ArrayList<Player> team1, ArrayList<Player> team2) {
-        //DofusMap map = World.getRandomFightingMap();
-        Iterator<Player> it = team1.iterator();
+
+
+    public void startFight(List<Player> team1, List<Player> team2) {
+        final DofusMap map = this.getRandomFightingMap();
+        final Iterator<Player> it = team1.iterator();
+        while (it.hasNext()) {
+            final Player p = it.next();
+            if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty)p.getClient().getParty()).inKolizeum()) {
+                ((ArenaParty)p.getClient().getParty()).setInKolizeum(false);
+                waitingGroups.remove(((ArenaParty)p.getClient().getParty()));
+            }
+            waiting.remove(p);
+            p.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
+            p.getClient().delGameAction(GameActionTypeEnum.KOLI);
+            lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(),p.getCell().getId()));
+            p.teleport(map.getId(),0);
+        }
+        final Iterator<Player> it1 = team2.iterator();
+        while (it1.hasNext()) {
+            final Player p = it1.next();
+            if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty)p.getClient().getParty()).inKolizeum()) {
+                ((ArenaParty)p.getClient().getParty()).setInKolizeum(false);
+                waitingGroups.remove(((ArenaParty)p.getClient().getParty()));
+            }
+            waiting.remove(p);
+            p.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
+            p.getClient().delGameAction(GameActionTypeEnum.KOLI);
+            lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(),p.getCell().getId()));
+            p.teleport(map.getId(),0);
+        }
+        this.scheduleTask(new StartFightTask(this, FightTypeEnum.FIGHT_TYPE_PVP_ARENA, map, team1, team2), 3000);
+
     }
 
     private static final SecureRandom RAND = new SecureRandom();
@@ -270,9 +368,13 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
 
     protected static final SecureRandom random = new SecureRandom();
 
-    protected static final DofusMap getRandomMap(){
+    protected static final DofusMap getRandomFightingMap(){
         final int nextIndex = random.nextInt(MAPS.length - 1);
         return DAO.getMaps().findTemplate(MAPS[nextIndex]);
+    }
+
+    public static void teleportLastPosition(Player p ){
+        p.teleport(lastPositions.get(p.getID()).first,lastPositions.get(p.getID()).second);
     }
 
 }

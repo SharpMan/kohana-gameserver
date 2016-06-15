@@ -55,7 +55,9 @@ public abstract class BuffEffect {
                 return castInfos.spellId != SpellIDEnum.TREVE;
             case ADD_STATE:
             case CHANGE_APPEARANCE:
+            case SACRIFICE:
             case CHATIMENT:
+            case ENDS_ROUND:
             //Domage de sort
             case TRANSFORMATION:
                 return false;

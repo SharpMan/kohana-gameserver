@@ -11,7 +11,7 @@ import koh.protocol.messages.game.basic.TextInformationMessage;
 /**
  * Created by Melancholia on 12/12/15.
  */
-public class CreateItem  extends ItemAction {
+public class CreateItem extends ItemAction {
 
     private final boolean send;
     private final ItemTemplate templat;
@@ -21,30 +21,33 @@ public class CreateItem  extends ItemAction {
         super(args, criteria, template);
         this.templat = DAO.getItemTemplates().getTemplate(Integer.parseInt(args[0]));
         this.count = templat.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_PET ? 1 : Integer.parseInt(args[1]);
-        this.send = (args.length >2 && args[2].equals("1")) ? true : false;
+        this.send = (args.length > 2 && args[2].equals("1")) ? true : false;
     }
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell))
+    public boolean execute(Player possessor, Player p, int cell) {
+        if (!super.execute(possessor, p, cell))
             return false;
 
         if (templat == null) {
             return false;
         }
 
-        if(count > 0) {
+        if (count > 0) {
             final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), templat.getId(), 63, p.getID(), count, EffectHelper.generateIntegerEffect(templat.getPossibleEffects(), EffectGenerationType.NORMAL, templat instanceof Weapon));
             if (p.getInventoryCache().add(item, true)) {
                 item.setNeedInsert(true);
             }
-        }
-        else{
-            p.getInventoryCache().safeDelete(templat.getId(), -count);
+        } else {
+            possessor.getInventoryCache().safeDelete(templat.getId(), -count);
         }
 
-        if(send){
-            p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, count > 0 ? 21 : 22, new String[]{String.valueOf(count >0 ? count : -count),String.valueOf(templat.getId())} ));
+        if (send) {
+            if (count > 0)
+                p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 21, new String[]{String.valueOf(count > 0 ? count : -count), String.valueOf(templat.getId())}));
+            else
+                possessor.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 22, new String[]{String.valueOf(count > 0 ? count : -count), String.valueOf(templat.getId())}));
+
         }
 
         return true;

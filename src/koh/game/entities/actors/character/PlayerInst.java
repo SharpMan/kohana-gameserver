@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import koh.game.entities.actors.Player;
+import koh.game.fights.FightTypeEnum;
 import koh.utils.Couple;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,18 +22,34 @@ import lombok.Setter;
  */
 public class PlayerInst {
 
-    public Map<Integer, Couple<Long, Integer>> myVictimsById = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
-    public Map<String, Couple<Long, Integer>> myVictimIPS = Collections.synchronizedMap(new HashMap<String, Couple<Long, Integer>>());
-    public Map<Integer, Couple<Long, Integer>> victimsById = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
-    public Map<String, Couple<Long, Integer>> victimByIPS = Collections.synchronizedMap(new HashMap<String, Couple<Long, Integer>>());
+    public Map<FightTypeEnum,Map<Integer, Couple<Long, Integer>>> myVictimsById = Collections.synchronizedMap(new HashMap<FightTypeEnum,Map<Integer, Couple<Long, Integer>>>() {{
+        this.put(FightTypeEnum.FIGHT_TYPE_AGRESSION, new HashMap<>());
+        this.put(FightTypeEnum.FIGHT_TYPE_PVP_ARENA, new HashMap<>());
+    }});
+    public Map<FightTypeEnum,Map<String, Couple<Long, Integer>>> myVictimIPS = Collections.synchronizedMap(new HashMap<FightTypeEnum,Map<String, Couple<Long, Integer>>>() {{
+        this.put(FightTypeEnum.FIGHT_TYPE_AGRESSION, new HashMap<>());
+        this.put(FightTypeEnum.FIGHT_TYPE_PVP_ARENA, new HashMap<>());
+    }});
+    public Map<FightTypeEnum,Map<Integer, Couple<Long, Integer>>> victimsById = Collections.synchronizedMap(new HashMap<FightTypeEnum,Map<Integer, Couple<Long, Integer>>>() {{
+        this.put(FightTypeEnum.FIGHT_TYPE_AGRESSION, new HashMap<>());
+        this.put(FightTypeEnum.FIGHT_TYPE_PVP_ARENA, new HashMap<>());
+    }});
+    public Map<FightTypeEnum,Map<String, Couple<Long, Integer>>> victimByIPS = Collections.synchronizedMap(new HashMap<FightTypeEnum,Map<String, Couple<Long, Integer>>>() {{
+        this.put(FightTypeEnum.FIGHT_TYPE_AGRESSION, new HashMap<>());
+        this.put(FightTypeEnum.FIGHT_TYPE_PVP_ARENA, new HashMap<>());
+    }});
 
-    public Map<Integer, Couple<Long, Integer>> kolizeumVictims = Collections.synchronizedMap(new HashMap<Integer, Couple<Long, Integer>>());
     @Getter @Setter
-    private long mutedTime;
+    private long mutedTime, bannedTime;
     private Map<Long,Integer> cotes = new TreeMap<>();
+    @Getter
     private Map<Long,Boolean> kolizeumWins = new TreeMap<>();
 
-    public static final Map<Integer, PlayerInst> P_PROPERTIES = Collections.synchronizedMap(new HashMap<Integer, PlayerInst>());
+    public static final Map<Integer, PlayerInst> P_PROPERTIES = Collections.synchronizedMap(new HashMap<>());
+
+    public static boolean isPresent(int id){
+        return P_PROPERTIES.containsKey(id);
+    }
 
     public static PlayerInst getPlayerInst(int id){
         PlayerInst objet = P_PROPERTIES.get(id);
@@ -43,7 +61,7 @@ public class PlayerInst {
     }
 
     public void updateCote(Player character, boolean win){
-        this.cotes.put(Instant.now().toEpochMilli(), character.getKolizeumRate().getRating());
+        this.cotes.put(Instant.now().toEpochMilli(), character.getKolizeumRate().getScreenRating());
         this.kolizeumWins.put(Instant.now().toEpochMilli(), win);
     }
 
@@ -81,12 +99,14 @@ public class PlayerInst {
 
     public void clear() {
         try {
+            this.myVictimIPS.forEach((k, v) -> v.clear());
+            this.myVictimsById.forEach((k, v) -> v.clear());
+            this.victimByIPS.forEach((k, v) -> v.clear());
+            this.victimsById.forEach((k, v) -> v.clear());
             this.myVictimsById.clear();
             this.myVictimIPS.clear();
-            this.kolizeumVictims.clear();
             this.victimsById = null;
             this.victimByIPS = null;
-            this.kolizeumVictims = null;
             this.finalize();
         } catch (Throwable ex) {
         }

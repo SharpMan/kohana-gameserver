@@ -89,7 +89,7 @@ public class EffectHelper {
     };
 
     public static IoBuffer serializeEffectInstanceDice(EffectInstance[] effects) {
-        IoBuffer buff = IoBuffer.allocate(effects.length * 25);
+        final IoBuffer buff = IoBuffer.allocate(effects.length * 25);
         buff.setAutoExpand(true);
 
         buff.putInt(effects.length);

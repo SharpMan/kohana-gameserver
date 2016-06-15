@@ -39,7 +39,7 @@ public class FighterBuff {
             this.put(BuffActiveType.ACTIVE_ATTACK_POST_JET, new CopyOnWriteArrayList<>());
             this.put(BuffActiveType.ACTIVE_HEAL_AFTER_JET, new CopyOnWriteArrayList<>());
             this.put(BuffActiveType.ACTIVE_BEGINTURN, new CopyOnWriteArrayList<>());
-            this.put(BuffActiveType.ACTIVE_ENDTURN, new ArrayList<>());
+            this.put(BuffActiveType.ACTIVE_ENDTURN, new CopyOnWriteArrayList<>());
             this.put(BuffActiveType.ACTIVE_ENDMOVE, new ArrayList<>());
             this.put(BuffActiveType.ACTIVE_STATS, new CopyOnWriteArrayList<>());
             this.put(BuffActiveType.ACTIVE_ON_DIE, new CopyOnWriteArrayList<>());

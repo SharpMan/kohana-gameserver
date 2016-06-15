@@ -25,7 +25,7 @@ public class FmCommand implements PlayerCommand {
                         "Le cout de forgemagerie de "+ client.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_CAPE).getTemplate().getNameId() +" est de " + ExoCommand.computePrice(client,CharacterInventoryPositionEnum.ACCESSORY_POSITION_CAPE) +" tokens\n" : "") +
                 (client.getCharacter().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) ?
                 "Le cout de fromagerie de "+ client.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).getTemplate().getNameId() +" est de 0 tokens\n\n" : "")+
-                "Pour effectuer la forgemagerie, tapez .exo coiffe/cappe pa/pm/po\n" +
+                "Pour effectuer la forgemagerie, tapez .exo coiffe/cape pa/pm/po\n" +
                 "Pour effectuer la forgemagerie de l'arme tapez .arme terre/eau/feu/air"));
     }
 

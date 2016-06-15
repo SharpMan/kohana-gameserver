@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import koh.game.dao.api.*;
 import koh.game.dao.mysql.*;
+import koh.game.dao.script.ArenaBattleDAOImpl;
 import koh.game.dao.script.MonsterMindDAOImpl;
 import koh.game.dao.script.PlayerCommandDAOImpl;
 import koh.game.dao.sqlite.*;
@@ -64,7 +65,7 @@ public class DatabaseSource implements Service {
         binder.bind(MapMonsterDAO.class).to(MapMonsterDAOImpl.class).asEagerSingleton();
         binder.bind(PlayerCommandDAO.class).to(PlayerCommandDAOImpl.class).asEagerSingleton();
         binder.bind(MonsterMindDAO.class).to(MonsterMindDAOImpl.class).asEagerSingleton();
-
+        binder.bind(ArenaBattleDAO.class).to(ArenaBattleDAOImpl.class).asEagerSingleton();
         binder.requestStaticInjection(DAO.class);
     }
 

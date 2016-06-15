@@ -3,6 +3,8 @@ package koh.game.network.handlers.game.approach;
 import koh.d2o.entities.Breed;
 import koh.d2o.entities.Head;
 import koh.game.Main;
+import koh.game.actions.*;
+import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.dao.mysql.PlayerDAOImpl;
@@ -41,6 +43,7 @@ import koh.protocol.messages.game.initialization.CharacterCapabilitiesMessage;
 import koh.protocol.messages.game.inventory.InventoryContentMessage;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.SpellListMessage;
+import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.SetEnablePVPRequestMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarContentMessage;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
@@ -78,8 +81,11 @@ public class CharacterHandler {
     }
 
     @HandlerAttribute(ID = SetEnablePVPRequestMessage.M_ID)
-    public static void handleSetEnablePVPRequestMessage(WorldClient Client, SetEnablePVPRequestMessage Message) {
-        Client.getCharacter().setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
+    public static void handleSetEnablePVPRequestMessage(WorldClient client, SetEnablePVPRequestMessage Message) {
+        if(client.isGameAction(GameActionTypeEnum.FIGHT)){
+            return;
+        }
+        client.getCharacter().setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
     }
 
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)
@@ -123,7 +129,7 @@ public class CharacterHandler {
         }
         if(character == null){
             client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
-        }else if (!answer.toString().equalsIgnoreCase(message.secretAnswerHash)){
+        }else if (character.getLevel() > 20 && !answer.toString().equalsIgnoreCase(message.secretAnswerHash)){
             client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_BAD_SECRET_ANSWER));
         }
         else if(!client.getAccount().remove(message.characterId)){
@@ -157,7 +163,7 @@ public class CharacterHandler {
                 client.send(new EnabledChannelsMessage(character.getEnabledChannels(), character.getDisabledChannels()));
                 client.send(new NotificationListMessage(new int[] { 2147483647 }));
                 client.send(new CharacterSelectedSuccessMessage(character.toBaseInformations(), false));
-                client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
+                client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getScreenRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
                 client.send(new InventoryContentMessage(character.getInventoryCache().toObjectsItem(), character.getKamas()));
                 client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, character.getShortcuts().toShortcuts(character)));
                 client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, character.getMySpells().toShortcuts()));
@@ -195,7 +201,12 @@ public class CharacterHandler {
                     client.send(new MountSetMessage(client.getCharacter().getMountInfo().mount));
                     client.send(new MountXpRatioMessage(client.getCharacter().getMountInfo().ratio));
                     client.send(new MountRidingMessage(true));
+
                 }
+
+
+                //
+
                 client.getAccount().last_login = new Timestamp(System.currentTimeMillis());
                 client.getAccount().lastIP = client.getIP();
 

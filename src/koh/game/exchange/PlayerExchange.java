@@ -30,6 +30,7 @@ import koh.protocol.messages.game.inventory.items.ExchangeObjectRemovedMessage;
 import koh.protocol.messages.game.inventory.items.ExchangeObjectsModifiedMessage;
 import koh.protocol.messages.game.inventory.items.ExchangeObjectsRemovedMessage;
 import koh.protocol.types.game.data.items.ObjectItem;
+import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -59,7 +60,7 @@ public class PlayerExchange extends Exchange {
         this.myClient1 = Client1;
         this.myClient2 = Client2;
 
-        logger.debug("PlayerExchange launched : Player1={}" + " Player2={}" ,this.myClient1.getAccount().nickName, this.myClient2.getAccount().nickName);
+        logger.info("PlayerExchange launched : Player1={}" + " Player2={}" ,this.myClient1.getAccount().nickName, this.myClient2.getAccount().nickName);
     }
 
     public void Open() {
@@ -255,9 +256,9 @@ public class PlayerExchange extends Exchange {
             return false;
         }
 
-        logger.debug("PlayerExchange(" + this.myClient1.getCharacter().getNickName() + " - " + this.myClient1.getCharacter().getNickName() + ")::finish()"
-                + "\n          -- P1(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient1).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient1) + ")"
-                + "\n          -- P2(items=" + StringUtils.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray(), ",") + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
+        logger.info("PlayerExchange(" + this.myClient1.getCharacter().getNickName() + " - " + this.myClient1.getCharacter().getNickName() + ")::finish()"
+                + "\n          -- P1(items=" + Enumerable.join(this.myItemsToTrade.get(this.myClient1).entrySet().stream().mapToInt(y -> y.getKey()).toArray()) + " kamas=" + this.myKamasToTrade.get(this.myClient1) + ")"
+                + "\n          -- P2(items=" + Enumerable.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray()) + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
 
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient1).entrySet()) {
             final InventoryItem item = this.myClient1.getCharacter().getInventoryCache().find(ItemData.getKey());

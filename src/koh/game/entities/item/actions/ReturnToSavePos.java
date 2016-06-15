@@ -14,8 +14,8 @@ public class ReturnToSavePos  extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
+    public boolean execute(Player possessor,Player p, int cell) {
+        if(!super.execute(possessor,p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         p.teleport(p.getSavedMap(), p.getSavedCell());
         return true;

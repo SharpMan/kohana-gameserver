@@ -53,7 +53,7 @@ public abstract class ItemAction {
         return DAO.getItemTemplates().getTemplate(this.template);
     }
 
-    public boolean execute(Player p, int cell) {
+    public boolean execute(Player possessor,Player p, int cell) {
         if(!areConditionFilled(p)){
             return false;
         }

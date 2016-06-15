@@ -1,12 +1,14 @@
 package koh.game.entities.actors.character;
 
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameParty;
 import koh.game.actions.requests.PartyRequest;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.IWorldEventObserver;
+import koh.game.entities.kolissium.ArenaParty;
 import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.PartyTypeEnum;
@@ -33,7 +35,7 @@ import lombok.Getter;
  */
 public class Party extends IWorldEventObserver {
 
-    public static volatile int nextID = 0;
+    protected static AtomicInteger idGen = new AtomicInteger();
     public static final byte MAX_PARTICIPANTS = 8;
     @Getter
     protected byte type = PartyTypeEnum.PARTY_TYPE_CLASSICAL;
@@ -51,12 +53,19 @@ public class Party extends IWorldEventObserver {
     private Player chief;
 
     public Party(Player character, Player p2, byte type) {
-        this.id = nextID++;
+        this.id = idGen.incrementAndGet();
         this.type = type;
         chief = character;
         guests.add(p2);
         this.addPlayer(character);
 
+    }
+
+    public Party(Player character,byte type){
+        this.id = idGen.incrementAndGet();
+        this.type = type;
+        chief = character;
+        this.addPlayer(character);
     }
     
     public boolean containsPlayer(Player p){
@@ -201,11 +210,15 @@ public class Party extends IWorldEventObserver {
 
     public void clear() {
         try {
-            for (Player p : this.players) p.getClient().endGameAction(GameActionTypeEnum.GROUP);
             this.sendToField(new PartyDeletedMessage(this.id));
+            for (Player p : this.players) {
+                if(p != null && p.getClient() != null)
+                    p.getClient().endGameAction(GameActionTypeEnum.GROUP);
+            }
             this.chief = null;
             this.guests.clear();
             this.guests = null;
+
             this.players.clear();
             this.players = null;
             this.finalize();
@@ -213,6 +226,10 @@ public class Party extends IWorldEventObserver {
 
         }
 
+    }
+
+    public ArenaParty asArena(){
+        return (ArenaParty) this;
     }
 
     public void followAll(Player playerById) {

@@ -9,9 +9,7 @@ import koh.game.fights.Fight;
 import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject.FightObjectType;
-import koh.game.fights.fighters.BombFighter;
-import koh.game.fights.fighters.DoubleFighter;
-import koh.game.fights.fighters.MonsterFighter;
+import koh.game.fights.fighters.*;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.GameActionFightInvisibilityStateEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
@@ -140,7 +138,7 @@ public class Pathfunction {
     }
 
     public static ArrayList<Fighter> getEnnemyNearToTakle(Fight Fight, FightTeam team, short cellId) {
-        final ArrayList<Fighter> ennemies = new ArrayList<>();
+        final ArrayList<Fighter> ennemies = new ArrayList<>(3);
 
         for (final byte direction : Pathfunction.FIGHT_DIRECTIONS) {
             final Fighter ennemy = Fight.hasEnnemyInCell(Pathfunction.nextCell(cellId, direction), team);
@@ -148,6 +146,8 @@ public class Pathfunction {
                 if (!ennemy.isDead()
                         && !(ennemy instanceof BombFighter)
                         && !(ennemy instanceof DoubleFighter)
+                        && !(ennemy instanceof StaticFighter)
+                        && !(ennemy instanceof SummonedReplacerFighter)
                         && !ennemy.getStates().hasState(FightStateEnum.ENRACINÉ)
                         && !(ennemy instanceof MonsterFighter && ennemy.asMonster().getGrade().getMonster().isCanTackle())
                         && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
@@ -159,8 +159,8 @@ public class Pathfunction {
         return ennemies;
     }
 
-    public static byte oppositeDirection(byte Direction) {
-        return (byte) (Direction >= 4 ? Direction - 4 : Direction + 4);
+    public static byte oppositeDirection(byte direction) {
+        return (byte) (direction >= 4 ? direction - 4 : direction + 4);
     }
 
     public static short computeNextCell(short cell, int direction)

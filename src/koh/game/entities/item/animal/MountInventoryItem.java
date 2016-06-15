@@ -50,7 +50,7 @@ public class MountInventoryItem extends InventoryItem {
             this.mount.experienceForNextLevel = (double) DAO.getExps().getLevel(2).getMount();
             this.mount.id = (double) this.entity.animalID;
             this.mount.isRideable = true;
-            this.mount.level = 1;
+            this.mount.level = DAO.getSettings().getIntElement("World.ID") == 1 ? (byte) 100 : 1;
             this.mount.model = DAO.getMounts().findTemplate(this.templateId).getId();
             this.mount.effectList = DAO.getMounts().getMountByEffect(this.mount.model, this.mount.level);
             this.serializeInformations();

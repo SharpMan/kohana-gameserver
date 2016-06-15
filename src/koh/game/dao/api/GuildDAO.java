@@ -31,6 +31,5 @@ public abstract class GuildDAO implements Service {
 
     public abstract Guild get(String name);
 
-    public abstract Guild getForPlayer(int playerId);
 
 }

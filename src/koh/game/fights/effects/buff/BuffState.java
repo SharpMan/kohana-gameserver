@@ -15,10 +15,12 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffState extends BuffEffect {
 
-    public BuffState(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
-        if(this.duration != -1 && castInfos.effectType != StatsEnum.INVISIBILITY)
+    public BuffState(EffectCast CastInfos, Fighter target) {
+        super(CastInfos, target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
+        if(this.duration != -1 && castInfos.effectType != StatsEnum.INVISIBILITY
+                && !(castInfos.caster == target && FightStateEnum.valueOf(castInfos.effect.value) == FightStateEnum.PESANTEUR)) {
             this.duration++;
+        }
     }
 
     @Override

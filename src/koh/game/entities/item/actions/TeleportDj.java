@@ -22,8 +22,8 @@ public class TeleportDj  extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
+    public boolean execute(Player possessor,Player p, int cell) {
+        if(!super.execute(possessor,p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         if(true){
             return false; //need to chance all mapid
@@ -32,9 +32,9 @@ public class TeleportDj  extends ItemAction {
         {
             p.teleport(newMapID,newCellID);
         }else if(mapNeeded > 0){
-            if(p.getInventoryCache().hasItemId(objetNeed) && p.getMapid() == mapNeeded){
+            if(possessor.getInventoryCache().hasItemId(objetNeed) && p.getMapid() == mapNeeded){
                 p.teleport(newMapID,newCellID);
-                p.getInventoryCache().safeDelete(p.getInventoryCache().findTemplate(objetNeed),1);
+                possessor.getInventoryCache().safeDelete(p.getInventoryCache().findTemplate(objetNeed),1);
             }
             else if(p.getCurrentMap().getId() != mapNeeded){
                 PlayerController.sendServerMessage(p.getClient(),"Vous n'etes pas sur la bonne map du donjon pour etre teleporter.", "009900");

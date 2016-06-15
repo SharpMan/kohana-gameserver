@@ -96,7 +96,7 @@ public class EffectDamage extends EffectBase {
             }
 
             // Calcul resistances
-            target.calculReduceDamages(castInfos.effectType, damageJet, castInfos.isCritical());
+            target.calculReduceDamages(castInfos.effectType, damageJet, !castInfos.isPoison && castInfos.isCritical());
 
 
             // Reduction des dommages grace a l'armure
@@ -183,14 +183,17 @@ public class EffectDamage extends EffectBase {
                 return target.tryDie(caster.getID());
             }
 
-            target.setLifeMax(Math.max(1, target.getMaxLife() -  (int) Math.floor(damageJet.floatValue() * 0.05f)));
+            target.setLifeMax(Math.max(1, target.getMaxLife() - (int) Math.floor(damageJet.floatValue() * 0.05f)));
 
             // Deduit la vie
             target.setLife(target.getLife() - damageJet.intValue());
 
             // Enois du packet combat subit des dommages
             if (damageJet.intValue() != 0) {
-                target.getFight().sendToField(new GameActionFightLifePointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, caster.getID(), target.getID(), damageJet.intValue(), 0));
+                if (damageJet.getValue() < 0)
+                    target.getFight().sendToField(new GameActionFightLifePointsGainMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_LIFE_POINTS_LOST, caster.getID(), target.getID(), Math.abs(damageJet.intValue())));
+                else
+                    target.getFight().sendToField(new GameActionFightLifePointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, caster.getID(), target.getID(), damageJet.intValue(), 0));
             }
             return target.tryDie(caster.getID());
         }

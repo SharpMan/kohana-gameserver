@@ -39,7 +39,8 @@ public class BuffDamagePerPM extends BuffEffect {
         // on applique le boost
         // Ancienne formule : dgt = (int)(((100+inte+pdom)/100) *
         // dgt);
-        damageValue.setValue((((100 + inte + pdom) / 100) * damageValue.getValue() * 1.5));
+        damageValue.setValue((((100 + inte + pdom) / 100) * damageValue.getValue() /** 1.5*/));
+        
 
         return EffectDamage.applyDamages(this.castInfos, this.target, damageValue);
     }

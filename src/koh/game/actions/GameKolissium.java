@@ -34,14 +34,17 @@ public class GameKolissium extends GameAction {
     }
 
     @Override
-    public void abort(Object[] Args) {
+    public void abort(Object[] args) {
+        if(args.length  > 1){
+            return;
+        }
         if(party != null){
             WorldServer.getKoli().unregisterGroup(party.getChief(), party);
         }
         else
             WorldServer.getKoli().unregisterPlayer(this.player);
 
-        super.abort(Args);
+        super.abort(args);
     }
 
     @Override

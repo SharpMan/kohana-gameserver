@@ -17,8 +17,8 @@ public class LearnSpell  extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
+    public boolean execute(Player possessor,Player p, int cell) {
+        if(!super.execute(possessor,p, cell) || p.getClient().isGameAction(GameActionTypeEnum.FIGHT))
             return false;
         p.getMySpells().addSpell(id, (byte) 1, p.getMySpells().getFreeSlot(), p.getClient());
         return true;

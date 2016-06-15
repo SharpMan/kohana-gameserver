@@ -101,8 +101,8 @@ public abstract class Criterion extends ConditionExpression {
                return new MariedCriterion();
             case "P¨Q":
                return new MaxRankCriterion();
-            case "SG":
-               return new MonthCriterion();
+           /* case "SG":
+               return new MonthCriterion();*/
             case "PN":
                return new NameCriterion();
             case "Pe":
@@ -133,6 +133,10 @@ public abstract class Criterion extends ConditionExpression {
                return new SpecializationCriterion();
             case "Sc":
                return new StaticCriterion();
+            case "Sd":
+                return new DayItemCriterion();
+            case "SG":
+                return new MonthItemCriterion();
             case "PB":
                return new SubAreaCriterion();
             case "PZ":

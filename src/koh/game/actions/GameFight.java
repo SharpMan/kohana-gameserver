@@ -19,15 +19,19 @@ public class GameFight extends GameAction {
     }
 
     @Override
-    public void abort(Object[] Args) {
+    public void abort(Object[] args) {
         if (fight instanceof ChallengeFight) {
             this.fight.leaveFight((Fighter) actor);
         }
         else{
-            fight.disconnect((CharacterFighter) actor);
+            if(args != null && (boolean) args[0] == false){
+                fight.leaveFight((Fighter) actor);
+            }
+            else
+                fight.disconnect((CharacterFighter) actor);
         }
         
-        super.abort(Args);
+        super.abort(args);
     }
 
     @Override

@@ -2,6 +2,7 @@ package koh.game.fights;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,33 +42,52 @@ public class FightWorker {
 
     public void initTurns() {
         this.myFightersTurn.clear();
-
         final List<Fighter> team1 = fight.fighters().filter(x -> x.getTeam().id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
         final List<Fighter> team2 = fight.fighters().filter(x -> x.getTeam().id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
 
-        for (final Fighter fighter : team1) {
-            int FIndex = team1.indexOf(fighter);
+        try {
+            final List<Fighter> strongTeam = team2.isEmpty() || team1.get(0).getInitiative(false) > team2.get(0).getInitiative(false) ? team1 : team2;
+            final Iterator<Fighter> noobTeam = (team2.isEmpty() || team1.get(0).getInitiative(false) > team2.get(0).getInitiative(false) ? team2 : team1).iterator();
 
-            if (team2.size() - 1 >= FIndex) {
-                final Fighter oppositeFighter = team2.get(FIndex);
+            for (final Fighter fighter : strongTeam) {
+                this.myFightersTurn.add(fighter);
+                if (noobTeam.hasNext()) {
+                    this.myFightersTurn.add(noobTeam.next());
+                }
+            }
 
-                if (oppositeFighter.getInitiative(false) > fighter.getInitiative(false)) {
-                    myFightersTurn.add(oppositeFighter);
-                    myFightersTurn.add(fighter);
+            while (noobTeam.hasNext()) {
+                this.myFightersTurn.add(noobTeam.next());
+            }
+
+        }
+        catch (Exception e){
+            this.myFightersTurn.clear();
+            for (final Fighter fighter : team1) {
+                final int FIndex = team1.indexOf(fighter);
+
+                if (team2.size() - 1 >= FIndex) {
+                    final Fighter oppositeFighter = team2.get(FIndex);
+
+                    if (oppositeFighter.getInitiative(false) > fighter.getInitiative(false)) {
+                        myFightersTurn.add(oppositeFighter);
+                        myFightersTurn.add(fighter);
+                    } else {
+                        myFightersTurn.add(fighter);
+                        myFightersTurn.add(oppositeFighter);
+                    }
                 } else {
                     myFightersTurn.add(fighter);
-                    myFightersTurn.add(oppositeFighter);
                 }
-            } else {
-                myFightersTurn.add(fighter);
+            }
+
+            for (Fighter Fighter : team2) {
+                if (!this.myFightersTurn.contains(Fighter)) {
+                    myFightersTurn.add(Fighter);
+                }
             }
         }
 
-        for (Fighter Fighter : team2) {
-            if (!this.myFightersTurn.contains(Fighter)) {
-                myFightersTurn.add(Fighter);
-            }
-        }
     }
 
     public Fighter getNextFighter() {

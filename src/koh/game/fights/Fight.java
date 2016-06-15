@@ -618,8 +618,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 if (!fakeLaunch
                         && fighter.getVisibleState() == GameActionFightInvisibilityStateEnum.INVISIBLE
-                        && silentCast
-                        && spellLevel.getSpellId() != 2763) {
+                        /*&& silentCast
+                        && spellLevel.getSpellId() != 2763*/) {
                     this.sendToField(new ShowCellMessage(fighter.getID(), fighter.getCellId()));
                 }
 
@@ -1690,8 +1690,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
             this.stopTimer("gameLoop");
 
-            this.myTeam1.getFighters().filter(fr -> fr.isLeft() && fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
-            this.myTeam2.getFighters().filter(fr -> fr.isLeft() && fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
+            this.myTeam1.getFighters().filter(fr -> fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
+            this.myTeam2.getFighters().filter(fr -> fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
 
 
 
@@ -1933,14 +1933,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 .mapToInt(x -> x.getID()).toArray());
     }
 
-    private synchronized FightCell getFreeSpawnCell(FightTeam Team) {
-        for (FightCell Cell : this.myFightCells.get(Team).values()) {
-            if (Cell.canWalk()) {
-                return Cell;
+    private synchronized FightCell getFreeSpawnCell(FightTeam team) {
+        for (FightCell cell : this.myFightCells.get(team).values()) {
+            if (cell.canWalk()) {
+                return cell;
             }
         }
-        if (!this.myFightCells.get(Team).isEmpty()) {
-            return this.myFightCells.get(Team).values().stream().filter(x -> x.getObjectsAsFighter() == null).findFirst().orElse(null);
+        if (!this.myFightCells.get(team).isEmpty()) {
+            return this.myFightCells.get(team).values().stream().filter(x -> x.getObjectsAsFighter() == null).findFirst().orElse(null);
         }
         return null;
     }

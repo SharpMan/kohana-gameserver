@@ -144,6 +144,7 @@ public class WorldClient {
     }
 
     public int getGameActionCount() {
+        this.myActions.values().forEach(System.out::println);
         return this.myActions.size();
     }
 

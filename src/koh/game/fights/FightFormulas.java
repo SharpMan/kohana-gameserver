@@ -1,6 +1,7 @@
 package koh.game.fights;
 
 import koh.game.dao.DAO;
+import koh.game.entities.actors.character.PlayerInst;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
@@ -85,8 +86,28 @@ public class FightFormulas {
         return Character.getFight().getEnnemyTeam(Character.getTeam()).alignmentSide != AlignmentSideEnum.ALIGNMENT_NEUTRAL ? (short) 0 : (short) 1;
     }
 
-    public static short honorPoint(Fighter Fighter, Stream<Fighter> Winners, Stream<Fighter> Lossers, boolean isLosser) {
-        return honorPoint(Fighter, Winners, Lossers, isLosser, true);
+    public static int cotePoint(CharacterFighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers, boolean isLosser) {
+        if (System.currentTimeMillis() - fighter.getFight().getFightTime() > 120 * 1000) {
+           fighter.getCharacter().addScore(isLosser ? ScoreType.ARENA_LOOSE : ScoreType.ARENA_WIN);
+        }
+        final int oldCote = fighter.getPlayer().getKolizeumRate().getRating();
+        final PlayerInst inst = PlayerInst.getPlayerInst(fighter.getID());
+        inst.updateCote(fighter.getCharacter(), !isLosser);
+        if(isLosser){
+            winners.map(f -> f.getPlayer().getKolizeumRate()).forEach(fighter.getPlayer().getKolizeumRate()::addLoss);
+        }
+        else{
+            lossers.map(f -> f.getPlayer().getKolizeumRate()).forEach(fighter.getPlayer().getKolizeumRate()::addWin);
+        }
+        if(fighter.getPlayer().getKolizeumRate().getRating() > fighter.getPlayer().getScores().get(ScoreType.BEST_COTE)){
+            fighter.getPlayer().getScores().replace(ScoreType.BEST_COTE, fighter.getPlayer().getKolizeumRate().getRating());
+        }
+        fighter.getPlayer().getKolizeumRate().update();
+        return fighter.getPlayer().getKolizeumRate().getRating() - oldCote;
+    }
+
+    public static short honorPoint(Fighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers, boolean isLosser) {
+        return honorPoint(fighter, winners, lossers, isLosser, true);
     }
 
     public static short honorPoint(Fighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers, boolean isLosser, boolean end) {

@@ -5,6 +5,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import koh.game.dao.DAO;
 import koh.game.dao.api.GuildMemberDAO;
+import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildMember;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,19 @@ public class GuildMemberDAOImpl extends GuildMemberDAO {
                     null, null), GuildMember.class);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Guild getForPlayer(int playerId) {
+        try {
+            final int guildId = (int)dataSource.queryRawValue("select guild_id from guilds_members WHERE char_id = " + playerId);
+
+            final Guild found = DAO.getGuilds().get(guildId);
+            return found.memberStream()
+                    .anyMatch(x -> x.characterID == playerId) ? found : null;
+        } catch (Exception e) {
+            return null;
         }
     }
 

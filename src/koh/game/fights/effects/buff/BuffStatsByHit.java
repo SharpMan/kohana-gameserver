@@ -20,22 +20,15 @@ public class BuffStatsByHit extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
-        try {
-            if(damageInfos== null || damageValue == null)
-                return super.applyEffect(damageValue, damageInfos);
-            if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, damageInfos.spellLevel.getEffects(), damageInfos.effect, false, this.castInfos.effect.triggers, damageInfos.cellId)) {
-                final BuffStats buffStats = new BuffStats(new EffectCast(castInfos.effectType, this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, JET, null, this.castInfos.effect.duration, this.getId()), this.target);
+        if (damageInfos == null || damageValue == null)
+            return super.applyEffect(damageValue, damageInfos);
+        if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, damageInfos.spellLevel == null ? null : damageInfos.spellLevel.getEffects(), damageInfos.effect, false, this.castInfos.effect.triggers, damageInfos.cellId)) {
+            final BuffStats buffStats = new BuffStats(new EffectCast(castInfos.effectType, this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, JET, null, this.castInfos.effect.duration, this.getId()), this.target);
 
-                buffStats.applyEffect(null, null);
+            buffStats.applyEffect(null, null);
 
-                this.target.getBuff().addBuff(buffStats);
-            }
+            this.target.getBuff().addBuff(buffStats);
         }
-        catch (NullPointerException e){
-            logger.error("Wh's null ? 1 {} 2 {} 3 {}",damageInfos.caster == null,damageInfos.spellLevel == null,this.castInfos.effect == null);
-        }
-
-
         return super.applyEffect(damageValue, damageInfos);
     }
 

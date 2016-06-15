@@ -25,8 +25,8 @@ public class SpellAnimation extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell))
+    public boolean execute(Player possessor,Player p, int cell) {
+        if(!super.execute(possessor,p, cell))
             return false;
         p.getCurrentMap().sendToField(new GameRolePlayDelayedObjectUseMessage(p.getID(), DelayedActionTypeEnum.DELAYED_ACTION_OBJECT_USE, Instant.now().plus(2, ChronoUnit.SECONDS).toEpochMilli(), this.template));
         p.getCurrentMap().sendToField(new GameRolePlaySpellAnimMessage(p.getID(), cell, spellID, (byte)5));

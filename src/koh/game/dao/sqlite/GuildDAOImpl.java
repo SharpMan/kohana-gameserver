@@ -101,18 +101,7 @@ public class GuildDAOImpl extends GuildDAO {
         return entitiesByName.get(name.trim().toLowerCase());
     }
 
-    @Override
-    public Guild getForPlayer(int playerId) {
-        try {
-            int guildId = (int)dataSource.queryRawValue("select guild_id from guilds_members WHERE char_id = " + playerId);
 
-            final Guild found = entitiesById.get(guildId);
-            return found.memberStream()
-                    .anyMatch(x -> x.characterID == playerId) ? found : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     private int loadAll() {
         try {

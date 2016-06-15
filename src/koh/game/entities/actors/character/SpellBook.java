@@ -59,6 +59,10 @@ public class SpellBook {
             return  DAO.getSpells().findSpell(id).getSpellLevels()[Level - 1];
         }
 
+        public int size(){
+            return DAO.getSpells().findSpell(id).getSpellLevels().length;
+        }
+
         public SpellItem getSpellItem() {
             return new SpellItem((byte) 63, this.id, (byte) this.level);
         }
@@ -153,10 +157,10 @@ public class SpellBook {
     }
 
     public Shortcut[] toShortcuts() { //FIXME : Collectors.Arrays
-        Shortcut[] array = new Shortcut[(int) this.mySpells.values().stream().filter(x -> x.position != -1).count()];
+        Shortcut[] array = new Shortcut[(int) this.mySpells.values().stream().filter(x -> x.position != -1 && x.position < 100).count()];
         int i = 0;
         for (SpellInfo sp : this.mySpells.values()) {
-            if (sp.position == -1) {
+            if (sp.position == -1 || sp.position > 99) {
                 continue;
             }
             array[i] = new ShortcutSpell(sp.position, sp.id);
@@ -266,7 +270,10 @@ public class SpellBook {
             return false;
         } else if (client.getCharacter().getSpellPoints() < (int) spell.level) {
             return false;
-        } else {
+        } else if(spell.level > spell.size()){ //TODO check if correct
+            return false;
+        }
+        else {
             return spell.getSpellLevel((byte) (spell.level + 1)).getMinPlayerLevel() <= client.getCharacter().getLevel();
         }
     }

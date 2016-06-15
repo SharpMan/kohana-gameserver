@@ -11,6 +11,7 @@ import koh.game.fights.*;
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.buff.BuffActiveType;
+import koh.game.fights.fighters.SummonedReplacerFighter;
 import koh.protocol.client.enums.*;
 import koh.protocol.messages.game.actions.fight.GameActionFightTriggerGlyphTrapMessage;
 import koh.protocol.types.game.actions.fight.GameActionMark;
@@ -167,6 +168,7 @@ public abstract class FightActivableObject implements IFightObject {
         for (EffectInstanceDice effect : castSpell.getEffects()) {
             System.out.println(castSpell.getSpellId() + " "+effect);
             targetsPerEffect.addAll(targets);
+            targetsPerEffect.removeIf(f -> f instanceof SummonedReplacerFighter && ((SummonedReplacerFighter)f).isDying());
             targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, castSpell.getEffects(), effect, false, effect.triggers, target.getCellId())
                     && effect.isValidTarget(caster, target)
                     && EffectInstanceDice.verifySpellEffectMask(caster, target, effect,target.getCellId())));

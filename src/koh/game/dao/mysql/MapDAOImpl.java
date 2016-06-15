@@ -34,6 +34,7 @@ public class MapDAOImpl extends MapDAO {
     @Inject
     private DatabaseSource dbSource;
 
+
     private int loadAll() {
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from maps_data order by id desc;", 0)) {
             ResultSet result = conn.getResult();

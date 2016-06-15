@@ -192,7 +192,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                                     this.deserializeEffects(result.getBytes("job_informations"));
                                 }
                             })
-                            .kolizeumRate(Glicko2Player.defaultValue())
+                            .kolizeumRate(result.getString("koliseo_rating").isEmpty() ? Glicko2Player.defaultValue() : new Glicko2Player(result.getString("koliseo_rating").split(";")))
                             .shortcuts(ShortcutBook.deserialize(result.getBytes("shortcuts")))
                             .kamas(result.getInt("kamas"))
                             .savedMap(Integer.parseInt(result.getString("savedpos").split(",")[0]))
@@ -260,7 +260,7 @@ public class PlayerDAOImpl extends PlayerDAO {
 
     @Override
     public boolean update(Player character, boolean clear) {
-        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `character` set breed = ?,skins = ?,scales = ?,sex = ?,level = ?,colors = ?,map = ?,cell = ?,chat_channels = ?,stat_points = ?,spell_points = ?,stats = ?,spells = ?,kamas = ?,shortcuts = ?,savedpos = ? ,entity_look = ?,emotes = ?,tinsel = ?,mount_informations = ?,job_informations = ?,honor_points = ?, alignment_informations = ?, scores = ?, additional_stat = ? WHERE id = ?;")) {
+        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `character` set breed = ?,skins = ?,scales = ?,sex = ?,level = ?,colors = ?,map = ?,cell = ?,chat_channels = ?,stat_points = ?,spell_points = ?,stats = ?,spells = ?,kamas = ?,shortcuts = ?,savedpos = ? ,entity_look = ?,emotes = ?,tinsel = ?,mount_informations = ?,job_informations = ?,honor_points = ?, alignment_informations = ?, scores = ?, additional_stat = ?, koliseo_rating = ?, screen_rating = ? WHERE id = ?;")) {
             PreparedStatement pStatement = conn.getStatement();
             pStatement.setInt(1, character.getBreed());
             pStatement.setString(2, StringUtils.join(character.getSkins(), ','));
@@ -287,8 +287,9 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setString(23, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor());
             pStatement.setString(24, StringUtils.join(character.getScores().values(), ','));
             pStatement.setString(25, Enumerable.join(character.getAdditionalStats()));
-            pStatement.setInt(26, character.getID());
-
+            pStatement.setString(26, character.getKolizeumRate().serialize());
+            pStatement.setDouble(27, Math.round(character.getKolizeumRate().getRatingd() * 100) / 100d);
+            pStatement.setInt(28, character.getID());
             pStatement.executeUpdate();
             if (clear) {
                 character.totalClear();
@@ -304,7 +305,7 @@ public class PlayerDAOImpl extends PlayerDAO {
     @Override
     public boolean add(Player character) {
 
-        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `character` (`id`,`owner`,`nickname`,`breed`,`skins`,`scales`,`sex`,`level`,`colors`,`map`,`cell`,`chat_channels`,`stat_points`,`spell_points`,`stats`,`spells`,`shortcuts`,`savedpos`,`entity_look`,`emotes`,`tinsel`,`job_informations`,`honor_points`,`alignment_informations`,`scores`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", true)) {
+        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `character` (`id`,`owner`,`nickname`,`breed`,`skins`,`scales`,`sex`,`level`,`colors`,`map`,`cell`,`chat_channels`,`stat_points`,`spell_points`,`stats`,`spells`,`shortcuts`,`savedpos`,`entity_look`,`emotes`,`tinsel`,`job_informations`,`honor_points`,`alignment_informations`,`scores`,`koliseo_rating`,`screen_rating`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", true)) {
             PreparedStatement pStatement = conn.getStatement();
 
             pStatement.setInt(1, character.getID());
@@ -332,6 +333,8 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setInt(23, character.getHonor());
             pStatement.setString(24, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor());
             pStatement.setString(25, StringUtils.join(character.getScores().values(), ','));
+            pStatement.setString(26, character.getKolizeumRate().serialize());
+            pStatement.setDouble(27, character.getKolizeumRate().getRating());
             pStatement.execute();
             ResultSet resultSet = pStatement.getGeneratedKeys();
             if (!resultSet.first())//character not created ?

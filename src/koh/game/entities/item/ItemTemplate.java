@@ -216,11 +216,11 @@ public class ItemTemplate {
     }
 
 
-    public boolean use(Player plr,int cell){
+    public boolean use(Player possessor, Player plr,int cell){
         if(this.actions == null) {
             return false;
         }
-        return this.actions.stream().allMatch(x -> x.execute(plr,cell));
+        return this.actions.stream().allMatch(x -> x.execute(possessor,plr,cell));
     }
 
 

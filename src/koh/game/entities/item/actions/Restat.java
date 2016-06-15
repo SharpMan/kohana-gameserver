@@ -15,8 +15,8 @@ public class Restat  extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
+    public boolean execute(Player possessor,Player p, int cell) {
+        if(!super.execute(p,p, cell) || !p.getClient().canGameAction(GameActionTypeEnum.CHANGE_MAP))
             return false;
         p.setLife(Math.max(p.getLife() - p.getVitality(), 0));
         p.setVitality(0);
@@ -24,6 +24,7 @@ public class Restat  extends ItemAction {
         p.setIntell(0);
         p.setAgility(0);
         p.setChance(0);
+        p.setWisdom(0);
         p.getStats().getStats().get(StatsEnum.VITALITY).base = 0;
         p.getStats().getStats().get(StatsEnum.WISDOM).base = 0;
         p.getStats().getStats().get(StatsEnum.STRENGTH).base = 0;

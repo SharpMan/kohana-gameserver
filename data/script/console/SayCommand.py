@@ -12,7 +12,7 @@ class SayCommand(PlayerCommand):
         return "Say a sentence to everybody";
 
     def apply(self,client,args):
-        PlayerController.sendServerMessage("<b>"+client.getCharacter().getNickName()+"</b> : "+args[0],"EAA401");
+        PlayerController.sendServerMessage("<b>"+client.getCharacter().getNickName()+"</b> : "+args[0],"AC776A");
 
     def can(self,client):
         return True;

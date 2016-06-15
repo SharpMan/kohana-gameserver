@@ -18,8 +18,8 @@ public class Kamas extends ItemAction {
 
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell))
+    public boolean execute(Player possessor,Player p, int cell) {
+        if(!super.execute(possessor,p, cell))
             return false;
         int curKamas = p.getKamas();
         int newKamas = curKamas + count;

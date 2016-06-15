@@ -374,6 +374,7 @@ TELEPORT_STARTING_TURN_CELL
                case SUMMON:
                case ACTION_SUMMON_BOMB:
                    return scoreInvocation(AI, effect, targets, reverse, invokPreview);
+
                case KILL_TARGET_TO_REPLACE_INVOCATION:
                    return scoreSubBuff_IV(AI, effect, targets, reverse, true) + scoreInvocation(AI, effect, targets, reverse, invokPreview);
 

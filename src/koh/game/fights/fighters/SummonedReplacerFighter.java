@@ -7,6 +7,7 @@ import koh.game.fights.Fighter;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
 import koh.protocol.types.game.context.fight.GameFightFighterInformations;
+import lombok.Getter;
 
 import java.util.Arrays;
 
@@ -24,12 +25,16 @@ public class SummonedReplacerFighter extends SummonedFighter {
     }
 
 
+    @Getter //TODO Maybe do it for everyone ?
+    protected boolean isDying;
+
     @Override
     public int tryDie(int casterId, boolean force) {
         final int value = super.tryDie(casterId, force);
         if (value == -2) {
+            this.isDying = true;
             final MonsterFighter summon = new SummonedFighter(fight, replacedMonster, summoner);
-            summon.setLife((int)(summon.getLife() * 50 / 100f));
+            summon.setLife((int)(summon.getLife() * 0.5f));
             summon.joinFight();
             summon.getFight().joinFightTeam(summon, summoner.getTeam(), false, this.getCellId(), true);
             fight.sendToField(Pl -> new GameActionFightSummonMessage(ActionIdEnum.ACTION_SUMMON_CREATURE, summoner.getID(), (GameFightFighterInformations) summon.getGameContextActorInformations(Pl)));

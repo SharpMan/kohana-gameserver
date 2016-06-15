@@ -17,6 +17,7 @@ import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.ItemTemplate;
 import koh.game.entities.item.Weapon;
+import koh.game.entities.kolissium.ArenaParty;
 import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
@@ -117,6 +118,13 @@ public class ChatHandler {
             return;
         }
         switch (message.channel) {
+            case CHANNEL_ARENA:
+                if (client.getParty() == null || !(client.getParty() instanceof ArenaParty)) {
+                    PlayerController.sendServerMessage(client, "Erreur : Vous ne faîtes pas partie d'un groupe Kolizeum.");
+                    return;
+                }
+                client.getParty().sendToField(new ChatServerWithObjectMessage(message.channel, message.content, (int) Instant.now().getEpochSecond(), "az", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id, message.objects));
+                break;
             case CHANNEL_TEAM:
                 if (client.getCharacter().getFighter() != null) {
                     client.getCharacter().getFighter().getTeam().sendToField(new ChatServerWithObjectMessage(message.channel, message.content, (int) Instant.now().getEpochSecond(), "", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id, message.objects));
@@ -170,6 +178,13 @@ public class ChatHandler {
             return;
         }
         switch (message.channel) {
+            case CHANNEL_ARENA:
+                if (client.getParty() == null || !(client.getParty() instanceof ArenaParty)) {
+                    PlayerController.sendServerMessage(client, "Erreur : Vous ne faîtes pas partie d'un groupe Kolizeum.");
+                    return;
+                }
+                client.getParty().sendToField(new ChatServerMessage(message.channel, message.content, (int) Instant.now().getEpochSecond(), "az", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id));
+                break;
             case CHANNEL_TEAM:
                 if (client.getCharacter().getFighter() != null) {
                     client.getCharacter().getFighter().getTeam().sendToField(new ChatServerMessage(message.channel, message.content, (int) Instant.now().getEpochSecond(), "", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id));

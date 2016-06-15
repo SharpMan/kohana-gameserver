@@ -33,8 +33,8 @@ public class GenLife  extends ItemAction {
     }
 
     @Override
-    public boolean execute(Player p, int cell) {
-        if(!super.execute(p, cell))
+    public boolean execute(Player possessor,Player p, int cell) {
+        if(!super.execute(possessor,p, cell))
             return false;
         final int val = EffectHelper.randomValue(min,max);
         final int copy = p.getLife() + val > p.getMaxLife() ? p.getMaxLife() - p.getLife() : val;

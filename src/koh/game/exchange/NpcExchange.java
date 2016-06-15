@@ -57,7 +57,7 @@ public class NpcExchange extends Exchange {
 
         NpcItem npcItem = this.npc.getTemplate().getItems().get(templateId);
 
-        if (npcItem == null) {
+        if (npcItem == null || quantity < 0) {
             client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }
@@ -109,7 +109,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        if (item == null) {
+        if (item == null || quantity < 0) {
             client.send(new ExchangeErrorMessage(ExchangeErrorEnum.SELL_ERROR));
             return false;
         }else if(this.npc.getTemplate() == null){

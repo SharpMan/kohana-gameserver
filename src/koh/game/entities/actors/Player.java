@@ -31,6 +31,7 @@ import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
 import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
 import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
+import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.AlignmentRankUpdateMessage;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
@@ -209,7 +210,7 @@ public class Player extends IGameActor implements Observer {
             };
         }
 
-        this.guild = DAO.getGuilds().getForPlayer(this.ID);
+        this.guild = DAO.getGuildMembers().getForPlayer(this.ID);
 
         this.stats = new GenericStats(this);
 
@@ -354,6 +355,22 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
+  /*  public synchronized void teleportPeriodicContest(int newMapID, int newCellID) {
+        if (this.currentMap.getId() == newMapID) {
+            this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
+            this.currentMap.sendToField(new TeleportOnSameMapMessage(ID, cell.getId()));
+            return;
+        }
+        final DofusMap nextMap = DAO.getMaps().findTemplate(newMapID);
+        if (nextMap == null) {
+            logger.error("Nulled map on {}", newMapID);
+            PlayerController.sendServerMessage(client, "Signal on the bugTracker nulled map -> " + newMapID);
+            //client.sendPacket(new ErrorMapNotFoundMessage());
+            return;
+        }
+        client.endGameAction(koh.game.actions.GameActionTypeEnum.MAP_MOVEMENT);
+    }*/
+
     public synchronized void teleport(int newMapID, int newCellID) {
         if (this.currentMap.getId() == newMapID) {
             this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
@@ -412,6 +429,10 @@ public class Player extends IGameActor implements Observer {
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
                 PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
+                PlayerController.sendServerMessage(client, "Pour télecharger le patch du launcher <a href=\"http://gate.nakama-serveur.eu/kpatch.exe\"> cliquez ici</a>");
+
+                client.send(new PopupWarningMessage((byte) 2, "#", "<center>Important</center>\n\n Si vous avez des problèmes de vote avec le launcher \n Veuillez télechargez le patch du launcher disponnible dans le chat"));
+
                 // client.send(new BasicNoOperationMessage());
                 client.send(new AlignmentRankUpdateMessage(this.alignmentGrade, false));
                 client.sequenceMessage();
@@ -734,10 +755,6 @@ public class Player extends IGameActor implements Observer {
     }
 
     public ActorExtendedAlignmentInformations getActorAlignmentExtendInformations() {
-        if (DAO.getExps().getLevel(this.alignmentGrade) == null)
-            logger.error("lga1");
-        else if (alignmentSide == null)
-            logger.error("lga2");
         return new ActorExtendedAlignmentInformations(this.alignmentSide.value,
                 this.alignmentValue,
                 this.PvPEnabled == AggressableStatusEnum.NON_AGGRESSABLE ? 0 : this.alignmentGrade,
@@ -835,7 +852,7 @@ public class Player extends IGameActor implements Observer {
             FieldNotification task = (FieldNotification) arg;
             if (task.can(this)) {
                 if (client != null && inWorld) {
-                    client.send((Message) task.packet);
+                    client.send(task.packet);
                 }
             }
         } else if (arg instanceof FieldOperation) {
