@@ -476,15 +476,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 boolean isCc = false;
                 if (spellLevel.getCriticalHitProbability() != 0 && spellLevel.getCriticalEffect().length > 0) {
-                    int TauxCC = spellLevel.getCriticalHitProbability() - fighter.getStats().getTotal(StatsEnum.ADD_CRITICAL_HIT);
-                    if (TauxCC < 2) {
-                        TauxCC = 2;
-                    }
-                    if (Fight.RANDOM.nextInt(TauxCC) == 0) {
+                    final int tauxCC =  Math.max(1,fighter.getStats().getTotal(StatsEnum.ADD_CRITICAL_HIT) - spellLevel.getCriticalHitProbability());
+                    logger.debug("CC: {} TauxCC {} getSpellLevel.criticalHitProbability {} stat {}", isCc, tauxCC, spellLevel.getCriticalHitProbability(),fighter.getStats().getTotal(StatsEnum.ADD_CRITICAL_HIT));
+
+                    if (Fight.RANDOM.nextInt( Math.abs(100-tauxCC)) == 0) {
                         isCc = true;
                     }
-                    logger.debug("CC: {} TauxCC {} getSpellLevel.criticalHitProbability {}", isCc, TauxCC, spellLevel.getCriticalHitProbability());
-                }
+                 }
                 isCc &= !fighter.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
                 if (isCc && !fakeLaunch && fighter.getStats().getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Turquoise
                     fighter.getPlayer().getInventoryCache().getEffects(CAST_SPELL_ON_CRITICAL_HIT.value()).forEach(list -> {
@@ -704,7 +702,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 if (tauxCC < 2) {
                     tauxCC = 2;
                 }
-                if (Fight.RANDOM.nextInt(tauxCC) == 0) {
+                if (Fight.RANDOM.nextInt(tauxCC) == 0 && weapon.getWeaponTemplate().getCriticalHitProbability() > 0) {
                     isCc = true;
                 }
 
@@ -740,14 +738,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 EffectInstanceDice effectParent;
                 for (ObjectEffectDice effect : effects) {
-                    effectParent = (EffectInstanceDice) (weapon.getTemplate().getEffect(effect.actionId) == null ?
+                    effectParent = (EffectInstanceDice) (weapon.getTemplate().getEffect(effect.actionId, effect.diceNum) == null ?
                             Arrays.stream(weapon.getTemplate().getPossibleEffects())
                                     .parallel()
                                     .filter(x -> x instanceof EffectInstanceDice)
                                     .map(x -> (EffectInstanceDice) x)
                                     .filter(e -> e.diceNum == effect.diceNum && e.diceSide == effect.diceSide)
                                     .findFirst().get() :
-                            weapon.getTemplate().getEffect(effect.actionId));
+                            weapon.getTemplate().getEffect(effect.actionId, effect.diceNum));
                     logger.debug(effectParent.toString());
             /*if (effectParent.random > 0) {
                 if (!flag) {

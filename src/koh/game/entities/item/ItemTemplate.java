@@ -13,6 +13,7 @@ import koh.game.dao.api.ItemTemplateDAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.actions.LearnSpell;
 import koh.game.entities.spells.EffectInstance;
+import koh.game.entities.spells.EffectInstanceDice;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
 import lombok.Getter;
@@ -116,6 +117,15 @@ public class ItemTemplate {
     
     public EffectInstance getEffect(int uid) {
         return Arrays.stream(possibleEffects).filter(x -> x.effectId == uid).findFirst().orElse(null);
+    }
+
+    public EffectInstance getEffect(int uid,int dice) {
+        return Arrays.stream(possibleEffects)
+                .filter(x -> x instanceof EffectInstanceDice)
+                .map(x -> (EffectInstanceDice)x)
+                .filter(x -> x.effectId == uid && x.diceNum == dice)
+                .findFirst()
+                .orElse(null);
     }
     
     public boolean isVisibleInTooltip(int Effect) {
