@@ -9,7 +9,7 @@ public class EffectDieFighter extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        castInfos.targets.forEach(Target -> Target.tryDie(Target.getID(), true));
+        castInfos.targets.forEach(target -> target.tryDie(target.getID(), true));
         return -1;
     }
 

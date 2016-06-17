@@ -7,6 +7,7 @@ import koh.game.fights.effects.buff.BuffDecrementType;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffStats;
 import koh.protocol.client.enums.ActionIdEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightModifyEffectsDurationMessage;
 
 /**
@@ -77,7 +78,7 @@ public class EffectDispellEffectDuration extends EffectBase {
 
 
     private static boolean isNotBad(BuffEffect buff){
-        return (buff.getCastInfos().effect != null && buff.getCastInfos().effect.category() != EffectHelper.DAMAGE_EFFECT_CATEGORY)
+        return (buff.getCastInfos().effect != null && buff.getCastInfos().effect.category() != EffectHelper.DAMAGE_EFFECT_CATEGORY && buff.getCastInfos().effectType != StatsEnum.INCREASE_FINAL_DAMAGES_PERCENT)
                 || !(buff instanceof BuffStats && GenericStats.getOPPOSITE_STATS().containsKey(buff.castInfos.effectType));
     }
 

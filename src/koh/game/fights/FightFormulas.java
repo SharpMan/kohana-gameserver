@@ -191,7 +191,7 @@ public class FightFormulas {
         }
         xpWin.set((int) (xp - xp * pXpGive));
 
-        Fighter.getCharacter().getGuild().onFighterAddedExperience(gm, (long) Math.round(toGuild));
+        Fighter.getCharacter().getGuild().onFighterAddedExperience(gm,  Math.round(toGuild));
 
         return (int) Math.round(toGuild);
     }

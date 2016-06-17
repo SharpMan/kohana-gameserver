@@ -49,6 +49,7 @@ import koh.protocol.types.game.house.HouseInformations;
 import koh.protocol.types.game.interactive.InteractiveElement;
 import koh.protocol.types.game.interactive.InteractiveElementSkill;
 import koh.protocol.types.game.interactive.InteractiveElementWithAgeBonus;
+import koh.utils.Enumerable;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -72,7 +73,6 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public boolean useLowPassFilter, useReverb;
     private int presetId;
     private byte[] compressedCells, compressedLayers;
-    private String compressedBlueCells, compressedRedCells;
     @Getter
     private boolean myInitialized = false;
     @Getter
@@ -280,14 +280,14 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             this.layers[i] = new Layer(this, buf);
         }
         buf.clear();
-        this.blueCells = MapController.unCompressStartingCells(this, compressedBlueCells);
-        this.redCells = MapController.unCompressStartingCells(this, compressedRedCells);
+      /*  this.blueCells = MapController.unCompressStartingCells(this, compressedBlueCells);
+        this.redCells = MapController.unCompressStartingCells(this, compressedRedCells);*/
         //StatedElement[]
         //this.elementsStated = this.ElementsList.stream().map(x -> new StatedElement(x.id, x.ElementCellID, x.State)).collect(Collectors.toList()).toArray(new StatedElement[this.ElementsList.size()]);
         this.compressedCells = null;
         this.compressedLayers = null;
-        this.compressedBlueCells = null;
-        this.compressedRedCells = null;
+        /*this.compressedBlueCells = null;
+        this.compressedRedCells = null;*/
         //throw un nullP mieux que referencer une liste on 111000 map object
         try {
             for (Npc npc : DAO.getNpcs().forMap(this.id)) {
@@ -359,8 +359,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.presetId = pr;
         this.compressedCells = sbb;
         this.compressedLayers = rc;
-        this.compressedBlueCells = cc;
-        this.compressedRedCells = sl;
+        this.blueCells = Enumerable.stringToShortArray(cc);
+        this.redCells =  Enumerable.stringToShortArray(sl);
     }
 
     public static final ScheduledExecutorService GlobalTimer = Executors.newScheduledThreadPool(20);

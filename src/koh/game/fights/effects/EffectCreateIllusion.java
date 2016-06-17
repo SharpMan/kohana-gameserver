@@ -7,7 +7,6 @@ import koh.game.fights.effects.buff.BuffDecrementType;
 import koh.game.fights.effects.buff.BuffState;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.IllusionFighter;
-import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_TELEPORT_ON_SAME_MAP;
 import koh.protocol.client.enums.DirectionsEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
@@ -15,19 +14,29 @@ import koh.protocol.messages.game.actions.fight.GameActionFightTeleportOnSameMap
 import koh.protocol.messages.game.context.fight.character.GameFightShowFighterMessage;
 import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 
+import java.util.Arrays;
+
+import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_TELEPORT_ON_SAME_MAP;
+
 /**
- *
  * @author Neo-Craft
  */
 public class EffectCreateIllusion extends EffectBase {
 
-    public static final byte[] TRUE_DIRECTION = new byte[]{DirectionsEnum.DOWN_RIGHT, DirectionsEnum.DOWN_LEFT, DirectionsEnum.UP_LEFT, DirectionsEnum.UP_RIGHT};
+    public static final Byte[] TRUE_DIRECTION = new Byte[]{DirectionsEnum.DOWN_RIGHT, DirectionsEnum.DOWN_LEFT, DirectionsEnum.UP_LEFT, DirectionsEnum.UP_RIGHT};
 
     @Override
     public int applyEffect(EffectCast castInfos) {
+
         final int distanceCharacterFromHidedPlace = Pathfunction.goalDistance(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
         final byte ignoredDirection = Pathfunction.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
         final short startCell = castInfos.caster.getCellId();
+        if(Arrays.stream(TRUE_DIRECTION).noneMatch(d -> {
+            final FightCell c = castInfos.caster.getFight().getCell(Pathfunction.nextCell(startCell, d, distanceCharacterFromHidedPlace));
+            return c != null && c.canWalk();
+        })){
+            return -1;
+        }
 
         final BuffState buff = new BuffState(new EffectCast(StatsEnum.INVISIBILITY, castInfos.spellId, castInfos.cellId, castInfos.chance, null, castInfos.caster, null), castInfos.caster);
         buff.duration = 1;
@@ -54,10 +63,10 @@ public class EffectCreateIllusion extends EffectBase {
             if (ignoredDirection == Direction) {
                 continue;
             }
-            final FightCell Cell = castInfos.caster.getFight().getCell(Pathfunction.nextCell(startCell, Direction, distanceCharacterFromHidedPlace));
-            if (Cell != null && Cell.canWalk()) {
+            final FightCell summoningCell = castInfos.caster.getFight().getCell(Pathfunction.nextCell(startCell, Direction, distanceCharacterFromHidedPlace));
+            if (summoningCell != null && summoningCell.canWalk()) {
                 final IllusionFighter clone = new IllusionFighter(castInfos.caster.getFight(), castInfos.caster);
-                clone.getFight().joinFightTeam(clone, castInfos.caster.getTeam(), false, Cell.Id, true);
+                clone.getFight().joinFightTeam(clone, castInfos.caster.getTeam(), false, summoningCell.Id, true);
                 castInfos.caster.getFight().sendToField(new GameActionFightSummonMessage(1097, castInfos.caster.getID(), (GameFightFighterInformations) clone.getGameContextActorInformations(null)));
                 castInfos.caster.getFight().getFightWorker().summonFighter(clone);
             }

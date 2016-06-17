@@ -71,6 +71,8 @@ public class FightGlyph extends FightActivableObject {
             castInfos.isGlyph = true;
             castInfos.glyphId = this.ID;
             final int result = EffectBase.tryApplyEffect(castInfos);
+            /*System.out.println(effect.toString());
+            System.out.println("a"+result);*/
             if(result < bestResult){
                 bestResult = result;
             }

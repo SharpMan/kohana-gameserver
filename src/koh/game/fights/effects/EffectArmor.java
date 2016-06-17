@@ -16,6 +16,7 @@ public class EffectArmor extends EffectBase {
         for (Fighter Target : castInfos.targets) {
             buf = new BuffArmor(castInfos, Target);
             if (!Target.getBuff().buffMaxStackReached(buf)) {
+                buf.applyEffect(null,null);
                 Target.getBuff().addBuff(buf);
             }
         }

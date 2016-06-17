@@ -70,6 +70,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
         try {
             this.consoleCommands.clear();
             this.consoleCommands.put("teleport", new TeleportCommand()); //FOR TEST
+            this.consoleCommands.put("restartkolizeum", new RestartKolizeumCommand());
 
             Files.walk(Paths.get("data/script/console"))
                     .filter(Files::isRegularFile)

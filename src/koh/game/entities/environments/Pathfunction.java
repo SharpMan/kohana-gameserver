@@ -126,10 +126,17 @@ public class Pathfunction {
         ArrayList<Fighter> ennemies = new ArrayList<>();
 
         for (byte Direction : Pathfunction.FIGHT_DIRECTIONS) {
-            Fighter Ennemy = fight.hasEnnemyInCell(Pathfunction.nextCell(cellId, Direction), team);
-            if (Ennemy != null) {
-                if (!Ennemy.isDead() && !(notVisible && Ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) && !(Ennemy instanceof BombFighter)) {
-                    ennemies.add(Ennemy);
+            final Fighter ennemy = fight.hasEnnemyInCell(Pathfunction.nextCell(cellId, Direction), team);
+            if (ennemy != null) {
+                if (!ennemy.isDead()
+                        && !(ennemy instanceof BombFighter)
+                       // && !(ennemy instanceof DoubleFighter)
+                        && !(ennemy instanceof StaticFighter)
+                        && !(ennemy instanceof SummonedReplacerFighter)
+                        && ! ennemy.getStates().hasState(FightStateEnum.ENRACINÉ)
+                        && !(ennemy instanceof MonsterFighter && !ennemy.asMonster().getGrade().getMonster().isCanTackle())
+                        && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                    ennemies.add(ennemy);
                 }
             }
         }
@@ -145,11 +152,11 @@ public class Pathfunction {
             if (ennemy != null) {
                 if (!ennemy.isDead()
                         && !(ennemy instanceof BombFighter)
-                        && !(ennemy instanceof DoubleFighter)
+                        //&& !(ennemy instanceof DoubleFighter)
                         && !(ennemy instanceof StaticFighter)
                         && !(ennemy instanceof SummonedReplacerFighter)
                         && !ennemy.getStates().hasState(FightStateEnum.ENRACINÉ)
-                        && !(ennemy instanceof MonsterFighter && ennemy.asMonster().getGrade().getMonster().isCanTackle())
+                        && !(ennemy instanceof MonsterFighter && !ennemy.asMonster().getGrade().getMonster().isCanTackle())
                         && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {
                     ennemies.add(ennemy);
                 }

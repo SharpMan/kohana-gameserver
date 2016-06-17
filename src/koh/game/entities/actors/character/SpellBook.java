@@ -44,7 +44,7 @@ public class SpellBook {
 
         public SpellInfo(IoBuffer buf) {
             this.id = buf.getInt();
-            if(this.id == 293){
+            if(this.id == 293 || id == 371){
                 this.id = 366;
             }
             this.level = buf.get();
@@ -139,7 +139,7 @@ public class SpellBook {
         if (binary.length <= 0) {
             return;
         }
-        IoBuffer buf = IoBuffer.wrap(binary);
+        final IoBuffer buf = IoBuffer.wrap(binary);
         int len = buf.getInt();
         for (int i = 0; i < len; i++) {
             this.addSpell(new SpellInfo(buf));

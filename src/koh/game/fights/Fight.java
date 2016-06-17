@@ -14,6 +14,7 @@ import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.maps.pathfinding.*;
+import koh.game.entities.spells.EffectInstance;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.IFightObject.FightObjectType;
@@ -56,6 +57,7 @@ import koh.protocol.types.game.context.roleplay.party.NamedPartyTeamWithOutcome;
 import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
 import koh.protocol.types.game.idol.Idol;
 import koh.utils.Couple;
+import koh.utils.Enumerable;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -191,38 +193,38 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         if (Fight.MAP_FIGHTCELLS.containsKey(this.map.getId())) {
             // Ajout
             synchronized (Fight.MAP_FIGHTCELLS) {
-                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(0)) {
-                    this.myFightCells.get(this.myTeam1).put(Cell, this.fightCells.get(Cell));
+                for (Short cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(0)) {
+                    this.myFightCells.get(this.myTeam1).put(cell, this.fightCells.get(cell));
                 }
-                for (Short Cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(1)) {
-                    this.myFightCells.get(this.myTeam2).put(Cell, this.fightCells.get(Cell));
+                for (Short cell : Fight.MAP_FIGHTCELLS.get(this.map.getId()).get(1)) {
+                    this.myFightCells.get(this.myTeam2).put(cell, this.fightCells.get(cell));
                 }
             }
             return;
         }
 
-        for (Short CellValue : this.map.getRedCells()) {
-            FightCell Cell = this.fightCells.get(CellValue);
-            if (Cell == null || !Cell.canWalk()) {
+        for (Short cellValue : this.map.getRedCells()) {
+            final FightCell cell = this.fightCells.get(cellValue);
+            if (cell == null || !cell.canWalk()) {
                 continue;
             }
-            this.myFightCells.get(this.myTeam1).put(CellValue, Cell);
+            this.myFightCells.get(this.myTeam1).put(cellValue, cell);
         }
 
-        for (Short CellValue : this.map.getBlueCells()) {
-            FightCell Cell = this.fightCells.get(CellValue);
-            if (Cell == null || !Cell.canWalk()) {
+        for (Short cellValue : this.map.getBlueCells()) {
+            final FightCell cell = this.fightCells.get(cellValue);
+            if (cell == null || !cell.canWalk()) {
                 continue;
             }
-            this.myFightCells.get(this.myTeam2).put(CellValue, Cell);
+            this.myFightCells.get(this.myTeam2).put(cellValue, cell);
         }
 
         if (this.map.getBlueCells().length == 0 || this.map.getRedCells().length == 0) {
             this.myFightCells.get(this.myTeam1).clear();
             this.myFightCells.get(this.myTeam2).clear();
-            Couple<ArrayList<FightCell>, ArrayList<FightCell>> startCells = Algo.genRandomFightPlaces(this);
-            for (FightCell Cell : startCells.first) {
-                this.myFightCells.get(this.myTeam1).put(Cell.Id, Cell);
+            final Couple<ArrayList<FightCell>, ArrayList<FightCell>> startCells = Algo.genRandomFightPlaces(this);
+            for (FightCell cell : startCells.first) {
+                this.myFightCells.get(this.myTeam1).put(cell.Id, cell);
             }
             for (FightCell Cell : startCells.second) {
                 this.myFightCells.get(this.myTeam2).put(Cell.Id, Cell);
@@ -431,6 +433,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             KILL_TARGET_TO_REPLACE_INVOCATION,
             StatsEnum.KILL,
             StatsEnum.SUMMON,
+            StatsEnum.DESENVOUTEMENT,
+
 
     };
 
@@ -494,13 +498,29 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 final int maxGroup = Arrays.stream(spellEffects).mapToInt(ef -> ef.group).max().orElse(0);
                 if (maxGroup > 0) {
+                    final EffectInstanceDice[] effectsUnique = Arrays.stream(spellEffects) //Rekop have a effect without group...
+                            .map(ee -> ee.effectId)
+                            .distinct()
+                            .filter(id ->  (Arrays.stream((spellLevel.getEffects() != null ? spellLevel.getEffects() : spellLevel.getCriticalEffect()))
+                                    .filter(eee -> (id == eee.effectId)).count() == 1)
+                            )
+                            .map(e -> Arrays.stream(spellLevel.getEffects() != null ? spellLevel.getEffects() : spellLevel.getCriticalEffect()).filter(ee -> ee.effectId == e).findFirst().get())
+                            .toArray(EffectInstanceDice[]::new);
+
                     Arrays.stream(spellEffects).forEach(e -> e.random = 0); //TODO check 3-4 monsters group spells
                     final int randGroup = RANDOM.nextInt(maxGroup);
                     spellEffects = Arrays.stream(spellEffects).filter(ef -> ef.group == randGroup).toArray(EffectInstanceDice[]::new);
+
                     while (spellEffects.length == 0){
-                        spellEffects = Arrays.stream(isCc || spellLevel.getEffects() == null ? spellLevel.getCriticalEffect() : spellLevel.getEffects()).filter(ef -> ef.group == RANDOM.nextInt(maxGroup)).toArray(EffectInstanceDice[]::new);
+                        final int gr = RANDOM.nextInt(maxGroup);
+                        spellEffects = Arrays.stream(isCc || spellLevel.getEffects() == null ? spellLevel.getCriticalEffect() : spellLevel.getEffects()).filter(ef -> ef.group == gr).toArray(EffectInstanceDice[]::new);
                     }
                     Arrays.stream(spellEffects).forEach(x -> x.targetMask = "a,A");
+
+                    for (EffectInstanceDice effect : effectsUnique) {
+                        spellEffects = ArrayUtils.add(spellEffects,effect);
+                    }
+
                     //TODO: Ecaflip rekop make all c targetMask in db , ankama mistake ...
                 }
 
@@ -550,7 +570,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     }
 
                     for (Fighter target : targetsOnZone) {
-                        logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}", effect.effectId, target.getID(), EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId, true), effect.isValidTarget(fighter, target), EffectInstanceDice.verifySpellEffectMask(fighter, target, effect, cellId));
+                        logger.debug("EffectId {} {} target {} Triger {} validTarget {} spellMask {}", effect.effectId,StatsEnum.valueOf(effect.effectId), target.getID(), EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId, true), effect.isValidTarget(fighter, target), EffectInstanceDice.verifySpellEffectMask(fighter, target, effect, cellId));
                         if ((ArrayUtils.contains(BLACKLISTED_EFFECTS, effect.effectUid)
                                 || EffectHelper.verifyEffectTrigger(fighter, target, spellEffects, effect, false, effect.triggers, cellId, true))
                                 && effect.isValidTarget(fighter, target)
@@ -565,6 +585,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                  }*/
                             logger.debug("Targeet Added!");
                             targets.get(effect).add(target);
+                        }
+                        else if(effect.effectId == 1160){
+                            logger.debug("Contained {} ", Enumerable.join(Arrays.stream(DAO.getSpells().findSpell(effect.diceNum).getSpellLevel(effect.diceSide).getEffects()).map(e -> e.getEffectType().toString()).toArray(String[]::new)));
                         }
                     }
                 }
@@ -1157,7 +1180,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             boolean flag = false;
             for (EffectInstanceDice effect : spell.getEffects()) {
                 logger.debug(effect.toString());
-                logger.debug("EffectId {} target {} Triger {} validTarget {} spellMask {}", effect.effectId, target.getID(), EffectHelper.verifyEffectTrigger(caster, target, spell.getEffects(), effect, false, effect.triggers, target.getCellId(), true), effect.isValidTarget(caster, target), EffectInstanceDice.verifySpellEffectMask(caster, target, effect,target.getCellId()));
+                logger.debug("*EffectId {} {} target {} Triger {} validTarget {} spellMask {}", effect.effectId,StatsEnum.valueOf(effect.effectId), target.getID(), EffectHelper.verifyEffectTrigger(caster, target, spell.getEffects(), effect, false, effect.triggers, target.getCellId(), true), effect.isValidTarget(caster, target), EffectInstanceDice.verifySpellEffectMask(caster, target, effect,target.getCellId()));
 
                 if (!(effect.isValidTarget(caster, target)
                         && EffectInstanceDice.verifySpellEffectMask(caster, target, effect, target.getCellId())) ||
@@ -1257,6 +1280,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         this.startSequence(SequenceTypeEnum.SEQUENCE_MOVE);
 
+        fighter.getPreviousCellPos().add(fighter.getCellId());
+
         if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.getStates().hasState(FightStateEnum.ENRACINÉ)) {
             this.onTackled(fighter, path.getMovementLength());
             if (path.transitCells.isEmpty() || path.getMovementLength() == 0) {
@@ -1276,7 +1301,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         fighter.usedMP += path.getMovementLength();
         this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -path.getMovementLength()));
-
+        fighter.getPreviousCellPos().add(path.getEndCell());
         fighter.setCell(this.getCell(path.getEndCell()));
         fighter.setDirection(path.getEndDirection());
         this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);

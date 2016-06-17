@@ -76,7 +76,13 @@ public class InventoryItem {
     }
 
     public ItemSuperTypeEnum getSuperType() {
-        return ItemSuperTypeEnum.valueOf(DAO.getItemTemplates().getType(getTemplate().getTypeId()).getSuperType());
+        try {
+            return ItemSuperTypeEnum.valueOf(DAO.getItemTemplates().getType(getTemplate().getTypeId()).getSuperType());
+        }
+        catch (Exception e){
+            logger.error(this.getTemplate().toString());
+            throw e;
+        }
     }
 
     public boolean isEquiped() {

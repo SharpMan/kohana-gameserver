@@ -4,6 +4,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameKolissium;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
+import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.PlayerInst;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.kolissium.ArenaBattle;
@@ -39,8 +40,8 @@ public class ArenaHandler {
                if (client.getParty().getPlayers().stream().anyMatch(pl -> pl.getLevel() < 50)) {
                    client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 327, client.getParty().getPlayers().stream().filter(pl -> pl.getLevel() < 50).findFirst().get().getNickName()));
                    return;
-               }else if (client.getParty().getPlayers().stream().filter(p -> ArrayUtils.contains(KolizeumExecutor.PILLAR, p.getBreed())).count() > 1){
-                   PlayerController.sendServerMessage(client,"1 classe pillier merci");
+               }else if (client.getParty().getPlayers().stream().map(Player::getBreed).distinct().count() != client.getParty().getPlayers().size()){
+                   PlayerController.sendServerMessage(client,"1 classe unique par team");
                    return;
                }else if(client.getParty().asArena().inKolizeum()|| WorldServer.getKoli().groupIsRegistred(client.getParty().asArena())){
                    PlayerController.sendServerMessage(client,"Groupe déjà inscrit");

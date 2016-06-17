@@ -37,12 +37,16 @@ public class EffectActivableObject extends EffectBase {
                 break;
             case LAYING_PORTAIL:
                 if (castInfos.getCell().hasGameObject(FightObjectType.OBJECT_PORTAL)) {
+
                     if(!((FightPortal) castInfos.getCell().getObjects(FightObjectType.OBJECT_PORTAL)[0]).enabled){
                         break;
                     }
                     ((FightPortal) castInfos.getCell().getObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
                 } else if (castInfos.caster.getFight().getActivableObjects().get(castInfos.caster) != null
-                        && castInfos.caster.getFight().getActivableObjects().get(castInfos.caster).stream().filter(Object -> Object instanceof FightPortal).count() > 3) {
+                        && castInfos.caster.getFight().getActivableObjects().get(castInfos.caster)
+                        .stream()
+                        .filter(ob -> ob instanceof FightPortal)
+                        .count() > 3) {
                     castInfos.caster.getFight().getActivableObjects().get(castInfos.caster).stream().findFirst().get().remove();
                 }
                 /*if (!castInfos.caster.getFight().canPutObject(castInfos.getCellId)) {

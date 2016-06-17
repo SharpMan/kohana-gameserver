@@ -726,7 +726,7 @@ public class SelfActingAction extends AIAction {
             // Template de monstre existante
             if (monster != null) {
                 final MonsterGrade monsterLevel = monster.getLevelOrNear(invocationLevel);
-                // Level de monstre existant
+                // level de monstre existant
                 if (monsterLevel != null) {
                     List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
                     for (SpellLevel spell : monsterLevel.getSpells()) {
@@ -786,7 +786,7 @@ public class SelfActingAction extends AIAction {
             catch (NullPointerException e){
                 return 0;
             }
-            // Level de monstre existant
+            // level de monstre existant
             if (monsterLevel != null) {
                 List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isDead()).collect(Collectors.toList());
                 for (SpellLevel spell : monsterLevel.getSpells()) {

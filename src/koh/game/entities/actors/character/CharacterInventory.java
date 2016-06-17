@@ -690,7 +690,7 @@ public class CharacterInventory {
                 .sum() > qua;
     }
 
-    private void checkItemsCriterias() {
+    public void checkItemsCriterias() {
         this.itemsCache.values().stream().filter(x -> x.getPosition() != 63 && !x.areConditionFilled(player)).forEach((item) ->
             this.moveItem(item.getID(), CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED, 1)
         );

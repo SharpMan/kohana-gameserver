@@ -5,6 +5,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.ItemAction;
+import koh.game.fights.FightState;
 import koh.protocol.client.enums.DelayedActionTypeEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
@@ -56,6 +57,10 @@ public class GenLife  extends ItemAction {
                 p.removeHumanOption(HumanOptionObjectUse.class);
             }
         };
+
+        if(p.getClient().isGameAction(GameActionTypeEnum.FIGHT) && p.getFight().getFightState() == FightState.STATE_PLACE){
+            p.getFight().getFightWorker().initTurns();
+        }
 
 
         return true;

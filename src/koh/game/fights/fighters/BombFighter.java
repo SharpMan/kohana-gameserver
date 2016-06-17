@@ -57,7 +57,7 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public void adjustStats() {
-        this.stats.addBase(StatsEnum.VITALITY, (short) (((double) this.summoner.getStats().getTotal(StatsEnum.VITALITY)) * (0.2f)));
+        this.stats.addBase(StatsEnum.VITALITY, (short) Math.max(((double) this.summoner.getStats().getTotal(StatsEnum.VITALITY)) * (0.2f),0));
         this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));

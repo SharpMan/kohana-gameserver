@@ -62,6 +62,7 @@ public class Restat  extends ItemAction {
             }
         });
         p.refreshStats();
+        p.getInventoryCache().checkItemsCriterias();
         return true;
     }
 }

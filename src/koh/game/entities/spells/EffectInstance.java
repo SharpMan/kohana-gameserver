@@ -324,6 +324,9 @@ public class EffectInstance implements Serializable {
                         // verify = true;
                         break;
                     case 'T':
+                        /*if(true){
+                            verify = true;
+                        }*/
                         if(cell > 0) {
                             try {
                                 final FightCell simetry = targetIsCaster ?
@@ -342,8 +345,41 @@ public class EffectInstance implements Serializable {
 
                             }
                         }
-                        else if (monsterInfo != null && monsterInfo.creatureGenericId == 3958) {
-                            verify = true;
+                        if(!verify && pEffect != null && ((EffectInstanceDice)pEffect).diceNum == 5429 && !pTargetId.getPreviousCellPos().isEmpty()){
+                            try {
+                                final FightCell simetry =  pCasterId.getFight().getCell(pTargetId.getPreviousCellPos().get(pTargetId.getPreviousCellPos().size() -1));
+                       /* pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pCasterId.getFight().getCell(MapPoint.fromCellId(cell).pointSymetry(pCasterId.getMapPoint()).get_cellId()).getId()));
+                        pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pTargetId.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId()));
+*/
+                                //System.out.println();
+                                if (simetry != null && simetry.hasFighter()) {
+                                    verify = true;
+
+                                }
+                            }
+                            catch (NullPointerException e1){
+
+                            }
+                        }
+                        if (!verify && monsterInfo != null
+                                && monsterInfo.creatureGenericId == 3958
+                                && pTargetId.getTeam().getAliveFighters().anyMatch(f -> f instanceof SummonedFighter && f.asMonster().getGrade().getMonsterId() == 3960)) {
+                            //verify = true;
+                            try {
+                                final Fighter cadran = pTargetId.getTeam().getAliveFighters().filter(f -> f instanceof SummonedFighter && f.asMonster().getGrade().getMonsterId() == 3960).findFirst().get();
+                                final FightCell simetry = pCasterId.getFight().getCell(cadran.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId());
+                       /* pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pCasterId.getFight().getCell(MapPoint.fromCellId(cell).pointSymetry(pCasterId.getMapPoint()).get_cellId()).getId()));
+                        pTargetId.getFight().sendToField(new ShowCellMessage(pTargetId.getID(),pTargetId.getMapPoint().pointSymetry(pCasterId.getMapPoint()).get_cellId()));
+*/
+                                //System.out.println();
+                                if (simetry != null && simetry.hasFighter()) {
+                                    verify = true;
+
+                                }
+                            }
+                            catch (NullPointerException e1){
+
+                            }
                         }
                         break;
                     case 'W':

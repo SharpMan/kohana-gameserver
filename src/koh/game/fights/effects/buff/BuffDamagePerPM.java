@@ -27,20 +27,15 @@ public class BuffDamagePerPM extends BuffEffect {
         damageValue.setValue(val * nbr);
         //Poison Paralysant
 
-        int inte = castInfos.caster.getStats().getTotal(StatsEnum.INTELLIGENCE);
-        
-        if (inte < 0) {
-            inte = 0;
-        }
-        int pdom = castInfos.caster.getStats().getTotal(StatsEnum.ADD_DAMAGE_PERCENT);
-        if (pdom < 0) {
-            pdom = 0;
-        }
+        final int inte = Math.abs(castInfos.caster.getStats().getTotal(StatsEnum.INTELLIGENCE));
+
+        int pdom = Math.abs(castInfos.caster.getStats().getTotal(StatsEnum.ADD_DAMAGE_PERCENT));
         // on applique le boost
         // Ancienne formule : dgt = (int)(((100+inte+pdom)/100) *
         // dgt);
         damageValue.setValue((((100 + inte + pdom) / 100) * damageValue.getValue() /** 1.5*/));
-        
+        damageValue.add(castInfos.caster.getStats().getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS));
+        damageValue.add(castInfos.caster.getStats().getTotal(StatsEnum.ALL_DAMAGES_BONUS));
 
         return EffectDamage.applyDamages(this.castInfos, this.target, damageValue);
     }

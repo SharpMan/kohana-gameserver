@@ -166,7 +166,7 @@ public abstract class FightActivableObject implements IFightObject {
         final ArrayList<Fighter> targetsPerEffect = new ArrayList<>();
         int bestResult = -1;
         for (EffectInstanceDice effect : castSpell.getEffects()) {
-            System.out.println(castSpell.getSpellId() + " "+effect);
+            //System.out.println(castSpell.getSpellId() + " "+effect);
             targetsPerEffect.addAll(targets);
             targetsPerEffect.removeIf(f -> f instanceof SummonedReplacerFighter && ((SummonedReplacerFighter)f).isDying());
             targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, castSpell.getEffects(), effect, false, effect.triggers, target.getCellId())
@@ -210,7 +210,9 @@ public abstract class FightActivableObject implements IFightObject {
             this.m_fight.getCell(cell).removeObject(this);
         }
         if (this.m_fight.getActivableObjects().containsKey(this.caster)) {
-            this.m_fight.getActivableObjects().get(this.caster).remove(this);
+            if(!this.m_fight.getActivableObjects().get(this.caster).remove(this) && this.getObjectType() == FightObjectType.OBJECT_PORTAL){
+                log.error("Portland unremoved");
+            }
         }
 
     }

@@ -40,6 +40,7 @@ import koh.protocol.types.game.choice.CharacterBaseInformations;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.*;
 import koh.protocol.types.game.look.EntityLook;
+import koh.utils.Enumerable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -428,11 +429,14 @@ public class Player extends IGameActor implements Observer {
                 client.send(new CurrentMapMessage(currentMap.getId(), "649ae451ca33ec53bbcbcc33becf15f4")); //kdpelrkdpaielcmspekdprcvkdparkdb
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
+
                 PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
-                PlayerController.sendServerMessage(client, "Pour télecharger le patch du launcher <a href=\"http://gate.nakama-serveur.eu/kpatch.exe\"> cliquez ici</a>");
+               if(!DAO.getSettings().getBoolElement("Logging.Debug")) {
+                   PlayerController.sendServerMessage(client, "Pour télecharger le patch du launcher <a href=\"http://gate.nakama-serveur.eu/kpatch.exe\"> cliquez ici</a>");
 
-                client.send(new PopupWarningMessage((byte) 2, "#", "<center>Important</center>\n\n Si vous avez des problèmes de vote avec le launcher \n Veuillez télechargez le patch du launcher disponnible dans le chat"));
+                   client.send(new PopupWarningMessage((byte) 2, "#", "<center>Important</center>\n\n Si vous avez des problèmes de vote avec le launcher \n Veuillez télechargez le patch du launcher disponnible dans le chat"));
 
+               }
                 // client.send(new BasicNoOperationMessage());
                 client.send(new AlignmentRankUpdateMessage(this.alignmentGrade, false));
                 client.sequenceMessage();

@@ -3,6 +3,7 @@ package koh.game.controllers;
 import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.Layer;
 import koh.game.entities.environments.DofusMap;
+import koh.utils.Enumerable;
 
 /**
  *
@@ -53,14 +54,14 @@ public class MapController {
         return Layers;
     }
 
-    public static short[] unCompressStartingCells(DofusMap aThis, String BlueCells) {
-        if (BlueCells.isEmpty()) {
+    public static short[] unCompressStartingCells(DofusMap aThis, String blueCells) {
+        if (blueCells.isEmpty()) {
             return new short[0];
         }
-        short[] array = new short[BlueCells.split(",").length];
+        final short[] array = new short[blueCells.split(",").length];
         int i = 0;
         while (i < array.length) {
-            array[i] = Short.parseShort(BlueCells.split(",")[i]);
+            array[i] = Short.parseShort(blueCells.split(",")[i]);
             i++;
         }
         return array;

@@ -12,6 +12,7 @@ import koh.game.network.codec.ProtocolDecoder;
 import koh.protocol.client.Message;
 import koh.protocol.client.codec.Dofus2ProtocolEncoder;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -25,8 +26,8 @@ public class WorldServer {
     private final NioSocketAcceptor acceptor;
     private final InetSocketAddress address;
     public static GameLoader gameLoader = new GameLoader();
-    @Getter
-    private static final KolizeumExecutor koli = new KolizeumExecutor();
+    @Getter @Setter
+    private static KolizeumExecutor koli = new KolizeumExecutor();
 
     /**
      * 2 * estimated client optimal size (64)

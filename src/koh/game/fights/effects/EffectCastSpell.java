@@ -42,7 +42,7 @@ public class EffectCastSpell extends EffectBase {
         final SpellLevel spell = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide);
         if(castInfos.spellId== 89){ //paradox
             for (Fighter target : castInfos.targets) {
-                castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, true, true,castInfos.spellId);
+                castInfos.getFight().launchSpell(castInfos.caster, spell, target.getCellId(), true, true, true,castInfos.spellId);
             }
             return -1;
         }

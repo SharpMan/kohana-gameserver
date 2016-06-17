@@ -65,8 +65,8 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
     @Override
     public MonsterGroup genMonsterGroup(SubArea sub, DofusMap map){
         final int groupDifficulty = sub.getArea().getRANDOM().nextInt(2);
-        final int groupCount = this.MONSTER_COUNT_BY_DIFFICULTY[groupDifficulty][this.MONSTER_COUNT_BY_DIFFICULTY[groupDifficulty].length -1];
-        MonsterGrade mainMonster = monsters.find(sub.getMonsters()[sub.getArea().getRANDOM().nextInt(sub.getMonsters().length)]).getRandomGrade(sub.getArea().getRANDOM());
+        final int groupCount = Math.min(this.MONSTER_COUNT_BY_DIFFICULTY[groupDifficulty][this.MONSTER_COUNT_BY_DIFFICULTY[groupDifficulty].length -1],map.getBlueCells().length != 0 ? map.getBlueCells().length -1 : 100);
+        final MonsterGrade mainMonster = monsters.find(sub.getMonsters()[sub.getArea().getRANDOM().nextInt(sub.getMonsters().length)]).getRandomGrade(sub.getArea().getRANDOM());
 
 
         final MonsterGroup gr = MonsterGroup.builder()
@@ -86,9 +86,9 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                                 false))
                 .build();
         gr.getGameContextActorInformations(null).disposition.cellId = gr.getFixedCell();
-        for (int ii = 0; ii < groupCount; ii++) {
-            MonsterGrade randMonster = monsters.find(sub.getMonsters()[sub.getArea().getRANDOM().nextInt(sub.getMonsters().length)]).getRandomGrade(sub.getArea().getRANDOM());
-            ((GameRolePlayGroupMonsterInformations) gr.getGameContextActorInformations(null)).staticInfos.underlings[ii] = new MonsterInGroupInformations(randMonster.getMonsterId(), (byte) randMonster.getGrade(), randMonster.getMonster().getEntityLook());
+        for (int ii = 0; ii  < groupCount; ii++) {
+            final MonsterGrade randMonster = monsters.find(sub.getMonsters()[sub.getArea().getRANDOM().nextInt(sub.getMonsters().length)]).getRandomGrade(sub.getArea().getRANDOM());
+            ((GameRolePlayGroupMonsterInformations) gr.getGameContextActorInformations(null)).staticInfos.underlings[ii] = new MonsterInGroupInformations(randMonster.getMonsterId(), randMonster.getGrade(), randMonster.getMonster().getEntityLook());
         }
         return gr;
     }

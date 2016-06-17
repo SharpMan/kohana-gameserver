@@ -40,8 +40,10 @@ public class EffectHeal extends EffectBase {
         if (target.getLife() + heal.getValue() > target.getMaxLife()) {
             heal.setValue(target.getMaxLife() - target.getLife());
             if (heal.getValue() < 0) {
-                logger.error("TargetMaxlife {} TargettLife {}" ,target.getMaxLife(), target.getLife());
+                logger.debug("TargetMaxlife {} TargettLife {}" ,target.getMaxLife(), target.getLife());
+                heal.setValue(0);
             }
+
         }
 
         // Affectation

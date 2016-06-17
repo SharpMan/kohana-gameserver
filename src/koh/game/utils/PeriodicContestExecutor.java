@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class PeriodicContestExecutor implements Runnable {
 
     protected final static long TIME_REFRESH = DAO.getSettings().getBoolElement("Logging.Debug") ? 3000 : 30000; //debug 3000
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);//2
     private ScheduledFuture<?> myFuture;
 
     protected void initialize() {

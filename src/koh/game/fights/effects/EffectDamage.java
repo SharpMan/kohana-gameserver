@@ -29,6 +29,7 @@ public class EffectDamage extends EffectBase {
             });
         } else // Dommage direct
         {
+            int bestResult = -1;
             if (castInfos.targets.stream().anyMatch(target -> target.getStates().hasState(FightStateEnum.ECOLOGISTE) || target.getStates().hasState(FightStateEnum.ÉCOLOGISTE))) {
                 final Iterator<Fighter> targertsIterator = castInfos.targets.stream()
                         .filter(target -> target.getStates().hasState(FightStateEnum.ECOLOGISTE) || target.getStates().hasState(FightStateEnum.ÉCOLOGISTE))
@@ -42,11 +43,16 @@ public class EffectDamage extends EffectBase {
             }
             for (Fighter target : castInfos.targets) {
                 final MutableInt damageValue = new MutableInt(castInfos.randomJet(target));
-
-                if (EffectDamage.applyDamages(castInfos, target, damageValue) == -3) {
+                final int result = EffectDamage.applyDamages(castInfos, target, damageValue);
+                if(result < bestResult){
+                    bestResult = result;
+                }
+                if (result == -3) {
                     return -3;
                 }
             }
+            if(castInfos.isGlyph && bestResult != -1)
+                return bestResult;
         }
 
         return -1;

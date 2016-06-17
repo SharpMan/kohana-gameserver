@@ -24,7 +24,7 @@ public class AdminRightsCriterion extends Criterion {
         try {
             result = Integer.parseInt(literal);
         } catch (Exception e) {
-            throw new Error(String.format("Cannot build AdminRightsCriterion, {0} is not a valid role", this.literal));
+            throw new Error(String.format("Cannot build AdminRightsCriterion, %s is not a valid role", this.literal));
         }
         this.role = (byte) result;
     }

@@ -813,7 +813,7 @@ public class DebuffEnnemyAction extends AIAction {
             if (monster != null)
             {
                 final MonsterGrade monsterLevel = monster.getLevelOrNear(invocationLevel);
-                // Level de monstre existant
+                // level de monstre existant
                 if (monsterLevel != null)
                 {
                     List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
@@ -873,7 +873,7 @@ public class DebuffEnnemyAction extends AIAction {
         {
 
             MonsterGrade monsterLevel = DAO.getMonsters().find(invocationId).getLevelOrNear(invocationLevel);
-            // Level de monstre existant
+            // level de monstre existant
             if (monsterLevel != null)
             {
                 List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isDead()).collect(Collectors.toList());
@@ -1207,7 +1207,7 @@ public class DebuffEnnemyAction extends AIAction {
             // Template de monstre existante
             if (monster != null) {
                 final SpellLevel spell = DAO.getSpells().findSpell(spellId).getSpellLevels()[spellLevel == 0 ? 0 : spellLevel - 1];
-                // Level de monstre existant
+                // level de monstre existant
                 if (spell != null) {
                     final List<Fighter> possibleTargets = new ArrayList<Fighter>() {{
                         add(AI.getFighter());

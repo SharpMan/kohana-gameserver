@@ -120,6 +120,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int setCell(FightCell cell) {
+        if(cell != null)
+            previousCellPos.add(cell.getId());
         return this.setCell(cell, true);
     }
 
@@ -320,6 +322,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (buffResult != -1) {
             return buffResult;
         }
+
         this.previousFirstCellPos.add(this.myCell.Id);
         return myCell.beginTurn(this);
     }
@@ -638,6 +641,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         try {
             return this.myCell.Id;
         } catch (NullPointerException e) {
+            fight.getLogger().error(fight.getMap().getId());
             this.fight.getLogger().error(this.toString());
             e.printStackTrace();
             return 0;

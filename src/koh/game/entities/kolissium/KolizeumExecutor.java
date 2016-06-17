@@ -19,6 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -42,13 +43,14 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     };
 
     public KolizeumExecutor(){
-        this.waiting = new CopyOnWriteArrayList<Player>();
+        this.waiting = new CopyOnWriteArrayList<>();
         this.waitingGroups = new CopyOnWriteArrayList<>();
         super.initialize();
     }
 
     private CopyOnWriteArrayList<Player> waiting;
     private CopyOnWriteArrayList<ArenaParty> waitingGroups;
+    //private Map<Integer,Player> waiting = new ConcurrentHashMap<>())
     private static Map<Integer,Couple<Integer,Short>> lastPositions = new HashMap<>();
 
     @Getter
@@ -142,6 +144,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         for (Party group : waitingGroups) {
             waitingSize += group.memberCounts();
         }
+        System.out.println("waitingSize= "+waitingSize);
         if (waitingSize >= TEAM_SIZE * 2) {
             tryToStartFight();
         }
@@ -151,148 +154,156 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     }
 
     private void tryToStartFight() {
-        final ArrayList<Player> team1 = new ArrayList<Player>();
-        final ArrayList<Player> team2 = new ArrayList<Player>();
-        int lvlTeam1 = 0;
-        int lvlTeam2 = 0;
+        try {
+            final ArrayList<Player> team1 = new ArrayList<Player>();
+            final ArrayList<Player> team2 = new ArrayList<Player>();
+            int lvlTeam1 = 0;
+            int lvlTeam2 = 0;
 
-        final List<ArenaParty> groupSortedList = new ArrayList<ArenaParty>();
-        groupSortedList.addAll(this.nextWaitingGroups(2));
-        groupSortedList.sort(partySorter);
+            final List<ArenaParty> groupSortedList = new ArrayList<ArenaParty>();
+            System.out.println("getnextWaiting");
+            groupSortedList.addAll(this.nextWaitingGroups(2));
+            groupSortedList.sort(partySorter);
 
-        for (ArenaParty group : groupSortedList) {
-            if (!group.inKolizeum()) {
-                waitingGroups.remove(group);
-                continue;
-            }
-            final int groupSize = group.getPlayers().size();
-            final int grouplevel = group.getPlayers().stream().mapToInt(Player::getLevel).sum();
-            if (lvlTeam1 > lvlTeam2 && team1.size() + groupSize <= 3) {
-                lvlTeam2 += grouplevel;
-                team2.addAll(group.observers);
-            } else if (team1.size() + groupSize <= TEAM_SIZE) {
-                lvlTeam1 += grouplevel;
-                team1.addAll(group.getPlayers());
-            } else if (team2.size() + groupSize <= TEAM_SIZE) {
-                lvlTeam2 += grouplevel;
-                team2.addAll(group.getPlayers());
-            } else {
-                break;//all teams are ready
-            }
-            //group.sendMessageToGroup( "Votre groupe a été associé à une équipe de combat, en attente d'autres joueurs...");
-        }
-        groupSortedList.clear();
-
-        if (!waiting.isEmpty()) {
-            final List<Player> sortedList = new ArrayList<>();
-            Player p;
-            sortedList.addAll(this.nextWaitingPlayers(2 * TEAM_SIZE - (team1.size() + team2.size())));
-            Collections.sort(sortedList, playerSorter);
-            p = waiting.get(0);
-
-            while (team1.size() != TEAM_SIZE || team2.size() != TEAM_SIZE || p != null) {
-                if (lvlTeam1 > lvlTeam2 && team2.size() < 3) {
-                    if (p == null) {
-                        continue;
-                    }
-                    lvlTeam2 += p.getLevel();
-                    team2.add(p);
-                    sortedList.remove(p);
-                } else if (team1.size() < TEAM_SIZE) {
-                    if (p == null) {
-                        continue;
-                    }
-                    lvlTeam1 += p.getLevel();
-                    team1.add(p);
-                    sortedList.remove(p);
-                } else if (team2.size() < TEAM_SIZE) {
-                    if (p == null) {
-                        continue;
-                    }
-                    lvlTeam2 += p.getLevel();
-                    team2.add(p);
-                    sortedList.remove(p);
+            for (ArenaParty group : groupSortedList) {
+                if (!group.inKolizeum()) {
+                    waitingGroups.remove(group);
+                    System.out.println("removing group cause not inkoli");
+                    continue;
+                }
+                final int groupSize = group.getPlayers().size();
+                final int grouplevel = group.getPlayers().stream().mapToInt(Player::getLevel).sum();
+                if (lvlTeam1 > lvlTeam2 && team1.size() + groupSize <= 3) {
+                    lvlTeam2 += grouplevel;
+                    team2.addAll(group.observers);
+                } else if (team1.size() + groupSize <= TEAM_SIZE) {
+                    lvlTeam1 += grouplevel;
+                    team1.addAll(group.getPlayers());
+                } else if (team2.size() + groupSize <= TEAM_SIZE) {
+                    lvlTeam2 += grouplevel;
+                    team2.addAll(group.getPlayers());
                 } else {
                     break;//all teams are ready
                 }
-
-                final Iterator<Player> it = sortedList.iterator();
-                if (it.hasNext()) {
-                    p = it.next();
-                } else {
-                    p = null;
-                }
-                //P is Initialized => recheck
+                //group.sendMessageToGroup( "Votre groupe a été associé à une équipe de combat, en attente d'autres joueurs...");
             }
-            p = null;
-            sortedList.clear();
+            groupSortedList.clear();
+
+            if (!waiting.isEmpty()) {
+                final List<Player> sortedList = new ArrayList<>();
+                Player p;
+                System.out.println("getnextPlayerWiaing");
+                sortedList.addAll(this.nextWaitingPlayers(2 * TEAM_SIZE - (team1.size() + team2.size())));
+                Collections.sort(sortedList, playerSorter);
+                System.out.println("get first in list");
+                p = waiting.get(0);
+
+                while (team1.size() != TEAM_SIZE || team2.size() != TEAM_SIZE || p != null) {
+                    if (lvlTeam1 > lvlTeam2 && team2.size() < 3) {
+                        if (p == null) {
+                            continue;
+                        }
+                        lvlTeam2 += p.getLevel();
+                        team2.add(p);
+                        sortedList.remove(p);
+                    } else if (team1.size() < TEAM_SIZE) {
+                        if (p == null) {
+                            continue;
+                        }
+                        lvlTeam1 += p.getLevel();
+                        team1.add(p);
+                        sortedList.remove(p);
+                    } else if (team2.size() < TEAM_SIZE) {
+                        if (p == null) {
+                            continue;
+                        }
+                        lvlTeam2 += p.getLevel();
+                        team2.add(p);
+                        sortedList.remove(p);
+                    } else {
+                        break;//all teams are ready
+                    }
+
+                    final Iterator<Player> it = sortedList.iterator();
+                    if (it.hasNext()) {
+                        p = it.next();
+                    } else {
+                        p = null;
+                    }
+                    //P is Initialized => recheck
+                }
+                p = null;
+                sortedList.clear();
+            }
+
+            final int teamDiff = Math.abs(lvlTeam1 - lvlTeam2);
+            if (teamDiff > TEAM_LVL_DIFF_MAX) { //TODO check 2 team1's ip vs team2's ip have seen
+                return;
+            } else if (team1.size() != TEAM_SIZE || team2.size() != TEAM_SIZE) {
+                System.out.println("TEAMSIZE !"+team1.size()+" "+team2.size());
+                return;
+            } else if (team1.stream().anyMatch(team2::contains) || team2.stream().anyMatch(team1::contains)) {
+                System.out.println("team depracated");
+                return;
+            } else if ((int) team1.stream().map(Player::getBreed).distinct().count() != team1.size()
+                    || (int) team2.stream().map(Player::getBreed).distinct().count() != team2.size()) {
+                System.out.println("too many breed");
+                return;
+            }
+            final ArenaParty team1Group = team1.stream()
+                    .filter(p -> p.getClient().getParty() instanceof ArenaParty)
+                    .map(p -> p.getClient().getParty().asArena())
+                    .max(Comparator.comparing(ArenaParty::memberCounts))
+                    .orElse(null);
+            team1.stream().filter(p -> p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team1Group)
+                    .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
+
+            final ArenaParty team2Group = team2.stream()
+                    .filter(p -> p.getClient().getParty() instanceof ArenaParty)
+                    .map(p -> p.getClient().getParty().asArena())
+                    .max(Comparator.comparing(ArenaParty::memberCounts))
+                    .orElse(null);
+
+            team2.stream().filter(p -> p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team2Group)
+                    .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
+
+            if (team1Group != null) {
+                team1Group.setInKolizeum(false);
+                team1.stream().filter(p -> !team1Group.containsPlayer(p)).forEach(team1Group::addPlayer);
+                this.waitingGroups.remove(team1Group);
+            }
+            if (team2Group != null) {
+                team1Group.setInKolizeum(false);
+                team2.stream().filter(p -> !team2Group.containsPlayer(p)).forEach(team2Group::addPlayer);
+                this.waitingGroups.remove(team2Group);
+            }
+
+            final ArenaParty party = team1Group != null ? team1Group : new ArenaParty(team1), party1 = team2Group != null ? team2Group : new ArenaParty(team2);
+
+
+            team1.forEach(waiting::remove);
+            team2.forEach(waiting::remove);
+
+
+            party1.setInKolizeum(true);
+            party.setInKolizeum(true);
+            party.sendToField(new GameRolePlayArenaRegistrationStatusMessage(true, PvpArenaStepEnum.ARENA_STEP_WAITING_FIGHT, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+            party1.sendToField(new GameRolePlayArenaRegistrationStatusMessage(true, PvpArenaStepEnum.ARENA_STEP_WAITING_FIGHT, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+
+
+            final ArenaBattle battle = new ArenaBattle(party1, party);
+            DAO.getArenas().add(battle);
+
+
+            party.sendFightProposition(battle.getId());
+            party1.sendFightProposition(battle.getId());
+
+
+            //Invitation
         }
-
-        final int teamDiff = Math.abs(lvlTeam1 - lvlTeam2);
-        if (teamDiff > TEAM_LVL_DIFF_MAX) { //TODO check 2 team1's ip vs team2's ip have seen
-            return;
+        catch (Exception e){
+            e.printStackTrace();
         }
-        else if (team1.size() != TEAM_SIZE || team2.size() != TEAM_SIZE) {
-            return;
-        }
-        else if(team1.stream().anyMatch(team2::contains)  || team2.stream().anyMatch(team1::contains)){
-            return;
-        }
-        else if(team1.stream().filter(p -> ArrayUtils.contains(PILLAR, p.getBreed())).count() > 1
-                || team2.stream().filter(p -> ArrayUtils.contains(PILLAR, p.getBreed())).count() > 1){
-            return;
-        }
-        final ArenaParty team1Group = team1.stream()
-                .filter(p -> p.getClient().getParty() instanceof ArenaParty)
-                .map(p -> p.getClient().getParty().asArena())
-                .max(Comparator.comparing(ArenaParty::memberCounts))
-                .orElse(null);
-        team1.stream().filter(p-> p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team1Group)
-                .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
-
-        final ArenaParty team2Group = team2.stream()
-                .filter(p -> p.getClient().getParty() instanceof ArenaParty)
-                .map(p -> p.getClient().getParty().asArena())
-                .max(Comparator.comparing(ArenaParty::memberCounts))
-                .orElse(null);
-
-        team2.stream().filter(p-> p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team2Group)
-                .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
-
-        if(team1Group != null){
-            team1Group.setInKolizeum(false);
-            team1.stream().filter(p -> !team1Group.containsPlayer(p)).forEach(team1Group::addPlayer);
-            this.waitingGroups.remove(team1Group);
-        }
-        if(team2Group != null){
-            team1Group.setInKolizeum(false);
-            team2.stream().filter(p -> !team2Group.containsPlayer(p)).forEach(team2Group::addPlayer);
-            this.waitingGroups.remove(team2Group);
-        }
-
-        final ArenaParty party = team1Group != null ? team1Group :new ArenaParty(team1), party1 = team2Group != null ? team2Group :new ArenaParty(team2);
-
-
-
-        team1.forEach(waiting::remove);
-        team2.forEach(waiting::remove);
-
-
-        party1.setInKolizeum(true);
-        party.setInKolizeum(true);
-        party.sendToField(new GameRolePlayArenaRegistrationStatusMessage(true, PvpArenaStepEnum.ARENA_STEP_WAITING_FIGHT, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
-        party1.sendToField(new GameRolePlayArenaRegistrationStatusMessage(true, PvpArenaStepEnum.ARENA_STEP_WAITING_FIGHT, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
-
-
-        final ArenaBattle battle = new ArenaBattle(party1,party);
-        DAO.getArenas().add(battle);
-
-
-        party.sendFightProposition(battle.getId());
-        party1.sendFightProposition(battle.getId());
-
-
-        //Invitation
 
     }
 
@@ -335,42 +346,75 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     private List<ArenaParty> nextWaitingGroups(int bound) {
         final List<ArenaParty> parties = new ArrayList<>();
         int tests = 0;
-        while (parties.size() < bound) {
-            if (tests > 20 || this.waitingGroups.size() <= bound) {
-                return waitingGroups;
+            while (parties.size() < bound) {
+                if (tests > 20 || this.waitingGroups.size() <= bound) {
+                    return waitingGroups;
+                }
+                int nextIndex = RAND.nextInt(this.waitingGroups.size() - 1);
+                final ArenaParty next = waitingGroups.get(nextIndex);
+                if (next != null && !parties.contains(next)) {
+                    parties.add(next);
+                }
+                tests++;
             }
-            int nextIndex = RAND.nextInt(this.waitingGroups.size() - 1);
-            final ArenaParty next = waitingGroups.get(nextIndex);
-            if (next != null && !parties.contains(next)) {
-                parties.add(next);
-            }
-            tests++;
-        }
+
         return parties;
     }
 
     private List<Player> nextWaitingPlayers(int bound) {
         final List<Player> players = new ArrayList<Player>();
         int tests = 0;
-        while (players.size() < bound) {
-            if (tests > 20 || this.waiting.size() <= bound) {
-                return this.waiting;
+            while (players.size() < bound) {
+                if (tests > 20 || this.waiting.size() <= bound) {
+                    return this.waiting;
+                }
+                int nextIndex = RAND.nextInt(this.waiting.size() - 1);
+                final Player next = waiting.get(nextIndex);
+                if (next != null && !players.contains(next)) {
+                    players.add(next);
+                }
+                tests++;
             }
-            int nextIndex = RAND.nextInt(this.waiting.size() - 1);
-            final Player next = waiting.get(nextIndex);
-            if (next != null && !players.contains(next)) {
-                players.add(next);
-            }
-            tests++;
-        }
+
         return players;
     }
 
-    protected static final SecureRandom random = new SecureRandom();
+   // protected static final SecureRandom random = new SecureRandom();
+   protected static final Random random = new Random();
 
     protected static final DofusMap getRandomFightingMap(){
         final int nextIndex = random.nextInt(MAPS.length - 1);
         return DAO.getMaps().findTemplate(MAPS[nextIndex]);
+    }
+
+    @Override
+    public void shutdown(){
+        try {
+            ArrayList<Player> players = new ArrayList<>(waiting);
+            for (Player player : players) {
+                if(player.getClient() != null) {
+                    player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
+                    player.getClient().delGameAction(GameActionTypeEnum.KOLI);
+                }
+                player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+
+            }
+            ArrayList<ArenaParty> parties = new ArrayList<>(waitingGroups);
+            for (ArenaParty party : parties) {
+                party.setInKolizeum(false);
+                for (Player player : party.getPlayers()) {
+                    if(player.getClient() != null) {
+                        player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
+                        player.getClient().delGameAction(GameActionTypeEnum.KOLI);
+                    }
+                    player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        super.shutdown();
     }
 
     public static void teleportLastPosition(Player p ){

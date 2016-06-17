@@ -6,6 +6,7 @@ import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
  *
@@ -15,10 +16,15 @@ public class BuffArmor extends BuffEffect {
 
     private final int JET;
 
-    public BuffArmor(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
-        this.JET = CastInfos.randomJet(Target);
-        Target.getStats().addBoost(StatsEnum.ADD_ARMOR, (JET * (100 + (CastInfos.caster.getLevel() * 5)) / 100));
+    public BuffArmor(EffectCast CastInfos, Fighter target) {
+        super(CastInfos, target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+        this.JET = CastInfos.randomJet(target);
+    }
+
+    @Override
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
+        target.getStats().addBoost(StatsEnum.ADD_ARMOR, (JET * (100 + (castInfos.caster.getLevel() * 5)) / 100));
+        return super.applyEffect(damageValue,damageInfos);
     }
 
     @Override

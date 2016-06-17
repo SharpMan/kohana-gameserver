@@ -355,7 +355,7 @@ public class PlayerDAOImpl extends PlayerDAO {
         if (myCharacterByName.get(name.toLowerCase()) != null)
             return true;//if already loaded
 
-        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("SELECT 1 FROM `character` WHERE LOWER(nickname) = LOWER(?);")) {
+        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("SELECT 1 FROM `character` WHERE LOWER(nickname) = LOWER(?) AND removed = 0;")) {
             PreparedStatement pStatement = conn.getStatement();
             pStatement.setString(1, name);
 

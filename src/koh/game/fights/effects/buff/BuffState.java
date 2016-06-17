@@ -1,7 +1,10 @@
 package koh.game.fights.effects.buff;
 
+import koh.game.dao.DAO;
+import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
+import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -18,14 +21,23 @@ public class BuffState extends BuffEffect {
     public BuffState(EffectCast CastInfos, Fighter target) {
         super(CastInfos, target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
         if(this.duration != -1 && castInfos.effectType != StatsEnum.INVISIBILITY
-                && !(castInfos.caster == target && FightStateEnum.valueOf(castInfos.effect.value) == FightStateEnum.PESANTEUR)) {
+                && !(castInfos.caster == target && getState() == FightStateEnum.PESANTEUR)) {
             this.duration++;
         }
+    }
+
+    private FightStateEnum getState(){
+        return FightStateEnum.valueOf(castInfos.effect.value);
     }
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.target.getStates().addState(this);
+        /*if(getState() == FightStateEnum.Téléfrag && this.target instanceof SummonedFighter && target.asSummon().getGrade().getMonsterId() == 3958) { // Synchro
+            final SpellLevel spell = DAO.getSpells().findSpell(5435).getLevelOrNear(target.asSummon().getGrade().getLevel());
+            castInfos.getFight().launchSpell(target, spell, target.getCellId(), true, true, true, castInfos.spellId);
+           // target.tryDie(castInfos.caster.getID(), true);
+        }*/
         return super.applyEffect(DamageValue, DamageInfos);
     }
 

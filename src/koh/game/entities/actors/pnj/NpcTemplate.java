@@ -81,7 +81,7 @@ public class NpcTemplate {
                     Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()));
                 }
 
-                itemList = Objects.map(x -> x.toShop()).toArray(ObjectItemToSellInNpcShop[]::new);
+                itemList = Objects.map(x -> x.toShop()).filter(x -> x != null).toArray(ObjectItemToSellInNpcShop[]::new);
             }
         }
         return itemList;

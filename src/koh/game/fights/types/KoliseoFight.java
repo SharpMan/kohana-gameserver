@@ -30,7 +30,7 @@ import java.util.Calendar;
  */
 public class KoliseoFight extends Fight {
 
-    private final static SimpleLogger koliseoLog =  new SimpleLogger("logs\\koli\\"+SimpleLogger.getCurrentTimeStamp()+".txt", 0);
+    private SimpleLogger koliseoLog;
 
 
     public KoliseoFight(DofusMap map, WorldClient attacker, WorldClient defender) {
@@ -105,28 +105,38 @@ public class KoliseoFight extends Fight {
 
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_VICTORY);
-            log.append("Winner : ").append(fighter.getPlayer().getNickName()).append(" ").append(fighter.getPlayer().getLevel()).append(" ");
+            log.append("Winner : ").append(fighter.getPlayer().getNickName()).append("Cote ").append(fighter.getPlayer().getKolizeumRate().getRatingd()).append(" ");
 
             if(fighter.isLeft())
                 continue;
-            int cote = (FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_PVP_ARENA));
+            final int diviser = AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_PVP_ARENA);
+            int cote = FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), false) / diviser;
             final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() !=null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
+            int kamas  = RANDOM.nextInt(150) + 40;
             if(count == getEnnemyTeam(getWinners()).getFighters().count()){
                 cote  = 0;
+                kamas = 10;
             }else if(count != 0 && (getEnnemyTeam(getWinners()).getFighters().count() - count) >= 1){
                 cote  /= (count * 4);
+                kamas /= (count * 4);
             }
-            final int tokenQua = (int) Math.abs(cote * 0.15f);
+            fighter.getPlayer().addKamas(kamas);
+            final int tokenQua = (int) Math.max(Math.abs(cote * 0.25f),1);
             final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), ArenaBattle.KOLIZETON.getId(), 63, fighter.getPlayer().getID(), tokenQua, EffectHelper.generateIntegerEffect(ArenaBattle.KOLIZETON.getPossibleEffects(), EffectGenerationType.NORMAL, false));
             if (fighter.getPlayer().getInventoryCache().add(item, true)) {
                 item.setNeedInsert(true);
             }
 
-            log.append("cote += ").append(cote).append("Zetons ").append(tokenQua).append("\n");
+            log.append("cote += ")
+                    .append(cote)
+                    .append(" Zetons=").append(tokenQua)
+                    .append(" Divizer =").append(diviser)
+                    .append(" OpponentSameIpCount=").append(count)
+                    .append("\n");
             this.myResult.results.add(
                     new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY,
                             fighter.getWave(),
-                            new FightLoot(tokenQua > 0 ? (new int[]{ ArenaBattle.KOLIZETON.getId(), tokenQua }) : new int[0], 0),
+                            new FightLoot(tokenQua > 0 ? (new int[]{ ArenaBattle.KOLIZETON.getId(), tokenQua }) : new int[0], kamas),
                             fighter.getID(),
                             fighter.isAlive(),
                             (byte) fighter.getLevel(),
@@ -135,8 +145,15 @@ public class KoliseoFight extends Fight {
 
         }
         log.append("=========================================/n");
-        koliseoLog.write(log.toString());
-        koliseoLog.newLine();
+        try {
+            koliseoLog = new SimpleLogger("logs/koli/" + SimpleLogger.getCurrentDayStamp() + ".txt", 0);
+            koliseoLog.write(log.toString());
+            koliseoLog.newLine();
+            koliseoLog.close();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
 
         super.endFight();
     }
