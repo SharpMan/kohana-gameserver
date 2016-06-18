@@ -592,6 +592,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 double num1 = Fight.RANDOM.nextDouble();
                 final double num2 = (double) Arrays.stream(spellEffects).mapToInt(x -> x.random).sum();
                 boolean flag = false;
+                final short castingCell = fighter.getCellId();
                 for (final Iterator<EffectInstanceDice> effectIterator = ((Arrays.stream(spellEffects).sorted((e1, e2) -> Integer.compare(ArrayUtils.indexOf(FIRST_EFFECTS, e2.getEffectType()), ArrayUtils.indexOf(FIRST_EFFECTS, e1.getEffectType())))).iterator()); effectIterator.hasNext(); ) {
                     final EffectInstanceDice effect = effectIterator.next();
                     if (effect.random > 0) {
@@ -627,6 +628,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     final EffectCast castInfos = new EffectCast(effect.getEffectType(), spellId == -1 ? spellLevel.getSpellId() : spellId, cellId, num1, effect, fighter, targets.get(effect), false, StatsEnum.NONE, 0, spellLevel);
                     castInfos.targetKnownCellId = cellId;
                     castInfos.oldCell = oldCell;
+                    castInfos.casterOldCell = castingCell;
                     castInfos.setCritical(isCc);
                     if (EffectBase.tryApplyEffect(castInfos) == -3) {
                         break;
@@ -1235,7 +1237,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         }
 
-        fighter.getPreviousCellPos().add(fighter.getCellId());
+        //fighter.getPreviousCellPos().add(fighter.getCellId());
 
         for (int i = 0; i < path.getCellsPath().length; ++i) {
             if (Pathfunction.isStopCell(this, fighter.getTeam(), path.getCellsPath()[i].getId(), fighter)) {
@@ -1244,7 +1246,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     break;
                 }
             }
-            fighter.getPreviousCellPos().add(path.getCellsPath()[i].getId());
+            if(i != path.getCellsPath().length)
+                fighter.getPreviousCellPos().add(path.getCellsPath()[i].getId());
         }
 
         GameMapMovement gameMapMovement = new GameMapMovement(this, fighter, path.getClientPathKeys());
@@ -1278,7 +1281,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         this.startSequence(SequenceTypeEnum.SEQUENCE_MOVE);
 
-        fighter.getPreviousCellPos().add(fighter.getCellId());
+        //fighter.getPreviousCellPos().add(fighter.getCellId());
 
         if ((fighter.getTackledMP() > 0 || fighter.getTackledAP() > 0) && !this.currentFighter.getStates().hasState(FightStateEnum.ENRACINÉ)) {
             this.onTackled(fighter, path.getMovementLength());
@@ -1288,7 +1291,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
 
         }
-        GameMapMovement gameMapMovement = new GameMapMovement(this, fighter, path.serializePath());
+        final GameMapMovement gameMapMovement = new GameMapMovement(this, fighter, path.serializePath());
 
         this.sendToField(new FieldNotification(new GameMapMovementMessage(gameMapMovement.keyMovements, fighter.getID())) {
             @Override
@@ -1297,9 +1300,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
         });
 
+        path.transitCells.forEach(fighter.getPreviousCellPos()::add);
+        if(!path.transitCells.isEmpty() && !fighter.getPreviousCellPos().isEmpty()){
+            fighter.getPreviousCellPos().remove(fighter.getPreviousCellPos().size() -1);
+        }
+
         fighter.usedMP += path.getMovementLength();
         this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -path.getMovementLength()));
-        fighter.getPreviousCellPos().add(path.getEndCell());
+
         fighter.setCell(this.getCell(path.getEndCell()));
         fighter.setDirection(path.getEndDirection());
         this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);

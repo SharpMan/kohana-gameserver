@@ -89,10 +89,6 @@ public class EffectPush extends EffectBase {
                     break;
                 case PULL_FORWARD:
                     direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId());
-                    System.out.println(castInfos.caster.getMyCell().hasGameObject(FightObjectType.OBJECT_PORTAL));
-                    System.out.println(Pathfunction.goalDistance(castInfos.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId()));
-                    System.out.println(!castInfos.caster.getPreviousCellPos().isEmpty());
-                    System.out.println();
                     if(castInfos.isTrap){
                         if(target.getCellId() == castInfos.targetKnownCellId)
                             continue;
@@ -101,12 +97,8 @@ public class EffectPush extends EffectBase {
                     else if(castInfos.isGlyph){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
                     }
-                    else if(castInfos.spellId == 5390
-                            && castInfos.caster.getMyCell().hasGameObject(FightObjectType.OBJECT_PORTAL)
-                            && Pathfunction.goalDistance(castInfos.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId()) > 2
-                            && !castInfos.caster.getPreviousCellPos().isEmpty()){
-                        System.out.println("aywa");
-                        direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getPreviousCellPos().get(castInfos.caster.getPreviousCellPos().size() -1));
+                    else if(castInfos.spellId == 5390){ //Odysee
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.casterOldCell);
                     }
                     else if(castInfos.spellId == 5382 || castInfos.spellId == 5475 /*|| castInfos.spellId == 5390*/){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
@@ -176,10 +168,11 @@ public class EffectPush extends EffectBase {
 
             currentCell = nextCell;
         }
+        target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+
 
         int result = target.setCell(currentCell);
 
-        target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
 
         target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
 

@@ -17,6 +17,7 @@ import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.fighters.SummonedFighter;
 import koh.game.fights.layers.FightActivableObject;
+import koh.game.fights.layers.FightBlyph;
 import koh.game.fights.layers.FightTrap;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -876,10 +877,10 @@ public class SelfActingAction extends AIAction {
                 {
                     layerScore *= 4;//Immediat
                 }
-                /*else if (layer instanceof FightBlypheLayer)
+                else if (layer instanceof FightBlyph)
                 {
                     layerScore *= 2;//Debut de tour
-                }*/
+                }
                 score += layerScore;
             }
         }

@@ -120,8 +120,6 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int setCell(FightCell cell) {
-        if(cell != null)
-            previousCellPos.add(cell.getId());
         return this.setCell(cell, true);
     }
 
@@ -134,6 +132,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public int setCell(FightCell cell, boolean runEvent) {
         int addResult;
         if (this.myCell != null) {
+            previousCellPos.add(myCell.getId());
             this.myCell.removeObject(this); // On vire le fighter de la cell:
             if (this.myCell.hasGameObject(FightObjectType.OBJECT_PORTAL)) {
                 ((FightPortal) this.myCell.getObjects(FightObjectType.OBJECT_PORTAL)[0]).enable(this, true);

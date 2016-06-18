@@ -52,7 +52,7 @@ public class EffectCast {
     }
 
     public int spellId, fakeValue, damageValue, parentUID, glyphId;
-    public short cellId,oldCell,targetKnownCellId;
+    public short cellId,oldCell,targetKnownCellId, casterOldCell;
     public boolean isReflect, isPoison, isCAC, isTrap, isGlyph, isReturnedDamages,isPoutch;
     @Getter @Setter
     private boolean critical;

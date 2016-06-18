@@ -331,7 +331,7 @@ public class CharacterInventory {
                 player.send(new ObjectErrorMessage(ObjectErrorEnum.LEVEL_TOO_LOW));
                 return;
             }
-            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_SHIELD && hasWeaponTwoHanded()) //Todo IsValidConditions
+            if (item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_SHIELD && hasWeaponTwoHanded())
             {
                 player.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 78, new String[0]));
                 return;
