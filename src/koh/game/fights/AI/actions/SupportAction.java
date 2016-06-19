@@ -15,6 +15,7 @@ import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectPush;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.layers.FightActivableObject;
+import koh.game.fights.layers.FightBlyph;
 import koh.game.fights.layers.FightTrap;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -34,15 +35,13 @@ public class SupportAction extends AIAction {
         int baseScore = 13;
         baseScore *= effect.randomJet();
 
-        for (Fighter target : targets)
-        {
+        for (Fighter target : targets) {
             int currScore = baseScore;
-            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY)
-            {
+            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY) {
                 score -= currScore;
                 continue;
             }
-            double percentLife = Math.ceil((double)(target.getLife() / target.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (target.getLife() / target.getMaxLife()) * 100);
             if (percentLife < 10)
                 currScore *= 12;
             if (percentLife < 20)
@@ -53,31 +52,23 @@ public class SupportAction extends AIAction {
                 currScore *= 3;
             else if (percentLife < 75)
                 currScore *= 2;
-            else if (percentLife >= 95)
-            {
+            else if (percentLife >= 95) {
                 continue;
             }
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
-                if (target == AI.getFighter())
-                {
+            if (reverse) {
+                if (target == AI.getFighter()) {
                     score -= currScore;
-                }
-                else if (target.getTeam() == AI.getFighter().getTeam())
+                } else if (target.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 4;
                 else
                     score += currScore;
-            }
-            else
-            {
-                if (target == AI.getFighter())
-                {
+            } else {
+                if (target == AI.getFighter()) {
                     score += currScore;
-                }
-                else if (target.getTeam() != AI.getFighter().getTeam())
+                } else if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore * 4;
@@ -92,20 +83,17 @@ public class SupportAction extends AIAction {
         double score = 0;
         int baseScore = 10;
 
-        if (!notUseJet)
-        {
+        if (!notUseJet) {
             baseScore *= effect.randomJet();
         }
 
-        for (Fighter target : targets)
-        {
+        for (Fighter target : targets) {
             int currScore = baseScore;
-            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY)
-            {
+            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY) {
                 score -= currScore;
                 continue;
             }
-            double percentLife = Math.ceil((double)(target.getLife() / target.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (target.getLife() / target.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 8;
             else if (percentLife < 30)
@@ -117,27 +105,20 @@ public class SupportAction extends AIAction {
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
-                if (target == AI.getFighter())
-                {
+            if (reverse) {
+                if (target == AI.getFighter()) {
                     score -= currScore;
-                }
-                else if (target.getTeam() == AI.getFighter().getTeam())
+                } else if (target.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 4;
                 else
                     score += currScore;
-            }
-            else
-            {
-                if (target == AI.getFighter())
-                {
+            } else {
+                if (target == AI.getFighter()) {
                     score += currScore;
-                }
-                else if (target.getTeam() != AI.getFighter().getTeam())
+                } else if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
-                    score += currScore*4;
+                    score += currScore * 4;
 
             }
         }
@@ -150,20 +131,17 @@ public class SupportAction extends AIAction {
         double score = 0;
         int baseScore = 12;
 
-        if (!notUseJet)
-        {
+        if (!notUseJet) {
             baseScore *= effect.randomJet();
         }
 
-        for (Fighter target : targets)
-        {
+        for (Fighter target : targets) {
             int currScore = baseScore;
-            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY)
-            {
+            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY) {
                 score -= currScore;
                 continue;
             }
-            double percentLife = Math.ceil((double)(target.getLife() / target.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (target.getLife() / target.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 8;
             else if (percentLife < 30)
@@ -175,27 +153,20 @@ public class SupportAction extends AIAction {
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
-                if (target == AI.getFighter())
-                {
+            if (reverse) {
+                if (target == AI.getFighter()) {
                     score -= currScore;
-                }
-                else if (target.getTeam() == AI.getFighter().getTeam())
+                } else if (target.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 4;
                 else
                     score += currScore;
-            }
-            else
-            {
-                if (target == AI.getFighter())
-                {
+            } else {
+                if (target == AI.getFighter()) {
                     score += currScore;
-                }
-                else if (target.getTeam() != AI.getFighter().getTeam())
+                } else if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
-                    score += currScore *4;
+                    score += currScore * 4;
             }
         }
 
@@ -207,20 +178,17 @@ public class SupportAction extends AIAction {
         double score = 0;
         int baseScore = 15;
 
-        if (!notUseJet)
-        {
+        if (!notUseJet) {
             baseScore *= effect.randomJet();
         }
 
-        for (Fighter target : targets)
-        {
+        for (Fighter target : targets) {
             int currScore = baseScore;
-            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY)
-            {
+            if (target.getStates().hasState(FightStateEnum.INVISIBLE) && effect.getEffectType() == StatsEnum.INVISIBILITY) {
                 score -= currScore;
                 continue;
             }
-            double percentLife = Math.ceil((double)(target.getLife() / target.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (target.getLife() / target.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 8;
             else if (percentLife < 30)
@@ -232,27 +200,20 @@ public class SupportAction extends AIAction {
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
-                if (target == AI.getFighter())
-                {
+            if (reverse) {
+                if (target == AI.getFighter()) {
                     score -= currScore;
-                }
-                else if (target.getTeam() == AI.getFighter().getTeam())
+                } else if (target.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 4;
                 else
                     score += currScore;
-            }
-            else
-            {
-                if (target == AI.getFighter())
-                {
+            } else {
+                if (target == AI.getFighter()) {
                     score += currScore;
-                }
-                else if (target.getTeam() != AI.getFighter().getTeam())
+                } else if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
-                    score += currScore *4;
+                    score += currScore * 4;
             }
         }
 
@@ -264,10 +225,9 @@ public class SupportAction extends AIAction {
         double score = 0;
         int baseScore = 2;
         baseScore *= effect.randomJet();
-        for (Fighter target : targets)
-        {
+        for (Fighter target : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(target.getLife() / target.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (target.getLife() / target.getMaxLife()) * 100);
             if (percentLife < 5)
                 currScore *= 8;
             else if (percentLife < 10)
@@ -280,15 +240,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (target.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (target.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
@@ -304,10 +261,9 @@ public class SupportAction extends AIAction {
         double score = 0;
         int baseScore = 4;
         baseScore *= Math.abs(effect.diceNum);
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 5)
                 currScore *= 8;
             else if (percentLife < 10)
@@ -320,15 +276,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
@@ -344,10 +297,9 @@ public class SupportAction extends AIAction {
         double score = 0;
         int baseScore = 5;
         baseScore *= Math.abs(effect.diceNum);
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 5)
                 currScore *= 8;
             else if (percentLife < 10)
@@ -360,15 +312,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
@@ -384,10 +333,9 @@ public class SupportAction extends AIAction {
         double score = 0;
         int baseScore = 6;
         baseScore *= Math.abs(effect.diceNum);
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 5)
                 currScore *= 8;
             else if (percentLife < 10)
@@ -400,15 +348,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 3;
                 else
@@ -427,10 +372,9 @@ public class SupportAction extends AIAction {
 
         baseScore *= effect.randomJet();
 
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             currScore *= fighter.getMaxAP();
             if (percentLife < 20)
                 currScore *= 2;
@@ -444,15 +388,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -467,15 +408,13 @@ public class SupportAction extends AIAction {
     protected double scoreSubBuff_I(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
         double score = 0;
         int baseScore = 12;
-        if (!notUseJet)
-        {
+        if (!notUseJet) {
             baseScore *= effect.randomJet();
         }
 
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 2;
             else if (percentLife < 30)
@@ -487,15 +426,12 @@ public class SupportAction extends AIAction {
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -510,15 +446,13 @@ public class SupportAction extends AIAction {
     protected double scoreSubBuff_II(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
         double score = 0;
         int baseScore = 15;
-        if (!notUseJet)
-        {
+        if (!notUseJet) {
             baseScore *= effect.randomJet();
         }
 
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 2;
             else if (percentLife < 30)
@@ -530,15 +464,12 @@ public class SupportAction extends AIAction {
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -553,15 +484,13 @@ public class SupportAction extends AIAction {
     protected double scoreSubBuff_III(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
         double score = 0;
         int baseScore = 18;
-        if (!notUseJet)
-        {
+        if (!notUseJet) {
             baseScore *= effect.randomJet();
         }
 
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 2;
             else if (percentLife < 30)
@@ -573,15 +502,12 @@ public class SupportAction extends AIAction {
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -596,15 +522,13 @@ public class SupportAction extends AIAction {
     protected double scoreSubBuff_IV(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
         double score = 0;
         int baseScore = 18;
-        if (!notUseJet)
-        {
+        if (!notUseJet) {
             baseScore *= effect.randomJet();
         }
 
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 2;
             else if (percentLife < 30)
@@ -616,15 +540,12 @@ public class SupportAction extends AIAction {
 
             if (effect.duration > 0)
                 currScore *= effect.duration;
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -639,10 +560,9 @@ public class SupportAction extends AIAction {
     protected double scoreAddStateGood(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         double score = 0;
         int baseScore = 11;
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 8;
             else if (percentLife < 30)
@@ -655,15 +575,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -677,10 +594,9 @@ public class SupportAction extends AIAction {
     protected double scoreAddStateBad(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         double score = 0;
         int baseScore = 11;
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 2;
             else if (percentLife < 30)
@@ -693,15 +609,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -715,10 +628,9 @@ public class SupportAction extends AIAction {
     protected double scoreRemStateGood(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         double score = 0;
         int BaseScore = 11;
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = BaseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 2;
             else if (percentLife < 30)
@@ -731,15 +643,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -753,10 +662,9 @@ public class SupportAction extends AIAction {
     protected double scoreRemStateBad(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse) {
         double score = 0;
         int baseScore = 11;
-        for (Fighter fighter : targets)
-        {
+        for (Fighter fighter : targets) {
             int currScore = baseScore;
-            double percentLife = Math.ceil((double)(fighter.getLife() / fighter.getMaxLife()) * 100);
+            double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)
                 currScore *= 8;
             else if (percentLife < 30)
@@ -769,15 +677,12 @@ public class SupportAction extends AIAction {
             if (effect.duration > 0)
                 currScore *= effect.duration;
 
-            if (reverse)
-            {
+            if (reverse) {
                 if (fighter.getTeam() == AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
                     score += currScore;
-            }
-            else
-            {
+            } else {
                 if (fighter.getTeam() != AI.getFighter().getTeam())
                     score -= currScore * 2;
                 else
@@ -798,16 +703,15 @@ public class SupportAction extends AIAction {
 
         //BaseScore *= effect.randomJet();
 
-        for (Fighter target : targets)
-        {
+        for (Fighter target : targets) {
             int currScore = baseScore;
             final List<Fighter> cible = new ArrayList<>();
             cible.add(target);
-            for(List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()){
-                for(BuffEffect buff : buffs){
-                    if(buff.castInfos.effect == null)
+            for (List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()) {
+                for (BuffEffect buff : buffs) {
+                    if (buff.castInfos.effect == null)
                         continue;
-                    currScore += (int)this.getEffectScore(AI, (short)-1, (short)-1, buff.castInfos.effect, cible, true,false);
+                    currScore += (int) this.getEffectScore(AI, (short) -1, (short) -1, buff.castInfos.effect, cible, true, false);
                 }
             }
             score += currScore;
@@ -821,8 +725,7 @@ public class SupportAction extends AIAction {
         if (reverse)//On evite la boucle infinie
         {
             return 0;
-        }
-        else if(AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
+        } else if (AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0) {
             return 0;
         }
         int baseScore = 11;
@@ -830,40 +733,30 @@ public class SupportAction extends AIAction {
 
         final int invocationId = effect.diceNum;
         final int invocationLevel = effect.diceSide;
-        if (invokPreview)
-        {
+        if (invokPreview) {
             return baseScore * invocationLevel;
         }
-        if (!AI.getNeuron().myScoreInvocations.containsKey(invocationId))
-        {
+        if (!AI.getNeuron().myScoreInvocations.containsKey(invocationId)) {
             MonsterTemplate monster = DAO.getMonsters().find(invocationId);
             // Template de monstre existante
-            if (monster != null)
-            {
+            if (monster != null) {
                 final MonsterGrade monsterLevel = monster.getLevelOrNear(invocationLevel);
                 // level de monstre existant
-                if (monsterLevel != null)
-                {
+                if (monsterLevel != null) {
                     List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
-                    for (SpellLevel spell : monsterLevel.getSpells())
-                    {
-                        for (EffectInstanceDice spellEffect : spell.getEffects())
-                        {
-                            int currScore = (int)this.getEffectScore(AI, (short)-1, (short)-1, spellEffect, possibleTargets, false, true);
-                            if (currScore > 0)
-                            {
+                    for (SpellLevel spell : monsterLevel.getSpells()) {
+                        for (EffectInstanceDice spellEffect : spell.getEffects()) {
+                            int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                            if (currScore > 0) {
                                 score += currScore;
                             }
                         }
                     }
                     possibleTargets = AI.getFight().getEnnemyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
-                    for (SpellLevel spell : monsterLevel.getSpells())
-                    {
-                        for (EffectInstanceDice spellEffect : spell.getEffects())
-                        {
-                            int currScore = (int)this.getEffectScore(AI, (short)-1, (short)-1, spellEffect, possibleTargets, false, true);
-                            if (currScore > 0)
-                            {
+                    for (SpellLevel spell : monsterLevel.getSpells()) {
+                        for (EffectInstanceDice spellEffect : spell.getEffects()) {
+                            int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                            if (currScore > 0) {
                                 score += currScore;
                             }
                         }
@@ -874,9 +767,7 @@ public class SupportAction extends AIAction {
                     return score;
                 }
             }
-        }
-        else
-        {
+        } else {
             return AI.getNeuron().myScoreInvocations.get(invocationId);
         }
         return 0;
@@ -893,25 +784,19 @@ public class SupportAction extends AIAction {
 
         int invocationId = effect.diceNum;
         int invocationLevel = effect.diceSide;
-        if (invokPreview)
-        {
+        if (invokPreview) {
             return baseScore * invocationLevel;
         }
-        if (!AI.getNeuron().myScoreInvocations.containsKey(invocationId))
-        {
+        if (!AI.getNeuron().myScoreInvocations.containsKey(invocationId)) {
 
             MonsterGrade monsterLevel = DAO.getMonsters().find(invocationId).getLevelOrNear(invocationLevel);
             // level de monstre existant
-            if (monsterLevel != null)
-            {
+            if (monsterLevel != null) {
                 List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isDead()).collect(Collectors.toList());
-                for (SpellLevel spell : monsterLevel.getSpells())
-                {
-                    for (EffectInstanceDice spellEffect : spell.getEffects())
-                    {
-                        int currScore = (int) this.getEffectScore(AI, (short)-1, (short)-1, spellEffect, possibleTargets, false,true);
-                        if (currScore > 0)
-                        {
+                for (SpellLevel spell : monsterLevel.getSpells()) {
+                    for (EffectInstanceDice spellEffect : spell.getEffects()) {
+                        int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                        if (currScore > 0) {
                             score += currScore;
                         }
                     }
@@ -922,16 +807,13 @@ public class SupportAction extends AIAction {
                 return score;
             }
 
-        }
-        else
-        {
+        } else {
             return AI.getNeuron().myScoreInvocations.get(invocationId);
         }
         return 0;
     }
 
-    private double scorePush(AIProcessor AI, Fighter target, byte direction, int length, boolean fear)
-    {
+    private double scorePush(AIProcessor AI, Fighter target, byte direction, int length, boolean fear) {
         boolean isAlly = target.getTeam() == AI.getFighter().getTeam();
         List<Fighter> fighterList = new ArrayList<Fighter>();
         fighterList.add(target);
@@ -941,55 +823,42 @@ public class SupportAction extends AIAction {
         for (FightActivableObject layer : target.getMyCell().getObjectsLayer())//On cherche à savoir si décaller de cette cellule est utile
         {
             int layerScore = 0;
-            if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null)
+            if (layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null)
                 continue;
-            for (EffectInstanceDice effect : layer.getCastSpell().getEffects())
-            {
-                layerScore = (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, effect, fighterList, true, true));
+            for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
+                layerScore = (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, true, true));
             }
-            /*if (Layer is FightBlypheLayer)
-            {
-                LayerScore *= 2;
-            }*/
+            if (layer instanceof FightBlyph) {
+                layerScore *= 2;
+            }
             score += layerScore;
         }
 
         int pathScore = 4;
         int finalLength = 0;
-        for (int i = 0; i < length; i++)
-        {
+        for (int i = 0; i < length; i++) {
             FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(lastCell.getId(), direction));
-            if (nextCell != null)
-            {
+            if (nextCell != null) {
                 lastCell = nextCell;
             }
 
-            if (nextCell != null && nextCell.isWalkable())
-            {
-                if (nextCell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) || nextCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC) || target.getStates().hasState(FightStateEnum.ENRACINÉ))
-                {
-                    if (!fear)
-                    {
+            if (nextCell != null && nextCell.isWalkable()) {
+                if (nextCell.hasGameObject(IFightObject.FightObjectType.OBJECT_FIGHTER) || nextCell.hasGameObject(IFightObject.FightObjectType.OBJECT_STATIC) || target.getStates().hasState(FightStateEnum.ENRACINÉ)) {
+                    if (!fear) {
                         pathScore *= EffectPush.getRANDOM_PUSHDAMAGE().nextInt(4) + 4;
-                        if (isAlly)
-                        {
+                        if (isAlly) {
                             pathScore *= -1;
                         }
                     }
                     break;
-                }
-                else if (nextCell.hasGameObject(IFightObject.FightObjectType.OBJECT_TRAP))
-                {//On Stop seulement : ce genre de calcul se fera a la fin.
+                } else if (nextCell.hasGameObject(IFightObject.FightObjectType.OBJECT_TRAP)) {//On Stop seulement : ce genre de calcul se fera a la fin.
                     break;
                 }
-            }
-            else
-            {
-                if (!fear)
-                {
-                    pathScore *= EffectPush.getRANDOM_PUSHDAMAGE().nextInt(4) + 4;;
-                    if (isAlly)
-                    {
+            } else {
+                if (!fear) {
+                    pathScore *= EffectPush.getRANDOM_PUSHDAMAGE().nextInt(4) + 4;
+                    ;
+                    if (isAlly) {
                         pathScore *= -1;
                     }
                 }
@@ -998,23 +867,19 @@ public class SupportAction extends AIAction {
             finalLength += 1;
         }
         score += finalLength * pathScore;
-        if (lastCell != target.getMyCell())
-        {
-            for (FightActivableObject layer : target.getMyCell().getObjectsLayer())
-            {
+        if (lastCell != target.getMyCell()) {
+            for (FightActivableObject layer : target.getMyCell().getObjectsLayer()) {
                 int layerScore = 0;
-                for (EffectInstanceDice Effect : layer.getCastSpell().getEffects())
-                {
-                    layerScore += (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, Effect, fighterList, false, true));
-                }
+                if (layer.getCastSpell() != null && layer.getCastSpell().getEffects() != null)
+                    for (EffectInstanceDice Effect : layer.getCastSpell().getEffects()) {
+                        layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, Effect, fighterList, false, true));
+                    }
                 if (layer instanceof FightTrap)// TODO : Calculate if traplayer others targets
                 {
                     layerScore *= 4;//Immediat
-                }
-                /*else if (layer instanceof FightBlypheLayer)
-                {
+                } else if (layer instanceof FightBlyph) {
                     layerScore *= 2;//Debut de tour
-                }*/
+                }
                 score += layerScore;
             }
         }
@@ -1024,35 +889,27 @@ public class SupportAction extends AIAction {
 
     @Override
     protected double scoreRepulse(AIProcessor AI, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean invokPreview, boolean isFear) {
-        if (invokPreview)
-        {
+        if (invokPreview) {
             return 0;
         }
         double score = 0;
-        if (isFear)
-        {
-            byte d = Pathfunction.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell);
+        if (isFear) {
+            byte d = Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell);
             FightCell startCell = AI.getFight().getCell(Pathfunction.nextCell(AI.getFighter().getCellId(), d));
             FightCell endCell = AI.getFight().getCell(castCell);
-            if (startCell != null && endCell != null)
-            {
+            if (startCell != null && endCell != null) {
                 Fighter target = startCell.getFighter();
-                if (target != null)
-                {
-                    score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell),
-                            Pathfunction.goalDistance(AI.getFight().getMap(),AI.getFighter().getCellId(), castCell), true);
+                if (target != null) {
+                    score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell),
+                            Pathfunction.goalDistance(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell), true);
                 }
             }
-        }
-        else
-        {
+        } else {
             FightCell startCell = AI.getFight().getCell(castCell);
-            if (startCell != null)
-            {
+            if (startCell != null) {
                 Fighter target = startCell.getFighter();
-                if (target != null)
-                {
-                    score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(),AI.getFighter().getCellId(),castCell), effect.randomJet(), false);
+                if (target != null) {
+                    score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell), effect.randomJet(), false);
                 }
             }
         }
@@ -1062,21 +919,18 @@ public class SupportAction extends AIAction {
 
     @Override
     protected double scoreAttract(AIProcessor AI, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean invokPreview) {
-        if (invokPreview)
-        {
+        if (invokPreview) {
             return 0;
         }
 
         double score = 0;
-        byte d = Pathfunction.getDirection(AI.getFight().getMap(),castCell, AI.getFighter().getCellId());
+        byte d = Pathfunction.getDirection(AI.getFight().getMap(), castCell, AI.getFighter().getCellId());
         FightCell endCell = AI.getFight().getCell(Pathfunction.nextCell(AI.getFighter().getCellId(), d));
         FightCell startCell = AI.getFight().getCell(castCell);
-        if (startCell != null && endCell != null)
-        {
+        if (startCell != null && endCell != null) {
             Fighter target = startCell.getFighter();
-            if (target != null)
-            {
-                score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(),castCell, AI.getFighter().getCellId()), Pathfunction.goalDistance(AI.getFight().getMap(), castCell, AI.getFighter().getCellId()), true);
+            if (target != null) {
+                score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(), castCell, AI.getFighter().getCellId()), Pathfunction.goalDistance(AI.getFight().getMap(), castCell, AI.getFighter().getCellId()), true);
             }
         }
 
@@ -1085,34 +939,26 @@ public class SupportAction extends AIAction {
 
     @Override
     protected double scoreDeplace(AIProcessor AI, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean invokPreview, boolean isThrow) {
-        if (invokPreview)
-        {
+        if (invokPreview) {
             return 0;
         }
         double score = 0;
 
-        if (isThrow)
-        {
+        if (isThrow) {
             FightCell targetCell = AI.getFight().getCell(castCell);
-            if (targetCell != null)
-            {
+            if (targetCell != null) {
                 BuffEffect infos = AI.getFighter().getStates().findState(FightStateEnum.CARRIER);
-                if (infos != null)
-                {
+                if (infos != null) {
                     Fighter target = infos.target;
-                    if (target != null && target.getStates().hasState(FightStateEnum.CARRIED))
-                    {
+                    if (target != null && target.getStates().hasState(FightStateEnum.CARRIED)) {
                         List<Fighter> targetList = new ArrayList<>();
                         targetList.add(target);
-                        for (FightActivableObject layer : targetCell.getObjectsLayer())
-                        {
+                        for (FightActivableObject layer : targetCell.getObjectsLayer()) {
                             int layerScore = 0;
-                            for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects())
-                            {
-                                layerScore += (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, effect, targetList, false, true));
+                            for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects()) {
+                                layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, targetList, false, true));
                             }
-                            if (layer instanceof FightTrap)
-                            {
+                            if (layer instanceof FightTrap) {
                                 layerScore *= 4;//Immediat
                             }
                     /*else if (Layer ista FightBlypheLayer)
@@ -1124,9 +970,7 @@ public class SupportAction extends AIAction {
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
 
         }
 
@@ -1138,22 +982,17 @@ public class SupportAction extends AIAction {
         double score = 0;
         FightCell targetCell = AI.getFight().getCell(castCell);
         FightCell launchCell = AI.getFight().getCell(casterCell);
-        if (targetCell != null)
-        {
+        if (targetCell != null) {
             Fighter target = targetCell.getFighter();
-            if (target != null)
-            {
+            if (target != null) {
                 List<Fighter> targetList = new ArrayList<>();
                 targetList.add(AI.getFighter());
-                for (FightActivableObject layer : targetCell.getObjectsLayer())
-                {
+                for (FightActivableObject layer : targetCell.getObjectsLayer()) {
                     int layerScore = 0;
-                    for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects())
-                    {
-                        layerScore += (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, effect, targetList, false, true));
+                    for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects()) {
+                        layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, targetList, false, true));
                     }
-                    if (layer instanceof FightTrap)
-                    {
+                    if (layer instanceof FightTrap) {
                         layerScore *= 4;//Immediat
                     }
                     /*else if (Layer ista FightBlypheLayer)
@@ -1165,15 +1004,12 @@ public class SupportAction extends AIAction {
 
                 targetList = new ArrayList<Fighter>();
                 targetList.add(target);
-                for (FightActivableObject layer : launchCell.getObjectsLayer())
-                {
+                for (FightActivableObject layer : launchCell.getObjectsLayer()) {
                     int layerScore = 0;
-                    for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects())
-                    {
-                        layerScore += (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, effect, targetList, false, true));
+                    for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects()) {
+                        layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, targetList, false, true));
                     }
-                    if (layer instanceof FightTrap)
-                    {
+                    if (layer instanceof FightTrap) {
                         layerScore *= 4;//Immediat
                     }
                     /*else if (Layer ista FightBlypheLayer)
@@ -1191,24 +1027,19 @@ public class SupportAction extends AIAction {
     protected double scoreUseLayer(AIProcessor AI, short castCell, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
         double score = 0;
         Spell spell = DAO.getSpells().findSpell(effect.diceNum);
-        if (spell != null)
-        {
+        if (spell != null) {
             SpellLevel spellLevel = spell.getSpellLevel(effect.diceSide);
-            if (spellLevel != null)
-            {
+            if (spellLevel != null) {
                 List<Fighter> possibleTargets = AI.getFight().getEnnemyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
                 int LayerScore = 0;
-                for (EffectInstanceDice effectLayer : spellLevel.getEffects())
-                {
-                    LayerScore += (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, effect, possibleTargets, false, true));
+                for (EffectInstanceDice effectLayer : spellLevel.getEffects()) {
+                    LayerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, possibleTargets, false, true));
                 }
-                if (LayerScore <= 0)
-                {
+                if (LayerScore <= 0) {
                     LayerScore = 0;
                     possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
-                    for (EffectInstanceDice effectLayer : spellLevel.getEffects())
-                    {
-                        LayerScore += (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, effect, possibleTargets, false, true));
+                    for (EffectInstanceDice effectLayer : spellLevel.getEffects()) {
+                        LayerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, possibleTargets, false, true));
                     }
                 }
                 score += LayerScore;

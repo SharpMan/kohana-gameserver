@@ -120,7 +120,7 @@ public class FightCell {
             return myFightObjects.stream().anyMatch(x -> x.getObjectType() == objectType || x.getObjectType() == objectTyp2);
         }
         catch (Exception e){
-            logger.error("myfightObject null {} or object {}",myFightObjects == null,myFightObjects.stream().anyMatch(x-> x == null));
+            logger.error("myfightObject null {} or object {}",myFightObjects == null, myFightObjects.stream()!= null && myFightObjects.stream().anyMatch(x-> x == null));
             e.printStackTrace();
             return true;
         }

@@ -7,6 +7,7 @@ import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
+import koh.game.fights.IFightObject;
 import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
@@ -34,6 +35,7 @@ public class EffectPush extends EffectBase {
         byte direction = 0;
         for (Fighter target : castInfos.targets.stream().filter(tarrget -> /*!(target instanceof StaticFighter) &&*/
                 !tarrget.getStates().hasState(FightStateEnum.CARRIED)
+                        && (tarrget.getObjectType() != IFightObject.FightObjectType.OBJECT_STATIC)
                         && !tarrget.getStates().hasState(FightStateEnum.INÉBRANLABLE)
                         && !tarrget.getStates().hasState(FightStateEnum.ENRACINÉ)
                         && !tarrget.getStates().hasState(FightStateEnum.INDÉPLAÇABLE))

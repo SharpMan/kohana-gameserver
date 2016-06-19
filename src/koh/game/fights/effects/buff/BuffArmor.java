@@ -17,7 +17,7 @@ public class BuffArmor extends BuffEffect {
     private final int JET;
 
     public BuffArmor(EffectCast CastInfos, Fighter target) {
-        super(CastInfos, target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+        super(CastInfos, target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
         this.JET = CastInfos.randomJet(target);
     }
 

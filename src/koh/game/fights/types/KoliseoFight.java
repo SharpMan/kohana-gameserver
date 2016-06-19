@@ -8,6 +8,7 @@ import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
 import koh.game.entities.kolissium.ArenaBattle;
+import koh.game.entities.kolissium.KolizeumExecutor;
 import koh.game.fights.*;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.utils.AntiCheat;
@@ -83,45 +84,25 @@ public class KoliseoFight extends Fight {
         log.append("\n");
 
 
-        for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
-            super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_LOST);
-            log.append("Losser : ").append(fighter.getPlayer().getNickName()).append(" ").append(fighter.getPlayer().getLevel()).append(" ");
-            if(fighter.isLeft())
-                continue;
-            final int cote = (FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false,FightTypeEnum.FIGHT_TYPE_PVP_ARENA));
-
-            log.append("cote -= ").append(cote).append("\n");
-
-            this.myResult.results.add(
-                    new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST,
-                            fighter.getWave(),
-                            new FightLoot(new int[0], 0),
-                            fighter.getID(),
-                            fighter.isAlive(),
-                            (byte) fighter.getLevel(),
-                            new FightResultExperienceData[]{
-                                    new FightResultExperienceData(fighter.getPlayer().getKolizeumRate().getScreenRating(), true, 0,true , 4000, true, cote, true, 0, false, 0, false, false, (byte)0)}));
-        }
-
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_VICTORY);
             log.append("Winner : ").append(fighter.getPlayer().getNickName()).append("Cote ").append(fighter.getPlayer().getKolizeumRate().getRatingd()).append(" ");
 
             if(fighter.isLeft())
                 continue;
-            final int diviser = AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_PVP_ARENA);
+            final int diviser = AntiCheat.deviserBy(getLoosers().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_PVP_ARENA);
             int cote = FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), false) / diviser;
-            final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() !=null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
+            final long count = getLoosers().getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() !=null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
             int kamas  = RANDOM.nextInt(150) + 40;
-            if(count == getEnnemyTeam(getWinners()).getFighters().count()){
+            if(count == KolizeumExecutor.getTEAM_SIZE()){
                 cote  = 0;
                 kamas = 10;
-            }else if(count != 0 && (getEnnemyTeam(getWinners()).getFighters().count() - count) >= 1){
+            }else if(count != 0 && (getLoosers().getFighters().count() - count) >= 1){
                 cote  /= (count * 4);
                 kamas /= (count * 4);
             }
             fighter.getPlayer().addKamas(kamas);
-            final int tokenQua = (int) Math.max(Math.abs(cote * 0.25f),1);
+            final int tokenQua = (int) Math.max(Math.abs(cote * 0.15f),1);
             final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), ArenaBattle.KOLIZETON.getId(), 63, fighter.getPlayer().getID(), tokenQua, EffectHelper.generateIntegerEffect(ArenaBattle.KOLIZETON.getPossibleEffects(), EffectGenerationType.NORMAL, false));
             if (fighter.getPlayer().getInventoryCache().add(item, true)) {
                 item.setNeedInsert(true);
@@ -144,6 +125,28 @@ public class KoliseoFight extends Fight {
                                     new FightResultExperienceData(fighter.getPlayer().getKolizeumRate().getScreenRating(), true, 0,true , 2300, true, cote, true, 0, false, 0, false, false, (byte)0)}));
 
         }
+
+        for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
+            super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_LOST);
+            log.append("Losser : ").append(fighter.getPlayer().getNickName()).append("Cote ").append(fighter.getPlayer().getKolizeumRate().getRatingd()).append(" ");
+            if(fighter.isLeft())
+                continue;
+            final int cote = (FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false,FightTypeEnum.FIGHT_TYPE_PVP_ARENA));
+
+            log.append("cote -= ").append(cote).append("\n");
+
+            this.myResult.results.add(
+                    new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST,
+                            fighter.getWave(),
+                            new FightLoot(new int[0], 0),
+                            fighter.getID(),
+                            fighter.isAlive(),
+                            (byte) fighter.getLevel(),
+                            new FightResultExperienceData[]{
+                                    new FightResultExperienceData(fighter.getPlayer().getKolizeumRate().getScreenRating(), true, 0,true , 4000, true, cote, true, 0, false, 0, false, false, (byte)0)}));
+        }
+
+
         log.append("=========================================/n");
         try {
             koliseoLog = new SimpleLogger("logs/koli/" + SimpleLogger.getCurrentDayStamp() + ".txt", 0);

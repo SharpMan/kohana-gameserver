@@ -431,7 +431,7 @@ public class Player extends IGameActor implements Observer {
                 ChatChannel.register(client);
 
                 PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
-               if(!DAO.getSettings().getBoolElement("Logging.Debug")) {
+               if(this.account.last_login.getDay() < 15) {
                    PlayerController.sendServerMessage(client, "Pour télecharger le patch du launcher <a href=\"http://gate.nakama-serveur.eu/kpatch.exe\"> cliquez ici</a>");
 
                    client.send(new PopupWarningMessage((byte) 2, "#", "<center>Important</center>\n\n Si vous avez des problèmes de vote avec le launcher \n Veuillez télechargez le patch du launcher disponnible dans le chat"));

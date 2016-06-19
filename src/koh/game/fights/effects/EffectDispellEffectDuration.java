@@ -18,22 +18,22 @@ public class EffectDispellEffectDuration extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
+        System.out.println(castInfos.targets.size());
         for (Fighter target : castInfos.targets) {
-            final short jet = castInfos.randomJet(target);
             if(castInfos.spellId == 108){ //Esprit felin
-                final int result = decrementEffectDurationExceptMe(target,jet);
+                final int result = decrementEffectDurationExceptMe(target,castInfos.effect.diceNum);
                 if(result != -1){
                     return result;
                 }
             }
             else {
-                final int result = target.getBuff().decrementEffectDuration(jet);
+                final int result = target.getBuff().decrementEffectDuration(castInfos.effect.diceNum);
                 if(result != -1){
                     return result;
                 }
             }
 
-            target.getFight().sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, castInfos.caster.getID(), target.getID(), (short) -jet));
+            target.getFight().sendToField(new GameActionFightModifyEffectsDurationMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, castInfos.caster.getID(), target.getID(), (short) -castInfos.effect.diceNum));
         }
 
         return -1;

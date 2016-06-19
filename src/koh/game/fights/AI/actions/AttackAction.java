@@ -15,6 +15,7 @@ import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectPush;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.layers.FightActivableObject;
+import koh.game.fights.layers.FightBlyph;
 import koh.game.fights.layers.FightTrap;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -691,7 +692,7 @@ public class AttackAction extends AIAction {
             cible.add(target);
             for (List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()) {
                 for (BuffEffect buff : buffs) {
-                    if(buff.castInfos.effect == null)
+                    if (buff.castInfos.effect == null)
                         continue;
                     currScore += (int) this.getEffectScore(AI, (short) -1, (short) -1, buff.castInfos.effect, cible, true, false);
                 }
@@ -707,8 +708,7 @@ public class AttackAction extends AIAction {
         if (reverse)//On evite la boucle infinie
         {
             return 0;
-        }
-        else if(AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
+        } else if (AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0) {
             return 0;
         }
         int baseScore = 11;
@@ -805,16 +805,15 @@ public class AttackAction extends AIAction {
 
         for (FightActivableObject layer : target.getMyCell().getObjectsLayer())//On cherche à savoir si décaller de cette cellule est utile
         {
-            if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null)
-                continue;
             int layerScore = 0;
+            if (layer.getCastSpell() != null && layer.getCastSpell().getEffects() != null)
             for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
                 layerScore = (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, true, true));
             }
-            /*if (Layer is FightBlypheLayer)
+            if (layer instanceof FightBlyph)
             {
-                LayerScore *= 2;
-            }*/
+                layerScore *= 2;
+            }
             score += layerScore;
         }
 
@@ -854,17 +853,18 @@ public class AttackAction extends AIAction {
         if (lastCell != target.getMyCell()) {
             for (FightActivableObject layer : target.getMyCell().getObjectsLayer()) {
                 int layerScore = 0;
-                for (EffectInstanceDice Effect : layer.getCastSpell().getEffects()) {
-                    layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, Effect, fighterList, false, true));
-                }
+                if (layer.getCastSpell() != null && layer.getCastSpell().getEffects() != null)
+                    for (EffectInstanceDice Effect : layer.getCastSpell().getEffects()) {
+                        layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, Effect, fighterList, false, true));
+                    }
                 if (layer instanceof FightTrap)// TODO : Calculate if traplayer others targets
                 {
                     layerScore *= 4;//Immediat
                 }
-                /*else if (layer instanceof FightBlypheLayer)
+                else if (layer instanceof FightBlyph)
                 {
                     layerScore *= 2;//Debut de tour
-                }*/
+                }
                 score += layerScore;
             }
         }

@@ -694,7 +694,7 @@ public class SelfActingAction extends AIAction {
             cible.add(target);
             for (List<BuffEffect> buffs : target.getBuff().getBuffsDec().values()) {
                 for (BuffEffect buff : buffs) {
-                    if(buff.castInfos.effect == null)
+                    if (buff.castInfos.effect == null)
                         continue;
                     currScore += (int) this.getEffectScore(AI, (short) -1, (short) -1, buff.castInfos.effect, cible, true, false);
                 }
@@ -710,8 +710,7 @@ public class SelfActingAction extends AIAction {
         if (reverse)//On evite la boucle infinie
         {
             return 0;
-        }
-        else if(AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
+        } else if (AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0) {
             return 0;
         }
         double baseScore = 11;
@@ -732,7 +731,7 @@ public class SelfActingAction extends AIAction {
                     List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
                     for (SpellLevel spell : monsterLevel.getSpells()) {
                         for (EffectInstanceDice spellEffect : spell.getEffects()) {
-                            if(spellEffect.getEffectType() == StatsEnum.SUMMON){
+                            if (spellEffect.getEffectType() == StatsEnum.SUMMON) {
                                 continue;
                             }
                             final int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
@@ -744,7 +743,7 @@ public class SelfActingAction extends AIAction {
                     possibleTargets = AI.getFight().getEnnemyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
                     for (SpellLevel spell : monsterLevel.getSpells()) {
                         for (EffectInstanceDice spellEffect : spell.getEffects()) {
-                            if(spellEffect.getEffectType() == StatsEnum.SUMMON){
+                            if (spellEffect.getEffectType() == StatsEnum.SUMMON) {
                                 continue;
                             }
                             final int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
@@ -783,8 +782,7 @@ public class SelfActingAction extends AIAction {
             final MonsterGrade monsterLevel;
             try {
                 monsterLevel = DAO.getMonsters().find(invocationId).getLevelOrNear(invocationLevel);
-            }
-            catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 return 0;
             }
             // level de monstre existant
@@ -820,15 +818,13 @@ public class SelfActingAction extends AIAction {
         for (FightActivableObject layer : target.getMyCell().getObjectsLayer())//On cherche à savoir si décaller de cette cellule est utile
         {
             int layerScore = 0;
-            if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null)
-                continue;
-            for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
-                layerScore = (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, true, true));
+            if (layer.getCastSpell() != null && layer.getCastSpell().getEffects() != null)
+                for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
+                    layerScore = (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, true, true));
+                }
+            if (layer instanceof FightBlyph) {
+                layerScore *= 2;
             }
-            /*if (Layer is FightBlypheLayer)
-            {
-                LayerScore *= 2;
-            }*/
             score += layerScore;
         }
 
@@ -866,19 +862,15 @@ public class SelfActingAction extends AIAction {
         score += finalLength * pathScore;
         if (lastCell != target.getMyCell()) {
             for (FightActivableObject layer : target.getMyCell().getObjectsLayer()) {
-                if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null){
-                    continue;
-                }
                 int layerScore = 0;
-                for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
-                    layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, false, true));
-                }
+                if (layer.getCastSpell() != null && layer.getCastSpell().getEffects() != null)
+                    for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
+                        layerScore += (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, false, true));
+                    }
                 if (layer instanceof FightTrap)// TODO : Calculate if traplayer others targets
                 {
                     layerScore *= 4;//Immediat
-                }
-                else if (layer instanceof FightBlyph)
-                {
+                } else if (layer instanceof FightBlyph) {
                     layerScore *= 2;//Debut de tour
                 }
                 score += layerScore;
@@ -990,7 +982,7 @@ public class SelfActingAction extends AIAction {
                 targetList.add(AI.getFighter());
                 for (FightActivableObject layer : targetCell.getObjectsLayer()) {
                     int layerScore = 0;
-                    if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null){
+                    if (layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null) {
                         continue;
                     }
                     for (EffectInstanceDice effectLayer : layer.getCastSpell().getEffects()) {
@@ -1009,7 +1001,7 @@ public class SelfActingAction extends AIAction {
                 targetList = new ArrayList<Fighter>();
                 targetList.add(target);
                 for (FightActivableObject layer : launchCell.getObjectsLayer()) {
-                    if(layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null){
+                    if (layer.getCastSpell() == null || layer.getCastSpell().getEffects() == null) {
                         continue;
                     }
                     int layerScore = 0;

@@ -15,6 +15,7 @@ import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectPush;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.layers.FightActivableObject;
+import koh.game.fights.layers.FightBlyph;
 import koh.game.fights.layers.FightTrap;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -914,10 +915,10 @@ public class RepelsAction extends AIAction {
             {
                 layerScore = (int)Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short)-1, (short)-1, effect, fighterList, true, true));
             }
-            /*if (Layer is FightBlypheLayer)
+            if (layer instanceof FightBlyph)
             {
-                LayerScore *= 2;
-            }*/
+                layerScore *= 2;
+            }
             score += layerScore;
         }
 
@@ -978,10 +979,10 @@ public class RepelsAction extends AIAction {
                 {
                     layerScore *= 4;//Immediat
                 }
-                /*else if (layer instanceof FightBlypheLayer)
+                else if (layer instanceof FightBlyph)
                 {
                     layerScore *= 2;//Debut de tour
-                }*/
+                }
                 score += layerScore;
             }
         }

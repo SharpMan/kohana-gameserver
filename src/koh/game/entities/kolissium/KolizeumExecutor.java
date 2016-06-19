@@ -273,7 +273,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
                 this.waitingGroups.remove(team1Group);
             }
             if (team2Group != null) {
-                team1Group.setInKolizeum(false);
+                team2Group.setInKolizeum(false);
                 team2.stream().filter(p -> !team2Group.containsPlayer(p)).forEach(team2Group::addPlayer);
                 this.waitingGroups.remove(team2Group);
             }
