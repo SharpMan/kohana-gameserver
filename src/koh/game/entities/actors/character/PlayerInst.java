@@ -44,6 +44,8 @@ public class PlayerInst {
     private Map<Long,Integer> cotes = new TreeMap<>();
     @Getter
     private Map<Long,Boolean> kolizeumWins = new TreeMap<>();
+    @Getter @Setter
+    private int alignmentChange;
 
     public static final Map<Integer, PlayerInst> P_PROPERTIES = Collections.synchronizedMap(new HashMap<>());
 

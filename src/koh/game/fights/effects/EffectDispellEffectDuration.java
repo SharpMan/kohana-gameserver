@@ -18,7 +18,6 @@ public class EffectDispellEffectDuration extends EffectBase {
 
     @Override
     public int applyEffect(EffectCast castInfos) {
-        System.out.println(castInfos.targets.size());
         for (Fighter target : castInfos.targets) {
             if(castInfos.spellId == 108){ //Esprit felin
                 final int result = decrementEffectDurationExceptMe(target,castInfos.effect.diceNum);

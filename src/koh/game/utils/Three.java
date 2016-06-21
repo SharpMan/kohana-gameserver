@@ -16,7 +16,7 @@ public class Three <L, R,S> {
         tree = j;
     }
 
-    public void Clear() {
+    public void clear() {
         try {
             this.first = null;
             this.second = null;

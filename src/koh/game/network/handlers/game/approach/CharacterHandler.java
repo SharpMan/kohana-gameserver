@@ -81,11 +81,17 @@ public class CharacterHandler {
     }
 
     @HandlerAttribute(ID = SetEnablePVPRequestMessage.M_ID)
-    public static void handleSetEnablePVPRequestMessage(WorldClient client, SetEnablePVPRequestMessage Message) {
+    public static void handleSetEnablePVPRequestMessage(WorldClient client, SetEnablePVPRequestMessage message) {
         if(client.isGameAction(GameActionTypeEnum.FIGHT)){
             return;
         }
-        client.getCharacter().setEnabldPvp(Message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
+        final PlayerInst inst = PlayerInst.getPlayerInst(client.getCharacter().getID());
+        if(inst.getAlignmentChange() > 5 && !message.enable){
+            PlayerController.sendServerErrorMessage(client, "Vous ne pouvez pas changer vos ailes plus de 5 fois par jour");
+        }else
+            inst.setAlignmentChange(inst.getAlignmentChange() +1);
+
+        client.getCharacter().setEnabldPvp(message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
     }
 
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)

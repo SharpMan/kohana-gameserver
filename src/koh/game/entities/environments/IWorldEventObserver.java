@@ -5,6 +5,7 @@
  */
 package koh.game.entities.environments;
 
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
@@ -45,6 +46,10 @@ public abstract class IWorldEventObserver extends Observable {
 
     public Iterable<Player> observable$Stream() {
         return observers.stream()::iterator;
+    }
+
+    public Iterable<Player> observable$Stream(Predicate<Player> prd) {
+        return observers.stream().filter(prd)::iterator;
     }
 
 }

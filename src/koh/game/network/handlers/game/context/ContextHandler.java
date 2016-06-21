@@ -11,7 +11,8 @@ import koh.game.entities.environments.DofusCell;
 import koh.game.entities.environments.MovementPath;
 import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.item.InventoryItem;
-import koh.game.fights.fighters.CharacterFighter;
+import koh.game.fights.Fighter;
+import koh.game.fights.fighters.SlaveFighter;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.Message;
@@ -20,18 +21,7 @@ import koh.protocol.client.enums.ObjectErrorEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.protocol.messages.game.context.GameContextCreateMessage;
-import koh.protocol.messages.game.context.GameContextCreateRequestMessage;
-import koh.protocol.messages.game.context.GameContextDestroyMessage;
-import koh.protocol.messages.game.context.GameContextReadyMessage;
-import koh.protocol.messages.game.context.GameMapChangeOrientationMessage;
-import koh.protocol.messages.game.context.GameMapChangeOrientationRequestMessage;
-import koh.protocol.messages.game.context.GameMapMovementCancelMessage;
-import koh.protocol.messages.game.context.GameMapMovementConfirmMessage;
-import koh.protocol.messages.game.context.GameMapMovementMessage;
-import koh.protocol.messages.game.context.GameMapMovementRequestMessage;
-import koh.protocol.messages.game.context.GameMapNoMovementMessage;
-import koh.protocol.messages.game.context.ShowCellRequestMessage;
+import koh.protocol.messages.game.context.*;
 import koh.protocol.messages.game.context.roleplay.MapInformationsRequestMessage;
 import koh.protocol.messages.game.inventory.items.ObjectDropMessage;
 import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
@@ -40,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- *
  * @author Neo-Craft
  */
 public class ContextHandler {
@@ -52,7 +41,7 @@ public class ContextHandler {
         if (client.getCharacter().getFight() == null) {
             client.getCharacter().setDirection(message.direction);
             client.getCharacter().getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(client.getCharacter().getID(), client.getCharacter().getDirection())));
-            logger.debug("New direction for actor {}~{}" , client.getCharacter().getID() , message.direction);
+            logger.debug("New direction for actor {}~{}", client.getCharacter().getID(), message.direction);
         }
     }
 
@@ -82,7 +71,7 @@ public class ContextHandler {
 
             Client.send(new GameContextCreateMessage((byte) (Client.getCharacter().getFighter() == null ? 1 : 2)));
             Client.getCharacter().updateRegenedEnergy();
-            Client.getCharacter().refreshStats(false,false);
+            Client.getCharacter().refreshStats(false, false);
             Client.getCharacter().onLogged();
         }
     }
@@ -146,10 +135,10 @@ public class ContextHandler {
     @HandlerAttribute(ID = MapInformationsRequestMessage.MESSAGE_ID)
     public static void handleMapInformationsRequestMessage(WorldClient client, Message message) {
         //client.sequenceMessage();
-        if(client.getCharacter().isOnTutorial()){
+        if (client.getCharacter().isOnTutorial()) {
             client.send(client.getCharacter().getCurrentMap().getFakedMapComplementaryInformationsDataMessage(client.getCharacter()));
             client.addGameAction(new GameTutorial(client.getCharacter()));
-        }else
+        } else
             client.send(client.getCharacter().getCurrentMap().getMapComplementaryInformationsDataMessage(client.getCharacter()));
         client.getCharacter().getCurrentMap().sendMapInfo(client);
 
@@ -177,20 +166,23 @@ public class ContextHandler {
     public static void handleGameMapMovementRequestMessage(WorldClient client, GameMapMovementRequestMessage message) {
 
         if (message.keyMovements.length <= 0) {
-            logger.error("Empty Path{}" , client.getIP());
+            logger.error("Empty Path{}", client.getIP());
             client.send(new BasicNoOperationMessage());
             return;
         }
 
         if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            final MovementPath path = Pathfunction.isValidPath(client.getCharacter().getFight(), client.getCharacter().getFighter(), client.getCharacter().getFighter().getCellId(), client.getCharacter().getFighter().getDirection(), message.keyMovements);
+            final Fighter mover = client.getCharacter().getFight().getCurrentFighter() instanceof SlaveFighter
+                    && client.getCharacter().getFight().getCurrentFighter().getSummoner() == client.getCharacter().getFighter() ?
+                    client.getCharacter().getFight().getCurrentFighter() : client.getCharacter().getFighter();
+            final MovementPath path = Pathfunction.isValidPath(client.getCharacter().getFight(), mover, mover.getCellId(), mover.getDirection(), message.keyMovements);
             if (path != null) {
-                if (client.getCharacter().getFighter().isDead()) {
+                if (mover .isDead()) {
                     client.send(new BasicNoOperationMessage());
                     client.getCharacter().getFight().endTurn();
                     return;
                 }
-                final GameMapMovement GameMovement = client.getCharacter().getFight().tryMove(client.getCharacter().getFighter(), path);
+                final GameMapMovement GameMovement = client.getCharacter().getFight().tryMove(mover, path);
 
                 if (GameMovement != null) {
                     GameMovement.execute();
@@ -201,7 +193,7 @@ public class ContextHandler {
         if (client.getCharacter().getCurrentMap() == null) {
             client.send(new GameMapNoMovementMessage());
             PlayerController.sendServerErrorMessage(client, "Votre map est absente veuillez le signalez au staff ");
-            logger.error("Vacant map {} " , client.getCharacter().toString());
+            logger.error("Vacant map {} ", client.getCharacter().toString());
             return;
         }
         client.getCharacter().stopSitEmote();

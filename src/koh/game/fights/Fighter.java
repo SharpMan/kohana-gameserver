@@ -259,6 +259,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             for (final Fighter fighter : aliveFighters) {
                 if (fighter instanceof SummonedFighter)
                     ((SummonedFighter) fighter).tryDieSilencious(this.ID, true);
+                else if(fighter instanceof SlaveFighter)
+                    ((SlaveFighter) fighter).tryDieSilencious(this.ID, true);
                 else
                     fighter.tryDie(this.ID, true);
             }

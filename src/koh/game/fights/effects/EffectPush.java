@@ -2,6 +2,8 @@ package koh.game.fights.effects;
 
 import java.util.Arrays;
 import java.util.Random;
+
+import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
@@ -138,7 +140,7 @@ public class EffectPush extends EffectBase {
 
             if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {
-                    castInfos.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id));
+                    castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id)));
                     return target.setCell(nextCell);
                 }
             } else {
@@ -152,8 +154,9 @@ public class EffectPush extends EffectBase {
 
                 if (i != 0) {
                     target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
-                    target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
-
+                    for (Player player : castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p))) {
+                        player.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+                    }
                 }
 
                 if(currentCell.getId() == target.getCellId()){ //StarckOverflow's correction by pushing same cell
@@ -170,7 +173,9 @@ public class EffectPush extends EffectBase {
 
             currentCell = nextCell;
         }
-        target.getFight().sendToField(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+        for (Player player : castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p))) {
+            player.send(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+        }
 
 
         int result = target.setCell(currentCell);

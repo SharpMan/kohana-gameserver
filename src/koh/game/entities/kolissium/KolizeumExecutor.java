@@ -8,19 +8,24 @@ import koh.game.entities.actors.character.Party;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.kolissium.tasks.StartFightTask;
 import koh.game.fights.FightTypeEnum;
+import koh.game.network.ChatChannel;
 import koh.game.utils.PeriodicContestExecutor;
 import koh.protocol.client.enums.BreedEnum;
 import koh.protocol.client.enums.PvpArenaStepEnum;
 import koh.protocol.client.enums.PvpArenaTypeEnum;
+import koh.protocol.messages.game.chat.ChatServerMessage;
 import koh.protocol.messages.game.context.roleplay.fight.arena.GameRolePlayArenaRegistrationStatusMessage;
 import koh.utils.Couple;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static koh.protocol.client.enums.ChatActivableChannelsEnum.CHANNEL_ADMIN;
 
 /**
  * Created by Melancholia on 3/20/16.
@@ -145,6 +150,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
             waitingSize += group.memberCounts();
         }
         System.out.println("waitingSize= "+waitingSize);
+            ChatChannel.CHANNELS.get(CHANNEL_ADMIN).sendToField(new ChatServerMessage(CHANNEL_ADMIN, "Koliseo scale "+waitingSize+"/"+TEAM_SIZE, (int) Instant.now().getEpochSecond(), "az", 1, "Neo-Craft", 1));
         if (waitingSize >= TEAM_SIZE * 2) {
             tryToStartFight();
         }

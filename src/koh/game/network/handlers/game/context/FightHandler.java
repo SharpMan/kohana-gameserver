@@ -11,6 +11,7 @@ import koh.game.fights.Fight.FightLoopState;
 import koh.game.fights.FightState;
 import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
+import koh.game.fights.fighters.SlaveFighter;
 import koh.game.fights.utils.SwapPositionRequest;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.types.AgressionFight;
@@ -62,19 +63,21 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = 718)
-    public static void HandleGameFightTurnFinishMessage(WorldClient Client, GameFightTurnFinishMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleGameFightTurnFinishMessage(WorldClient client, GameFightTurnFinishMessage Message) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.getCharacter().getFight().getFightState() != FightState.STATE_ACTIVE) {
-            Client.send(new BasicNoOperationMessage());
+        if (client.getCharacter().getFight().getFightState() != FightState.STATE_ACTIVE) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.getCharacter().getFight().getCurrentFighter() == Client.getCharacter().getFighter()) {
-            Client.getCharacter().getFight().setFightLoopState(FightLoopState.STATE_END_TURN);
+
+        if (client.getCharacter().getFight().getCurrentFighter() == client.getCharacter().getFighter() || client.getCharacter().getFight().getCurrentFighter() instanceof SlaveFighter
+                && client.getCharacter().getFight().getCurrentFighter().getSummoner() == client.getCharacter().getFighter()) {
+            client.getCharacter().getFight().setFightLoopState(FightLoopState.STATE_END_TURN);
         }
     }
 

@@ -50,7 +50,7 @@ public abstract class BuffEffect {
         if(this.castInfos.spellId == 103){
             return false;
         }
-        System.out.println(this.castInfos.effectType);
+        logger.debug("Checkinf if buff {} is debuffable",this.castInfos.effectType);
         switch (this.castInfos.effectType) {
             case DAMAGE_ARMOR_REDUCTION:
                 return castInfos.spellId != SpellIDEnum.TREVE;

@@ -54,7 +54,6 @@ public class ArenaParty extends Party {
     @Override
     public void addPlayer(Player player) {
         if (this.inKolizeum) {
-            System.out.println("1");
             /*this.sendMessageToGroup(
                     "Votre groupe a été désinscrit du Kolizeum car <b>" + player.getNickName() + "</b> vient de le rejoindre.");*/
             this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,353,player.getNickName()));

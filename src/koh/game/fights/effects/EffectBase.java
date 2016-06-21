@@ -285,10 +285,11 @@ public abstract class EffectBase {
             this.put(StatsEnum.SUMMON_DOUBLE , new EffectSummonDouble());
             this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION, new EffectSummon());
             this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2, new EffectSummon());
+            this.put(StatsEnum.SUMMON_SLAVE, new EffectSummonSlave());
 
 
             //Roublard
-            this.put(StatsEnum.ACTION_SUMMON_BOMB, new EffectSummonBomb());
+            this.put(StatsEnum.SUMMON_BOMB, new EffectSummonBomb());
             this.put(StatsEnum.COMBO_DAMMAGES, new EffectStats());
             this.put(StatsEnum.EXPAND_SIZE, new EffectExpandSize());
             this.put(StatsEnum.ENABLE_BOMB, new EffectEnableBomb());
