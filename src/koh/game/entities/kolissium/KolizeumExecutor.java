@@ -147,7 +147,11 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         try {
         int waitingSize = waiting.size();
         for (Party group : waitingGroups) {
-            waitingSize += group.memberCounts();
+            try {
+                waitingSize += group.memberCounts();
+            } catch (NullPointerException e){
+                waitingGroups.remove(group);
+            }
         }
         System.out.println("waitingSize= "+waitingSize);
             ChatChannel.CHANNELS.get(CHANNEL_ADMIN).sendToField(new ChatServerMessage(CHANNEL_ADMIN, "Koliseo scale "+waitingSize+"/"+TEAM_SIZE, (int) Instant.now().getEpochSecond(), "az", 1, "Neo-Craft", 1));
