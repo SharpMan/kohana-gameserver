@@ -2,6 +2,7 @@ package koh.game.fights.effects.buff;
 
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
+import koh.game.fights.effects.EffectHeal;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
@@ -14,8 +15,13 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffChatiment extends BuffEffect {
 
-    public BuffChatiment(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_ENDTURN);
+    final int maxValue, duration2;
+
+    public BuffChatiment(EffectCast castInfos, Fighter target) {
+        super(castInfos, target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
+        this.duration--;
+        maxValue = this.castInfos.effect.diceSide;
+        duration2 = this.castInfos.effect.value;
     }
 
     @Override
@@ -25,13 +31,12 @@ public class BuffChatiment extends BuffEffect {
         }
         final MutableInt buffValue = new MutableInt(damageValue.getValue() / 2); // Divise par deux les stats a boost car c'est un personnage.
         //var StatsType = (EffectEnum)this.castInfos.value1 == EffectEnum.HEAL ? EffectEnum.AddVitalite : (EffectEnum)this.castInfos.value1;
-        int MaxValue = this.castInfos.effect.diceSide;
-        int Duration = this.castInfos.effect.value;
+        final int maxValue = this.castInfos.effect.diceSide;
 
         if (this.target.getFight().getCurrentFighter().getID() == this.castInfos.fakeValue) {
-            if (this.castInfos.damageValue < MaxValue) {
-                if (this.castInfos.damageValue + buffValue.getValue() > MaxValue) {
-                    buffValue.setValue(MaxValue - this.castInfos.damageValue);
+            if (this.castInfos.damageValue < maxValue) {
+                if (this.castInfos.damageValue + buffValue.getValue() > maxValue) {
+                    buffValue.setValue(maxValue - this.castInfos.damageValue);
                 }
             } else {
                 buffValue.setValue(0);
@@ -40,16 +45,27 @@ public class BuffChatiment extends BuffEffect {
             this.castInfos.damageValue = 0;
             this.castInfos.fakeValue = (int) this.target.getFight().getCurrentFighter().getID();
 
-            if (this.castInfos.damageValue + buffValue.getValue() > MaxValue) {
-                buffValue.setValue(MaxValue);
+            if (this.castInfos.damageValue + buffValue.getValue() > maxValue) {
+                buffValue.setValue(maxValue);
             }
         }
         if (buffValue.getValue() > 0) {
             this.castInfos.damageValue += buffValue.getValue();
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.castInfos.effect.diceNum), this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, buffValue.getValue(), null, Duration, this.getId()), this.target);
+            switch (StatsEnum.valueOf(this.castInfos.effect.diceNum)){
+                case HEAL:
+                case PDV_REPORTS:
+                    EffectHeal.applyHeal(castInfos,target,buffValue,false);
+                    break;
+                default:
 
-            BuffStats.applyEffect(buffValue, damageInfos);
-            this.target.getBuff().addBuff(BuffStats);
+                    final BuffStats buffStats = new BuffStats(new EffectCast(StatsEnum.valueOf(this.castInfos.effect.diceNum), this.castInfos.spellId, this.castInfos.cellId, 0, null, castInfos.caster, null, false, this.castInfos.effectType, buffValue.getValue(), null, duration2, this.getId()), this.target);
+
+                    buffStats.applyEffect(buffValue, damageInfos);
+                    this.target.getBuff().addBuff(buffStats);
+                    break;
+            }
+
+
         }
 
         return super.applyEffect(damageValue, damageInfos);
