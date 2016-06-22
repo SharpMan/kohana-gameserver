@@ -88,6 +88,7 @@ public class CharacterHandler {
         final PlayerInst inst = PlayerInst.getPlayerInst(client.getCharacter().getID());
         if(inst.getAlignmentChange() > 5 && !message.enable){
             PlayerController.sendServerErrorMessage(client, "Vous ne pouvez pas changer vos ailes plus de 5 fois par jour");
+            return;
         }else
             inst.setAlignmentChange(inst.getAlignmentChange() +1);
 

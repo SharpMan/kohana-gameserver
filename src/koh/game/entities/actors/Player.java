@@ -727,7 +727,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     private void onAligmenentSideChanged() {
-        this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 82));
+        this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 82, String.valueOf(this.alignmentGrade)));
         this.currentMap.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) getGameContextActorInformations(null)));
         this.currentMap.sendToField(Player -> this.currentMap.getAgressableActorsStatus(Player));
         this.refreshStats();
@@ -742,8 +742,12 @@ public class Player extends IGameActor implements Observer {
     }
 
     public BasicGuildInformations getBasicGuildInformations() {
-        return new BasicGuildInformations(0, "");
+        if(this.guild == null)
+            return nullGuildInformations;
+        return new BasicGuildInformations(guild.getEntity().guildID, guild.getEntity().name);
     }
+
+    private static final BasicGuildInformations nullGuildInformations = new BasicGuildInformations(0, "");
 
     public int getCharacterPower() {
         return this.ID + this.level;
