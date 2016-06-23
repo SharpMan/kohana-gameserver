@@ -120,10 +120,9 @@ public class FightFormulas {
             ((CharacterFighter) fighter).getCharacter().addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
         }
 
-       //if(winners.get)
 
         if (end && fighter.getFight().getWinners().getFighters().count() == 1L && fighter.getFight().getWinners().getFighters().count() == fighter.getFight().getEnnemyTeam(fighter.getFight().getWinners()).getFighters().count()) {
-            return isLosser ? computeHonorLost(winners, lossers) : computeHonorWon(winners, lossers);
+            return isLosser ? computeHonorLost(winners, lossers,false) : computeHonorWon(winners, lossers,false);
         }
 
         final double num1 = (double) winners.mapToInt(x -> x.getLevel()).sum();
@@ -137,6 +136,30 @@ public class FightFormulas {
             }
         }
         return (short) num3;
+    }
+
+    public static short koliseoPoint(Fighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers, boolean isLosser, boolean end) {
+
+
+        if (System.currentTimeMillis() - fighter.getFight().getFightTime() < (120 * 1000)) {
+            return 0;
+        }
+
+        //if (end && fighter.getFight().getWinners().getFighters().count() == 1L && fighter.getFight().getWinners().getFighters().count() == fighter.getFight().getEnnemyTeam(fighter.getFight().getWinners()).getFighters().count()) {
+        return isLosser ? computeHonorLost(winners, lossers,true) : computeHonorWon(winners, lossers,true);
+        //}
+
+        /*final double num1 = (double) winners.mapToInt(x -> x.getLevel()).sum();
+        final double num2 = (double) lossers.mapToInt(x -> x.getLevel()).sum();
+        double num3 = Math.floor(Math.sqrt((double) fighter.getLevel()) * 10.0 * (num2 / num1));
+        if (isLosser) {
+            if (num3 > fighter.getPlayer().getHonor()) {
+                num3 = -(short) fighter.getPlayer().getHonor();
+            } else {
+                num3 = -num3;
+            }
+        }
+        return (short) num3;*/
     }
 
     public static int XPDefie(Fighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers) {
@@ -247,7 +270,7 @@ public class FightFormulas {
         return (int) Math.round(xp * pToMount * coeff);
     }
 
-    public static short computeHonorWon(Stream<Fighter> winners, Stream<Fighter> loosers) {
+    public static short computeHonorWon(Stream<Fighter> winners, Stream<Fighter> loosers,boolean isKoli) {
         try {
             int totalGradeWinner = 0;
             int totalGradeLooser = 0;
@@ -258,24 +281,32 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
+                    if(isKoli)
+                        totalGradeWinner += fighter.getPlayer().getKoliseoGrade();
+                    else
+                        totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
+
+                    totalGradeWinnerForEached++;
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
 
-                totalGradeWinnerForEached++;
             }
             for (Fighter fighter : (Iterable<Fighter>) loosers::iterator) {
                 if (!(fighter instanceof CharacterFighter) /*&& fighter.getPrisme() == null*/) {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
+                    if(isKoli)
+                        totalGradeLooser += fighter.getPlayer().getKoliseoGrade();
+                    else
+                        totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
+
+                    totalGradeLooserForEached++;
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
 
-                totalGradeLooserForEached++;
             }
             int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
             int randomGain = EffectHelper.randomValue(100, 120);
@@ -287,7 +318,8 @@ public class FightFormulas {
         }
     }
 
-    public static short computeHonorLost(Stream<Fighter> loosers, Stream<Fighter> winners) {
+
+    public static short computeHonorLost(Stream<Fighter> loosers, Stream<Fighter> winners, boolean isKoli) {
         try {
             int totalGradeWinner = 0;
             int totalGradeLooser = 0;
@@ -298,24 +330,35 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
+                    if(isKoli)
+                        totalGradeWinner += fighter.getPlayer().getKoliseoGrade();
+                    else
+                        totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
+
+                    totalGradeWinnerForEached++;
                 } /*else {
                  TotalGradeWinner += fighter.getPrisme().getLevel();
                  }*/
 
-                totalGradeWinnerForEached++;
+
             }
             for (Fighter fighter : (Iterable<Fighter>) loosers::iterator) {
                 if (!(fighter instanceof CharacterFighter) /*&& fighter.getPrisme() == null*/) {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
+                    if(isKoli)
+                        totalGradeLooser += fighter.getPlayer().getKoliseoGrade();
+                    else
+                        totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
+
+                    totalGradeLooserForEached++;
+
                 } /*else {
                  TotalGradeLooser += fighter.getPrisme().getLevel();
                  }*/
 
-                totalGradeLooserForEached++;
+
             }
             int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
             int randomPerte = 0;

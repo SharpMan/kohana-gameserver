@@ -59,6 +59,9 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         if (buf.remaining() < messageLength) {
             return false;
         }
+        if(Math.abs(Integer.MAX_VALUE - messageLength) < 5){ //java.lang.OutOfMemoryError: Requested array size exceeds VM limit
+            return true;
+        }
         if (getMessageId(header) < 0) {
             session.close();
             return false;
@@ -71,7 +74,8 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         } catch (Exception e) {
             logger.error("[ERROR] Unknown Message Header Handler {} {}" , (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) , session.getRemoteAddress().toString());
             session.write(new BasicNoOperationMessage());
-            buf.skip(messageLength);
+            logger.info(messageLength);
+            //buf.skip(messageLength);
             return true;
         }
         message.deserialize(buf);

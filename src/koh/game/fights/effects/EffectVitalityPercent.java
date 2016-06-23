@@ -23,6 +23,8 @@ public class EffectVitalityPercent extends EffectBase {
                     return -3;
                 }
                 target.getBuff().addBuff(buffstats);
+                if(castInfos.spellId == 111)//contrecoup
+                    buffstats.duration++;
             }
 
         }

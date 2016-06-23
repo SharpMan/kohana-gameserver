@@ -175,14 +175,16 @@ public class BombFighter extends StaticFighter {
         return bestValue;
     }
 
+    private int result = 666;
+
     @Override
-    public int tryDie(int casterId, boolean force) {
+    public synchronized int tryDie(int casterId, boolean force) {
         if (this.getLife() <= 0 && !force) {
             if (this.buff.getAllBuffs().anyMatch(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE)) {
                 return this.buff.getAllBuffs().filter(x -> x.activeType == BuffActiveType.ACTIVE_ON_DIE).findFirst().get().applyEffect(null, null);
             } else {
                 if (this.fightBombs != null) {
-                    this.fightBombs.forEach(Bomb -> Bomb.remove());
+                    this.fightBombs.stream().distinct().forEach(Bomb -> Bomb.remove());
                 }
                 return super.tryDie(casterId, force);
             }
@@ -191,7 +193,7 @@ public class BombFighter extends StaticFighter {
             final int result = selfMurder(casterId);
             fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false,-1);
             if (this.fightBombs != null) {
-                this.fightBombs.forEach(Bomb -> Bomb.remove());
+                this.fightBombs.stream().distinct().forEach(Bomb -> Bomb.remove());
             }
             final int result2 = super.tryDie(casterId, force);
             return result < result2 ? result : result2;

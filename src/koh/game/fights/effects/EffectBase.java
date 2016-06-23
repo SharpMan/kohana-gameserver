@@ -50,6 +50,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.PULL_FORWARD, new EffectPush());
             this.put(StatsEnum.DODGE, new EffectDodge());
 
+
             //Effet de IOP
             this.put(StatsEnum.POUTCH, new EffectPoutch());
             this.put(StatsEnum.DISTRIBUTES_DAMAGES_OCCASIONED, new EffectDistributesDamagesOccasioned());

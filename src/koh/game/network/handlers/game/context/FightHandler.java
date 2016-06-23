@@ -180,11 +180,11 @@ public class FightHandler {
             } else if (Client.getCharacter().getFighter().getTeam().leader != Client.getCharacter().getFighter()) {
                 Client.send(new BasicNoOperationMessage());
             } else {
-                Fighter Fighter = Client.getCharacter().getFight().getFighter(Message.targetId);
+                final Fighter Fighter = Client.getCharacter().getFight().getFighter(Message.targetId);
 
                 if (Fighter == null || Fighter == Client.getCharacter().getFighter()) {
                     Client.send(new BasicNoOperationMessage());
-                } else if (Fighter.getTeam() != Client.getCharacter().getFighter().getTeam()) {
+                } else if (Fighter.getTeam().id != Client.getCharacter().getFighter().getTeam().id) {
                     Client.send(new BasicNoOperationMessage());
                 } else {
                     Client.getCharacter().getFight().leaveFight(Fighter);

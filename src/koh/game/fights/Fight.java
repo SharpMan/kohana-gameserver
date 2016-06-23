@@ -1176,6 +1176,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public void affectSpellTo(Fighter caster, Fighter target, int level, int... spells) {
+        int bestResult;
         SpellLevel spell;
         for (int spellid : spells) {
             spell = DAO.getSpells().findSpell(spellid).getSpellLevel(level);

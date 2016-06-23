@@ -90,7 +90,7 @@ public class Player extends IGameActor implements Observer {
     private Account account;
     @Getter
     @Setter
-    private int achievementPoints, level;
+    private int achievementPoints, level, koliseoPoints;
     @Getter
     @Setter
     private WorldClient client;
@@ -726,6 +726,15 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
+    public int getKoliseoGrade(){
+        for (byte n = 1; n <= 10; n++) {
+            if (honor < DAO.getExps().getLevel(n).getPvP()) {
+                return (byte) (n - 1);
+            }
+        }
+        return 0;
+    }
+
     private void onAligmenentSideChanged() {
         this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 82, String.valueOf(this.alignmentGrade)));
         this.currentMap.sendToField(new GameRolePlayShowActorMessage((GameRolePlayActorInformations) getGameContextActorInformations(null)));
@@ -963,7 +972,8 @@ public class Player extends IGameActor implements Observer {
         sb.append(this.experience).append(',');
         sb.append(this.activableTitle).append(',');
         sb.append(this.activableOrnament).append(',');
-        sb.append(this.regenStartTime);
+        sb.append(this.regenStartTime).append(',');
+        sb.append(this.koliseoPoints);
         return sb.toString();
     }
 

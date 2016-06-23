@@ -92,6 +92,8 @@ public class KoliseoFight extends Fight {
                 continue;
             final int diviser = AntiCheat.deviserBy(getLoosers().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_PVP_ARENA);
             int cote = FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), false) / diviser;
+            final short honorWon = (short) (FightFormulas.koliseoPoint(fighter, winners.getFighters(), loosers.getFighters(), false, true) / diviser);
+            fighter.getPlayer().setKoliseoPoints(fighter.getPlayer().getKoliseoPoints() +honorWon);
             final long count = getLoosers().getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() !=null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
             int kamas  = RANDOM.nextInt(150) + 40;
             if(count == KolizeumExecutor.getTEAM_SIZE()){
@@ -102,7 +104,7 @@ public class KoliseoFight extends Fight {
                 kamas /= (count * 4);
             }
             fighter.getPlayer().addKamas(kamas);
-            final int tokenQua = (int) Math.max(Math.abs(cote * 0.15f),1);
+            final int tokenQua = (int) Math.max(Math.abs(honorWon * 0.15f),1);
             final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), ArenaBattle.KOLIZETON.getId(), 63, fighter.getPlayer().getID(), tokenQua, EffectHelper.generateIntegerEffect(ArenaBattle.KOLIZETON.getPossibleEffects(), EffectGenerationType.NORMAL, false));
             if (fighter.getPlayer().getInventoryCache().add(item, true)) {
                 item.setNeedInsert(true);
@@ -131,7 +133,11 @@ public class KoliseoFight extends Fight {
             log.append("Losser : ").append(fighter.getPlayer().getNickName()).append("Cote ").append(fighter.getPlayer().getKolizeumRate().getRatingd()).append(" ");
             if(fighter.isLeft())
                 continue;
-            final int cote = (FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), true) / AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false,FightTypeEnum.FIGHT_TYPE_PVP_ARENA));
+            final int divizer = AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false,FightTypeEnum.FIGHT_TYPE_PVP_ARENA);
+            final int cote = (FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), true) / divizer);
+
+            final short loosedHonor = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), true) / divizer);
+            fighter.getPlayer().setKoliseoPoints(Math.max(0, fighter.getPlayer().getKoliseoPoints() - loosedHonor));
 
             log.append("cote -= ").append(cote).append("\n");
 

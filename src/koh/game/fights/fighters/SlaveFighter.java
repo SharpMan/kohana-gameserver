@@ -53,12 +53,16 @@ public class SlaveFighter extends StaticFighter {
 
     @Override
     public int beginTurn() {
-        super.onBeginTurn();
         final int r = super.beginTurn();
         if (r == -1) {
             this.summoner.send(new SlaveSwitchContextMessage(summoner.getID(), this.getID(), spellCuts, getCharacteristics(), shortcuts));
         }
         return r;
+    }
+
+    @Override
+    public int endTurn() {
+        return this.tryDieSilencious(this.ID,true);
     }
 
 
@@ -109,6 +113,7 @@ public class SlaveFighter extends StaticFighter {
     public void joinFight() {
 
     }
+
 
     @Override
     public EntityLook getEntityLook() {

@@ -127,6 +127,7 @@ public abstract class AIAction {
 17:39:04.716 [pool-61-thread-38] ERROR fights.AI.AIAction -     Effect[DAMAGE_NEUTRAL_FIX] non defini pour l'IA
 EROSION
 TELEPORT_STARTING_TURN_CELL
+HEAL_ATTACKER_DAMAGE_PERCENT_INCURED
                * */
 
 
