@@ -430,7 +430,7 @@ public class Player extends IGameActor implements Observer {
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
 
-                PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged")+this.account.last_login.getDay(), DAO.getSettings().getStringElement("World.onLoggedColor"));
+                PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
 
                 // client.send(new BasicNoOperationMessage());
                 client.send(new AlignmentRankUpdateMessage(this.alignmentGrade, false));

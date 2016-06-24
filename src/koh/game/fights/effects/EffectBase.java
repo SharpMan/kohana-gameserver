@@ -317,6 +317,9 @@ public abstract class EffectBase {
             this.put(StatsEnum.ADVANCE_CELL, new EffectPush());
             this.put(StatsEnum.BOOST_SHIELD_LIFE_PERCENT, new EffectShieldLifePoint());
 
+            //Roublard
+            this.put(StatsEnum.ATTRACT_TO_CELL,new EffectAttract());
+
             //Resistance% ALL
             this.put(StatsEnum.ADD_ALL_RESITANCES_PERCENT, new EffectAddAllResist());
             this.put(StatsEnum.SUB_ALl_RESISTANCES_PERCENT, new EffectSubAllResist());

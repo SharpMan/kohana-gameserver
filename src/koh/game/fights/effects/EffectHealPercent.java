@@ -3,6 +3,7 @@ package koh.game.fights.effects;
 import koh.game.fights.effects.buff.BuffHealPercent;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.ActionIdEnum;
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMessage;
 
 /**
@@ -35,10 +36,13 @@ public class EffectHealPercent extends EffectBase {
     }
 
     public static int applyHealPercent(EffectCast CastInfos, Fighter target, int heal) {
+        if(target.hasState(FightStateEnum.INSOIGNABLE.value)){
+            return -1;
+        }
         final Fighter caster = CastInfos.caster;
 
         // boost soin etc
-        heal = heal * (target.getMaxLife() / 100);
+        heal = heal * (target.getLife() / 100);
 
         // Si le soin est superieur a sa vie actuelle
         if ((target.getLife() + heal) > target.getMaxLife()) {

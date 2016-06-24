@@ -116,7 +116,7 @@ public class FightFormulas {
             return (short) 0;
         }
 
-        if (System.currentTimeMillis() - fighter.getFight().getFightTime() > 2 * 60 * 1000) {
+        if (System.currentTimeMillis() - fighter.getFight().getFightTime() > 2 * 60 * 1000 ) {
             ((CharacterFighter) fighter).getCharacter().addScore(isLosser ? ScoreType.PVP_LOOSE : ScoreType.PVP_WIN);
         }
 
@@ -141,9 +141,11 @@ public class FightFormulas {
     public static short koliseoPoint(Fighter fighter, Stream<Fighter> winners, Stream<Fighter> lossers, boolean isLosser, boolean end) {
 
 
-        if (System.currentTimeMillis() - fighter.getFight().getFightTime() < (120 * 1000)) {
+        if (System.currentTimeMillis() - fighter.getFight().getFightTime() < (120 * 1000)
+                || fighter.getPlayer().getInventoryCache().getEquipedItems().count() < 5) {
             return 0;
         }
+
 
         //if (end && fighter.getFight().getWinners().getFighters().count() == 1L && fighter.getFight().getWinners().getFighters().count() == fighter.getFight().getEnnemyTeam(fighter.getFight().getWinners()).getFighters().count()) {
         return isLosser ? computeHonorLost(winners, lossers,true) : computeHonorWon(winners, lossers,true);

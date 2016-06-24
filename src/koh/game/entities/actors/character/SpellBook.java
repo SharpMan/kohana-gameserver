@@ -177,7 +177,9 @@ public class SpellBook {
             this.mySpells.put(spellId, new SpellInfo(spellId, level, position));
             if (client != null) {
                 client.send(new SpellUpgradeSuccessMessage(spellId, (byte) level));
-                client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, this.mySpells.get(spellId).toShortcut()));
+                if(position < 1 && position > 99){
+                    client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, this.mySpells.get(spellId).toShortcut()));
+                }
                 client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 3, new String[]{String.valueOf(spellId)}));
             }
 
@@ -299,13 +301,13 @@ public class SpellBook {
     }
 
     public SpellItem[] toSpellItems() {
-        SpellItem[] Array = new SpellItem[this.mySpells.size()];
+        final SpellItem[] array = new SpellItem[this.mySpells.size()];
         int i = 0;
         for (SpellInfo s : this.mySpells.values()) {
-            Array[i] = s.getSpellItem();
+            array[i] = s.getSpellItem();
             i++;
         }
-        return Array;
+        return array;
     }
 
 }

@@ -104,7 +104,10 @@ public class KoliseoFight extends Fight {
                 kamas /= (count * 4);
             }
             fighter.getPlayer().addKamas(kamas);
+            final boolean canCraft = fighter.getPlayer().getHonor() > 400;
             final int tokenQua = (int) Math.max(Math.abs(honorWon * 0.15f),1);
+
+
             final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), ArenaBattle.KOLIZETON.getId(), 63, fighter.getPlayer().getID(), tokenQua, EffectHelper.generateIntegerEffect(ArenaBattle.KOLIZETON.getPossibleEffects(), EffectGenerationType.NORMAL, false));
             if (fighter.getPlayer().getInventoryCache().add(item, true)) {
                 item.setNeedInsert(true);

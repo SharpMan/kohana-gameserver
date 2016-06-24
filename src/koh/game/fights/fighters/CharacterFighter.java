@@ -231,7 +231,8 @@ public class CharacterFighter extends Fighter {
             this.fight.unregisterPlayer(character);
 
             if (this.character.isInWorld()) {
-                this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
+                if(character.getClient() != null)
+                     this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
                 this.character.send(new GameContextDestroyMessage());
                 this.character.send(new GameContextCreateMessage((byte) 1));
                 this.character.setFight(null);

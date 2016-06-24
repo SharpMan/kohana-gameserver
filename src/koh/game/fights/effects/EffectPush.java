@@ -186,7 +186,7 @@ public class EffectPush extends EffectBase {
         return result;
     }
 
-    public static int applyPushBackDamages(EffectCast castInfos, Fighter target, int Length, int CurrentLength) {
+    public static int applyPushBackDamages(EffectCast castInfos, Fighter target, int Length, int currentLength) {
         int damageCoef = 0;
         if (target.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
             damageCoef = 7;
@@ -200,7 +200,7 @@ public class EffectPush extends EffectBase {
         if (levelCoef < 0.1) {
             levelCoef = 0.1;
         }
-        double pushDmg = (castInfos.caster.getLevel() / 2 + (castInfos.caster.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS) - target.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS)) + 32) * (castInfos.effect == null ? 1 : castInfos.effect.diceNum) / (4 * Math.pow(2, CurrentLength));
+        double pushDmg = (castInfos.caster.getLevel() / 2 + (castInfos.caster.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS) - target.getStats().getTotal(StatsEnum.ADD_PUSH_DAMAGES_BONUS)) + 32) * (castInfos.effect == null ? 1 : castInfos.effect.diceNum) / (4 * Math.pow(2, currentLength));
         final MutableInt damageValue = new MutableInt(pushDmg);
         //MutableInt damageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 

@@ -80,8 +80,9 @@ public class InventoryItem {
             return ItemSuperTypeEnum.valueOf(DAO.getItemTemplates().getType(getTemplate().getTypeId()).getSuperType());
         }
         catch (Exception e){
-            logger.error(this.getTemplate().toString());
-            throw e;
+            //logger.error(this.getTemplate().toString());
+            //TODO classify useless item ex id=16820,typeId=184,nameId=Sachet de Cendres ernelles
+            return ItemSuperTypeEnum.SUPERTYPE_UNKNOWN_0;
         }
     }
 

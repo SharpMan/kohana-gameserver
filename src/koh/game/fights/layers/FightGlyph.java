@@ -62,6 +62,7 @@ public class FightGlyph extends FightActivableObject {
             else if (activationType == BuffActiveType.ACTIVE_BEGINTURN && !ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
                 continue;
             }
+            this.logger.debug("** {}",effect.toString());
             targetsPerEffect.addAll(targets);
             targetsPerEffect.removeIf(target -> !(EffectHelper.verifyEffectTrigger(caster, target, castSpell.getEffects(), effect, false, effect.triggers, target.getCellId())
                     && effect.isValidTarget(caster, target)

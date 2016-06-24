@@ -90,17 +90,18 @@ public class SpellDAOImpl extends SpellDAO {
                                e.printStackTrace();
                            }
                        });
-                /*if(result.getInt("spell_id") == 197){
+                if(result.getInt("spell_id") == 114){
                     for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
-                        if(effect.effectId == 1160){
-                            /*levels.get(result.getInt("id")).setEffects(ArrayUtils.removeElement(levels.get(result.getInt("id")).getEffects(),effect));
+                        System.out.println(effect.toString());
+                        /*if(effect.effectId != 406){
+                            levels.get(result.getInt("id")).setEffects(ArrayUtils.removeElement(levels.get(result.getInt("id")).getEffects(),effect));
                             levels.get(result.getInt("id")).setCriticalEffect(ArrayUtils.removeElement(levels.get(result.getInt("id")).getCriticalEffect(),effect));
 
                             effect.delay = 0;
                             System.out.println(effect.toString());
-                        }
+                        }*/
                     }
-                    try (ConnectionStatement<PreparedStatement> connn = dbSource.prepareStatement("UPDATE `spell_levels` set effects= ?,critical_effects =?  WHERE id = ?;")) {
+                    /*try (ConnectionStatement<PreparedStatement> connn = dbSource.prepareStatement("UPDATE `spell_levels` set effects= ?,critical_effects =?  WHERE id = ?;")) {
                         PreparedStatement pStatemente =  connn.getStatement();
                         pStatemente.setBytes(1, EffectHelper.serializeEffectInstanceDice(levels.get(result.getInt("id")).getEffects()).array());
                         pStatemente.setBytes(2, EffectHelper.serializeEffectInstanceDice(levels.get(result.getInt("id")).getCriticalEffect()).array());
@@ -113,9 +114,9 @@ public class SpellDAOImpl extends SpellDAO {
                         logger.error(e);
                         logger.warn(e.getMessage());
                     }
-                }*/
+                }
                 i++;
-            }
+            }*/
         } catch (Exception e) {
             logger.error(e);
             logger.warn(e.getMessage());

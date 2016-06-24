@@ -21,7 +21,8 @@ public class EffectDamage extends EffectBase {
         // Si > 0 alors c'est un buff
         if (castInfos.duration > 0) {
             // L'effet est un poison
-            castInfos.isPoison = true;
+            if(castInfos.spellId != 114)
+                castInfos.isPoison = true;
 
             // Ajout du buff
             castInfos.targets.stream().forEach((Target) -> {

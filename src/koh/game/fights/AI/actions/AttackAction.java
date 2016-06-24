@@ -807,11 +807,10 @@ public class AttackAction extends AIAction {
         {
             int layerScore = 0;
             if (layer.getCastSpell() != null && layer.getCastSpell().getEffects() != null)
-            for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
-                layerScore = (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, true, true));
-            }
-            if (layer instanceof FightBlyph)
-            {
+                for (EffectInstanceDice effect : layer.getCastSpell().getEffects()) {
+                    layerScore = (int) Math.floor(AIAction.AI_ACTIONS.get(AIActionEnum.SELF_ACTING).getEffectScore(AI, (short) -1, (short) -1, effect, fighterList, true, true));
+                }
+            if (layer instanceof FightBlyph) {
                 layerScore *= 2;
             }
             score += layerScore;
@@ -860,9 +859,7 @@ public class AttackAction extends AIAction {
                 if (layer instanceof FightTrap)// TODO : Calculate if traplayer others targets
                 {
                     layerScore *= 4;//Immediat
-                }
-                else if (layer instanceof FightBlyph)
-                {
+                } else if (layer instanceof FightBlyph) {
                     layerScore *= 2;//Debut de tour
                 }
                 score += layerScore;
@@ -932,7 +929,7 @@ public class AttackAction extends AIAction {
         if (isThrow) {
             FightCell targetCell = AI.getFight().getCell(castCell);
             if (targetCell != null) {
-                BuffEffect infos = AI.getFighter().getStates().findState(FightStateEnum.CARRIER);
+                final BuffEffect infos = AI.getFighter().getStates().findState(FightStateEnum.CARRIER);
                 if (infos != null) {
                     Fighter target = infos.target;
                     if (target != null && target.getStates().hasState(FightStateEnum.CARRIED)) {
@@ -945,11 +942,9 @@ public class AttackAction extends AIAction {
                             }
                             if (layer instanceof FightTrap) {
                                 layerScore *= 4;//Immediat
+                            } else if (layer instanceof FightBlyph) {
+                                layerScore *= 2;//Debut de tour
                             }
-                    /*else if (Layer ista FightBlypheLayer)
-                    {
-                        LayerScore *= 2;//Debut de tour
-                    }*/
                             score += layerScore;
                         }
                     }

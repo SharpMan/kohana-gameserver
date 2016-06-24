@@ -19,7 +19,7 @@ public class BuffSpellCoolDown extends BuffEffect {
     public int value, spell;
 
     public BuffSpellCoolDown(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
+        super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
         this.value = CastInfos.effect.value;
         this.spell = CastInfos.effect.diceNum;
     }
@@ -33,7 +33,7 @@ public class BuffSpellCoolDown extends BuffEffect {
 
     @Override
     public int removeEffect() {
-        FighterSpell.SpellinitialCooldown currentCooldown = this.target.getSpellsController().getInitialCooldown().get(spell);
+        final FighterSpell.SpellinitialCooldown currentCooldown = this.target.getSpellsController().getInitialCooldown().get(spell);
         if (currentCooldown != null) {
             this.target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, this.caster.getID(), target.getID(), spell, currentCooldown.initialCooldown + 1));
         }

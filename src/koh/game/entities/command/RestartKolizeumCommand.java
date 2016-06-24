@@ -10,6 +10,8 @@ import koh.protocol.messages.authorized.ConsoleMessage;
  */
 public class RestartKolizeumCommand implements PlayerCommand {
 
+    private int i = 0;
+
     @Override
     public String getDescription() {
         return null;
@@ -17,9 +19,18 @@ public class RestartKolizeumCommand implements PlayerCommand {
 
     @Override
     public void apply(WorldClient client, String[] args) {
+        if(client.getCharacter().getNickName().startsWith("Melan")){
+            WorldServer.getKoli().clear();
+            return;
+        }
+        if(i == 3){
+            client.send(new ConsoleMessage((byte) 0, "Koliseo can not longer restart"));
+            return;
+        }
         WorldServer.getKoli().shutdown();
         WorldServer.setKoli(new KolizeumExecutor());
-        client.send(new ConsoleMessage((byte) 0, "Kolizeum Task rescheduled"));
+        client.send(new ConsoleMessage((byte) 0, "Koliseo Task rescheduled"));
+        i++;
     }
 
     @Override

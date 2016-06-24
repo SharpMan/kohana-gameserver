@@ -440,6 +440,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 if (this.fightState != fightState.STATE_ACTIVE) {
                     return;
                 }
+                if(this.fightLoopState == fightLoopState.STATE_WAIT_READY){
+                    return;
+                }
                 //System.out.println(spellLevel);
                 final short oldCell = cellId;
                 if (spellLevel.getSpellId() == 0 && fighter.isPlayer() && fighter.getPlayer().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)) {
@@ -517,7 +520,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                             .toArray(EffectInstanceDice[]::new);
 
                     Arrays.stream(spellEffects).forEach(e -> e.random = 0); //TODO check 3-4 monsters group spells
-                    final int randGroup = RANDOM.nextInt(maxGroup);
+                    final int randGroup = spellId == 114 ? RANDOM.nextInt(maxGroup) +1  : RANDOM.nextInt(maxGroup +1);
                     spellEffects = Arrays.stream(spellEffects).filter(ef -> ef.group == randGroup).toArray(EffectInstanceDice[]::new);
 
                     while (spellEffects.length == 0) {
@@ -1970,6 +1973,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     private synchronized FightCell getFreeSpawnCell(FightTeam team) {
         for (FightCell cell : this.myFightCells.get(team).values()) {
+            if(!cell.isWalkable()){
+                logger.info("Cell {} map {} ",cell.getId(),map.getId());
+            }
             if (cell.canWalk()) {
                 return cell;
             }

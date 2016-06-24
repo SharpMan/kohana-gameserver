@@ -38,7 +38,9 @@ public class InteractiveElementAction extends GameAction {
     }
 
     static {
-        DAO.getJobTemplates().consumeSkills((x -> x.getGatheredRessourceItem() != -1),(Skill -> HANDLERS.put(InteractiveActionEnum.valueOf(Skill.getID()), new Collect(Skill))));
+        DAO.getJobTemplates()
+                .consumeSkills((x -> x.getGatheredRessourceItem() != -1 && x.getParentJobId() != 1), //TODO 1 == BASE
+                        (Skill -> HANDLERS.put(InteractiveActionEnum.valueOf(Skill.getID()), new Collect(Skill))));
     }
 
     public InteractiveElementSkill skill;

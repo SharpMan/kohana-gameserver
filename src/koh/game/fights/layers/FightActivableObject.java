@@ -18,6 +18,8 @@ import koh.protocol.types.game.actions.fight.GameActionMark;
 import koh.protocol.types.game.actions.fight.GameActionMarkedCell;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +29,7 @@ import java.util.Arrays;
  */
 @Log4j2
 public abstract class FightActivableObject implements IFightObject {
+    protected static final Logger logger = LogManager.getLogger(FightActivableObject.class);
 
     public int priority;
     public BuffActiveType activationType;

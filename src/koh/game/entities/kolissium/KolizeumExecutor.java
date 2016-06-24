@@ -53,6 +53,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         super.initialize();
     }
 
+
     private CopyOnWriteArrayList<Player> waiting;
     private CopyOnWriteArrayList<ArenaParty> waitingGroups;
     //private Map<Integer,Player> waiting = new ConcurrentHashMap<>())
@@ -66,6 +67,38 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     private static Comparator<Player> playerSorter;
 
     public static byte[] PILLAR = new byte[] { BreedEnum.Sacrieur,BreedEnum.Xelor,BreedEnum.Osamodas,BreedEnum.Eniripsa };
+
+    public void clear(){
+        try {
+            ArrayList<Player> players = new ArrayList<>(waiting);
+            for (Player player : players) {
+                if(player.getClient() != null) {
+                    player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
+                    player.getClient().delGameAction(GameActionTypeEnum.KOLI);
+                }
+                player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+
+            }
+            ArrayList<ArenaParty> parties = new ArrayList<>(waitingGroups);
+            for (ArenaParty party : parties) {
+                party.setInKolizeum(false);
+                for (Player player : party.getPlayers()) {
+                    if(player.getClient() != null) {
+                        player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
+                        player.getClient().delGameAction(GameActionTypeEnum.KOLI);
+                    }
+                    player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        waiting.clear();
+        waitingGroups.clear();
+        waiting = new CopyOnWriteArrayList<>();
+        waitingGroups = new CopyOnWriteArrayList<>();
+    }
 
     static{
         partySorter = Comparator.comparing(party -> party.getMoyLevel());
@@ -261,11 +294,11 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
                 return;
             }
             final ArenaParty team1Group = team1.stream()
-                    .filter(p -> p.getClient().getParty() instanceof ArenaParty)
+                    .filter(p -> p.getClient() != null && p.getClient().getParty() instanceof ArenaParty)
                     .map(p -> p.getClient().getParty().asArena())
                     .max(Comparator.comparing(ArenaParty::memberCounts))
                     .orElse(null);
-            team1.stream().filter(p -> p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team1Group)
+            team1.stream().filter(p -> p.getClient() != null && p.getClient().getParty() != null && p.getClient().getParty()/*.asArena()*/ != team1Group)
                     .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
 
             final ArenaParty team2Group = team2.stream()
