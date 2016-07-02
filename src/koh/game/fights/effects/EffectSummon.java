@@ -20,19 +20,19 @@ public class EffectSummon extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         // Possibilité de spawn une creature sur la case ?
-        if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION || castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2){
+        if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION || castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE){
             if(castInfos.targets.isEmpty() || castInfos.targets.stream().noneMatch(bf -> bf instanceof SummonedFighter || bf instanceof StaticFighter))
                 return -1;
             castInfos.targets.forEach(target -> target.tryDie(castInfos.caster.getID(),true));
             //Now mask
         }
-        else if(castInfos.caster.getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
-            return -1;
-        }
 
         final MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
         // getTemplate de monstre existante
         if (monster != null) {
+            if(monster.isUseSummonSlot() && castInfos.caster.getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0){
+                return -1;
+            }
             final MonsterGrade monsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
             if (monsterLevel != null) {
                 if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
@@ -40,13 +40,14 @@ public class EffectSummon extends EffectBase {
                     if(monster.isStatic())
                         summon = new StaticSummonedFighter(castInfos.getFight(),castInfos.caster,monsterLevel);
                     else
-                        summon = (castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION && castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2) ?
+                        summon = (castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION && castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE) ?
                             new SummonedFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster)
                             : new SummonedReplacerFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster, castInfos.targets.stream().filter(bf -> bf instanceof SummonedFighter).findFirst().get().asSummon().getGrade());
 
 
-                    if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2){
+                    if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE){
                         //System.out.println(castInfos.targets.get(0).getBuff().delayedEffects.size());
+                        castInfos.targets.get(0).getBuff().delayedEffects.forEach(i -> i.second = 1);
                         summon.getBuff().delayedEffects.addAll(castInfos.targets.get(0).getBuff().delayedEffects);
                         summon.getBuff().delayedEffects.forEach(e -> e.first.targets.add(summon));
                     }

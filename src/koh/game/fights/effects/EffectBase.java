@@ -285,7 +285,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.SUMMON, new EffectSummon());
             this.put(StatsEnum.SUMMON_DOUBLE , new EffectSummonDouble());
             this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION, new EffectSummon());
-            this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2, new EffectSummon());
+            this.put(StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE, new EffectSummonSlave());
             this.put(StatsEnum.SUMMON_SLAVE, new EffectSummonSlave());
 
 

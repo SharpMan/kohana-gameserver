@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
+import koh.game.fights.effects.EffectEnableBomb;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.effects.buff.BuffDecrementType;
 import koh.game.fights.effects.buff.BuffEffect;
@@ -95,12 +96,13 @@ public class FighterBuff {
     //Le -1 definie l'infini
     public int beginTurn() {
         final MutableInt damage = new MutableInt(0);
-        for (Couple<EffectCast, Integer> EffectCast : this.delayedEffects) {
-            EffectCast.second--;
-            if (EffectCast.second <= 0) {
-                this.delayedEffects.remove(EffectCast);
-                EffectCast.first.targets.removeIf(Fighter -> !Fighter.isAlive());
-                if (EffectBase.tryApplyEffect(EffectCast.first) == -3) {
+        for (Couple<EffectCast, Integer> effectCast : this.delayedEffects) {
+            effectCast.second--;
+            if (effectCast.second <= 0) {
+                this.delayedEffects.remove(effectCast);
+                effectCast.first.targets.removeIf(Fighter -> !Fighter.isAlive());
+                System.out.println("appply"+ effectCast.first);
+                if (EffectBase.tryApplyEffect(effectCast.first) == -3) {
                     return -3;
                 }
             }

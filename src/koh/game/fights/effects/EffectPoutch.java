@@ -38,7 +38,7 @@ public class EffectPoutch extends EffectBase {
                 target.getBuff().addBuff(new BuffPoutch(castInfos, target));
         else {
             if(castInfos.caster.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getID())){
-                castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getCellId(), true, false, true,castInfos.spellId);
+                castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getCellId(), true, true, true,castInfos.spellId);
             }
         }
         log.debug("{} duration {} ",castInfos.effectType,castInfos.duration);

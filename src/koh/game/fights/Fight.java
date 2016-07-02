@@ -424,7 +424,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private static final int[] BLACKLISTED_EFFECTS = DAO.getSettings().getIntArray("Effect.BlacklistedByTriggers");
     private static final StatsEnum[] FIRST_EFFECTS = new StatsEnum[]{
             StatsEnum.DISPELL_SPELL,
-            StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION2,
+            StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE,
             //StatsEnum.CAST_SPELL,
             KILL_TARGET_TO_REPLACE_INVOCATION,
             StatsEnum.KILL,
@@ -440,7 +440,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 if (this.fightState != fightState.STATE_ACTIVE) {
                     return;
                 }
-                if (this.fightLoopState == fightLoopState.STATE_WAIT_READY) {
+                if (!fakeLaunch && this.fightLoopState == fightLoopState.STATE_WAIT_READY) {
                     return;
                 }
                 //System.out.println(spellLevel);
