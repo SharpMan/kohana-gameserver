@@ -6,7 +6,7 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.PlayerInst;
-import koh.game.entities.actors.character.shortcut.ScoreType;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.kolissium.ArenaBattle;
 import koh.game.entities.kolissium.ArenaParty;
 import koh.game.network.WorldClient;

@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import koh.game.entities.actors.Player;
-import koh.game.entities.actors.character.ItemShortcut;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.ShortcutBarEnum;
 import koh.protocol.client.enums.ShortcutType;
@@ -86,24 +85,32 @@ public class ShortcutBook {
     }
 
     public static ShortcutBook deserialize(byte[] binary) {
+
         final ShortcutBook book = new ShortcutBook();
         if (binary.length <= 0) {
             return book;
-        }
-        final IoBuffer buf = IoBuffer.wrap(binary);
-        int len = buf.getInt();
-        for (int i = 0; i < len; i++) {
-            switch (buf.getInt()) {
-                case ShortcutType.SHORTCUT_ITEM:
-                    book.add(new ItemShortcut(buf));
-                    break;
-                default:
-                    throw new Error("type not supported");
+        }try {
+            final IoBuffer buf = IoBuffer.wrap(binary);
+            int len = buf.getInt();
+            for (int i = 0; i < len; i++) {
+                switch (buf.getInt()) {
+                    case ShortcutType.SHORTCUT_ITEM:
+                        book.add(new ItemShortcut(buf));
+                        break;
+                    case ShortcutType.SHORTCUT_PRESET:
+                        book.add(new PresetShortcut(buf));
+                        break;
+                    default:
+                        throw new Error("type not supported");
 
+                }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return book;
     }
+
 
     public void add(PlayerShortcut ps) {
         this.myShortcuts.put(ps.position, ps);

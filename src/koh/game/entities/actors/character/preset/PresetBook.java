@@ -1,8 +1,11 @@
 package koh.game.entities.actors.character.preset;
 
 import koh.game.dao.DAO;
+import koh.game.entities.actors.Player;
 import koh.protocol.types.game.inventory.preset.Preset;
+import koh.protocol.types.game.inventory.preset.PresetItem;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +32,20 @@ public class PresetBook {
         this.entities.put(preset.presetId,entity);
     }
 
-    public Stream<Preset> getValues(){
+    public Stream<Preset> getValues(Player character){
+        for (Preset preset : book.values()) {
+            if(!Arrays.stream(preset.objects).map(o -> o.objUid).allMatch(character.getInventoryCache()::contains)){
+                if(Arrays.stream(preset.objects).map(o -> o.objUid).noneMatch(character.getInventoryCache()::contains)){
+                    this.remove(preset.presetId, character.getID());
+                    continue;
+                }
+                preset.objects = Arrays.stream(preset.objects).filter(o -> character.getInventoryCache().contains(o.objUid)).toArray(PresetItem[]::new);
+                final PresetEntity presetEntity = this.getEntity(preset.presetId);
+                if(presetEntity != null)
+                    presetEntity.informations = preset.serializeInformations();
+                DAO.getPresets().update(character.getID(), presetEntity);
+            }
+        }
         return book.values().stream();
     }
 
@@ -39,6 +55,10 @@ public class PresetBook {
 
     public Preset get(byte id){
         return this.book.get(id);
+    }
+
+    public boolean contains(byte id){
+        return this.book.containsKey(id);
     }
 
     public PresetEntity getEntity(byte id){

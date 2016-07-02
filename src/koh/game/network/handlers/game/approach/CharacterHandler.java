@@ -10,7 +10,7 @@ import koh.game.dao.mysql.PlayerDAOImpl;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.MountInformations;
 import koh.game.entities.actors.character.PlayerInst;
-import koh.game.entities.actors.character.shortcut.ScoreType;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.actors.character.shortcut.ShortcutBook;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
@@ -80,15 +80,15 @@ public class CharacterHandler {
 
     @HandlerAttribute(ID = SetEnablePVPRequestMessage.M_ID)
     public static void handleSetEnablePVPRequestMessage(WorldClient client, SetEnablePVPRequestMessage message) {
-        if(client.isGameAction(GameActionTypeEnum.FIGHT)){
+        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
             return;
         }
         final PlayerInst inst = PlayerInst.getPlayerInst(client.getCharacter().getID());
-        if(inst.getAlignmentChange() > 5 && !message.enable){
+        if (inst.getAlignmentChange() > 5 && !message.enable) {
             PlayerController.sendServerErrorMessage(client, "Vous ne pouvez pas changer vos ailes plus de 5 fois par jour");
             return;
-        }else
-            inst.setAlignmentChange(inst.getAlignmentChange() +1);
+        } else
+            inst.setAlignmentChange(inst.getAlignmentChange() + 1);
 
         client.getCharacter().setEnabldPvp(message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
     }
@@ -108,7 +108,8 @@ public class CharacterHandler {
     }
 
     private static MessageDigest md5;
-    static{
+
+    static {
         try {
             md5 = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
@@ -132,14 +133,13 @@ public class CharacterHandler {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        if(character == null){
+        if (character == null) {
             client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
-        }else if (character.getLevel() > 20 && !answer.toString().equalsIgnoreCase(message.secretAnswerHash)){
+        } else if (character.getLevel() > 20 && !answer.toString().equalsIgnoreCase(message.secretAnswerHash)) {
             client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_BAD_SECRET_ANSWER));
-        }
-        else if(!client.getAccount().remove(message.characterId)){
+        } else if (!client.getAccount().remove(message.characterId)) {
             client.send(new CharacterDeletionErrorMessage(CharacterDeletionErrorEnum.DEL_ERR_RESTRICED_ZONE));
-        }else{
+        } else {
             DAO.getPlayers().remove(message.characterId);
             client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
         }
@@ -166,12 +166,20 @@ public class CharacterHandler {
                 final PlayerInst inst = PlayerInst.getPlayerInst(character.getID());
                 //client.send(new ComicReadingBeginMessage(79));
                 client.send(new EnabledChannelsMessage(character.getEnabledChannels(), character.getDisabledChannels()));
-                client.send(new NotificationListMessage(new int[] { 2147483647 }));
+                client.send(new NotificationListMessage(new int[]{2147483647}));
                 client.send(new CharacterSelectedSuccessMessage(character.toBaseInformations(), false));
                 client.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getScreenRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
-                if(client.getCharacter().getPresets().size() > 0){
-                    client.send(new InventoryContentAndPresetMessage(character.getInventoryCache().toObjectsItem(), character.getKamas(),character.getPresets().getValues().toArray(Preset[]::new)));
-                } else client.send(new InventoryContentMessage(character.getInventoryCache().toObjectsItem(), character.getKamas()));
+                if (client.getCharacter().getPresets().size() > 0) {
+                    client.send(new InventoryContentAndPresetMessage(
+                            character.getInventoryCache().toObjectsItem(),
+                            character.getKamas(),
+                            character.getPresets().getValues(character)
+                                    //.filter(pr -> Arrays.stream(pr.objects).allMatch(i -> client.getCharacter().getInventoryCache().contains(i.objUid) ))
+                                    .toArray(Preset[]::new)
+                    ));
+                } else
+                    client.send(new InventoryContentMessage(character.getInventoryCache().toObjectsItem(), character.getKamas()));
+
                 client.send(new ShortcutBarContentMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, character.getShortcuts().toShortcuts(character)));
                 client.send(new ShortcutBarContentMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, character.getMySpells().toShortcuts()));
                 client.send(new EmoteListMessage(character.getEmotes()));
@@ -228,7 +236,7 @@ public class CharacterHandler {
     public static void sendCharacterStatsListMessage(WorldClient client, boolean fight) {
         client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.getCharacter().getExperience(), (double) DAO.getExps().getPlayerMinExp(client.getCharacter().getLevel()), (double) DAO.getExps().getPlayerMaxExp(client.getCharacter().getLevel()), client.getCharacter().getKamas(), client.getCharacter().getStatPoints(), 0, client.getCharacter().getSpellPoints(), client.getCharacter().getActorAlignmentExtendInformations(),
                 client.getCharacter().getLife(), client.getCharacter().getMaxLife(), client.getCharacter().getEnergy(), PlayerEnum.MAX_ENERGY,
-                (short) client.getCharacter().getStats().getTotal(StatsEnum.ACTION_POINTS,fight), (short) client.getCharacter().getStats().getTotal(StatsEnum.MOVEMENT_POINTS,fight),
+                (short) client.getCharacter().getStats().getTotal(StatsEnum.ACTION_POINTS, fight), (short) client.getCharacter().getStats().getTotal(StatsEnum.MOVEMENT_POINTS, fight),
                 new CharacterBaseCharacteristic(client.getCharacter().getInitiative(true), 0, client.getCharacter().getStats().getItem(StatsEnum.INITIATIVE), 0, 0), client.getCharacter().getStats().getEffect(StatsEnum.PROSPECTING), client.getCharacter().getStats().getEffect(StatsEnum.ACTION_POINTS),
                 client.getCharacter().getStats().getEffect(StatsEnum.MOVEMENT_POINTS), client.getCharacter().getStats().getEffect(StatsEnum.STRENGTH), client.getCharacter().getStats().getEffect(StatsEnum.VITALITY),
                 client.getCharacter().getStats().getEffect(StatsEnum.WISDOM), client.getCharacter().getStats().getEffect(StatsEnum.CHANCE), client.getCharacter().getStats().getEffect(StatsEnum.AGILITY),
@@ -313,7 +321,7 @@ public class CharacterHandler {
                         .titles(new int[0])
                         .kolizeumRate(Glicko2Player.defaultValue())
                         .fighterLook(new Object())
-                        .moodSmiley((byte)-1)
+                        .moodSmiley((byte) -1)
                         .fighterLook(new Object())
                         .alignmentSide(AlignmentSideEnum.ALIGNMENT_NEUTRAL)
                         .build();

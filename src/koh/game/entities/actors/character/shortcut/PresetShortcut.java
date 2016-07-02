@@ -25,7 +25,7 @@ public class PresetShortcut extends PlayerShortcut {
     }
 
     public PresetShortcut(IoBuffer buf) {
-        super(buf.get(), ShortcutType.SHORTCUT_ITEM);
+        super(buf.get(), ShortcutType.SHORTCUT_PRESET);
         this.preset = buf.get();
     }
 

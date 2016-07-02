@@ -1,7 +1,8 @@
 package koh.game.network.handlers.character;
 
 import koh.game.controllers.PlayerController;
-import koh.game.entities.actors.character.ItemShortcut;
+import koh.game.entities.actors.character.shortcut.ItemShortcut;
+import koh.game.entities.actors.character.shortcut.PresetShortcut;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.ShortcutBarEnum;
@@ -75,12 +76,12 @@ public class ShortcutHandler {
                 client.getCharacter().getMySpells().moveSpell(client, ((ShortcutSpell) message.shortcut).spellId, ((ShortcutSpell) message.shortcut).Slot);
                 break;
             case ShortcutBarEnum.GENERAL_SHORTCUT_BAR:
-                if (!(message.shortcut instanceof ShortcutObjectItem)) {
+                if (!(message.shortcut instanceof ShortcutObjectItem) && !(message.shortcut instanceof ShortcutObjectPreset)) {
                     logger.error("Trying to parse SpellShortcut with  {}" , message.shortcut.getTypeId());
                     client.send(new BasicNoOperationMessage());
                     break;
                 }
-                if (!client.getCharacter().getShortcuts().canAddShortcutItem((ShortcutObjectItem) message.shortcut)) {
+                if (message.shortcut instanceof ShortcutObjectItem && !client.getCharacter().getShortcuts().canAddShortcutItem((ShortcutObjectItem) message.shortcut)) {
                     PlayerController.sendServerMessage(client, "Vous ne pouvez pas dupliquez le même item ^^' ...");
                     client.send(new BasicNoOperationMessage());
                     break;
@@ -90,8 +91,18 @@ public class ShortcutHandler {
                     client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, message.shortcut.Slot));
                 }
 
-                client.getCharacter().getShortcuts().add(new ItemShortcut(message.shortcut.Slot, ((ShortcutObjectItem) message.shortcut).itemUID));
-                client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, client.getCharacter().getShortcuts().myShortcuts.get(message.shortcut.Slot).toShortcut(client.getCharacter()))); //getshortcut slto
+                switch (message.shortcut.getTypeId()){
+                    case 370:
+                        if(!client.getCharacter().getPresets().contains(((ShortcutObjectPreset) message.shortcut).presetId)){
+                            return;
+                        }
+                        client.getCharacter().getShortcuts().add(new PresetShortcut(message.shortcut.Slot, ((ShortcutObjectPreset) message.shortcut).presetId));
+                        break;
+                    case 371:
+                        client.getCharacter().getShortcuts().add(new ItemShortcut(message.shortcut.Slot, ((ShortcutObjectItem) message.shortcut).itemUID));
+                        break;
+                }
+                client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, client.getCharacter().getShortcuts().myShortcuts.get(message.shortcut.Slot).toShortcut(client.getCharacter())));
 
                 break;
             default:

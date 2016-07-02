@@ -6,14 +6,18 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import koh.game.dao.api.PresetDAO;
+import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.preset.PresetBook;
 import koh.game.entities.actors.character.preset.PresetEntity;
 import koh.protocol.types.game.inventory.preset.Preset;
+import koh.protocol.types.game.inventory.preset.PresetItem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 
+import java.sql.Array;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 /**
  * Created by Melancholia on 7/1/16.
@@ -69,14 +73,23 @@ public class PresetDAOImpl extends PresetDAO {
     }
 
     @Override
-    public PresetBook load(int owner) {
+    public PresetBook get(Player owner) {
         final PresetBook book = new PresetBook();
         try {
-            for (PresetEntity presetEntity : dataSource.queryForEq("owner", owner)) {
+            for (PresetEntity presetEntity : dataSource.queryForEq("owner", owner.getID())) {
                 final Preset preset = new Preset();
                 final IoBuffer buf = IoBuffer.wrap(presetEntity.informations);
                 preset.deserialize(buf);
                 buf.clear();
+                if(!Arrays.stream(preset.objects).map(o -> o.objUid).allMatch(owner.getInventoryCache()::contains)){
+                    if(Arrays.stream(preset.objects).map(o -> o.objUid).noneMatch(owner.getInventoryCache()::contains)){
+                        this.remove(owner.getID(),preset.presetId);
+                        continue;
+                    }
+                    preset.objects = Arrays.stream(preset.objects).filter(o -> owner.getInventoryCache().contains(o.objUid)).toArray(PresetItem[]::new);
+                    presetEntity.informations = preset.serializeInformations();
+                    this.update(owner.getID(), presetEntity);
+                }
                 book.add(preset,presetEntity);
             }
 

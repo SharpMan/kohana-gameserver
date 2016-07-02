@@ -29,6 +29,7 @@ import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.IdentifiedEntityDispositionInformations;
 import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.look.EntityLook;
+import koh.utils.Enumerable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -661,7 +662,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         try {
             return this.myCell.Id;
         } catch (NullPointerException e) {
-            fight.getLogger().error(fight.getMap().getId());
+            fight.getLogger().error("map {} cell {} {} ",fight.getMap().getId(), Enumerable.join(fight.myFightCells.get(fight.getTeam1()).keySet().stream().toArray(Short[]::new)),Enumerable.join(fight.myFightCells.get(fight.getTeam2()).keySet().stream().toArray(Short[]::new)));
             this.fight.getLogger().error(this.toString());
             e.printStackTrace();
             return 0;

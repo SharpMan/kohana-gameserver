@@ -1,4 +1,4 @@
-package koh.game.entities.actors.character.shortcut;
+package koh.game.entities.actors.character;
 
 /**
  *

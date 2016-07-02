@@ -7,7 +7,7 @@ import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.character.*;
 import koh.game.entities.actors.character.preset.PresetBook;
-import koh.game.entities.actors.character.shortcut.ScoreType;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.actors.character.shortcut.ShortcutBook;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.guilds.Guild;
@@ -213,9 +213,6 @@ public class Player extends IGameActor implements Observer {
             };
         }
 
-        if (this.presets == null) {
-            this.presets = DAO.getPresets().load(this.ID);
-        }
 
         this.guild = DAO.getGuildMembers().getForPlayer(this.ID);
 
@@ -242,6 +239,10 @@ public class Player extends IGameActor implements Observer {
                 });
 
         this.inventoryCache.generalItemSetApply();
+
+        if (this.presets == null) {
+            this.presets = DAO.getPresets().get(this);
+        }
 
         this.myInitialized = true;
         if (life == 0) {
@@ -989,9 +990,10 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void totalClear() {
-        /*TODO
+        /*TODO:
         cachedHumanInformations
         kolizeumRate
+        presets
          */
         owner = 0;
         moodSmiley = 0;

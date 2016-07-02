@@ -42,7 +42,10 @@ public class PartyRequest extends GameBaseRequest {
             this.requester.getParty().removeGuest(this.requested.getCharacter());
         }
         catch (NullPointerException e1){
-            this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requester.getCharacter().getID()));
+            try {
+                this.requested.send(new PartyInvitationCancelledForGuestMessage(this.requester.getParty().id, this.requester.getCharacter().getID()));
+            }
+            catch (Exception e) {}
         }
         catch (Exception e) {
             e.printStackTrace();

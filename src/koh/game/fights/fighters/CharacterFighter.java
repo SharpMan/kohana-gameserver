@@ -4,7 +4,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.PlayerInst;
-import koh.game.entities.actors.character.shortcut.ScoreType;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.kolissium.KolizeumExecutor;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.*;

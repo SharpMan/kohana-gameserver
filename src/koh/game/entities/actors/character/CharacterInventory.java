@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
+import koh.game.entities.actors.character.shortcut.ItemShortcut;
 import koh.game.entities.item.*;
 import koh.game.entities.item.animal.MountInventoryItem;
 import koh.look.EntityLookParser;
@@ -69,6 +70,10 @@ public class CharacterInventory {
 
     public InventoryItem find(int id) {
         return this.itemsCache.get(id);
+    }
+
+    public boolean contains(int id) {
+        return this.itemsCache.containsKey(id);
     }
 
     public InventoryItem findTemplate(int template) {

@@ -2,7 +2,7 @@ package koh.game.fights;
 
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.PlayerInst;
-import koh.game.entities.actors.character.shortcut.ScoreType;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.mob.MonsterDrop;

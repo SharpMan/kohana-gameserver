@@ -1572,7 +1572,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             //fighter.getSpellsController().getInitialCooldown().entrySet()
             //       .stream().forEach(f-> System.out.println(f.getKey()+" "+f.getValue()));
 
-            if(fighter.getSummonedCreature().noneMatch(fi -> fi instanceof SlaveFighter)) {
+            if (fighter.getSummonedCreature().noneMatch(fi -> fi instanceof SlaveFighter)) {
                 fighter.send(new GameFightResumeMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.fightWorker.fightTurn, (int) (System.currentTimeMillis() - this.fightTime), getIdols(),
                         fighter.getSpellsController().getInitialCooldown().entrySet()
                                 .stream()
@@ -1584,7 +1584,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         (byte) fighter.getTeam().getAliveFighters()
                                 .filter(x -> x.getSummonerID() == fighter.getID() && (x instanceof BombFighter))
                                 .count()));
-            }else{
+            } else {
                 fighter.send(new GameFightResumeWithSlavesMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.fightWorker.fightTurn, (int) (System.currentTimeMillis() - this.fightTime), getIdols(),
                         fighter.getSpellsController().getInitialCooldown().entrySet()
                                 .stream()
@@ -1607,8 +1607,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             CharacterHandler.sendCharacterStatsListMessage(fighter.getCharacter().getClient(), true);
             if (this.currentFighter.getID() == fighter.getID()) {
                 fighter.send(this.currentFighter.asPlayer().getFighterStatsListMessagePacket());
-            }
-            else if(this.currentFighter instanceof SlaveFighter && currentFighter.getSummonerID() == fighter.getID()){
+            } else if (this.currentFighter instanceof SlaveFighter && currentFighter.getSummonerID() == fighter.getID()) {
                 fighter.send(currentFighter.asSlave().getSwitchContextMessage());
             }
             /*Fighter.send(new GameFightUpdateTeamMessage(this.fightId, this.getTeam1().getFightTeamInformations()));
@@ -1974,21 +1973,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public Fighter hasEnnemyInCell(short cellId, FightTeam Team) {
-        try {
-            if (cellId == -1) {
-                return null;
-            }
-            return this.fightCells.get(cellId).hasEnnemy(Team);
-        }catch (NullPointerException e){
+        if (!this.fightCells.containsKey(cellId)) {
             return null;
         }
+        return this.fightCells.get(cellId).hasEnnemy(Team);
     }
 
-    public Fighter hasFriendInCell(short CellId, FightTeam Team) {
-        if (CellId == -1) {
+    public Fighter hasFriendInCell(short cellId, FightTeam Team) {
+        if (!this.fightCells.containsKey(cellId)) {
             return null;
         }
-        return this.fightCells.get(CellId).hasFriend(Team);
+        return this.fightCells.get(cellId).hasFriend(Team);
     }
 
     public GameFightTurnListMessage getFightTurnListMessage() {

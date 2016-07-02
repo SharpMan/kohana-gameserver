@@ -3,7 +3,7 @@ package koh.game.fights.types;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.MonsterGroup;
-import koh.game.entities.actors.character.shortcut.ScoreType;
+import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;

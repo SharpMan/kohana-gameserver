@@ -1,4 +1,4 @@
-package koh.game.entities.actors.character;
+package koh.game.entities.actors.character.shortcut;
 
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.shortcut.PlayerShortcut;
