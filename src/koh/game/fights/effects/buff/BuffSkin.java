@@ -87,7 +87,7 @@ public class BuffSkin extends BuffEffect {
         }
         look.bonesId = this.oldBonesID;
         look.scales = this.oldScales;
-        if (this.skinToRemove != 0) {
+        if (this.skinToRemove != 0 && look.skins.indexOf(this.skinToRemove) != -1) {
             look.skins.remove(look.skins.indexOf(this.skinToRemove));
         }
         this.caster.getFight().sendToField(new GameActionFightChangeLookMessage(ACTION_CHARACTER_CHANGE_LOOK, this.caster.getID(), this.target.getID(), this.target.getEntityLook()));

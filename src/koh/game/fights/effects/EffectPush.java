@@ -16,6 +16,7 @@ import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.effects.buff.BuffPorteur;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.fights.fighters.SummonedFighter;
+import koh.game.fights.layers.FightPortal;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.SpellIDEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -104,7 +105,7 @@ public class EffectPush extends EffectBase {
                     else if(castInfos.spellId == 5390){ //Odysee
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.casterOldCell);
                     }
-                    else if(castInfos.spellId == 5382 || castInfos.spellId == 5475 /*|| castInfos.spellId == 5390*/){
+                    else if(castInfos.spellId == 5382 || castInfos.spellId == 5475 /*|| castInfos.emoteId == 5390*/){
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
                     }
                     else if(castInfos.spellId == 2801 ){
@@ -143,6 +144,12 @@ public class EffectPush extends EffectBase {
                     castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id)));
                     return target.setCell(nextCell);
                 }
+                else if(nextCell.hasObject(FightObjectType.OBJECT_PORTAL) && nextCell.getObjects().stream().anyMatch(o -> o instanceof FightPortal && ((FightPortal)o).enabled)){
+                    castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id)));
+                    return target.setCell(nextCell);
+                }
+
+
             } else {
                 int pushResult = -1;
                 if (castInfos.effectType == StatsEnum.PUSH_BACK) {

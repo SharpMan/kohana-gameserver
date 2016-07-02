@@ -35,7 +35,7 @@ public class BuffState extends BuffEffect {
         this.target.getStates().addState(this);
         /*if(getState() == FightStateEnum.Téléfrag && this.target instanceof SummonedFighter && target.asSummon().getGrade().getMonsterId() == 3958) { // Synchro
             final SpellLevel spell = DAO.getSpells().findSpell(5435).getLevelOrNear(target.asSummon().getGrade().getLevel());
-            castInfos.getFight().launchSpell(target, spell, target.getCellId(), true, true, true, castInfos.spellId);
+            castInfos.getFight().launchSpell(target, spell, target.getCellId(), true, true, true, castInfos.emoteId);
            // target.tryDie(castInfos.caster.getID(), true);
         }*/
         return super.applyEffect(DamageValue, DamageInfos);

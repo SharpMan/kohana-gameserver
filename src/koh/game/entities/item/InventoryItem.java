@@ -99,11 +99,11 @@ public class InventoryItem {
     }
 
     public short getApparrance() {
-        ObjectEffectInteger effect = (ObjectEffectInteger) this.getEffect(972);
+        final ObjectEffectInteger effect = (ObjectEffectInteger) this.getEffect(972);
         if (effect == null) {
             return this.getTemplate().getAppearanceId();
         } else {
-            ObjectEffectInteger type = (ObjectEffectInteger) this.getEffect(970);
+            final ObjectEffectInteger type = (ObjectEffectInteger) this.getEffect(970);
             if (type == null) {
                 return this.getTemplate().getAppearanceId();
             }
@@ -312,7 +312,7 @@ public class InventoryItem {
     }
 
     private boolean isTokenItem() {
-        return this.templateId == 13470;
+        return this.templateId == 13470 || this.templateId == 12736;
     }
 
 }

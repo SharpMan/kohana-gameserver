@@ -146,12 +146,17 @@ public class AgressionFight extends Fight {
             if(fighter.isLeft())
                 continue;
             short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_AGRESSION));
-            final long count = getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() !=null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
-            if(count == getEnnemyTeam(getWinners()).getFighters().count()){
-                honorWon = 0;
-            }else if(count != 0 && (getEnnemyTeam(getWinners()).getFighters().count() - count) >= 1){
-                honorWon /= (count * 4);
+
+            if(fighter.getPlayer().getAccount() != null){
+                final long count = loosers.getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() != null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
+                if (count == getEnnemyTeam(getWinners()).getFighters().count()) {
+                    honorWon = 0;
+                } else if (count != 0 && (getEnnemyTeam(getWinners()).getFighters().count() - count) >= 1) {
+                    honorWon /= (count * 4);
+                }
             }
+
+
             fighter.getPlayer().addHonor(honorWon, true);
             fighter.getPlayer().addDishonor(FightFormulas.calculateEarnedDishonor(fighter),true);
             this.myResult.results.add(

@@ -134,6 +134,7 @@ public class SummonedFighter extends MonsterFighter {
                 this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
                 if (summoner instanceof CharacterFighter) {
                     summoner.send(summoner.asPlayer().getCharacterStatsListMessagePacket());
+                    //summoner.send(((CharacterFighter) summoner).getFighterStatsListMessagePacket());
                 }
             }
             //5435

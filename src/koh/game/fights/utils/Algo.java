@@ -17,8 +17,8 @@ public class Algo {
     private static final Random RANDOM = new Random();
 
     private static Couple<Short, Short> getRandomBaseCellPlaces(DofusMap map) {
-        short team1_baseCell = map.getRandomWalkableCell();
-        short team2_baseCell = map.getRandomWalkableCell();
+        short team1_baseCell = map.getRandomWalkableCellInFight();
+        short team2_baseCell = map.getRandomWalkableCellInFight();
 
         if (Pathfunction.goalDistance(map, team1_baseCell, team2_baseCell) < 3) {
             return getRandomBaseCellPlaces(map);
@@ -48,7 +48,7 @@ public class Algo {
             }
             if (boucles > 25) {
                 short randomCellId = fight.getMap().getRandomCell();
-                FightCell cell = fight.getCell(randomCellId);
+                final FightCell cell = fight.getCell(randomCellId);
                 if (cell != null && cell.isWalkable()) {
                     if (!team1.contains(cell)) {
                         team1.add(cell);

@@ -4,7 +4,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.PlayerInst;
-import koh.game.entities.actors.character.ScoreType;
+import koh.game.entities.actors.character.shortcut.ScoreType;
 import koh.game.entities.kolissium.KolizeumExecutor;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.*;
@@ -314,7 +314,7 @@ public class CharacterFighter extends Fighter {
                 new CharacterBaseCharacteristic(this.getInitiative(true), 0, stats.getItem(StatsEnum.INITIATIVE), 0, 0), stats.getEffect(StatsEnum.PROSPECTING), stats.getEffect(StatsEnum.ACTION_POINTS),
                 stats.getEffect(StatsEnum.MOVEMENT_POINTS), stats.getEffect(StatsEnum.STRENGTH), stats.getEffect(StatsEnum.VITALITY),
                 stats.getEffect(StatsEnum.WISDOM), stats.getEffect(StatsEnum.CHANCE), stats.getEffect(StatsEnum.AGILITY),
-                stats.getEffect(StatsEnum.INTELLIGENCE), stats.getEffect(StatsEnum.ADD_RANGE), stats.getEffect(StatsEnum.ADD_SUMMON_LIMIT),
+                stats.getEffect(StatsEnum.INTELLIGENCE), new CharacterBaseCharacteristic(stats.getBase(StatsEnum.ADD_RANGE) + stats.getBoost(StatsEnum.ADD_RANGE), 0, stats.getItem(StatsEnum.ADD_RANGE), 0, 0), stats.getEffect(StatsEnum.ADD_SUMMON_LIMIT),
                 stats.getEffect(StatsEnum.DAMAGE_REFLECTION), stats.getEffect(StatsEnum.ADD_CRITICAL_HIT), character.getInventoryCache().weaponCriticalHit(),
                 stats.getEffect(StatsEnum.CRITICAL_MISS), stats.getEffect(StatsEnum.ADD_HEAL_BONUS), stats.getEffect(StatsEnum.ALL_DAMAGES_BONUS),
                 stats.getEffect(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT), stats.getEffect(StatsEnum.ADD_DAMAGE_PERCENT), stats.getEffect(StatsEnum.TRAP_BONUS),

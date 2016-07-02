@@ -221,8 +221,8 @@ public class SpellBook {
             Spell.position = -1;
             client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, position));
         });
-        /*if (this.mySpells.get(spellId).position != -1) {
-         client.sendPacket(new ShortcutBarRemovedMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, this.mySpells.get(spellId).position));
+        /*if (this.mySpells.get(emoteId).position != -1) {
+         client.sendPacket(new ShortcutBarRemovedMessage(ShortcutBarEnum.SPELL_SHORTCUT_BAR, this.mySpells.get(emoteId).position));
          }*/
         this.mySpells.get(spellId).position = position;
         client.sequenceMessage();

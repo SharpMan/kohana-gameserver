@@ -68,6 +68,10 @@ public class FightGlyph extends FightActivableObject {
                     && effect.isValidTarget(caster, target)
                     && EffectInstanceDice.verifySpellEffectMask(caster, target, effect,target.getCellId())));
 
+            if(!ArrayUtils.contains(EffectHelper.DAMAGE_EFFECTS_IDS,effect.effectId)){
+                targetsPerEffect.removeIf(tar -> tar.getBuff().getAllBuffs().anyMatch(bf -> bf.castInfos != null && bf.castInfos.spellId == castSpell.getSpellId() && bf.castInfos.effect != null && bf.castInfos.effect.effectUid == effect.effectUid));
+            }
+
             final EffectCast castInfos = new EffectCast(effect.getEffectType(), this.castSpell.getSpellId(), cell.Id, 100, effect, caster, targetsPerEffect, false, StatsEnum.NONE, 0, this.castSpell);
             castInfos.isGlyph = true;
             castInfos.glyphId = this.ID;

@@ -110,6 +110,7 @@ public class PetsInventoryItem extends InventoryItem {
             PlayerController.sendServerMessage(p.getClient(), "Veuillez patientez " + ((/*getAnimal().getMinDurationBeforeMeal()*/60) - ((int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " minutes pour le prochain repas");
             return false;
         }
+        this.removeEffect(983);
 
         for (FoodItem i : getAnimal().getFoodItems()) {
             if (food.getTemplateId() == i.getItemID()) {

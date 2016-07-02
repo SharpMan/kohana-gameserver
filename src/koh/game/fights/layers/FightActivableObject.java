@@ -210,7 +210,10 @@ public abstract class FightActivableObject implements IFightObject {
         disappearForAll();
 
         for (short cell : affectedCells) {
-            this.m_fight.getCell(cell).removeObject(this);
+            try {
+                this.m_fight.getCell(cell).removeObject(this);
+            }
+            catch (Exception e){ }
         }
         if (this.m_fight.getActivableObjects().containsKey(this.caster)) {
             if(!this.m_fight.getActivableObjects().get(this.caster).remove(this) && this.getObjectType() == FightObjectType.OBJECT_PORTAL){

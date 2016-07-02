@@ -457,6 +457,16 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
     }
 
+    public short getRandomWalkableCellInFight() {
+        short cell = getRandomCell();
+        if (cells[cell].walakableInFight()) {
+            return cell;
+        } else {
+            return getRandomWalkableCellInFight();
+        }
+    }
+
+
     public void addDoor(MapDoor d) {
         if (this.doors == null) {
             this.doors = new HashMap();

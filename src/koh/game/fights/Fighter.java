@@ -104,7 +104,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     @Setter
     protected boolean turnReady = true;
     public Object temperoryLook = new Object();
-    @Getter @Setter
+    @Getter
+    @Setter
     private short lastCellSeen;
     @Getter
     private Object mutex;
@@ -115,6 +116,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     public void endFight() {
 
     }
+
     public MapPoint getMapPoint() {
         return mapPointCache;
     }
@@ -259,7 +261,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             for (final Fighter fighter : aliveFighters) {
                 if (fighter instanceof SummonedFighter)
                     ((SummonedFighter) fighter).tryDieSilencious(this.ID, true);
-                else if(fighter instanceof SlaveFighter)
+                else if (fighter instanceof SlaveFighter)
                     ((SlaveFighter) fighter).tryDieSilencious(this.ID, true);
                 else
                     fighter.tryDie(this.ID, true);
@@ -575,7 +577,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return this.getVisibleStateFor(character) != GameActionFightInvisibilityStateEnum.INVISIBLE.value;
     }
 
-    public boolean isVisibleFor(Fighter fighter){
+    public boolean isVisibleFor(Fighter fighter) {
         if (this.team.getAliveFighters().anyMatch(Fighter -> (Fighter instanceof IllusionFighter) && Fighter.summoner.getID() == this.ID)) {
             return true;
         } else if (fighter == null) {
@@ -605,6 +607,23 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return false;
         }
         return character.getFighter().isFriendlyWith(this);
+    }
+
+    public GameFightResumeSlaveInfo[] getGameFightResumeSlaveInfo() {
+        return this.getSummonedCreature()
+                .filter(f -> f instanceof SlaveFighter)
+                .map(f -> new GameFightResumeSlaveInfo(f.getID(),
+                        f.getSpellsController().getInitialCooldown().entrySet()
+                                .stream()
+                                .map(x -> new GameFightSpellCooldown(x.getKey(), f.getSpellsController().minCastInterval(x.getKey()) == 0 ? x.getValue().initialCooldown : f.getSpellsController().minCastInterval(x.getKey())))
+                                .toArray(GameFightSpellCooldown[]::new)
+                        , (byte) f.getTeam().getAliveFighters()
+                        .filter(x -> x.getSummonerID() == f.getID() && !(x instanceof BombFighter))
+                        .count(),
+                        (byte) f.getTeam().getAliveFighters()
+                                .filter(x -> x.getSummonerID() == f.getID() && (x instanceof BombFighter))
+                                .count())).toArray(GameFightResumeSlaveInfo[]::new);
+
     }
 
     public int getInitiative(boolean Base) { //FIXME : Considerate stats ?
@@ -734,8 +753,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         double _loc13_ = 0;
         double _loc2_ = 1;
 
-        for (CopyOnWriteArrayList<FightActivableObject> Objects : fight.getActivableObjects().values()) {
-            for (FightActivableObject Object : Objects) {
+        for (CopyOnWriteArrayList<FightActivableObject> objs : fight.getActivableObjects().values()) {
+            for (FightActivableObject Object : objs) {
                 if (Object instanceof FightPortal && ((FightPortal) Object).enabled) {
                     _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
                     if (Object.getCellId() == param1) {
@@ -838,21 +857,21 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:
             case LIFE_LEFT_TO_THE_ATTACKER_NEUTRAL_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0)),50)) / 100
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
                         - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_EARTH:
             case STEAL_EARTH:
             case LIFE_LEFT_TO_THE_ATTACKER_EARTH_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0)),50)) / 100
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
                         - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_FIRE:
             case STEAL_FIRE:
             case LIFE_LEFT_TO_THE_ATTACKER_FIRE_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0)),50)) / 100
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
                         - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
@@ -860,18 +879,18 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             case STEAL_AIR:
             case LIFE_LEFT_TO_THE_ATTACKER_AIR_DAMAGES:
             case PA_USED_LOST_X_PDV:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0)),50)) / 100
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
                         - this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_WATER:
             case STEAL_WATER:
             case LIFE_LEFT_TO_THE_ATTACKER_WATER_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0)),50)) / 100
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
                         - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
         }
-        if(cc){
+        if (cc) {
             damages.subtract(this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION));
         }
     }
@@ -912,16 +931,16 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 }
             }
         } else {
-            final int dodgeMPCaster = caster.getMPCancelling() + 1;
-            final int dodgeMPTarget = this.getMPDodge() + 1;
+            final int dodgeMPCaster = Math.max(1, caster.getMPCancelling() + 1);
+            final int dodgeMPTarget = Math.max(1, this.getMPDodge() + 1);
 
             for (int i = 0; i < lostPoint; i++) {
-                int ActualMP = (isBuff && this.ID == this.fight.getCurrentFighter().ID ? this.getMaxMP() : this.getMP()) - realLostPoint;
+                final int actualMP = (isBuff && this.ID == this.fight.getCurrentFighter().ID ? this.getMaxMP() : this.getMP()) - realLostPoint;
                 int realMP = getMP();
                 if (realMP == 0) {
                     realMP = 1;
                 }
-                final double percentLastMP = ActualMP / realMP;
+                final double percentLastMP = actualMP / realMP;
                 final double chance = 0.5 * (dodgeMPCaster / dodgeMPTarget) * percentLastMP;
                 int percentChance = (int) (chance * 100);
 
@@ -943,7 +962,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public void calculheal(MutableInt heal) {
         heal.setValue((Math.floor(heal.doubleValue() *
-                (1 + (this.stats.getTotal(StatsEnum.INTELLIGENCE) / 100f)))  + this.stats.getTotal(StatsEnum.ADD_HEAL_BONUS)));
+                (1 + (this.stats.getTotal(StatsEnum.INTELLIGENCE) / 100f))) + this.stats.getTotal(StatsEnum.ADD_HEAL_BONUS)));
     }
 
     public int calculArmor(StatsEnum DamageEffect) {
@@ -988,6 +1007,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public MonsterFighter asMonster() {
         return (MonsterFighter) this;
+    }
+
+    public SlaveFighter asSlave() {
+        return (SlaveFighter) this;
     }
 
     public Player getPlayer() {

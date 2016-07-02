@@ -133,7 +133,9 @@ public class RolePlayHandler {
             return;
         }
         if (message.boostPoint <= 0) {
-            throw new Error("client given 0 as boostpoint. Forbidden value.");
+            client.send(new BasicNoOperationMessage());
+            PlayerController.sendServerErrorMessage(client, "client given 0 as boostpoint. Forbidden value");
+            return;
         }
         int base = client.getCharacter().getStats().getBase(Stat);
         short num1 = (short) message.boostPoint;

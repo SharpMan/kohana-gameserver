@@ -42,11 +42,11 @@ public class EffectActivableObject extends EffectBase {
                         break;
                     }
                     ((FightPortal) castInfos.getCell().getObjects(FightObjectType.OBJECT_PORTAL)[0]).remove();
-                } else if (castInfos.caster.getFight().getActivableObjects().get(castInfos.caster) != null
+                } else if (castInfos.caster.getFight().getActivableObjects().containsKey(castInfos.caster)
                         && castInfos.caster.getFight().getActivableObjects().get(castInfos.caster)
                         .stream()
                         .filter(ob -> ob instanceof FightPortal)
-                        .count() > 3) {
+                        .count() > 3L) {
                     castInfos.caster.getFight().getActivableObjects().get(castInfos.caster).stream().findFirst().get().remove();
                 }
                 /*if (!castInfos.caster.getFight().canPutObject(castInfos.getCellId)) {

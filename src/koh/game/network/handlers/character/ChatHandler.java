@@ -87,6 +87,10 @@ public class ChatHandler {
 
     @HandlerAttribute(ID = 852)
     public static void handleChatClientPrivateWithObjectMessage(WorldClient client, ChatClientPrivateWithObjectMessage message) {
+        if(PlayerInst.isMuted(client.getCharacter().getID())){
+            client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,124, String.valueOf(PlayerInst.muteTime(client.getCharacter().getID()))));
+            return;
+        }
         if (message.objects == null) {
             handleChatClientPrivateMessage(client, message);
             return;
@@ -102,7 +106,11 @@ public class ChatHandler {
 
     @HandlerAttribute(ID = ChatClientPrivateMessage.MESSAGE_ID)
     public static void handleChatClientPrivateMessage(WorldClient client, ChatClientPrivateMessage message) {
-        Player target = DAO.getPlayers().getCharacter(message.Receiver);
+        if(PlayerInst.isMuted(client.getCharacter().getID())){
+            client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,124, String.valueOf(PlayerInst.muteTime(client.getCharacter().getID()))));
+            return;
+        }
+        final Player target = DAO.getPlayers().getCharacter(message.Receiver);
         if (target == null || target.getClient() == null) {
             client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
         } else {
@@ -195,9 +203,13 @@ public class ChatHandler {
                     client.getCharacter().getFight().sendToField(new ChatServerMessage(message.channel, message.content, (int) Instant.now().getEpochSecond(), "", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id));
                 }
                 else if(message.content.startsWith(".")){
+                    if((System.currentTimeMillis() - client.getLastCommand()) < 1000 * 3){
+                        PlayerController.sendServerMessage(client,"Veuillez reesayer");
+                        return;
+                    }
                     String [] args = message.content.split(" ");
-                    PlayerCommand chatCommand = DAO.getCommands().findChatCommand(args[0].substring(1));
-
+                    final PlayerCommand chatCommand = DAO.getCommands().findChatCommand(args[0].substring(1));
+                    client.setLastCommand(System.currentTimeMillis());
                     if(chatCommand != null){
                         chatCommand.call(client,message.content.substring(args.length > 1 ? (args[0].length() +1) : args[0].length()));
                     }

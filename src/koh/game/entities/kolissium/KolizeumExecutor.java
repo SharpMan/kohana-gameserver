@@ -17,12 +17,10 @@ import koh.protocol.messages.game.chat.ChatServerMessage;
 import koh.protocol.messages.game.context.roleplay.fight.arena.GameRolePlayArenaRegistrationStatusMessage;
 import koh.utils.Couple;
 import lombok.Getter;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static koh.protocol.client.enums.ChatActivableChannelsEnum.CHANNEL_ADMIN;
@@ -32,22 +30,22 @@ import static koh.protocol.client.enums.ChatActivableChannelsEnum.CHANNEL_ADMIN;
  */
 public class KolizeumExecutor extends PeriodicContestExecutor {
 
-    protected static final int[] MAPS = new int[] {
-            94634497,94634499,94634501,
-            94634507,94634509,94634511,
-            94634513, 94634515,94634517,
-            94634519,94634505,94634503,
-            141033472,141033474,141034496,
-            141034498,141035520,141035522,
-            141036544,141036546,141037568,
-            141037570,141038592,141038594,
-            141295616,141295618,141296640,
-            141296642,141297664,141297666,
-            141298688,141298690,141299712,
-            141299714,141300736,141300738
+    protected static final int[] MAPS = new int[]{
+            94634497, 94634499, 94634501,
+            94634507, 94634509, 94634511,
+            94634513, 94634515, 94634517,
+            94634519, 94634505, 94634503,
+            141033472, 141033474, 141034496,
+            141034498, 141035520, 141035522,
+            141036544, 141036546, 141037568,
+            141037570, 141038592, 141038594,
+            141295616, 141295618, 141296640,
+            141296642, 141297664, 141297666,
+            141298688, 141298690, 141299712,
+            141299714, 141300736, 141300738
     };
 
-    public KolizeumExecutor(){
+    public KolizeumExecutor() {
         this.waiting = new CopyOnWriteArrayList<>();
         this.waitingGroups = new CopyOnWriteArrayList<>();
         super.initialize();
@@ -57,7 +55,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     private CopyOnWriteArrayList<Player> waiting;
     private CopyOnWriteArrayList<ArenaParty> waitingGroups;
     //private Map<Integer,Player> waiting = new ConcurrentHashMap<>())
-    private static Map<Integer,Couple<Integer,Short>> lastPositions = new HashMap<>();
+    private static Map<Integer, Couple<Integer, Short>> lastPositions = new HashMap<>();
 
     @Getter
     private static final int TEAM_SIZE = DAO.getSettings().getIntElement("Koliseo.Size");
@@ -66,32 +64,31 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     private static Comparator<ArenaParty> partySorter;
     private static Comparator<Player> playerSorter;
 
-    public static byte[] PILLAR = new byte[] { BreedEnum.Sacrieur,BreedEnum.Xelor,BreedEnum.Osamodas,BreedEnum.Eniripsa };
+    public static byte[] PILLAR = new byte[]{BreedEnum.Sacrieur, BreedEnum.Xelor, BreedEnum.Osamodas, BreedEnum.Eniripsa};
 
-    public void clear(){
+    public void clear() {
         try {
             ArrayList<Player> players = new ArrayList<>(waiting);
             for (Player player : players) {
-                if(player.getClient() != null) {
+                if (player.getClient() != null) {
                     player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
                     player.getClient().delGameAction(GameActionTypeEnum.KOLI);
                 }
-                player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+                player.send(new GameRolePlayArenaRegistrationStatusMessage(false, PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
 
             }
             ArrayList<ArenaParty> parties = new ArrayList<>(waitingGroups);
             for (ArenaParty party : parties) {
                 party.setInKolizeum(false);
                 for (Player player : party.getPlayers()) {
-                    if(player.getClient() != null) {
+                    if (player.getClient() != null) {
                         player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
                         player.getClient().delGameAction(GameActionTypeEnum.KOLI);
                     }
-                    player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+                    player.send(new GameRolePlayArenaRegistrationStatusMessage(false, PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
                 }
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         waiting.clear();
@@ -100,7 +97,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         waitingGroups = new CopyOnWriteArrayList<>();
     }
 
-    static{
+    static {
         partySorter = Comparator.comparing(party -> party.getMoyLevel());
         partySorter.thenComparing(Comparator.comparing(party -> party.getRating()));
 
@@ -148,7 +145,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     }
 
     @Override
-    public boolean isRegistred(Player player){
+    public boolean isRegistred(Player player) {
         return waiting.contains(player);
     }
 
@@ -178,19 +175,21 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     @Override
     public void run() {
         try {
-        int waitingSize = waiting.size();
-        for (Party group : waitingGroups) {
-            try {
-                waitingSize += group.memberCounts();
-            } catch (NullPointerException e){
-                waitingGroups.remove(group);
+            int waitingSize = waiting.size();
+            for (Party group : waitingGroups) {
+                try {
+                    waitingSize += group.memberCounts();
+                } catch (NullPointerException e) {
+                    waitingGroups.remove(group);
+                }
             }
-        }
-        System.out.println("waitingSize= "+waitingSize);
-            ChatChannel.CHANNELS.get(CHANNEL_ADMIN).sendToField(new ChatServerMessage(CHANNEL_ADMIN, "Koliseo scale "+waitingSize+"/"+TEAM_SIZE, (int) Instant.now().getEpochSecond(), "az", 1, "Neo-Craft", 1));
-        if (waitingSize >= TEAM_SIZE * 2) {
-            tryToStartFight();
-        }
+            if (!DAO.getSettings().getBoolElement("Logging.Debug")) {
+                System.out.println("waitingSize= " + waitingSize);
+                ChatChannel.CHANNELS.get(CHANNEL_ADMIN).sendToField(new ChatServerMessage(CHANNEL_ADMIN, "Koliseo scale " + waitingSize + "/" + TEAM_SIZE, (int) Instant.now().getEpochSecond(), "az", 1, "Neo-Craft", 1));
+            }
+            if (waitingSize >= TEAM_SIZE * 2) {
+                tryToStartFight();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -283,7 +282,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
             if (teamDiff > TEAM_LVL_DIFF_MAX) { //TODO check 2 team1's ip vs team2's ip have seen
                 return;
             } else if (team1.size() != TEAM_SIZE || team2.size() != TEAM_SIZE) {
-                System.out.println("TEAMSIZE !"+team1.size()+" "+team2.size());
+                System.out.println("TEAMSIZE !" + team1.size() + " " + team2.size());
                 return;
             } else if (team1.stream().anyMatch(team2::contains) || team2.stream().anyMatch(team1::contains)) {
                 System.out.println("team depracated");
@@ -302,7 +301,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
                     .forEach(pl -> pl.getClient().endGameAction(GameActionTypeEnum.GROUP));
 
             final ArenaParty team2Group = team2.stream()
-                    .filter(p -> p.getClient().getParty() instanceof ArenaParty)
+                    .filter(p -> p.getClient() != null && p.getClient().getParty() instanceof ArenaParty)
                     .map(p -> p.getClient().getParty().asArena())
                     .max(Comparator.comparing(ArenaParty::memberCounts))
                     .orElse(null);
@@ -343,13 +342,11 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
 
 
             //Invitation
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
 
 
     public void startFight(List<Player> team1, List<Player> team2) {
@@ -357,28 +354,28 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         final Iterator<Player> it = team1.iterator();
         while (it.hasNext()) {
             final Player p = it.next();
-            if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty)p.getClient().getParty()).inKolizeum()) {
-                ((ArenaParty)p.getClient().getParty()).setInKolizeum(false);
-                waitingGroups.remove(((ArenaParty)p.getClient().getParty()));
+            if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty) p.getClient().getParty()).inKolizeum()) {
+                ((ArenaParty) p.getClient().getParty()).setInKolizeum(false);
+                waitingGroups.remove(((ArenaParty) p.getClient().getParty()));
             }
             waiting.remove(p);
             p.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
             p.getClient().delGameAction(GameActionTypeEnum.KOLI);
-            lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(),p.getCell().getId()));
-            p.teleport(map.getId(),0);
+            lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(), p.getCell().getId()));
+            p.teleport(map.getId(), 0);
         }
         final Iterator<Player> it1 = team2.iterator();
         while (it1.hasNext()) {
             final Player p = it1.next();
-            if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty)p.getClient().getParty()).inKolizeum()) {
-                ((ArenaParty)p.getClient().getParty()).setInKolizeum(false);
-                waitingGroups.remove(((ArenaParty)p.getClient().getParty()));
+            if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty) p.getClient().getParty()).inKolizeum()) {
+                ((ArenaParty) p.getClient().getParty()).setInKolizeum(false);
+                waitingGroups.remove(((ArenaParty) p.getClient().getParty()));
             }
             waiting.remove(p);
             p.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
             p.getClient().delGameAction(GameActionTypeEnum.KOLI);
-            lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(),p.getCell().getId()));
-            p.teleport(map.getId(),0);
+            lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(), p.getCell().getId()));
+            p.teleport(map.getId(), 0);
         }
         this.scheduleTask(new StartFightTask(this, FightTypeEnum.FIGHT_TYPE_PVP_ARENA, map, team1, team2), 3000);
 
@@ -389,17 +386,17 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     private List<ArenaParty> nextWaitingGroups(int bound) {
         final List<ArenaParty> parties = new ArrayList<>();
         int tests = 0;
-            while (parties.size() < bound) {
-                if (tests > 20 || this.waitingGroups.size() <= bound) {
-                    return waitingGroups;
-                }
-                int nextIndex = RAND.nextInt(this.waitingGroups.size() - 1);
-                final ArenaParty next = waitingGroups.get(nextIndex);
-                if (next != null && !parties.contains(next)) {
-                    parties.add(next);
-                }
-                tests++;
+        while (parties.size() < bound) {
+            if (tests > 20 || this.waitingGroups.size() <= bound) {
+                return waitingGroups;
             }
+            int nextIndex = RAND.nextInt(this.waitingGroups.size() - 1);
+            final ArenaParty next = waitingGroups.get(nextIndex);
+            if (next != null && !parties.contains(next)) {
+                parties.add(next);
+            }
+            tests++;
+        }
 
         return parties;
     }
@@ -407,61 +404,60 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     private List<Player> nextWaitingPlayers(int bound) {
         final List<Player> players = new ArrayList<Player>();
         int tests = 0;
-            while (players.size() < bound) {
-                if (tests > 20 || this.waiting.size() <= bound) {
-                    return this.waiting;
-                }
-                int nextIndex = RAND.nextInt(this.waiting.size() - 1);
-                final Player next = waiting.get(nextIndex);
-                if (next != null && !players.contains(next)) {
-                    players.add(next);
-                }
-                tests++;
+        while (players.size() < bound) {
+            if (tests > 20 || this.waiting.size() <= bound) {
+                return this.waiting;
             }
+            int nextIndex = RAND.nextInt(this.waiting.size() - 1);
+            final Player next = waiting.get(nextIndex);
+            if (next != null && !players.contains(next)) {
+                players.add(next);
+            }
+            tests++;
+        }
 
         return players;
     }
 
-   // protected static final SecureRandom random = new SecureRandom();
-   protected static final Random random = new Random();
+    // protected static final SecureRandom random = new SecureRandom();
+    protected static final Random random = new Random();
 
-    protected static final DofusMap getRandomFightingMap(){
+    protected static final DofusMap getRandomFightingMap() {
         final int nextIndex = random.nextInt(MAPS.length - 1);
         return DAO.getMaps().findTemplate(MAPS[nextIndex]);
     }
 
     @Override
-    public void shutdown(){
+    public void shutdown() {
         try {
             ArrayList<Player> players = new ArrayList<>(waiting);
             for (Player player : players) {
-                if(player.getClient() != null) {
+                if (player.getClient() != null) {
                     player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
                     player.getClient().delGameAction(GameActionTypeEnum.KOLI);
                 }
-                player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+                player.send(new GameRolePlayArenaRegistrationStatusMessage(false, PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
 
             }
             ArrayList<ArenaParty> parties = new ArrayList<>(waitingGroups);
             for (ArenaParty party : parties) {
                 party.setInKolizeum(false);
                 for (Player player : party.getPlayers()) {
-                    if(player.getClient() != null) {
+                    if (player.getClient() != null) {
                         player.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
                         player.getClient().delGameAction(GameActionTypeEnum.KOLI);
                     }
-                    player.send(new GameRolePlayArenaRegistrationStatusMessage(false,  PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
+                    player.send(new GameRolePlayArenaRegistrationStatusMessage(false, PvpArenaStepEnum.ARENA_STEP_UNREGISTER, PvpArenaTypeEnum.ARENA_TYPE_3VS3));
                 }
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         super.shutdown();
     }
 
-    public static void teleportLastPosition(Player p ){
-        p.teleport(lastPositions.get(p.getID()).first,lastPositions.get(p.getID()).second);
+    public static void teleportLastPosition(Player p) {
+        p.teleport(lastPositions.get(p.getID()).first, lastPositions.get(p.getID()).second);
     }
 
 }

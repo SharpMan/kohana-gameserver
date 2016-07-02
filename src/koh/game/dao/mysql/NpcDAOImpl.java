@@ -162,6 +162,84 @@ public class NpcDAOImpl extends NpcDAO {
         return i;
     }
 
+    final Random rand = new Random();
+
+    public NpcItem randomEntry(Map<Integer, NpcItem> map) {
+        ArrayList<Integer> keys = new ArrayList<>(map.keySet());
+        final int start = rand.nextInt(keys.size());
+        return map.get(keys.get(start));
+    }
+
+    private int loadExtraItems(){
+        int i = 0;
+        try{
+            templates.get(1524).setItems(new HashMap<>());
+
+            final int size = templates.get(1511).getItems().size();
+
+            NpcItem item = randomEntry(templates.get(1511).getItems());
+
+            templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
+                    .customPrice((int) (item.getCustomPrice() + (item.getTemplate().getLevel() <= 100 ? 50 : 100)))
+                    .buyCriterion(item.getBuyCriterion())
+                    .maximiseStats(item.isMaximiseStats())
+                    .item(item.getItem())
+                    .token(13470)
+                    .build());
+
+            item = randomEntry(templates.get(1511).getItems());
+
+            templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
+                    .customPrice((int) (item.getCustomPrice() + (item.getTemplate().getLevel() <= 100 ? 50 : 100)))
+                    .buyCriterion(item.getBuyCriterion())
+                    .maximiseStats(item.isMaximiseStats())
+                    .item(item.getItem())
+                    .token(13470)
+                    .build());
+
+            item = randomEntry(templates.get(1511).getItems());
+
+            templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
+                    .customPrice((int) (item.getCustomPrice() + (item.getTemplate().getLevel() <= 100 ? 50 : 100)))
+                    .buyCriterion(item.getBuyCriterion())
+                    .maximiseStats(item.isMaximiseStats())
+                    .item(item.getItem())
+                    .token(13470)
+                    .build());
+
+            try (ConnectionResult conn = dbSource.executeQuery("SELECT * from npc_items WHERE token_id = 13470 AND custom_price > 90 ORDER BY RAND() LIMIT 10", 0)) {
+                ResultSet result = conn.getResult();
+
+                while (result.next()) {
+                    templates.get(1524).getItems().put(result.getInt("item_id"),
+                            NpcItem.builder()
+                                    .customPrice((int) (result.getFloat("custom_price") * 0.68))
+                                    .buyCriterion(result.getString("buy_criterion"))
+                                    .maximiseStats(result.getBoolean("max_stats"))
+                                    .item(result.getInt("item_id"))
+                                    .token(result.getInt("token_id"))
+                                    .build());
+                    i++;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+
+
+
+            i++;
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+        return  i;
+    }
+
     private int loadAllMessages() {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from npc_messages", 0)) {
@@ -214,6 +292,8 @@ public class NpcDAOImpl extends NpcDAO {
         logger.info("loaded {} npc items", this.loadAllItems());
         logger.info("loaded {} npc messages", this.loadAllMessages());
         logger.info("loaded {} npc replies", this.loadAllReplies());
+        logger.info("loaded {} npc extra items", this.loadExtraItems());
+
     }
 
     @Override

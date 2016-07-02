@@ -24,12 +24,18 @@ class ItemCommand(PlayerCommand):
         else:
             type = EffectGenerationType.NORMAL;
 
+
+        if (id is 13470 or id is 12736 or id is 11792 or id is 11563) and client.getAccount().right < 4:
+            id = 8876
+
         template = DAO.getItemTemplates().getTemplate(id);
+
         if template is None:
-            client.send(ConsoleMessage(0, "Inexistant item"));
-            pass;
-        if template.getSuperType() is ItemSuperTypeEnum.SUPERTYPE_PET :
-            qua = 1;
+            client.send(ConsoleMessage(0, "Inexistant item"))
+            pass
+        if not template.getSuperType() is None and template.getSuperType() is ItemSuperTypeEnum.SUPERTYPE_PET :
+            qua = 1
+
         item = InventoryItem.getInstance(DAO.getItems().nextItemId(), id, 63, client.getCharacter().getID(), qua, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), type, template.isWeapon()));
         if client.getCharacter().getInventoryCache().add(item, True) :
             item.setNeedInsert(True);
@@ -41,7 +47,7 @@ class ItemCommand(PlayerCommand):
         return True;
 
     def roleRestrained(self):
-        return 4;
+        return 3
 
     def argsNeeded(self):
         return 3;

@@ -1,21 +1,24 @@
 package koh.game.entities.actors.character;
 
 import koh.game.entities.actors.Player;
+import koh.game.entities.actors.character.shortcut.PlayerShortcut;
 import koh.protocol.client.enums.ShortcutType;
 import koh.protocol.types.game.shortcut.Shortcut;
 import koh.protocol.types.game.shortcut.ShortcutObjectItem;
+import lombok.ToString;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  *
  * @author Neo-Craft
  */
+@ToString
 public class ItemShortcut extends PlayerShortcut {
 
     public int itemID;
 
     public ItemShortcut(byte pos, int template) {
-        super(pos, ShortcutType.ShortcutItem);
+        super(pos, ShortcutType.SHORTCUT_ITEM);
         this.itemID = template;
     }
 
@@ -25,7 +28,7 @@ public class ItemShortcut extends PlayerShortcut {
     }
 
     public ItemShortcut(IoBuffer buf) {
-        super(buf.get(), ShortcutType.ShortcutItem);
+        super(buf.get(), ShortcutType.SHORTCUT_ITEM);
         this.itemID = buf.getInt();
     }
 

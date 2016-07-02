@@ -71,11 +71,11 @@ public class SpellLevel {
                 if (this.spellId == 126) {//To patch in DAO After
                     this.effects[i].targetMask = "a";
                 }
-                /*if(this.spellId == 5589 && this.grade == 6){
+                /*if(this.emoteId == 5589 && this.grade == 6){
                     System.out.println(this.effects[i].toString());
                 }*/
                             /* if(this.effects[i].effectId == 165)
-                             System.out.println("hn"+this.spellId);*/
+                             System.out.println("hn"+this.emoteId);*/
             }
             buf.clear();
 

@@ -66,6 +66,7 @@ public class DatabaseSource implements Service {
         binder.bind(PlayerCommandDAO.class).to(PlayerCommandDAOImpl.class).asEagerSingleton();
         binder.bind(MonsterMindDAO.class).to(MonsterMindDAOImpl.class).asEagerSingleton();
         binder.bind(ArenaBattleDAO.class).to(ArenaBattleDAOImpl.class).asEagerSingleton();
+        binder.bind(PresetDAO.class).to(PresetDAOImpl.class).asEagerSingleton();
         binder.requestStaticInjection(DAO.class);
     }
 

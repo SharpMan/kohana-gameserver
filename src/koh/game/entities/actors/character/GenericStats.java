@@ -8,6 +8,7 @@ import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteris
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.util.Collections;
 import java.util.HashMap;

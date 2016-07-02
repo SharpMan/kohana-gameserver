@@ -89,6 +89,7 @@ public class ShortcutHandler {
                     client.getCharacter().getShortcuts().myShortcuts.remove(message.shortcut.Slot);
                     client.send(new ShortcutBarRemovedMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, message.shortcut.Slot));
                 }
+
                 client.getCharacter().getShortcuts().add(new ItemShortcut(message.shortcut.Slot, ((ShortcutObjectItem) message.shortcut).itemUID));
                 client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, client.getCharacter().getShortcuts().myShortcuts.get(message.shortcut.Slot).toShortcut(client.getCharacter()))); //getshortcut slto
 

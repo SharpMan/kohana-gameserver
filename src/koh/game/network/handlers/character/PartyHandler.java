@@ -11,14 +11,12 @@ import koh.game.entities.kolissium.ArenaParty;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.Message;
-import koh.protocol.client.enums.PartyJoinErrorEnum;
-import koh.protocol.client.enums.PartyNameErrorEnum;
-import koh.protocol.client.enums.PartyTypeEnum;
-import koh.protocol.client.enums.PlayerStatusEnum;
-import koh.protocol.client.enums.TextInformationTypeEnum;
+import koh.protocol.client.enums.*;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.roleplay.party.*;
+import koh.protocol.messages.game.inventory.preset.InventoryPresetSaveMessage;
+import koh.protocol.messages.game.inventory.preset.InventoryPresetSaveResultMessage;
 
 /**
  *
@@ -41,6 +39,7 @@ public class PartyHandler {
         //TODO : AutoDecliner
         worldClient.send(new PartyLoyaltyStatusMessage(worldClient.getParty().id, message.loyal));
     }
+
 
     @HandlerAttribute(ID = PartyNameSetRequestMessage.M_ID)
     public static void handlePartyNameSetRequestMessage(WorldClient client, PartyNameSetRequestMessage message) {
@@ -140,8 +139,8 @@ public class PartyHandler {
             PlayerController.sendServerMessage(client, "Erreur : Ce joueur ne fait pas partie du groupe");
             return;
         }
-        client.getParty().leave(client.getParty().getPlayerById(message.playerId), true);
         client.getParty().sendToField(new PartyMemberEjectedMessage(client.getParty().id, message.playerId, client.getCharacter().getID()));
+        client.getParty().leave(client.getParty().getPlayerById(message.playerId), true);
 
     }
 
@@ -177,15 +176,19 @@ public class PartyHandler {
     }
 
     @HandlerAttribute(ID = 6254)
-    public static void handlePartyCancelInvitationMessage(WorldClient Client, PartyCancelInvitationMessage message) {
-        final PartyRequest request = Client.getPartyRequest(message.partyId, message.guestId);
+    public static void handlePartyCancelInvitationMessage(WorldClient client, PartyCancelInvitationMessage message) {
+        if(client.getPartyRequests() == null){
+            client.send(new BasicNoOperationMessage());
+            return;
+        }
+        final PartyRequest request = client.getPartyRequest(message.partyId, message.guestId);
         if (request != null) {
             request.abort();
-            Client.removePartyRequest(request);
-        } else if (Client.getParty() != null && Client.getParty().isChief(Client.getCharacter())) {
-            Client.getParty().abortRequest(Client, message.guestId);
+            client.removePartyRequest(request);
+        } else if (client.getParty() != null && client.getParty().isChief(client.getCharacter())) {
+            client.getParty().abortRequest(client, message.guestId);
         } else {
-            Client.send(new BasicNoOperationMessage());
+            client.send(new BasicNoOperationMessage());
         }
     }
 

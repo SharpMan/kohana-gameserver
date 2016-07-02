@@ -558,7 +558,7 @@ public class CharacterInventory {
     }
 
     public int getTotalWeight() {
-        return 1000 + this.player.getStats().getTotal(StatsEnum.ADD_PODS) + Math.min(0, 5 * this.player.getStats().getTotal(StatsEnum.STRENGTH));
+        return 1000 + this.player.getStats().getTotal(StatsEnum.ADD_PODS) + Math.max(0, 5 * this.player.getStats().getTotal(StatsEnum.STRENGTH));
     }
 
     public Stream<Stream<ObjectEffectDice>> getEffects(int id) {

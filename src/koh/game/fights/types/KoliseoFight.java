@@ -88,6 +88,11 @@ public class KoliseoFight extends Fight {
             super.addNamedParty((CharacterFighter)fighter, FightOutcomeEnum.RESULT_VICTORY);
             log.append("Winner : ").append(fighter.getPlayer().getNickName()).append("Cote ").append(fighter.getPlayer().getKolizeumRate().getRatingd()).append(" ");
 
+            try{
+                log.append(fighter.getPlayer().getAccount().lastIP).append(" ");
+            }catch (Exception e) {}
+
+
             if(fighter.isLeft())
                 continue;
             final int diviser = AntiCheat.deviserBy(getLoosers().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_PVP_ARENA);
@@ -104,7 +109,7 @@ public class KoliseoFight extends Fight {
                 kamas /= (count * 4);
             }
             fighter.getPlayer().addKamas(kamas);
-            final boolean canCraft = fighter.getPlayer().getHonor() > 400;
+            //final boolean canCraft = fighter.getPlayer().getHonor() > 400;
             final int tokenQua = (int) Math.max(Math.abs(honorWon * 0.15f),1);
 
 
@@ -134,6 +139,10 @@ public class KoliseoFight extends Fight {
         for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
             super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_LOST);
             log.append("Losser : ").append(fighter.getPlayer().getNickName()).append("Cote ").append(fighter.getPlayer().getKolizeumRate().getRatingd()).append(" ");
+
+            try{
+                log.append(fighter.getPlayer().getAccount().lastIP).append(" ");
+            }catch (Exception e) {}
             if(fighter.isLeft())
                 continue;
             final int divizer = AntiCheat.deviserBy(getWinners().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, false,FightTypeEnum.FIGHT_TYPE_PVP_ARENA);

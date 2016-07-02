@@ -6,13 +6,15 @@ import koh.game.dao.DAO;
 import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.character.*;
+import koh.game.entities.actors.character.preset.PresetBook;
+import koh.game.entities.actors.character.shortcut.ScoreType;
+import koh.game.entities.actors.character.shortcut.ShortcutBook;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildMember;
 import koh.game.entities.spells.LearnableSpell;
 import koh.game.fights.Fight;
 import koh.game.fights.FightState;
-import koh.game.fights.Fighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
@@ -31,7 +33,6 @@ import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
 import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
 import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
-import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.AlignmentRankUpdateMessage;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
@@ -40,7 +41,6 @@ import koh.protocol.types.game.choice.CharacterBaseInformations;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.*;
 import koh.protocol.types.game.look.EntityLook;
-import koh.utils.Enumerable;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -121,6 +121,8 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private volatile JobBook myJobs;
+    @Getter @Setter
+    private PresetBook presets;
     @Getter
     @Setter
     private CharacterInventory inventoryCache;
@@ -209,6 +211,10 @@ public class Player extends IGameActor implements Observer {
                     this.deserializeEffects(new byte[0]);
                 }
             };
+        }
+
+        if (this.presets == null) {
+            this.presets = DAO.getPresets().load(this.ID);
         }
 
         this.guild = DAO.getGuildMembers().getForPlayer(this.ID);
@@ -699,9 +705,14 @@ public class Player extends IGameActor implements Observer {
     }
 
     public void addDishonor(int point, boolean notice) {
-        this.dishonor += point;
-        if (notice) {
-            this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 75, new String[]{Integer.toString(point)}));
+        try {
+            this.dishonor += point;
+            if (notice) {
+                this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 75, new String[]{Integer.toString(point)}));
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 

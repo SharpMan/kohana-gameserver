@@ -4,6 +4,7 @@ import koh.game.fights.effects.buff.BuffHealPercent;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightStateEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMessage;
 
 /**
@@ -35,14 +36,16 @@ public class EffectHealPercent extends EffectBase {
         return -1;
     }
 
-    public static int applyHealPercent(EffectCast CastInfos, Fighter target, int heal) {
+    public static int applyHealPercent(EffectCast castInfos, Fighter target, int heal) {
         if(target.hasState(FightStateEnum.INSOIGNABLE.value)){
             return -1;
         }
-        final Fighter caster = CastInfos.caster;
+        final Fighter caster = castInfos.caster;
 
         // boost soin etc
-        heal = heal * (target.getLife() / 100);
+        heal = heal * (castInfos.spellId == 131 ? target.getLife() : target.getMaxLife()) / 100;
+        heal += caster.getStats().getTotal(StatsEnum.ADD_HEAL_BONUS);
+        heal *= caster.getPortalsSpellEfficiencyBonus(castInfos.oldCell, caster.getFight());
 
         // Si le soin est superieur a sa vie actuelle
         if ((target.getLife() + heal) > target.getMaxLife()) {

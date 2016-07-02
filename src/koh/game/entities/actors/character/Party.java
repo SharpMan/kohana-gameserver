@@ -157,7 +157,8 @@ public class Party extends IWorldEventObserver {
         }
         if (kicked) {
             player.send(new PartyKickedByMessage(this.id, this.chief.getID()));
-            player.getClient().delGameAction(GameActionTypeEnum.GROUP);
+            if(player.getClient() != null)
+                player.getClient().delGameAction(GameActionTypeEnum.GROUP);
         }
         if (player.getFollowers() != null) { //int partyId, boolean success, int followedId
             player.getFollowers().forEach(x -> {
@@ -181,6 +182,9 @@ public class Party extends IWorldEventObserver {
     }
 
     public synchronized void updateLeader(Player p) {
+        if(p == null & players.isEmpty()){
+            return;
+        }
         this.chief = p == null ? this.players.get(0) : p;
         this.sendToField(new PartyLeaderUpdateMessage(this.id, chief.getID()));
     }

@@ -42,11 +42,13 @@ class InterHandler extends IoHandlerAdapter {
     @Override
     public void sessionClosed(IoSession session) throws Exception {
         super.sessionClosed(session);
-        //connector.retryConnect();
+
     }
 
     @Override
-    public void exceptionCaught(IoSession is, Throwable cause) throws Exception {
+    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+        connector.retryConnect();
+        //System.out.println(cause.toString());
         logger.error("(server->proxy->client)::Error: {} ::cause.toString() {}", cause.getMessage(),cause.toString());
     }
 

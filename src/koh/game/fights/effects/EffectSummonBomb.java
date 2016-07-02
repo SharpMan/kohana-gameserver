@@ -20,7 +20,9 @@ public class EffectSummonBomb extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         // Possibilité de spawn une creature sur la case ?
-
+        if(castInfos.caster.getTeam().getAliveFighters().filter(f -> f instanceof BombFighter && f.getSummoner() == castInfos.caster).count() >= 3L){
+            return -1;
+        }
         final MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
         // getTemplate de monstre existante
         if (monster != null) {

@@ -79,5 +79,8 @@ public class DAO {
     @Inject @Getter
     private static ArenaBattleDAO arenas;
 
+    @Inject @Getter
+    private static PresetDAO presets;
+
 
 }

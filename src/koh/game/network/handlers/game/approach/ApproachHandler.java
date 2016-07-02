@@ -4,7 +4,6 @@ import koh.game.dao.mysql.AccountTicketDAO;
 import koh.game.network.WorldClient;
 import koh.game.network.WorldServer;
 import koh.game.network.handlers.HandlerAttribute;
-import koh.protocol.client.Message;
 import koh.protocol.messages.connection.LoginQueueStatusMessage;
 import koh.protocol.messages.game.approach.AuthenticationTicketMessage;
 import koh.protocol.messages.game.approach.AuthenticationTicketRefusedMessage;
@@ -25,18 +24,18 @@ public class ApproachHandler {
     }
 
     @HandlerAttribute(ID = AuthenticationTicketMessage.MESSAGE_ID)
-    public static void AuthenticationTicketMessage(WorldClient Client, Message message) {
+    public static void AuthenticationTicketMessage(WorldClient client, AuthenticationTicketMessage message) {
 
-        Client.setTempTicket(AccountTicketDAO.getWaitingCompte(((AuthenticationTicketMessage) message).Ticket));
+        client.setTempTicket(AccountTicketDAO.getWaitingCompte(message.ticket));
 
-        if (Client.getTempTicket() != null && Client.getTempTicket().isCorrect(Client.getIP(), ((AuthenticationTicketMessage) message).Ticket)) {
-            WorldServer.gameLoader.addClient(Client);
-            if (WorldServer.gameLoader.getPosition(Client) != 1) {
-                Client.send(new LoginQueueStatusMessage((short) WorldServer.gameLoader.getPosition(Client), (short) WorldServer.gameLoader.getTotal()));
-                Client.setShowQueue(true);
+        if (client.getTempTicket() != null && client.getTempTicket().isCorrect(client.getIP(), message.ticket)) {
+            WorldServer.gameLoader.addClient(client);
+            if (WorldServer.gameLoader.getPosition(client) != 1) {
+                client.send(new LoginQueueStatusMessage((short) WorldServer.gameLoader.getPosition(client), (short) WorldServer.gameLoader.getTotal()));
+                client.setShowQueue(true);
             }
         } else {
-            Client.send(new AuthenticationTicketRefusedMessage());
+            client.send(new AuthenticationTicketRefusedMessage());
             //Diconnected After 1s
         }
         

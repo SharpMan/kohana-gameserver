@@ -17,7 +17,7 @@ public class AdminRightsCriterion extends Criterion {
 
     @Override
     public void Build() {
-        if (this.literal.equalsIgnoreCase("G")) {
+       /* if (this.literal.equalsIgnoreCase("G")) {
             this.role = 0; //player
         }
         int result;
@@ -26,12 +26,13 @@ public class AdminRightsCriterion extends Criterion {
         } catch (Exception e) {
             throw new Error(String.format("Cannot build AdminRightsCriterion, %s is not a valid role", this.literal));
         }
-        this.role = (byte) result;
+        this.role = (byte) result;*/
     }
 
     @Override
     public boolean eval(Player character) {
-        return this.Compare((Comparable<Byte>) character.getAccount().right, this.role);
+        return  true;
+        //return this.Compare((Comparable<Byte>) character.getAccount().right, this.role);
     }
     
     @Override

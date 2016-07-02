@@ -19,9 +19,16 @@ public class EffectTeleportSymetricFromCaster extends EffectBase {
     public int applyEffect(EffectCast castInfos) {
         int toReturn = -1;
         FightCell cell;
+        if(castInfos.targets == null){
+            return  toReturn;
+        }
         for (Fighter target : castInfos.targets) {
-            cell = castInfos.caster.getFight().getCell(target.getMapPoint().pointSymetry(castInfos.caster.getMapPoint()).get_cellId());
-
+            try {
+                cell = castInfos.caster.getFight().getCell(target.getMapPoint().pointSymetry(castInfos.caster.getMapPoint()).get_cellId());
+            }
+            catch (NullPointerException e){
+                continue;
+            }
             if (cell != null) {
                 if(cell.canWalk()) {
                     target.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), target.getID(), cell.Id));

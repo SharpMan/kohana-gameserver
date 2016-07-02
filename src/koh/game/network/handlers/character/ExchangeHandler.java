@@ -36,11 +36,11 @@ import koh.protocol.messages.game.inventory.exchanges.ExchangeSellMessage;
 public class ExchangeHandler {
 
     @HandlerAttribute(ID = ExchangeReadyMessage.M_ID)
-    public static void HandleExchangeReadyMessage(WorldClient Client, ExchangeReadyMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleExchangeReadyMessage(WorldClient client, ExchangeReadyMessage Message) {
+        if (!client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
+            client.send(new BasicNoOperationMessage());
         }
-        Client.getMyExchange().validate(Client);
+        client.getMyExchange().validate(client);
     }
 
     @HandlerAttribute(ID = ExchangeObjectTransfertListFromInvMessage.M_ID)

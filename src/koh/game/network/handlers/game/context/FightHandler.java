@@ -88,7 +88,7 @@ public class FightHandler {
             return;
         }
 
-        if (Client.getCharacter().getFight().getFightState() != FightState.STATE_ACTIVE) {
+        if (Client.getCharacter().getFight() == null || Client.getCharacter().getFight().getFightState() != FightState.STATE_ACTIVE) {
             Client.send(new BasicNoOperationMessage());
             return;
         }
@@ -199,13 +199,13 @@ public class FightHandler {
         final Fight fight = client.getCharacter().getCurrentMap().getFight(message.fightId);
         if (fight == null) {
             client.send(new BasicNoOperationMessage());
-        } else if (fight.getFightState() != FightState.STATE_PLACE) {
+        } else if (fight.getFightState() == FightState.STATE_ACTIVE) {
             if(fight.canJoinSpectator()){
                 fight.joinFightSpectator(client);
             }else{
                 client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,57));
             }
-        } else {
+        } else if(fight.getFightState() == FightState.STATE_PLACE) {
             final FightTeam team = fight.getTeam(message.fighterId);
             if (team == null) { //Ne doit pas arriver
                 client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.JUST_RESPAWNED));

@@ -51,11 +51,15 @@ public class SlaveFighter extends StaticFighter {
     }
 
 
+    public SlaveSwitchContextMessage getSwitchContextMessage(){
+        return new SlaveSwitchContextMessage(summoner.getID(), this.getID(), spellCuts, getCharacteristics(), shortcuts);
+    }
+
     @Override
     public int beginTurn() {
         final int r = super.beginTurn();
         if (r == -1) {
-            this.summoner.send(new SlaveSwitchContextMessage(summoner.getID(), this.getID(), spellCuts, getCharacteristics(), shortcuts));
+            this.summoner.send(getSwitchContextMessage());
         }
         return r;
     }

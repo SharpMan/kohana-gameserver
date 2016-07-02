@@ -71,7 +71,10 @@ public class WorldClient {
     private volatile DofusTrigger onMouvementConfirm;
     @Getter @Setter
     public Exchange myExchange;
+    @Getter @Setter
+    private long lastCommand;
     private GameBaseRequest myBaseRequest;
+    @Getter
     private CopyOnWriteArrayList<PartyRequest> partyRequests;
     private static final Logger logger = LogManager.getLogger(WorldClient.class);
 

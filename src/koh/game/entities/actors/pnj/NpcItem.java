@@ -19,10 +19,13 @@ import org.apache.logging.log4j.Logger;
 public class NpcItem {
     private static final Logger logger = LogManager.getLogger(NpcItem.class);
 
+    @Getter
     private boolean maximiseStats;
     @Getter
     private int item, token;
+    @Getter
     private String buyCriterion;
+    @Getter
     private float customPrice;
 
     public float getPrice() {

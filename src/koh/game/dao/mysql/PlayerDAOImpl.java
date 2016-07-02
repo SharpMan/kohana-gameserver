@@ -10,7 +10,7 @@ import koh.game.entities.Account;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.JobBook;
 import koh.game.entities.actors.character.MountInformations;
-import koh.game.entities.actors.character.ShortcutBook;
+import koh.game.entities.actors.character.shortcut.ShortcutBook;
 import koh.game.entities.actors.character.SpellBook;
 import koh.game.utils.sql.ConnectionResult;
 import koh.game.utils.sql.ConnectionStatement;
@@ -24,7 +24,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
