@@ -140,8 +140,10 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
 
     @Override
     public void unregisterGroupForced(ArenaParty group) {
-        waitingGroups.remove(group);
-        group.setInKolizeum(false);
+        this.executeTask(() -> {
+            waitingGroups.remove(group);
+            group.setInKolizeum(false);
+        });
     }
 
     @Override
@@ -355,10 +357,9 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         while (it.hasNext()) {
             final Player p = it.next();
             if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty) p.getClient().getParty()).inKolizeum()) {
-                ((ArenaParty) p.getClient().getParty()).setInKolizeum(false);
-                waitingGroups.remove(((ArenaParty) p.getClient().getParty()));
+                this.unregisterGroupForced(p.getClient().getParty().asArena());
             }
-            waiting.remove(p);
+            this.unregisterPlayer(p);
             p.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
             p.getClient().delGameAction(GameActionTypeEnum.KOLI);
             lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(), p.getCell().getId()));
@@ -369,9 +370,9 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
             final Player p = it1.next();
             if (p.getClient().getParty() != null && p.getClient().getParty() instanceof ArenaParty && ((ArenaParty) p.getClient().getParty()).inKolizeum()) {
                 ((ArenaParty) p.getClient().getParty()).setInKolizeum(false);
-                waitingGroups.remove(((ArenaParty) p.getClient().getParty()));
+                this.unregisterGroupForced(p.getClient().getParty().asArena());
             }
-            waiting.remove(p);
+            this.unregisterPlayer(p);
             p.getClient().abortGameAction(GameActionTypeEnum.KOLI, new Object[2]);
             p.getClient().delGameAction(GameActionTypeEnum.KOLI);
             lastPositions.put(p.getID(), new Couple<>(p.getCurrentMap().getId(), p.getCell().getId()));

@@ -1,4 +1,4 @@
-package koh.game.dao.sqlite;
+package koh.game.dao.mysql;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -42,6 +42,7 @@ public class PresetDAOImpl extends PresetDAO {
         try {
             dataSource.create(entity);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -55,6 +56,7 @@ public class PresetDAOImpl extends PresetDAO {
             builder.where().eq("owner", owner).and().eq("id",entity.id);
             builder.update();
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -67,6 +69,7 @@ public class PresetDAOImpl extends PresetDAO {
             delete.where().eq("owner", owner).and().eq("id",id);
             delete.delete();
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -94,6 +97,7 @@ public class PresetDAOImpl extends PresetDAO {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
