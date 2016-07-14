@@ -29,6 +29,7 @@ public class JoinFightTask  implements Runnable {
         this.guid = guid;
         this.myFuture = PeriodicContest.schedulePeriodicTask(this, 750, 500);
     }
+    private static final short cell = -1;
 
     @Override
     public void run() {
@@ -45,7 +46,7 @@ public class JoinFightTask  implements Runnable {
                         final GameAction FightAction = new GameFight(fighter, fight);
 
                         joiner.getClient().addGameAction(FightAction);
-                        fight.joinFightTeam(fighter, team, false, (short) -1, true);
+                        fight.joinFightTeam(fighter, team, false, cell, true);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

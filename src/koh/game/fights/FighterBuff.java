@@ -1,5 +1,6 @@
 package koh.game.fights;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,10 +10,7 @@ import java.util.stream.Stream;
 import koh.game.fights.effects.EffectBase;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectEnableBomb;
-import koh.game.fights.effects.buff.BuffActiveType;
-import koh.game.fights.effects.buff.BuffDecrementType;
-import koh.game.fights.effects.buff.BuffEffect;
-import koh.game.fights.effects.buff.BuffState;
+import koh.game.fights.effects.buff.*;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightDispellableEffectMessage;
 import koh.utils.Couple;
@@ -101,7 +99,7 @@ public class FighterBuff {
             if (effectCast.second <= 0) {
                 this.delayedEffects.remove(effectCast);
                 effectCast.first.targets.removeIf(Fighter -> !Fighter.isAlive());
-                System.out.println("appply"+ effectCast.first);
+                //System.out.println("appply"+ effectCast.first);
                 if (EffectBase.tryApplyEffect(effectCast.first) == -3) {
                     return -3;
                 }
@@ -257,11 +255,22 @@ public class FighterBuff {
     /// <param name="castInfos"></param>
     /// <param name="damageValue"></param>
     public int onAttackedAfterjet(EffectCast CastInfos, MutableInt DamageValue) {
-        for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET)) {
-            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
+        for (BuffEffect buff : (Iterable<BuffEffect>) buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET).stream().filter(bf -> bf instanceof BuffReduceDamage)::iterator) {
+            if (buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }
+
+        for (BuffEffect buff : (Iterable<BuffEffect>) buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET).stream().filter(bf -> !(bf instanceof BuffReduceDamage))::iterator) {
+            if (buff.applyEffect(DamageValue, CastInfos) == -3) {
+                return -3;
+            }
+        }
+        /*for (BuffEffect buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET)) {
+            if (buff.applyEffect(DamageValue, CastInfos) == -3) {
+                return -3;
+            }
+        }*/
         return -1;
     }
 

@@ -19,54 +19,55 @@ public class PresetBook {
     private final Map<Byte, Preset> book = Collections.synchronizedMap(new HashMap<>(4));
     private final Map<Byte, PresetEntity> entities = Collections.synchronizedMap(new HashMap<>(4));
 
-    public PresetBook(){
+    public PresetBook() {
 
     }
 
-    public void add(Preset preset){
-        this.book.put(preset.presetId,preset);
+    public void add(Preset preset) {
+        this.book.put(preset.presetId, preset);
     }
 
-    public void add(Preset preset,PresetEntity entity){
-        this.book.put(preset.presetId,preset);
-        this.entities.put(preset.presetId,entity);
+    public void add(Preset preset, PresetEntity entity) {
+        this.book.put(preset.presetId, preset);
+        this.entities.put(preset.presetId, entity);
     }
 
-    public Stream<Preset> getValues(Player character){
+    public Stream<Preset> getValues(Player character) {
         for (Preset preset : book.values()) {
-            if(!Arrays.stream(preset.objects).map(o -> o.objUid).allMatch(character.getInventoryCache()::contains)){
-                if(Arrays.stream(preset.objects).map(o -> o.objUid).noneMatch(character.getInventoryCache()::contains)){
+            if (!Arrays.stream(preset.objects).map(o -> o.objUid).allMatch(character.getInventoryCache()::contains)) {
+                if (Arrays.stream(preset.objects).map(o -> o.objUid).noneMatch(character.getInventoryCache()::contains)) {
                     this.remove(preset.presetId, character.getID());
                     continue;
                 }
                 preset.objects = Arrays.stream(preset.objects).filter(o -> character.getInventoryCache().contains(o.objUid)).toArray(PresetItem[]::new);
                 final PresetEntity presetEntity = this.getEntity(preset.presetId);
-                if(presetEntity != null)
-                    presetEntity.informations = preset.serializeInformations();
-                DAO.getPresets().update(character.getID(), presetEntity);
+                if (presetEntity != null) {
+                    presetEntity.setInformations(preset.serializeInformations());
+                    DAO.getPresets().update(character.getID(), presetEntity);
+                }
             }
         }
         return book.values().stream();
     }
 
-    public int size(){
+    public int size() {
         return book.size();
     }
 
-    public Preset get(byte id){
+    public Preset get(byte id) {
         return this.book.get(id);
     }
 
-    public boolean contains(byte id){
+    public boolean contains(byte id) {
         return this.book.containsKey(id);
     }
 
-    public PresetEntity getEntity(byte id){
+    public PresetEntity getEntity(byte id) {
         return this.entities.get(id);
     }
 
-    public boolean remove (byte id, int owner){
-        DAO.getPresets().remove(owner,id);
+    public boolean remove(byte id, int owner) {
+        DAO.getPresets().remove(owner, id);
         entities.remove(id);
         return book.remove(id) != null;
     }

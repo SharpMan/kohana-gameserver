@@ -39,7 +39,7 @@ public class EffectTranspose extends EffectBase {
                     continue;
                 }
             }
-            else if(target instanceof MonsterFighter && !target.asMonster().getGrade().getMonster().isCanSwitchPos()){
+            if(target instanceof MonsterFighter && !target.asMonster().getGrade().getMonster().isCanSwitchPos()){
                 continue;
             }
 

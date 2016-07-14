@@ -111,7 +111,7 @@ public class EffectDamage extends EffectBase {
                 // Si ce n'est pas des dommages direct on ne reduit pas
                 if (!castInfos.isPoison && !castInfos.isReflect && castInfos.effectType != StatsEnum.DAMAGE_BRUT) {
                     // Calcul de l'armure par rapport a l'effet
-                    int armor = target.calculArmor(castInfos.effectType);
+                    final int armor = target.calculArmor(castInfos.effectType);
                     // Si il reduit un minimum
                     if (armor != 0) {
                         // XX Reduit les dommages de X

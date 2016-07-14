@@ -101,6 +101,9 @@ public class ShortcutHandler {
                     case 371:
                         client.getCharacter().getShortcuts().add(new ItemShortcut(message.shortcut.Slot, ((ShortcutObjectItem) message.shortcut).itemUID));
                         break;
+                    default:
+                        client.send(new BasicNoOperationMessage());
+                        break;
                 }
                 client.send(new ShortcutBarRefreshMessage(ShortcutBarEnum.GENERAL_SHORTCUT_BAR, client.getCharacter().getShortcuts().myShortcuts.get(message.shortcut.Slot).toShortcut(client.getCharacter())));
 

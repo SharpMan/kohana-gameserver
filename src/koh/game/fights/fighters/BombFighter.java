@@ -223,17 +223,30 @@ public class BombFighter extends StaticFighter {
                 Arrays.stream(this.myCell.getObjects(FightObjectType.OBJECT_BOMB)).forEach(Object -> ((FightBomb) Object).remove());
             }
             Short[] cells;
-            for (Fighter Friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfunction.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
-                final int distance = Pathfunction.goalDistance(null, getCellId(), Friend.getCellId());
+            for (Fighter friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfunction.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
+                final int distance = Pathfunction.goalDistance(null, getCellId(), friend.getCellId());
                 logger.debug("Bomb Distance = {}" , distance);
                 if (distance >= 2 && distance <= 7) {
-                    cells = Pathfunction.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfunction.getDirection(null, this.getCellId(), Friend.getCellId()), Friend.getCellId(), false);
+                    cells = Pathfunction.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfunction.getDirection(null, this.getCellId(), friend.getCellId()), friend.getCellId(), false);
                     if (cells != null) {
-                        cells =  ArrayUtils.removeElement(cells, this.getCellId());
-                        cells =  ArrayUtils.removeElement(cells, Friend.getCellId());
-                        final FightBomb Bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), cells, new BombFighter[]{this, (BombFighter) Friend});
-                        fight.addActivableObject(this, Bomb);
+                        cells = ArrayUtils.removeElement(cells, this.getCellId());
+                        cells = ArrayUtils.removeElement(cells, friend.getCellId());
+                        final FightBomb bomb = new FightBomb(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId).getSpellLevel(this.grade.getGrade()), EffectActivableObject.getColor(DAO.getSpells().findBomb(grade.getMonsterId()).wallSpellId), cells, new BombFighter[]{this, (BombFighter) friend});
+                        fight.addActivableObject(this, bomb);
+                        if (previousCellPos.isEmpty()) {
+                            final int[] result = new int[]{-1};
+                            bomb.getFightCells().filter(FightCell::hasFighter).forEach(cell -> {
+                                bomb.loadTargets(cell.getFighter());
+                                result[0] = bomb.activate(cell.getFighter(), BuffActiveType.ACTIVE_ENDMOVE);
+                            /*if(result == -3)
+                                return result;*/
+                            });
+                            if (result[0] == -3) {
+                                return -3;
+                            }
+                        }
                     }
+
                 }
             }
 

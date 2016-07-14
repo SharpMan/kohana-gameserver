@@ -23,7 +23,7 @@ public class BuffShieldLifePoint extends BuffEffect {
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
 
         this.jet = castInfos.randomJet(target);
-        this.value1 = (jet * this.target.getLife()) / 100;
+        this.value1 = (jet * this.caster.getLife()) / 100;
         this.target.setShieldPoints(target.getShieldPoints() + value1);
         this.target.getStats().addBoost(this.castInfos.effectType, this.value1);
 

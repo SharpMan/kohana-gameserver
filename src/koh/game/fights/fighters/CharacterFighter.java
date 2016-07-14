@@ -246,7 +246,10 @@ public class CharacterFighter extends Fighter {
                 else if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
                         && this.team.id == this.fight.getLoosers().id
                         && this.character.getSavedMap() != this.character.getCurrentMap().getId()) {
-                    this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
+                    if(character.getClient() == null)
+                        character.offlineTeleport(character.getSavedMap(),character.getSavedCell());
+                    else
+                        this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
                 } else {
                     this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
                     //this.character.send(new BasicTimeMessage((double) (new Date().getTime()), 0));

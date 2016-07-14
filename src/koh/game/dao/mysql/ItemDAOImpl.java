@@ -8,6 +8,7 @@ import koh.game.utils.StringUtil;
 import koh.game.utils.sql.ConnectionResult;
 import koh.game.utils.sql.ConnectionStatement;
 import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -79,7 +80,9 @@ public class ItemDAOImpl extends ItemDAO {
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from " + table + " where owner =" + player + ";")) {
             ResultSet result = conn.getResult();
             while (result.next()) {
-                List<ObjectEffect> effects = deserializeEffects(result.getBytes("effects"));
+                final List<ObjectEffect> effects = deserializeEffects(result.getBytes("effects"));
+                effects.removeIf(e -> e instanceof ObjectEffectDate && ((ObjectEffectDate)e).isDepracated());
+
                 cache.put(result.getInt("id"), InventoryItem.getInstance(
                         result.getInt("id"),
                         result.getInt("template"),

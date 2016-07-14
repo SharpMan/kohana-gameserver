@@ -1,6 +1,7 @@
 package koh.game.fights.effects;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 import koh.game.entities.actors.Player;
@@ -134,18 +135,18 @@ public class EffectPush extends EffectBase {
     }
 
     public static int applyPush(EffectCast castInfos, Fighter target, byte direction, int length) {
-       FightCell currentCell = target.getMyCell();
-        short StartCell = target.getCellId();
+        FightCell currentCell = target.getMyCell();
+        final short startCell = target.getCellId();
         for (int i = 0; i < length; i++) {
             final FightCell nextCell = target.getFight().getCell(Pathfunction.nextCell(currentCell.Id, direction));
 
             if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {
-                    castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id)));
+                    castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
                     return target.setCell(nextCell);
                 }
                 else if(nextCell.hasObject(FightObjectType.OBJECT_PORTAL) && nextCell.getObjects().stream().anyMatch(o -> o instanceof FightPortal && ((FightPortal)o).enabled)){
-                    castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, nextCell.Id)));
+                    castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
                     return target.setCell(nextCell);
                 }
 
@@ -160,9 +161,9 @@ public class EffectPush extends EffectBase {
                 }
 
                 if (i != 0) {
-                    target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
+                    target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(startCell)));
                     for (Player player : castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p))) {
-                        player.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+                        player.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, currentCell.Id));
                     }
                 }
 
@@ -181,14 +182,14 @@ public class EffectPush extends EffectBase {
             currentCell = nextCell;
         }
         for (Player player : castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p))) {
-            player.send(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), StartCell, currentCell.Id));
+            player.send(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, currentCell.Id));
         }
 
 
         int result = target.setCell(currentCell);
 
 
-        target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(StartCell)));
+        target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(startCell)));
 
         return result;
     }

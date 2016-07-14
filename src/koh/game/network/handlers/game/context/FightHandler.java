@@ -82,22 +82,22 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = GameFightTurnReadyMessage.M_ID)
-    public static void HandleGameFightTurnReadyMessage(WorldClient Client, GameFightTurnReadyMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleGameFightTurnReadyMessage(WorldClient client, GameFightTurnReadyMessage Message) {
+        if (client.getCharacter() == null || !client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.getCharacter().getFight() == null || Client.getCharacter().getFight().getFightState() != FightState.STATE_ACTIVE) {
-            Client.send(new BasicNoOperationMessage());
+        if (client.getCharacter().getFight() == null || client.getCharacter().getFight().getFightState() != FightState.STATE_ACTIVE) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.getCharacter().getFighter() == null) {
+        if (client.getCharacter().getFighter() == null) {
             return;
         }
 
-        Client.getCharacter().getFighter().setTurnReady(true);
+        client.getCharacter().getFighter().setTurnReady(true);
     }
 
     @HandlerAttribute(ID = 255)
@@ -255,7 +255,7 @@ public class FightHandler {
     @HandlerAttribute(ID = GameRolePlayPlayerFightRequestMessage.M_ID)
     public static void HandleGameRolePlayPlayerFightRequestMessage(WorldClient client, GameRolePlayPlayerFightRequestMessage Message) {
         Player target = client.getCharacter().getCurrentMap().getPlayer(Message.targetId);
-        if (target == null) {
+        if (target == null || target.getClient() == null) {
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
         } else if (target == client.getCharacter()) {
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.FIGHT_MYSELF));

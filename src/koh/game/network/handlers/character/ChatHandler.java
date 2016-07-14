@@ -59,7 +59,6 @@ public class ChatHandler {
     public static void HandleChannelEnablingMessage(WorldClient Client, ChannelEnablingMessage message) {
         //System.out.println(message.channel + "" + message.enable);
         if (message.channel < CHANNEL_GLOBAL || message.channel > CHANNEL_ARENA) {
-
             Client.send(new BasicNoOperationMessage());
         } else if (message.enable && !Client.getCharacter().getEnabledChannels().contains(message.channel)) {
             Client.getCharacter().getEnabledChannels().add(message.channel);
@@ -113,7 +112,11 @@ public class ChatHandler {
         final Player target = DAO.getPlayers().getCharacter(message.Receiver);
         if (target == null || target.getClient() == null) {
             client.send(new ChatErrorMessage(ChatErrorEnum.CHAT_ERROR_RECEIVER_NOT_FOUND));
-        } else {
+        }
+        else if(target.getStatus() == PlayerStatusEnum.PLAYER_STATUS_AFK){
+            client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,364,target.getNickName()));
+        }
+        else {
             client.send(new ChatServerCopyMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, message.content, (int) Instant.now().getEpochSecond(), "az", target.getID(), target.getNickName()));
             target.send(new ChatServerMessage(ChatActivableChannelsEnum.PSEUDO_CHANNEL_PRIVATE, message.content, (int) Instant.now().getEpochSecond(), "az", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id));
         }
@@ -181,7 +184,7 @@ public class ChatHandler {
 
     @HandlerAttribute(ID = ChatClientMultiMessage.MESSAGE_ID)
     public static void handleChatClientMultiMessage(WorldClient client, ChatClientMultiMessage message) {
-        if(PlayerInst.isMuted(client.getCharacter().getID())){
+        if(client.getCharacter() == null || PlayerInst.isMuted(client.getCharacter().getID())){
             client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,124, String.valueOf(PlayerInst.muteTime(client.getCharacter().getID()))));
             return;
         }

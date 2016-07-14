@@ -32,7 +32,6 @@ import koh.protocol.types.game.look.EntityLook;
 import koh.utils.Enumerable;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -47,7 +46,6 @@ import java.util.stream.Stream;
 /**
  * @author Neo-Craft
  */
-@ToString
 public abstract class Fighter extends IGameActor implements IFightObject {
 
     public Fighter(Fight fight, Fighter summoner) {
@@ -191,9 +189,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         }
 
         if (runEvent) {
-            int Result = onCellChanged();
-            if (Result != -1) {
-                return Result;
+            final int result = onCellChanged();
+            if (result != -1) {
+                return result;
             }
         }
         return this.tryDie(this.ID);
@@ -663,7 +661,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             return this.myCell.Id;
         } catch (NullPointerException e) {
             fight.getLogger().error("map {} cell {} {} ",fight.getMap().getId(), Enumerable.join(fight.myFightCells.get(fight.getTeam1()).keySet().stream().toArray(Short[]::new)),Enumerable.join(fight.myFightCells.get(fight.getTeam2()).keySet().stream().toArray(Short[]::new)));
-            this.fight.getLogger().error(this.toString());
+            //this.fight.getLogger().error(this.toString());
             e.printStackTrace();
             return 0;
         }

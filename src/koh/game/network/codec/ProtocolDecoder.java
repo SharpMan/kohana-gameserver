@@ -60,6 +60,7 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
             return false;
         }
         if(Math.abs(Integer.MAX_VALUE - messageLength) < 5){ //java.lang.OutOfMemoryError: Requested array size exceeds VM limit
+            //buf.clear();
             return true;
         }
         if (getMessageId(header) < 0) {
@@ -76,10 +77,12 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
             session.write(new BasicNoOperationMessage());
             logger.info(messageLength);
             //buf.skip(messageLength);
+            //buf.clear();
             return true;
         }
         message.deserialize(buf);
         out.write(message);
+        //buf.clear();
         return true;
     }
 

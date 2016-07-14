@@ -102,7 +102,7 @@ public class FightCell {
 
     public boolean canWalk() {
         //return this.myWalkable && !this.hasGameObject(FightObjectType.OBJECT_CAWOTTE) && !this.hasGameObject(FightObjectType.OBJECT_FIGHTER);
-        return this.myWalkable && this.myFightObjects.stream().allMatch(obj -> obj.canGoThrough());
+        return this.myWalkable && (this.myFightObjects.isEmpty() || this.myFightObjects.stream().allMatch(obj -> obj.canGoThrough()));
     }
 
     public boolean canGoTrough(){

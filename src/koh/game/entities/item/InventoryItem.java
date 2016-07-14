@@ -25,6 +25,8 @@ import org.apache.mina.core.buffer.IoBuffer;
 /**
  *
  * @author Neo-Craft
+ * TODO make ObjectItem created at first sight
+ * TODO2 check mimcryHandler in this case
  */
 public class InventoryItem {
 

@@ -39,8 +39,10 @@ public class ExchangeHandler {
     public static void HandleExchangeReadyMessage(WorldClient client, ExchangeReadyMessage Message) {
         if (!client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
             client.send(new BasicNoOperationMessage());
+
         }
-        client.getMyExchange().validate(client);
+        else
+            client.getMyExchange().validate(client);
     }
 
     @HandlerAttribute(ID = ExchangeObjectTransfertListFromInvMessage.M_ID)

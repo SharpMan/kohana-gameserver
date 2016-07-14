@@ -122,6 +122,8 @@ public class WorldClient {
     }
 
     public PartyRequest getPartyRequest(int id, int guestId) {
+        if(this.partyRequests == null)
+            return null;
        return this.partyRequests.stream().filter(x -> x.requester.getParty() != null && x.requester.getParty().id == id && x.requested.character.getID() == guestId).findFirst().orElse(null);
 
     }

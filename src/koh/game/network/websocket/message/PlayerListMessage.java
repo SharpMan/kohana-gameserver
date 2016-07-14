@@ -26,7 +26,7 @@ public class PlayerListMessage implements IMessage {
 
     @Override
     public void serialize(JSONArray buf) {
-       players.forEach(pl -> {
+       players.forEachOrdered(pl -> {
            buf.add(pl.getID());
            buf.add(pl.getNickName());
        });

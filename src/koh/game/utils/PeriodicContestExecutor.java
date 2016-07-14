@@ -14,18 +14,35 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class PeriodicContestExecutor implements Runnable {
 
-    protected final static long TIME_REFRESH = DAO.getSettings().getBoolElement("Logging.Debug") ? 3000 : 30000; //debug 3000
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);//2
-    private ScheduledFuture<?> myFuture;
+    protected final static long TIME_REFRESH = DAO.getSettings().getBoolElement("Logging.Debug") ? 3000 : 30000;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    protected ScheduledFuture<?> myFuture;
 
-    protected void initialize() {
-        this.myFuture = scheduler.scheduleWithFixedDelay(this, TIME_REFRESH, TIME_REFRESH, TimeUnit.MILLISECONDS);
+
+    protected synchronized void initialize() {
+        if(myFuture == null){
+            this.myFuture = scheduler.scheduleWithFixedDelay(this, TIME_REFRESH, TIME_REFRESH, TimeUnit.MILLISECONDS);
+        }
+        else {
+            synchronized (myFuture) {
+                if(this.myFuture.isCancelled()){
+                    myFuture.cancel(true);
+                }
+                this.myFuture = scheduler.scheduleWithFixedDelay(this, TIME_REFRESH, TIME_REFRESH, TimeUnit.MILLISECONDS);
+            }
+        }
+    }
+
+    protected void cancelTask(){
+        synchronized (myFuture) {
+            if (myFuture != null && !myFuture.isCancelled()) {
+                myFuture.cancel(true);
+            }
+        }
     }
 
     public void shutdown() {
-        if (myFuture != null && !myFuture.isCancelled()) {
-            myFuture.cancel(true);
-        }
+        this.cancelTask();
         scheduler.shutdownNow();
     }
 

@@ -347,7 +347,7 @@ public class EffectHelper {
                     continue;
                 }
                 if (ArrayUtils.contains(DATE_EFFECT, e.effectId)) {
-                    Calendar now = Calendar.getInstance();
+                    final Calendar now = Calendar.getInstance();
                     effects.add(new ObjectEffectDate(e.effectId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR_OF_DAY), (byte) now.get(Calendar.MINUTE)));
                     continue;
                 }

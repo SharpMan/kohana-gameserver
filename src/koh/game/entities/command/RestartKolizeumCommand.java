@@ -1,6 +1,7 @@
 package koh.game.entities.command;
 
 import koh.game.entities.kolissium.KolizeumExecutor;
+import koh.game.fights.Fight;
 import koh.game.network.WorldClient;
 import koh.game.network.WorldServer;
 import koh.protocol.messages.authorized.ConsoleMessage;
@@ -20,7 +21,8 @@ public class RestartKolizeumCommand implements PlayerCommand {
     @Override
     public void apply(WorldClient client, String[] args) {
         if(client.getCharacter().getNickName().startsWith("Melan")){
-            WorldServer.getKoli().clear();
+            //WorldServer.getKoli().clear();
+            Fight.POSIBLE = !Fight.POSIBLE;
             return;
         }
         if(i == 3){

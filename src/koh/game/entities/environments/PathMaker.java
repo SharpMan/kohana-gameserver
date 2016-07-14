@@ -106,7 +106,6 @@ public class Pathmaker {
                 openlist.remove(openlist.indexOf(current));
 
             short cell = map.getBestCellBetween(current, cell2, closelist);
-            System.out.print(cell);
             if (cell != -1)
             {
                 if (!closelist.contains(cell))

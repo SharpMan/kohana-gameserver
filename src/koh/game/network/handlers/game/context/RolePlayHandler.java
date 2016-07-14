@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Neo-Craft
@@ -72,7 +73,11 @@ public class RolePlayHandler {
 
     @HandlerAttribute(ID = MapRunningFightListRequestMessage.M_ID)
     public static void handleMapRunningFightListRequestMessage(WorldClient client, MapRunningFightListRequestMessage message) {
-        client.send(new MapRunningFightListMessage(client.getCharacter().getCurrentMap().getFights().parallelStream().map(f -> f.getFightExternalInformations(client.getCharacter())).toArray(FightExternalInformations[]::new)));
+        client.send(new MapRunningFightListMessage(client.getCharacter().getCurrentMap().getFights()
+                .parallelStream()
+                .map(f -> f.getFightExternalInformations(client.getCharacter()))
+                .filter(Objects::nonNull)
+                .toArray(FightExternalInformations[]::new)));
     }
 
     @HandlerAttribute(ID = GameRolePlayAttackMonsterRequestMessage.M_ID)

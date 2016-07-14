@@ -226,7 +226,6 @@ public class FightFormulas {
             return 0;
         }
         if (fighter.getCharacter().getMountInfo() == null) {
-            logger.error("mountInfo Null {} ", fighter.getCharacter().toString());
             return 0;
         }
         if (!fighter.getCharacter().getMountInfo().isToogled

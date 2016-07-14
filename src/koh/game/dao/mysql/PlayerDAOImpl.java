@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Stream;
 
@@ -86,8 +87,8 @@ public class PlayerDAOImpl extends PlayerDAO {
     }
 
     public final List<Integer> accountInUnload = Collections.synchronizedList(new ArrayList<>()); //TO : CopyOnWriteArrayList ?
-    private final Map<Integer, Player> myCharacterById = Collections.synchronizedMap(new HashMap<>());
-    private final Map<String, Player> myCharacterByName = Collections.synchronizedMap(new HashMap<>());
+    private final Map<Integer, Player> myCharacterById = new ConcurrentHashMap<>(800);
+    private final Map<String, Player> myCharacterByName = new ConcurrentHashMap<>(800);
     private final ConcurrentLinkedQueue<Couple<Long, Player>> characterUnloadQueue = new ConcurrentLinkedQueue();
 
 

@@ -31,7 +31,6 @@ public class EffectAttract extends EffectBase {
                 break;
             }
             if (nextCell.hasFighter()) {
-                System.out.println("found"+trajet.size());
                 final Fighter target = nextCell.getFighter();
                 final FightCell startCell = target.getMyCell();
                 while (!trajet.isEmpty()) {

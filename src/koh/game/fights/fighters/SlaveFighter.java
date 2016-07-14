@@ -30,7 +30,6 @@ import java.util.List;
  * Created by Melancholia on 6/20/16.
  */
 public class SlaveFighter extends StaticFighter {
-    //TODO intaclable
 
     private final SpellItem[] spellCuts;
     private final Shortcut[] shortcuts;

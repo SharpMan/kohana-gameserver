@@ -66,7 +66,7 @@ public class PartyRequest extends GameBaseRequest {
 
             this.requester.getParty().removeGuest(this.requested.getCharacter());
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         this.requester.removePartyRequest(this);

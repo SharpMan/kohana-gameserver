@@ -105,6 +105,7 @@ public class PetsInventoryItem extends InventoryItem {
             //TODO : life
             return true;
         } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
+            this.removeEffect(983);
             return false;
         } else if (((int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < 60 /*pet.getMinDurationBeforeMeal()*/) {
             PlayerController.sendServerMessage(p.getClient(), "Veuillez patientez " + ((/*getAnimal().getMinDurationBeforeMeal()*/60) - ((int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " minutes pour le prochain repas");

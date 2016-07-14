@@ -36,13 +36,13 @@ public abstract class BuffEffect {
     public Fighter caster;
     public Fighter target;
     public int duration, delay;
-    private int Uid = -1;
+    private int uid = -1;
 
     public int getId() {
-        if (this.Uid == -1) {
-            Uid = target.getNextBuffUid().incrementAndGet();
+        if (this.uid == -1) {
+            uid = target.getNextBuffUid().incrementAndGet();
         }
-        return this.Uid;
+        return this.uid;
     }
 
     //TODO: Create List in Setting

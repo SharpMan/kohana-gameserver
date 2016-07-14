@@ -40,7 +40,7 @@ public class FightWorker {
         myFightersTurn.add(index, fighter);
     }
 
-    public void initTurns() {
+    public synchronized void initTurns() {
         this.myFightersTurn.clear();
         final List<Fighter> team1 = fight.fighters().filter(x -> x.getTeam().id == 0).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());
         final List<Fighter> team2 = fight.fighters().filter(x -> x.getTeam().id == 1).sorted((e1, e2) -> Integer.compare(e2.getInitiative(false), e1.getInitiative(false))).collect(Collectors.toList());

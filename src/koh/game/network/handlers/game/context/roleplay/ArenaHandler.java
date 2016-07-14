@@ -1,4 +1,4 @@
-package koh.game.network.handlers.character;
+package koh.game.network.handlers.game.context.roleplay;
 
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameKolissium;
@@ -12,6 +12,7 @@ import koh.game.entities.kolissium.ArenaParty;
 import koh.game.network.WorldClient;
 import koh.game.network.WorldServer;
 import koh.game.network.handlers.HandlerAttribute;
+import koh.game.network.handlers.character.PartyHandler;
 import koh.protocol.client.enums.PvpArenaStepEnum;
 import koh.protocol.client.enums.PvpArenaTypeEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
@@ -49,6 +50,13 @@ public class ArenaHandler {
                         .stream()
                         .filter(pl -> WorldServer.getKoli().isRegistred(pl))
                         .forEach(WorldServer.getKoli()::unregisterPlayer);
+               try{
+                   client.getParty().getPlayers().stream()
+                           .filter(p -> p.getClient() != null)
+                           .forEach(p -> client.getParty().leave(p,true));
+               }catch (Exception e){
+                   e.printStackTrace();
+               }
 
                 if (WorldServer.getKoli().registerGroup(client.getCharacter(), (ArenaParty) client.getParty())) {
                     client.getParty().getPlayers().forEach(pl -> {

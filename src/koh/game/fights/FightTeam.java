@@ -25,6 +25,7 @@ import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
 /**
@@ -43,7 +44,7 @@ public class FightTeam {
 
     public AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_WITHOUT;
 
-    private List<Fighter> myFighters = new ArrayList<>(8);
+    private List<Fighter> myFighters = Fight.POSIBLE ? new CopyOnWriteArrayList<>() : new ArrayList<>(8);
     public byte id;
     public int leaderId;
     public Fighter leader;

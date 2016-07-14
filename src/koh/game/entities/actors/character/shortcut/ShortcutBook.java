@@ -66,7 +66,7 @@ public class ShortcutBook {
                /* if(nullPointers == null)
                     nullPointers = new Stack<>();
                 nullPointers.add(i);*/
-                System.out.println(sp.toString());
+                //System.out.println(sp.toString());
                 this.myShortcuts.remove(sp.getKey());
                 continue;
             }

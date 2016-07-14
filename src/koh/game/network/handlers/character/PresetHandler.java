@@ -5,6 +5,7 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.preset.PresetEntity;
 import koh.game.entities.item.InventoryItem;
+import koh.game.fights.FightState;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
@@ -25,7 +26,7 @@ public class PresetHandler {
 
     @HandlerAttribute(ID = InventoryPresetUseMessage.MESSAGE_ID)
     public static void handleInventoryPresetUseMessage(WorldClient client, InventoryPresetUseMessage message){
-        if(client.isGameAction(GameActionTypeEnum.FIGHT)){
+        if((client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE)){
             client.send(new InventoryPresetUseResultMessage(message.presetId, PresetUseResultEnum.PRESET_USE_ERR_UNKNOWN, EMPTY_ARRAY));
             return;
         }
@@ -97,8 +98,7 @@ public class PresetHandler {
                 preset.objects = client.getCharacter().getInventoryCache().getEquipedItems()
                         .map(i -> new PresetItem((byte)i.getPosition(), i.getTemplateId(), i.getID())).toArray(PresetItem[]::new);
                 final PresetEntity entity = client.getCharacter().getPresets().getEntity(message.presetId);
-                entity.owner = client.getCharacter().getID();
-                entity.informations = preset.serializeInformations();
+                entity.setInformations(preset.serializeInformations());
                 client.send(new InventoryPresetUpdateMessage(preset));
                 DAO.getPresets().update(client.getCharacter().getID(),entity);
             }
@@ -109,10 +109,7 @@ public class PresetHandler {
                         client.getCharacter().getInventoryCache().getEquipedItems()
                                 .map(i -> new PresetItem((byte) i.getPosition(), i.getTemplateId(), i.getID())).toArray(PresetItem[]::new));
 
-                final PresetEntity entity = new PresetEntity();
-                entity.id = message.presetId;
-                entity.owner = client.getCharacter().getID();
-                entity.informations = obj.serializeInformations();
+                final PresetEntity entity = new PresetEntity(client.getCharacter().getID(),message.presetId,obj.serializeInformations(),obj);
                 DAO.getPresets().insert(entity);
 
                 client.getCharacter().getPresets().add(obj, entity);

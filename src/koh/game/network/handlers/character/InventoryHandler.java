@@ -1,9 +1,7 @@
 package koh.game.network.handlers.character;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Calendar;
 import koh.game.actions.GameActionTypeEnum;
+import koh.game.controllers.PlayerController;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.ItemLivingObject;
@@ -16,7 +14,6 @@ import koh.protocol.client.enums.ObjectErrorEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
-import koh.protocol.messages.game.context.GameMapMovementMessage;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.items.*;
 import koh.protocol.types.game.data.items.ObjectEffect;
@@ -24,27 +21,33 @@ import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import lombok.extern.log4j.Log4j2;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+
 /**
- *
  * @author Neo-Craft
  */
 @Log4j2
 public class InventoryHandler {
 
+
+
+
     @HandlerAttribute(ID = ObjectUseMultipleMessage.MESSAGE_ID)
-    public static void handleObjectUseMultipleMessage(WorldClient client,ObjectUseMultipleMessage message){
+    public static void handleObjectUseMultipleMessage(WorldClient client, ObjectUseMultipleMessage message) {
         if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
             client.send(new BasicNoOperationMessage());
             return;
         }
         InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
-        if(item.getQuantity() < message.quantity || item == null || !item.areConditionFilled(client.getCharacter())){
+        if (item.getQuantity() < message.quantity || item == null || !item.areConditionFilled(client.getCharacter())) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
         //int i = 0;
-        for(int i = 0; message.quantity > i ; i++){
-            if(!item.getTemplate().use(client.getCharacter(),client.getCharacter(),client.getCharacter().getCell().getId())){
+        for (int i = 0; message.quantity > i; i++) {
+            if (!item.getTemplate().use(client.getCharacter(), client.getCharacter(), client.getCharacter().getCell().getId())) {
                 client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
                 break;
             }
@@ -53,20 +56,20 @@ public class InventoryHandler {
     }
 
     @HandlerAttribute(ID = ObjectUseOnCellMessage.MESSAGE_ID)
-    public static void handleObjectUseOnCellMessage(WorldClient client,ObjectUseOnCellMessage message){
+    public static void handleObjectUseOnCellMessage(WorldClient client, ObjectUseOnCellMessage message) {
         if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
             client.send(new BasicNoOperationMessage());
             return;
         }
         final InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
-        if(item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(),client.getCharacter(),message.cell)){
+        if (item == null || !item.areConditionFilled(client.getCharacter()) || !item.getTemplate().use(client.getCharacter(), client.getCharacter(), message.cell)) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
     }
 
     @HandlerAttribute(ID = ObjectUseOnCharacterMessage.MESSAGE_ID)
-    public static void handleObjectUseOnCharacterMessage(WorldClient client,ObjectUseOnCharacterMessage message){
+    public static void handleObjectUseOnCharacterMessage(WorldClient client, ObjectUseOnCharacterMessage message) {
         if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
             client.send(new BasicNoOperationMessage());
             return;
@@ -74,7 +77,7 @@ public class InventoryHandler {
         final Player target = client.getCharacter().getCurrentMap().getPlayer(message.characterId);
         final InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
 
-        if(target == null || item == null || !item.areConditionFilled(target) || item.getTemplate().use(client.getCharacter(),target,target.getCell().getId())){
+        if (target == null || item == null || !item.areConditionFilled(target) || item.getTemplate().use(client.getCharacter(), target, target.getCell().getId())) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
             return;
         }
@@ -83,22 +86,20 @@ public class InventoryHandler {
     }
 
     @HandlerAttribute(ID = ObjectUseMessage.MESSAGE_ID)
-    public static void handleObjectUseMessage(WorldClient client,ObjectUseMessage message){
+    public static void handleObjectUseMessage(WorldClient client, ObjectUseMessage message) {
         if (client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
             client.send(new BasicNoOperationMessage());
             return;
         }
         final InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
-        if(item == null){
+        if (item == null) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DESTROY));
-        }
-        else if(!item.areConditionFilled(client.getCharacter())){
+        } else if (!item.areConditionFilled(client.getCharacter())) {
             log.error("Wrond conditions");
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
-        }
-        else if(!item.getTemplate().use(client.getCharacter(),client.getCharacter(),client.getCharacter().getCell().getId())){
+        } else if (!item.getTemplate().use(client.getCharacter(), client.getCharacter(), client.getCharacter().getCell().getId())) {
             log.error("Item action criterias invalid");
-            client.send(new ObjectErrorMessage  (ObjectErrorEnum.CRITERIONS));
+            client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
         }
 
         //client.getCharacter().getInventoryCache().safeDelete(item,1);
@@ -122,7 +123,7 @@ public class InventoryHandler {
                 return;
             }
             client.getCharacter().getInventoryCache().moveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
-          }
+        }
     }
 
     @HandlerAttribute(ID = LivingObjectMessageRequestMessage.MESSAGE_ID)
@@ -181,13 +182,13 @@ public class InventoryHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        InventoryItem Item = Client.getCharacter().getInventoryCache().find(Message.objectUID), Food = Client.getCharacter().getInventoryCache().find(Message.foodUID);
-        if (Item == null || Food == null || Food.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+        final InventoryItem item = Client.getCharacter().getInventoryCache().find(Message.objectUID), Food = Client.getCharacter().getInventoryCache().find(Message.foodUID);
+        if (item == null || Food == null || Food.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        if (Item instanceof PetsInventoryItem) {
-            if (!((PetsInventoryItem) Item).eat(Client.getCharacter(), Food)) {
+        if (item instanceof PetsInventoryItem) {
+            if (!((PetsInventoryItem) item).eat(Client.getCharacter(), Food)) {
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 53, new String[0]));
             } else {
                 int newQua = Food.getQuantity() - 1;
@@ -199,9 +200,9 @@ public class InventoryHandler {
                 Client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 32, new String[0]));
             }
 
-        } else if (Item.isLivingObject()) {
-            ObjectEffectInteger obviXp = (ObjectEffectInteger) Item.getEffect(974), obviType = (ObjectEffectInteger) Item.getEffect(973), obviState = (ObjectEffectInteger) Item.getEffect(971), obviSkin = (ObjectEffectInteger) Item.getEffect(972), obviItem = (ObjectEffectInteger) Item.getEffect(970);
-            ObjectEffectDate obviTime = (ObjectEffectDate) Item.getEffect(808);
+        } else if (item.isLivingObject()) {
+            ObjectEffectInteger obviXp = (ObjectEffectInteger) item.getEffect(974), obviType = (ObjectEffectInteger) item.getEffect(973), obviState = (ObjectEffectInteger) item.getEffect(971), obviSkin = (ObjectEffectInteger) item.getEffect(972), obviItem = (ObjectEffectInteger) item.getEffect(970);
+            ObjectEffectDate obviTime = (ObjectEffectDate) item.getEffect(808);
             if (obviItem == null || obviType == null || obviType.value != Food.getTemplate().getTypeId() || obviTime == null || obviXp == null || obviState == null || obviSkin == null) {
                 Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
                 return;
@@ -220,17 +221,17 @@ public class InventoryHandler {
             } else {
                 Client.getCharacter().getInventoryCache().updateObjectquantity(Food, newqua);
             }
-            Item.removeEffect(974);
-            Item.getEffects$Notify().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
+            item.removeEffect(974);
+            item.getEffects$Notify().add(((ObjectEffectInteger) obviXp.Clone()).SetValue(oldxp + xp));
             if (state < 2) {
-                Item.removeEffect(971);
-                Item.getEffects$Notify().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
+                item.removeEffect(971);
+                item.getEffects$Notify().add(((ObjectEffectInteger) obviState.Clone()).SetValue(state + 1));
             }
-            Item.removeEffect(808);
+            item.removeEffect(808);
             Calendar now = Calendar.getInstance();
-            Item.getEffects$Notify().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
+            item.getEffects$Notify().add(((ObjectEffectDate) new ObjectEffectDate(obviTime.actionId, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE))));
 
-            Client.send(new ObjectModifiedMessage(Item.getObjectItem()));
+            Client.send(new ObjectModifiedMessage(item.getObjectItem()));
             Client.getCharacter().send(new InventoryWeightMessage(Client.getCharacter().getInventoryCache().getWeight(), Client.getCharacter().getInventoryCache().getTotalWeight()));
         } else {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));

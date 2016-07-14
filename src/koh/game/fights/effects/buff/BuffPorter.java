@@ -44,16 +44,16 @@ public class BuffPorter extends BuffEffect {
             logger.debug("3bada " + this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).count());
             logger.debug("3bada " + this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur).count());
             logger.debug("3bada " + this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter).count());
-            this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> {
+            this.caster.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(buff -> {
                 {
-                    x.removeEffect();
-                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.caster.getID(), x.getId()));
+                    buff.removeEffect();
+                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.caster.getID(), buff.getId()));
                 }
             });
-            this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).forEach(x -> {
+            this.target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorter && x.duration != 0).forEach(buff -> {
                 {
-                    x.removeEffect();
-                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.target.getID(), x.getId()));
+                    buff.removeEffect();
+                    this.caster.getFight().sendToField(new GameActionFightDispellEffectMessage(514, this.caster.getID(), this.target.getID(), buff.getId()));
                 }
             });
             this.duration = 0;

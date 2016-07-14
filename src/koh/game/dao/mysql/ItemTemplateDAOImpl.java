@@ -49,6 +49,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             put(20, AddSpellPoint.class);
             put(21, AddEnergy.class);
             put(22, AddExperience.class);
+            put(23, OpenUI.class);
             put(228, SpellAnimation.class);
         }
     };
@@ -75,6 +76,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                 ++i;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
