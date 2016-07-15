@@ -17,6 +17,7 @@ import koh.protocol.messages.game.chat.ChatServerMessage;
 import koh.protocol.messages.game.context.roleplay.fight.arena.GameRolePlayArenaRegistrationStatusMessage;
 import koh.utils.Couple;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -57,9 +58,9 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     //private Map<Integer,Player> waiting = new ConcurrentHashMap<>())
     private static Map<Integer, Couple<Integer, Short>> lastPositions = new HashMap<>();
 
-    @Getter
-    private static final int TEAM_SIZE = DAO.getSettings().getIntElement("Koliseo.Size");
-    private static final int POOL_SIZE = DAO.getSettings().getIntElement("Koliseo.Size") * 2;
+    @Getter @Setter
+    private static int TEAM_SIZE = DAO.getSettings().getIntElement("Koliseo.Size"),
+            POOL_SIZE = DAO.getSettings().getIntElement("Koliseo.Size") * 2;
     private static final int TEAM_LVL_DIFF_MAX = 40;
 
     private static Comparator<ArenaParty> partySorter;

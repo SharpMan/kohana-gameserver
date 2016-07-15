@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -16,8 +17,8 @@ import java.util.stream.Stream;
  */
 public class PresetBook {
 
-    private final Map<Byte, Preset> book = Collections.synchronizedMap(new HashMap<>(4));
-    private final Map<Byte, PresetEntity> entities = Collections.synchronizedMap(new HashMap<>(4));
+    private final Map<Byte, Preset> book = new ConcurrentHashMap<>(4);
+    private final Map<Byte, PresetEntity> entities =new ConcurrentHashMap<>(4);
 
     public PresetBook() {
 

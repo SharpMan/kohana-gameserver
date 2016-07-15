@@ -11,6 +11,7 @@ import koh.game.utils.PeriodicContestExecutor;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,7 +26,6 @@ public class StartFightTask implements Runnable {
     private final List<Player> team2;
     private final PeriodicContestExecutor periodicContest;
     private final FightTypeEnum fightType;
-    private volatile int arenaFightN = 1;
 
     private final ScheduledExecutorService cellScheduler = Executors.newScheduledThreadPool(20);
 
@@ -49,17 +49,21 @@ public class StartFightTask implements Runnable {
                 case FIGHT_TYPE_PVP_ARENA:
                 default:
                     fight = new KoliseoFight(map,p1.getClient(),p2.getClient());
-                    final Future<Boolean> cellFuture = cellScheduler.submit(fight.initCellTask());
-                    final boolean result = cellFuture.get();
-                    if(result) { }
+                    final Future<Boolean> b = cellScheduler.submit(fight.initCellTask());
+                    final boolean result = b.get();
+                    int i = 0;
+                    while (!b.isDone()){
+                        i++;
+                        if(i > 1000){
+                            break;
+                        }
+                    }
                     ((KoliseoFight)fight).initFight();
                     break;
             }
 
             new JoinFightTask(periodicContest, team1Iterator, fight, p1.getID());
             new JoinFightTask(periodicContest, team2Iterator, fight, p2.getID());
-           /* if(Fight.POSIBLE)
-                periodicContest.executeTask(() -> fight.getFightWorker().initTurns());*/
 
         }
         catch (Exception e){

@@ -55,7 +55,6 @@ public class KoliseoFight extends Fight {
         this.joinFightTeam(myTeam1.leader, this.myTeam1, true, (short) -1, true);
         this.joinFightTeam(myTeam2.leader, this.myTeam2, true, (short) -1, true);
 
-        this.sendFightFlagInfos();
 
         // Si un timer pour le lancement du combat
         if (this.getStartTimer() != -1) {

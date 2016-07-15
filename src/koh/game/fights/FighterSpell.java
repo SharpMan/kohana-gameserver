@@ -19,7 +19,7 @@ public class FighterSpell {
 
     private HashMap<Integer, ArrayList<SpellTarget>> myTargets = new HashMap<>();
     @Getter
-    private HashMap<Integer, SpellinitialCooldown> initialCooldown = new HashMap<>();
+    private HashMap<Integer, SpellInitialCooldown> initialCooldown = new HashMap<>();
 
     public FighterBuff Buffs;
 
@@ -87,7 +87,7 @@ public class FighterSpell {
     public void actualize(SpellLevel spell, int targetId) {
         if (spell.getMinCastInterval() > 0) {
             if (!this.initialCooldown.containsKey(spell.getSpellId())) {
-                this.initialCooldown.put(spell.getSpellId(), new SpellinitialCooldown(spell.getMinCastInterval()));
+                this.initialCooldown.put(spell.getSpellId(), new SpellInitialCooldown(spell.getMinCastInterval()));
             } else {
                 this.initialCooldown.get(spell.getSpellId()).initialCooldown = spell.getMinCastInterval();
             }
@@ -103,16 +103,20 @@ public class FighterSpell {
         this.myTargets.get(spell.getSpellId()).add(new SpellTarget(targetId));
     }
 
-    public void endTurn() {
-        this.myTargets.values().stream().forEach(ArrayList::clear);
-        this.initialCooldown.values().stream().forEach(SpellinitialCooldown::decrement);
+    public void setCooldown(int spellid,byte relance){
+        this.initialCooldown.put(spellid, new SpellInitialCooldown(relance));
     }
 
-    public class SpellinitialCooldown {
+    public void endTurn() {
+        this.myTargets.values().stream().forEach(ArrayList::clear);
+        this.initialCooldown.values().stream().forEach(SpellInitialCooldown::decrement);
+    }
+
+    public class SpellInitialCooldown {
 
         public byte initialCooldown;
 
-        public SpellinitialCooldown(byte initialCooldown) {
+        public SpellInitialCooldown(byte initialCooldown) {
             this.initialCooldown = initialCooldown;
         }
 

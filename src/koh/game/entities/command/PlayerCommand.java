@@ -29,7 +29,8 @@ public interface PlayerCommand {
                 logger.error(e);
                 logger.warn(e.getMessage());
                 PlayerController.sendServerMessage(client, "Please enter correctly the command's args");
-                PlayerController.sendServerMessage(client,this.getDescription());
+                if(this.getDescription() != null)
+                    PlayerController.sendServerMessage(client, this.getDescription());
             }
         }
     }

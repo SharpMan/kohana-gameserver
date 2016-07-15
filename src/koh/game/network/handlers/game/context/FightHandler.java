@@ -211,9 +211,13 @@ public class FightHandler {
                 client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.JUST_RESPAWNED));
                 return;
             }
+            if(!client.canGameAction(GameActionTypeEnum.FIGHT)){
+                client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.IM_OCCUPIED));
+                return;
+            }
             final FighterRefusedReasonEnum answer = fight.canJoin(team, client.getCharacter());
             if (answer == FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
-                Fighter Fighter = new CharacterFighter(fight, client);
+                final Fighter Fighter = new CharacterFighter(fight, client);
 
                 GameAction FightAction = new GameFight(Fighter, fight);
 

@@ -21,6 +21,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.PrintStream;
+import java.time.DayOfWeek;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -29,7 +32,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class Main {
 
-    public static final int MIN_TIMEOUT = 30;
+    public static final int MIN_TIMEOUT = 15;
     private static final Logger logger = LogManager.getLogger(Main.class);
     @Getter
     private volatile static TransfererTimeOut transfererTimeOut;
@@ -55,6 +58,8 @@ public class Main {
             }
         };
     }
+
+    public static int DAY_OF_WEEK = 0;
 
 
     public static void main(String[] args) {
@@ -93,6 +98,18 @@ public class Main {
                 @Override
                 public void run() {
                     try{
+                        DAY_OF_WEEK=  Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris")).get(Calendar.DAY_OF_WEEK);
+                        if(DAY_OF_WEEK == Calendar.FRIDAY){
+                            if( WorldServer.getKoli().getTEAM_SIZE() != 2) {
+                                WorldServer.getKoli().setTEAM_SIZE(2);
+                                WorldServer.getKoli().setPOOL_SIZE(4);
+                            }
+                        }
+                        else if(WorldServer.getKoli().getTEAM_SIZE() == 2){
+                            WorldServer.getKoli().setTEAM_SIZE(DAO.getSettings().getIntElement("Koliseo.Size"));
+                            WorldServer.getKoli().setPOOL_SIZE(DAO.getSettings().getIntElement("Koliseo.Size") *2);
+                        }
+
                         logger.info("Save starting...");
                         worldServer.sendPacket(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,164));
                         DAO.getPlayers().getPlayers().forEach(pl -> pl.save(false));

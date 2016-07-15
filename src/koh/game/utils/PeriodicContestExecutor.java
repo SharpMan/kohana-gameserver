@@ -3,6 +3,7 @@ package koh.game.utils;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.kolissium.ArenaParty;
+import lombok.Getter;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -15,7 +16,8 @@ import java.util.concurrent.TimeUnit;
 public abstract class PeriodicContestExecutor implements Runnable {
 
     protected final static long TIME_REFRESH = DAO.getSettings().getBoolElement("Logging.Debug") ? 3000 : 30000;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    @Getter
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
     protected ScheduledFuture<?> myFuture;
 
 

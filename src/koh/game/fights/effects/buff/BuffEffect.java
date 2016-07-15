@@ -1,5 +1,6 @@
 package koh.game.fights.effects.buff;
 
+import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.SpellIDEnum;
@@ -40,7 +41,7 @@ public abstract class BuffEffect {
 
     public int getId() {
         if (this.uid == -1) {
-            uid = target.getNextBuffUid().incrementAndGet();
+            uid = Fight.POSIBLE ? target.getFight().getNextBuffUid().incrementAndGet() : target.getNextBuffUid().incrementAndGet();
         }
         return this.uid;
     }

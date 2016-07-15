@@ -100,6 +100,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     protected long myLoopTimeOut = -1;
     protected long myLoopActionTimeOut;
     protected ArrayList<GameAction> myActions = new ArrayList<>();
+    @Getter
+    protected AtomicInteger nextBuffUid = new AtomicInteger();
     protected volatile GameFightEndMessage myResult;
     @Getter
     @Setter
@@ -235,6 +237,76 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
     }
+
+    public Runnable initCellTask2(){
+        final Fight fight = this;
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Ajout des cells
+                    for (DofusCell cell : map.getCells()) {
+                        fightCells.put(cell.getId(), new FightCell(cell.getId(), cell.walakableInFight(), cell.los()));
+                    }
+                    myFightCells.put(myTeam1, new HashMap<>());
+                    myFightCells.put(myTeam2, new HashMap<>());
+
+                    if (Fight.MAP_FIGHTCELLS.containsKey(map.getId())) {
+                        // Ajout
+                        synchronized (Fight.MAP_FIGHTCELLS) {
+                            for (Short cell : Fight.MAP_FIGHTCELLS.get(map.getId()).get(0)) {
+                                myFightCells.get(myTeam1).put(cell, fightCells.get(cell));
+                            }
+                            for (Short cell : Fight.MAP_FIGHTCELLS.get(map.getId()).get(1)) {
+                                myFightCells.get(myTeam2).put(cell, fightCells.get(cell));
+                            }
+                        }
+                        return;
+                    }
+
+                    for (Short cellValue : map.getRedCells()) {
+                        final FightCell cell = fightCells.get(cellValue);
+                        if (cell == null || !cell.canWalk()) {
+                            continue;
+                        }
+                        myFightCells.get(myTeam1).put(cellValue, cell);
+                    }
+
+                    for (Short cellValue : map.getBlueCells()) {
+                        final FightCell cell = fightCells.get(cellValue);
+                        if (cell == null || !cell.canWalk()) {
+                            continue;
+                        }
+                        myFightCells.get(myTeam2).put(cellValue, cell);
+                    }
+
+                    if (map.getBlueCells().length == 0 || map.getRedCells().length == 0) {
+                        myFightCells.get(myTeam1).clear();
+                        myFightCells.get(myTeam2).clear();
+                        final Couple<ArrayList<FightCell>, ArrayList<FightCell>> startCells = Algo.genRandomFightPlaces(fight);
+                        for (FightCell cell : startCells.first) {
+                            myFightCells.get(myTeam1).put(cell.Id, cell);
+                        }
+                        for (FightCell Cell : startCells.second) {
+                            myFightCells.get(myTeam2).put(Cell.Id, Cell);
+                        }
+                        synchronized (Fight.MAP_FIGHTCELLS) {
+                            Fight.MAP_FIGHTCELLS.put(map.getId(), new HashMap<>());
+                            Fight.MAP_FIGHTCELLS.get(map.getId()).put(0, myFightCells.get(myTeam1).keySet().toArray(new Short[myFightCells.get(myTeam1).size()]));
+                            Fight.MAP_FIGHTCELLS.get(map.getId()).put(1, myFightCells.get(myTeam2).keySet().toArray(new Short[myFightCells.get(myTeam2).size()]));
+                        }
+                    }
+
+
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+            };
+        };
+    }
+
 
     public  Callable<Boolean> initCellTask() {
         return () -> {
@@ -428,17 +500,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter Fighter, int param1) {
-        return getTargetThroughPortal(Fighter, param1, false);
+        return getTargetThroughPortal(Fighter, param1, false,null);
     }
 
-    private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter fighter, int param1, boolean param2) {
+    private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter fighter, int param1, boolean param2, FightTeam team) {
         MapPoint _loc3_ = null;
         int damagetoReturn = 0;
         MapPoint _loc16_;
         FightPortal[] portals = new FightPortal[0];
         for (CopyOnWriteArrayList<FightActivableObject> Objects : this.activableObjects.values()) {
             for (FightActivableObject Object : Objects) {
-                if (Object instanceof FightPortal && fighter.getTeam() == ((FightPortal) Object).caster.getTeam() && ((FightPortal) Object).enabled) {
+                if (Object instanceof FightPortal && team == ((FightPortal) Object).caster.getTeam() && ((FightPortal) Object).enabled) {
                     portals = ArrayUtils.add(portals, (FightPortal) Object);
                     if (Object.getCellId() == param1) {
                         _loc3_ = Object.getMapPoint();
@@ -534,7 +606,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                     if (this.getCell(cellId).hasGameObject(FightObjectType.OBJECT_PORTAL)
                             && !Arrays.stream(spellEffects).anyMatch(effect -> effect.getEffectType().equals(StatsEnum.DISABLE_PORTAL))) {
-                        informations = this.getTargetThroughPortal(fighter, cellId, true);
+
+
+                        informations = this.getTargetThroughPortal(fighter,
+                                cellId,
+                                true,
+                                this.getCell(cellId).getObjects().stream()
+                                        .filter(x -> x.getObjectType() == FightObjectType.OBJECT_PORTAL)
+                                        .findFirst()
+                                        .map(f -> (FightPortal) f)
+                                        .get().caster.team
+                        );
                         cellId = informations.first.shortValue();
                         //this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 0, new String[]{"DamagePercentBoosted Suite au portails = " + informations.tree}));
 
@@ -692,7 +774,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         //TODO: Set ParentBoost UID
                         fighter.getBuff().delayedEffects.add(new Couple<>(new EffectCast(effect.getEffectType(), spellId == -1 ? spellLevel.getSpellId() : spellId, cellId, num1, effect, fighter, targets.get(effect), false, StatsEnum.NONE, 0, spellLevel), effect.delay));
                         targets.get(effect).stream().forEach((target) ->
-                                this.sendToField(new GameActionFightDispellableEffectMessage(effect.effectId, fighter.getID(), new FightTriggeredEffect(target.getNextBuffUid().incrementAndGet(), target.getID(), (short) effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), effect.effectUid, 0, (short) effect.diceNum, (short) effect.diceSide, (short) effect.value, (short) effect.delay)))
+                                this.sendToField(new GameActionFightDispellableEffectMessage(effect.effectId, fighter.getID(), new FightTriggeredEffect(Fight.POSIBLE ? this.nextBuffUid.incrementAndGet() : target.getNextBuffUid().incrementAndGet(), target.getID(), (short) effect.duration, FightDispellableEnum.DISPELLABLE, spellLevel.getSpellId(), effect.effectUid, 0, (short) effect.diceNum, (short) effect.diceSide, (short) effect.value, (short) effect.delay)))
                         );
                         continue;
                     }
@@ -1298,7 +1380,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 };
                 if (effect.delay > 0) {
                     target.getBuff().delayedEffects.add(new Couple<>(new EffectCast(effect.getEffectType(), spellid, target.getCellId(), num1, effect, caster, targets, false, StatsEnum.NONE, 0, spell), effect.delay));
-                    this.sendToField(new GameActionFightDispellableEffectMessage(effect.effectId, caster.getID(), new FightTriggeredEffect(target.getNextBuffUid().incrementAndGet(), target.getID(), (short) effect.duration, FightDispellableEnum.DISPELLABLE, spellid, effect.effectUid, 0, (short) effect.diceNum, (short) effect.diceSide, (short) effect.value, (short) effect.delay)));
+                    this.sendToField(new GameActionFightDispellableEffectMessage(effect.effectId, caster.getID(), new FightTriggeredEffect(Fight.POSIBLE ? this.nextBuffUid.incrementAndGet() : target.getNextBuffUid().incrementAndGet(), target.getID(), (short) effect.duration, FightDispellableEnum.DISPELLABLE, spellid, effect.effectUid, 0, (short) effect.diceNum, (short) effect.diceSide, (short) effect.value, (short) effect.delay)));
                     continue;
                 }
                 final EffectCast castInfos = new EffectCast(effect.getEffectType(), spellid, target.getCellId(), num1, effect, caster, targets, false, StatsEnum.NONE, 0, spell);
@@ -1591,8 +1673,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
             });
         }
-        //if (this.fightState == fightState.STATE_PLACE && !(POSIBLE && fightType == FightTypeEnum.FIGHT_TYPE_PVP_ARENA))
-        this.fightWorker.initTurns();
+        if (this.fightState == fightState.STATE_PLACE )
+            this.fightWorker.initTurns();
         if (this.fightState == FightState.STATE_ACTIVE && fighter.getObjectType() != FightObjectType.OBJECT_STATIC)
             this.sendToField(this.getFightTurnListMessage());
     }
@@ -1774,7 +1856,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.isSequencing = true;
         this.sequence = sequenceType;
         this.m_sequences.push(sequenceType);
-        this.sendToField(new SequenceStartMessage(sequenceType.value, this.currentFighter.getID())); //TODO not Spectator?
+        if(currentFighter != null)
+            this.sendToField(new SequenceStartMessage(sequenceType.value, this.currentFighter.getID())); //TODO not Spectator?
         return true;
     }
 

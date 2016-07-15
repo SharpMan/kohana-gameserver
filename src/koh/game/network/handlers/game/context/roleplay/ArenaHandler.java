@@ -1,5 +1,6 @@
 package koh.game.network.handlers.game.context.roleplay;
 
+import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameKolissium;
 import koh.game.controllers.PlayerController;
@@ -21,6 +22,7 @@ import koh.protocol.messages.game.context.roleplay.fight.arena.*;
 import koh.protocol.messages.game.context.roleplay.party.PartyInvitationArenaRequestMessage;
 
 import java.time.Instant;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,6 +37,9 @@ public class ArenaHandler {
         } else if (PlayerInst.isPresent(client.getCharacter().getID()) && PlayerInst.getPlayerInst(client.getCharacter().getID()).getBannedTime() > System.currentTimeMillis()) {
             client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 343, TimeUnit.MILLISECONDS.toMinutes(Instant.ofEpochMilli(PlayerInst.getPlayerInst(client.getCharacter().getID()).getBannedTime()).minusMillis(System.currentTimeMillis()).toEpochMilli()) + ""));
         } else if (client.canGameAction(GameActionTypeEnum.KOLI)) {
+            if(Main.DAY_OF_WEEK == Calendar.FRIDAY){
+                PlayerController.sendServerMessage(client,"Exceptionnel : Durant le vendredi, le Kolizeum est en mode 2vs2");
+            }
            if (client.getParty() instanceof ArenaParty && client.getParty().memberCounts() > 1) {
                if (client.getParty().getPlayers().stream().anyMatch(pl -> pl.getLevel() < 50)) {
                    client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 327, client.getParty().getPlayers().stream().filter(pl -> pl.getLevel() < 50).findFirst().get().getNickName()));
@@ -52,7 +57,7 @@ public class ArenaHandler {
                         .forEach(WorldServer.getKoli()::unregisterPlayer);
                try{
                    client.getParty().getPlayers().stream()
-                           .filter(p -> p.getClient() != null)
+                           .filter(p -> p.getClient() == null)
                            .forEach(p -> client.getParty().leave(p,true));
                }catch (Exception e){
                    e.printStackTrace();
