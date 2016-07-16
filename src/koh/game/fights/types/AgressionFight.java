@@ -3,6 +3,7 @@ package koh.game.fights.types;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
+import koh.game.entities.actors.Player;
 import koh.game.entities.environments.DofusMap;
 import koh.game.fights.utils.AntiCheat;
 import koh.game.fights.Fight;
@@ -12,6 +13,7 @@ import koh.game.fights.FightTypeEnum;
 import koh.game.fights.Fighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.WorldClient;
+import koh.protocol.client.enums.FighterRefusedReasonEnum;
 import koh.protocol.messages.game.context.fight.FightOutcomeEnum;
 import koh.protocol.messages.game.context.fight.GameFightEndMessage;
 import koh.protocol.messages.game.context.fight.GameFightJoinMessage;
@@ -109,6 +111,16 @@ public class AgressionFight extends Fight {
        }
        super.endFight();
    }
+
+    private static final int ARENA = 88212759;
+    @Override
+    public FighterRefusedReasonEnum canJoin(FightTeam teameam, Player character) {
+        if(map.getId() == ARENA){
+            return FighterRefusedReasonEnum.MULTIACCOUNT_NOT_ALLOWED;
+        }
+        return super.canJoin(teameam,character);
+    }
+
 
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {

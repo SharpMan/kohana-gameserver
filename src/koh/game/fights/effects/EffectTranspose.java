@@ -24,8 +24,8 @@ public class EffectTranspose extends EffectBase {
                     .forEach(fr -> castInfos.targets.add(fr));
         }
         for (Fighter target : (Iterable<Fighter>) castInfos.targets.stream()
-                .filter(fr -> (fr.getObjectType() != IFightObject.FightObjectType.OBJECT_STATIC)
-                        && !fr.getStates().hasState(FightStateEnum.CARRIED)
+                .filter(fr -> /*(fr.getObjectType() != IFightObject.FightObjectType.OBJECT_STATIC)
+                        && */!fr.getStates().hasState(FightStateEnum.CARRIED)
                         && !fr.getStates().hasState(FightStateEnum.INÉBRANLABLE)
                         && !fr.getStates().hasState(FightStateEnum.ENRACINÉ)
                         && !fr.getStates().hasState(FightStateEnum.INDÉPLAÇABLE))

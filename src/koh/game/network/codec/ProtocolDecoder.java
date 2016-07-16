@@ -71,8 +71,15 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         final Message message;
 
         try {
-            message = Handler.messages.get(getMessageId(header)).newInstance();
+            final Class<? extends Message> messageParent =  Handler.messages.get(getMessageId(header));
+            if(messageParent == null){
+                logger.error("[ERROR] Unknown Message Header Handler {} {}" , (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) , session.getRemoteAddress().toString());
+                session.write(new BasicNoOperationMessage());
+                return true;
+            }
+            message = messageParent.newInstance();
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("[ERROR] Unknown Message Header Handler {} {}" , (MessageEnum.valueOf(getMessageId(header)) == null ? getMessageId(header) : MessageEnum.valueOf(getMessageId(header))) , session.getRemoteAddress().toString());
             session.write(new BasicNoOperationMessage());
             logger.info(messageLength);

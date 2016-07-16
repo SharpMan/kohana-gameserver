@@ -90,7 +90,7 @@ public class Party extends IWorldEventObserver {
     }
 
     public int memberCounts() {
-        return this.guests.size() + this.players.size();
+        return this.guests == null ? 0 : this.guests.size() + (this.players == null ? 0  :this.players.size());
     }
 
     public void addPlayer(Player character) {

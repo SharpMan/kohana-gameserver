@@ -73,7 +73,7 @@ public class ArenaBattle {
 
                         //TODO: !canGameAction Fight ptete il se branle
                         final Player playerFighting = pussies.stream().filter(pl -> pl.getClient() == null || !pl.isInWorld() || pl.getClient().isGameAction(GameActionTypeEnum.FIGHT)).findFirst().orElse(null);
-                        if (playerFighting != null) {
+                        if (playerFighting != null || party1.memberCounts() == 0 || party2.memberCounts() == 0) {
                             pussies.forEach(p -> p.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 275, playerFighting.getNickName())));
                             playerFighting.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 343, String.valueOf(BAN_TIME_MINUTES)));
                             PlayerInst.getPlayerInst(playerFighting.getID()).setBannedTime(System.currentTimeMillis() + BAN_TIME_MINUTES * 60000);

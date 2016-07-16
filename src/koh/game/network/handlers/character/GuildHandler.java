@@ -134,6 +134,7 @@ public class GuildHandler {
     public static void HandleGuildInvitationAnswerMessage(WorldClient Client, GuildInvitationAnswerMessage Message) {
         if (!Client.isGameAction(GameActionTypeEnum.BASIC_REQUEST)) {
             Client.send(new BasicNoOperationMessage());
+            return;
         }
         GuildJoinRequest guildInvitationRequest = (GuildJoinRequest) Client.getBaseRequest();
         if (Client == guildInvitationRequest.requester && !Message.accept) {

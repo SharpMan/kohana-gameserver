@@ -116,13 +116,17 @@ public class InventoryHandler {
     }
 
     @HandlerAttribute(ID = ObjectSetPositionMessage.MESSAGE_ID)
-    public static void HandleObjectSetPositionMessage(WorldClient client, ObjectSetPositionMessage Message) {
+    public static void HandleObjectSetPositionMessage(WorldClient client, ObjectSetPositionMessage message) {
         synchronized (client.get$mutex()) {
-            if (client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
+            if (client.isGameAction(GameActionTypeEnum.FIGHT)
+                    && client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
                 client.send(new BasicNoOperationMessage());
                 return;
             }
-            client.getCharacter().getInventoryCache().moveItem(Message.objectUID, CharacterInventoryPositionEnum.valueOf(Message.position), Message.quantity);
+            if(client.getCharacter().getInventoryCache() == null){
+                return;
+            }
+            client.getCharacter().getInventoryCache().moveItem(message.objectUID, CharacterInventoryPositionEnum.valueOf(message.position), message.quantity);
         }
     }
 

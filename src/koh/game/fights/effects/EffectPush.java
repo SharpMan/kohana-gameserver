@@ -146,7 +146,8 @@ public class EffectPush extends EffectBase {
                     return target.setCell(nextCell);
                 }
                 else if(nextCell.hasObject(FightObjectType.OBJECT_PORTAL) && nextCell.getObjects().stream().anyMatch(o -> o instanceof FightPortal && ((FightPortal)o).enabled)){
-                    castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
+                    if(castInfos.effect != null && nextCell != null)
+                        castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
                     return target.setCell(nextCell);
                 }
 

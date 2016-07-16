@@ -39,9 +39,9 @@ public class EffectSpellCoolDown extends EffectBase {
             target.getSpellsController().setCooldown(castInfos.effect.diceNum, (byte) castInfos.effect.value);
         }
         else{
-            currentCooldown.initialCooldown += castInfos.effect.value;
+            currentCooldown.initialCooldown /*+*/= (byte) castInfos.effect.value;
         }
-        target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, castInfos.caster.getID(), target.getID(), castInfos.effect.diceNum, target.getSpellsController().getInitialCooldown().get(castInfos.effect.diceNum).initialCooldown /*castInfos.effect.value*/));
+        target.send(new GameActionFightSpellCooldownVariationMessage(ACTION_CHARACTER_ADD_SPELL_COOLDOWN, castInfos.caster.getID(), target.getID(), castInfos.effect.diceNum, /*target.getSpellsController().getInitialCooldown().get(castInfos.effect.diceNum).initialCooldown*/ castInfos.effect.value));
 
     }
 

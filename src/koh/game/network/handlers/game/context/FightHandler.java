@@ -48,18 +48,18 @@ import koh.protocol.messages.game.guild.ChallengeFightJoinRefusedMessage;
 public class FightHandler {
 
     @HandlerAttribute(ID = GameFightOptionToggleMessage.M_ID)
-    public static void HandleGameFightOptionToggleMessage(WorldClient Client, GameFightOptionToggleMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleGameFightOptionToggleMessage(WorldClient client, GameFightOptionToggleMessage Message) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        if (Client.getCharacter().getFighter() != Client.getCharacter().getFighter().getTeam().leader) {
-            Client.send(new BasicNoOperationMessage());
+        if (client.getCharacter().getFighter() != client.getCharacter().getFighter().getTeam().leader) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
 
-        Client.getCharacter().getFight().toggleLock(Client.getCharacter().getFighter(), FightOptionsEnum.valueOf(Message.option));
+        client.getCharacter().getFight().toggleLock(client.getCharacter().getFighter(), FightOptionsEnum.valueOf(Message.option));
     }
 
     @HandlerAttribute(ID = 718)

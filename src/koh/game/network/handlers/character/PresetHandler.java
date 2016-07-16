@@ -57,6 +57,9 @@ public class PresetHandler {
                     }
                 }
                 if(weapon != null){
+                    if(weapon.getWeaponTemplate().isTwoHanded() && client.getCharacter().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD)){
+                        client.getCharacter().getInventoryCache().unEquipItem(client.getCharacter().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD));
+                    }
                     client.getCharacter().getInventoryCache().moveItem(weapon.getID(), CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON,1);
                 }
                 client.send(new InventoryPresetUseResultMessage(message.presetId, partial ? PresetUseResultEnum.PRESET_USE_OK_PARTIAL : PresetUseResultEnum.PRESET_USE_OK, EMPTY_ARRAY));

@@ -32,7 +32,7 @@ public class WorldServer {
     /**
      * 2 * estimated client optimal size (64)
      */
-    private static final int DEFAULT_READ_SIZE = /*1024*/512;
+    private static final int DEFAULT_READ_SIZE = /*1024512*/256;
 
     /**
      * max used client packet size + additional size for infos of the next packet

@@ -190,6 +190,9 @@ public class ContextHandler {
             }
             return;
         }
+        if(client.getCharacter() == null){
+            return;
+        }
         if (client.getCharacter().getCurrentMap() == null) {
             client.send(new GameMapNoMovementMessage());
             PlayerController.sendServerErrorMessage(client, "Votre map est absente veuillez le signalez au staff ");

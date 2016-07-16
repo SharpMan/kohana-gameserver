@@ -27,8 +27,9 @@ public class BuffErosion extends BuffEffect {
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
         final float pdamage = JET / 100.00f;
-        int buffValue = this.target.getMaxLife() - (int) (damageValue.getValue() * pdamage);
-        score += damageValue.getValue() * pdamage;
+        final int decumulator = (int) (Math.max(0,damageValue.getValue()) * pdamage);
+        int buffValue = this.target.getMaxLife() - decumulator;
+        score += decumulator;
         if (buffValue < 0) {
             buffValue = 0;
         }

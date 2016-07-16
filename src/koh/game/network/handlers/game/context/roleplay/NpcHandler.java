@@ -36,6 +36,9 @@ public class NpcHandler {
     /*LeaveDialogRequestMessage*/
     @HandlerAttribute(ID = NpcGenericActionRequestMessage.MESSAGE_ID)
     public static void handleNpcGenericActionRequestMessage(WorldClient client, NpcGenericActionRequestMessage message) {
+        if(client.getCharacter() == null || client.getCharacter().getCurrentMap() == null){
+            return;
+        }
         final Npc PNJ = client.getCharacter().getCurrentMap().getNpc(message.npcId);
         if (PNJ == null) {
             if(client.getCharacter().isOnTutorial())
