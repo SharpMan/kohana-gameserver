@@ -105,7 +105,7 @@ public class BombFighter extends StaticFighter {
 
             case DAMAGE_FIRE:
             case STEAL_FIRE:
-                jet.setValue( Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
+                jet.setValue( Math.floor(jet.doubleValue() * ((100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100)
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100));
                 break;
 
@@ -165,7 +165,7 @@ public class BombFighter extends StaticFighter {
         }
         int bestValue = -1;
         for (BombFighter bomb : targets) {
-            final int result = bomb.tryDie(caster, true);
+            final int result = bomb.personnalMurder(caster, true);
             if(result < bestValue){
                 bestValue = result;
             }
@@ -176,6 +176,15 @@ public class BombFighter extends StaticFighter {
     }
 
     private int result = 666;
+
+    private int personnalMurder(int casterId, boolean force){
+        final int result = selfMurder(casterId);
+        if (this.fightBombs != null) {
+            this.fightBombs.stream().distinct().forEach(Bomb -> Bomb.remove());
+        }
+        final int result2 = super.tryDie(casterId, force);
+        return result < result2 ? result : result2;
+    }
 
     @Override
     public synchronized int tryDie(int casterId, boolean force) {

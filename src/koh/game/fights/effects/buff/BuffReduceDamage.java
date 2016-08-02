@@ -9,6 +9,7 @@ import koh.protocol.messages.game.actions.fight.GameActionFightReduceDamagesMess
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
+import static koh.protocol.client.enums.StatsEnum.PA_USED_LOST_X_PDV_2;
 
 /**
  *
@@ -30,6 +31,9 @@ public class BuffReduceDamage extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
+        if(damageInfos.effectType == PA_USED_LOST_X_PDV_2){
+            return super.applyEffect(damageValue, damageInfos);
+        }
         if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId)) {
             final int armor = JET * (100 + (castInfos.caster.getLevel() * 5)) / 100;
             target.getFight().sendToField(new GameActionFightReduceDamagesMessage(ActionIdEnum.ACTION_CHARACTER_LIFE_LOST_MODERATOR, target.getID(), target.getID(), armor));

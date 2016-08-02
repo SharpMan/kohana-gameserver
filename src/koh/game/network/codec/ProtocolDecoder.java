@@ -50,6 +50,7 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
 
         int header = buf.getShort(), messageLength;
 
+
         try {
             messageLength = getMessageLength(buf, header);
         } catch (BufferUnderflowException e) {

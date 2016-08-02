@@ -107,6 +107,7 @@ public class MonsterFight extends Fight {
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
                     FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots);
                 });
+                loots.add(new DroppedItem(11503, Arrays.stream(deadMobs).mapToInt(MonsterFighter::getLevel).sum() / 2));
                 fighter.getPlayer().addScore(ScoreType.PVM_WIN);
 
                 final int kamasWin = FightFormulas.computeKamas(fighter, baseKamas, teamPP);

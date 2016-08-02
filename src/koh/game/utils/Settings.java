@@ -28,7 +28,6 @@ public class Settings {
     private final String path;
     public Settings(String path) {
         this.path = path;
-        this.elements.clear();
         this.readSettings();
         this.getStringElement("Register.Channels").split(",");
         this.registredChannels = new Byte[getStringElement("Register.Channels").split(",").length];
@@ -76,7 +75,8 @@ public class Settings {
         return getGroup(g).get(k);
     }
 
-    private void readSettings() {
+    public void readSettings() {
+        elements.clear();
         Map<String, String> currentGroup = null;
         try {
             BufferedReader config = new BufferedReader(new FileReader(System.getProperty("user.dir")+path));

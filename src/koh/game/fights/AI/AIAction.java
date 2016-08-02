@@ -50,6 +50,7 @@ public abstract class AIAction {
             case INVISIBLE:
             case STATE_REFLECT_SPELL:
             case SAOUL:
+            case INVULNERABLE:
             case CARRIED:
             case CARRIER: {
                 return true;
@@ -59,6 +60,7 @@ public abstract class AIAction {
             case ALTRUISTE:
             case PESANTEUR:
             default: {
+                logger.debug("Untaken state{}", state);
                 return false;
             }
         }

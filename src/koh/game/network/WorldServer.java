@@ -32,12 +32,12 @@ public class WorldServer {
     /**
      * 2 * estimated client optimal size (64)
      */
-    private static final int DEFAULT_READ_SIZE = /*1024512*/256;
+    private static final int DEFAULT_READ_SIZE = /*1024512*/ 256;
 
     /**
      * max used client packet size + additional size for infos of the next packet
      */
-    private static final int MAX_READ_SIZE = /*4096 + 0xFF*/ 1024 + 0xFF;
+    private static final int MAX_READ_SIZE = /*4096 + 0xFF*/ 2048 + 0xFF;
 
     public WorldServer(int port) {
         this.acceptor = new NioSocketAcceptor(Runtime.getRuntime().availableProcessors() * 4);

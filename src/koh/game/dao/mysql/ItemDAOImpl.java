@@ -1,6 +1,7 @@
 package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.ItemDAO;
 import koh.game.entities.item.InventoryItem;
@@ -119,7 +120,7 @@ public class ItemDAOImpl extends ItemDAO {
             //TODO better dispose/totalClear pattern
             return true;
         }
-        catch(com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e1){
+        catch(MySQLIntegrityConstraintViolationException e1){
             try (ConnectionResult conn = dbSource.executeQuery("SELECT template,owner FROM `character_items` WHERE id = "+item.getID()+";")) {
                 ResultSet result = conn.getResult();
                 if(result.first()){
@@ -222,6 +223,7 @@ public class ItemDAOImpl extends ItemDAO {
 
         return false;
     }
+
 
     @Override
     public void start() {

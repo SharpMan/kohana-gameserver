@@ -4,6 +4,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
+import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.FightStateEnum;
@@ -18,11 +19,21 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffState extends BuffEffect {
 
-    public BuffState(EffectCast CastInfos, Fighter target) {
-        super(CastInfos, target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
+    public BuffState(EffectCast castInfos, Fighter target) {
+        super(castInfos, target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
 
-        if(this.duration != -1 && castInfos.effectType != StatsEnum.INVISIBILITY
-                && !(castInfos.effect != null && castInfos.caster == target && getState() == FightStateEnum.PESANTEUR)) {
+        if(this.duration != -1 && this.castInfos.effectType != StatsEnum.INVISIBILITY
+                && !(this.castInfos.effect != null && (this.castInfos.caster == target && (getState() == FightStateEnum.PESANTEUR) ))) {
+            if(castInfos.isGlyph){
+                return;
+            }
+            if(getState() == FightStateEnum.Hypoglyphe || getState() == FightStateEnum.PESANTEUR){
+                return;
+            }
+            if(getState() == FightStateEnum.Invulnérable && caster instanceof CharacterFighter){
+                this.duration--;
+                return;
+            }
             this.duration++;
         }
 

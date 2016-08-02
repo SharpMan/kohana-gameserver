@@ -5,20 +5,23 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import koh.game.app.Loggers;
+import koh.game.app.MemoryService;
 import koh.game.dao.api.*;
 import koh.game.dao.mysql.*;
 import koh.game.dao.script.ArenaBattleDAOImpl;
 import koh.game.dao.script.MonsterMindDAOImpl;
 import koh.game.dao.script.PlayerCommandDAOImpl;
-import koh.game.dao.sqlite.*;
+import koh.game.dao.sqlite.GuildDAOImpl;
+import koh.game.dao.sqlite.GuildMemberDAOImpl;
+import koh.game.dao.sqlite.MountInventoryDAOImpl;
+import koh.game.dao.sqlite.PetInventoryDAOImpl;
 import koh.game.entities.guilds.GuildMember;
-import koh.patterns.services.api.DependsOn;
-import koh.patterns.services.api.Service;
-import koh.game.app.Loggers;
-import koh.game.app.MemoryService;
 import koh.game.utils.Settings;
 import koh.game.utils.sql.ConnectionResult;
 import koh.game.utils.sql.ConnectionStatement;
+import koh.patterns.services.api.DependsOn;
+import koh.patterns.services.api.Service;
 import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.Field;
@@ -29,7 +32,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- *
  * @author Neo-Craft
  */
 @Log4j2
@@ -37,11 +39,11 @@ import java.sql.Statement;
 public class DatabaseSource implements Service {
 
     @Override
-    public void inject(Injector injector){
+    public void inject(Injector injector) {
     }
 
     @Override
-    public void configure(Binder binder){
+    public void configure(Binder binder) {
         binder.bind(AccountDataDAO.class).to(AccountDataDAOImpl.class).asEagerSingleton();
         binder.bind(AreaDAO.class).to(AreaDAOImpl.class).asEagerSingleton();
         binder.bind(D2oDAO.class).to(D2oDAOImpl.class).asEagerSingleton();
@@ -70,42 +72,56 @@ public class DatabaseSource implements Service {
         binder.requestStaticInjection(DAO.class);
     }
 
-    @Inject private Settings settings;
+    @Inject
+    private Settings settings;
 
     private static HikariDataSource dataSource;
 
-    @Override
-    public void start() {
-        if(dataSource != null && !dataSource.isClosed())
-            dataSource.close();
-
-        HikariConfig config = new HikariConfig();
+    public void setNewConnection() {
+        final HikariConfig config = new HikariConfig();
         config.setJdbcUrl("jdbc:mysql://" + settings.getStringElement("Database.Host") + "/" + settings.getStringElement("Database.Name"));
         config.setUsername(settings.getStringElement("Database.User"));
         config.setPassword(settings.getStringElement("Database.Password"));
+        /*config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("leakDetectionThreshold","38000");
+        config.addDataSourceProperty("validationTimeout","7000");
+        config.addDataSourceProperty("maxLifetime","300000");
+        config.setConnectionTestQuery("SELECT current_timestamp");*/
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        config.addDataSourceProperty("leakDetectionThreshold","20000");
-        config.addDataSourceProperty("validationTimeout","5000");
+        config.addDataSourceProperty("leakDetectionThreshold", "20000");
+        config.addDataSourceProperty("validationTimeout", "5000");
         config.setMaximumPoolSize(50);
 
         this.dataSource = new HikariDataSource(config);
-
-        Field[] fields = DAO.class.getDeclaredFields();
-        for(Field field : fields){ //J'ai eu la flemme de declarer tout les method la les injecter les _oStart
-           if(Modifier.isStatic(field.getModifiers()) && Service.class.isAssignableFrom(field.getType())){
-               try {
-                   field.setAccessible(true);
-                   ((Service)field.get(null)).start();
-               } catch (Exception e) {
-                   log.error(e);
-                   log.warn(e.getMessage());
-               }
-           }
-        }
     }
 
+    @Override
+    public void start() {
+        if (dataSource != null && !dataSource.isClosed())
+            dataSource.close();
+
+        this.setNewConnection();
+
+        final Field[] fields = DAO.class.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType() == DatabaseSource.class) {
+                continue;
+            }
+            if (Modifier.isStatic(field.getModifiers()) && Service.class.isAssignableFrom(field.getType())) {
+                try {
+                    field.setAccessible(true);
+                    ((Service) field.get(null)).start();
+                } catch (Exception e) {
+                    log.error(e);
+                    log.warn(e.getMessage());
+                }
+            }
+        }
+    }
 
 
     @Override
@@ -120,11 +136,14 @@ public class DatabaseSource implements Service {
         DAO.getGuilds().getEntites().forEach(DAO.getGuilds()::update);
 
         Field[] fields = DAO.class.getDeclaredFields();
-        for(Field field : fields){
-            if(Modifier.isStatic(field.getModifiers()) && Service.class.isAssignableFrom(field.getType())){
+        for (Field field : fields) {
+            if (field.getType() == DatabaseSource.class) {
+                continue;
+            }
+            if (Modifier.isStatic(field.getModifiers()) && Service.class.isAssignableFrom(field.getType())) {
                 try {
                     field.setAccessible(true);
-                    ((Service)field.get(null)).stop();
+                    ((Service) field.get(null)).stop();
                 } catch (Exception e) {
                     log.error(e);
                     log.warn(e.getMessage());
@@ -132,7 +151,7 @@ public class DatabaseSource implements Service {
             }
         }
 
-        if(dataSource != null)
+        if (dataSource != null)
             dataSource.close();
 
     }
@@ -140,21 +159,21 @@ public class DatabaseSource implements Service {
     public Connection getConnectionOfPool() throws SQLException {
         try {
             return dataSource.getConnection();
-        }
-        catch (java.sql.SQLException e){
+        } catch (java.sql.SQLException e) {
             e.printStackTrace();
             log.error("Connection restarted due to the pool closed");
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:mysql://" + settings.getStringElement("Database.Host") + "/" + settings.getStringElement("Database.Name"));
-            config.setUsername(settings.getStringElement("Database.User"));
-            config.setPassword(settings.getStringElement("Database.Password"));
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            config.setMaximumPoolSize(50);
-
-            this.dataSource = new HikariDataSource(config);
+            this.forcedRestart();
             return dataSource.getConnection();
+        }
+    }
+
+    public void forcedRestart() {
+        final HikariDataSource source = this.dataSource;
+        this.setNewConnection();
+        try {
+            source.close();
+        } catch (Exception ee) {
+            ee.printStackTrace();
         }
     }
 
@@ -185,9 +204,10 @@ public class DatabaseSource implements Service {
     public ConnectionResult executeQuery(String query, int secsTimeout) throws SQLException {
         Connection connection = this.getConnectionOfPool();
         Statement statement = connection.createStatement();
-        if(secsTimeout > 0)
+        if (secsTimeout > 0)
             statement.setQueryTimeout(secsTimeout);
         return new ConnectionResult(connection, statement, statement.executeQuery(query));
     }
+
 
 }

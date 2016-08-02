@@ -82,5 +82,9 @@ public class DAO {
     @Inject @Getter
     private static PresetDAO presets;
 
+    @Inject @Getter
+    private static DatabaseSource dbSource;
+
+
 
 }

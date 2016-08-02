@@ -6,6 +6,7 @@ import koh.game.entities.command.PlayerCommand;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.messages.authorized.AdminCommandMessage;
+import koh.protocol.messages.authorized.ClientAddress;
 import koh.protocol.messages.authorized.ConsoleMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +20,11 @@ import java.util.function.Consumer;
 public class AuthorizedHandler {
 
     private static final Logger logger = LogManager.getLogger("Command");
+
+    @HandlerAttribute(ID = ClientAddress.MESSAGE_ID)
+    public static void handleClientAddress(WorldClient client, ClientAddress message){
+        client.setAddress(message.getAddress());
+    }
 
     @HandlerAttribute(ID = AdminCommandMessage.MESSAGE_ID)
     public static void handlerAdminCommandMessage(WorldClient client , AdminCommandMessage message){

@@ -16,6 +16,7 @@ import koh.game.fights.effects.EffectPush;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.fighters.SummonedFighter;
+import koh.game.fights.fighters.SummonedReplacerFighter;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightBlyph;
 import koh.game.fights.layers.FightTrap;
@@ -123,6 +124,9 @@ public class SelfActingAction extends AIAction {
     protected double scoreBuff_II(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean notUseJet) {
         double score = 0;
         int baseScore = 12;
+        if(AI.getFighter() instanceof SummonedFighter && AI.getFighter().asMonster().getGrade().getMonsterId() == 239){
+            baseScore = 2;
+        }
 
         if (!notUseJet) {
             baseScore *= effect.randomJet();
@@ -978,6 +982,7 @@ public class SelfActingAction extends AIAction {
         if (targetCell != null) {
             Fighter target = targetCell.getFighter();
             if (target != null) {
+
                 List<Fighter> targetList = new ArrayList<>();
                 targetList.add(AI.getFighter());
                 for (FightActivableObject layer : targetCell.getObjectsLayer()) {

@@ -26,12 +26,15 @@ public class WorldHandler extends IoHandlerAdapter {
     public static char[] binaryKeys;
 
     private static final Logger logger = LogManager.getLogger(WorldHandler.class);
+    private static final boolean IS_PROXY = DAO.getSettings().getBoolElement("Protocol.proxy");
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
         session.setAttribute("session", new WorldClient(session));
-        session.write(new ProtocolRequired(DAO.getSettings().getIntElement("Protocol.requiredVersion"), DAO.getSettings().getIntElement("Protocol.currentVersion")));
-        session.write(new HelloGameMessage());
+        if(!IS_PROXY) {
+            session.write(new ProtocolRequired(DAO.getSettings().getIntElement("Protocol.requiredVersion"), DAO.getSettings().getIntElement("Protocol.currentVersion")));
+            session.write(new HelloGameMessage());
+        }
     }
 
     /**
@@ -61,6 +64,7 @@ public class WorldHandler extends IoHandlerAdapter {
     public void messageSent(IoSession session, Object arg1) throws Exception {
         Message message = (Message) arg1;
         logger.debug("[DEBUG] {} send >> {}",session.getRemoteAddress(),message.getClass().getSimpleName());
+
     }
 
     /**

@@ -1,6 +1,5 @@
 package koh.game.entities.spells;
 
-import com.mysql.jdbc.StringUtils;
 import jregex.Pattern;
 import jregex.REFlags;
 import koh.d2o.entities.Effect;
@@ -8,9 +7,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
-import koh.game.fights.fighters.BombFighter;
-import koh.game.fights.fighters.StaticFighter;
-import koh.game.fights.fighters.SummonedFighter;
+import koh.game.fights.fighters.*;
 import koh.protocol.client.BufUtils;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.SpellShapeEnum;
@@ -184,7 +181,7 @@ public class EffectInstance implements Serializable {
         boolean exclusiveMaskCasterOnly;
         boolean verify;
         int maskState;
-        if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || ((StringUtils.isNullOrEmpty(pEffect.targetMask))))))) {
+        if ((((((((pEffect == null)) /*|| ((pEffect.delay > 0))*/)) || (pEffect.targetMask == null || pEffect.targetMask .isEmpty()))))) {
             return (false);
         }
         ;
@@ -288,6 +285,10 @@ public class EffectInstance implements Serializable {
                         }
                         if (pTargetId instanceof BombFighter && DAO.getSpells().findBomb(Integer.parseInt(exclusiveMaskParam)) != null)
                             verify = true;
+
+                        /*if(Integer.parseInt(exclusiveMaskParam) == 9999){
+                            verify = true;
+                        }*/
 
                         /*if (verify && pTargetId instanceof BombFighter) { //TEmpororaire = bug
                          return true;
@@ -394,6 +395,9 @@ public class EffectInstance implements Serializable {
                         break;
                     case 'V':
                         verify = (((targetInfos.stats.lifePoints / targetInfos.stats.maxLifePoints) * 100) <= Integer.parseInt(exclusiveMaskParam));
+                        break;
+                    case 'l':
+                        verify = !(pTargetId instanceof StaticSummonedFighter);
                         break;
                 }
                 ;

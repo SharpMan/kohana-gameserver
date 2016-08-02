@@ -5,9 +5,11 @@ import koh.game.entities.mob.MonsterGrade;
 import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.protocol.client.enums.ActionIdEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
 import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import lombok.Getter;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Arrays;
 
@@ -27,6 +29,19 @@ public class SummonedReplacerFighter extends SummonedFighter {
 
     @Getter //TODO Maybe do it for everyone ?
     protected boolean isDying;
+
+    @Override
+    public void computeDamages(StatsEnum effect, MutableInt jet) {
+        if(this instanceof MonsterFighter && asMonster().getGrade().getMonsterId() == 116) {
+            final double firstJet = jet.doubleValue();
+            jet.setValue(jet.doubleValue() * summoner.getLevel() * (0.04f));
+            jet.add(firstJet);
+
+            jet.setValue(jet.getValue() * 0.01f * (100 + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MULTIPLICATOR)));
+            return;
+        }
+        super.computeDamages(effect,jet);
+    }
 
     @Override
     public int tryDie(int casterId, boolean force) {

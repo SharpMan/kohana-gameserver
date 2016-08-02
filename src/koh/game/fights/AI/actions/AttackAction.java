@@ -14,6 +14,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectPush;
 import koh.game.fights.effects.buff.BuffEffect;
+import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightBlyph;
 import koh.game.fights.layers.FightTrap;
@@ -112,6 +113,13 @@ public class AttackAction extends AIAction {
                 else
                     score += currScore;
             }
+
+            if(target instanceof StaticFighter){
+                if(score > 0)
+                    score /= 2;
+                else
+                    score *= 2;
+            }
         }
 
         return score;
@@ -155,6 +163,13 @@ public class AttackAction extends AIAction {
                 else
                     score += currScore;
             }
+
+            if(target instanceof StaticFighter){
+                if(score > 0)
+                    score /= 2;
+                else
+                    score *= 2;
+            }
         }
 
         return score;
@@ -197,6 +212,13 @@ public class AttackAction extends AIAction {
                     score -= currScore * 2;
                 else
                     score += currScore;
+            }
+
+            if(target instanceof StaticFighter){
+                if(score > 0)
+                    score /= 2;
+                else
+                    score *= 2;
             }
         }
 
@@ -544,6 +566,7 @@ public class AttackAction extends AIAction {
         double score = 0;
         int baseScore = 11;
         for (Fighter fighter : targets) {
+            //5581
             int currScore = baseScore;
             double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
             if (percentLife < 20)

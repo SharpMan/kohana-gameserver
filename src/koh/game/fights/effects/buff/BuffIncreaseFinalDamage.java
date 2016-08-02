@@ -19,7 +19,7 @@ public class BuffIncreaseFinalDamage extends BuffEffect {
     private final int JET;
 
     public BuffIncreaseFinalDamage(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACKED_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
+        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACK_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
         this.JET = CastInfos.randomJet(Target);
     }
 
@@ -27,6 +27,7 @@ public class BuffIncreaseFinalDamage extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast damageInfos) {
         if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId))
             DamageValue.add((DamageValue.intValue() * this.JET) / 100);
+
         return super.applyEffect(DamageValue, damageInfos);
     }
 

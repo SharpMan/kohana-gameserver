@@ -564,7 +564,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private static final StatsEnum[] FIRST_EFFECTS = new StatsEnum[]{
             StatsEnum.DISPELL_SPELL,
             StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE,
-            //StatsEnum.CAST_SPELL,
+            StatsEnum.CAST_SPELL,
             KILL_TARGET_TO_REPLACE_INVOCATION,
             StatsEnum.KILL,
             StatsEnum.SUMMON,
@@ -574,6 +574,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     };
 
     public void launchSpell(Fighter fighter, SpellLevel spellLevel, short cellId, boolean friend, boolean fakeLaunch, boolean imTargeted, int spellId) {
+        if(fighter.getMutex() == null){
+            return;
+        }
         synchronized (fighter.getMutex()) {
             try {
                 if (this.fightState != fightState.STATE_ACTIVE || fightLoopState == fightLoopState.STATE_WAIT_END) {
@@ -649,7 +652,9 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 isCc &= !fighter.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
                 if (isCc && !fakeLaunch && fighter.getStats().getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Turquoise
-                    fighter.getPlayer().getInventoryCache().getEffects(CAST_SPELL_ON_CRITICAL_HIT.value()).forEach(list -> {
+                    fighter.getPlayer().getInventoryCache().getEffects(CAST_SPELL_ON_CRITICAL_HIT.value())
+                            //filter turquoise
+                            .forEach(list -> {
                         list.forEach(effect -> {
                             launchSpell(fighter, DAO.getSpells().findSpell(effect.diceNum).getSpellLevel(effect.diceSide), fighter.getCellId(), true, true, true, -1);
                         });
@@ -746,7 +751,15 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 final double num2 = (double) Arrays.stream(spellEffects).mapToInt(x -> x.random).sum();
                 boolean flag = false;
                 final short castingCell = fighter.getCellId();
-                for (final Iterator<EffectInstanceDice> effectIterator = ((Arrays.stream(spellEffects).sorted((e1, e2) -> Integer.compare(ArrayUtils.indexOf(FIRST_EFFECTS, e2.getEffectType()), ArrayUtils.indexOf(FIRST_EFFECTS, e1.getEffectType())))).iterator()); effectIterator.hasNext(); ) {
+
+                Stream<EffectInstanceDice> $effects  = Arrays.stream(spellEffects);
+                if(spellLevel.getSpellId() != SpellIDEnum.DON_NATURAL){
+                    $effects = $effects.sorted((e1, e2) ->
+                            Integer.compare(ArrayUtils.indexOf(FIRST_EFFECTS, e2.getEffectType()), ArrayUtils.indexOf(FIRST_EFFECTS, e1.getEffectType()))
+                    );
+                }
+
+                for (final Iterator<EffectInstanceDice> effectIterator = $effects.iterator(); effectIterator.hasNext(); ) {
                     final EffectInstanceDice effect = effectIterator.next();
                     if (effect.random > 0) {
                         if (!flag) {
@@ -1744,10 +1757,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                 .stream()
                                 .map(x -> new GameFightSpellCooldown(x.getKey(), fighter.getSpellsController().minCastInterval(x.getKey()) == 0 ? x.getValue().initialCooldown : fighter.getSpellsController().minCastInterval(x.getKey())))
                                 .toArray(GameFightSpellCooldown[]::new),
-                        (byte) fighter.getTeam().getAliveFighters()
+                        (int) fighter.getTeam().getAliveFighters()
                                 .filter(x -> x.getSummonerID() == fighter.getID() && !(x instanceof BombFighter))
                                 .count(),
-                        (byte) fighter.getTeam().getAliveFighters()
+                        (int) fighter.getTeam().getAliveFighters()
                                 .filter(x -> x.getSummonerID() == fighter.getID() && (x instanceof BombFighter))
                                 .count()));
             } else {
@@ -1756,10 +1769,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                                 .stream()
                                 .map(x -> new GameFightSpellCooldown(x.getKey(), fighter.getSpellsController().minCastInterval(x.getKey()) == 0 ? x.getValue().initialCooldown : fighter.getSpellsController().minCastInterval(x.getKey())))
                                 .toArray(GameFightSpellCooldown[]::new),
-                        (byte) fighter.getTeam().getAliveFighters()
+                        (int) fighter.getTeam().getAliveFighters()
                                 .filter(x -> x.getSummonerID() == fighter.getID() && !(x instanceof BombFighter))
                                 .count(),
-                        (byte) fighter.getTeam().getAliveFighters()
+                        (int) fighter.getTeam().getAliveFighters()
                                 .filter(x -> x.getSummonerID() == fighter.getID() && (x instanceof BombFighter))
                                 .count(), fighter.getGameFightResumeSlaveInfo()));
             }
@@ -1997,12 +2010,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
         this.unregisterPlayer(client.getCharacter());
         client.endGameAction(GameActionTypeEnum.FIGHT);
+        if(client.getCharacter() ==null) {
+            return;
+        }
         client.getCharacter().setFight(null);
         client.send(new GameContextDestroyMessage());
         client.send(new GameContextCreateMessage((byte) 1));
         client.send(new CurrentMapMessage(client.getCharacter().getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
+
         client.getCharacter().getCurrentMap().spawnActor(client.getCharacter());
         client.getCharacter().refreshStats(false, true);
+
     }
 
     public void joinFightSpectator(WorldClient client) {

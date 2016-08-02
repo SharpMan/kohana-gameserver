@@ -1,10 +1,8 @@
 package koh.game.fights.effects.buff;
 
+import koh.game.entities.item.EffectHelper;
 import koh.game.fights.Fighter;
-import koh.game.fights.effects.EffectBase;
-import koh.game.fights.effects.EffectCast;
-import koh.game.fights.effects.EffectDamage;
-import koh.game.fights.effects.EffectLifeSteal;
+import koh.game.fights.effects.*;
 import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
@@ -33,12 +31,20 @@ public class BuffSacrifice extends BuffEffect {
             return -1;
         }
 
+        if (!EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId)) {
+            return -1;
+        }
+
         damageValue.setValue(0);
 
         damageInfos.isReturnedDamages = true;
 
         if(EffectLifeSteal.isStealingEffect(damageInfos.effectType)){
             return EffectLifeSteal.applyLifeSteal(damageInfos,castInfos.caster,new MutableInt(damageInfos.randomJet(caster)));
+        }
+
+        if(damageInfos.effectType == StatsEnum.PUNITION){
+            return EffectPunishment.applyDamages(damageInfos, castInfos.caster, new MutableInt(damageInfos.randomJet(caster)));
         }
 
         return EffectDamage.applyDamages(damageInfos, castInfos.caster, new MutableInt(damageInfos.randomJet(caster)));

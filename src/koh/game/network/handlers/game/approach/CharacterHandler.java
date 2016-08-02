@@ -86,11 +86,18 @@ public class CharacterHandler {
         final PlayerInst inst = PlayerInst.getPlayerInst(client.getCharacter().getID());
         if (inst.getAlignmentChange() > 5 && !message.enable) {
             PlayerController.sendServerErrorMessage(client, "Vous ne pouvez pas changer vos ailes plus de 5 fois par jour");
-            return;
-        } else
+        }
+        else if(client.getCharacter().getAlignmentGrade() >= 10 && !message.enable){
+            client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,317));
+        }
+        else {
+            if(!client.canParsePacket(message.getClass().getName(), 900)){
+                return;
+            }
             inst.setAlignmentChange(inst.getAlignmentChange() + 1);
+            client.getCharacter().setEnabldPvp(message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
+        }
 
-        client.getCharacter().setEnabldPvp(message.enable ? AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE : AggressableStatusEnum.NON_AGGRESSABLE);
     }
 
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)
@@ -155,6 +162,10 @@ public class CharacterHandler {
         try {
 
             final Player character = client.getAccount().getPlayer(id);
+            if(client.getCharacter() != null){
+                client.send(new CharacterSelectedErrorMessage());
+                return;
+            }
             if (character == null) {
                 client.send(new CharacterSelectedErrorMessage());
             } else {
@@ -265,6 +276,9 @@ public class CharacterHandler {
     @HandlerAttribute(ID = CharacterCreationRequestMessage.MESSAGE_ID)
     public static void handleCharacterCreationRequestMessage(WorldClient client, CharacterCreationRequestMessage message) {
         try {
+            if(client.getCharacter() != null){
+                return;
+            }
             if (client.getAccount().characters.size() >= PlayerDAOImpl.MAX_CHARACTER_SLOT) {
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_TOO_MANY_CHARACTERS.value()));
             } else if (!PlayerController.isValidName((message.name))) {

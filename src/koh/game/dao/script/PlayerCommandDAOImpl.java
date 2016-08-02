@@ -69,8 +69,10 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
     private int loadConsoleCommands() {
         try {
             this.consoleCommands.clear();
-            this.consoleCommands.put("teleport", new TeleportCommand()); //FOR TEST
+            this.consoleCommands.put("teleport", new TeleportCommand());
             this.consoleCommands.put("restartkolizeum", new RestartKolizeumCommand());
+            this.consoleCommands.put("restartdb", new DbRestartCommand());
+            this.consoleCommands.put("reloadsetting", new ReloadSettingCommand());
 
             Files.walk(Paths.get("data/script/console"))
                     .filter(Files::isRegularFile)
@@ -85,6 +87,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
 
                     });
             this.consoleCommands.put("help", new HelpCommand(this.consoleCommands));
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);

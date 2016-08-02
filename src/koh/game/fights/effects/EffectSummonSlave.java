@@ -32,10 +32,10 @@ public class EffectSummonSlave extends EffectBase {
             final MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
             final MonsterGrade monsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
             final Fighter summon = castInfos.effectType != StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE ?
-                    new SlaveFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster)
-                    : new SlaveReplacerFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster,castInfos.targets.stream().filter(bf -> bf instanceof SummonedFighter).findFirst().get().asSummon().getGrade());
-            summon.getStates().fakeState(FightStateEnum.ENRACINÉ,true);
-            if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE){
+                    new SlaveFighter(castInfos.caster.getFight(), monsterLevel, castInfos.caster)
+                    : new SlaveReplacerFighter(castInfos.caster.getFight(), monsterLevel, castInfos.caster, castInfos.targets.stream().filter(bf -> bf instanceof SummonedFighter).findFirst().get().asSummon().getGrade());
+            summon.getStates().fakeState(FightStateEnum.ENRACINÉ, true);
+            if (castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE) {
                 //System.out.println(castInfos.targets.get(0).getBuff().delayedEffects.size());
                 castInfos.targets.get(0).getBuff().delayedEffects.forEach(i -> i.second = 1);
                 summon.getBuff().delayedEffects.addAll(castInfos.targets.get(0).getBuff().delayedEffects);
@@ -47,9 +47,11 @@ public class EffectSummonSlave extends EffectBase {
             castInfos.caster.getFight().sendToField(Pl -> new GameActionFightSummonMessage(ActionIdEnum.ACTION_SUMMON_SLAVE, castInfos.caster.getID(), (GameFightFighterInformations) summon.getGameContextActorInformations(Pl)));
             castInfos.caster.getFight().getFightWorker().summonFighter(summon);
 
-            castInfos.caster.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base--;
-            if (castInfos.caster instanceof CharacterFighter)
-                castInfos.caster.send(castInfos.caster.asPlayer().getCharacterStatsListMessagePacket());
+            if (monster.isUseSummonSlot()) {
+                castInfos.caster.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base--;
+                if (castInfos.caster instanceof CharacterFighter)
+                    castInfos.caster.send(castInfos.caster.asPlayer().getCharacterStatsListMessagePacket());
+            }
         }
 
 

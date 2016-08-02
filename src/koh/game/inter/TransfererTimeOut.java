@@ -25,7 +25,7 @@ public class TransfererTimeOut {
             if (!client.isConnected()) {
                 client.retryConnect();
             }
-        }, 15, 15, TimeUnit.SECONDS);
+        }, 25, 25, TimeUnit.SECONDS);
 
         this.executor.scheduleWithFixedDelay((Runnable) () -> {
             client.send(this.message);

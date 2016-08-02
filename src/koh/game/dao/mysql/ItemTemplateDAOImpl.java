@@ -221,4 +221,11 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
     public ItemType getType(int id) {
         return itemTypes.get(id);
     }
+
+    @Override
+    public boolean loaded(){
+        return !this.itemTemplates.isEmpty();
+    }
+
+
 }

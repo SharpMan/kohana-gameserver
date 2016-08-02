@@ -114,6 +114,12 @@ public class EffectPush extends EffectBase {
                          if(/*castInfos.caster == target || */castInfos.targetKnownCellId == target.getCellId())
                             continue;
                     }
+                    else if(castInfos.spellId == 181){
+                        if(castInfos.caster == target)
+                            continue;
+                        direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
+                    }
+                    //System.out.println(castInfos.spellId  + " "+castInfos.effect.effectUid);
                     break;
                 case BACK_CELL:
                     final Fighter p = castInfos.caster;
@@ -142,7 +148,7 @@ public class EffectPush extends EffectBase {
 
             if (nextCell != null && nextCell.canWalk()) {
                 if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {
-                    castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
+                    castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
                     return target.setCell(nextCell);
                 }
                 else if(nextCell.hasObject(FightObjectType.OBJECT_PORTAL) && nextCell.getObjects().stream().anyMatch(o -> o instanceof FightPortal && ((FightPortal)o).enabled)){
@@ -213,7 +219,7 @@ public class EffectPush extends EffectBase {
         final MutableInt damageValue = new MutableInt(pushDmg);
         //MutableInt damageValue = new MutableInt(Math.floor(DamageCoef * LevelCoef) * (Length - CurrentLength + 1));
 
-        final EffectCast subInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, castInfos.spellId, castInfos.cellId, 0, null, target, null, false, StatsEnum.NONE, 0, null);
+        final EffectCast subInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, castInfos.spellId, castInfos.cellId, 0, null, castInfos.caster, null, false, StatsEnum.NONE, 0, null);
         subInfos.isTrap = castInfos.isTrap;
 
         return EffectDamage.applyDamages(subInfos, target, damageValue);

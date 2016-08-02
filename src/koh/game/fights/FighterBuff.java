@@ -99,7 +99,6 @@ public class FighterBuff {
             if (effectCast.second <= 0) {
                 this.delayedEffects.remove(effectCast);
                 effectCast.first.targets.removeIf(Fighter -> !Fighter.isAlive());
-                //System.out.println("appply"+ effectCast.first);
                 if (EffectBase.tryApplyEffect(effectCast.first) == -3) {
                     return -3;
                 }
@@ -136,7 +135,7 @@ public class FighterBuff {
         this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.duration <= 0 && x.duration != -1);
 
         this.buffsAct.values().stream().forEach((BuffList) -> {
-            BuffList.removeIf(Buff -> Buff.decrementType == BuffDecrementType.TYPE_BEGINTURN && Buff.duration <= 0);
+            BuffList.removeIf(Buff -> Buff.decrementType == BuffDecrementType.TYPE_BEGINTURN && Buff.duration <= 0 && Buff.duration != -1);
         });
 
         return -1;

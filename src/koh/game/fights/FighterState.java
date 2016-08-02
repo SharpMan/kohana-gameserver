@@ -31,6 +31,8 @@ public class FighterState {
             case CARRIED:
             case CARRIER:
                 return !hasState(FightStateEnum.HEAVY);
+           /* case Hypoglyphe:
+                return false;*/
         }
         return !hasState(State);
     }

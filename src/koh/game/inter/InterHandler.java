@@ -47,6 +47,7 @@ class InterHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+        cause.printStackTrace();
         connector.retryConnect();
         //System.out.println(cause.toString());
         logger.error("(server->proxy->client)::Error: {} ::cause.toString() {}", cause.getMessage(),cause.toString());

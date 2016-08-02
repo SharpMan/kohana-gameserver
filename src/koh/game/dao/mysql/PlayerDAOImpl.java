@@ -217,12 +217,13 @@ public class PlayerDAOImpl extends PlayerDAO {
                     if (!result.getString("entity_look").isEmpty()) {
                         p.setEntityLook(EntityLookParser.fromString(result.getString("entity_look")));
                     }
-                    if (result.getString("tinsel").split(";").length == 1) {
-                        p.setOrnaments(Enumerable.stringToIntArray(result.getString("tinsel").split(";")[0]));
+                    final String [] tinsel = result.getString("tinsel").split(";");
+                    if (tinsel.length == 1) {
+                        p.setOrnaments(Enumerable.stringToIntArray(tinsel[0]));
                         p.setTitles(new int[0]);
-                    } else if (result.getString("tinsel").split(";").length >= 2) {
-                        p.setOrnaments(Enumerable.stringToIntArray(result.getString("tinsel").split(";")[0]));
-                        p.setTitles(Enumerable.stringToIntArray(result.getString("tinsel").split(";")[1]));
+                    } else if (tinsel.length > 1) {
+                        p.setOrnaments(Enumerable.stringToIntArray(tinsel[0]));
+                        p.setTitles(Enumerable.stringToIntArray(tinsel[1]));
                     } else {
                         p.setTitles(new int[0]);
                         p.setOrnaments(new int[0]);
@@ -249,8 +250,18 @@ public class PlayerDAOImpl extends PlayerDAO {
             PreparedStatement pStatement = conn.getStatement();
             pStatement.setBoolean(1, Boolean.TRUE);
             pStatement.setInt(2, id);
-
             pStatement.executeUpdate();
+
+            try (ConnectionStatement<PreparedStatement> conn2 = dbSource.prepareStatement("DELETE FROM `character_items` WHERE owner = ?;")) {
+                final PreparedStatement pStatement2 = conn2.getStatement();
+                pStatement2.setInt(1, id);
+                pStatement2.execute();
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+                return false;
+            }
+
 
         } catch (Exception e) {
             logger.error(e);

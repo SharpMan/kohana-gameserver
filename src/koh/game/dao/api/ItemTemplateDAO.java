@@ -75,4 +75,5 @@ public abstract class ItemTemplateDAO implements Service {
 
     public abstract ItemType getType(int id);
 
+    public abstract boolean loaded();
 }

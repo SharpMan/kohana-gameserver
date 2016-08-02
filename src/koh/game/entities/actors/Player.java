@@ -33,6 +33,7 @@ import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
 import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
 import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
+import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.AlignmentRankUpdateMessage;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
@@ -49,6 +50,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -422,6 +427,19 @@ public class Player extends IGameActor implements Observer {
     @Setter
     private boolean onTutorial = false;
 
+
+    private static final Timestamp timeStamp;
+    static{
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = null;
+        try {
+            date = dateFormat.parse("31/08/2016");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        timeStamp = new Timestamp(date.getTime());
+    }
+
     public synchronized void onLogged() {
         try {
             if (!this.inWorld) {
@@ -436,6 +454,10 @@ public class Player extends IGameActor implements Observer {
                 client.send(new CurrentMapMessage(currentMap.getId(), "649ae451ca33ec53bbcbcc33becf15f4")); //kdpelrkdpaielcmspekdprcvkdparkdb
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
+
+                if(this.account.last_login != null && account.last_login.before(timeStamp)){
+                    client.send(new PopupWarningMessage((byte)4, "Offre Spéciale","Jusqu'au 20 Août vous pourrez vous procurer <b>1 titre + 1 ornement<b> au choix pour la faible somme de 1 euro le tout ! Alors n'hésitez pas et <a href=\"https://kohana-serveur.com/user/ornament\">cliquez <b>ici</b> sans plus attendre !!</a>"));
+                }
 
                 PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
 
@@ -740,7 +762,7 @@ public class Player extends IGameActor implements Observer {
 
     public int getKoliseoGrade(){
         for (byte n = 1; n <= 10; n++) {
-            if (honor < DAO.getExps().getLevel(n).getPvP()) {
+            if (koliseoPoints < DAO.getExps().getLevel(n).getPvP()) {
                 return (byte) (n - 1);
             }
         }

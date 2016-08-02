@@ -964,7 +964,12 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 (1 + (this.stats.getTotal(StatsEnum.INTELLIGENCE) / 100f))) + this.stats.getTotal(StatsEnum.ADD_HEAL_BONUS)));
     }
 
-    public int calculArmor(StatsEnum DamageEffect) {
+    public int calculArmor(StatsEnum damageEffect) {
+        switch (damageEffect){
+            case PA_USED_LOST_X_PDV_2:
+                return 0;
+        }
+
         /*switch (DamageEffect) {
          default:
          return this.stats.getTotal(StatsEnum.ADD_ARMOR);

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
+import koh.game.dao.DAO;
 import koh.game.network.websocket.message.TokenMessage;
 import koh.game.utils.Settings;
 import koh.protocol.client.enums.CommPacketEnum;
@@ -84,6 +85,8 @@ public class AutobahnServer extends WebSocketServer {
     @Override
     public void onMessage( WebSocket conn, String blob ) {
         try {
+            if(!DAO.getItemTemplates().loaded())
+                return;
             final JSONArray packet = (JSONArray) parser.parse(blob);
             final long packetId = (long) packet.get(0);
             final CommPacketEnum packetType = CommPacketEnum.valueOf(packetId);

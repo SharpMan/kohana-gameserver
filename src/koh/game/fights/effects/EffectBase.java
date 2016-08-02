@@ -74,6 +74,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.PA_USED_LOST_X_PDV, new EffectDamagePerPA());
             this.put(StatsEnum.PM_USED_LOST_X_PDV, new EffectDamagePerPM());
 
+
             this.put(StatsEnum.CHANGE_APPEARANCE, new EffectSkin());
             this.put(StatsEnum.CHANGE_LOOK, new EffectSkin());
 
@@ -326,6 +327,7 @@ public abstract class EffectBase {
 
             //Sadida
             this.put(StatsEnum.CAST_SPELL, new EffectCastSpell());
+            this.put(StatsEnum.SHARE_DAMAGES, new EffectShareDamages());
 
             //Arbre de vie
             this.put(StatsEnum.HEAL_ATTACKER_DAMAGE_PERCENT_INCURED, new EffectHealDamageIncured());

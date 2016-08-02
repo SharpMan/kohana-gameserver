@@ -100,9 +100,15 @@ public class InventoryItem {
         return this.getTemplate().getTypeId() == 113 || (this.getEffect(970) != null && this.getEffect(971) != null);
     }
 
+    private static final int ACTION_ITEM_SKIN_ITEM = 1151;
+
     public short getApparrance() {
         final ObjectEffectInteger effect = (ObjectEffectInteger) this.getEffect(972);
         if (effect == null) {
+            final ObjectEffectInteger mimi = (ObjectEffectInteger) this.getEffect(ACTION_ITEM_SKIN_ITEM);
+            if(mimi != null){
+                return DAO.getItemTemplates().getTemplate(mimi.value).getAppearanceId();
+            }
             return this.getTemplate().getAppearanceId();
         } else {
             final ObjectEffectInteger type = (ObjectEffectInteger) this.getEffect(970);
@@ -227,7 +233,7 @@ public class InventoryItem {
     }
 
     public IoBuffer serializeEffectInstanceDice() {
-        IoBuffer buff = IoBuffer.allocate(2535);
+        final IoBuffer buff = IoBuffer.allocate(2535);
         buff.setAutoExpand(true);
 
         buff.putInt(effects.size());

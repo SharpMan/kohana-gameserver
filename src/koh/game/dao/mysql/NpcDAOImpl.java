@@ -207,6 +207,19 @@ public class NpcDAOImpl extends NpcDAO {
                     .token(13470)
                     .build());
 
+
+            if(new Random().nextInt(3) == 0){
+                templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
+                        .customPrice(240 + (new Random().nextInt(35)))
+                        .buyCriterion(item.getBuyCriterion())
+                        .maximiseStats(item.isMaximiseStats())
+                        .item(14485)
+                        .token(13470)
+                        .build());
+            }
+
+            //
+
             try (ConnectionResult conn = dbSource.executeQuery("SELECT * from npc_items WHERE token_id = 13470 AND custom_price > 90 ORDER BY RAND() LIMIT 10", 0)) {
                 ResultSet result = conn.getResult();
 

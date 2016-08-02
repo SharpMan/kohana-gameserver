@@ -48,7 +48,7 @@ public class EffectCreateIllusion extends EffectBase {
         buff.duration = -1;
 
         FightCell cell = castInfos.caster.getFight().getCell(castInfos.cellId);
-        if (cell != null) {
+        if (cell != null && castInfos.caster instanceof CharacterFighter) {
             int Result = castInfos.caster.setCell(cell);
             ((CharacterFighter) castInfos.caster).fakeContextualId = castInfos.caster.getFight().getNextContextualId();
 

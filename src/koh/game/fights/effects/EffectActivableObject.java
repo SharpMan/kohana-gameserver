@@ -36,6 +36,9 @@ public class EffectActivableObject extends EffectBase {
                 obj = new FightTrap(castInfos, 0, getColor(castInfos.spellId), castInfos.effect.zoneSize(), getMarkType(castInfos.effect.getZoneShape()));
                 break;
             case LAYING_PORTAIL:
+                if(castInfos.getCell() == null){
+                    return -1;
+                }
                 if (castInfos.getCell().hasGameObject(FightObjectType.OBJECT_PORTAL)) {
 
                     if(!((FightPortal) castInfos.getCell().getObjects(FightObjectType.OBJECT_PORTAL)[0]).enabled){

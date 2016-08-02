@@ -45,7 +45,7 @@ public abstract class PeriodicContestExecutor implements Runnable {
 
     public void shutdown() {
         this.cancelTask();
-        scheduler.shutdownNow();
+        scheduler.shutdown();
     }
 
     public abstract void registerPlayer(Player p);

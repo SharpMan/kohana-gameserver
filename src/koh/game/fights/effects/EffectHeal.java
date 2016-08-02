@@ -4,6 +4,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffHeal;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightStateEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightLifePointsGainMessage;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +29,11 @@ public class EffectHeal extends EffectBase {
         }
 
         // boost soin etc
-        if (calculate) {
+
+        if(castInfos.spellId == 199){
+            heal.add(0.01f * heal.getValue() * ( (target.getStats().getTotal(StatsEnum.INTELLIGENCE)  + castInfos.caster.getStats().getTotal(StatsEnum.ADD_HEAL_BONUS))));
+        }
+        else if (calculate) {
             castInfos.caster.calculheal(heal);
         }
         

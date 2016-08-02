@@ -65,7 +65,7 @@ public class SlaveFighter extends StaticFighter {
 
     @Override
     public int endTurn() {
-        return this.tryDieSilencious(this.ID,true);
+        return this.tryDie(this.ID,true);
     }
 
 
@@ -167,6 +167,7 @@ public class SlaveFighter extends StaticFighter {
             if (this.grade.getMonster().isUseSummonSlot()) {
                 this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;
                 if (summoner instanceof CharacterFighter) {
+                    ((CharacterFighter) summoner).setNeedStatRefresh(true);
                     summoner.send(summoner.asPlayer().getCharacterStatsListMessagePacket());
                 }
             }

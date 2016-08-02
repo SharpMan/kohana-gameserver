@@ -27,7 +27,7 @@ public class GameTutorial extends GameAction {
     private final static NpcTemplate npc = DAO.getNpcs().findTemplate(309);
     private final static ExecutorService executor = Executors.newFixedThreadPool(45);
     private static final boolean CAN_CHOOSE_LEVEL = DAO.getSettings().getBoolElement("Register.ChooseLevel");
-    private static final String LEVEL = DAO.getSettings().getStringElement("Register.Text");
+    public static final String LEVEL = DAO.getSettings().getStringElement("Register.Text");
 
     public GameTutorial(Player actor) {
         super(GameActionTypeEnum.TUTORIAL, actor);

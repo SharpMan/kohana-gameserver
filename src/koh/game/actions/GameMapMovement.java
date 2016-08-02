@@ -59,7 +59,7 @@ public class GameMapMovement extends GameAction {
                 if (!this.myAborted) {
                     // cell de transit ?
                     if (args.length > 0) {
-                        short stoppedCell = (short) args[0];
+                        final short stoppedCell = (short) args[0];
 
                         try {
                             // on apelle

@@ -7,6 +7,8 @@ import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTemporaryBoostEffect;
 import org.apache.commons.lang3.mutable.MutableInt;
+import static koh.protocol.client.enums.StatsEnum.PA_USED_LOST_X_PDV_2;
+
 
 /**
  * @author Neo-Craft
@@ -26,8 +28,9 @@ public class BuffDammageOcassioned extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast damageInfos) {
-        if (EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId))
+        if (damageInfos.effectType != PA_USED_LOST_X_PDV_2 && EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId)) {
             DamageValue.setValue((DamageValue.intValue() * this.JET) / 100);
+        }
         return super.applyEffect(DamageValue, damageInfos);
     }
 

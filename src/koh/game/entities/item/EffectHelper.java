@@ -85,6 +85,8 @@ public class EffectHelper {
             StatsEnum.DAMAGE_ARMOR_REDUCTION,
             StatsEnum.DODGE,
             StatsEnum.SACRIFICE,
+            StatsEnum.SHARE_DAMAGES,
+            StatsEnum.REFOULLAGE
 
     };
 

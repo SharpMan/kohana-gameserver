@@ -40,6 +40,15 @@ public class EffectCastSpell extends EffectBase {
 
     public static int castSpell(EffectCast castInfos){
         final SpellLevel spell = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide);
+
+
+
+        if(castInfos.spellId == 199 || castInfos.effect.diceNum == 5570){ //don & trembl
+            for (Fighter target : castInfos.targets) {
+                castInfos.getFight().launchSpell(target, spell, target.getCellId(), true, true, true,castInfos.spellId);
+            }
+            return -1;
+        }
         if(castInfos.spellId== 89){ //paradox
             for (Fighter target : castInfos.targets) {
                 castInfos.getFight().launchSpell(castInfos.caster, spell, target.getCellId(), true, true, true,castInfos.spellId);

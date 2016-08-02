@@ -4,6 +4,7 @@ import com.google.common.primitives.Ints;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import koh.look.EntityLookParser;
 import koh.protocol.types.game.context.EntityDispositionInformations;
@@ -104,10 +105,37 @@ public class NpcTemplate {
         return ToStringBuilder.reflectionToString(this);
     }
 
+    int i = -1;
+
     public int getCommonTokenId() {
         if (items == null) {
             return 0;
         }
+        /*if(i == -1){
+            i = this.items.values().stream()
+                    .map(e -> e.getToken())
+                    .collect(Collectors.groupingBy(s -> s, Collectors.counting()))
+                    .entrySet()
+                    .stream()
+                    .max(Comparator.comparing(Map.Entry::getValue))
+                    .orElse(new Map.Entry<Integer, Long>() {
+                        @Override
+                        public Integer getKey() {
+                            return -1;
+                        }
+
+                        @Override
+                        public Long getValue() {
+                            return null;
+                        }
+
+                        @Override
+                        public Long setValue(Long value) {
+                            return null;
+                        }
+                    }).getKey();
+        }
+        return i;*/
         return this.items.values().stream().findFirst().get().getToken();
 
     }

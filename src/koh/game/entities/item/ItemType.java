@@ -1,8 +1,8 @@
 package koh.game.entities.item;
 
-import com.mysql.jdbc.StringUtils;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,7 +54,8 @@ public class ItemType {
     private void parseZone() {
         try {
             String[] params;
-            if (!StringUtils.isNullOrEmpty(this.rawZone)) {
+
+            if (StringUtils.isNotEmpty(this.rawZone)) {
                 this._zoneShape = this.rawZone.charAt(0);
                 if (!this.rawZone.contains(",")) {
                     return;

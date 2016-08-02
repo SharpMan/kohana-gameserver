@@ -91,7 +91,7 @@ public class Algo {
             if (toDir == null) {
                 continue;
             }
-            FightCell randomCell = fight.getCell(fight.getMap().getRandomAdjacentFreeCell(toDir.Id).getId());
+            final FightCell randomCell = fight.getCell(fight.getMap().getRandomAdjacentFreeCell(toDir.Id).getId());
             if (randomCell != null) {
                 if (!team1.contains(randomCell) && !team2.contains(randomCell) && randomCell.isWalkable()) {
                     team2.add(randomCell);

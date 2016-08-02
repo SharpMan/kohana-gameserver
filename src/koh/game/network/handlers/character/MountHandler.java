@@ -7,12 +7,14 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.animal.MountInventoryItem;
+import koh.game.fights.FightState;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.ExchangeHandleMountStableTypeEnum;
 import koh.protocol.client.enums.ObjectErrorEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
+import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.mount.*;
 import koh.protocol.messages.game.inventory.exchanges.ExchangeHandleMountsStableMessage;
@@ -52,7 +54,7 @@ public class MountHandler {
             Client.send(new ObjectErrorMessage(ObjectErrorEnum.LIVING_OBJECT_REFUSED_FOOD));
             return;
         }
-        int newQua = food.getQuantity() - Message.quantity;
+        final int newQua = food.getQuantity() - Message.quantity;
         if (newQua <= 0) {
             Client.getCharacter().getInventoryCache().removeItem(food);
         } else {
@@ -84,16 +86,23 @@ public class MountHandler {
     }
 
     @HandlerAttribute(ID = 5976)
-    public static void handleMountToggleRidingRequestMessage(WorldClient Client, MountToggleRidingRequestMessage message) {
-        if (Client.getCharacter().getMountInfo().mount == null) {
-            throw new Error(Client.getCharacter().getNickName() + " try to ride NullableMount");
+    public static void handleMountToggleRidingRequestMessage(WorldClient client, MountToggleRidingRequestMessage message) {
+        if ((client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) || client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
+            client.send(new BasicNoOperationMessage());
+            return;
         }
-        if (Client.getCharacter().getMountInfo().isToogled) {
-            Client.getCharacter().getMountInfo().onGettingOff();
+        if (client.getCharacter().getMountInfo().mount == null) {
+            throw new Error(client.getCharacter().getNickName() + " try to ride NullableMount");
+        }
+        if(!client.canParsePacket(message.getClass().getName(), 900)){
+            return;
+        }
+        if (client.getCharacter().getMountInfo().isToogled) {
+            client.getCharacter().getMountInfo().onGettingOff();
         } else {
-            Client.getCharacter().getMountInfo().onRiding();
+            client.getCharacter().getMountInfo().onRiding();
         }
-        Client.getCharacter().getMountInfo().save();
+        client.getCharacter().getMountInfo().save();
     }
 
     @HandlerAttribute(ID = ExchangeHandleMountsStableMessage.ID)

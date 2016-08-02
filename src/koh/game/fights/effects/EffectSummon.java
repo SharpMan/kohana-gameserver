@@ -45,6 +45,7 @@ public class EffectSummon extends EffectBase {
                             : new SummonedReplacerFighter(castInfos.caster.getFight(), monsterLevel,castInfos.caster, castInfos.targets.stream().filter(bf -> bf instanceof SummonedFighter).findFirst().get().asSummon().getGrade());
 
 
+
                     if(castInfos.effectType == StatsEnum.KILL_TARGET_TO_REPLACE_INVOCATION_SLAVE){
                         //System.out.println(castInfos.targets.get(0).getBuff().delayedEffects.size());
                         castInfos.targets.get(0).getBuff().delayedEffects.forEach(i -> i.second = 1);

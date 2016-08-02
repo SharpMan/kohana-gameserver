@@ -17,10 +17,9 @@ import koh.game.fights.IFightObject;
 import koh.game.fights.exceptions.FightException;
 import koh.game.fights.exceptions.FighterException;
 import koh.game.fights.exceptions.StopAIException;
-import koh.game.fights.fighters.DoubleFighter;
-import koh.game.fights.fighters.MonsterFighter;
-import koh.game.fights.fighters.VirtualFighter;
+import koh.game.fights.fighters.*;
 import koh.game.fights.utils.Path;
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.IAMindEnum;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -280,14 +279,31 @@ public class AIProcessor {
                     .map(fightCell -> fightCell.getObjectsAsFighter()[0]).collect(Collectors.toList());
 
 
+
             targets.removeIf(target -> !((((ArrayUtils.contains(BLACKLISTED_EFFECTS, effect.effectUid)
                     || EffectHelper.verifyEffectTrigger(fighter, target, spell.getEffects(), effect, false, effect.triggers, castCell))
                     && effect.isValidTarget(fighter, target)
                     && target.isVisibleFor(fighter)
                     && EffectInstanceDice.verifySpellEffectMask(fighter, target, effect,castCell)))));
 
+
+
             if (targets.size() > 0 || ((spell.isNeedFreeCell() || spell.isNeedFreeTrapCell()) && targets.size() == 0)) {
-                score += Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));
+                if(targets.size() == 1 && targets.get(0) instanceof SummonedFighter && targets.get(0).asMonster().getGrade().getMonsterId() == 282){ //arbre
+                    final double petitScore = Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));
+                    if(petitScore != 0){
+                        score += petitScore /5;
+                    }
+                }
+                else if(targets.size() == 1 && targets.get(0) instanceof StaticSummonedFighter){
+                    final double petitScore = Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));
+                    if(petitScore != 0){
+                        score += petitScore /7;
+                    }
+                }
+                else {
+                    score += Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false));
+                }
                 //logger.debug("effect {} score {}",effect.getEffectType(), Math.floor(action.getEffectScore(this, currentCellId, castCell, effect, targets, false, false)));
             }else{
                 //logger.debug("effect {} mask{} trigger {} ",effect.getEffectType(),effect.targetMask,effect.triggers);
@@ -295,6 +311,16 @@ public class AIProcessor {
 
         }
         return score;
+    }
+
+
+    public void rescueTree(){
+        fighter.getTeam().getAliveFighters().filter(fr -> fr.getStates().hasState(FightStateEnum.BLOQUEUSE)).forEach(fr -> {
+            this.mySpells.forEach(spell -> {
+                this.fight.launchSpell(this.fighter, spell, fr.getCellId(), true);
+            });
+
+        });
     }
 
     public boolean moveTo(Fighter target, int maxDistance) {
@@ -544,6 +570,9 @@ public class AIProcessor {
 
     public boolean madSelfAction() {
         this.mode = AIAction.AIActionEnum.MAD;
+        if(this.neuron != null && this.neuron.myBestScore == 0){
+            neuron.myBestScore = -900;
+        }
         return react();
     }
 

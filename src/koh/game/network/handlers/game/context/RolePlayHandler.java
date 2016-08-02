@@ -58,6 +58,9 @@ public class RolePlayHandler {
             client.send(new BasicNoOperationMessage());
             return;
         }
+        if(!client.canParsePacket(message.getClass().getName(), 800)){
+            return;
+        }
         client.send(new MapRunningFightDetailsMessage(
                 fight.getFightId(),
                 fight.getTeam1().getFighters()
@@ -73,8 +76,11 @@ public class RolePlayHandler {
 
     @HandlerAttribute(ID = MapRunningFightListRequestMessage.M_ID)
     public static void handleMapRunningFightListRequestMessage(WorldClient client, MapRunningFightListRequestMessage message) {
+        if(!client.canParsePacket(message.getClass().getName(), 800)){
+            return;
+        }
         client.send(new MapRunningFightListMessage(client.getCharacter().getCurrentMap().getFights()
-                .parallelStream()
+                .stream()
                 .map(f -> f.getFightExternalInformations(client.getCharacter()))
                 .filter(Objects::nonNull)
                 .toArray(FightExternalInformations[]::new)));
@@ -101,6 +107,9 @@ public class RolePlayHandler {
     public static void EmotePlayRequestMessage(WorldClient client, EmotePlayRequestMessage message) {
         if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
             client.send(new BasicNoOperationMessage());
+            return;
+        }
+        if(!client.canParsePacket(message.getClass().getName(), 800)){
             return;
         }
         if (message.emoteId == 1 || message.emoteId == 19) {

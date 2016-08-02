@@ -25,6 +25,7 @@ import koh.protocol.messages.game.context.*;
 import koh.protocol.messages.game.context.roleplay.MapInformationsRequestMessage;
 import koh.protocol.messages.game.inventory.items.ObjectDropMessage;
 import koh.protocol.messages.game.inventory.items.ObjectErrorMessage;
+import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.types.game.context.ActorOrientation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,6 +39,9 @@ public class ContextHandler {
 
     @HandlerAttribute(ID = GameMapChangeOrientationRequestMessage.M_ID)
     public static void handleGameMapChangeOrientationRequestMessage(WorldClient client, GameMapChangeOrientationRequestMessage message) {
+        if(!client.canParsePacket(message.getClass().getName(), 900)){
+            return;
+        }
         if (client.getCharacter().getFight() == null) {
             client.getCharacter().setDirection(message.direction);
             client.getCharacter().getCurrentMap().sendToField(new GameMapChangeOrientationMessage(new ActorOrientation(client.getCharacter().getID(), client.getCharacter().getDirection())));
@@ -46,9 +50,12 @@ public class ContextHandler {
     }
 
     @HandlerAttribute(ID = ShowCellRequestMessage.M_ID)
-    public static void handleShowCellRequestMessage(WorldClient Client, ShowCellRequestMessage message) {
-        if (Client.getCharacter().getFighter() != null) {
-            Client.getCharacter().getFighter().showCell(message.cellId, true);
+    public static void handleShowCellRequestMessage(WorldClient client, ShowCellRequestMessage message) {
+        if (client.getCharacter().getFighter() != null) {
+            if(!client.canParsePacket(message.getClass().getName(), 800)){
+                return;
+            }
+            client.getCharacter().getFighter().showCell(message.cellId, true);
         }
         //Spectator
     }
@@ -67,6 +74,7 @@ public class ContextHandler {
         if (Client.getCharacter().isInWorld()) {
             PlayerController.sendServerMessage(Client, "You are already Logged !");
         } else {
+
             Client.sequenceMessage(new GameContextDestroyMessage());
 
             Client.send(new GameContextCreateMessage((byte) (Client.getCharacter().getFighter() == null ? 1 : 2)));
@@ -202,6 +210,13 @@ public class ContextHandler {
         client.getCharacter().stopSitEmote();
         if (!client.canGameAction(GameActionTypeEnum.MAP_MOVEMENT)) {
             client.send(new GameMapNoMovementMessage());
+            if(client.isGameAction(GameActionTypeEnum.TUTORIAL)){
+                if(client.getCharacter().getLevel() == 1)
+                    client.send(new PopupWarningMessage((byte) 4, "Melan", GameTutorial.LEVEL));
+                else
+                    client.send(new PopupWarningMessage((byte) 1, "Melan", "Eh petit, t'es paralizé.\nEcoute moi bon sang !"));
+                return;
+            }
             client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 12, new String[0]));
             return;
         }

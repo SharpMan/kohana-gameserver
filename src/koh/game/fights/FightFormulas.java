@@ -273,8 +273,8 @@ public class FightFormulas {
 
     public static short computeHonorWon(Stream<Fighter> winners, Stream<Fighter> loosers,boolean isKoli) {
         try {
-            int totalGradeWinner = 0;
-            int totalGradeLooser = 0;
+            int totalGradeWinner = 0, totalPhWinner = 0;
+            int totalGradeLooser = 0, totalPhLooser = 0;
             int totalGradeWinnerForEached = 0;
             int totalGradeLooserForEached = 0;
             for (Fighter fighter : (Iterable<Fighter>) winners::iterator) {
@@ -282,10 +282,14 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    if(isKoli)
+                    if(isKoli) {
                         totalGradeWinner += fighter.getPlayer().getKoliseoGrade();
-                    else
+                        totalPhWinner += fighter.getPlayer().getKoliseoPoints();
+                    }
+                    else {
                         totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
+                        totalPhWinner += fighter.getPlayer().getHonor();
+                    }
 
                     totalGradeWinnerForEached++;
                 } /*else {
@@ -298,10 +302,14 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    if(isKoli)
+                    if(isKoli) {
                         totalGradeLooser += fighter.getPlayer().getKoliseoGrade();
-                    else
+                        totalPhLooser += fighter.getPlayer().getKoliseoPoints();
+                    }
+                    else {
                         totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
+                        totalPhLooser += fighter.getPlayer().getHonor();
+                    }
 
                     totalGradeLooserForEached++;
                 } /*else {
@@ -309,9 +317,13 @@ public class FightFormulas {
                  }*/
 
             }
-            int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
-            int randomGain = EffectHelper.randomValue(100, 120);
-            int randomValue = EffectHelper.randomValue(140, 160);
+            final int ecartPoint = (totalPhWinner / totalGradeWinnerForEached) - (totalPhLooser / totalGradeLooserForEached);
+            if(ecartPoint > 17000 && totalPhWinner > totalPhLooser){
+                return (short) EffectHelper.randomValue(40, 75);
+            }
+            final int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
+            final int randomGain = EffectHelper.randomValue(100, 120);
+            final int randomValue = EffectHelper.randomValue(140, 160);
             return (short) (totalGradeWinner <= 5 ? (randomGain + (ecartGrade < 0 ? 10 * -ecartGrade : 0)) : (randomValue + (ecartGrade < 0 ? 10 * -ecartGrade : 7 * -ecartGrade)));
         } catch (Exception e) {
             e.printStackTrace();
@@ -322,8 +334,8 @@ public class FightFormulas {
 
     public static short computeHonorLost(Stream<Fighter> loosers, Stream<Fighter> winners, boolean isKoli) {
         try {
-            int totalGradeWinner = 0;
-            int totalGradeLooser = 0;
+            int totalGradeWinner = 0, totalPhWinner = 0;
+            int totalGradeLooser = 0, totalPhLooser = 0;
             int totalGradeWinnerForEached = 0;
             int totalGradeLooserForEached = 0;
             for (Fighter fighter : (Iterable<Fighter>) winners::iterator) {
@@ -331,10 +343,14 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    if(isKoli)
+                    if(isKoli) {
                         totalGradeWinner += fighter.getPlayer().getKoliseoGrade();
-                    else
+                        totalPhWinner += fighter.getPlayer().getKoliseoPoints();
+                    }
+                    else {
                         totalGradeWinner += fighter.getPlayer().getAlignmentGrade();
+                        totalPhWinner += fighter.getPlayer().getHonor();
+                    }
 
                     totalGradeWinnerForEached++;
                 } /*else {
@@ -348,10 +364,14 @@ public class FightFormulas {
                     continue;
                 }
                 if (fighter instanceof CharacterFighter) {
-                    if(isKoli)
+                    if(isKoli) {
                         totalGradeLooser += fighter.getPlayer().getKoliseoGrade();
-                    else
+                        totalPhLooser += fighter.getPlayer().getKoliseoPoints();
+                    }
+                    else {
                         totalGradeLooser += fighter.getPlayer().getAlignmentGrade();
+                        totalPhLooser += fighter.getPlayer().getHonor();
+                    }
 
                     totalGradeLooserForEached++;
 
@@ -361,7 +381,11 @@ public class FightFormulas {
 
 
             }
-            int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
+            final int ecartGrade = (totalGradeWinner / totalGradeWinnerForEached) - (totalGradeLooser / totalGradeLooserForEached);
+            final int ecartPoint = (totalPhWinner / totalGradeWinnerForEached) - (totalPhLooser / totalGradeLooserForEached);
+            if(ecartPoint > 17000 && totalPhWinner < totalPhLooser){
+                return (short) -EffectHelper.randomValue(20, 30);
+            }
             int randomPerte = 0;
             switch (totalGradeWinner) {
                 case 1:
@@ -392,7 +416,8 @@ public class FightFormulas {
                     randomPerte = EffectHelper.randomValue(400, 500);
                     break;
                 case 10:
-                    randomPerte = 500;
+                    //randomPerte = 500;
+                    randomPerte = EffectHelper.randomValue(650, 800);
                     break;
             }
             return (short) -(totalGradeWinner <= 5 ? (randomPerte + (ecartGrade > 0 ? 10 * ecartGrade : 0)) : (randomPerte + (ecartGrade > 0 ? 20 * ecartGrade : 0)));

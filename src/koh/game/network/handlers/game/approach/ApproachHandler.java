@@ -25,10 +25,15 @@ public class ApproachHandler {
 
     @HandlerAttribute(ID = AuthenticationTicketMessage.MESSAGE_ID)
     public static void AuthenticationTicketMessage(WorldClient client, AuthenticationTicketMessage message) {
-
+        if(client.isHasSentTicket()){
+            client.forceClose();
+            return;
+        }
+        client.setHasSentTicket(true);
         client.setTempTicket(AccountTicketDAO.getWaitingCompte(message.ticket));
 
         if (client.getTempTicket() != null && client.getTempTicket().isCorrect(client.getIP(), message.ticket)) {
+            System.out.println("isCorrect");
             WorldServer.gameLoader.addClient(client);
             if (WorldServer.gameLoader.getPosition(client) != 1) {
                 client.send(new LoginQueueStatusMessage((short) WorldServer.gameLoader.getPosition(client), (short) WorldServer.gameLoader.getTotal()));

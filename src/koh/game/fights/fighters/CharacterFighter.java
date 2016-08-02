@@ -31,6 +31,7 @@ import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class CharacterFighter extends Fighter {
     public int fakeContextualId = -1000;
     @Getter
     private Player character;
+    @Getter
+    @Setter
+    private boolean needStatRefresh = false;
 
     public CharacterFighter(Fight Fight, WorldClient client) {
         super(Fight, null);
@@ -80,14 +84,14 @@ public class CharacterFighter extends Fighter {
                     (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0) + this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT),
                     (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0) + this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT),
                     (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION),
-                    (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0)  + this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION),
+                    (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION),
                     (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION),
                     (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION),
                     (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) + this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION),
                     this.stats.getTotal(StatsEnum.ADD_PUSH_DAMAGES_REDUCTION),
                     this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION),
-                    Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY),0),
-                    Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY),0),
+                    Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0),
+                    Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0),
                     this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE),
                     character == null ? this.visibleState.value : this.getVisibleStateFor(character),
                     this.getInitiative(false));
@@ -114,7 +118,7 @@ public class CharacterFighter extends Fighter {
                 this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION),
                 Math.max(this.stats.getTotal(StatsEnum.DODGE_PA_LOST_PROBABILITY), 0),
                 Math.max(this.stats.getTotal(StatsEnum.DODGE_PM_LOST_PROBABILITY), 0),
-                this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK),this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE),
+                this.stats.getTotal(StatsEnum.ADD_TACKLE_BLOCK), this.stats.getTotal(StatsEnum.ADD_TACKLE_EVADE),
                 character == null ? this.visibleState.value : this.getVisibleStateFor(character));
 
     }
@@ -172,6 +176,10 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public int beginTurn() {
+        if (this.needStatRefresh) {
+            //this.send(this.getCharacterStatsListMessagePacket());
+            this.needStatRefresh = false;
+        }
         this.cleanClone();
         if (this.character.getClient() == null && this.turnRunning <= 0) {
             return super.tryDie(this.ID, true);
@@ -189,7 +197,7 @@ public class CharacterFighter extends Fighter {
     @Override
     public void leaveFight() {
         super.leaveFight();
-       // if (this.fight.getFightState() != FightState.STATE_PLACE) {
+        // if (this.fight.getFightState() != FightState.STATE_PLACE) {
 
         //}
         this.endFight();
@@ -197,7 +205,7 @@ public class CharacterFighter extends Fighter {
 
     @Override
     public GameFightFighterLightInformations getGameFightFighterLightInformations() {
-        return new GameFightFighterNamedLightInformations(this.getID(),wave, getLevel(), character.getBreed(), character.hasSexe(), isAlive(), character.getNickName());
+        return new GameFightFighterNamedLightInformations(this.getID(), wave, getLevel(), character.getBreed(), character.hasSexe(), isAlive(), character.getNickName());
     }
 
     @Override
@@ -230,24 +238,26 @@ public class CharacterFighter extends Fighter {
 
             this.fight.unregisterPlayer(character);
 
+            if (this.character.getFight() != this.fight)
+                return;
+
             if (this.character.isInWorld()) {
-                if(character.getClient() != null)
-                     this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
+                if (character.getClient() != null)
+                    this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
                 this.character.send(new GameContextDestroyMessage());
                 this.character.send(new GameContextCreateMessage((byte) 1));
                 this.character.setFight(null);
                 this.character.refreshStats(false, true);
-                if(fight.getFightType() == FightTypeEnum.FIGHT_TYPE_PVP_ARENA){
+                if (fight.getFightType() == FightTypeEnum.FIGHT_TYPE_PVP_ARENA) {
                     KolizeumExecutor.teleportLastPosition(this.character);
                     final PlayerInst inst = PlayerInst.getPlayerInst(character.getID());
                     this.character.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getScreenRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
 
-                }
-                else if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
+                } else if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
                         && this.team.id == this.fight.getLoosers().id
                         && this.character.getSavedMap() != this.character.getCurrentMap().getId()) {
-                    if(character.getClient() == null)
-                        character.offlineTeleport(character.getSavedMap(),character.getSavedCell());
+                    if (character.getClient() == null)
+                        character.offlineTeleport(character.getSavedMap(), character.getSavedCell());
                     else
                         this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
                 } else {
@@ -261,12 +271,11 @@ public class CharacterFighter extends Fighter {
                 }
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             this.fight.getLogger().error(e);
             this.fight.getLogger().warn(e.getMessage());
-        }
-        finally {
+        } finally {
             this.character.setFight(null);
             this.character.setFighter(null);
             this.character.getFightsRegistred().add(this.fight);

@@ -3,6 +3,7 @@ package koh.game.fights.effects;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffDamage;
 import koh.game.fights.effects.buff.BuffReflectSpell;
+import koh.game.fights.effects.buff.BuffShareDamages;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -10,6 +11,8 @@ import koh.protocol.messages.game.actions.fight.*;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Iterator;
+
+import static koh.protocol.client.enums.StatsEnum.PA_USED_LOST_X_PDV_2;
 
 /**
  * @author Neo-Craft
@@ -85,6 +88,11 @@ public class EffectDamage extends EffectBase {
                     return -3; // Fin du combat
                 }
             }
+
+            if(castInfos.isCritical()){
+                caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));
+            }
+
             caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, castInfos.isCAC ? caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : caster.getStats().getTotal(StatsEnum.SPELL_POWER));
 
             // Calcul jet
@@ -96,6 +104,10 @@ public class EffectDamage extends EffectBase {
             }
 
             caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, castInfos.isCAC ? -caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : -caster.getStats().getTotal(StatsEnum.SPELL_POWER));
+
+            if(castInfos.isCritical()){
+                caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, -caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));
+            }
 
 
             if (castInfos.caster.hasState(FightStateEnum.PACIFISTE.value) && !castInfos.isGlyph) {
@@ -129,7 +141,7 @@ public class EffectDamage extends EffectBase {
                 }
             }
             // Application des buffs apres le calcul totaux et l'armure
-            if (!castInfos.isPoison && !castInfos.isReflect) {
+            if (!castInfos.isPoison && !castInfos.isReflect && castInfos.effectType != PA_USED_LOST_X_PDV_2) {
                 if (caster.getBuff().onAttackAfterJet(castInfos, damageJet) == -3) {
                     return -3; // Fin du combat
                 }
@@ -164,10 +176,38 @@ public class EffectDamage extends EffectBase {
                         // Dommage renvoyé
                         damageJet.subtract(reflectDamage.intValue());
                     }
+
+                    //TODO trigger
+                    for (BuffShareDamages buff : (Iterable<BuffShareDamages>)target.getBuff().getAllBuffs().filter(bf -> bf instanceof BuffShareDamages)
+                            .map(e -> (BuffShareDamages)e)::iterator){
+
+                        final Fighter[] alliance = target.getTeam().getAliveFighters()
+                                .filter(f -> f.getBuff().getAllBuffs().anyMatch(buf -> buf instanceof BuffShareDamages && ((BuffShareDamages)buf).getUid() == buff.getUid()))
+                                .toArray(Fighter[]::new);
+
+                        if(alliance.length > 0){
+                            damageJet.setValue(damageJet.getValue() / (alliance.length));
+                            for (final Fighter fighter : alliance) {
+                                if(fighter.getID() == target.getID()){
+                                    continue;
+                                }
+                                final EffectCast subInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, 0, (short) 0, 0, null, fighter, null, false, StatsEnum.NONE, 0, null);
+                                subInfos.isPoison = true;
+
+                                // Si le renvoi de dommage entraine la fin de combat on stop
+                                if (EffectDamage.applyDamages(subInfos, fighter, new MutableInt(damageJet.getValue())) == -3) {
+                                    return -3;
+                                }
+                            }
+                        }
+
+                    }
+
+
                 }
             }
             // Peu pas etre en dessous de 0
-            if (damageJet.getValue() < 0) {
+            if (damageJet.getValue() < 0 || target.getStates().hasState(FightStateEnum.INVULNERABLE) || target.getStates().hasState(FightStateEnum.Invulnérable)) {
                 damageJet.setValue(0);
             }
 

@@ -224,25 +224,29 @@ public class GuildHandler {
     }
 
     @HandlerAttribute(ID = 5550)
-    public static void HandleGuildGetInformationsMessage(WorldClient Client, GuildGetInformationsMessage Message) {
+    public static void HandleGuildGetInformationsMessage(WorldClient client, GuildGetInformationsMessage Message) {
+        if(client.getCharacter() == null || client.getCharacter().getGuild() == null){
+            client.send(new BasicNoOperationMessage());
+            return;
+        }
         switch (Message.infoType) {
             case 1:
-                Client.send(Client.getCharacter().getGuild().toGeneralInfos());
+                client.send(client.getCharacter().getGuild().toGeneralInfos());
                 break;
             case 2:
-                Client.send(new GuildInformationsMembersMessage(Client.getCharacter().getGuild().allGuildMembers()));
+                client.send(new GuildInformationsMembersMessage(client.getCharacter().getGuild().allGuildMembers()));
                 break;
             case 3:
-                Client.send(Client.getCharacter().getGuild().toGuildInfosUpgradeMessage());
+                client.send(client.getCharacter().getGuild().toGuildInfosUpgradeMessage());
                 break;
             case 4:
-                Client.send(new GuildInformationsPaddocksMessage((byte) 5, Client.getCharacter().getGuild().toPaddockContentInformations()));
+                client.send(new GuildInformationsPaddocksMessage((byte) 5, client.getCharacter().getGuild().toPaddockContentInformations()));
                 break;
             case 5:
-                Client.send(new GuildHousesInformationMessage(Client.getCharacter().getGuild().toHouseInformationsForGuild()));
+                client.send(new GuildHousesInformationMessage(client.getCharacter().getGuild().toHouseInformationsForGuild()));
                 break;
             case 6:
-                Client.send(Client.getCharacter().getGuild().toTaxCollectorListMessage());
+                client.send(client.getCharacter().getGuild().toTaxCollectorListMessage());
                 break;
 
         }

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+
 import koh.d2o.Couple;
 import koh.game.actions.GameAction;
 import koh.game.actions.GameActionTypeEnum;
@@ -42,6 +44,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.mina.core.session.IoSession;
 
 /**
@@ -55,6 +58,8 @@ public class WorldClient {
     private AccountTicket tempTicket;
     @Getter @Setter
     private boolean showQueue;
+    @Getter @Setter
+    private volatile boolean hasSentTicket = false;
     @Getter @Setter
     private Player character;
     @Getter
@@ -77,6 +82,10 @@ public class WorldClient {
     @Getter
     private CopyOnWriteArrayList<PartyRequest> partyRequests;
     private static final Logger logger = LogManager.getLogger(WorldClient.class);
+    private Map<String, Long> packetClock = new ConcurrentHashMap<>();
+    @Setter
+    private String address;
+
 
     @Getter
     public Map<Byte, Long> lastChannelMessage = new HashMap<Byte, Long>(7) {
@@ -153,6 +162,20 @@ public class WorldClient {
         return this.myActions.size();
     }
 
+    public synchronized boolean canParsePacket(String packet, final long delay){
+        final Long lastReq = this.packetClock.get(packet);
+        if(lastReq == null){
+            this.packetClock.put(packet, System.currentTimeMillis());
+        }else{
+            if(System.currentTimeMillis() - lastReq < delay){
+                return false;
+            }
+            this.packetClock.replace(packet, System.currentTimeMillis());
+        }
+        return true;
+    }
+
+
     public void endGameAction(GameActionTypeEnum action) {
         try {
             synchronized (this.myActions) {
@@ -218,6 +241,8 @@ public class WorldClient {
     }
 
     public String getIP() {
+        if(address != null)
+            return address;
         return this.getRemoteAddress().getAddress().getHostAddress();
     }
 
@@ -238,10 +263,10 @@ public class WorldClient {
             this.lastPacketId = message.getMessageId();
             this.sequenceMessage++;
             final Method messageIdentifier = Handler.getMethodByMessage(message.getMessageId());
-            if (messageIdentifier != null) {
+            if (messageIdentifier != null)
                 messageIdentifier.invoke(null, this, message);
-            } else {
-                logger.error("Packet not handled {}" , message.getMessageId());
+            else {
+                logger.info("Packet not handled {}" , message.getMessageId());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -256,6 +281,7 @@ public class WorldClient {
         if (packet == null) {
             return;
         }
+        //this.log((logger) -> logger.info();
 
         session.write(packet);
     }
@@ -330,10 +356,14 @@ public class WorldClient {
         if (session != null && !session.isClosing()) {
             session.close(true);
         }
+        if(packetClock != null){
+            packetClock.clear();
+            packetClock = null;
+        }
 
         this.showQueue = false;
         if (this.character != null) {
-            logger.debug("Player {} disconnected",this.character.getNickName());
+            logger.debug("Player disconnected",this.character.getNickName());
             ChatChannel.unRegister(this);
             this.character.onDisconnect();
             this.character = null;
@@ -344,6 +374,34 @@ public class WorldClient {
             tempTicket = null;
         }
 
+    }
+
+    /*public void log(Consumer<Logger> writer) {
+        if(session.isClosing() || !session.isConnected())
+            return;
+        try {
+            ThreadContext.put("clientAddress", this.getRemoteAddress().getAddress().getHostAddress());
+            if (character != null && character.getNickName() != null) {
+                ThreadContext.put("plName", character.getNickName());
+                ThreadContext.put("plId", Integer.toString(character.getID()));
+            }
+            try {
+                writer.accept(logger);
+            } finally {
+                ThreadContext.remove("clientAddress");
+                if (character != null && character.getNickName() != null) {
+                    ThreadContext.remove("plName");
+                    ThreadContext.remove("plId");
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }*/
+
+    public void forceClose(){
+        this.session.close(true);
     }
 
     public void setBaseRequest(GameBaseRequest Request) {

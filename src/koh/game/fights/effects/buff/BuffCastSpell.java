@@ -40,6 +40,7 @@ public class BuffCastSpell extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
+        castInfos.targets.removeIf(f -> f.getID() != target.getID());
         return EffectCastSpell.castSpell(castInfos);
         //return super.applyEffect(damageValue, damageInfos);
     }

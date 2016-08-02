@@ -58,15 +58,18 @@ public class ExoCommand implements PlayerCommand {
             case "po":
                 stat = StatsEnum.ADD_RANGE;
                 break;
+            case "invoc":
+                stat = StatsEnum.ADD_SUMMON_LIMIT;
+                break;
             default:
-                PlayerController.sendServerErrorMessage(client,"Vous devez spécifier pa ou pm ou po");
+                PlayerController.sendServerErrorMessage(client,"Vous devez spécifier pa ou pm ou po ou invoc");
                 return;
         }
         if(item.hasEffect(stat.value())){
             PlayerController.sendServerErrorMessage(client,"Votre item donne déjà "+((ObjectEffectInteger)item.getEffect(stat.value())).value+" "+args[1]);
             return;
         }
-        if(stat != StatsEnum.ADD_RANGE){
+        if(stat != StatsEnum.ADD_RANGE && stat != StatsEnum.ADD_SUMMON_LIMIT){
             if(item.hasEffect(StatsEnum.ACTION_POINTS.value()) || item.hasEffect(StatsEnum.MOVEMENT_POINTS.value())){
                 PlayerController.sendServerErrorMessage(client,"Votre item donne déjà 1 pa ou 1 pm");
                 return;

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import koh.game.dao.DAO;
 import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
+import koh.game.entities.item.EffectHelper;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -36,6 +37,8 @@ public class BuffPoutch extends BuffEffect {
         if(target instanceof BombFighter && target.getSummoner() == castInfos.caster){
             this.duration++;
         }
+        if(castInfos.effect.diceNum == 5589)
+            this.duration++;
     }
 
     @Override
@@ -43,6 +46,7 @@ public class BuffPoutch extends BuffEffect {
         if (damageInfos.isReflect || damageInfos.isReturnedDamages || damageInfos.isPoison || damageInfos.isPoutch) {
             return -1;
         }
+
         // mort
         if (caster.isDead()) {
             //target.buff.RemoveBuff(this);
@@ -55,6 +59,11 @@ public class BuffPoutch extends BuffEffect {
             }
             //target = DamageInfos.caster;
         }
+
+        if(castInfos.effectType == StatsEnum.REFOULLAGE && !EffectHelper.verifyEffectTrigger(damageInfos.caster, target, this.castInfos.spellLevel.getEffects(), damageInfos.effect, damageInfos.isCAC, this.castInfos.effect.triggers, damageInfos.cellId)) {
+            return -1;
+        }
+
 
         final SpellLevel SpellLevel = DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevels()[castInfos.effect.diceSide == 0 ? 0 : castInfos.effect.diceSide - 1];
         double num1 = Fight.RANDOM.nextDouble();
