@@ -61,7 +61,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     @Getter @Setter
     private static int TEAM_SIZE = DAO.getSettings().getIntElement("Koliseo.Size"),
             POOL_SIZE = DAO.getSettings().getIntElement("Koliseo.Size") * 2;
-    private static final int TEAM_LVL_DIFF_MAX = 40;
+    private static final int TEAM_LVL_DIFF_MAX = 100; //40
 
     private static Comparator<ArenaParty> partySorter;
     private static Comparator<Player> playerSorter;

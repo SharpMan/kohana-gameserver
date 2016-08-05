@@ -33,7 +33,6 @@ public class ApproachHandler {
         client.setTempTicket(AccountTicketDAO.getWaitingCompte(message.ticket));
 
         if (client.getTempTicket() != null && client.getTempTicket().isCorrect(client.getIP(), message.ticket)) {
-            System.out.println("isCorrect");
             WorldServer.gameLoader.addClient(client);
             if (WorldServer.gameLoader.getPosition(client) != 1) {
                 client.send(new LoginQueueStatusMessage((short) WorldServer.gameLoader.getPosition(client), (short) WorldServer.gameLoader.getTotal()));

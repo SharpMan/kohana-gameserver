@@ -56,10 +56,10 @@ public class ChallengeFight extends Fight {
 
             for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
                 super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_VICTORY);
-                final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, winners.getFighters(), loosers.getFighters()));
+              /*  final AtomicInteger xpTotal = new AtomicInteger(FightFormulas.XPDefie(fighter, winners.getFighters(), loosers.getFighters()));
 
                 final int guildXp = FightFormulas.guildXpEarned(fighter.asPlayer(), xpTotal), mountXp = FightFormulas.mountXpEarned(fighter.asPlayer(), xpTotal);
-                fighter.getPlayer().addExperience(xpTotal.get(), false);
+                fighter.getPlayer().addExperience(xpTotal.get(), false);*/
                 final int kamas  = RANDOM.nextInt(150) + 40;
                 fighter.getPlayer().addKamas(kamas);
 
@@ -71,12 +71,12 @@ public class ChallengeFight extends Fight {
                         this.showExperienceLevelFloor = true;
                         this.experienceNextLevelFloor = DAO.getExps().getPlayerMaxExp(fighter.getLevel());
                         this.showExperienceNextLevelFloor = fighter.getLevel() < 200;
-                        this.experienceFightDelta = xpTotal.get();
+                        this.experienceFightDelta = /*xpTotal.get()*/0;
                         this.showExperienceFightDelta = true;
-                        this.experienceForGuild = guildXp;
-                        this.showExperienceForGuild = guildXp > 0;
-                        this.experienceForMount = mountXp;
-                        this.showExperienceForMount = mountXp > 0;
+                        this.experienceForGuild = 0 /*guildXp*/;
+                        this.showExperienceForGuild = false /*guildXp > 0*/;
+                        this.experienceForMount = 0;//mountXp;
+                        this.showExperienceForMount = false;// mountXp > 0;
 
                     }
                 }}));

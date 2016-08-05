@@ -28,9 +28,9 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
             case 0:
                 return 0;
             case 1:
-                return buf.get();
+                return buf.getUnsigned();
             case 2:
-                return buf.getShort();
+                return buf.getUnsignedShort();
             case 3:
                 return (((buf.get() & 255) << 16) + ((buf.get() & 255) << 8) + (buf.get() & 255));
             default:
@@ -47,7 +47,7 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         if (buf.remaining() < 2) {
             return false;
         }
-
+        buf.mark();
         int header = buf.getShort(), messageLength;
 
 
@@ -57,17 +57,20 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
             return false;
         }
 
+
+
         if (buf.remaining() < messageLength) {
+            buf.reset();
             return false;
         }
-        if(Math.abs(Integer.MAX_VALUE - messageLength) < 5){ //java.lang.OutOfMemoryError: Requested array size exceeds VM limit
+        /*if(Math.abs(Integer.MAX_VALUE - messageLength) < 5){ //java.lang.OutOfMemoryError: Requested array size exceeds VM limit
             //buf.clear();
             return true;
-        }
-        if (getMessageId(header) < 0) {
+        }*/
+        /*if (getMessageId(header) < 0) {
             session.close();
             return false;
-        }
+        }*/
 
         final Message message;
 
@@ -90,6 +93,7 @@ public class ProtocolDecoder extends CumulativeProtocolDecoder {
         }
         message.deserialize(buf);
         out.write(message);
+        //System.out.println(buf.remaining());
         //buf.clear();
         return true;
     }

@@ -27,7 +27,9 @@ public class BuffState extends BuffEffect {
             if(castInfos.isGlyph){
                 return;
             }
-            if(getState() == FightStateEnum.Hypoglyphe || getState() == FightStateEnum.PESANTEUR){
+            if(getState() == FightStateEnum.Hypoglyphe
+                    || getState() == FightStateEnum.PESANTEUR
+                    || getState() == FightStateEnum.ENRACINÉ){
                 return;
             }
             if(getState() == FightStateEnum.Invulnérable && caster instanceof CharacterFighter){

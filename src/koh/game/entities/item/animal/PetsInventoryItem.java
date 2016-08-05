@@ -159,8 +159,11 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public void updateDate() {
-        Calendar now = Calendar.getInstance();
-        ((ObjectEffectDate) this.getEffect(808)).SetDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE));
+        final Calendar now = Calendar.getInstance();
+        if(this.effects.stream().anyMatch(e -> e.actionId == 808))
+            ((ObjectEffectDate) this.getEffect(808)).SetDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE));
+        else
+            this.effects.add(new ObjectEffectDate(808, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE)));
     }
 
     public void updateFood(int food) {

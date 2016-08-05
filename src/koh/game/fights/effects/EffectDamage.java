@@ -93,7 +93,11 @@ public class EffectDamage extends EffectBase {
                 caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));
             }
 
-            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, castInfos.isCAC ? caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : caster.getStats().getTotal(StatsEnum.SPELL_POWER));
+            final int portalEfficiencyBonus = (int) ((caster.getPortalsSpellEfficiencyBonus(castInfos.oldCell, caster.getFight())) * 100f);
+
+
+            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, portalEfficiencyBonus + (castInfos.isCAC ? caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
+
 
             // Calcul jet
             caster.computeDamages(castInfos.effectType, damageJet);
@@ -103,7 +107,7 @@ public class EffectDamage extends EffectBase {
                 caster.calculBonusDamages(castInfos.effect, damageJet, castInfos.cellId, target.getCellId(), castInfos.oldCell);
             }
 
-            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, castInfos.isCAC ? -caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : -caster.getStats().getTotal(StatsEnum.SPELL_POWER));
+            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, -portalEfficiencyBonus + (castInfos.isCAC ? -caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : -caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
 
             if(castInfos.isCritical()){
                 caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, -caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));

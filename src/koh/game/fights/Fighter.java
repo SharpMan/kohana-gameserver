@@ -789,7 +789,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
         double bonus = getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.zoneSize() != -100000 ? effect.zoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
-        bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
+        //bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
 
         jet.setValue((jet.floatValue() * bonus));
     }

@@ -585,7 +585,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 if (!fakeLaunch && this.fightLoopState == fightLoopState.STATE_WAIT_READY) {
                     return;
                 }
-                //System.out.println(spellLevel);
                 final short oldCell = cellId;
                 if (spellLevel.getSpellId() == 0 && fighter.isPlayer() && fighter.getPlayer().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON)) {
                     this.launchWeapon(fighter.asPlayer(), cellId);
@@ -696,7 +695,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 if (!fakeLaunch) {
                     for (Player player : this.observable$Stream()) {
-                        player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), targetId, (spellLevel.getSpellId() == 2763 ? true : ((!fighter.isVisibleFor(player) && silentCast) || ( Arrays.stream(spellEffects).anyMatch(e -> e.getEffectType() == StatsEnum.LAYING_TRAP_LEVEL)) )) ? 0 : cellId, (byte) (isCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) && silentCast), spellLevel.getSpellId(), spellLevel.getGrade(), informations == null ? new int[0] : informations.second));
+                        player.send(new GameActionFightSpellCastMessage(ActionIdEnum.ACTION_FIGHT_CAST_SPELL, fighter.getID(), targetId, (spellLevel.getSpellId() == 2763 ? true : ((!fighter.isVisibleFor(player) && silentCast) || ( Arrays.stream(spellEffects).anyMatch(e -> e.getEffectType() == StatsEnum.LAYING_TRAP_LEVEL)) )) ? 0 : cellId, (byte) (isCc ? 2 : 1), spellLevel.getSpellId() == 2763 ? true : (!fighter.isVisibleFor(player) && silentCast), spellLevel.getSpellId() == 0 ? 2 : spellLevel.getSpellId(), spellLevel.getGrade(), informations == null ? new int[0] : informations.second));
                     }
                 }
 
@@ -991,6 +990,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             fighter.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 175));
             return false;
         }
+
 
         int range = spell.getRange()
                 + fighter.getBuff().getAllBuffs()
