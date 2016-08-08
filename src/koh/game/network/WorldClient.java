@@ -27,6 +27,9 @@ import koh.game.entities.environments.IWorldEventObserver;
 import koh.game.exchange.Exchange;
 import koh.game.fights.FightTypeEnum;
 import koh.game.network.handlers.Handler;
+import koh.game.network.handlers.character.AuthorizedHandler;
+import koh.game.network.handlers.game.approach.ApproachHandler;
+import koh.game.network.handlers.game.approach.CharacterHandler;
 import koh.protocol.client.Message;
 import static koh.protocol.client.enums.ChatActivableChannelsEnum.*;
 import koh.protocol.messages.authorized.ConsoleCommandsListMessage;
@@ -263,8 +266,14 @@ public class WorldClient {
             this.lastPacketId = message.getMessageId();
             this.sequenceMessage++;
             final Method messageIdentifier = Handler.getMethodByMessage(message.getMessageId());
-            if (messageIdentifier != null)
+            if (messageIdentifier != null) {
+                if(character == null){
+                    if(!(messageIdentifier.getDeclaringClass().isAssignableFrom(ApproachHandler.class) || messageIdentifier.getDeclaringClass().isAssignableFrom(CharacterHandler.class) || messageIdentifier.getDeclaringClass().isAssignableFrom(AuthorizedHandler.class))){
+                        return;
+                    }
+                }
                 messageIdentifier.invoke(null, this, message);
+            }
             else {
                 logger.info("Packet not handled {}" , message.getMessageId());
             }

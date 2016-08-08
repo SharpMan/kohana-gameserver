@@ -315,7 +315,7 @@ public abstract class EffectBase {
             this.put(StatsEnum.DISABLE_PORTAL, new EffectDisablePortal());
 
             //Zobal
-            this.put(StatsEnum.ADVANCE_CELL, new EffectPush());
+            this.put(StatsEnum.ADVANCE_CELL, new EffectAdvance());
             this.put(StatsEnum.BOOST_SHIELD_LIFE_PERCENT, new EffectShieldLifePoint());
 
             //Roublard

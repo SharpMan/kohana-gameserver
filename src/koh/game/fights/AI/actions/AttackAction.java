@@ -13,6 +13,8 @@ import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
 import koh.game.fights.IFightObject;
 import koh.game.fights.effects.EffectPush;
+import koh.game.fights.effects.buff.BuffDamageBecomeHeal;
+import koh.game.fights.effects.buff.BuffDammageOcassioned;
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.fighters.StaticFighter;
 import koh.game.fights.layers.FightActivableObject;
@@ -269,7 +271,10 @@ public class AttackAction extends AIAction {
         for (Fighter fighter : targets) {
             int currScore = baseScore;
             double percentLife = Math.ceil((double) (fighter.getLife() / fighter.getMaxLife()) * 100);
-            if (percentLife < 5)
+            if(fighter.getBuff().getAllBuffs().anyMatch(bf -> bf instanceof BuffDamageBecomeHeal)){
+                currScore *= -5;
+            }
+            else if (percentLife < 5)
                 currScore *= 8;
             else if (percentLife < 10)
                 currScore *= 5;
@@ -277,6 +282,10 @@ public class AttackAction extends AIAction {
                 currScore *= 3;
             else if (percentLife < 50)
                 currScore *= 2;
+
+            if(fighter.getBuff().getAllBuffs().anyMatch(bf -> bf instanceof BuffDammageOcassioned)){
+                currScore *= 2;
+            }
 
             if (effect.duration > 0)
                 currScore *= effect.duration;

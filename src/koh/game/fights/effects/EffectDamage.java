@@ -1,13 +1,12 @@
 package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
-import koh.game.fights.effects.buff.BuffDamage;
-import koh.game.fights.effects.buff.BuffReflectSpell;
-import koh.game.fights.effects.buff.BuffShareDamages;
+import koh.game.fights.effects.buff.*;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Iterator;
@@ -17,6 +16,7 @@ import static koh.protocol.client.enums.StatsEnum.PA_USED_LOST_X_PDV_2;
 /**
  * @author Neo-Craft
  */
+@Log4j2
 public class EffectDamage extends EffectBase {
 
     @Override
@@ -89,25 +89,33 @@ public class EffectDamage extends EffectBase {
                 }
             }
 
+
+
             if(castInfos.isCritical()){
                 caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));
             }
 
-            final int portalEfficiencyBonus = (int) ((caster.getPortalsSpellEfficiencyBonus(castInfos.oldCell, caster.getFight())) * 100f);
+            final double portalEfficiencyBonus = ((caster.getPortalsSpellEfficiencyBonus(castInfos.oldCell, caster.getFight())));
 
+            damageJet.setValue(damageJet.doubleValue() * portalEfficiencyBonus);
 
-            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, portalEfficiencyBonus + (castInfos.isCAC ? caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
+            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, /*portalEfficiencyBonus +*/ (castInfos.isCAC ? caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
+
+            if(castInfos.spellId == 181){
+                log.info(damageJet.getValue() +" "+castInfos.effect.toString());
+            }
 
 
             // Calcul jet
             caster.computeDamages(castInfos.effectType, damageJet);
             //Calcul Bonus Negatif Zone ect ...
 
+
             if (castInfos.effect != null && !castInfos.isTrap) {
                 caster.calculBonusDamages(castInfos.effect, damageJet, castInfos.cellId, target.getCellId(), castInfos.oldCell);
             }
 
-            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, -portalEfficiencyBonus + (castInfos.isCAC ? -caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : -caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
+            caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, /*-portalEfficiencyBonus +*/ (castInfos.isCAC ? -caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : -caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
 
             if(castInfos.isCritical()){
                 caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, -caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));
@@ -151,6 +159,13 @@ public class EffectDamage extends EffectBase {
                 }
                 if (target.getBuff().onAttackedAfterjet(castInfos, damageJet) == -3) {
                     return -3; // Fin du combat
+                }
+            }
+
+            if(castInfos.isReturnedDamages && castInfos.getCell() != null && castInfos.getCell().hasFighter()){
+                final BuffEffect buff = castInfos.getCell().getFighter().getBuff().getAllBuffs().filter(b -> b instanceof BuffDammageOcassioned).findFirst().orElse(null);
+                if(buff != null){
+                    buff.applyEffect(damageJet,castInfos);
                 }
             }
 

@@ -32,8 +32,11 @@ import koh.protocol.types.game.context.roleplay.HumanOptionEmote;
 import koh.protocol.types.game.look.EntityLook;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.List;
+
+import static koh.protocol.client.enums.StatsEnum.CAST_SPELL_ON_CRITICAL_HIT;
 
 /**
  * @author Neo-Craft
@@ -65,6 +68,50 @@ public class CharacterFighter extends Fighter {
             super.setLife(1);
         }
         this.entityLook = EntityLookParser.copy(this.character.getEntityLook());
+    }
+
+    @Override
+    public void calculReduceDamages(StatsEnum effect, MutableInt damages, boolean cc) {
+        switch (effect) {
+            case DAMAGE_NEUTRAL:
+            case STEAL_NEUTRAL:
+            case LIFE_LEFT_TO_THE_ATTACKER_NEUTRAL_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_EARTH:
+            case STEAL_EARTH:
+            case LIFE_LEFT_TO_THE_ATTACKER_EARTH_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_FIRE:
+            case STEAL_FIRE:
+            case LIFE_LEFT_TO_THE_ATTACKER_FIRE_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_AIR:
+            case STEAL_AIR:
+            case LIFE_LEFT_TO_THE_ATTACKER_AIR_DAMAGES:
+            case PA_USED_LOST_X_PDV:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_WATER:
+            case STEAL_WATER:
+            case LIFE_LEFT_TO_THE_ATTACKER_WATER_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+        }
+        if (cc) {
+            damages.subtract(this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION));
+        }
     }
 
     @Override
@@ -184,6 +231,15 @@ public class CharacterFighter extends Fighter {
         if (this.character.getClient() == null && this.turnRunning <= 0) {
             return super.tryDie(this.ID, true);
         }
+        character.getInventoryCache().getEffects(CAST_SPELL_ON_CRITICAL_HIT.value())
+                //filter veuillez
+                .forEach(list -> {
+
+                    list.filter(e -> e.diceNum == 5453)
+                            .forEach(effect -> {
+                                fight.launchSpell(this, DAO.getSpells().findSpell(effect.diceNum).getSpellLevel(effect.diceSide), this.getCellId(), true, true, true, -1);
+                            });
+                });
         return super.beginTurn();
     }
 

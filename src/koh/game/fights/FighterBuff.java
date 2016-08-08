@@ -91,6 +91,7 @@ public class FighterBuff {
         logger.debug("Buff {} added",buff,getClass().getName());
     }
 
+
     //Le -1 definie l'infini
     public int beginTurn() {
         final MutableInt damage = new MutableInt(0);

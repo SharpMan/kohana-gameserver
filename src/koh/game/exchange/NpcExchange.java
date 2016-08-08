@@ -55,9 +55,10 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        NpcItem npcItem = this.npc.getTemplate().getItems().get(templateId);
+        final NpcItem npcItem = this.npc.getTemplate().getItems().get(templateId);
 
         if (npcItem == null || quantity < 0) {
+            System.out.println(npcItem);
             client.send(new ExchangeErrorMessage(ExchangeErrorEnum.REQUEST_CHARACTER_GUEST));
             return false;
         }

@@ -95,6 +95,13 @@ public class SpellDAOImpl extends SpellDAO {
                         }*/
                     }
                 }
+                //5570
+             /*   if(result.getInt("spell_id") == 181) {
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        System.out.println(effect.toString());
+                    }
+                }*/
+
 
                 //A,K,
               /* Arrays.stream(levels.get(result.getInt("id")).getEffects())

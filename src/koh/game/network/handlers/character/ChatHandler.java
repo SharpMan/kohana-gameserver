@@ -203,7 +203,8 @@ public class ChatHandler {
                 break;
             case CHANNEL_GLOBAL:
                 if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
-                    client.getCharacter().getFight().sendToField(new ChatServerMessage(message.channel, message.content, (int) Instant.now().getEpochSecond(), "", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id));
+                    if(client.getCharacter().getFight() != null)
+                        client.getCharacter().getFight().sendToField(new ChatServerMessage(message.channel, message.content, (int) Instant.now().getEpochSecond(), "", client.getCharacter().getID(), client.getCharacter().getNickName(), client.getAccount().id));
                 }
                 else if(message.content.startsWith(".")){
                     if((System.currentTimeMillis() - client.getLastCommand()) < 1000 * 3){

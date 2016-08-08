@@ -50,7 +50,11 @@ import koh.protocol.types.game.character.SetCharacterRestrictionsMessage;
 import koh.protocol.types.game.character.characteristic.CharacterBaseCharacteristic;
 import koh.protocol.types.game.character.characteristic.CharacterCharacteristicsInformations;
 import koh.protocol.types.game.character.characteristic.CharacterSpellModification;
+import koh.protocol.types.game.character.choice.CharacterToRecolorInformation;
+import koh.protocol.types.game.character.choice.CharacterToRelookInformation;
+import koh.protocol.types.game.character.choice.CharacterToRemodelInformations;
 import koh.protocol.types.game.inventory.preset.Preset;
+import koh.protocol.types.game.look.EntityLook;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -100,12 +104,112 @@ public class CharacterHandler {
 
     }
 
+    private static final int
+            CHANGE_COLOR = 1,
+            CHANGE_NAME = 3,
+                    CHANGE_SEX = 0;
+    private static final byte CHANGE_FACE = 2;
+
+
+    @HandlerAttribute(ID = 6121)
+    public static void handleCharacterSelectionWithRenameMessage(WorldClient client, CharacterSelectionWithRenameMessage message){
+        final Player character = client.getAccount().getPlayer(message.id);
+        if(character != null){
+            if (!PlayerController.isValidName((message.name))) {
+                client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
+
+            } else if (DAO.getPlayers().containsName((message.name))) {
+                client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
+            }else{
+                client.getCharacter().setNickName(message.name);
+                characterSelectionMessage(client, message.id);
+                character.getBooleans().replace(CHANGE_COLOR, FALSE);
+            }
+        }
+    }
+
+    @HandlerAttribute(ID = 6549)
+    public static void handleCharacterSelectionWithRemodelMessage(WorldClient client, CharacterSelectionWithRemodelMessage message){
+        final Player character = client.getAccount().getPlayer(message.id);
+
+        if(character != null){
+            EntityLook target = character.getEntityLook();
+            if (target.subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER))
+                target = target.subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook;
+
+            final Breed breedTemplate = DAO.getD2oTemplates().getBreed((message.remodel.breed));
+            if (breedTemplate == null) {
+                characterSelectionMessage(client, message.id);
+                return;
+            }
+            character.getIndexedColors().clear();
+            character.setIndexedColors(new ArrayList<Integer>(5) {
+                {
+                    for (byte i = 0; i < 5; i++) {
+                        if (message.remodel.colors[i] == -1) {
+                            add(breedTemplate.getColors(message.remodel.sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
+                        } else {
+                            add(message.remodel.colors[i] | (i + 1) * 0x1000000);
+                        }
+                    }
+                }
+            });
+            target.indexedColors.clear();
+            target.indexedColors = (new ArrayList<Integer>(character.getIndexedColors()));
+
+            final Head head = DAO.getD2oTemplates().getHead(message.remodel.cosmeticId);
+            if (!(head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != message.remodel.sex)) {
+                target.skins.remove(0);
+                target.skins.remove(1);
+                target.skins.add(0,message.remodel.sex ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook());
+                target.skins.add(1,Short.parseShort(head.skinstype));
+                character.getSkins().clear();
+                character.getSkins().add(0,message.remodel.sex ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook());
+                character.getSkins().add(1,Short.parseShort(head.skinstype));
+            }
+
+            character.getScales().remove(0);
+            character.getScales().add(0,message.remodel.sex ? breedTemplate.getFemaleSize() : breedTemplate.getMaleSize());
+            target.scales.remove(0);
+            target.scales.add(0,message.remodel.sex ? breedTemplate.getFemaleSize() : breedTemplate.getMaleSize());
+            character.setSexe(message.remodel.sex ? 1 : 0);
+
+        }
+        characterSelectionMessage(client, message.id);
+    }
+
+    private static final short FALSE = 0;
+
     @HandlerAttribute(ID = CharactersListRequestMessage.MESSAGE_ID)
-    public static void handleAuthenticationTicketMessage(WorldClient Client, Message message) {
-        final Player inFight = Client.getAccount().getPlayerInFight();
-        Client.send(new CharactersListMessage(false, Client.getAccount().toBaseInformations()));
+    public static void handleAuthenticationTicketMessage(WorldClient client, Message message) {
+        final Player inFight = client.getAccount().getPlayerInFight();
+
+        final Player model = client.getAccount().getCharacters().filter(p -> p.getBooleans() != null && p.getBooleans().entrySet().stream().anyMatch(x -> x.getKey() < 4 && x.getValue() == 1)).findFirst().orElse(null);
+        if(model != null && inFight == null){
+            switch (model.getBooleans().entrySet().stream().filter(x -> x.getKey() <4 && x.getValue() == 1).findAny().get().getKey()){
+                case CHANGE_COLOR:
+                    model.getBooleans().replace(CHANGE_COLOR, FALSE);
+                    client.send(new CharactersListWithRemodelingMessage(false, client.getAccount().toBaseInformations(), new CharacterToRemodelInformations[] { new CharacterToRemodelInformations(model.getID(), model.getNickName(), model.getBreed(), model.getSexe() == 1, model.getCosmetic(), model.getIndexedColors().stream().mapToInt(x -> x).toArray(),CHANGE_FACE,CHANGE_FACE) }));
+                    break;
+                case CHANGE_SEX:
+                    model.getBooleans().replace(CHANGE_SEX, FALSE);
+                    client.send(new CharactersListWithRemodelingMessage(false, client.getAccount().toBaseInformations(), new CharacterToRemodelInformations[] { new CharacterToRemodelInformations(model.getID(), model.getNickName(), model.getBreed(), model.getSexe() == 1, model.getCosmetic(), model.getIndexedColors().stream().mapToInt(x -> x).toArray(),(byte)20,(byte) 20) }));
+                    break;
+                case CHANGE_NAME:
+                    model.getBooleans().replace(CHANGE_NAME, FALSE);
+                    client.send(new CharactersListWithModificationsMessage(false, client.getAccount().toBaseInformations(), new CharacterToRecolorInformation[0],new int[] { model.getID() },new int[0],new CharacterToRelookInformation[] { new CharacterToRelookInformation(model.getID(),model.getIndexedColors().stream().mapToInt(x -> x).toArray(),model.getCosmetic())}));
+                    break;
+                default:
+                    client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
+                    break;
+            }
+        }else{
+            client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
+        }
+        //client.send(new CharactersListWithRemodelingMessage(false, client.getAccount().toBaseInformations(), new CharacterToRemodelInformations[] { new CharacterToRemodelInformations(first.getID(), first.getNickName(), first.getBreed(), first.getSexe() == 1, first.getSkins().get(1), first.getIndexedColors().stream().mapToInt(x -> x).toArray(),(byte)first.getSkins().get(1).byteValue(),(byte)first.getSkins().get(1).byteValue()) }));
+
         if (inFight != null) {
-            Client.send(new CharacterSelectedForceMessage(inFight.getID()));
+            client.send(new CharacterSelectedForceMessage(inFight.getID()));
         }
     }
 

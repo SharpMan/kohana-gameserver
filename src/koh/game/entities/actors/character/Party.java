@@ -9,7 +9,6 @@ import koh.game.actions.requests.PartyRequest;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.IWorldEventObserver;
 import koh.game.entities.kolissium.ArenaParty;
-import koh.game.network.ChatChannel;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.PartyTypeEnum;
 import koh.protocol.messages.game.character.status.PlayerStatus;
@@ -22,11 +21,8 @@ import koh.protocol.messages.game.context.roleplay.party.PartyMemberRemoveMessag
 import koh.protocol.messages.game.context.roleplay.party.PartyNewGuestMessage;
 import koh.protocol.messages.game.context.roleplay.party.PartyNewMemberMessage;
 import koh.protocol.messages.game.context.roleplay.party.PartyUpdateMessage;
-import koh.protocol.types.game.context.roleplay.party.PartyCompanionBaseInformations;
-import koh.protocol.types.game.context.roleplay.party.PartyCompanionMemberInformations;
-import koh.protocol.types.game.context.roleplay.party.PartyGuestInformations;
-import koh.protocol.types.game.context.roleplay.party.PartyInvitationMemberInformations;
-import koh.protocol.types.game.context.roleplay.party.PartyMemberInformations;
+import koh.protocol.types.game.context.roleplay.party.*;
+import koh.protocol.types.game.context.roleplay.party.PartyInvitationMemberInformation;
 import lombok.Getter;
 
 /**
@@ -109,16 +105,16 @@ public class Party extends IWorldEventObserver {
         }
     }
 
-    public PartyMemberInformations toMemberInformations(Player pl) {
-        return new PartyMemberInformations(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0]);
+    public PartyMemberInformation toMemberInformations(Player pl) {
+        return new PartyMemberInformation(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0]);
     }
 
-    public PartyMemberInformations[] toMemberInformations() {
-        return this.players.stream().map(pl -> new PartyMemberInformations(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformations[]::new);
+    public PartyMemberInformation[] toMemberInformations() {
+        return this.players.stream().map(pl -> new PartyMemberInformation(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0])).toArray(PartyMemberInformation[]::new);
     }
 
-    public PartyInvitationMemberInformations[] toPartyInvitationMemberInformations() {
-        return this.players.stream().map(x -> new PartyInvitationMemberInformations(x.getID(), (byte) x.getLevel(), x.getNickName(), x.getEntityLook(), x.getBreed(), x.hasSexe(), x.getCurrentMap().getPosition().getPosX(), x.getCurrentMap().getPosition().getPosY(), x.getCurrentMap().getId(), x.getCurrentMap().getSubAreaId(), new PartyCompanionBaseInformations[0])).toArray(PartyInvitationMemberInformations[]::new);
+    public PartyInvitationMemberInformation[] toPartyInvitationMemberInformations() {
+        return this.players.stream().map(x -> new PartyInvitationMemberInformation(x.getID(), (byte) x.getLevel(), x.getNickName(), x.getEntityLook(), x.getBreed(), x.hasSexe(), x.getCurrentMap().getPosition().getPosX(), x.getCurrentMap().getPosition().getPosY(), x.getCurrentMap().getId(), x.getCurrentMap().getSubAreaId(), new PartyCompanionBaseInformations[0])).toArray(PartyInvitationMemberInformation[]::new);
     }
 
     public void addGuest(Player p) {

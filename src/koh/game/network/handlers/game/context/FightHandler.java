@@ -49,7 +49,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = GameFightOptionToggleMessage.M_ID)
     public static void HandleGameFightOptionToggleMessage(WorldClient client, GameFightOptionToggleMessage Message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFighter() == null) {
             client.send(new BasicNoOperationMessage());
             return;
         }
@@ -64,7 +64,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = 718)
     public static void HandleGameFightTurnFinishMessage(WorldClient client, GameFightTurnFinishMessage Message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFighter() == null) {
             client.send(new BasicNoOperationMessage());
             return;
         }

@@ -75,19 +75,26 @@ public class EffectStatsSteal extends EffectBase {
 
             // Malus a la cible
             BuffStats buffStats = new BuffStats(malusInfos, target);
-            if (buffStats.applyEffect(damageValue, null) == -3) {
-                return -3;
+            if (!target.getBuff().buffMaxStackReached(buffStats)) {
+                if (buffStats.applyEffect(damageValue, null) == -3) {
+                    return -3;
+                }
+
+                target.getBuff().addBuff(buffStats);
             }
 
-            target.getBuff().addBuff(buffStats);
 
             // Bonus au lanceur
             buffStats = new BuffStats(bonusInfos, castInfos.caster);
-            if (buffStats.applyEffect(damageValue, null) == -3) {
-                return -3;
+            if (!castInfos.caster.getBuff().buffMaxStackReached(buffStats)) {
+                if (buffStats.applyEffect(damageValue, null) == -3) {
+                    return -3;
+                }
+
+                castInfos.caster.getBuff().addBuff(buffStats);
+
             }
 
-            castInfos.caster.getBuff().addBuff(buffStats);
         }
 
         return -1;

@@ -155,6 +155,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                     }
 
                     final String[] stats = result.getString("stats").split(",");
+                    final String[] scores = result.getString("scores").split("\\|");
                     p = Player.builder()
                             .nickName(result.getString("nickname"))
                             .breed((byte) result.getInt("breed"))
@@ -208,7 +209,7 @@ public class PlayerDAOImpl extends PlayerDAO {
                     Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
                     p.setMapid(result.getInt("map"));
                     p.setHonor(result.getInt("honor_points"), false);
-                    p.initScore(result.getString("scores"));
+                    p.initScore(scores[0]);
                     p.setActorCell(p.getCurrentMap().getCell(result.getShort("cell")));
                     p.getMountInfo().setPlayer(p);
                     for (String s : result.getString("chat_channels").split(",")) {
@@ -216,6 +217,9 @@ public class PlayerDAOImpl extends PlayerDAO {
                     }
                     if (!result.getString("entity_look").isEmpty()) {
                         p.setEntityLook(EntityLookParser.fromString(result.getString("entity_look")));
+                    }
+                    if(scores.length > 1){
+                        p.setBooleans(Enumerable.stringToShortHashMap(scores[1],5));
                     }
                     final String [] tinsel = result.getString("tinsel").split(";");
                     if (tinsel.length == 1) {
@@ -298,7 +302,7 @@ public class PlayerDAOImpl extends PlayerDAO {
             pStatement.setBytes(21, character.getMyJobs().serialize());
             pStatement.setInt(22, character.getHonor());
             pStatement.setString(23, character.getAlignmentValue() + "," + character.getPvPEnabled() + "," + character.getAlignmentSide().value + "," + character.getDishonor());
-            pStatement.setString(24, StringUtils.join(character.getScores().values(), ','));
+            pStatement.setString(24, character.getBooleans() == null ? StringUtils.join(character.getScores().values(), ',') : (StringUtils.join(character.getScores().values(), ',') + "|" +  Enumerable.join2(character.getBooleans())));
             pStatement.setString(25, Enumerable.join(character.getAdditionalStats()));
             pStatement.setString(26, character.getKolizeumRate().serialize());
             pStatement.setDouble(27, Math.round(character.getKolizeumRate().getRatingd() * 100) / 100d);

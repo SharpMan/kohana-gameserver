@@ -1,6 +1,7 @@
 package koh.game.fights.effects;
 
 import koh.game.fights.Fighter;
+import koh.game.fights.effects.buff.BuffDecrementType;
 import koh.game.fights.effects.buff.BuffStats;
 import koh.protocol.client.enums.StatsEnum;
 
@@ -19,12 +20,15 @@ public class EffectVitalityPercent extends EffectBase {
             final BuffStats buffstats = new BuffStats(subInfos, target);
 
             if (!target.getBuff().buffMaxStackReached(buffstats)) {
+                if(castInfos.spellId == 111) {//contrecoup
+                    buffstats.duration++;
+                    buffstats.decrementType = BuffDecrementType.TYPE_BEGINTURN;
+                }
                 if (buffstats.applyEffect(null, null) == -3) {
                     return -3;
                 }
                 target.getBuff().addBuff(buffstats);
-                if(castInfos.spellId == 111)//contrecoup
-                    buffstats.duration++;
+
             }
 
         }

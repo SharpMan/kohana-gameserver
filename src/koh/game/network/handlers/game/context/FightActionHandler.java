@@ -18,7 +18,7 @@ public class FightActionHandler {
 
     @HandlerAttribute(ID = GameActionFightCastOnTargetRequestMessage.M_ID)
     public static void handleGameActionFightCastOnTargetRequestMessage(WorldClient client, GameActionFightCastOnTargetRequestMessage message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT)  || client.getCharacter().getFighter() == null) {
             client.send(new BasicNoOperationMessage());
             return;
         }
@@ -45,7 +45,7 @@ public class FightActionHandler {
 
     @HandlerAttribute(ID = GameActionFightCastRequestMessage.M_ID)
     public static void handleGameActionFightCastRequestMessage(WorldClient client, GameActionFightCastRequestMessage message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFighter() == null) {
             client.send(new BasicNoOperationMessage());
             return;
         }

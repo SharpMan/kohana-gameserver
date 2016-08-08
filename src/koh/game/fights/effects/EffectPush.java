@@ -1,9 +1,5 @@
 package koh.game.fights.effects;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Random;
-
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
@@ -25,8 +21,10 @@ import koh.protocol.messages.game.actions.fight.GameActionFightSlideMessage;
 import lombok.Getter;
 import org.apache.commons.lang3.mutable.MutableInt;
 
+import java.util.Arrays;
+import java.util.Random;
+
 /**
- *
  * @author Neo-Craft
  */
 public class EffectPush extends EffectBase {
@@ -47,75 +45,59 @@ public class EffectPush extends EffectBase {
             switch (castInfos.effectType) {
                 case PUSH_X_CELL:
                 case PUSH_BACK:
-                    if(castInfos.spellId == SpellIDEnum.BOTTE){
-                        if(castInfos.targetKnownCellId == target.getCellId()){
+                    if (castInfos.spellId == SpellIDEnum.BOTTE) {
+                        if (castInfos.targetKnownCellId == target.getCellId()) {
                             continue;
                         }
                         final int ID = target.getID();
-                        if(Arrays.stream((new Zone(castInfos.effect.getZoneShape(), castInfos.effect.zoneSize(), MapPoint.fromCellId(castInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castInfos.cellId), true), castInfos.getFight().getMap()))
+                        if (Arrays.stream((new Zone(castInfos.effect.getZoneShape(), castInfos.effect.zoneSize(), MapPoint.fromCellId(castInfos.caster.getCellId()).advancedOrientationTo(MapPoint.fromCellId(castInfos.cellId), true), castInfos.getFight().getMap()))
                                 .getCells(castInfos.cellId))
                                 .map(cell -> castInfos.getFight().getCell(cell))
                                 .filter(cell -> cell != null && cell.hasGameObject(FightObjectType.OBJECT_FIGHTER, FightObjectType.OBJECT_STATIC))
                                 .map(fightCell -> fightCell.getFighter())
-                                .noneMatch(tr -> tr.getID() == ID)){
+                                .noneMatch(tr -> tr.getID() == ID)) {
                             continue;
                         }
                     }
-                    if(castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId())){
+                    if (castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId())) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
-                    }
-                    else if(castInfos.caster instanceof SummonedFighter
+                    } else if (castInfos.caster instanceof SummonedFighter
                             && castInfos.caster.asSummon().getGrade().getMonsterId() == 3289 //Tactirelle
-                            && target == castInfos.caster ){
+                            && target == castInfos.caster) {
                         continue;
-                    }
-                    else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId()) && castInfos.cellId != target.getCellId()) {
+                    } else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId()) && castInfos.cellId != target.getCellId()) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.cellId, target.getCellId());
                     } else if (Pathfunction.inLine(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId())) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
-                    }
-                    else if(target instanceof MonsterFighter && target.asMonster().getGrade().getMonster().isCanBePushed()){
+                    } else if (target instanceof MonsterFighter && target.asMonster().getGrade().getMonster().isCanBePushed()) {
                         continue;
-                    }
-                    else if(castInfos.caster instanceof SummonedFighter
-                            && castInfos.caster.asSummon().getGrade().getMonsterId() == 3289){
+                    } else if (castInfos.caster instanceof SummonedFighter
+                            && castInfos.caster.asSummon().getGrade().getMonsterId() == 3289) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.cellId, target.getCellId());
-                    }
-                    else {
+                    } else {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), castInfos.caster.getCellId(), target.getCellId());
                         //return -1;
                     }
                     break;
-                case ADVANCE_CELL:
-                    final Fighter pp = castInfos.caster;
-                    castInfos.caster = target;
-                    target = pp;
-                    castInfos.targets.remove(0);
-                    direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId());
-                    break;
                 case PULL_FORWARD:
                     direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId());
-                    if(castInfos.isTrap){
-                        if(target.getCellId() == castInfos.targetKnownCellId)
+
+                    if (castInfos.isTrap) {
+                        if (target.getCellId() == castInfos.targetKnownCellId)
                             continue;
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
-                    }
-                    else if(castInfos.isGlyph){
+                    } else if (castInfos.isGlyph) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
-                    }
-                    else if(castInfos.spellId == 5390){ //Odysee
+                    } else if (castInfos.spellId == 5390) { //Odysee
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.casterOldCell);
-                    }
-                    else if(castInfos.spellId == 5382 || castInfos.spellId == 5475 /*|| castInfos.emoteId == 5390*/){
+                    } else if (castInfos.spellId == 5382 || castInfos.spellId == 5475 /*|| castInfos.emoteId == 5390*/) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
-                    }
-                    else if(castInfos.spellId == 2801 ){
+                    } else if (castInfos.spellId == 2801) {
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.targetKnownCellId);
-                         if(/*castInfos.caster == target || */castInfos.targetKnownCellId == target.getCellId())
+                        if (/*castInfos.caster == target || */castInfos.targetKnownCellId == target.getCellId())
                             continue;
-                    }
-                    else if(castInfos.spellId == 181){
-                        if(castInfos.caster == target)
+                    } else if (castInfos.spellId == 181) {
+                        if (castInfos.caster == target)
                             continue;
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
                     }
@@ -150,9 +132,8 @@ public class EffectPush extends EffectBase {
                 if (nextCell.hasObject(FightObjectType.OBJECT_TRAP)) {
                     castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
                     return target.setCell(nextCell);
-                }
-                else if(nextCell.hasObject(FightObjectType.OBJECT_PORTAL) && nextCell.getObjects().stream().anyMatch(o -> o instanceof FightPortal && ((FightPortal)o).enabled)){
-                    if(castInfos.effect != null && nextCell != null)
+                } else if (nextCell.hasObject(FightObjectType.OBJECT_PORTAL) && nextCell.getObjects().stream().anyMatch(o -> o instanceof FightPortal && ((FightPortal) o).enabled)) {
+                    if (castInfos.effect != null && nextCell != null)
                         castInfos.getFight().observable$Stream(p -> p != null && target.isVisibleFor(p)).forEach(p -> p.send(new GameActionFightSlideMessage(castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, nextCell.Id)));
                     return target.setCell(nextCell);
                 }
@@ -174,7 +155,7 @@ public class EffectPush extends EffectBase {
                     }
                 }
 
-                if(currentCell.getId() == target.getCellId()){ //StarckOverflow's correction by pushing same cell
+                if (currentCell.getId() == target.getCellId()) { //StarckOverflow's correction by pushing same cell
                     return pushResult;
                 }
 
@@ -188,13 +169,14 @@ public class EffectPush extends EffectBase {
 
             currentCell = nextCell;
         }
-        for (Player player : castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p))) {
-            player.send(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, currentCell.Id));
-        }
 
 
-        int result = target.setCell(currentCell);
+        final int result = target.setCell(currentCell);
 
+        if (target.getCellId() == currentCell.getId())
+            for (Player player : castInfos.getFight().observable$Stream(p -> target.isVisibleFor(p))) {
+                player.send(new GameActionFightSlideMessage(castInfos.effect == null ? 5 : castInfos.effect.effectId, castInfos.caster.getID(), target.getID(), startCell, currentCell.Id));
+            }
 
         target.getBuff().getAllBuffs().filter(x -> x instanceof BuffPorteur && x.duration != 0).forEach(x -> x.target.setCell(target.getFight().getCell(startCell)));
 
@@ -202,7 +184,7 @@ public class EffectPush extends EffectBase {
     }
 
     public static int applyPushBackDamages(EffectCast castInfos, Fighter target, int Length, int currentLength) {
-        int damageCoef = 0;
+        final int damageCoef;
         if (target.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMaximiseEffects)) {
             damageCoef = 7;
         } else if (castInfos.caster.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects)) {

@@ -7,7 +7,6 @@ import koh.game.entities.Account;
 import koh.game.entities.ExpLevel;
 import koh.game.entities.actors.character.*;
 import koh.game.entities.actors.character.preset.PresetBook;
-import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.actors.character.shortcut.ShortcutBook;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.guilds.Guild;
@@ -38,7 +37,7 @@ import koh.protocol.messages.game.pvp.AlignmentRankUpdateMessage;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
 import koh.protocol.types.game.character.alignment.ActorExtendedAlignmentInformations;
-import koh.protocol.types.game.choice.CharacterBaseInformations;
+import koh.protocol.types.game.character.choice.CharacterBaseInformation;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.roleplay.*;
 import koh.protocol.types.game.look.EntityLook;
@@ -86,6 +85,7 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private ArrayList<Short> skins;
+    @Setter
     private ArrayList<Integer> indexedColors;
     @Getter
     @Setter
@@ -126,7 +126,8 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private volatile JobBook myJobs;
-    @Getter @Setter
+    @Getter
+    @Setter
     private PresetBook presets;
     @Getter
     @Setter
@@ -136,8 +137,12 @@ public class Player extends IGameActor implements Observer {
     @Setter
     @Getter
     private LinkedHashMap<ScoreType, Integer> scores;
-    @Getter @Setter
-    private Map<Integer,Integer> additionalStats;
+    @Getter
+    @Setter
+    private Map<Integer, Integer> additionalStats;
+    @Getter
+    @Setter
+    private Map<Integer, Short> booleans;
     @Setter
     @Getter
     private int chance, life, vitality, wisdom, strength, intell, agility;
@@ -189,7 +194,8 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private Glicko2Player kolizeumRate;
-    @Getter @Setter
+    @Getter
+    @Setter
     private ArrayList<Fight> fightsRegistred;
 
     private boolean wasSitted = false; //only for regen life
@@ -227,8 +233,7 @@ public class Player extends IGameActor implements Observer {
             if (this.mountInfo.isToogled) {
                 this.stats.merge(mountInfo.getStats());
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -368,6 +373,13 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
+    public short getCosmetic() {
+        if (getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER))
+            return getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook.skins.get(1);
+        return this.skins.get(1);
+    }
+
+
   /*  public synchronized void teleportPeriodicContest(int newMapID, int newCellID) {
         if (this.currentMap.getId() == newMapID) {
             this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
@@ -429,7 +441,8 @@ public class Player extends IGameActor implements Observer {
 
 
     private static final Timestamp timeStamp;
-    static{
+
+    static {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = null;
         try {
@@ -455,10 +468,10 @@ public class Player extends IGameActor implements Observer {
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
 
-                if(this.account.last_login != null && account.last_login.before(timeStamp)){
-                    client.send(new PopupWarningMessage((byte)4, "Offre Spéciale","Jusqu'au 20 Août vous pourrez vous procurer <b>1 titre + 1 ornement<b> au choix pour la faible somme de 1 euro le tout ! Alors n'hésitez pas et <a href=\"https://kohana-serveur.com/user/ornament\">cliquez <b>ici</b> sans plus attendre !!</a>"));
+                /*if (this.account.last_login != null && account.last_login.before(timeStamp)) {
+                    client.send(new PopupWarningMessage((byte) 0, "Offre Spéciale", "Jusqu'au 20 Août vous pourrez vous procurer <b>1 titre + 1 ornement<b> au choix pour la faible somme de 1 euro le tout ! Alors n'hésitez pas et <a href=\"https://kohana-serveur.com/user/ornament\">cliquez <b>ici</b> sans plus attendre !!</a>"));
                 }
-
+*/
                 PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
 
                 // client.send(new BasicNoOperationMessage());
@@ -532,9 +545,9 @@ public class Player extends IGameActor implements Observer {
                 this.myFighter.getStats().merge(this.stats);
                 this.myFighter.setLife(this.getLife());
                 client.send(this.myFighter.asPlayer().getCharacterStatsListMessagePacket());
-                CharacterHandler.sendCharacterStatsListMessage(this.client,true);
+                CharacterHandler.sendCharacterStatsListMessage(this.client, true);
             } else {
-                CharacterHandler.sendCharacterStatsListMessage(this.client,false);
+                CharacterHandler.sendCharacterStatsListMessage(this.client, false);
             }
         }
     }
@@ -733,8 +746,7 @@ public class Player extends IGameActor implements Observer {
             if (notice) {
                 this.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 75, new String[]{Integer.toString(point)}));
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -760,7 +772,7 @@ public class Player extends IGameActor implements Observer {
         }
     }
 
-    public int getKoliseoGrade(){
+    public int getKoliseoGrade() {
         for (byte n = 1; n <= 10; n++) {
             if (koliseoPoints < DAO.getExps().getLevel(n).getPvP()) {
                 return (byte) (n - 1);
@@ -785,7 +797,7 @@ public class Player extends IGameActor implements Observer {
     }
 
     public BasicGuildInformations getBasicGuildInformations() {
-        if(this.guild == null)
+        if (this.guild == null)
             return nullGuildInformations;
         return new BasicGuildInformations(guild.getEntity().guildID, guild.getEntity().name);
     }
@@ -811,8 +823,8 @@ public class Player extends IGameActor implements Observer {
                 this.PvPEnabled);
     }
 
-    public CharacterBaseInformations toBaseInformations() {
-        return new CharacterBaseInformations(ID, (byte) level, nickName, getEntityLook(), breed, sexe == 1);
+    public CharacterBaseInformation toBaseInformations() {
+        return new CharacterBaseInformation(ID, (byte) level, nickName, getEntityLook(), breed, sexe == 1);
     }
 
     public void addFollower(Player gay) {
@@ -1070,7 +1082,7 @@ public class Player extends IGameActor implements Observer {
         if (stats != null) {
             stats.totalClear();
         }
-        if(disabledChannels != null && !disabledChannels.isEmpty()){
+        if (disabledChannels != null && !disabledChannels.isEmpty()) {
             disabledChannels.clear();
             disabledChannels = null;
         }

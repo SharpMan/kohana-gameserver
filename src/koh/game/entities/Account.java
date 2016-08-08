@@ -6,9 +6,10 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import koh.inter.messages.PlayerComingMessage;
-import koh.protocol.types.game.choice.CharacterBaseInformations;
+import koh.protocol.types.game.character.choice.CharacterBaseInformation;
 import lombok.Getter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -42,8 +43,12 @@ public class Account {
     public AccountData accountData;
     public Player currentCharacter = null;
 
-    public List<CharacterBaseInformations> toBaseInformations() {
+    public List<CharacterBaseInformation> toBaseInformations() {
         return characters.stream().map(Player::toBaseInformations).collect(Collectors.toList());
+    }
+
+    public Stream<Player> getCharacters() {
+        return characters.stream();
     }
     
     public Player getPlayerInFight(){

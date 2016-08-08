@@ -209,7 +209,7 @@ public class NpcDAOImpl extends NpcDAO {
 
 
             if(new Random().nextInt(3) == 0){
-                templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
+                templates.get(1524).getItems().put(14485, NpcItem.builder()
                         .customPrice(240 + (new Random().nextInt(35)))
                         .buyCriterion(item.getBuyCriterion())
                         .maximiseStats(item.isMaximiseStats())

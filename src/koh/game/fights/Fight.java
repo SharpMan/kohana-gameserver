@@ -650,11 +650,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 fighter.getSpellsController().actualize(spellLevel, targetId);
 
                 isCc &= !fighter.getBuff().getAllBuffs().anyMatch(x -> x instanceof BuffMinimizeEffects);
-                if (isCc && !fakeLaunch && fighter.getStats().getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0) { //Turquoise
+                if (isCc && !fakeLaunch && fighter.getStats().getTotal(CAST_SPELL_ON_CRITICAL_HIT) > 0 && fighter.isPlayer()) { //Turquoise
                     fighter.getPlayer().getInventoryCache().getEffects(CAST_SPELL_ON_CRITICAL_HIT.value())
                             //filter turquoise
                             .forEach(list -> {
-                        list.forEach(effect -> {
+                        list.filter(e -> e.diceNum == 5952)
+                                .forEach(effect -> {
                             launchSpell(fighter, DAO.getSpells().findSpell(effect.diceNum).getSpellLevel(effect.diceSide), fighter.getCellId(), true, true, true, -1);
                         });
                     });

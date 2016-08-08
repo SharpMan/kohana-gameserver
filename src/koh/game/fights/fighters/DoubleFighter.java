@@ -6,12 +6,14 @@ import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.FightState;
 import koh.game.fights.IFightObject;
+import koh.game.fights.types.AgressionFight;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.context.GameContextActorInformations;
 import koh.protocol.types.game.context.fight.*;
 import koh.protocol.types.game.look.EntityLook;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.List;
 
@@ -76,6 +78,50 @@ public class DoubleFighter extends VirtualFighter {
     @Override
     public void send(Message Packet) {
 
+    }
+
+    @Override
+    public void calculReduceDamages(StatsEnum effect, MutableInt damages, boolean cc) {
+        switch (effect) {
+            case DAMAGE_NEUTRAL:
+            case STEAL_NEUTRAL:
+            case LIFE_LEFT_TO_THE_ATTACKER_NEUTRAL_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_EARTH:
+            case STEAL_EARTH:
+            case LIFE_LEFT_TO_THE_ATTACKER_EARTH_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_FIRE:
+            case STEAL_FIRE:
+            case LIFE_LEFT_TO_THE_ATTACKER_FIRE_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_AIR:
+            case STEAL_AIR:
+            case LIFE_LEFT_TO_THE_ATTACKER_AIR_DAMAGES:
+            case PA_USED_LOST_X_PDV:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+
+            case DAMAGE_WATER:
+            case STEAL_WATER:
+            case LIFE_LEFT_TO_THE_ATTACKER_WATER_DAMAGES:
+                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                        - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
+                break;
+        }
+        if (cc) {
+            damages.subtract(this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION));
+        }
     }
 
     @Override

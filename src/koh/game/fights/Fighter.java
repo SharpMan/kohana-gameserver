@@ -120,7 +120,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return mapPointCache;
     }
 
-    public int setCell(FightCell cell) {
+    public int  setCell(FightCell cell) {
         return this.setCell(cell, true);
     }
 
@@ -129,6 +129,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return this.team.getAliveFighters()
                 .filter(fighter -> fighter.getSummonerID() == this.getID());
     }
+
+
 
     public int setCell(FightCell cell, boolean runEvent) {
         int addResult;
@@ -171,13 +173,31 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                             return addResult;
                         }
                     }
+                    if(myCell != cell){
+                        if (this.myCell != null) {
+                            this.mapPointCache.set_cellId(myCell.Id);
+                            addResult = this.myCell.addObject(this, runEvent);
+
+                            if (addResult == -3 || addResult == -2) {
+                                return addResult;
+                            }
+                        }
+
+                        if (runEvent) {
+                            final int result = onCellChanged();
+                            if (result != -1) {
+                                return result;
+                            }
+                        }
+                        return this.tryDie(this.ID);
+                    }
                 }
             }
 
         }
 
 
-        this.myCell = cell;
+       this.myCell = cell;
 
         if (this.myCell != null) {
             this.mapPointCache.set_cellId(myCell.Id);
@@ -754,7 +774,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
         for (CopyOnWriteArrayList<FightActivableObject> objs : fight.getActivableObjects().values()) {
             for (FightActivableObject Object : objs) {
-                if (Object instanceof FightPortal && ((FightPortal) Object).enabled) {
+                if (Object instanceof FightPortal && Object.caster.getTeam() == this.getTeam() && ((FightPortal) Object).enabled) {
                     _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
                     if (Object.getCellId() == param1) {
                         _loc3_ = true;
@@ -789,7 +809,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
         double bonus = getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.zoneSize() != -100000 ? effect.zoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
-        //bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
+       // bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
 
         jet.setValue((jet.floatValue() * bonus));
     }
@@ -856,21 +876,21 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:
             case LIFE_LEFT_TO_THE_ATTACKER_NEUTRAL_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                damages.setValue(damages.intValue() * (100 - (this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_RESIST_PERCENT) : 0))) / 100
                         - this.stats.getTotal(StatsEnum.NEUTRAL_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_NEUTRAL_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_EARTH:
             case STEAL_EARTH:
             case LIFE_LEFT_TO_THE_ATTACKER_EARTH_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                damages.setValue(damages.intValue() * (100 - (this.stats.getTotal(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_RESIST_PERCENT) : 0))) / 100
                         - this.stats.getTotal(StatsEnum.EARTH_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_EARTH_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_FIRE:
             case STEAL_FIRE:
             case LIFE_LEFT_TO_THE_ATTACKER_FIRE_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                damages.setValue(damages.intValue() * (100 - (this.stats.getTotal(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_RESIST_PERCENT) : 0))) / 100
                         - this.stats.getTotal(StatsEnum.FIRE_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_FIRE_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
@@ -878,14 +898,14 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             case STEAL_AIR:
             case LIFE_LEFT_TO_THE_ATTACKER_AIR_DAMAGES:
             case PA_USED_LOST_X_PDV:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                damages.setValue(damages.intValue() * (100 - (this.stats.getTotal(StatsEnum.AIR_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_RESIST_PERCENT) : 0))) / 100
                         - this.stats.getTotal(StatsEnum.AIR_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_AIR_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
 
             case DAMAGE_WATER:
             case STEAL_WATER:
             case LIFE_LEFT_TO_THE_ATTACKER_WATER_DAMAGES:
-                damages.setValue(damages.intValue() * (100 - Math.min((this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0)), 50)) / 100
+                damages.setValue(damages.intValue() * (100 - (this.stats.getTotal(StatsEnum.WATER_ELEMENT_RESIST_PERCENT) + (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_RESIST_PERCENT) : 0))) / 100
                         - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
         }

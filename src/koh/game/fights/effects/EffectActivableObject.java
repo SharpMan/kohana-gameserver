@@ -50,7 +50,9 @@ public class EffectActivableObject extends EffectBase {
                         .stream()
                         .filter(ob -> ob instanceof FightPortal)
                         .count() > 3L) {
-                    castInfos.caster.getFight().getActivableObjects().get(castInfos.caster).stream().findFirst().get().remove();
+                    castInfos.caster.getFight().getActivableObjects().get(castInfos.caster).stream()
+                            .filter(objj -> objj instanceof FightPortal)
+                            .findFirst().get().remove();
                 }
                 /*if (!castInfos.caster.getFight().canPutObject(castInfos.getCellId)) {
                  return -1;

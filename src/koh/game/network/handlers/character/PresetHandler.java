@@ -48,7 +48,11 @@ public class PresetHandler {
                         partial = true;
                     }
                     else if(item.isEquiped()){
-                        continue;
+                        if(item.getPosition() != object.position){
+                            client.getCharacter().getInventoryCache().unEquipItem(item);
+                        }
+                        else
+                            continue;
                     }
                     else if(item.isWeapon()){
                         weapon = item;

@@ -1,6 +1,7 @@
 package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
+import com.singularsys.jep.functions.Add;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.ItemTemplateDAO;
 import koh.game.entities.item.*;
@@ -50,6 +51,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             put(21, AddEnergy.class);
             put(22, AddExperience.class);
             put(23, OpenUI.class);
+            put(24, AddBoolean.class);
             put(228, SpellAnimation.class);
         }
     };

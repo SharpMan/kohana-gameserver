@@ -179,7 +179,7 @@ public class ContextHandler {
             return;
         }
 
-        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFighter() != null) {
             final Fighter mover = client.getCharacter().getFight().getCurrentFighter() instanceof SlaveFighter
                     && client.getCharacter().getFight().getCurrentFighter().getSummoner() == client.getCharacter().getFighter() ?
                     client.getCharacter().getFight().getCurrentFighter() : client.getCharacter().getFighter();

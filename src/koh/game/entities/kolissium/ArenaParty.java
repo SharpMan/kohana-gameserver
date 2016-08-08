@@ -11,8 +11,8 @@ import koh.protocol.messages.game.character.status.PlayerStatus;
 import koh.protocol.messages.game.chat.ChatServerMessage;
 import koh.protocol.messages.game.context.roleplay.fight.arena.GameRolePlayArenaFightPropositionMessage;
 import koh.protocol.types.game.context.roleplay.party.PartyCompanionMemberInformations;
-import koh.protocol.types.game.context.roleplay.party.PartyMemberArenaInformations;
-import koh.protocol.types.game.context.roleplay.party.PartyMemberInformations;
+import koh.protocol.types.game.context.roleplay.party.PartyMemberArenaInformation;
+import koh.protocol.types.game.context.roleplay.party.PartyMemberInformation;
 
 import java.time.Instant;
 import java.util.List;
@@ -77,13 +77,13 @@ public class ArenaParty extends Party {
 
 
     @Override
-    public PartyMemberInformations toMemberInformations(Player pl) {
-        return new PartyMemberArenaInformations(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0], pl.getKolizeumRate().getScreenRating());
+    public PartyMemberInformation toMemberInformations(Player pl) {
+        return new PartyMemberArenaInformation(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0], pl.getKolizeumRate().getScreenRating());
     }
 
     @Override
-    public PartyMemberInformations[] toMemberInformations() {
-        return this.players.stream().map(pl -> new PartyMemberArenaInformations(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0], pl.getKolizeumRate().getScreenRating())).toArray(PartyMemberInformations[]::new);
+    public PartyMemberInformation[] toMemberInformations() {
+        return this.players.stream().map(pl -> new PartyMemberArenaInformation(pl.getID(), (byte) pl.getLevel(), pl.getNickName(), pl.getEntityLook(), pl.getBreed(), pl.hasSexe(), pl.getLife(), pl.getMaxLife(), pl.getProspection(), pl.getRegenRate(), pl.getInitiative(false), pl.getAlignmentSide().value, pl.getCurrentMap().getPosition().getPosX(), pl.getCurrentMap().getPosition().getPosY(), pl.getCurrentMap().getId(), pl.getCurrentMap().getSubAreaId(), new PlayerStatus(pl.getStatus().value()), new PartyCompanionMemberInformations[0], pl.getKolizeumRate().getScreenRating())).toArray(PartyMemberInformation[]::new);
     }
 
     public synchronized void setInKolizeum(boolean is) {
