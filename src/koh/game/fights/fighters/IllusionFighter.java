@@ -36,7 +36,7 @@ public class IllusionFighter extends StaticFighter {
         if(myCell == null){
             return -1;
         }
-        if (Arrays.stream(new Exception().getStackTrace()).anyMatch(Method -> Method.getMethodName().equalsIgnoreCase("joinFightTeam"))) { //Il viens de rejoindre la team rofl on le tue pas
+        if (Arrays.stream(new Exception().getStackTrace()).anyMatch(method -> method.getMethodName().equalsIgnoreCase("joinFightTeam") || method.getMethodName().equalsIgnoreCase("setCell"))) { //Il viens de rejoindre la team rofl on le tue pas
             return -1;
         }
         this.setLife(0);

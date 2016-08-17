@@ -26,6 +26,8 @@ public abstract class PlayerDAO implements Service {
 
     public abstract Player getCharacter(String characterName);
 
+    public abstract boolean updateName(Player character);
+
     public abstract boolean remove(int id);
 
     public abstract boolean update(Player character, boolean clear);

@@ -11,13 +11,16 @@ import koh.game.entities.environments.DofusMap;
 import koh.game.entities.environments.SubArea;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.utils.sql.ConnectionResult;
+import koh.game.utils.sql.ConnectionStatement;
 import koh.protocol.types.game.context.EntityDispositionInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayGroupMonsterInformations;
 import koh.protocol.types.game.context.roleplay.GroupMonsterStaticInformations;
 import koh.protocol.types.game.context.roleplay.MonsterInGroupInformations;
 import koh.protocol.types.game.context.roleplay.MonsterInGroupLightInformations;
+import koh.utils.Enumerable;
 import lombok.extern.log4j.Log4j2;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Arrays;
 
@@ -45,7 +48,7 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                     .forEach(sub -> {
                         Arrays.stream(sub.getMapIds())
                                 .mapToObj(id -> mapDAO.findTemplate(id))
-                                .filter(map -> map != null && !(map.getPosition() != null && map.getPosition().getWorldMap() == -1)) // On ne spawn pas dans les maisons
+                                .filter(map -> map != null && map.getFightActions() == null && !(map.getPosition() != null && map.getPosition().getWorldMap() == -1)) // On ne spawn pas dans les maisons
                                 .forEach(map -> {
                                     final int monsterRemaining = MONSTER_GROUP_PER_MAP - map.getMonsters().size();
                                     if (monsterRemaining > 0) {
@@ -93,6 +96,53 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
         return gr;
     }
 
+    @Override
+    public void insert(int map, short cell,byte direction, String param1, String param2) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `map_monsters_fix` VALUES (?,?,?,?,?,?,?,?,?,?,?);")) {
+
+                PreparedStatement pStatement = conn.getStatement();
+
+                pStatement.setInt(1, map);
+                pStatement.setInt(2, cell);
+                pStatement.setByte(3, direction);
+                pStatement.setInt(4, 0); //10
+                pStatement.setByte(5, (byte) -1);
+                pStatement.setByte(6, (byte)-1);
+                pStatement.setInt(7, 0);
+                pStatement.setInt(8, 0);
+                pStatement.setInt(9, 0);
+                pStatement.setString(10, param1);
+                pStatement.setString(11, param2);
+                pStatement.execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void remove(int map, short cell) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("DELETE from `map_monsters_fix` WHERE `map` = ? AND `cell` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1,map);
+                pStatement.setShort(2,cell);
+                pStatement.execute();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error(e);
+                log.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e);
+            log.warn(e.getMessage());
+        }
+    }
+
+
     public final int loadAll() {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from map_monsters_fix")) {
@@ -130,8 +180,9 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                 ++i;
             }
         } catch (Exception e) {
-            log.error(e);
-            log.warn(e.getMessage());
+            log.error("Error at row  @{}",i);
+            e.printStackTrace();
+
         }
         return i;
     }

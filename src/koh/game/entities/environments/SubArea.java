@@ -39,7 +39,7 @@ public class SubArea {
     public void removeArchiMonster() {
         Arrays.stream(monsters)
                 .mapToObj(id -> DAO.getMonsters().find(id))
-                .filter(mob -> mob.isMiniBoss())
+                .filter(mob -> mob.isMiniBoss() || mob.isQuestMonster())
                 .forEach(mob -> this.monsters = ArrayUtils.removeElement(this.monsters, mob.getId()));
     }
 }

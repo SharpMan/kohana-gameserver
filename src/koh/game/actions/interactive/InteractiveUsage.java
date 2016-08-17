@@ -66,7 +66,7 @@ public class InteractiveUsage implements InteractiveAction {
                 //}
                 break;
             default:
-                PlayerController.sendServerMessage(actor.getClient(), "Door not parametered ...");
+                PlayerController.sendServerMessage(actor.getClient(), "Door not parametered ... "+element);
                 return;
         }
 

@@ -6,6 +6,7 @@ import koh.game.entities.spells.SpellLevel;
 import koh.protocol.client.enums.StatsEnum;
 import koh.utils.Enumerable;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.ResultSet;
@@ -27,8 +28,10 @@ public class MonsterGrade {
     private byte grade;
     @Getter
     private int monsterId, level, lifePoints, actionPoints, movementPoints, paDodge, pmDodge;
+    @Getter @Setter
+    private int strenght, chance, intelligence, agility;
     @Getter
-    private int wisdom, tackleEvade, tackleBlock, strenght, chance, intelligence, agility, earthResistance, airResistance, fireResistance, waterResistance, neutralResistance;
+    private int wisdom, tackleEvade, tackleBlock, earthResistance, airResistance, fireResistance, waterResistance, neutralResistance;
     @Getter
     private int gradeXp, damageReflect, hiddenLevel;
     private GenericStats myStats;

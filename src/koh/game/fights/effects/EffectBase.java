@@ -182,6 +182,9 @@ public abstract class EffectBase {
             
             //Corruption
             this.put(StatsEnum.SKIP_TURN, new EffectEndTurn());
+
+            //Zombie
+            this.put(StatsEnum.RESTITUE_TARGET_WITH_PDV_PERCENT, new EffectRestitue());
             
             //Caracteristiques Ajout/Reduction
             this.put(StatsEnum.STRENGTH, new EffectStats());

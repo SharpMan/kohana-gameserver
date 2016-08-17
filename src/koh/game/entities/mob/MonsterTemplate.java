@@ -50,6 +50,7 @@ public class MonsterTemplate {
 
     public MonsterTemplate(ResultSet result) throws SQLException {
         Id = result.getInt("id");
+        nameId = result.getString("name");
         gfxId = result.getInt("gfx_id");
         race = result.getInt("race");
         look = result.getString("look");

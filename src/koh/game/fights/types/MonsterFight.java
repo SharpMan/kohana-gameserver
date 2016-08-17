@@ -19,6 +19,7 @@ import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.fight.*;
 import koh.protocol.types.game.context.fight.FightLoot;
 import koh.protocol.types.game.context.fight.FightResultExperienceData;
+import koh.protocol.types.game.context.fight.FightResultFighterListEntry;
 import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
 import lombok.Getter;
 
@@ -144,7 +145,8 @@ public class MonsterFight extends Fight {
                 fighter.getPlayer().addKamas(kamasWin);
 
             } else {
-                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
+                this.myResult.results.add(new FightResultFighterListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive()));
+                //this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
             }
         }
 
@@ -173,7 +175,8 @@ public class MonsterFight extends Fight {
                     }
                 }}));
             } else {
-                this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[0]));
+
+                this.myResult.results.add(new FightResultFighterListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive()));
             }
         }
 

@@ -1,16 +1,7 @@
 package koh.game.fights.effects;
 
 import koh.game.entities.environments.Pathfunction;
-import koh.game.entities.environments.cells.Zone;
-import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.fights.Fighter;
-import koh.game.fights.IFightObject;
-import koh.game.fights.fighters.MonsterFighter;
-import koh.game.fights.fighters.SummonedFighter;
-import koh.protocol.client.enums.FightStateEnum;
-import koh.protocol.client.enums.SpellIDEnum;
-
-import java.util.Arrays;
 
 /**
  * Created by Melancholia on 8/6/16.
@@ -27,11 +18,16 @@ public class EffectAdvance extends EffectBase {
                         && !tarrget.getStates().hasState(FightStateEnum.INDÉPLAÇABLE))*/
                 .toArray(Fighter[]::new)) {
 
-                    final Fighter pp = castInfos.caster;
-                    castInfos.caster = target;
-                    target = pp;
-                    castInfos.targets.remove(0);
-                    direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId());
+            final Fighter pp = castInfos.caster;
+            castInfos.caster = target;
+            target = pp;
+            castInfos.targets.remove(0);
+            if ((castInfos.effect.diceNum == 3356 && !Pathfunction.inLine(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId()))
+                    || Pathfunction.goalDistance(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId()) == 1) {
+                continue;
+            }
+
+            direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.caster.getCellId());
 
 
             if (EffectPush.applyPush(castInfos, target, direction, castInfos.randomJet(target)) == -3) {

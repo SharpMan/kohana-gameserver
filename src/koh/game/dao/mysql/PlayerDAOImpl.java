@@ -206,7 +206,12 @@ public class PlayerDAOImpl extends PlayerDAO {
                             .fighterLook(new Object())
                             .additionalStats(Enumerable.stringToIntHashMap(result.getString("additional_stat"),6))
                             .build();
-                    Arrays.stream(result.getString("colors").split(",")).forEach(c -> p.getIndexedColors().add(Integer.parseInt(c)));
+                    Arrays.stream(result.getString("colors").split(",")).forEach(c ->
+                            {
+                                if(!c.isEmpty())
+                                    p.getIndexedColors().add(Integer.parseInt(c));
+                            }
+                    );
                     p.setMapid(result.getInt("map"));
                     p.setHonor(result.getInt("honor_points"), false);
                     p.initScore(scores[0]);
@@ -247,6 +252,22 @@ public class PlayerDAOImpl extends PlayerDAO {
         }
     }
 
+
+    @Override
+    public boolean updateName(Player character){
+        try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `character` set nickname = ? WHERE id = ?;")) {
+            PreparedStatement pStatement = conn.getStatement();
+            pStatement.setString(1, character.getNickName());
+            pStatement.setInt(2, character.getID());
+            pStatement.executeUpdate();
+
+        } catch (Exception e) {
+            logger.error(e);
+            logger.warn(e.getMessage());
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public boolean remove(int id){

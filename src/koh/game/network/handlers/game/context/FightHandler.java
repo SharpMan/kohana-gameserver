@@ -82,8 +82,8 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = GameFightTurnReadyMessage.M_ID)
-    public static void HandleGameFightTurnReadyMessage(WorldClient client, GameFightTurnReadyMessage Message) {
-        if (client.getCharacter() == null || !client.isGameAction(GameActionTypeEnum.FIGHT)) {
+    public static void HandleGameFightTurnReadyMessage(WorldClient client, GameFightTurnReadyMessage message) {
+        if (client.getCharacter().getFighter() == null || !client.isGameAction(GameActionTypeEnum.FIGHT)) {
             client.send(new BasicNoOperationMessage());
             return;
         }
@@ -102,7 +102,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = 255)
     public static void HandleGameContextQuitMessage(WorldClient client, GameContextQuitMessage Message) {
-        if (client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFight() != null) {
             if(client.getCharacter().getFighter() != null)
                 client.getCharacter().getFight().leaveFight(client.getCharacter().getFighter());
             else
@@ -114,7 +114,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = 708)
     public static void handleGameFightReadyMessage(WorldClient client, GameFightReadyMessage message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT)) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFight() == null) {
             client.send(new BasicNoOperationMessage());
             return;
         }
@@ -133,7 +133,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsRequestMessage.M_ID)
     public static void HandleGameFightPlacementSwapPositionsRequestMessage(WorldClient client, GameFightPlacementSwapPositionsRequestMessage message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || client.getCharacter().getFighter().getID() == message.requestedId) {
+        if (client.getCharacter().getFighter() == null || client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || client.getCharacter().getFighter().getID() == message.requestedId) {
             client.send(new BasicNoOperationMessage());
             return;
         }
@@ -158,7 +158,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsCancelMessage.M_ID)
     public static void HandleGameFightPlacementSwapPositionsCancelMessage(WorldClient client, GameFightPlacementSwapPositionsCancelMessage message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || client.getCharacter().getFighter().getTeam().getRequest(message.requestId) == null) {
+        if (client.getCharacter().getFighter() == null || client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || client.getCharacter().getFighter().getTeam().getRequest(message.requestId) == null) {
             client.send(new BasicNoOperationMessage());
             return;
         }
@@ -172,7 +172,7 @@ public class FightHandler {
 
     @HandlerAttribute(ID = GameFightPlacementSwapPositionsAcceptMessage.M_ID)
     public static void HandleGameFightPlacementSwapPositionsAcceptMessage(WorldClient client, GameFightPlacementSwapPositionsAcceptMessage message) {
-        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || client.getCharacter().getFighter().getTeam().getRequest(message.requestId) == null) {
+        if (client.getCharacter().getFighter() == null || client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || client.getCharacter().getFighter().getTeam().getRequest(message.requestId) == null) {
             client.send(new BasicNoOperationMessage());
             return;
         }
@@ -187,24 +187,24 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = 6081)
-    public static void HandleGameContextKickMessage(WorldClient Client, GameContextKickMessage Message) {
-        if (Client.isGameAction(GameActionTypeEnum.FIGHT)) {
-            if (Client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
-                Client.send(new BasicNoOperationMessage());
-            } else if (Client.getCharacter().getFighter().getTeam().leader != Client.getCharacter().getFighter()) {
-                Client.send(new BasicNoOperationMessage());
+    public static void HandleGameContextKickMessage(WorldClient client, GameContextKickMessage Message) {
+        if (client.isGameAction(GameActionTypeEnum.FIGHT) && client.getCharacter().getFighter() != null ) {
+            if (client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE) {
+                client.send(new BasicNoOperationMessage());
+            } else if (client.getCharacter().getFighter().getTeam().leader != client.getCharacter().getFighter()) {
+                client.send(new BasicNoOperationMessage());
             } else {
-                final Fighter Fighter = Client.getCharacter().getFight().getFighter(Message.targetId);
+                final Fighter Fighter = client.getCharacter().getFight().getFighter(Message.targetId);
 
-                if (Fighter == null || Fighter == Client.getCharacter().getFighter()) {
-                    Client.send(new BasicNoOperationMessage());
-                } else if (Fighter.getTeam().id != Client.getCharacter().getFighter().getTeam().id) {
-                    Client.send(new BasicNoOperationMessage());
+                if (Fighter == null || Fighter == client.getCharacter().getFighter()) {
+                    client.send(new BasicNoOperationMessage());
+                } else if (Fighter.getTeam().id != client.getCharacter().getFighter().getTeam().id) {
+                    client.send(new BasicNoOperationMessage());
                 } else {
-                    if(!Client.canParsePacket(Message.getClass().getName(), 1000)){
+                    if(!client.canParsePacket(Message.getClass().getName(), 1000)){
                         return;
                     }
-                    Client.getCharacter().getFight().leaveFight(Fighter);
+                    client.getCharacter().getFight().leaveFight(Fighter);
                 }
             }
         }
@@ -248,12 +248,12 @@ public class FightHandler {
     }
 
     @HandlerAttribute(ID = GameFightPlacementPositionRequestMessage.M_ID)
-    public static void HandleGameFightPlacementPositionRequestMessage(WorldClient Client, GameFightPlacementPositionRequestMessage Message) {
-        if (!Client.isGameAction(GameActionTypeEnum.FIGHT) || Client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || Client.getCharacter().getFighter().getCellId() == Message.cellId) {
-            Client.send(new BasicNoOperationMessage());
+    public static void HandleGameFightPlacementPositionRequestMessage(WorldClient client, GameFightPlacementPositionRequestMessage Message) {
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFight() == null || client.getCharacter().getFight().getFightState() != FightState.STATE_PLACE || client.getCharacter().getFighter().getCellId() == Message.cellId) {
+            client.send(new BasicNoOperationMessage());
             return;
         }
-        Client.getCharacter().getFight().setFighterPlace(Client.getCharacter().getFighter(), (short) Message.cellId);
+        client.getCharacter().getFight().setFighterPlace(client.getCharacter().getFighter(), (short) Message.cellId);
     }
 
     @HandlerAttribute(ID = 5732)
@@ -262,20 +262,20 @@ public class FightHandler {
             Client.send(new BasicNoOperationMessage());
             return;
         }
-        ChallengeFightRequest InvitationRequest = (ChallengeFightRequest) Client.getBaseRequest();
+        final ChallengeFightRequest invitationRequest = (ChallengeFightRequest) Client.getBaseRequest();
         if (Message.accept) {
-            InvitationRequest.accept();
-        } else if (Client == InvitationRequest.requested) {
-            InvitationRequest.declin();
+            invitationRequest.accept();
+        } else if (Client == invitationRequest.requested) {
+            invitationRequest.declin();
         } else {
-            InvitationRequest.Cancel();
+            invitationRequest.Cancel();
         }
 
     }
 
     @HandlerAttribute(ID = GameRolePlayPlayerFightRequestMessage.M_ID)
     public static void HandleGameRolePlayPlayerFightRequestMessage(WorldClient client, GameRolePlayPlayerFightRequestMessage Message) {
-        Player target = client.getCharacter().getCurrentMap().getPlayer(Message.targetId);
+        final Player target = client.getCharacter().getCurrentMap().getPlayer(Message.targetId);
         if (target == null || target.getClient() == null) {
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
         } else if (target == client.getCharacter()) {

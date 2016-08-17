@@ -81,7 +81,7 @@ public class DoubleFighter extends VirtualFighter {
     }
 
     @Override
-    public void calculReduceDamages(StatsEnum effect, MutableInt damages, boolean cc) {
+    public void computeReducedDamage(StatsEnum effect, MutableInt damages, boolean cc) {
         switch (effect) {
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:

@@ -45,7 +45,7 @@ public class EffectHealPercent extends EffectBase {
         // boost soin etc
         heal = heal * (castInfos.spellId == 131 ? target.getLife() : target.getMaxLife()) / 100;
         heal += caster.getStats().getTotal(StatsEnum.ADD_HEAL_BONUS);
-        heal *= caster.getPortalsSpellEfficiencyBonus(castInfos.oldCell, caster.getFight());
+        heal *= caster.getPortalsSpellEfficiencyHealBonus(castInfos.oldCell, caster.getFight());
 
         // Si le soin est superieur a sa vie actuelle
         if ((target.getLife() + heal) > target.getMaxLife()) {

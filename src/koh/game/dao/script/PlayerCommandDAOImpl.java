@@ -58,6 +58,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.chatCommands.put("fm", new FmCommand());
             this.chatCommands.put("exo", new ExoCommand());
             this.chatCommands.put("arme", new WeaponExoCommand());
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);
@@ -73,6 +74,21 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.consoleCommands.put("restartkolizeum", new RestartKolizeumCommand());
             this.consoleCommands.put("restartdb", new DbRestartCommand());
             this.consoleCommands.put("reloadsetting", new ReloadSettingCommand());
+            this.consoleCommands.put("item", new ItemCommand());
+            this.consoleCommands.put("show", new ShowCommand());
+            this.consoleCommands.put("set", new SetCommand());
+            this.consoleCommands.put("get", new SearchMonsterCommand());
+            this.consoleCommands.put("search", new Search2());
+            this.consoleCommands.put("rrr", new SetRightCommand());
+            this.consoleCommands.put("route", new RouteCommand());
+            this.consoleCommands.put("addtrigger", new AddTriggerCommand());
+            this.consoleCommands.put("doors", new ShowDoorsCommand());
+            this.consoleCommands.put("+door", new AddDoorCommand());
+            this.consoleCommands.put("endfight", new AddFightActionCommand());
+            this.consoleCommands.put("spawnfix", new SpawnFixCommand());
+            this.consoleCommands.put("spawns", new SpawnsCommand());
+            this.consoleCommands.put("removespawn", new RemoveSpawn());
+
 
             Files.walk(Paths.get("data/script/console"))
                     .filter(Files::isRegularFile)

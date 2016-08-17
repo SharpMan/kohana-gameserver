@@ -294,23 +294,25 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 this.fight.getActivableObjects().get(this).stream().forEach(y -> y.remove());
             }
 
-            for (final Fighter fighter : aliveFighters) {
+            /*for (final Fighter fighter : aliveFighters) {
+                System.out.println(fighter);
                 fighter.getBuff().getBuffsDec().values().forEach(list -> {
                     for (BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator) {
+                        System.out.println(buff.caster +" "+this +" "+buff.caster.getID());
                         if (buff.caster == this)
                             fighter.getBuff().debuff(buff);
                     }
                 });
-            }
+            }*/
 
-            /*for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
+            for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
                 fr.getBuff().getBuffsDec().values().forEach(list -> {
-                    for(BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator){
+                    for(BuffEffect buff : (Iterable<BuffEffect>) list./*parallelS*/stream()::iterator){
                         if(buff.caster == this)
                             fr.getBuff().debuff(buff);
                     }
                 });
-            }*/
+            }
 
             myCell.removeObject(this);
 
@@ -762,7 +764,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public static final byte EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY = 4;
 
-    public double getPortalsSpellEfficiencyBonus(short param1, Fight fight) {
+    public double getPortalsSpellEfficiencyHealBonus(short param1, Fight fight) {
         boolean _loc3_ = false;
         FightPortal[] _loc8_ = new FightPortal[0];
         int _loc9_ = 0;
@@ -775,6 +777,57 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         for (CopyOnWriteArrayList<FightActivableObject> objs : fight.getActivableObjects().values()) {
             for (FightActivableObject Object : objs) {
                 if (Object instanceof FightPortal && Object.caster.getTeam() == this.getTeam() && ((FightPortal) Object).enabled) {
+                    _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
+                    if (Object.getCellId() == param1) {
+                        _loc3_ = true;
+                    }
+                }
+            }
+        }
+
+        if (!_loc3_) {
+            return _loc2_;
+        }
+        final int[] _loc6_ = LinkedCellsManager.getLinks(MapPoint.fromCellId(param1), Arrays.stream(_loc8_).map(x -> x.getMapPoint()).toArray(MapPoint[]::new));
+        int _loc7_ = _loc6_.length;
+        if (_loc7_ > 1) {
+            while (_loc9_ < _loc7_) {
+                _loc10_ = _loc8_[_loc9_];
+                _loc12_ = (int) Math.max(_loc12_, (_loc10_.damageValue - 50) * 0.95f);
+                if (_loc11_ != null) {
+                    _loc13_ = _loc13_ + MapPoint.fromCellId(_loc10_.getCellId()).distanceToCell(MapPoint.fromCellId(_loc11_.getCellId()));
+                }
+                _loc11_ = _loc10_;
+                _loc9_++;
+            }
+            _loc2_ = 1 + (_loc12_ + _loc8_.length * _loc13_) / 100;
+        }
+        return _loc2_;
+    }
+
+    public double getPortalsSpellEfficiencyBonus(short param1, Fight fight) {
+        boolean _loc3_ = false;
+        FightPortal[] _loc8_ = new FightPortal[0];
+        int _loc9_ = 0;
+        FightPortal _loc10_ = null;
+        FightPortal _loc11_ = null;
+        int _loc12_ = 0;
+        double _loc13_ = 0;
+        double _loc2_ = 1;
+
+        final IFightObject object = this.fight.getCell(param1).getObjects()
+                .stream()
+                .filter(p -> p instanceof FightPortal)
+                .findFirst()
+                .orElse(null);
+
+
+        for (CopyOnWriteArrayList<FightActivableObject> objs : fight.getActivableObjects().values()) {
+            for (FightActivableObject Object : objs) {
+                if (Object instanceof FightPortal /*&& Object.caster.getTeam() == this.getTeam()*/ && ((FightPortal) Object).enabled) {
+                    if(object != null && ((FightPortal) Object).caster.getTeam() != ((FightPortal) Object).caster.getTeam()){
+                        continue;
+                    }
                     _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
                     if (Object.getCellId() == param1) {
                         _loc3_ = true;
@@ -871,7 +924,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return Math.max(0, DAMAGE_NOT_BOOSTED - 0.01 * Math.min(param1, param5) * param4);
     }
 
-    public void calculReduceDamages(StatsEnum effect, MutableInt damages, boolean cc) {
+    public void computeReducedDamage(StatsEnum effect, MutableInt damages, boolean cc) {
         switch (effect) {
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:

@@ -5,6 +5,7 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.MonsterGroup;
+import koh.game.entities.environments.DofusMap;
 import koh.game.fights.Fight;
 import koh.game.fights.Fighter;
 import koh.game.fights.types.MonsterFight;
@@ -220,13 +221,33 @@ public class RolePlayHandler {
         }
 
         if (client.getCharacter().getCurrentMap().getTopNeighbourId() == Message.mapId) {
-            client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[0].getMapid() : Message.mapId, client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[0].getCellid() : (client.getCharacter().getCell().getId() + 532));
+            if(client.getCharacter().getCurrentMap().getNewNeighbour()[0] != null){
+                client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour()[0].getMapid(), client.getCharacter().getCurrentMap().getNewNeighbour()[0].getCellid());
+            }
+            else
+                client.getCharacter().teleport(Message.mapId,(client.getCharacter().getCell().getId() + 532));
+
         } else if (client.getCharacter().getCurrentMap().getBottomNeighbourId() == Message.mapId) {
-            client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[1].getMapid() : Message.mapId, client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[1].getCellid() : (client.getCharacter().getCell().getId() - 532));
+            if(client.getCharacter().getCurrentMap().getNewNeighbour()[1] != null){
+                client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour()[1].getMapid(), client.getCharacter().getCurrentMap().getNewNeighbour()[1].getCellid());
+            }
+            else
+                client.getCharacter().teleport(Message.mapId,(client.getCharacter().getCell().getId() - 532));
+
         } else if (client.getCharacter().getCurrentMap().getLeftNeighbourId() == Message.mapId) {
-            client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[2].getMapid() : Message.mapId, client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[2].getCellid() : (client.getCharacter().getCell().getId() + 13));
+            if(client.getCharacter().getCurrentMap().getNewNeighbour()[2] != null){
+                client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour()[2].getMapid(), client.getCharacter().getCurrentMap().getNewNeighbour()[2].getCellid());
+            }
+            else
+                client.getCharacter().teleport(Message.mapId,(client.getCharacter().getCell().getId() + 13));
         } else if (client.getCharacter().getCurrentMap().getRightNeighbourId() == Message.mapId) {
-            client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[3].getMapid() : Message.mapId, client.getCharacter().getCurrentMap().getNewNeighbour() != null ? client.getCharacter().getCurrentMap().getNewNeighbour()[3].getCellid() : (client.getCharacter().getCell().getId() - 13));
+
+            if(client.getCharacter().getCurrentMap().getNewNeighbour()[3] != null){
+                client.getCharacter().teleport(client.getCharacter().getCurrentMap().getNewNeighbour()[3].getMapid(), client.getCharacter().getCurrentMap().getNewNeighbour()[3].getCellid());
+            }
+            else
+                client.getCharacter().teleport(Message.mapId,(client.getCharacter().getCell().getId() -13));
+
         } else {
             // Client.getCharacter().teleport(Message.mapId, -1);
             log.error("client {} teleport from {} to {}", client.getCharacter().getNickName(), client.getCharacter().getCurrentMap().getId(), Message.mapId);

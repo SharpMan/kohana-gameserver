@@ -206,15 +206,15 @@ public class GenericStats {
                 total += getTotal(StatsEnum.WISDOM) / 4;
                 break;
             case ACTION_POINTS:
-                if (isCharacterFighter && (total - stats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pa")) {
+                /*if (isCharacterFighter && (total - stats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pa")) {
                     total -= (total - stats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pa");
-                }
+                }*/
                 total += getTotal(StatsEnum.ADD_PA_BIS);
                 break;
             case MOVEMENT_POINTS:
-                if (isCharacterFighter && (total - stats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pm")) {
+                /*if (isCharacterFighter && (total - stats.get(effectType).additionnal) > DAO.getSettings().getIntElement("Limit.Pm")) {
                     total -= (total - stats.get(effectType).additionnal) - DAO.getSettings().getIntElement("Limit.Pm");
-                }
+                }*/
                 total += getTotal(StatsEnum.ADD_PM);
                 break;
             case ADD_TACKLE_BLOCK:

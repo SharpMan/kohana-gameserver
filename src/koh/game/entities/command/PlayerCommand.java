@@ -6,6 +6,8 @@ import koh.game.network.WorldClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.SQLException;
+
 /**
  * Created by Melancholia on 12/10/15.
  */
@@ -16,7 +18,7 @@ public interface PlayerCommand {
     public String getDescription();
 
     public default void call(WorldClient client, String args){
-        if(client.getAccount().right < this.roleRestrained()){
+        if(client.getAccount().accountData.right < this.roleRestrained()){
             PlayerController.sendServerMessage(client, "You do not have the appropriate rank");
         }
         else if(args.split(" ").length < this.argsNeeded()){
@@ -35,7 +37,7 @@ public interface PlayerCommand {
         }
     }
 
-    public void apply(WorldClient client,String[] args);
+    public void apply(WorldClient client,String[] args) throws SQLException;
 
     public boolean can(WorldClient client);
 

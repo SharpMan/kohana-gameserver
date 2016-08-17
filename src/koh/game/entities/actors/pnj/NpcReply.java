@@ -16,7 +16,7 @@ public class NpcReply {
     @Getter @Setter
     private int replyID;
     @Setter
-    private String criteria;
+    protected String criteria;
     @Getter @Setter
     private String[] parameters;
 

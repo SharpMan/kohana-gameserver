@@ -46,7 +46,7 @@ public class EffectLifeEroded extends EffectBase {
                 }
 
                 // Calcul resistances
-                target.calculReduceDamages(DAMAGE_EQ.get(castInfos.effectType), damageJet, castInfos.isCritical());
+                target.computeReducedDamage(DAMAGE_EQ.get(castInfos.effectType), damageJet, castInfos.isCritical());
                 // Reduction des dommages grace a l'armure
                 if (damageJet.intValue() > 0) {
                     // Si ce n'est pas des dommages direct on ne reduit pas

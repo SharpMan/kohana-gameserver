@@ -30,6 +30,10 @@ public class PresetHandler {
             client.send(new InventoryPresetUseResultMessage(message.presetId, PresetUseResultEnum.PRESET_USE_ERR_UNKNOWN, EMPTY_ARRAY));
             return;
         }
+        if(client.isGameAction(GameActionTypeEnum.EXCHANGE)){
+            client.send(new InventoryPresetUseResultMessage(message.presetId, PresetUseResultEnum.PRESET_USE_ERR_UNKNOWN, EMPTY_ARRAY));
+            return;
+        }
         else {
             final Preset preset = client.getCharacter().getPresets().get(message.presetId);
             if(preset == null){

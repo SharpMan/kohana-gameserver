@@ -67,11 +67,13 @@ public class CharacterFighter extends Fighter {
         if (super.getLife() == 0) {
             super.setLife(1);
         }
+        this.stats.getEffect(StatsEnum.ACTION_POINTS).additionnal = Math.min(getLevel() >= 100 ? 5 : 6,this.stats.getEffect(StatsEnum.ACTION_POINTS).additionnal);
+        this.stats.getEffect(StatsEnum.MOVEMENT_POINTS).additionnal = Math.min(6,this.stats.getEffect(StatsEnum.MOVEMENT_POINTS).additionnal);
         this.entityLook = EntityLookParser.copy(this.character.getEntityLook());
     }
 
     @Override
-    public void calculReduceDamages(StatsEnum effect, MutableInt damages, boolean cc) {
+    public void computeReducedDamage(StatsEnum effect, MutableInt damages, boolean isCritical) {
         switch (effect) {
             case DAMAGE_NEUTRAL:
             case STEAL_NEUTRAL:
@@ -109,7 +111,7 @@ public class CharacterFighter extends Fighter {
                         - this.stats.getTotal(StatsEnum.WATER_ELEMENT_REDUCTION) - (fight instanceof AgressionFight ? this.stats.getTotal(StatsEnum.PVP_WATER_ELEMENT_REDUCTION) : 0) - this.stats.getTotal(StatsEnum.ADD_MAGIC_REDUCTION));
                 break;
         }
-        if (cc) {
+        if (isCritical) {
             damages.subtract(this.stats.getTotal(StatsEnum.ADD_CRITICAL_DAMAGES_REDUCTION));
         }
     }
@@ -297,14 +299,16 @@ public class CharacterFighter extends Fighter {
             if (this.character.getFight() != this.fight)
                 return;
 
-            if (this.character.isInWorld()) {
                 if (character.getClient() != null)
                     this.character.getClient().endGameAction(GameActionTypeEnum.FIGHT);
                 this.character.send(new GameContextDestroyMessage());
                 this.character.send(new GameContextCreateMessage((byte) 1));
                 this.character.setFight(null);
                 this.character.refreshStats(false, true);
-                if (fight.getFightType() == FightTypeEnum.FIGHT_TYPE_PVP_ARENA) {
+                if (this.isLeft()) {
+                    this.character.fightTeleportation(this.character.getSavedMap(), this.character.getSavedCell());
+                }
+                else if (fight.getFightType() == FightTypeEnum.FIGHT_TYPE_PVP_ARENA) {
                     KolizeumExecutor.teleportLastPosition(this.character);
                     final PlayerInst inst = PlayerInst.getPlayerInst(character.getID());
                     this.character.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getScreenRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
@@ -312,20 +316,22 @@ public class CharacterFighter extends Fighter {
                 } else if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
                         && this.team.id == this.fight.getLoosers().id
                         && this.character.getSavedMap() != this.character.getCurrentMap().getId()) {
-                    if (character.getClient() == null)
-                        character.offlineTeleport(character.getSavedMap(), character.getSavedCell());
-                    else
-                        this.character.teleport(this.character.getSavedMap(), this.character.getSavedCell());
-                } else {
+                    this.character.fightTeleportation(this.character.getSavedMap(), this.character.getSavedCell());
+                }
+                else if(fight.getFightType() == FightTypeEnum.FIGHT_TYPE_PvM
+                        && this.team.id == this.fight.getWinners().id
+                        && fight.getMap().getFightActions() != null){
+                    //FIXME: If maps has others actions than teleport, then edit this scope
+                    fight.getMap().getFightActions().forEach(action -> {
+                        action.execute(this.character);
+                    });
+                }
+                else if(character.getClient() != null) {
                     this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
                     //this.character.send(new BasicTimeMessage((double) (new Date().getTime()), 0));
                     this.character.getCurrentMap().spawnActor(this.character);
                 }
-            } else {
-                if (this.isLeft() || (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE && this.team.id == this.fight.getLoosers().id)) {
-                    this.character.offlineTeleport(this.character.getSavedMap(), this.character.getSavedCell());
-                }
-            }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -361,7 +367,7 @@ public class CharacterFighter extends Fighter {
                 stats.getEffect(StatsEnum.CRITICAL_MISS), stats.getEffect(StatsEnum.ADD_HEAL_BONUS), stats.getEffect(StatsEnum.ALL_DAMAGES_BONUS),
                 stats.getEffect(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT), stats.getEffect(StatsEnum.ADD_DAMAGE_PERCENT), stats.getEffect(StatsEnum.TRAP_BONUS),
                 stats.getEffect(StatsEnum.TRAP_DAMAGE_PERCENT), stats.getEffect(StatsEnum.GLYPH_BONUS_PERCENT), stats.getEffect(StatsEnum.PERMANENT_DAMAGE_PERCENT), stats.getEffect(StatsEnum.ADD_TACKLE_BLOCK),
-                stats.getEffect(StatsEnum.ADD_TACKLE_EVADE), stats.getEffect(StatsEnum.ADD_RETRAIT_PA), stats.getEffect(StatsEnum.ADD_RETRAIT_PM), stats.getEffect(StatsEnum.ADD_PUSH_DAMAGES_BONUS),
+                new CharacterBaseCharacteristic(stats.getBase(StatsEnum.ADD_TACKLE_EVADE) + (stats.getBase(StatsEnum.WISDOM) / 4), stats.getBoost(StatsEnum.ADD_TACKLE_EVADE) + (stats.getBoost(StatsEnum.WISDOM) / 4), stats.getItem(StatsEnum.ADD_TACKLE_EVADE) + (stats.getItem(StatsEnum.WISDOM) / 4),0,0)/*stats.getEffect(StatsEnum.ADD_TACKLE_EVADE)*/, stats.getEffect(StatsEnum.ADD_RETRAIT_PA), stats.getEffect(StatsEnum.ADD_RETRAIT_PM), stats.getEffect(StatsEnum.ADD_PUSH_DAMAGES_BONUS),
                 stats.getEffect(StatsEnum.ADD_CRITICAL_DAMAGES), stats.getEffect(StatsEnum.ADD_NEUTRAL_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_EARTH_DAMAGES_BONUS),
                 stats.getEffect(StatsEnum.ADD_WATER_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_AIR_DAMAGES_BONUS), stats.getEffect(StatsEnum.ADD_FIRE_DAMAGES_BONUS),
                 stats.getEffect(StatsEnum.DODGE_PA_LOST_PROBABILITY), stats.getEffect(StatsEnum.DODGE_PM_LOST_PROBABILITY), stats.getEffect(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT),

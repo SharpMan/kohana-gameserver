@@ -107,7 +107,8 @@ public class CharacterHandler {
     private static final int
             CHANGE_COLOR = 1,
             CHANGE_NAME = 3,
-                    CHANGE_SEX = 0;
+                    CHANGE_SEX = 0,
+    CHANGE_FACE_T = 2;
     private static final byte CHANGE_FACE = 2;
 
 
@@ -130,9 +131,28 @@ public class CharacterHandler {
 
     @HandlerAttribute(ID = 6549)
     public static void handleCharacterSelectionWithRemodelMessage(WorldClient client, CharacterSelectionWithRemodelMessage message){
+        if(client.getCharacter() != null){
+            return;
+        }
         final Player character = client.getAccount().getPlayer(message.id);
 
         if(character != null){
+            if(!character.getNickName().toLowerCase().equalsIgnoreCase(message.remodel.name)){
+                if (!PlayerController.isValidName((message.remodel.name))) {
+                    client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
+                    return;
+
+                } else if (DAO.getPlayers().containsName((message.remodel.name))) {
+                    client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.ERR_NAME_ALREADY_EXISTS.value()));
+                    return;
+                }
+                else{
+                    DAO.getPlayers().delCharacter(character);
+                    character.setNickName(message.remodel.name);
+                    DAO.getPlayers().addCharacter(character);
+                    DAO.getPlayers().updateName(character);
+                }
+            }
             EntityLook target = character.getEntityLook();
             if (target.subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER))
                 target = target.subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook;
@@ -142,20 +162,29 @@ public class CharacterHandler {
                 characterSelectionMessage(client, message.id);
                 return;
             }
-            character.getIndexedColors().clear();
-            character.setIndexedColors(new ArrayList<Integer>(5) {
-                {
-                    for (byte i = 0; i < 5; i++) {
-                        if (message.remodel.colors[i] == -1) {
-                            add(breedTemplate.getColors(message.remodel.sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
-                        } else {
-                            add(message.remodel.colors[i] | (i + 1) * 0x1000000);
+            final ArrayList<Integer> oldColors = new ArrayList<>(character.getIndexedColors());
+            try {
+                character.getIndexedColors().clear();
+                character.setIndexedColors(new ArrayList<Integer>(5) {
+                    {
+                        for (byte i = 0; i < 5; i++) {
+                            if (message.remodel.colors[i] == -1) {
+                                add(breedTemplate.getColors(message.remodel.sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
+                            } else {
+                                add(message.remodel.colors[i] | (i + 1) * 0x1000000);
+                            }
                         }
                     }
-                }
-            });
-            target.indexedColors.clear();
-            target.indexedColors = (new ArrayList<Integer>(character.getIndexedColors()));
+                });
+                target.indexedColors.clear();
+                target.indexedColors = (new ArrayList<Integer>(character.getIndexedColors()));
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                character.setIndexedColors(oldColors);
+            }
+
+
 
             final Head head = DAO.getD2oTemplates().getHead(message.remodel.cosmeticId);
             if (!(head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != message.remodel.sex)) {
@@ -195,9 +224,13 @@ public class CharacterHandler {
                     model.getBooleans().replace(CHANGE_SEX, FALSE);
                     client.send(new CharactersListWithRemodelingMessage(false, client.getAccount().toBaseInformations(), new CharacterToRemodelInformations[] { new CharacterToRemodelInformations(model.getID(), model.getNickName(), model.getBreed(), model.getSexe() == 1, model.getCosmetic(), model.getIndexedColors().stream().mapToInt(x -> x).toArray(),(byte)20,(byte) 20) }));
                     break;
+                case CHANGE_FACE_T:
+                    model.getBooleans().replace(CHANGE_FACE_T, FALSE);
+                    client.send(new CharactersListWithRemodelingMessage(false, client.getAccount().toBaseInformations(), new CharacterToRemodelInformations[] { new CharacterToRemodelInformations(model.getID(), model.getNickName(), model.getBreed(), model.getSexe() == 1, model.getCosmetic(), model.getIndexedColors().stream().mapToInt(x -> x).toArray(),(byte)4,(byte) 4) }));
+                break;
                 case CHANGE_NAME:
                     model.getBooleans().replace(CHANGE_NAME, FALSE);
-                    client.send(new CharactersListWithModificationsMessage(false, client.getAccount().toBaseInformations(), new CharacterToRecolorInformation[0],new int[] { model.getID() },new int[0],new CharacterToRelookInformation[] { new CharacterToRelookInformation(model.getID(),model.getIndexedColors().stream().mapToInt(x -> x).toArray(),model.getCosmetic())}));
+                    client.send(new CharactersListWithRemodelingMessage(false, client.getAccount().toBaseInformations(), new CharacterToRemodelInformations[] { new CharacterToRemodelInformations(model.getID(), model.getNickName(), model.getBreed(), model.getSexe() == 1, model.getCosmetic(), model.getIndexedColors().stream().mapToInt(x -> x).toArray(),(byte)1,(byte) 1) }));
                     break;
                 default:
                     client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
@@ -349,6 +382,7 @@ public class CharacterHandler {
     }
 
     public static void sendCharacterStatsListMessage(WorldClient client, boolean fight) {
+
         client.send(new CharacterStatsListMessage(new CharacterCharacteristicsInformations((double) client.getCharacter().getExperience(), (double) DAO.getExps().getPlayerMinExp(client.getCharacter().getLevel()), (double) DAO.getExps().getPlayerMaxExp(client.getCharacter().getLevel()), client.getCharacter().getKamas(), client.getCharacter().getStatPoints(), 0, client.getCharacter().getSpellPoints(), client.getCharacter().getActorAlignmentExtendInformations(),
                 client.getCharacter().getLife(), client.getCharacter().getMaxLife(), client.getCharacter().getEnergy(), PlayerEnum.MAX_ENERGY,
                 (short) client.getCharacter().getStats().getTotal(StatsEnum.ACTION_POINTS, fight), (short) client.getCharacter().getStats().getTotal(StatsEnum.MOVEMENT_POINTS, fight),

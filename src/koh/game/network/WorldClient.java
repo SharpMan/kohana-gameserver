@@ -253,6 +253,8 @@ public class WorldClient {
         return tempTicket.valid();
     }
 
+    private int nb = 0;
+
     public void parsePacket(Message message) {
         try {
             if (message == null) {
@@ -277,7 +279,15 @@ public class WorldClient {
             else {
                 logger.info("Packet not handled {}" , message.getMessageId());
             }
-        } catch (Exception e) {
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+            nb++;
+            if(nb == 3){
+                this.forceClose();
+            }
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -332,9 +342,9 @@ public class WorldClient {
             this.send(new AuthenticationTicketAcceptedMessage());
             this.send(new BasicTimeMessage((double) (new Date().getTime()), 0));
             this.send(new ServerOptionalFeaturesMessage(new byte[]{1, 2}));
-            this.send(new AccountCapabilitiesMessage(getAccount().id, false, (short) Integer.MAX_VALUE, (short) Integer.MAX_VALUE, this.getAccount().right));
+            this.send(new AccountCapabilitiesMessage(getAccount().id, false, (short) Integer.MAX_VALUE, (short) Integer.MAX_VALUE, this.getAccount().accountData.right));
             this.send(new TrustStatusMessage(true));
-            if (this.getAccount().right > 0) {
+            if (this.getAccount().accountData.right > 0) {
                 this.send(consolePregenMessage);
             }
         } catch (AccountOccupedException ex) {

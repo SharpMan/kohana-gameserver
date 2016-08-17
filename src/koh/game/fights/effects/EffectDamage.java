@@ -101,14 +101,14 @@ public class EffectDamage extends EffectBase {
 
             caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, /*portalEfficiencyBonus +*/ (castInfos.isCAC ? caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
 
-            if(castInfos.spellId == 181){
-                log.info(damageJet.getValue() +" "+castInfos.effect.toString());
-            }
-
 
             // Calcul jet
-            caster.computeDamages(castInfos.effectType, damageJet);
+            if(castInfos.spellId == 181 && caster.hasSummoner()){
+                caster.getSummoner().computeDamages(castInfos.effectType, damageJet);
+            }
+            else caster.computeDamages(castInfos.effectType, damageJet);
             //Calcul Bonus Negatif Zone ect ...
+
 
 
             if (castInfos.effect != null && !castInfos.isTrap) {
@@ -127,7 +127,7 @@ public class EffectDamage extends EffectBase {
             }
 
             // Calcul resistances
-            target.calculReduceDamages(castInfos.effectType, damageJet, !castInfos.isPoison && castInfos.isCritical());
+            target.computeReducedDamage(castInfos.effectType, damageJet, !castInfos.isPoison && castInfos.isCritical());
 
 
             // Reduction des dommages grace a l'armure

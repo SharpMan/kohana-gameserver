@@ -24,7 +24,7 @@ public class EffectDamageDropLife extends EffectBase {
         } else // Dommage direct
         {
             final int effectBase = castInfos.randomJet(castInfos.caster);
-            final MutableInt damageValue = new MutableInt((castInfos.caster.currentLife / 100) * effectBase);
+            final MutableInt damageValue = new MutableInt((castInfos.caster.getLife() / 100f) * effectBase);
             if (EffectDamage.applyDamages(castInfos, castInfos.caster, damageValue) == -3) {
                 for (Fighter Target : castInfos.targets) {
                     if (Target.getID() == castInfos.caster.getID()) {
@@ -36,11 +36,11 @@ public class EffectDamageDropLife extends EffectBase {
                 }
                 return -3;
             } else {
-                for (Fighter Target : castInfos.targets) {
-                    if (Target.getID() == castInfos.caster.getID()) {
+                for (Fighter target : castInfos.targets) {
+                    if (target.getID() == castInfos.caster.getID()) {
                         continue;
                     }
-                    if (EffectHeal.applyHeal(castInfos, Target, damageValue, false) == -3) {
+                    if (EffectHeal.applyHeal(castInfos, target, damageValue, false) == -3) {
                         return -3;
                     }
                 }

@@ -22,21 +22,30 @@ public class BuffState extends BuffEffect {
     public BuffState(EffectCast castInfos, Fighter target) {
         super(castInfos, target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_BEGINTURN);
 
-        if(this.duration != -1 && this.castInfos.effectType != StatsEnum.INVISIBILITY
-                && !(this.castInfos.effect != null && (this.castInfos.caster == target && (getState() == FightStateEnum.PESANTEUR) ))) {
+        if(this.duration != -1 && this.castInfos.effectType != StatsEnum.INVISIBILITY) {
             if(castInfos.isGlyph){
                 return;
             }
             if(getState() == FightStateEnum.Hypoglyphe
                     || getState() == FightStateEnum.PESANTEUR
-                    || getState() == FightStateEnum.ENRACINÉ){
+                    || getState() == FightStateEnum.ENRACINÉ
+                    || getState() == FightStateEnum.AFFAIBLI
+                    || getState() == FightStateEnum.PORTAL
+                    /*|| getState() == FightStateEnum.Invulnérable*/){
                 return;
             }
+
             if(getState() == FightStateEnum.Invulnérable && caster instanceof CharacterFighter){
                 this.duration--;
                 return;
             }
+            if(getState() == FightStateEnum.INVULNERABLE && caster instanceof CharacterFighter){
+                return;
+            }
+
             this.duration++;
+
+            //
         }
 
     }

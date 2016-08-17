@@ -36,6 +36,7 @@ public class AccountData {
     public int kamas;
     public FriendContact[] friends;
     public IgnoredContact[] ignored;
+    public byte right;
     public IgnoredContact spouse;
     public boolean friend_warn_on_login;
     public boolean friend_warn_on_level_gain;

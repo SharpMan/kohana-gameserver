@@ -1,18 +1,18 @@
 package koh.game.dao.mysql;
 
 import com.google.inject.Inject;
-import koh.game.MySQL;
 import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.MonsterDAO;
 import koh.game.entities.mob.MonsterDrop;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.utils.sql.ConnectionResult;
-import koh.utils.Enumerable;
-import org.apache.commons.lang3.ArrayUtils;
+import koh.game.utils.sql.ConnectionStatement;
+import koh.utils.SimpleLogger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 
@@ -22,7 +22,7 @@ import java.util.HashMap;
 public class MonsterDAOImpl extends MonsterDAO {
 
     private static final Logger logger = LogManager.getLogger(MonsterDAOImpl.class);
-    private final HashMap<Integer, MonsterTemplate> templates = new HashMap<>();
+
     @Inject
     private DatabaseSource dbSource;
 
@@ -30,6 +30,87 @@ public class MonsterDAOImpl extends MonsterDAO {
     @Override
     public MonsterTemplate find(int id){
         return this.templates.get(id);
+    }
+
+    @Override
+    public void update(MonsterGrade gr, String column, int value) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `monster_grades` SET `"+column+"` = ? WHERE `monster_id` = ? AND `grade` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1, value);
+                pStatement.setByte(3,gr.getGrade());
+                pStatement.setInt(2, gr.getMonsterId());
+                pStatement.executeUpdate();
+
+                try {
+                    SimpleLogger koliseoLog = new SimpleLogger("logs/koli/" + SimpleLogger.getCurrentDayStamp() + ".txt", 0);
+                    koliseoLog.write(pStatement.toString());
+                    koliseoLog.newLine();
+                    koliseoLog.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                try (ConnectionStatement<PreparedStatement> connn = dbSource.prepareStatement("UPDATE `monster_grades` SET `"+column+"` = ? WHERE `monster_id` = ? AND `"+column+"` = 0;")) {
+                    PreparedStatement pStatement2 = connn.getStatement();
+                    pStatement2.setInt(1, value);
+                    pStatement2.setInt(2, gr.getMonsterId());
+                    pStatement2.executeUpdate();
+
+
+
+                } catch (Exception e) {
+                    logger.error(e);
+                    logger.warn(e.getMessage());
+                }
+
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+    }
+
+    @Override
+    public void update(MonsterGrade gr) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `monster_grades` SET `strength` = ?,`chance` = ?,`intelligence` = ?,`agility` = ? WHERE `monster_id` = ? AND `grade` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1, gr.getStrenght());
+                pStatement.setInt(2, gr.getChance());
+                pStatement.setInt(3, gr.getIntelligence());
+                pStatement.setInt(4, gr.getAgility());
+                pStatement.setByte(6,gr.getGrade());
+                pStatement.setInt(5, gr.getMonsterId());
+                pStatement.executeUpdate();
+
+                try (ConnectionStatement<PreparedStatement> connn = dbSource.prepareStatement("UPDATE `monster_grades` SET `strength` = ?,`chance` = ?,`intelligence` = ?,`agility` = ? WHERE `monster_id` = ? AND `strength` = 0 AND `chance` = 0 AND `intelligence` = 0 AND `agility` = 0;")) {
+                    PreparedStatement pStatement2 = connn.getStatement();
+                    pStatement2.setInt(1, gr.getStrenght());
+                    pStatement2.setInt(2, gr.getChance());
+                    pStatement2.setInt(3, gr.getIntelligence());
+                    pStatement2.setInt(4, gr.getAgility());
+                    pStatement2.setInt(5, gr.getMonsterId());
+                    pStatement2.executeUpdate();
+
+                } catch (Exception e) {
+                    logger.error(e);
+                    logger.warn(e.getMessage());
+                }
+
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
     }
 
     private int loadAll() {

@@ -25,7 +25,7 @@ public class ChatChannel extends IWorldEventObserver {
         CHANNELS.forEach((k, v) -> {
             {
                 if (k == CHANNEL_ADMIN) {
-                    if (client.getAccount().right > 0) {
+                    if (client.getAccount().accountData.right > 0) {
                         v.registerPlayer(client.getCharacter());
                     }
                 } else {
@@ -39,7 +39,7 @@ public class ChatChannel extends IWorldEventObserver {
         CHANNELS.forEach((k, v) -> {
             {
                 if (k == CHANNEL_ADMIN) {
-                    if (client.getAccount().right > 0) {
+                    if (client.getAccount().accountData.right > 0) {
                         v.unregisterPlayer(client.getCharacter());
                     }
                 } else {

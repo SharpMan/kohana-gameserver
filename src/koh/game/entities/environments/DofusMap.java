@@ -90,7 +90,10 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private final MutableInt myNextActorId = new MutableInt(0);
     @Getter
     private final ArrayList<MonsterGroup> monsters = new ArrayList<>(4);
+    @Getter
     private Map<Integer, MapDoor> doors;
+    @Getter
+    private ArrayList<MapAction> fightActions;
     private FightController myFightController;
     /*After loadAll */
     @Getter
@@ -342,7 +345,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         return this.myNextActorId.intValue();
     }
 
-    public DofusMap(int id, byte v, int r, byte m, int SubAreaId, int bn, int tn, int ln, int rn, int sb, boolean u, boolean ur, int pr, String cc, String sl, byte[] sbb, byte[] rc) {
+    public DofusMap(int id, byte v, int r, byte m, int SubAreaId, int bn, int tn, int ln, int rn, int sb, boolean u, boolean ur, int pr, String cc, String sl, byte[] sbb, byte[] rc, String neighboor) {
         this.id = id;
         this.version = v;
         this.relativeId = r;
@@ -361,6 +364,13 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.compressedLayers = rc;
         this.blueCells = Enumerable.stringToShortArray(cc);
         this.redCells =  Enumerable.stringToShortArray(sl);
+        this.newNeighbour = new NeighBourStruct[4];
+        final String[] neigh = neighboor.split(",");
+        for (int i = 0; i < 4; i++) {
+            if(!neigh[i].equalsIgnoreCase("-1") && !neigh[i].isEmpty()){
+               this.newNeighbour[i] =  new NeighBourStruct(neigh[i].split(":"));
+            }
+        }
     }
 
     public static final ScheduledExecutorService GlobalTimer = Executors.newScheduledThreadPool(20);
@@ -473,6 +483,14 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
         this.doors.put(d.getElementID(), d);
     }
+
+    public void addAction(MapAction d) {
+        if (this.fightActions == null) {
+            this.fightActions = new ArrayList<>();
+        }
+        this.fightActions.add(d);
+    }
+
 
     public MapDoor getDoor(int id) {
         if (this.doors == null) {

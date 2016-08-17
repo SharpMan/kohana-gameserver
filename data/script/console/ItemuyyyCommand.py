@@ -9,10 +9,10 @@ from java.lang import String
 from koh.protocol.messages.authorized import ConsoleMessage
 
 
-class ItemCommand(PlayerCommand):
+class ItemuyyyCommand(PlayerCommand):
 
     def getDescription(self):
-        return "Add item arg1 quantity arg2 type arg3 to me;
+        return None
 
     def apply(self,client,args):
         id = int(args[0]);
@@ -47,7 +47,7 @@ class ItemCommand(PlayerCommand):
         return True;
 
     def roleRestrained(self):
-        return 3
+        return 5
 
     def argsNeeded(self):
-        return 3;
+        return 3

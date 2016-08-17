@@ -116,7 +116,7 @@ public class ContextHandler {
                     cellID = (short) (client.getCharacter().getCell().getId() + 14);
                     break;
             }
-            DofusCell curcell = client.getCharacter().getCurrentMap().getCell(cellID);
+            final DofusCell curcell = client.getCharacter().getCurrentMap().getCell(cellID);
             if (curcell.nonWalkableDuringRP() || client.getCharacter().getCurrentMap().cellIsOccuped(cellID) || client.getCharacter().getCurrentMap().hasActorOnCell(cellID)) {
                 cellID = -1;
                 continue;

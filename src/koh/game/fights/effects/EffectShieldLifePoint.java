@@ -17,6 +17,9 @@ public class EffectShieldLifePoint extends EffectBase {
             }
             final EffectCast subInfos = new EffectCast(castInfos.effectType, castInfos.spellId, castInfos.cellId, castInfos.chance, castInfos.effect, castInfos.caster, castInfos.targets,castInfos.spellLevel);
             final BuffShieldLifePoint buffStats = new BuffShieldLifePoint(subInfos, target);
+            if (target.getBuff().buffMaxStackReached(buffStats)) {
+                continue;
+            }
             if (buffStats.applyEffect(null, null) == -3) {
                 return -3;
             }

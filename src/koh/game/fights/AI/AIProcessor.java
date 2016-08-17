@@ -159,8 +159,19 @@ public class AIProcessor {
     public void selectBestAction() {
         final AIAction action = AIAction.AI_ACTIONS.get(mode);
         if (action != null) {
+            final int apPoints;
+
+            if (!fighter.getStates().hasState(FightStateEnum.ENRACINÉ)){
+                apPoints = this.fighter.getAP() - fighter.getTackledAP();
+            }
+            else{
+                apPoints = this.fighter.getAP();
+            }
+
             for (short cell : neuron.myReachableCells) {
                 for (SpellLevel spell : this.mySpells) {
+                    if(cell != fighter.getCellId() && apPoints < spell.getApCost())
+                        continue;
                     this.selectBestSpell(action, spell, cell);
                 }
             }
@@ -220,12 +231,13 @@ public class AIProcessor {
                 if (this.fight.canLaunchSpell(this.fighter, spell, currentCell, cell, firstTarget == null ? -1 : firstTarget.getID())) {
                     double score = this.getSpellScore(action, spell, currentCell, cell);
 
-                    int distance = (Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), currentCell) * 5);
+                    final int distance = (Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), currentCell) * 5);
                     if (score > 0)
                         if (score - distance < 0)
                             score = 1;
                         else
                             score -= distance;
+
 
                     if (fightCell.hasEnnemy(this.fighter.getTeam()) != null) {
                         /*if(firstTarget != null && !firstTarget.isVisibleFor(this.fighter)){
@@ -260,9 +272,18 @@ public class AIProcessor {
         neuron.myReachableCells.clear();
         neuron.myReachableCells.add(this.fighter.getCellId());
 
+        final int pmPoints;
+
+        if (!fighter.getStates().hasState(FightStateEnum.ENRACINÉ)){
+            pmPoints = this.fighter.getMP() - fighter.getTackledMP();
+        }
+        else{
+            pmPoints = this.fighter.getMP();
+        }
+
         this.fight.getFightCells().values().stream()
                 .filter(cell -> cell.canWalk()
-                        && Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), cell.getId()) <= this.fighter.getMP())
+                        && Pathfunction.goalDistance(this.fight.getMap(), this.fighter.getCellId(), cell.getId()) <= pmPoints)
                 .forEach(cell -> neuron.myReachableCells.add(cell.getId()));
     }
 

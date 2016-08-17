@@ -393,9 +393,9 @@ public class CharacterInventory {
                             }
                             this.player.getEntityLook().scales.clear();
                         } else {
-                            this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET, 0, new EntityLook(item.getApparrance(), new ArrayList<>(), item.getTemplateId() == 13679 ? new ArrayList<>(player.getIndexedColors()) : new ArrayList<>(), new ArrayList<Short>() {
+                            this.player.getEntityLook().subentities.add(new SubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_PET, 0, new EntityLook(item.getApparrance(), new ArrayList<>(), item.getApparrance() == 2024 ? new ArrayList<>(player.getIndexedColors()) : new ArrayList<>(), new ArrayList<Short>() {
                                 {
-                                    this.add(item.getTemplateId() == 13679 ? 100 :  (short) 80);
+                                    this.add((item.getApparrance() == 2024 || item.getApparrance() == 265) ? 100 :  (short) 80);
                                 }
                             }, new ArrayList<>())));
                         }

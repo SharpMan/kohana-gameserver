@@ -15,4 +15,8 @@ public abstract class MapMonsterDAO implements Service {
     protected final int[][] MONSTER_COUNT_BY_DIFFICULTY = new int[][]{ {1, 2, 3}, {4, 5}, {6,7, 8} };
 
     public abstract MonsterGroup genMonsterGroup(SubArea sub, DofusMap map);
+
+    public abstract void insert(int map, short cell,byte direction, String param1, String param2);
+
+    public abstract void remove(int map, short cell);
 }

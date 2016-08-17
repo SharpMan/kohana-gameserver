@@ -39,7 +39,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
             return;
         int i = 1;
         String query = "UPDATE `accounts_data` set ";
-        query = data.columsToUpdate.stream().map((s) -> s + " =?,").reduce(query, String::concat);
+        query = data.columsToUpdate.stream().map((s) -> "`"+s + "` =?,").reduce(query, String::concat);
         query = StringUtil.removeLastChar(query);
         query += " WHERE id = ?;";
 
@@ -59,32 +59,35 @@ public class AccountDataDAOImpl extends AccountDataDAO {
         }
     }
 
-    private static void setValue(PreparedStatement p, String Column, int Seq, AccountData Item) {
+    private static void setValue(PreparedStatement p, String Column, int seq, AccountData Item) {
         try {
             switch (Column) {
                 case "id":
-                    p.setInt(Seq, Item.id);
+                    p.setInt(seq, Item.id);
+                    break;
+                case "right":
+                    p.setByte(seq, Item.right);
                     break;
                 case "kamas":
-                    p.setLong(Seq, Item.kamas);
+                    p.setLong(seq, Item.kamas);
                     break;
                 case "friends":
-                    p.setBytes(Seq, Item.serializeFriends());
+                    p.setBytes(seq, Item.serializeFriends());
                     break;
                 case "ignored":
-                    p.setBytes(Seq, Item.serializeIgnored());
+                    p.setBytes(seq, Item.serializeIgnored());
                     break;
                 case "spouse":
-                    p.setBytes(Seq, null);
+                    p.setBytes(seq, null);
                     break;
                 case "friend_warn_on_login":
-                    p.setBoolean(Seq, Item.friend_warn_on_login);
+                    p.setBoolean(seq, Item.friend_warn_on_login);
                     break;
                 case "friend_warn_on_level_gain":
-                    p.setBoolean(Seq, Item.friend_warn_on_level_gain);
+                    p.setBoolean(seq, Item.friend_warn_on_level_gain);
                     break;
                 case "guild_warn_on_login":
-                    p.setBoolean(Seq, Item.guild_warn_on_login);
+                    p.setBoolean(seq, Item.guild_warn_on_login);
                     break;
 
             }
@@ -94,7 +97,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
         }
     }
 
-    private static final String SAVE_ACCOUNT_DATA = "INSERT INTO `accounts_data` VALUES (?,?,?,?,?,?,?,?);";
+    private static final String SAVE_ACCOUNT_DATA = "INSERT INTO `accounts_data` VALUES (?,?,?,?,?,?,?,?,?);";
 
     @Override
     public AccountData get(int accountId) {
@@ -113,6 +116,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
                         friend_warn_on_login = result.getBoolean("friend_warn_on_login");
                         friend_warn_on_level_gain = result.getBoolean("friend_warn_on_level_gain");
                         guild_warn_on_login = result.getBoolean("guild_warn_on_login");
+                        right = result.getByte("right");
 
                         try (Statement statement = conn.getConnection().createStatement()) {
                             ResultSet result = statement.executeQuery("SELECT * from storage_items where owner =" + id + ";");
@@ -153,6 +157,7 @@ public class AccountDataDAOImpl extends AccountDataDAO {
                             pStatement.setBoolean(6, friend_warn_on_login);
                             pStatement.setBoolean(7, friend_warn_on_level_gain);
                             pStatement.setBoolean(8, guild_warn_on_login);
+                            pStatement.setInt(9,0);
                             pStatement.execute();
                         }
                     }

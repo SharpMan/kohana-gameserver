@@ -9,14 +9,19 @@ import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.MapDAO;
 import koh.game.entities.environments.*;
 import koh.game.utils.sql.ConnectionResult;
+import koh.game.utils.sql.ConnectionStatement;
 import koh.protocol.types.game.house.HouseInformations;
 import koh.protocol.types.game.interactive.StatedElement;
+import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.StringBuilders;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -40,17 +45,7 @@ public class MapDAOImpl extends MapDAO {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                dofusMaps.put(result.getInt("id"), new DofusMap(result.getInt("id"), (byte) result.getInt("version"), result.getInt("relativeid"), (byte) result.getInt("maptype"), result.getInt("subareaid"), result.getInt("bottomneighbourId"), result.getInt("topneighbourid"), result.getInt("leftneighbourId"), result.getInt("rightneighbourId"), result.getInt("shadowbonusonentities"), result.getByte("uselowpassfilter") == 1, result.getByte("usereverb") == 1, result.getInt("presetid"), result.getString("bluecells"), result.getString("redcells"), result.getBytes("cells"), result.getBytes("layers")));
-                if (result.getString("new_neighbour") != null) {
-                    String[] neighbours = result.getString("new_neighbour").split(",");
-                    dofusMaps.get(result.getInt("id")).setNewNeighbour(new NeighBourStruct[]
-                            {
-                                    new NeighBourStruct(neighbours[0].split(":")),
-                                    new NeighBourStruct(neighbours[1].split(":")),
-                                    new NeighBourStruct(neighbours[2].split(":")),
-                                    new NeighBourStruct(neighbours[3].split(":"))
-                            });
-                }
+                dofusMaps.put(result.getInt("id"), new DofusMap(result.getInt("id"), (byte) result.getInt("version"), result.getInt("relativeid"), (byte) result.getInt("maptype"), result.getInt("subareaid"), result.getInt("bottomneighbourId"), result.getInt("topneighbourid"), result.getInt("leftneighbourId"), result.getInt("rightneighbourId"), result.getInt("shadowbonusonentities"), result.getByte("uselowpassfilter") == 1, result.getByte("usereverb") == 1, result.getInt("presetid"), result.getString("bluecells"), result.getString("redcells"), result.getBytes("cells"), result.getBytes("layers"),result.getString("new_neighbour")));
             }
         } catch (Exception e) {
             logger.error(e);
@@ -58,6 +53,55 @@ public class MapDAOImpl extends MapDAO {
         }
         return dofusMaps.size();
     }
+
+    @Override
+    public void updateNeighboor(DofusMap map) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `maps_data` SET `new_neighbour` = ? WHERE `id` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                StringBuilder ct = new StringBuilder();
+                ct.append(map.getNewNeighbour()[0] == null ? -1 : map.getNewNeighbour()[0].getMapid() + ":"+map.getNewNeighbour()[0].getCellid()).append(",");
+                ct.append(map.getNewNeighbour()[1] == null ? -1 : map.getNewNeighbour()[1].getMapid() + ":"+map.getNewNeighbour()[1].getCellid()).append(",");
+                ct.append(map.getNewNeighbour()[2] == null ? -1 : map.getNewNeighbour()[2].getMapid() + ":"+map.getNewNeighbour()[2].getCellid()).append(",");
+                ct.append(map.getNewNeighbour()[3] == null ? -1 : map.getNewNeighbour()[3].getMapid() + ":"+map.getNewNeighbour()[3].getCellid());
+                pStatement.setString(1, ct.toString());
+                pStatement.setInt(2, map.getId());
+                pStatement.executeUpdate();
+                logger.info(pStatement.toString());
+
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+    }
+
+    @Override
+    public void insert(int map, short cell, DofusTrigger tg) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `maps_triggers` VALUES (?,?,?,?,?,?);")) {
+                PreparedStatement pStatement = conn.getStatement();
+
+
+                pStatement.setInt(1, 0);
+                pStatement.setInt(2, map);
+                pStatement.setShort(3, cell);
+                pStatement.setInt(4, tg.getNewMap());
+                pStatement.setInt(5, tg.getNewCell());
+                pStatement.setString(6, "");
+                pStatement.execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+    }
+
 
     @Override
     public DofusZaap getZaap(int id){
@@ -163,7 +207,86 @@ public class MapDAOImpl extends MapDAO {
             logger.warn(e.getMessage());
         }
         return i;
+    }
 
+    private int loadAllFightActions() {
+        int i = 0;
+        try (ConnectionResult conn = dbSource.executeQuery("SELECT * from map_endfight", 0)) {
+            final ResultSet result = conn.getResult();
+
+            while (result.next()) {
+                try {
+                    dofusMaps.get(result.getInt("map")).addAction(new MapAction(result.getByte("type"),result.getString("param")));
+                } catch (Exception e) {
+                    logger.debug("map {} endfight nulled", result.getInt("map"));
+                }
+                i++;
+            }
+        } catch (Exception e) {
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+        return i;
+    }
+
+    @Override
+    public void insertMapAction(int map, MapAction door) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `map_endfight` VALUES (?,?,?);")) {
+                PreparedStatement pStatement = conn.getStatement();
+
+                pStatement.setInt(1, map);
+                pStatement.setByte(2, door.getAction());
+                pStatement.setString(3, Enumerable.join(door.getParam()));
+                pStatement.execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void updateDoor(MapDoor map) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `maps_interactive_doors` SET `type` = ?,`parameters` = ? WHERE `elem_id` = ? AND `map` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1, map.getType());
+                pStatement.setString(2, map.getParameters());
+                pStatement.setInt(3, map.getElementID());
+                pStatement.setInt(4, map.getMap());
+                pStatement.executeUpdate();
+
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+    }
+
+
+    @Override
+    public void insertDoor(MapDoor door) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `maps_interactive_doors` VALUES (?,?,?,?,?);")) {
+                PreparedStatement pStatement = conn.getStatement();
+
+                pStatement.setInt(1, door.getElementID());
+                pStatement.setInt(2, door.getMap());
+                pStatement.setInt(3, door.getType());
+                pStatement.setString(4, door.getParameters());
+                pStatement.setString(5, null);
+                pStatement.execute();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
     }
 
     private int loadAllHouseInformations() {
@@ -273,7 +396,7 @@ public class MapDAOImpl extends MapDAO {
                 try {
                     dofusMaps.get(result.getInt("map")).getInteractiveElements().add(new InteractiveElementStruct(result.getInt("element_id"), result.getInt("element_type_id"), result.getString("enabled_skills"), result.getString("disabled_skills"), result.getShort("age_bonus")));
                 } catch (Exception e) {
-                    logger.error("map {} element nulled", result.getInt("map"));
+                    logger.debug("map {} element nulled", result.getInt("map"));
                 }
 
                 i++;
@@ -298,6 +421,7 @@ public class MapDAOImpl extends MapDAO {
         logger.info("Loaded {} interactive elements", this.loadAllInteractiveElements());
         logger.info("Loaded {} house informations", this.loadAllHouseInformations());
         logger.info("Loaded {} interactive doors", this.loadAllDoors());
+        logger.info("Loaded {} end fight actions", this.loadAllFightActions());
         logger.info("Loaded {} map positions", this.loadAllPositions());
         logger.info("Loaded {} map zaaps", this.loadAllZaaps());
         logger.info("Loaded {} map subways", this.loadAllSubways());

@@ -45,15 +45,15 @@ public class EffectCreateIllusion extends EffectBase {
         if (buff.applyEffect(null, null) == -3) {
             return -3;
         }
-        buff.duration = -1;
+        buff.duration = /*-1*/2;
 
-        FightCell cell = castInfos.caster.getFight().getCell(castInfos.cellId);
+        final FightCell cell = castInfos.caster.getFight().getCell(castInfos.cellId);
         if (cell != null && castInfos.caster instanceof CharacterFighter) {
-            int Result = castInfos.caster.setCell(cell);
+            int result = castInfos.caster.setCell(cell);
             ((CharacterFighter) castInfos.caster).fakeContextualId = castInfos.caster.getFight().getNextContextualId();
 
-            if (Result != -1) {
-                return Result;
+            if (result != -1) {
+                return result;
             }
         } else {
             return -1;

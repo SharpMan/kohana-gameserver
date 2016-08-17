@@ -26,7 +26,7 @@ public class Account {
     public Account(PlayerComingMessage message) {
         id = message.accountId;
         nickName = message.nickname;
-        right = message.rights;
+        //right = message.rights;
         secretQuestion = message.secretQuestion;
         secretAnswer = message.secretAnswer;
         lastIP = message.lastAddress == null ? "" : message.lastAddress;
@@ -36,7 +36,6 @@ public class Account {
     @Getter
     public int id;
     public String nickName;
-    public byte right;
     public String secretQuestion, secretAnswer, lastIP, currentIP;
     public Timestamp last_login;
     public ArrayList<Player> characters;
@@ -72,7 +71,6 @@ public class Account {
             accountData = null;
             id = 0;
             nickName = null;
-            right = 0;
             secretQuestion = null;
             secretAnswer = null;
             lastIP = null;

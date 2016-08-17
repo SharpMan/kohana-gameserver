@@ -82,7 +82,7 @@ public class ItemDAOImpl extends ItemDAO {
             ResultSet result = conn.getResult();
             while (result.next()) {
                 final List<ObjectEffect> effects = deserializeEffects(result.getBytes("effects"));
-                effects.removeIf(e -> e instanceof ObjectEffectDate && ((ObjectEffectDate)e).isDepracated());
+                effects.removeIf(e -> e instanceof ObjectEffectDate && (e.actionId == 983) && ((ObjectEffectDate)e).isDepracated());
 
                 cache.put(result.getInt("id"), InventoryItem.getInstance(
                         result.getInt("id"),

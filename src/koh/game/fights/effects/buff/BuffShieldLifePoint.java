@@ -12,7 +12,8 @@ import org.apache.commons.lang3.mutable.MutableInt;
  */
 public class BuffShieldLifePoint extends BuffEffect {
 
-    private int value1, jet;
+    private int value1;
+    private double jet;
 
     public BuffShieldLifePoint(EffectCast CastInfos, Fighter Target) {
         super(CastInfos, Target, BuffActiveType.ACTIVE_STATS, BuffDecrementType.TYPE_ENDTURN);
@@ -23,7 +24,7 @@ public class BuffShieldLifePoint extends BuffEffect {
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
 
         this.jet = castInfos.randomJet(target);
-        this.value1 = (jet * this.caster.getLife()) / 100;
+        this.value1 = (int) (jet * this.caster.getLife() * 0.01);
         this.target.setShieldPoints(target.getShieldPoints() + value1);
         this.target.getStats().addBoost(this.castInfos.effectType, this.value1);
 

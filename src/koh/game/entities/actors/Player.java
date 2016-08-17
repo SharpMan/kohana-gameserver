@@ -396,6 +396,14 @@ public class Player extends IGameActor implements Observer {
         client.endGameAction(koh.game.actions.GameActionTypeEnum.MAP_MOVEMENT);
     }*/
 
+
+    public synchronized void fightTeleportation(int newMapID, int newCellID){
+        if(this.client == null)
+            this.offlineTeleport(newMapID,newCellID);
+        else
+            this.teleport(newMapID,newCellID);
+    }
+
     public synchronized void teleport(int newMapID, int newCellID) {
         if (this.currentMap.getId() == newMapID) {
             this.cell = newCellID == -1 ? currentMap.getAnyCellWalakable() : currentMap.getCell((short) newCellID) != null ? currentMap.getCell((short) newCellID) : cell;
@@ -440,7 +448,7 @@ public class Player extends IGameActor implements Observer {
     private boolean onTutorial = false;
 
 
-    private static final Timestamp timeStamp;
+    /*private static final Timestamp timeStamp;
 
     static {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -451,7 +459,7 @@ public class Player extends IGameActor implements Observer {
             e.printStackTrace();
         }
         timeStamp = new Timestamp(date.getTime());
-    }
+    }*/
 
     public synchronized void onLogged() {
         try {

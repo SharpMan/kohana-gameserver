@@ -129,6 +129,7 @@ public class SummonedFighter extends MonsterFighter {
     @Override
     public int tryDie(int casterId, boolean force) {
        final int result = super.tryDie(casterId,force);
+
         if(result == -2 || result == -3){
             if(this.grade.getMonster().isUseSummonSlot()) {
                 this.summoner.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base++;

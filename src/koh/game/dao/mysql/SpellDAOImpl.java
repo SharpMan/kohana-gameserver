@@ -82,9 +82,9 @@ public class SpellDAOImpl extends SpellDAO {
                 levels.put(result.getInt("id"), new SpellLevel(result));
                 i++;
                 if(result.getInt("spell_id") == 5590) {
-                    System.out.println(result.getByte("grade"));
+                    //System.out.println(result.getByte("grade"));
                     for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
-                        System.out.println(effect.toString());
+                       // System.out.println(effect.toString());
                         effect.targetMask = "a";
                         /*if(effect.effectId != 406){
                             levels.get(result.getInt("id")).setEffects(ArrayUtils.removeElement(levels.get(result.getInt("id")).getEffects(),effect));

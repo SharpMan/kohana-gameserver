@@ -1,0 +1,235 @@
+INSERT INTO `map_endfight` VALUES ('11534336', '0', '11536384,-1');
+INSERT INTO `map_endfight` VALUES ('11536384', '0', '11536386,-1');
+INSERT INTO `map_endfight` VALUES ('11536386', '0', '11537408,-1');
+INSERT INTO `map_endfight` VALUES ('11537408', '0', '11539456,-1');
+INSERT INTO `map_endfight` VALUES ('11539456', '0', '11542528,-1');
+INSERT INTO `map_endfight` VALUES ('11542528', '0', '11543552,-1');
+INSERT INTO `map_endfight` VALUES ('11543552', '0', '1544576,-1');
+INSERT INTO `map_endfight` VALUES ('16515072', '0', '16515841,-1');
+INSERT INTO `map_endfight` VALUES ('16515841', '0', '16515584,-1');
+INSERT INTO `map_endfight` VALUES ('16515584', '0', '16515585,-1');
+INSERT INTO `map_endfight` VALUES ('16515585', '0', '16516353,-1');
+INSERT INTO `map_endfight` VALUES ('16516353', '0', '16516096,-1');
+INSERT INTO `map_endfight` VALUES ('16516096', '0', '16516097,-1');
+INSERT INTO `map_endfight` VALUES ('16516097', '0', '16516608,-1');
+INSERT INTO `map_endfight` VALUES ('16516608', '0', '16516867,-1');
+INSERT INTO `map_endfight` VALUES ('16516867', '0', '16515331,-1');
+
+
+
+| 18087936  | Donjon des Kitsounes - Entrée                               |
+| 18087938  | Donjon des Kitsounes - Sixième salle                        |
+| 18087940  | Donjon des Kitsounes - Cinquième salle annexe 1             |
+| 18087942  | Donjon des Kitsounes - Salle de transition                     |
+| 18087944  | Donjon des Kitsounes - Cinquième salle annexe 2             |
+| 18088960  | Donjon des Kitsounes - Première salle                       |
+| 18088962  | Donjon des Kitsounes - Quatrième salle annexe 1             |
+| 18088964  | Donjon des Kitsounes - Septième salle                       |
+| 18088966  | Donjon des Kitsounes - Premier chemin                          |
+| 18088968  | Donjon des Kitsounes - Cinquième salle annexe 3             |
+| 18089984  | Donjon des Kitsounes - Deuxième salle                       |
+| 18089986  | Donjon des Kitsounes - Quatrième salle annexe 2             |
+| 18089988  | Donjon des Kitsounes - Sortie                                  |
+| 18089990  | Donjon des Kitsounes - Deuxième chemin                      |
+| 18091008  | Donjon des Kitsounes - Troisième salle                      |
+| 18091010  | Donjon des Kitsounes - Quatrième salle annexe 3             |
+| 18091012  | Donjon des Kitsounes - Salle secrète du Bambou Sacré     |
+| 18091014  | Donjon des Kitsounes - Troisième chemin                     |
+
+| 18874368  | Donjon des Blops - Entrée                                   |
+| 18874370  | Donjon des Blops - Troisième salle                          |
+| 18874372  | Donjon des Blops - Salle du Blop Griotte Royal                 |
+| 18875394  | Donjon des Blops - Quatrième salle                          |
+| 18875396  | Donjon des Blops - Sixième salle                            |
+| 18876416  | Donjon des Blops - Première salle                           |
+| 18876418  | Donjon des Blops - Cinquième salle                          |
+| 18877442  | Donjon des Blops - Salle du Blop Coco Royal                    |
+| 18878466  | Donjon des Blops - Salle du Blop Reinette Royal                |
+| 18879488  | Donjon des Blops - Deuxième salle                           |
+| 18879490  | Donjon des Blops - Salle du Blop Indigo Royal                  |
+| 19136772  | Donjon Fungus - Première salle                              |
+| 19138820  | Donjon Fungus - Deuxième salle                              |
+| 19139844  | Donjon Fungus - Troisième salle                             |
+| 19140868  | Donjon Fungus - Quatrième salle                             |
+| 19141890  | Donjon Fungus - Cinquième salle bis                         |
+| 19141892  | Donjon Fungus - Cinquième salle                             |
+| 19142914  | Donjon Fungus - Sixième salle bis                           |
+| 19142916  | Donjon Fungus - Sixième salle                               |
+| 19143939  | Donjon Fungus - Septième salle                              |
+| 19144963  | Donjon Fungus - Huitième salle                              |
+| 19145987  | Donjon Fungus - Sortie                                         |
+| 27000832  | Donjon des Rats de Bonta - Première salle                   |
+| 27000836  | Donjon des Rats de Bonta - Cinquième salle                  |
+| 27001858  | Donjon des Rats de Bonta - Troisième salle                  |
+| 27001860  | Donjon des Rats de Bonta - Sortie                              |
+| 27003904  | Donjon des Rats de Bonta - Deuxième salle                   |
+| 27003906  | Donjon des Rats de Bonta - Quatrième salle                  |
+| 27787264  | Donjon des Dragoeufs - Première salle                       |
+| 27788290  | Donjon des Dragoeufs - Troisième salle                      |
+| 27788292  | Donjon des Dragoeufs - Quatrième salle                      |
+| 27789312  | Donjon des Dragoeufs - Deuxième salle                       |
+| 27789316  | Donjon des Dragoeufs - Cinquième salle                      |
+| 27789318  | Donjon des Dragoeufs - Sortie                                  |
+| 36175872  | Donjon d'Ilyzaelle - Première salle                         |
+| 36175875  | Donjon d'Ilyzaelle - Quatrième salle                        |
+| 36177408  | Donjon d'Ilyzaelle - Deuxième salle                         |
+| 36177411  | Donjon d'Ilyzaelle - Cinquième salle                        |
+| 36178944  | Donjon d'Ilyzaelle - Troisième salle                        |
+| 36178947  | Donjon d'Ilyzaelle - Sixième salle                          |
+| 36962304  | Donjon de Ku'tan - Première salle                           |
+| 36962307  | Donjon de Ku'tan - Quatrième salle                          |
+| 36963840  | Donjon de Ku'tan - Deuxième salle                           |
+| 36963843  | Donjon de Ku'tan - Cinquième salle                          |
+| 36965376  | Donjon de Ku'tan - Troisième salle                          |
+| 36965379  | Donjon de Ku'tan - Sixième salle                            |
+| 40108544  | Donjon des Rats de Brâkmar - Première salle              |
+| 40109568  | Donjon des Rats de Brâkmar - Deuxième salle              |
+| 40110085  | Donjon des Rats de Brâkmar - Cinquième salle             |
+| 40110087  | Donjon des Rats de Brâkmar - Sortie                         |
+| 40110594  | Donjon des Rats de Brâkmar - Quatrième salle             |
+| 40111616  | Donjon des Rats de Brâkmar - Troisième salle             |
+| 57934593  | Donjon de la mine de Sakaï - Première salle              |
+| 57935617  | Donjon de la mine de Sakaï - Deuxième salle              |
+| 57936641  | Donjon de la mine de Sakaï - Troisième salle             |
+| 57937665  | Donjon de la mine de Sakaï - Quatrième salle             |
+| 57938689  | Donjon de la mine de Sakaï - Cinquième salle             |
+| 57939713  | Donjon de la mine de Sakaï - Sortie                         |
+| 60293120  | Donjon Kanniboul - Première salle                           |
+| 60294144  | Donjon Kanniboul - Deuxième salle                           |
+| 60295168  | Donjon Kanniboul - Troisième salle                          |
+| 60296192  | Donjon Kanniboul - Quatrième salle                          |
+| 60297216  | Donjon Kanniboul - Cinquième salle                          |
+| 60298240  | Donjon Kanniboul - Sortie                                      |
+| 66585088  | Donjon de Nowel - Première salle                            |
+| 66586112  | Donjon de Nowel - Deuxième salle                            |
+| 66587136  | Donjon de Nowel - Troisième salle                           |
+| 66588160  | Donjon de Nowel - Quatrième salle                           |
+| 66589184  | Donjon de Nowel - Cinquième salle                           |
+| 66590208  | Donjon de Nowel - Sortie                                       |
+| 80740865  | Donjon d'Incarnam - Grille d'accès                          |
+| 80741889  | Donjon d'Incarnam - Entrée                                  |
+| 80742913  | Donjon d'Incarnam - Première salle                          |
+| 80743937  | Donjon d'Incarnam - Deuxième salle                          |
+| 80744961  | Donjon d'Incarnam - Troisième salle                         |
+| 80745985  | Donjon d'Incarnam - Quatrième salle                         |
+| 80747009  | Donjon d'Incarnam - Sortie                                     |
+| 87032320  | Donjon des Squelettes - Entrée                              |
+| 87032322  | Donjon des Squelettes - Quatrième salle                     |
+| 87033344  | Donjon des Squelettes - Première salle                      |
+| 87033346  | Donjon des Squelettes - Cinquième salle                     |
+| 87034368  | Donjon des Squelettes - Deuxième salle                      |
+| 87034370  | Donjon des Squelettes - Sortie                                 |
+| 87035392  | Donjon des Squelettes - Troisième salle                     |
+| 87035394  | Donjon des Squelettes - Salle annexe                           |
+| 87294465  | Donjon des Forgerons - Entrée                               |
+| 87294467  | Donjon des Forgerons - Quatrième salle                      |
+| 87294469  | Donjon des Forgerons - Sixième salle                        |
+| 87294471  | Donjon des Forgerons - Neuvième salle                       |
+| 87295489  | Donjon des Forgerons - Première salle                       |
+| 87295491  | Donjon des Forgerons - Cinquième salle                      |
+| 87295493  | Donjon des Forgerons - Septième salle                       |
+| 87296513  | Donjon des Forgerons - Deuxième salle                       |
+| 87296515  | Donjon des Forgerons - Salle finale                            |
+| 87296517  | Donjon des Forgerons - Huitième salle                       |
+| 87297537  | Donjon des Forgerons - Troisième salle                      |
+| 87297541  | Donjon des Forgerons - Attitude                                |
+| 94109696  | Donjon des Scarafeuilles - Entrée                           |
+| 94110720  | Donjon des Scarafeuilles - Première salle                   |
+| 94111744  | Donjon des Scarafeuilles - Deuxième salle                   |
+| 94111746  | Donjon des Scarafeuilles - Sous-sol                            |
+| 94112768  | Donjon des Scarafeuilles - Troisième salle                  |
+| 94113792  | Donjon des Scarafeuilles - Quatrième salle                  |
+| 94114816  | Donjon des Scarafeuilles - Cinquième salle                  |
+| 94115840  | Donjon des Scarafeuilles - Sixième salle                    |
+| 94116864  | Donjon des Scarafeuilles - Sortie                              |
+| 96206848  | Donjon des Tofus - Troisième salle                          |
+| 96206850  | Donjon des Tofus - Deuxième salle                           |
+| 96206852  | Donjon des Tofus - Sous-sol                                    |
+| 96207874  | Donjon des Tofus - Quatrième salle                          |
+| 96208898  | Donjon des Tofus - Cinquième salle                          |
+| 96209922  | Donjon des Tofus - Sixième salle                            |
+| 96210946  | Donjon des Tofus - Sortie                                      |
+| 96338946  | Donjon des Tofus - Première salle                           |
+| 96993797  | Donjon des Larves - Sixième salle                           |
+| 96994817  | Donjon des Larves - Première salle                          |
+| 96994821  | Donjon des larves - Septième salle                          |
+| 96995841  | Donjon des Larves - Deuxième salle                          |
+| 96995845  | Donjon des Larves - Huitième salle                          |
+| 96996865  | Donjon des Larves - Troisième salle                         |
+| 96996869  | Donjon des Larves - Neuvième salle                          |
+| 96996871  | Donjon des Larves - Neuvième salle bis                      |
+| 96997889  | Donjon des Larves - Quatrième salle                         |
+| 96997891  | Donjon des Larves - Quatrième salle bis                     |
+| 96997893  | Donjon des Larves - Dixième salle                           |
+| 96997895  | Donjon des Larves - Dixième salle bis                       |
+| 96998913  | Donjon des Larves - Cinquième salle                         |
+| 96998915  | Donjon des Larves - Cinquième salle bis                     |
+| 96998917  | Donjon des Larves - Onzième salle                           |
+| 96998919  | Donjon des Larves - Sortie                                     |
+| 102760961 | Donjon des Rats du Chateau d'Amakna - Première salle        |
+| 102760963 | Donjon des Rats du Chateau d'Amakna - Cinquième salle       |
+| 102761985 | Donjon des Rats du Chateau d'Amakna - Deuxième salle        |
+| 102761987 | Donjon des Rats du Chateau d'Amakna - Sortie                   |
+| 102763009 | Donjon des Rats du Chateau d'Amakna - Troisième salle       |
+| 102764033 | Donjon des Rats du Chateau d'Amakna - Quatrième salle       |
+| 104333825 | Donjon du Bworker - Première salle                          |
+| 104333827 | Donjon du Bworker - Cinquième salle                         |
+| 104334849 | Donjon du Bworker - Deuxième salle                          |
+| 104334851 | Donjon du Bworker - Sortie                                     |
+| 104335873 | Donjon du Bworker - Troisième salle                         |
+| 104336897 | Donjon du Bworker - Quatrième salle                         |
+| 104595969 | Donjon des Bworks - Première salle                          |
+| 104595971 | Donjon des Bworks - Quatrième salle                         |
+| 104596993 | Donjon des Bworks - Deuxième salle                          |
+| 104596995 | Donjon des Bworks - Cinquième salle                         |
+| 104598017 | Donjon des Bworks - Troisième salle                         |
+| 104598019 | Donjon des Bworks - Sortie                                     |
+| 104599041 | Donjon des Bworks - Cachot                                     |
+| 104599043 | Donjon des Bworks - Cachot de Kreuvète                      |
+| 105381888 | Donjon des Champs - Première salle                          |
+| 105382912 | Donjon des Champs - Deuxième salle                          |
+| 105383936 | Donjon des Champs - Troisième salle                         |
+| 105384960 | Donjon des Champs - Quatrième salle                         |
+| 105385984 | Donjon des Champs - Cinquième salle                         |
+| 105387008 | Donjon des Champs - Sortie                                     |
+| 105644032 | Donjon Ensablé - Première salle                          |
+| 105645056 | Donjon Ensablé - Deuxième salle                          |
+| 105646080 | Donjon Ensablé - Troisième salle                         |
+| 105647104 | Donjon Ensablé - Quatrième salle                         |
+| 105647106 | Donjon Ensablé                                              |
+| 105648128 | Donjon Ensablé - Cinquième salle                         |
+| 105649152 | Donjon Ensablé - Sortie                                     |
+| 106954752 | Donjon des Craqueleurs - Première salle                     |
+| 106955776 | Donjon des Craqueleurs - Deuxième salle                     |
+| 106956800 | Donjon des Craqueleurs - Troisième salle                    |
+| 106957824 | Donjon des Craqueleurs - Quatrième salle                    |
+| 106957826 | Donjon des Craqueleurs                                         |
+| 106957828 | Donjon des Craqueleurs                                         |
+| 106958848 | Donjon des Craqueleurs - Cinquième salle                    |
+| 106959872 | Donjon des Craqueleurs - Sixième salle                      |
+| 106959874 | Donjon des Craqueleurs - Plateau                               |
+| 106960896 | Donjon des Craqueleurs - Septième salle                     |
+| 106961920 | Donjon des Craqueleurs - Sortie                                |
+| 112198145 | Donjon du Comte - Hall des Sinistros                           |
+| 112199169 | Donjon du Comte - Salle de Banquet                             |
+| 112200193 | Donjon du Comte - Galerie des glaçons                       |
+| 112201217 | Donjon du Comte - Atelier d'horlogerie                         |
+| 112202241 | Donjon du Comte - Salle de la Tocante                          |
+| 112203265 | Donjon du Comte - Balcon de Klime                              |
+| 112203269 | Donjon du Comte - Balcon de Missiz Frizz                       |
+| 112203271 | Donjon du Comte - Balcon de Nileza                             |
+| 112203521 | Donjon du Comte - Balcon de Sylargh                            |
+| 112203523 | Donjon du Comte - Grande aiguille                              |
+| 112204289 | Donjon du Comte - Balcon de Klime                              |
+| 112204293 | Donjon du Comte - Balcon de Missiz Frizz                       |
+| 112204295 | Donjon du Comte - Balcon de Nileza                             |
+| 112204545 | Donjon du Comte - Balcon de Sylargh                            |
+| 112204547 | Donjon du Comte - Grande aiguille                              |
+| 121373185 | Donjon des Bouftous - Première salle                        |
+| 121373187 | Donjon des Bouftous - Quatrième salle                       |
+| 121374209 | Donjon des Bouftous - Deuxième salle                        |
+| 121374211 | Donjon des Bouftous - Cinquième salle                       |
+| 121375233 | Donjon des Bouftous - Troisième salle                       |
+| 121375235 | Donjon des Bouftous - Sortie                                   |
++-----------+----------------------------------------------------------------+
+232 rows in set (0.03 sec)

@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.entities.actors.Player;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,9 +19,17 @@ public class MapDoor {
     private int elementID;
     @Getter
     private int type, map;
-    @Getter
+    @Getter @Setter
     private String parameters;
     private String criteria;
+
+    public MapDoor(int ele, int type , int map, String param, String citeria){
+        this.elementID = ele;
+        this.type =type;
+        this.map = map;
+        this.parameters = param;
+        this.criteria = citeria;
+    }
 
     private ConditionExpression m_criteriaExpression;
 

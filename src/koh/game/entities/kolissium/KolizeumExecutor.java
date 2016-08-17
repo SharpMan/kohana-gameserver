@@ -483,7 +483,7 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
     }
 
     public static void teleportLastPosition(Player p) {
-        p.teleport(lastPositions.get(p.getID()).first, lastPositions.get(p.getID()).second);
+        p.fightTeleportation(lastPositions.get(p.getID()).first, lastPositions.get(p.getID()).second);
     }
 
 }
