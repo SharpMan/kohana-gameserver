@@ -11,6 +11,9 @@ public class EffectIncreaseFinalDamages extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         for (Fighter target : castInfos.targets) {
+            if(castInfos.effect.effectUid == 133475 && castInfos.getFight().getFightWorker().round %2 == 0){
+                continue;
+            }
             target.getBuff().addBuff(new BuffIncreaseFinalDamage(castInfos, target));
         }
         return -1;

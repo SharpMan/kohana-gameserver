@@ -196,6 +196,7 @@ HEAL_ATTACKER_DAMAGE_PERCENT_INCURED
              /* BUFFS LEVEL 3*/
                case DAMAGE_REDUCTION:
                case DAMAGE_ARMOR_REDUCTION:
+               case DAMAGE_REFLECTION:
                case DAMMAGES_OCASSIONED:
                case ADD_CRITICAL_DAMAGES_REDUCTION:
                case ADD_PUSH_DAMAGES_REDUCTION:

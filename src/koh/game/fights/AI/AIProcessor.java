@@ -225,7 +225,7 @@ public class AIProcessor {
     }
 
     protected void selectBestSpell(AIAction action, SpellLevel spell, short currentCell) {
-        Short[] cells = fighter.getCastZone(spell, currentCell);
+        final Short[] cells = fighter.getCastZone(spell, currentCell);
         for (Short cell : cells) {
             FightCell fightCell = this.fight.getCell(cell);
             if (fightCell != null) {

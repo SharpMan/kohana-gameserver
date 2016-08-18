@@ -1,16 +1,11 @@
 package koh.game.fights.fighters;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.environments.Pathfunction;
 import koh.game.entities.environments.cells.Zone;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.mob.MonsterGrade;
-import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.FightCell;
@@ -34,8 +29,11 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
- *
  * @author Neo-Craft
  */
 public class BombFighter extends StaticFighter {
@@ -44,11 +42,15 @@ public class BombFighter extends StaticFighter {
     private static final Logger logger = LogManager.getLogger(BombFighter.class);
 
     public BombFighter(Fight fight, Fighter summoner, MonsterGrade monster) {
-        super(fight, summoner,monster);
+        super(fight, summoner, monster);
         super.initFighter(this.grade.getStats(), fight.getNextContextualId());
         this.entityLook = EntityLookParser.copy(this.grade.getMonster().getEntityLook());
         this.adjustStats();
-        this.stats.merge(this.summoner.getStats(),StatsEnum.VITALITY);
+        this.stats.merge(this.summoner.getStats(),
+                StatsEnum.VITALITY, StatsEnum.FIRE_ELEMENT_REDUCTION, StatsEnum.FIRE_ELEMENT_RESIST_PERCENT,
+                StatsEnum.WATER_ELEMENT_REDUCTION, StatsEnum.WATER_ELEMENT_RESIST_PERCENT,
+                StatsEnum.EARTH_ELEMENT_REDUCTION, StatsEnum.EARTH_ELEMENT_RESIST_PERCENT,
+                StatsEnum.AIR_ELEMENT_REDUCTION, StatsEnum.AIR_ELEMENT_RESIST_PERCENT);
         this.stats.addBoost(StatsEnum.VITALITY, -this.summoner.getStats().getBoost(StatsEnum.VITALITY));
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());
@@ -57,7 +59,7 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public void adjustStats() {
-        this.stats.addBase(StatsEnum.VITALITY, (short) Math.max(((double) this.summoner.getStats().getTotal(StatsEnum.VITALITY)) * (0.2f),0));
+        this.stats.addBase(StatsEnum.VITALITY, (short) Math.max(((double) this.summoner.getStats().getTotal(StatsEnum.VITALITY)) * (0.2f), 0));
         this.stats.addBase(StatsEnum.INTELLIGENCE, (short) ((double) this.stats.getEffect(StatsEnum.INTELLIGENCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.CHANCE, (short) ((double) this.stats.getEffect(StatsEnum.CHANCE).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
         this.stats.addBase(StatsEnum.STRENGTH, (short) ((double) this.stats.getEffect(StatsEnum.STRENGTH).base * (1.0 + (double) this.summoner.getLevel() / 100.0)));
@@ -105,20 +107,20 @@ public class BombFighter extends StaticFighter {
 
             case DAMAGE_FIRE:
             case STEAL_FIRE:
-                jet.setValue( Math.floor(jet.doubleValue() * ((100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100)
+                jet.setValue(Math.floor(jet.doubleValue() * ((100 + this.stats.getTotal(StatsEnum.INTELLIGENCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100)
                         + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_FIRE_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100));
                 break;
 
             case DAMAGE_AIR:
             case STEAL_AIR:
-                jet.setValue( Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
-                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100) );
+                jet.setValue(Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.AGILITY) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_AIR_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100));
                 break;
 
             case DAMAGE_WATER:
             case STEAL_WATER:
-                jet.setValue( Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
-                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100) );
+                jet.setValue(Math.floor(jet.doubleValue() * (100 + this.stats.getTotal(StatsEnum.CHANCE) + this.stats.getTotal(StatsEnum.ADD_DAMAGE_PERCENT)) / 100
+                        + this.stats.getTotal(StatsEnum.ADD_DAMAGE_MAGIC) + this.stats.getTotal(StatsEnum.ALL_DAMAGES_BONUS) + this.stats.getTotal(StatsEnum.ADD_WATER_DAMAGES_BONUS)) * (1 + this.stats.getTotal(StatsEnum.COMBO_DAMMAGES) / 100));
                 break;
         }
     }
@@ -166,7 +168,7 @@ public class BombFighter extends StaticFighter {
         int bestValue = -1;
         for (BombFighter bomb : targets) {
             final int result = bomb.personnalMurder(caster, true);
-            if(result < bestValue){
+            if (result < bestValue) {
                 bestValue = result;
             }
 
@@ -177,7 +179,7 @@ public class BombFighter extends StaticFighter {
 
     private int result = 666;
 
-    private int personnalMurder(int casterId, boolean force){
+    private int personnalMurder(int casterId, boolean force) {
         final int result = selfMurder(casterId);
         if (this.fightBombs != null) {
             this.fightBombs.stream().distinct().forEach(Bomb -> Bomb.remove());
@@ -200,7 +202,7 @@ public class BombFighter extends StaticFighter {
         }
         if (this.getLife() <= 0 || force) {
             final int result = selfMurder(casterId);
-            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false,-1);
+            fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false, -1);
             if (this.fightBombs != null) {
                 this.fightBombs.stream().distinct().forEach(Bomb -> Bomb.remove());
             }
@@ -234,7 +236,7 @@ public class BombFighter extends StaticFighter {
             Short[] cells;
             for (Fighter friend : (Iterable<Fighter>) this.team.getAliveFighters().filter(Fighter -> (Fighter instanceof BombFighter) && Fighter.getSummoner() == this.summoner && Pathfunction.inLine(null, this.getCellId(), Fighter.getCellId()) && this.grade.getMonsterId() == ((BombFighter) Fighter).grade.getMonsterId())::iterator) {
                 final int distance = Pathfunction.goalDistance(null, getCellId(), friend.getCellId());
-                logger.debug("Bomb Distance = {}" , distance);
+                logger.debug("Bomb Distance = {}", distance);
                 if (distance >= 2 && distance <= 7) {
                     cells = Pathfunction.getLineCellsBetweenBomb(fight, this.getCellId(), Pathfunction.getDirection(null, this.getCellId(), friend.getCellId()), friend.getCellId(), false);
                     if (cells != null) {

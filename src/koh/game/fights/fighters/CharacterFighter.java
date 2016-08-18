@@ -237,11 +237,22 @@ public class CharacterFighter extends Fighter {
                 //filter veuillez
                 .forEach(list -> {
 
-                    list.filter(e -> e.diceNum == 5453)
+                    list.filter(e -> e.diceNum == 5453 || e.diceNum == 5454)
                             .forEach(effect -> {
                                 fight.launchSpell(this, DAO.getSpells().findSpell(effect.diceNum).getSpellLevel(effect.diceSide), this.getCellId(), true, true, true, -1);
                             });
                 });
+        /*character.getInventoryCache().getEffects(CAST_SPELL_ON_CRITICAL_HIT.value())
+                //filter veuillez
+                .forEach(list -> {
+
+                    list.filter(e -> e.diceNum == 5454)
+                            .findFirst()
+                            .ifPresent(effect -> {
+                                        fight.launchSpell(this, DAO.getSpells().findSpell(effect.diceNum).getSpellLevel((fight.getFightWorker().round %2 == 0) ? 3 : 4), this.getCellId(), true, true, true, -1);
+                                    }
+                            );
+                });*/
         return super.beginTurn();
     }
 

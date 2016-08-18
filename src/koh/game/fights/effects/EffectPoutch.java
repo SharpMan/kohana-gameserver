@@ -38,6 +38,15 @@ public class EffectPoutch extends EffectBase {
                 target.getBuff().addBuff(new BuffPoutch(castInfos, target));
         else {
             if(castInfos.caster.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getID())){
+                if(castInfos.effect.diceNum == 5454){
+                    System.out.println("side"+castInfos.effect.diceSide+" "+(castInfos.getFight().getFightWorker().round %2));
+                    if(castInfos.effect.diceSide == 1 && castInfos.getFight().getFightWorker().round %2 == 0){
+                        return -1;
+                    }
+                    if(castInfos.effect.diceSide == 2 && castInfos.getFight().getFightWorker().round %2 != 0){
+                        return -1;
+                    }
+                }
                 castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getCellId(), true, true, true,castInfos.spellId);
             }
         }
