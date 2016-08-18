@@ -18,9 +18,12 @@ import koh.game.fights.exceptions.FightException;
 import koh.game.fights.exceptions.FighterException;
 import koh.game.fights.exceptions.StopAIException;
 import koh.game.fights.fighters.*;
+import koh.game.fights.layers.FightPortal;
 import koh.game.fights.utils.Path;
+import koh.game.utils.Three;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.IAMindEnum;
+import koh.protocol.client.enums.StatsEnum;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
@@ -224,9 +227,23 @@ public class AIProcessor {
     protected void selectBestSpell(AIAction action, SpellLevel spell, short currentCell) {
         Short[] cells = fighter.getCastZone(spell, currentCell);
         for (Short cell : cells) {
-            final FightCell fightCell = this.fight.getCell(cell);
-
+            FightCell fightCell = this.fight.getCell(cell);
             if (fightCell != null) {
+                if(!fightCell.hasFighter() && fightCell.hasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)){
+                    final Three<Integer, int[], Integer> informations = fight.getTargetThroughPortal(fighter,
+                            cell,
+                            true,
+                            fightCell.getObjects().stream()
+                                    .filter(x -> x.getObjectType() == IFightObject.FightObjectType.OBJECT_PORTAL)
+                                    .findFirst()
+                                    .map(f -> (FightPortal) f)
+                                    .get().caster.getTeam()
+                    );
+                    fightCell = fight.getCell(informations.first.shortValue());
+                    if (fightCell == null) {
+                        continue;
+                    }
+                }
                 final Fighter firstTarget = fightCell.getFighter();
                 if (this.fight.canLaunchSpell(this.fighter, spell, currentCell, cell, firstTarget == null ? -1 : firstTarget.getID())) {
                     double score = this.getSpellScore(action, spell, currentCell, cell);

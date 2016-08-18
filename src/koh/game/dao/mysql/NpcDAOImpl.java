@@ -180,7 +180,7 @@ public class NpcDAOImpl extends NpcDAO {
             NpcItem item = randomEntry(templates.get(1511).getItems());
 
             templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
-                    .customPrice((int) (item.getCustomPrice() + (item.getTemplate().getLevel() <= 100 ? 50 : 100)))
+                    .customPrice((int) (item.getCustomPrice() * 0.69f ))
                     .buyCriterion(item.getBuyCriterion())
                     .maximiseStats(item.isMaximiseStats())
                     .item(item.getItem())
@@ -190,7 +190,7 @@ public class NpcDAOImpl extends NpcDAO {
             item = randomEntry(templates.get(1511).getItems());
 
             templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
-                    .customPrice((int) (item.getCustomPrice() + (item.getTemplate().getLevel() <= 100 ? 50 : 100)))
+                    .customPrice((int) (item.getCustomPrice() * 0.69f))
                     .buyCriterion(item.getBuyCriterion())
                     .maximiseStats(item.isMaximiseStats())
                     .item(item.getItem())
@@ -200,7 +200,7 @@ public class NpcDAOImpl extends NpcDAO {
             item = randomEntry(templates.get(1511).getItems());
 
             templates.get(1524).getItems().put(item.getItem(), NpcItem.builder()
-                    .customPrice((int) (item.getCustomPrice() + (item.getTemplate().getLevel() <= 100 ? 50 : 100)))
+                    .customPrice((int) (item.getCustomPrice()))
                     .buyCriterion(item.getBuyCriterion())
                     .maximiseStats(item.isMaximiseStats())
                     .item(item.getItem())

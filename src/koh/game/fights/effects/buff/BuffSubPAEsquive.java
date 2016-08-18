@@ -22,9 +22,10 @@ public class BuffSubPAEsquive extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
         final MutableInt lostAP = new MutableInt(castInfos.randomJet(target));
         lostAP.setValue(lostAP.getValue() > target.getAP() ? target.getAP() : lostAP.getValue());
+
         castInfos.damageValue = target.calculDodgeAPMP(castInfos.caster, lostAP.intValue(), false, castInfos.duration > 0);
 
         if (castInfos.damageValue != lostAP.intValue() && lostAP.getValue() > 0) {
@@ -32,7 +33,7 @@ public class BuffSubPAEsquive extends BuffEffect {
         }
 
         if (castInfos.damageValue > 0) {
-            BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.SUB_PA, this.castInfos.spellId, (short) this.castInfos.spellId, 0, null, this.castInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, castInfos.damageValue, castInfos.spellLevel, duration, 0), this.target);
+            final BuffStats BuffStats = new BuffStats(new EffectCast(StatsEnum.SUB_PA, this.castInfos.spellId, (short) this.castInfos.spellId, 0, null, this.castInfos.caster, null, false, StatsEnum.NOT_DISPELLABLE, castInfos.damageValue, castInfos.spellLevel, duration, 0), this.target);
             BuffStats.applyEffect(lostAP, null);
             this.target.getBuff().addBuff(BuffStats);
             if (target.getID() == target.getFight().getCurrentFighter().getID()) {
@@ -40,7 +41,7 @@ public class BuffSubPAEsquive extends BuffEffect {
             }
         }
 
-        return super.applyEffect(DamageValue, DamageInfos);
+        return super.applyEffect(damageValue, damageInfos);
     }
 
     @Override

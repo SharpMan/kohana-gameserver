@@ -1,9 +1,16 @@
 package koh.game.fights.AI;
 
+import koh.game.dao.DAO;
+import koh.game.entities.mob.MonsterGrade;
+import koh.game.entities.mob.MonsterTemplate;
 import koh.game.entities.spells.EffectInstanceDice;
+import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.AI.actions.*;
 import koh.game.fights.Fighter;
+import koh.game.fights.fighters.CharacterFighter;
+import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.FightStateEnum;
+import koh.protocol.client.enums.StatsEnum;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Melancholia on 1/11/16.
@@ -43,6 +51,8 @@ public abstract class AIAction {
             this.put(AIActionEnum.MAD, new MadAction());
         }
     };
+
+
 
     private static boolean isGoodState(FightStateEnum state) {
         switch (state) {
@@ -374,6 +384,10 @@ HEAL_ATTACKER_DAMAGE_PERCENT_INCURED
                case SUMMON_DOUBLE:
                case STATIC_SUMMON:
                    return scoreInvocationStatic(AI, effect, targets, reverse, invokPreview);
+
+               case RESTITUE_TARGET_WITH_PDV_PERCENT:
+                   return scoreRestitution(AI,effect,targets,reverse,invokPreview);
+
                case SUMMON:
                case SUMMON_BOMB:
                    return scoreInvocation(AI, effect, targets, reverse, invokPreview);
@@ -412,6 +426,72 @@ HEAL_ATTACKER_DAMAGE_PERCENT_INCURED
            logger.error("Stupid effect {}", effect.toString());
            return 0;
        }
+    }
+
+    protected double scoreRestitution(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean invokPreview) {
+        return scoreRestitution(AI,effect,targets,reverse,invokPreview,15);
+    }
+
+    protected double scoreRestitution(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean invokPreview, int baseScore) {
+        if (reverse)//On evite la boucle infinie
+        {
+            return 0;
+        } else if (AI.getFighter().getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) <= 0) {
+            return 0;
+        }
+        final Fighter zomby = AI.getFight().getDeadFighters()
+                .filter(f -> !f.hasSummoner() && !f.isLeft())
+                .findFirst()
+                .orElse(AI.getFight().getDeadFighters()
+                        .filter(f -> !f.isLeft())
+                        .findFirst()
+                        .orElse(null)
+                );
+
+        if(zomby == null){
+            return 0;
+        }
+
+        double score = baseScore;
+
+        final int lifePercent = effect.diceNum;
+
+        if (!AI.getNeuron().myScoreInvocations.containsKey(zomby.getID())) {
+            if(zomby instanceof CharacterFighter){
+                return baseScore * lifePercent;
+            }
+            else if(zomby instanceof MonsterFighter) {
+                final MonsterGrade monsterLevel = zomby.asMonster().getGrade();
+
+                        List<Fighter> possibleTargets = AI.getFight().getAllyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
+                        for (SpellLevel spell : monsterLevel.getSpells()) {
+                            for (EffectInstanceDice spellEffect : spell.getEffects()) {
+                                int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                                if (currScore > 0) {
+                                    score += currScore;
+                                }
+                            }
+                        }
+                        possibleTargets = AI.getFight().getEnnemyTeam(AI.getFighter().getTeam()).getFighters().filter(x -> x.isAlive()).collect(Collectors.toList());
+                        for (SpellLevel spell : monsterLevel.getSpells()) {
+                            for (EffectInstanceDice spellEffect : spell.getEffects()) {
+                                int currScore = (int) this.getEffectScore(AI, (short) -1, (short) -1, spellEffect, possibleTargets, false, true);
+                                if (currScore > 0) {
+                                    score += currScore;
+                                }
+                            }
+                        }
+                        score += monsterLevel.getStats().totalBasePoints();
+                        score *= monsterLevel.getLevel();
+                        AI.getNeuron().myScoreInvocations.put(zomby.getID(), score);
+                        return score;
+
+
+            }
+        } else {
+            return AI.getNeuron().myScoreInvocations.get(zomby.getID());
+        }
+        return 0;
     }
 
     public enum AIActionEnum {

@@ -499,11 +499,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         return false;
     }
 
-    private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter Fighter, int param1) {
-        return getTargetThroughPortal(Fighter, param1, false,null);
-    }
-
-    private Three<Integer, int[], Integer> getTargetThroughPortal(Fighter fighter, int param1, boolean param2, FightTeam team) {
+    public Three<Integer, int[], Integer> getTargetThroughPortal(Fighter fighter, int param1, boolean param2, FightTeam team) {
         MapPoint _loc3_ = null;
         int damagetoReturn = 0;
         MapPoint _loc16_;

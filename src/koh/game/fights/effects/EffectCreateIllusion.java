@@ -31,9 +31,13 @@ public class EffectCreateIllusion extends EffectBase {
         final int distanceCharacterFromHidedPlace = Pathfunction.goalDistance(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
         final byte ignoredDirection = Pathfunction.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
         final short startCell = castInfos.caster.getCellId();
-        if(Arrays.stream(TRUE_DIRECTION).noneMatch(d -> {
+
+        if(!Arrays.stream(TRUE_DIRECTION).noneMatch(d -> {
+            if(ignoredDirection == d){
+                return true;
+            }
             final FightCell c = castInfos.caster.getFight().getCell(Pathfunction.nextCell(startCell, d, distanceCharacterFromHidedPlace));
-            return c != null && c.canWalk();
+            return c != null  && c.canWalk();
         })){
             return -1;
         }
@@ -45,7 +49,7 @@ public class EffectCreateIllusion extends EffectBase {
         if (buff.applyEffect(null, null) == -3) {
             return -3;
         }
-        buff.duration = /*-1*/2;
+        //buff.duration = /*-1*/2;
 
         final FightCell cell = castInfos.caster.getFight().getCell(castInfos.cellId);
         if (cell != null && castInfos.caster instanceof CharacterFighter) {
@@ -59,11 +63,12 @@ public class EffectCreateIllusion extends EffectBase {
             return -1;
         }
 
-        for (byte Direction : TRUE_DIRECTION) {
-            if (ignoredDirection == Direction) {
+        for (final byte direction : TRUE_DIRECTION) {
+            if (ignoredDirection == direction) {
                 continue;
             }
-            final FightCell summoningCell = castInfos.caster.getFight().getCell(Pathfunction.nextCell(startCell, Direction, distanceCharacterFromHidedPlace));
+            final FightCell summoningCell = castInfos.caster.getFight().getCell(Pathfunction.nextCell(startCell, direction, distanceCharacterFromHidedPlace));
+
             if (summoningCell != null && summoningCell.canWalk()) {
                 final IllusionFighter clone = new IllusionFighter(castInfos.caster.getFight(), castInfos.caster);
                 clone.getFight().joinFightTeam(clone, castInfos.caster.getTeam(), false, summoningCell.Id, true);

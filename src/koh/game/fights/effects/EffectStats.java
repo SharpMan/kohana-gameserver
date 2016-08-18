@@ -45,6 +45,7 @@ public class EffectStats extends EffectBase {
                 target.getBuff().addBuff(new BuffStatsByPortalTeleport(subInfos, target));
             }
             else if (!target.getBuff().buffMaxStackReached(subInfos)) {
+
                 final BuffStats buffStats = new BuffStats(subInfos, target);
                 if (buffStats.applyEffect(null, null) == -3) {
                     return -3;

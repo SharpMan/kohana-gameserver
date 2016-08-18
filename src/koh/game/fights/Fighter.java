@@ -60,6 +60,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     @Getter
     private static final Random RANDOM = new Random();
 
+    @Setter
     protected boolean dead;
     @Setter
     @Getter
@@ -78,7 +79,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     protected int usedAP, usedMP, turnRunning = 19, shieldPoints;
     @Getter
     protected GenericStats stats;
-    @Getter
+    @Getter @Setter
     protected Fighter summoner;
     @Getter
     @Setter

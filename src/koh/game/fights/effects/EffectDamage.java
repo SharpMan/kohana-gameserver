@@ -249,7 +249,7 @@ public class EffectDamage extends EffectBase {
                 return target.tryDie(caster.getID());
             }
 
-            target.setLifeMax(Math.max(1, target.getMaxLife() - (int) Math.floor(damageJet.floatValue() * 0.05f)));
+            target.setLifeMax(Math.max(1, target.getMaxLife() - (int) Math.floor(damageJet.floatValue() * 0.1f)));
 
             // Deduit la vie
             target.setLife(target.getLife() - damageJet.intValue());

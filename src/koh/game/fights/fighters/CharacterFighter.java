@@ -67,8 +67,8 @@ public class CharacterFighter extends Fighter {
         if (super.getLife() == 0) {
             super.setLife(1);
         }
-        this.stats.getEffect(StatsEnum.ACTION_POINTS).additionnal = Math.min(getLevel() >= 100 ? 5 : 6,this.stats.getEffect(StatsEnum.ACTION_POINTS).additionnal);
-        this.stats.getEffect(StatsEnum.MOVEMENT_POINTS).additionnal = Math.min(6,this.stats.getEffect(StatsEnum.MOVEMENT_POINTS).additionnal);
+        this.stats.getEffect(StatsEnum.ACTION_POINTS).objectsAndMountBonus = Math.min(getLevel() >= 100 ? 5 : 6,this.stats.getEffect(StatsEnum.ACTION_POINTS).objectsAndMountBonus);
+        this.stats.getEffect(StatsEnum.MOVEMENT_POINTS).objectsAndMountBonus = Math.min(6,this.stats.getEffect(StatsEnum.MOVEMENT_POINTS).objectsAndMountBonus);
         this.entityLook = EntityLookParser.copy(this.character.getEntityLook());
     }
 

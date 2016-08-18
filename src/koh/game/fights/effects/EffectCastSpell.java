@@ -25,6 +25,13 @@ public class EffectCastSpell extends EffectBase {
         }
 
         if(castInfos.duration > 0){
+            if(castInfos.effect.diceNum == 5570){
+                if(!castInfos.targets.isEmpty()){
+                    castInfos.targets.get(0).getBuff().addBuff(new BuffCastSpell(castInfos, castInfos.targets.get(0)));
+                }
+                return -1;
+
+            }
             for (Fighter target : castInfos.targets)
                 target.getBuff().addBuff(new BuffCastSpell(castInfos, target));
             return -1;

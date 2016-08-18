@@ -735,6 +735,7 @@ public class AttackAction extends AIAction {
         return score;
     }
 
+
     @Override
     protected double scoreInvocation(AIProcessor AI, EffectInstanceDice effect, List<Fighter> targets, boolean reverse, boolean invokPreview) {
         if (reverse)//On evite la boucle infinie

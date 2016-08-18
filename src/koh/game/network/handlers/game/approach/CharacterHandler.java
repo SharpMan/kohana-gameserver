@@ -153,9 +153,11 @@ public class CharacterHandler {
                     DAO.getPlayers().updateName(character);
                 }
             }
-            EntityLook target = character.getEntityLook();
-            if (target.subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER))
-                target = target.subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook;
+            final EntityLook target;
+            if (character.getEntityLook().subentities.stream().anyMatch(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER))
+                target = character.getEntityLook().subentities.stream().filter(x -> x.bindingPointCategory == SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER).findFirst().get().subEntityLook;
+            else
+                target = character.getEntityLook();
 
             final Breed breedTemplate = DAO.getD2oTemplates().getBreed((message.remodel.breed));
             if (breedTemplate == null) {
@@ -187,7 +189,7 @@ public class CharacterHandler {
 
 
             final Head head = DAO.getD2oTemplates().getHead(message.remodel.cosmeticId);
-            if (!(head == null || head.breedtype != breedTemplate.id || head.gendertype == 1 != message.remodel.sex)) {
+            if (head != null && head.breedtype == breedTemplate.id /*|| head.gendertype == 1 != message.remodel.sex)*/) {
                 target.skins.remove(0);
                 target.skins.remove(1);
                 target.skins.add(0,message.remodel.sex ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook());
