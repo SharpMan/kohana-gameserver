@@ -39,7 +39,6 @@ public class EffectPoutch extends EffectBase {
         else {
             if(castInfos.caster.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), castInfos.caster.getID())){
                 if(castInfos.effect.diceNum == 5454){
-                    System.out.println("side"+castInfos.effect.diceSide+" "+(castInfos.getFight().getFightWorker().round %2));
                     if(castInfos.effect.diceSide == 1 && castInfos.getFight().getFightWorker().round %2 == 0){
                         return -1;
                     }

@@ -52,6 +52,9 @@ public class EffectDamage extends EffectBase {
                     bestResult = result;
                 }
                 if (result == -3) {
+                    if(castInfos.getFight().tryEndFight()){
+                        castInfos.getFight().setNeedToFinish(true);
+                    }
                     return -3;
                 }
             }

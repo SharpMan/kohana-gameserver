@@ -125,15 +125,15 @@ public class FighterBuff {
             }
         }
 
-        for (BuffEffect Buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
-            if (Buff.duration != -1 && Buff.decrementDuration() <= 0) {
-                if (Buff.removeEffect() == -3) {
+        for (BuffEffect buff : this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN)) {
+            if (buff.duration != -1 && buff.decrementDuration() <= 0) {
+                if (buff.removeEffect() == -3) {
                     return -3;
                 }
             }
         }
 
-        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.duration <= 0 && x.duration != -1);
+        this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.duration != -1 && x.duration <= 0);
 
         this.buffsAct.values().stream().forEach((BuffList) -> {
             BuffList.removeIf(Buff -> Buff.decrementType == BuffDecrementType.TYPE_BEGINTURN && Buff.duration <= 0 && Buff.duration != -1);
@@ -216,8 +216,9 @@ public class FighterBuff {
     /// <param name="castInfos"></param>
     /// <param name="damageValue"></param>
     public int onAttackAfterJet(EffectCast CastInfos, MutableInt DamageValue) {
-        for (BuffEffect Buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACK_AFTER_JET)) {
-            if (Buff.applyEffect(DamageValue, CastInfos) == -3) {
+        for (BuffEffect buff : buffsAct.get(BuffActiveType.ACTIVE_ATTACK_AFTER_JET)) {
+            //System.out.println("app"+buff.getClass().getName());
+            if (buff.applyEffect(DamageValue, CastInfos) == -3) {
                 return -3;
             }
         }

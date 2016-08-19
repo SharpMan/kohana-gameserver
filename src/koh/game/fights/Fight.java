@@ -379,6 +379,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.fightLoopState = fightLoopState.STATE_END_TURN;
         }
         fighter.setTurnReady(true);
+
     }
 
     public void launchSpell(Fighter fighter, SpellLevel spelllevel, short cellId, boolean friend) {
@@ -393,7 +394,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             if (!cell.canGoTrough())
                 return false;
         }
-        ;
         return (los);
     }
 
@@ -1165,7 +1165,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         this.middleTurn();
                         this.beginTurn();
                     } else if (this.myLoopTimeOut + 5000 < System.currentTimeMillis()) {
-                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.isTurnReady() && x instanceof CharacterFighter).map(y -> ((CharacterFighter) y).getCharacter().getNickName()).toArray(String[]::new), ", ")}));
+                        this.sendToField(new TextInformationMessage((byte) 1, 29, new String[]{StringUtils.join(this.getAliveFighters().filter(x -> !x.isTurnReady() && x.isPlayer()).map(y -> y.getPlayer().getNickName()).toArray(String[]::new), ", ")}));
                         this.middleTurn();
                         this.beginTurn();
                     }
@@ -1190,7 +1190,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         if (!hasFinished || this.isActionsFinish() || this.myLoopActionTimeOut < System.currentTimeMillis()) {
                             hasFinished = true;
                             this.endTurn(true);
-                            //System.Threading.Thread.Sleep(500);
                             this.myTeam1.endFight();
                             this.myTeam2.endFight();
                             this.endFight(this.getWinners(), this.getEnnemyTeam(this.getWinners()));
@@ -1216,10 +1215,18 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         return this.myActions.isEmpty();
     }
 
+    @Getter @Setter
+    private boolean needToFinish;
+
     public synchronized void beginTurn() {
+
+        if(needToFinish){
+            this.myLoopActionTimeOut = System.currentTimeMillis() - 5000;
+            this.fightLoopState = FightLoopState.STATE_WAIT_END;
+            return;
+        }
         // Mise a jour du combattant
         this.currentFighter = this.fightWorker.getNextFighter();
-
         this.startSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
 
         // Activation des buffs et fightObjects
@@ -1554,7 +1561,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     private void setAllUnReady() {
         this.fighters()
-                .filter(fr -> fr instanceof CharacterFighter && ((CharacterFighter) fr).getCharacter().getClient() != null)
+                .filter(fr -> fr.isPlayer() && fr.getPlayer().getClient() != null)
                 .forEach(fr -> fr.setTurnReady(false));
         /*foreach (var Fighter in this.fighters.Where(Fighter => Fighter is DoubleFighter))
          Fighter.turnReady = true;*/
@@ -1566,14 +1573,14 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             return;
         }
 
-        FightCell Cell = this.myFightCells.get(fighter.getTeam()).get(cellId);
+        final FightCell cell = this.myFightCells.get(fighter.getTeam()).get(cellId);
 
         // Existante ?
-        if (Cell != null) {
+        if (cell != null) {
             // Aucun persos dessus ?
-            if (Cell.canWalk()) {
+            if (cell.canWalk()) {
                 // Affectation
-                fighter.setCell(Cell);
+                fighter.setCell(cell);
                 this.fighters().forEach(x -> x.setDirection(this.findPlacementDirection(x)));
                 this.sendToField(new GameEntitiesDispositionMessage(this.fighters().map(x -> x.getIdentifiedEntityDispositionInformations()).toArray(IdentifiedEntityDispositionInformations[]::new)));
             }

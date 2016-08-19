@@ -215,6 +215,16 @@ public class CharacterFighter extends Fighter {
         }
     }
 
+
+    @Override
+    public boolean isTurnReady(){
+        if(character.getClient() == null && fight.getFightState() == FightState.STATE_ACTIVE){
+            return true;
+        }
+        return turnReady;
+    }
+
+
     public void onCloneDisposed() {
         this.fight.observers.stream().filter(x -> !this.isMyFriend(((Player) x))).forEach(o -> ((Player) o).send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
         this.fakeContextualId = -1000;

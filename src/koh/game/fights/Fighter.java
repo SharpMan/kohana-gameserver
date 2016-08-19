@@ -100,7 +100,6 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     protected AtomicInteger nextBuffUid = new AtomicInteger();
     protected short nextCell;
     protected byte nextDir;
-    @Getter
     @Setter
     protected boolean turnReady = true;
     public Object temperoryLook = new Object();
@@ -246,6 +245,12 @@ public abstract class Fighter extends IGameActor implements IFightObject {
      }
      return flag1 && !flag2 ? FightOutcomeEnum.RESULT_LOST : FightOutcomeEnum.RESULT_DRAW;
      }*/
+
+
+    public boolean isTurnReady(){
+        return turnReady;
+    }
+
     public void leaveFight() {
         if (this.fight.getFightState() == FightState.STATE_PLACE) {
             // On le vire de l'equipe
@@ -295,16 +300,14 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 this.fight.getActivableObjects().get(this).stream().forEach(y -> y.remove());
             }
 
-            /*for (final Fighter fighter : aliveFighters) {
-                System.out.println(fighter);
+            for (final Fighter fighter : aliveFighters) {
                 fighter.getBuff().getBuffsDec().values().forEach(list -> {
                     for (BuffEffect buff : (Iterable<BuffEffect>) list.parallelStream()::iterator) {
-                        System.out.println(buff.caster +" "+this +" "+buff.caster.getID());
                         if (buff.caster == this)
                             fighter.getBuff().debuff(buff);
                     }
                 });
-            }*/
+            }
 
             for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
                 fr.getBuff().getBuffsDec().values().forEach(list -> {
@@ -421,7 +424,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
     public boolean canBeginTurn() {
         if (this.isDead()) {
-            return false; // Mort    
+            return false; // Mort
         }
         return true;
     }
