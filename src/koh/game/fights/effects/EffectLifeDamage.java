@@ -25,7 +25,7 @@ public class EffectLifeDamage extends EffectBase {
         {
             for (Fighter Target : castInfos.targets) {
                 int effectBase = castInfos.randomJet(Target);
-                MutableInt DamageValue = new MutableInt((Target.currentLife / 100) * effectBase);
+                final MutableInt DamageValue = new MutableInt((Target.currentLife / 100) * effectBase);
                 //damageValue = (-damageValue);
                 if (EffectDamage.applyDamages(castInfos, Target, DamageValue) == -3) {
                     return -3;

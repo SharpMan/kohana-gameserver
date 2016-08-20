@@ -51,16 +51,16 @@ public class EffectLifeSteal extends EffectBase {
         }
     }
 
-    public static int applyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt DamageJet) {
+    public static int applyLifeSteal(EffectCast CastInfos, Fighter Target, MutableInt damageJet) {
         //castInfos.effectType = StatsEnum.DAMAGE_BRUT;
 
-        if (EffectDamage.applyDamages(CastInfos, Target, DamageJet) == -3) {
+        if (EffectDamage.applyDamages(CastInfos, Target, damageJet) == -3) {
             return -3;
         }
 
        // DamageJet.
 
-        final MutableInt healJet = new MutableInt(DamageJet.intValue() / 2);
+        final MutableInt healJet = new MutableInt(damageJet.intValue() / 2);
 
         if (EffectHeal.applyHeal(CastInfos, CastInfos.caster, healJet,false) == -3) {
             return -3;

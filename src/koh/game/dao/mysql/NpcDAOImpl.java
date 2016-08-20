@@ -12,10 +12,12 @@ import koh.game.entities.actors.pnj.NpcTemplate;
 import koh.game.entities.actors.pnj.replies.*;
 import koh.game.entities.item.ItemTemplate;
 import koh.game.utils.sql.ConnectionResult;
+import koh.game.utils.sql.ConnectionStatement;
 import koh.utils.Enumerable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.stream.Stream;
@@ -77,6 +79,9 @@ public class NpcDAOImpl extends NpcDAO {
                     case "restat":
                         npcReply = new RestatReply();
                         break;
+                    case "dj":
+                        npcReply = new DjReply();
+                        break;
                     default:
                         continue;
                 }
@@ -106,8 +111,8 @@ public class NpcDAOImpl extends NpcDAO {
 
                 i++;
             }
-            npcReply = null;
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());
         }
@@ -132,6 +137,30 @@ public class NpcDAOImpl extends NpcDAO {
             logger.warn(e.getMessage());
         }
         return i;
+    }
+
+    @Override
+    public void insert(Npc npc) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `maps_npcs` VALUES (?,?,?,?,?,?,?,?);")) {
+
+                PreparedStatement pStatement = conn.getStatement();
+
+                pStatement.setInt(1, npc.getNpcId());
+                pStatement.setInt(2, npc.getMapid());
+                pStatement.setShort(3,npc.getCellID());
+                pStatement.setByte(4, npc.getDirection()); //10
+                pStatement.setBoolean(5, npc.isSex());
+                pStatement.setString(6, "");
+                pStatement.setString(7, "");
+                pStatement.setInt(8, 0);
+                pStatement.execute();
+
+                System.out.println(pStatement.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private int loadAllItems() {

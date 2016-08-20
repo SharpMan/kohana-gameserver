@@ -12,9 +12,9 @@ public class EffectDamageBasedLifeLeft extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
         final float effectBase = castInfos.randomJet(castInfos.caster) / 100f;
-        final MutableInt damageValue = new MutableInt((castInfos.caster.getMaxLife() - castInfos.caster.getLife()) * effectBase);
+        final float damageValue = ((castInfos.caster.getMaxLife() - castInfos.caster.getLife()) * effectBase);
         for (Fighter target : castInfos.targets) {
-            if (EffectDamage.applyDamages(castInfos, target, damageValue) == -3) {
+            if (EffectDamage.applyDamages(castInfos, target, new MutableInt(damageValue)) == -3) {
                 return -3;
             }
         }

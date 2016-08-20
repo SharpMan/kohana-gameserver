@@ -20,4 +20,6 @@ public abstract class NpcDAO implements Service {
     public abstract NpcMessage findMessage(int id);
 
     public abstract Stream<NpcReply> repliesAsStream();
+
+    public abstract void insert(Npc npc);
 }

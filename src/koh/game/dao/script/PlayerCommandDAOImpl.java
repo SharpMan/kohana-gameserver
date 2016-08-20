@@ -88,6 +88,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.consoleCommands.put("spawnfix", new SpawnFixCommand());
             this.consoleCommands.put("spawns", new SpawnsCommand());
             this.consoleCommands.put("removespawn", new RemoveSpawn());
+            this.consoleCommands.put("spawnnpc", new SpawnNPC());
 
 
             Files.walk(Paths.get("data/script/console"))

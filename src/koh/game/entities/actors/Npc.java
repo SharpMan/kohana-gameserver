@@ -23,9 +23,22 @@ public class Npc extends IGameActor {
     private int npcId, artwork;
     @Getter
     private short cellID;
+    @Getter
     private boolean sex;
     private GameContextActorInformations contextActorInformations;
     private int[] questsToValid, questsToStart;
+
+    public Npc(int mapId,int npcId,short cell,byte dir,boolean sex, int art){
+        super();
+        this.mapid = mapId;
+        this.cellID = cell;
+        this.direction = dir;
+        this.sex = sex;
+        this.npcId = npcId;
+        this.artwork = art;
+        this.questsToStart = new int[0];
+        this.questsToValid = questsToStart;
+    }
 
     public Npc(ResultSet result) throws SQLException {
         super();
