@@ -8,6 +8,7 @@ import koh.protocol.client.enums.FightDispellableEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
@@ -21,14 +22,19 @@ public class BuffDodge extends BuffEffect {
     }
 
     @Override
-    public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
-        if (target.getCellId() != DamageInfos.targetKnownCellId || Pathfunction.goalDistance(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId()) > 1) {
-            return -1;
+    public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
+        if (target.getCellId() != damageInfos.targetKnownCellId || Pathfunction.goalDistance(target.getFight().getMap(), damageInfos.caster.getCellId(), target.getCellId()) > 1) {
+            if(!(damageInfos.spellLevel != null &&
+                    ArrayUtils.indexOf(damageInfos.spellLevel.getEffects(), damageInfos.effect) > 0 &&
+                    Pathfunction.goalDistance(target.getFight().getMap(), damageInfos.caster.getCellId(), target.getCellId()) > ( ArrayUtils.indexOf(damageInfos.spellLevel.getEffects(), damageInfos.effect)) &&
+                    target.getCellId() != damageInfos.targetKnownCellId)){
+                return -1;
+            }
         }
         damageValue.setValue(0);
 
-        final EffectCast subInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, DamageInfos.caster, null, false, StatsEnum.NONE, 0, null);
-        final byte direction = Pathfunction.getDirection(target.getFight().getMap(), DamageInfos.caster.getCellId(), target.getCellId());
+        final EffectCast subInfos = new EffectCast(StatsEnum.PUSH_BACK, 0, (short) 0, 0, null, damageInfos.caster, null, false, StatsEnum.NONE, 0, null);
+        final byte direction = Pathfunction.getDirection(target.getFight().getMap(), damageInfos.caster.getCellId(), target.getCellId());
 
         // Application du push
         return EffectPush.applyPush(subInfos, this.target, direction, 1);

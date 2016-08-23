@@ -499,6 +499,51 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         return false;
     }
 
+    public FightPortal[] getPortalsThroughPortal(Fighter fighter, int param1, boolean param2, FightTeam team) {
+        MapPoint _loc3_ = null;
+        int damagetoReturn = 0;
+        MapPoint _loc16_;
+        FightPortal[] portals = new FightPortal[0];
+        for (CopyOnWriteArrayList<FightActivableObject> Objects : this.activableObjects.values()) {
+            for (FightActivableObject Object : Objects) {
+                if (Object instanceof FightPortal && team == ((FightPortal) Object).caster.getTeam() && ((FightPortal) Object).enabled) {
+                    portals = ArrayUtils.add(portals, (FightPortal) Object);
+                    if (Object.getCellId() == param1) {
+                        _loc3_ = Object.getMapPoint();
+                    }
+                }
+            }
+        }
+        if (portals.length < 2) {
+            return new FightPortal[0];
+        }
+        if (_loc3_ == null) {
+            return new FightPortal[0];
+        }
+        final int[] _loc10_ = LinkedCellsManager.getLinks(_loc3_, Arrays.stream(portals)/*.filter(x -> x.caster.team == Fighter.team)*/.map(x -> x.getMapPoint()).toArray(MapPoint[]::new));
+        final MapPoint _loc11_ = MapPoint.fromCellId(_loc10_[/*_loc10_.length == 0 ? 0 :*/_loc10_.length - 1]);
+        final MapPoint _loc12_ = MapPoint.fromCellId(fighter.getCellId());
+        if (_loc12_ == null) {
+            return new FightPortal[0];
+        }
+        final int _loc13_ = _loc3_.get_x() - _loc12_.get_x() + _loc11_.get_x();
+        final int _loc14_ = _loc3_.get_y() - _loc12_.get_y() + _loc11_.get_y();
+        if (!MapPoint.isInMap(_loc13_, _loc14_)) {
+            return new FightPortal[0];
+        }
+        final FightPortal[] portailIds = new FightPortal[_loc10_.length];
+        FightPortal portal;
+        for (int i = 0; i < _loc10_.length; i++) {
+            final int ID = _loc10_[i];
+            portal = Arrays.stream(portals).filter(y -> y.getCellId() == ID).findFirst().get();
+            if (fighter.getTeam() == portal.caster.getTeam()) {
+            }
+            portailIds[i] = portal;
+        }
+        return portailIds;
+    }
+
+
     public Three<Integer, int[], Integer> getTargetThroughPortal(Fighter fighter, int param1, boolean param2, FightTeam team) {
         MapPoint _loc3_ = null;
         int damagetoReturn = 0;
@@ -1674,7 +1719,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         // cell de combat
         if (cell == -1) {
             fighter.setCell(this.getFreeSpawnCell2(team));
-        } else {
+        } else if(!(fighter instanceof SummonedFighter || fighter instanceof StaticSummonedFighter)) {
             fighter.setCell(this.getCell(cell));
         }
 

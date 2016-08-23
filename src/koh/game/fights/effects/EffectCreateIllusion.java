@@ -32,9 +32,9 @@ public class EffectCreateIllusion extends EffectBase {
         final byte ignoredDirection = Pathfunction.getDirection(castInfos.caster.getFight().getMap(), castInfos.caster.getCellId(), castInfos.cellId);
         final short startCell = castInfos.caster.getCellId();
 
-        if(!Arrays.stream(TRUE_DIRECTION).noneMatch(d -> {
+        if(Arrays.stream(TRUE_DIRECTION).noneMatch(d -> {
             if(ignoredDirection == d){
-                return true;
+                return false;
             }
             final FightCell c = castInfos.caster.getFight().getCell(Pathfunction.nextCell(startCell, d, distanceCharacterFromHidedPlace));
             return c != null  && c.canWalk();

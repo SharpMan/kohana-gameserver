@@ -35,12 +35,19 @@ public class SlaveReplacerFighter extends SlaveFighter {
             final MonsterFighter summon = new SummonedFighter(fight, replacedMonster, summoner);
             summon.setLife((int)(summon.getLife() * 0.5f));
             summon.joinFight();
+            if (summon.setCell(this.getMyCell(), false) == -3){
+                return -3;
+            }
             summon.getFight().joinFightTeam(summon, summoner.getTeam(), false, this.getCellId(), true);
             fight.sendToField(Pl -> new GameActionFightSummonMessage(ActionIdEnum.ACTION_SUMMON_CREATURE, summoner.getID(), (GameFightFighterInformations) summon.getGameContextActorInformations(Pl)));
             fight.getFightWorker().summonFighter(summon);
+            final int result = summon.getMyCell().onObjectAdded(summon);
             Arrays.stream(replacedMonster.getMonster().getSpellsOnSummons())
                     .mapToObj(sp -> DAO.getSpells().findSpell(sp).getLevelOrNear(1))
                     .forEach(sp -> fight.launchSpell(summon, sp, this.getCellId(), true, true, true,-1));
+            if (result == -3) {
+                return result;
+            }
 
         }
         return value;
@@ -54,12 +61,19 @@ public class SlaveReplacerFighter extends SlaveFighter {
             final MonsterFighter summon = new SummonedFighter(fight, replacedMonster, summoner);
             summon.setLife((int)(summon.getLife() * 0.5f));
             summon.joinFight();
+            if (summon.setCell(this.getMyCell(), false) == -3){
+                return -3;
+            }
             summon.getFight().joinFightTeam(summon, summoner.getTeam(), false, this.getCellId(), true);
             fight.sendToField(Pl -> new GameActionFightSummonMessage(ActionIdEnum.ACTION_SUMMON_CREATURE, summoner.getID(), (GameFightFighterInformations) summon.getGameContextActorInformations(Pl)));
             fight.getFightWorker().summonFighter(summon);
             Arrays.stream(replacedMonster.getMonster().getSpellsOnSummons())
                     .mapToObj(sp -> DAO.getSpells().findSpell(sp).getLevelOrNear(1))
                     .forEach(sp -> fight.launchSpell(summon, sp, this.getCellId(), true, true, true,-1));
+            final int result = summon.getMyCell().onObjectAdded(summon);
+            if (result == -3) {
+                return result;
+            }
 
         }
         return value;

@@ -55,8 +55,13 @@ public class EffectSummon extends EffectBase {
 
                     summon.joinFight();
                     castInfos.caster.getFight().getFightWorker().summonFighter(summon);
+                    if (summon.setCell(castInfos.getCell(), false) == -3){
+                        return -3;
+                    }
                     summon.getFight().joinFightTeam(summon, castInfos.caster.getTeam(), false, castInfos.cellId, true);
+
                     castInfos.caster.getFight().sendToField(Pl -> new GameActionFightSummonMessage(ActionIdEnum.ACTION_SUMMON_CREATURE, castInfos.caster.getID(), (GameFightFighterInformations) summon.getGameContextActorInformations(Pl)));
+
 
                     Arrays.stream(monster.getSpellsOnSummons())
                             .mapToObj(sp -> DAO.getSpells().findSpell(sp).getLevelOrNear(1))
@@ -66,6 +71,15 @@ public class EffectSummon extends EffectBase {
                         castInfos.caster.getStats().getEffect(StatsEnum.ADD_SUMMON_LIMIT).base--;
                         if (castInfos.caster instanceof CharacterFighter)
                             castInfos.caster.send(castInfos.caster.asPlayer().getCharacterStatsListMessagePacket());
+                    }
+
+                    /*if (summon.onCellChanged() == -3) {
+                        return -3;
+                    }*/
+
+                    final int result = summon.getMyCell().onObjectAdded(summon);
+                    if (result != -1) {
+                        return result;
                     }
                 }
             }

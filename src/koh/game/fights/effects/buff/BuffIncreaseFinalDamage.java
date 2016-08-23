@@ -18,9 +18,12 @@ public class BuffIncreaseFinalDamage extends BuffEffect {
 
     private final int JET;
 
-    public BuffIncreaseFinalDamage(EffectCast CastInfos, Fighter Target) {
-        super(CastInfos, Target, BuffActiveType.ACTIVE_ATTACK_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
-        this.JET = CastInfos.randomJet(Target);
+    public BuffIncreaseFinalDamage(EffectCast castInfos, Fighter target) {
+        super(castInfos, target, BuffActiveType.ACTIVE_ATTACK_AFTER_JET, BuffDecrementType.TYPE_BEGINTURN);
+        this.JET = castInfos.randomJet(target);
+        if(castInfos.spellId == 5454){
+            this.duration++;
+        }
     }
 
     @Override

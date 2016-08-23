@@ -101,6 +101,21 @@ public class EffectPush extends EffectBase {
                             continue;
                         direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), castInfos.cellId);
                     }
+                    else if(castInfos.getFight().getCell(castInfos.oldCell).hasGameObject(FightObjectType.OBJECT_PORTAL)
+                        && !Arrays.stream(castInfos.spellLevel.getEffects()).anyMatch(effect -> effect.getEffectType().equals(StatsEnum.DISABLE_PORTAL))){
+                        final FightPortal[] portals = castInfos.getFight().getPortalsThroughPortal(castInfos.caster,
+                                castInfos.oldCell,
+                                true,
+                                castInfos.getFight().getCell(castInfos.oldCell).getObjects().stream()
+                                        .filter(x -> x.getObjectType() == FightObjectType.OBJECT_PORTAL)
+                                        .findFirst()
+                                        .map(f -> (FightPortal) f)
+                                        .get().caster.getTeam()
+                        );
+                        if(portals.length > 0){
+                            direction = Pathfunction.getDirection(target.getFight().getMap(), target.getCellId(), portals[portals.length -1].getCellId());
+                        }
+                    }
                     //System.out.println(castInfos.spellId  + " "+castInfos.effect.effectUid);
                     break;
                 case BACK_CELL:

@@ -245,8 +245,12 @@ public class EffectDamage extends EffectBase {
                     target.getFight().sendToField(new GameActionFightLifeAndShieldPointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, caster.getID(), target.getID(), 0, 0, damageJet.intValue()));
                     damageJet.setValue(0);
                 } else {
-                    damageJet.subtract(target.getShieldPoints());
                     final int lifePointRemaining = damageJet.toInteger() - target.getShieldPoints();
+                    if(damageJet.getValue() > target.getShieldPoints())
+                        damageJet.subtract(target.getShieldPoints());
+                    else
+                        damageJet.setValue(0);
+
                     target.getFight().sendToField(new GameActionFightLifeAndShieldPointsLostMessage(castInfos.effect != null ? castInfos.effect.effectId : ActionIdEnum.ACTION_CHARACTER_ACTION_POINTS_LOST, caster.getID(), target.getID(), lifePointRemaining, 0, target.getShieldPoints()));
                     target.setLife(target.getLife() - lifePointRemaining);
                     target.setShieldPoints(0);
