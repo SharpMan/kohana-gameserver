@@ -25,10 +25,10 @@ public class EffectRestitue extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
 
-        final Fighter zomby = castInfos.getFight().getDeadFighters()
+        final Fighter zomby = castInfos.caster.getTeam().getDeadFighters()
                 .filter(f -> !f.hasSummoner() && !f.isLeft())
                 .findFirst()
-                .orElse(castInfos.getFight().getDeadFighters()
+                .orElse(castInfos.caster.getTeam().getDeadFighters()
                         .filter(f -> !f.isLeft())
                         .findFirst()
                         .orElse(null)

@@ -225,8 +225,14 @@ public class CharacterFighter extends Fighter {
         return turnReady;
     }
 
+    private boolean cloneDispsing;
+
 
     public void onCloneDisposed() {
+        if(cloneDispsing){
+            return;
+        }
+        cloneDispsing = true;
         this.fight.observers.stream().filter(x -> !this.isMyFriend(((Player) x))).forEach(o -> ((Player) o).send(new GameActionFightVanishMessage(1029, this.ID, fakeContextualId)));
         this.fakeContextualId = -1000;
         this.buff.dispell(2763);

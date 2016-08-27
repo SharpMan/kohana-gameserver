@@ -16,6 +16,8 @@ import koh.game.network.handlers.Handler;
 import koh.patterns.services.ServicesProvider;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
+import koh.protocol.messages.game.moderation.PopupWarningMessage;
+import koh.protocol.messages.server.basic.SystemMessageDisplayMessage;
 import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +28,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Neo-Craft
@@ -47,7 +50,10 @@ public class Main {
         return interClient;
     }
 
-    private static final ScheduledExecutorService saveWorker = Executors.newSingleThreadScheduledExecutor();
+    private static final ScheduledExecutorService SAVE_WORKER = Executors.newSingleThreadScheduledExecutor();
+
+    private static ScheduledExecutorService REBOOT_WORKER;
+
     private static CancellableScheduledRunnable saveRunnable;
 
     public static PrintStream createLoggingProxy(final PrintStream realPrintStream) {
@@ -93,7 +99,9 @@ public class Main {
             transfererTimeOut = new TransfererTimeOut(interClient);
             worldServer = new WorldServer(DAO.getSettings().getIntElement("World.Port")).configure().launch();
             logger.info("WorldServer start in {} ms.", (System.currentTimeMillis() - time));
-            saveRunnable = new CancellableScheduledRunnable(saveWorker, 60 * 1000 * 60,60 * 1000 * 60) {
+            scheduleReboot(DAO.getSettings().getIntElement("World.REBOOT"));
+
+            saveRunnable = new CancellableScheduledRunnable(SAVE_WORKER, 60 * 1000 * 60,60 * 1000 * 60) {
 
                 @Override
                 public void run() {
@@ -137,7 +145,7 @@ public class Main {
 
     private static void close() {
         try {
-            saveWorker.shutdown();
+            SAVE_WORKER.shutdown();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -145,5 +153,31 @@ public class Main {
         }
 
     }
+
+    private static int minuteLeft = 0;
+
+    public static void scheduleReboot(int hour){
+        if(REBOOT_WORKER != null){
+            REBOOT_WORKER.shutdownNow();
+        }
+        if(hour == 0){
+            return;
+        }
+        REBOOT_WORKER  = Executors.newSingleThreadScheduledExecutor();
+        REBOOT_WORKER.scheduleWithFixedDelay(() -> {
+            REBOOT_WORKER.scheduleWithFixedDelay(() -> {
+                if (minuteLeft == 10) {
+                    System.exit(0);
+                    return;
+                }
+                if (minuteLeft == 5) {
+                    worldServer.sendPacket(new PopupWarningMessage((byte) 5, "Melancholia","Le serveur va redemarré dans 5minutes (Durée d'indisponibilité 13s)"));
+                }else{
+                    worldServer.sendPacket(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,15, ((10 - minuteLeft) + " " + (minuteLeft == 9 ? "minute" : "minutes"))));
+                }
+                minuteLeft++;
+            },1,1, TimeUnit.MINUTES);
+        },hour,hour, TimeUnit.HOURS);
+    };
 
 }

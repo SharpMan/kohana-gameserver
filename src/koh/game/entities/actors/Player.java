@@ -554,6 +554,9 @@ public class Player extends IGameActor implements Observer {
                 this.myFighter.setLife(this.getLife());
                 client.send(this.myFighter.asPlayer().getCharacterStatsListMessagePacket());
                 CharacterHandler.sendCharacterStatsListMessage(this.client, true);
+                this.myFighter.getStats().getEffect(StatsEnum.ACTION_POINTS).objectsAndMountBonus = Math.min(getLevel() >= 100 ? 5 : 6,this.myFighter.getStats().getEffect(StatsEnum.ACTION_POINTS).objectsAndMountBonus);
+                this.myFighter.getStats().getEffect(StatsEnum.MOVEMENT_POINTS).objectsAndMountBonus = Math.min(3,this.myFighter.getStats().getEffect(StatsEnum.MOVEMENT_POINTS).objectsAndMountBonus);
+
             } else {
                 CharacterHandler.sendCharacterStatsListMessage(this.client, false);
             }

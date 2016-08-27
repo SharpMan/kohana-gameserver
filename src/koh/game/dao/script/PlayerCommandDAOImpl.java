@@ -90,6 +90,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.consoleCommands.put("removespawn", new RemoveSpawn());
             this.consoleCommands.put("spawnnpc", new SpawnNPC());
             this.consoleCommands.put("debug", new DebugCommand());
+            this.consoleCommands.put("rekt", new RebootCommand());
 
 
             Files.walk(Paths.get("data/script/console"))
