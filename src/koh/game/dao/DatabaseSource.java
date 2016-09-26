@@ -10,6 +10,7 @@ import koh.game.app.MemoryService;
 import koh.game.dao.api.*;
 import koh.game.dao.mysql.*;
 import koh.game.dao.script.ArenaBattleDAOImpl;
+import koh.game.dao.script.ChallengeDAOImpl;
 import koh.game.dao.script.MonsterMindDAOImpl;
 import koh.game.dao.script.PlayerCommandDAOImpl;
 import koh.game.dao.sqlite.GuildDAOImpl;
@@ -69,6 +70,7 @@ public class DatabaseSource implements Service {
         binder.bind(MonsterMindDAO.class).to(MonsterMindDAOImpl.class).asEagerSingleton();
         binder.bind(ArenaBattleDAO.class).to(ArenaBattleDAOImpl.class).asEagerSingleton();
         binder.bind(PresetDAO.class).to(PresetDAOImpl.class).asEagerSingleton();
+        binder.bind(ChallengeDAO.class).to(ChallengeDAOImpl.class).asEagerSingleton();
         binder.requestStaticInjection(DAO.class);
     }
 

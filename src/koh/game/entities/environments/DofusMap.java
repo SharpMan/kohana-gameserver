@@ -334,6 +334,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000){
                 @Override
                 public void run() {
+                    grp.getGameRolePlayGroupMonsterInformations().ageBonus = -1;
                     spawnActor(grp);
                 }
             };

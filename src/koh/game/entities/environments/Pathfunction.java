@@ -1,8 +1,11 @@
 package koh.game.entities.environments;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
+import com.google.common.primitives.Bytes;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.maps.pathfinding.MapTools;
 import koh.game.fights.Fight;
@@ -120,6 +123,15 @@ public class Pathfunction {
 
     public static ArrayList<Fighter> getEnnemyNear(Fight fight, FightTeam team, short cellId) {
         return getEnnemyNear(fight, team, cellId, false);
+    }
+
+
+    public static Stream<Fighter> getFightersNext(Fighter fighter){
+        return Bytes.asList(Pathfunction.FIGHT_DIRECTIONS)
+                .stream()
+                .map(dir -> fighter.getFight().getCell(Pathfunction.nextCell(fighter.getCellId(), dir)).getFighter())
+                .filter(o -> o != null);
+
     }
 
     public static ArrayList<Fighter> getEnnemyNear(Fight fight, FightTeam team, short cellId, boolean notVisible) {

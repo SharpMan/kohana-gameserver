@@ -1,13 +1,12 @@
 package koh.game.fights.types;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.fight.Challenge;
 import koh.game.fights.Fight;
-import koh.game.fights.FightFormulas;
 import koh.game.fights.FightTeam;
 import koh.game.fights.FightTypeEnum;
 import koh.game.fights.Fighter;
@@ -30,6 +29,8 @@ import koh.protocol.types.game.context.roleplay.party.NamedPartyTeamWithOutcome;
  */
 public class ChallengeFight extends Fight {
 
+
+
     public ChallengeFight(DofusMap Map, WorldClient attacker, WorldClient defender) {
         super(FightTypeEnum.FIGHT_TYPE_CHALLENGE, Map);
         Fighter attFighter = new CharacterFighter(this, attacker);
@@ -39,7 +40,6 @@ public class ChallengeFight extends Fight {
         defender.addGameAction(new GameFight(defFighter, this));
 
         super.initFight(attFighter, defFighter);
-
     }
 
     @Override

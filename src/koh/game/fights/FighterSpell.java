@@ -27,6 +27,18 @@ public class FighterSpell {
         this.Buffs = FighterBuffs;
     }
 
+    public boolean canLaunchSpellId(int id){
+        if (this.initialCooldown.containsKey(id)) {
+            if (this.initialCooldown.get(id) != null) {
+                int newCoolDown = minCastInterval(id);
+                if ((newCoolDown == 0 ? this.initialCooldown.get(id).initialCooldown : newCoolDown) > 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public boolean canLaunchSpell(SpellLevel spell, int targetId) {
         if (spell.getMinCastInterval() > 0) {
             if (this.initialCooldown.containsKey(spell.getSpellId())) {

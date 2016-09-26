@@ -169,13 +169,22 @@ public class NpcDAOImpl extends NpcDAO {
             ResultSet result = conn.getResult();
 
             while (result.next()) {
-                if (templates.get(result.getInt("npc_shop_id")).getItems() == null) {
-                    templates.get(result.getInt("npc_shop_id")).setItems(new HashMap<>());
+                final NpcTemplate npc = templates.get(result.getInt("npc_shop_id"));
+                if (npc.getItems() == null) {
+                    npc.setItems(new HashMap<>());
                 }
+                //System.out.println(f.getMapid());
 
-                templates.get(result.getInt("npc_shop_id")).getItems().put(result.getInt("item_id"),
+               /* boolean dispo = npcs.entrySet().stream()
+                        .anyMatch(e-> e.getValue().stream().anyMatch(f -> f.getMapid() == 115082755 && f.getCellID() != 260))
+                        && !result.getBoolean("max_stats");
+
+                if(dispo && DAO.getItemTemplates().getTemplate(result.getInt("item_id")) != null && DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() >= 100)
+                 System.out.println("UPDATE `npc_items` set custom_price="+DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() * 1000+" WHERE item_id="+result.getInt("item_id")+" AND npc_shop_id="+result.getInt("npc_shop_id")+";");
+*/
+                npc.getItems().put(result.getInt("item_id"),
                         NpcItem.builder()
-                                .customPrice(result.getFloat("custom_price"))
+                                .customPrice(/*dispo && DAO.getItemTemplates().getTemplate(result.getInt("item_id")) != null && DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() >= 100 ? DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() * 1000 :*/ result.getFloat("custom_price"))
                                 .buyCriterion(result.getString("buy_criterion"))
                                 .maximiseStats(result.getBoolean("max_stats"))
                                 .item(result.getInt("item_id"))

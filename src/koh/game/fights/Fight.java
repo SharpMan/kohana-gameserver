@@ -11,6 +11,7 @@ import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.FieldNotification;
 import koh.game.entities.environments.*;
 import koh.game.entities.environments.cells.Zone;
+import koh.game.entities.fight.Challenge;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.maps.pathfinding.*;
@@ -39,6 +40,7 @@ import koh.protocol.messages.game.actions.fight.*;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.*;
 import koh.protocol.messages.game.context.fight.*;
+import koh.protocol.messages.game.context.fight.challenge.ChallengeInfoMessage;
 import koh.protocol.messages.game.context.fight.character.GameFightShowFighterMessage;
 import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayRemoveChallengeMessage;
@@ -77,6 +79,7 @@ import static koh.protocol.client.enums.StatsEnum.*;
  * @author Neo-Craft
  */
 public abstract class Fight extends IWorldEventObserver implements IWorldField {
+    protected static final Class[] CHALLENGE_CONSTRUCTOR = new Class[] { Fight.class,FightTeam.class};
 
     //public static final ImprovedCachedThreadPool BackGroundWorker2 = new ImprovedCachedThreadPool(5, 50, 2);
     public static final ScheduledExecutorService BACK_GROUND_WORKER = Executors.newScheduledThreadPool(50);
@@ -134,6 +137,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     private int m_sequenceLevel;
     private Stack<SequenceTypeEnum> m_sequences = new Stack<>();
     private AtomicInteger contextualIdProvider = new AtomicInteger(-2);
+    protected Map<Integer, Challenge> challenges = new HashMap<>(3);
 
     public Fight(FightTypeEnum type, DofusMap map) {
         this.fightState = fightState.STATE_PLACE;
@@ -1151,7 +1155,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         // Preparation du lancement
         this.fightState = fightState.STATE_INIT;
 
-        //TODO : CHALLENGE
+        this.challenges.values().forEach(Challenge::onFightStart);
+
+        this.challenges.forEach((id, ch) -> this.sendToField(new ChallengeInfoMessage(id, ch.getTarget() != null ? ch.getTarget().getID() : 0, Challenge.getXPBonus(id), Challenge.getXPBonus(id))));
+
         // Arret du timer
         this.stopTimer("startTimer");
         this.fightTime = System.currentTimeMillis();

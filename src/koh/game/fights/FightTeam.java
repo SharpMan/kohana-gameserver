@@ -21,6 +21,7 @@ import koh.protocol.types.game.context.fight.FightOptionsInformations;
 import koh.protocol.types.game.context.fight.FightTeamInformations;
 import koh.protocol.types.game.context.fight.FightTeamLightInformations;
 import koh.protocol.types.game.context.fight.FightTeamMemberInformations;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class FightTeam {
 
     public AlignmentSideEnum alignmentSide = AlignmentSideEnum.ALIGNMENT_WITHOUT;
 
+    @Getter
     private List<Fighter> myFighters = Fight.POSIBLE ? new CopyOnWriteArrayList<>() : new ArrayList<>(8);
     public byte id;
     public int leaderId;
@@ -186,6 +188,7 @@ public class FightTeam {
     public synchronized int getNextRequestId() {
         return swapRequests.stream().mapToInt(x -> x.requestId).max().orElse(0);
     }
+
 
     public FightTeamLightInformations getFightTeamLightInformations(Player visitor) {
         //byte teamId, int leaderId, byte teamSide, byte teamTypeId, byte nbWaves, byte teamMembersCount, int meanLevel, boolean hasFriend, boolean hasGuildMember, boolean hasAllianceMember, boolean hasGroupMember, boolean hasMyTaxCollector

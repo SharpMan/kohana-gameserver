@@ -5,6 +5,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.actors.MonsterGroup;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.fight.Challenge;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
@@ -23,6 +24,7 @@ import koh.protocol.types.game.context.fight.FightResultFighterListEntry;
 import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
 import lombok.Getter;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -53,6 +55,18 @@ public class MonsterFight extends Fight {
         super.initFight(attFighter, defFighter);
 
         this.monsterGroup.getMonsters().forEach(mob -> super.joinFightTeam(new MonsterFighter(this, mob, this.getNextContextualId(), group), this.myTeam2, false, (short) -1, true));
+        while (this.challenges.size() < 2){
+            final int key = DAO.getChallenges().pop();
+            if(!Challenge.canBeUsed(this, myTeam1, key)){
+                continue;
+            }
+            try {
+                final Challenge chall = DAO.getChallenges().find(key).getDeclaredConstructor(CHALLENGE_CONSTRUCTOR).newInstance(this, myTeam1);
+                this.challenges.put(key, chall);
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e ) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

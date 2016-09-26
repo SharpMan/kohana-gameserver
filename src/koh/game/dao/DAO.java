@@ -83,6 +83,9 @@ public class DAO {
     private static PresetDAO presets;
 
     @Inject @Getter
+    private static ChallengeDAO challenges;
+
+    @Inject @Getter
     private static DatabaseSource dbSource;
 
 

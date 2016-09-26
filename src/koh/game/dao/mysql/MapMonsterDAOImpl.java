@@ -153,30 +153,36 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                 if (map == null) {
                     continue;
                 }
-                map.addMonster(MonsterGroup.builder()
-                        .fix(true)
-                        .fixedCell(result.getShort("cell"))
-                        .gameRolePlayGroupMonsterInformations(
-                                new GameRolePlayGroupMonsterInformations(map.getNextActorId(),
-                                        monsters.find(Integer.parseInt(result.getString("main_creature").split(",")[0])).getEntityLook(),
-                                        new EntityDispositionInformations(result.getShort("cell"), result.getByte("direction")),
-                                        new GroupMonsterStaticInformations(
-                                                new MonsterInGroupLightInformations(Integer.parseInt(result.getString("main_creature").split(",")[0]), Byte.parseByte(result.getString("main_creature").split(",")[1])),
-                                                Arrays.stream(result.getString("underlings").split(";"))
-                                                        .filter(text -> !text.isEmpty())
-                                                        .map(x -> new MonsterInGroupInformations(
-                                                                Integer.parseInt(x.split(",")[0]),
-                                                                Byte.parseByte(x.split(",")[1]),
-                                                                monsters.find(Integer.parseInt(x.split(",")[0])).getEntityLook()))
-                                                        .toArray(MonsterInGroupInformations[]::new)),
+                try {
+                    map.addMonster(MonsterGroup.builder()
+                            .fix(true)
+                            .fixedCell(result.getShort("cell"))
+                            .gameRolePlayGroupMonsterInformations(
+                                    new GameRolePlayGroupMonsterInformations(map.getNextActorId(),
+                                            monsters.find(Integer.parseInt(result.getString("main_creature").split(",")[0])).getEntityLook(),
+                                            new EntityDispositionInformations(result.getShort("cell"), result.getByte("direction")),
+                                            new GroupMonsterStaticInformations(
+                                                    new MonsterInGroupLightInformations(Integer.parseInt(result.getString("main_creature").split(",")[0]), Byte.parseByte(result.getString("main_creature").split(",")[1])),
+                                                    Arrays.stream(result.getString("underlings").split(";"))
+                                                            .filter(text -> !text.isEmpty())
+                                                            .map(x -> new MonsterInGroupInformations(
+                                                                    Integer.parseInt(x.split(",")[0]),
+                                                                    Byte.parseByte(x.split(",")[1]),
+                                                                    monsters.find(Integer.parseInt(x.split(",")[0])).getEntityLook()))
+                                                            .toArray(MonsterInGroupInformations[]::new)),
 
-                                        result.getShort("age_bonus"),
-                                        result.getByte("lot_share"),
-                                        result.getByte("alignement_side"),
-                                        result.getBoolean("key_ring_bonus"),
-                                        result.getBoolean("has_hard_core_drop"),
-                                        result.getBoolean("has_ava_rewaard_token")))
-                        .build());
+                                        /*result.getShort("age_bonus")*/(short) -1,
+                                            result.getByte("lot_share"),
+                                            result.getByte("alignement_side"),
+                                            result.getBoolean("key_ring_bonus"),
+                                            result.getBoolean("has_hard_core_drop"),
+                                            result.getBoolean("has_ava_rewaard_token")))
+                            .build());
+                }
+                catch (Exception e){
+                    log.error("Error at row  @{},{}",result.getInt("map"),result.getShort("cell"));
+                    e.printStackTrace();
+                }
                 ++i;
             }
         } catch (Exception e) {

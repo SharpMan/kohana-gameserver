@@ -170,10 +170,18 @@ public class CharacterHandler {
                 character.setIndexedColors(new ArrayList<Integer>(5) {
                     {
                         for (byte i = 0; i < 5; i++) {
-                            if (message.remodel.colors[i] == -1) {
-                                add(breedTemplate.getColors(message.remodel.sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
-                            } else {
-                                add(message.remodel.colors[i] | (i + 1) * 0x1000000);
+                            try {
+                                if (message.remodel.colors[i] == -1) {
+                                    add(breedTemplate.getColors(message.remodel.sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
+                                } else {
+                                    add(message.remodel.colors[i] | (i + 1) * 0x1000000);
+                                }
+                            }catch (ArrayIndexOutOfBoundsException e){
+                                if (oldColors.get(i) == -1) {
+                                    add(breedTemplate.getColors(message.remodel.sex ? 1 : 0).get(i) | (i + 1) * 0x1000000);
+                                } else {
+                                    add(oldColors.get(i) | (i + 1) * 0x1000000);
+                                }
                             }
                         }
                     }
@@ -191,7 +199,7 @@ public class CharacterHandler {
             final Head head = DAO.getD2oTemplates().getHead(message.remodel.cosmeticId);
             if (head != null && head.breedtype == breedTemplate.id /*|| head.gendertype == 1 != message.remodel.sex)*/) {
                 target.skins.remove(0);
-                target.skins.remove(1);
+                target.skins.remove(0);
                 target.skins.add(0,message.remodel.sex ? breedTemplate.getFemaleLook() : breedTemplate.getMaleLook());
                 target.skins.add(1,Short.parseShort(head.skinstype));
                 character.getSkins().clear();
