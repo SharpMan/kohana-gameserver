@@ -5,6 +5,7 @@ import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.character.PlayerInst;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.fight.Challenge;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.kolissium.ArenaBattle;
@@ -24,6 +25,8 @@ import koh.protocol.types.game.context.fight.FightLoot;
 import koh.protocol.types.game.context.fight.FightResultExperienceData;
 import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
 import koh.utils.SimpleLogger;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by Melancholia on 6/10/16.
@@ -48,6 +51,22 @@ public class KoliseoFight extends Fight {
         // On despawn avant la vue du flag de combat
         attFighter.joinFight();
         defFighter.joinFight();
+        try{
+            while (this.challenges.size() < 2){
+                final int key = DAO.getChallenges().pop();
+                if(!Challenge.canBeUsed(this, myTeam1, key)){
+                    continue;
+                }
+                try {
+                    final Challenge chall = DAO.getChallenges().find(key).getDeclaredConstructor(CHALLENGE_CONSTRUCTOR).newInstance(this, myTeam1);
+                    this.challenges.put(key, myTeam1,chall);
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e ) {
+                    e.printStackTrace();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 

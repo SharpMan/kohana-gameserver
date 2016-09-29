@@ -10,6 +10,7 @@ import koh.game.fights.FightTypeEnum;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.protocol.client.enums.StatsEnum;
+import koh.protocol.messages.game.context.fight.challenge.ChallengeResultMessage;
 import koh.protocol.messages.game.context.fight.challenge.ChallengeTargetsListMessage;
 import lombok.Generated;
 import lombok.Getter;
@@ -48,7 +49,7 @@ public abstract class Challenge {
     public abstract void onFighterHealed(Fighter fighter,EffectCast cast, int heal);
 
     public void failChallenge(){
-        //TODO: call fight
+        this.fight.onChallengeFail(this);
     }
 
     public void validate(){

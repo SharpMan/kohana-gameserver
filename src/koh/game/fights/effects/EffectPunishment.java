@@ -1,5 +1,6 @@
 package koh.game.fights.effects;
 
+import koh.game.entities.fight.Challenge;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffDamagePerAttackantLife;
 import koh.game.fights.effects.buff.BuffReflectSpell;
@@ -159,10 +160,19 @@ public class EffectPunishment extends EffectBase {
                 damageJet.setValue(0);
             }
 
+
             // Dommages superieur a la vie de la cible
             // Dommages superieur a la vie de la cible
             if (damageJet.getValue() > target.getLife() + target.getShieldPoints()) {
                 damageJet.setValue(target.getLife() + target.getShieldPoints());
+            }
+
+            try {
+                for (Challenge challenge : target.getFight().getChallenges().values()) {
+                    challenge.onFighterLooseLife(target, castInfos, damageJet.intValue());
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
 
             // On verifie les point bouclier d'abord

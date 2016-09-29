@@ -1,5 +1,6 @@
 package koh.game.fights.effects;
 
+import koh.game.entities.fight.Challenge;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.BuffHeal;
 import koh.protocol.client.enums.ActionIdEnum;
@@ -49,6 +50,15 @@ public class EffectHeal extends EffectBase {
                 heal.setValue(0);
             }
 
+        }
+
+        try {
+            for (Challenge challenge : target.getFight().getChallenges().values()) {
+                challenge.onFighterHealed(target, castInfos, heal.intValue());
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
 
         // Affectation

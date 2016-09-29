@@ -62,7 +62,7 @@ public class MonsterFight extends Fight {
             }
             try {
                 final Challenge chall = DAO.getChallenges().find(key).getDeclaredConstructor(CHALLENGE_CONSTRUCTOR).newInstance(this, myTeam1);
-                this.challenges.put(key, chall);
+                this.challenges.put(key, myTeam1,chall);
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e ) {
                 e.printStackTrace();
             }

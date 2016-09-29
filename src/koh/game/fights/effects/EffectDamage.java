@@ -1,5 +1,6 @@
 package koh.game.fights.effects;
 
+import koh.game.entities.fight.Challenge;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.*;
 import koh.protocol.client.enums.ActionIdEnum;
@@ -24,7 +25,7 @@ public class EffectDamage extends EffectBase {
         // Si > 0 alors c'est un buff
         if (castInfos.duration > 0) {
             // L'effet est un poison
-            if(castInfos.spellId != 114)
+            if (castInfos.spellId != 114)
                 castInfos.isPoison = true;
 
             // Ajout du buff
@@ -48,17 +49,17 @@ public class EffectDamage extends EffectBase {
             for (Fighter target : castInfos.targets) {
                 final MutableInt damageValue = new MutableInt(castInfos.randomJet(target));
                 final int result = EffectDamage.applyDamages(castInfos, target, damageValue);
-                if(result < bestResult){
+                if (result < bestResult) {
                     bestResult = result;
                 }
                 if (result == -3) {
-                    if(castInfos.getFight().tryEndFight()){
+                    if (castInfos.getFight().tryEndFight()) {
                         castInfos.getFight().setNeedToFinish(true);
                     }
                     return -3;
                 }
             }
-            if(castInfos.isGlyph && bestResult != -1)
+            if (castInfos.isGlyph && bestResult != -1)
                 return bestResult;
         }
 
@@ -93,8 +94,7 @@ public class EffectDamage extends EffectBase {
             }
 
 
-
-            if(castInfos.isCritical()){
+            if (castInfos.isCritical()) {
                 caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));
             }
 
@@ -106,12 +106,10 @@ public class EffectDamage extends EffectBase {
 
 
             // Calcul jet
-            if(castInfos.spellId == 181 && caster.hasSummoner()){
+            if (castInfos.spellId == 181 && caster.hasSummoner()) {
                 caster.getSummoner().computeDamages(castInfos.effectType, damageJet);
-            }
-            else caster.computeDamages(castInfos.effectType, damageJet);
+            } else caster.computeDamages(castInfos.effectType, damageJet);
             //Calcul Bonus Negatif Zone ect ...
-
 
 
             if (castInfos.effect != null && !castInfos.isTrap) {
@@ -120,7 +118,7 @@ public class EffectDamage extends EffectBase {
 
             caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, /*-portalEfficiencyBonus +*/ (castInfos.isCAC ? -caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : -caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
 
-            if(castInfos.isCritical()){
+            if (castInfos.isCritical()) {
                 caster.getStats().addBase(StatsEnum.ADD_DAMAGE_PHYSIC, -caster.getStats().getTotal(StatsEnum.ADD_CRITICAL_DAMAGES));
             }
 
@@ -165,10 +163,10 @@ public class EffectDamage extends EffectBase {
                 }
             }
 
-            if(castInfos.isReturnedDamages && castInfos.getCell() != null && castInfos.getCell().hasFighter()){
+            if (castInfos.isReturnedDamages && castInfos.getCell() != null && castInfos.getCell().hasFighter()) {
                 final BuffEffect buff = castInfos.getCell().getFighter().getBuff().getAllBuffs().filter(b -> b instanceof BuffDammageOcassioned).findFirst().orElse(null);
-                if(buff != null){
-                    buff.applyEffect(damageJet,castInfos);
+                if (buff != null) {
+                    buff.applyEffect(damageJet, castInfos);
                 }
             }
 
@@ -200,17 +198,17 @@ public class EffectDamage extends EffectBase {
                     }
 
                     //TODO trigger
-                    for (BuffShareDamages buff : (Iterable<BuffShareDamages>)target.getBuff().getAllBuffs().filter(bf -> bf instanceof BuffShareDamages)
-                            .map(e -> (BuffShareDamages)e)::iterator){
+                    for (BuffShareDamages buff : (Iterable<BuffShareDamages>) target.getBuff().getAllBuffs().filter(bf -> bf instanceof BuffShareDamages)
+                            .map(e -> (BuffShareDamages) e)::iterator) {
 
                         final Fighter[] alliance = target.getTeam().getAliveFighters()
-                                .filter(f -> f.getBuff().getAllBuffs().anyMatch(buf -> buf instanceof BuffShareDamages && ((BuffShareDamages)buf).getUid() == buff.getUid()))
+                                .filter(f -> f.getBuff().getAllBuffs().anyMatch(buf -> buf instanceof BuffShareDamages && ((BuffShareDamages) buf).getUid() == buff.getUid()))
                                 .toArray(Fighter[]::new);
 
-                        if(alliance.length > 0){
+                        if (alliance.length > 0) {
                             damageJet.setValue(damageJet.getValue() / (alliance.length));
                             for (final Fighter fighter : alliance) {
-                                if(fighter.getID() == target.getID()){
+                                if (fighter.getID() == target.getID()) {
                                     continue;
                                 }
                                 final EffectCast subInfos = new EffectCast(StatsEnum.DAMAGE_BRUT, 0, (short) 0, 0, null, fighter, null, false, StatsEnum.NONE, 0, null);
@@ -233,6 +231,15 @@ public class EffectDamage extends EffectBase {
                 damageJet.setValue(0);
             }
 
+            try {
+                for (Challenge challenge : target.getFight().getChallenges().values()) {
+                    challenge.onFighterLooseLife(target, castInfos, damageJet.intValue());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
             // Dommages superieur a la vie de la cible
             if (damageJet.getValue() > (target.getLife() + target.getShieldPoints())) {
                 damageJet.setValue(target.getLife() + target.getShieldPoints());
@@ -246,7 +253,7 @@ public class EffectDamage extends EffectBase {
                     damageJet.setValue(0);
                 } else {
                     final int lifePointRemaining = damageJet.toInteger() - target.getShieldPoints();
-                    if(damageJet.getValue() > target.getShieldPoints())
+                    if (damageJet.getValue() > target.getShieldPoints())
                         damageJet.subtract(target.getShieldPoints());
                     else
                         damageJet.setValue(0);
