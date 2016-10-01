@@ -173,6 +173,7 @@ public class NpcDAOImpl extends NpcDAO {
                 if (npc.getItems() == null) {
                     npc.setItems(new HashMap<>());
                 }
+
                 //System.out.println(f.getMapid());
 
                /* boolean dispo = npcs.entrySet().stream()
@@ -192,6 +193,25 @@ public class NpcDAOImpl extends NpcDAO {
                                 .build());
                 i++;
             }
+            /*NpcTemplate npc = this.findTemplate(812);
+
+                DAO.getItemTemplates().getItemTemplates().values()
+                        .stream()
+                        .filter(item -> item.getTypeId() == 84)
+                        .forEach(it -> {
+                            if (npc.getItems() == null) {
+                                npc.setItems(new HashMap<>());
+                            }
+                            npc.getItems().put(it.getId(),
+                                    NpcItem.builder()
+                                            .customPrice(0)
+                                            .buyCriterion("")
+                                            .maximiseStats(false)
+                                            .item(it.getId())
+                                            .token(0)
+                                            .build());
+                        });
+*/
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);

@@ -644,7 +644,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
 
                 try {
-                    challenges.values().forEach(ch -> ch.onFighterCastSpell(fighter, spellLevel));
+                    if(!fakeLaunch)
+                        challenges.values().forEach(ch -> ch.onFighterCastSpell(fighter, spellLevel));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1353,11 +1354,12 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         //Chalenge
-        //TODO only for team and !summoner ?
-        try {
-            this.challenges.values().forEach(ch -> ch.onTurnStart(currentFighter));
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
+            try {
+                this.challenges.values().forEach(ch -> ch.onTurnStart(currentFighter));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // Monstre passe le tour
@@ -1383,20 +1385,19 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void endTurn(boolean finish) {
         this.startSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
+        if(!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
+            try {
+                this.challenges.values().forEach(ch -> ch.onTurnEnd(currentFighter));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         // Fin du tour, activation des buffs, pieges etc
         if (this.currentFighter.endTurn() == -3) {
             return;
         }
         this.endSequence(SequenceTypeEnum.SEQUENCE_TURN_END, false);
         // Combat fini a la fin de son tour
-
-
-        //TODO only for team and !summoner ?
-        try {
-            this.challenges.values().forEach(ch -> ch.onTurnEnd(currentFighter));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         // Tout le monde doit se synchro
         this.setAllUnReady();
@@ -1896,8 +1897,16 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             fighter.send(getFightTurnListMessage());
             fighter.send(new GameFightSynchronizeMessage(this.fighters().filter(x -> !x.isLeft()).map(x -> x.getGameContextActorInformations(fighter.getCharacter())).toArray(GameFightFighterInformations[]::new)));
 
-            /*/213.248.126.93 ChallengeInfoMessage Second8 paket
-             /213.248.126.93 ChallengeResultMessage Second9 paket*/
+            try {
+                this.challenges.cellSet().forEach((ch) -> fighter.send(new ChallengeInfoMessage(ch.getRowKey(), ch.getValue().getTarget() != null ? ch.getValue().getTarget().getID() : 0, (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()), (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()))));
+                this.challenges.cellSet()
+                        .stream()
+                        .filter(ch -> !ch.getValue().isFailed())
+                        .forEach(c -> fighter.send(new ChallengeResultMessage(c.getRowKey(), false)));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             CharacterHandler.sendCharacterStatsListMessage(fighter.getCharacter().getClient(), true);
             if (this.currentFighter.getID() == fighter.getID()) {
                 fighter.send(this.currentFighter.asPlayer().getFighterStatsListMessagePacket());
@@ -2052,6 +2061,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
             this.stopTimer("gameLoop");
 
+            this.challenges.cellSet()
+                    .stream()
+                    .filter(ch -> !ch.getValue().isFailed())
+                    .forEach(c -> this.sendToField(new ChallengeResultMessage(c.getRowKey(), true)));
+
             this.myTeam1.getFighters().filter(fr -> fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
             this.myTeam2.getFighters().filter(fr -> fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
 
@@ -2162,8 +2176,16 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         client.send(getFightTurnListMessage());
         client.send(new GameFightSpectateMessage(getFightDispellableEffectExtendedInformations(), getAllGameActionMark(), this.fightWorker.fightTurn, (int) Instant.now().minusMillis(this.fightTime).toEpochMilli(), getIdols()));
         client.send(new GameFightNewRoundMessage(this.fightWorker.round));
-            /*/213.248.126.93 ChallengeInfoMessage Second8 paket
-             /213.248.126.93 ChallengeResultMessage Second9 paket*/
+
+        try {
+            this.challenges.cellSet().forEach((ch) -> client.send(new ChallengeInfoMessage(ch.getRowKey(), ch.getValue().getTarget() != null ? ch.getValue().getTarget().getID() : 0, (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()), (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()))));
+            this.challenges.cellSet()
+                    .stream()
+                    .filter(ch -> !ch.getValue().isFailed())
+                    .forEach(c -> client.send(new ChallengeResultMessage(c.getRowKey(), false)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         CharacterHandler.sendCharacterStatsListMessage(client, true);
         this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 36, client.getCharacter().getNickName()));
         if (this.currentFighter != null) {

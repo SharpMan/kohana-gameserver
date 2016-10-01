@@ -27,12 +27,13 @@ public class Barbare extends Challenge {
 
     @Override
     public void onTurnStart(Fighter fighter) {
-        this.weaponCasted = false;
+        if(fighter.getTeam() == team)
+            this.weaponCasted = false;
     }
 
     @Override
     public void onTurnEnd(Fighter fighter) {
-        if(!weaponCasted){
+        if(fighter.getTeam() == team && !weaponCasted && fighter.isPlayer()){
             this.failChallenge();
         }
     }

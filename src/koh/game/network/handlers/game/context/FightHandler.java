@@ -6,6 +6,7 @@ import koh.game.actions.GameFight;
 import koh.game.actions.GameRequest;
 import koh.game.actions.requests.ChallengeFightRequest;
 import koh.game.entities.actors.Player;
+import koh.game.entities.fight.Challenge;
 import koh.game.fights.Fight;
 import koh.game.fights.Fight.FightLoopState;
 import koh.game.fights.FightState;
@@ -37,6 +38,7 @@ import koh.protocol.messages.game.context.fight.GameFightPlacementSwapPositionsR
 import koh.protocol.messages.game.context.fight.GameFightReadyMessage;
 import koh.protocol.messages.game.context.fight.GameFightTurnFinishMessage;
 import koh.protocol.messages.game.context.fight.GameFightTurnReadyMessage;
+import koh.protocol.messages.game.context.fight.challenge.ChallengeTargetsListRequestMessage;
 import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFightFriendlyAnswerMessage;
 import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFightRequestMessage;
 import koh.protocol.messages.game.guild.ChallengeFightJoinRefusedMessage;
@@ -46,6 +48,20 @@ import koh.protocol.messages.game.guild.ChallengeFightJoinRefusedMessage;
  * @author Neo-Craft
  */
 public class FightHandler {
+
+    @HandlerAttribute(ID = ChallengeTargetsListRequestMessage.MESSAGE_ID)
+    public static void handleChallengeTargetsListRequestMessage(WorldClient client, ChallengeTargetsListRequestMessage message){
+        if (!client.isGameAction(GameActionTypeEnum.FIGHT) || client.getCharacter().getFighter() == null) {
+            client.send(new BasicNoOperationMessage());
+            return;
+        }
+        final Challenge chal = client.getCharacter().getFight().getChallenges().get(message.getChallengedId(),client.getCharacter().getFighter().getTeam());
+        if(chal == null || chal.getTarget() == null){
+            client.send(new BasicNoOperationMessage());
+            return;
+        }
+        chal.sendSingleTarget(client);
+    }
 
     @HandlerAttribute(ID = GameFightOptionToggleMessage.M_ID)
     public static void HandleGameFightOptionToggleMessage(WorldClient client, GameFightOptionToggleMessage Message) {

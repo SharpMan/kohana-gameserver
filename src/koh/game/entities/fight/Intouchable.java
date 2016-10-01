@@ -64,7 +64,7 @@ public class Intouchable extends Challenge{
 
     @Override
     public void onFighterLooseLife(Fighter fighter, EffectCast cast, int damage) {
-        if(fighter.getTeam() == this.team){
+        if(fighter.getTeam() == this.team && fighter.isPlayer()){
             this.failChallenge();
         }
     }

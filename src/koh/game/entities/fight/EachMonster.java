@@ -19,6 +19,7 @@ public class EachMonster extends Challenge {
     public EachMonster(Fight fight, FightTeam team) {
         super(fight, team);
         this.oppositions = new HashMap<>(8);
+        this.killReg = new HashMap<>();
     }
 
     private HashMap<Fighter,Fighter> oppositions;

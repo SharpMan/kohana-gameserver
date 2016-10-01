@@ -69,6 +69,8 @@ public class Elemantaire extends Challenge {
 
     @Override
     public void onFighterLooseLife(Fighter fighter, EffectCast cast, int damage) {
+            if(cast.caster.getTeam() != team || !cast.caster.isPlayer())
+                return;
         StatsEnum general;
         switch (cast.effectType) {
             case DAMAGE_NEUTRAL:

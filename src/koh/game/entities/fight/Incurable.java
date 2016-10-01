@@ -69,7 +69,7 @@ public class Incurable extends Challenge {
 
     @Override
     public void onFighterHealed(Fighter fighter, EffectCast cast, int heal) {
-        if(fighter.getTeam() == this.team){
+        if(cast.caster.getTeam() == this.team && cast.caster.isPlayer()){
             this.failChallenge();
         }
     }

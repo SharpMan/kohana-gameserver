@@ -35,6 +35,7 @@ public class Imprevisible extends Challenge {
             this.target = getEnnemyTeam()
                     .getAliveFighters()
                     .toArray(Fighter[]::new)[random.nextInt((int) getEnnemyTeam().getAliveFighters().count())];
+            this.sendSingleTarget();
         }
 
     }
@@ -77,7 +78,7 @@ public class Imprevisible extends Challenge {
     @Override
     public void onFighterLooseLife(Fighter fighter, EffectCast cast, int damage) {
         if (cast.caster.getTeam() == team &&
-                !cast.caster.hasSummoner() &&
+                cast.caster.isPlayer() &&
                 cast.caster == fight.getCurrentFighter() &&
                 fighter.isFriendlyWith(target) &&
                 fighter != target) {

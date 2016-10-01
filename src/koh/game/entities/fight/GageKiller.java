@@ -49,7 +49,7 @@ public class GageKiller extends Challenge {
             }else{
                 this.target = getEnnemyTeam()
                         .getAliveFighters()
-                        .toArray(Fighter[]::new)[rnd.nextInt((int) getEnnemyTeam().getAliveFighters().count())];
+                        .toArray(Fighter[]::new)[rnd.nextInt((int) Math.max(0,getEnnemyTeam().getAliveFighters().count()))];
                 this.sendSingleTarget();
             }
         }

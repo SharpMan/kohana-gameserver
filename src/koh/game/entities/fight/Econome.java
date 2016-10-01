@@ -35,6 +35,9 @@ public class Econome extends Challenge {
 
     @Override
     public void onTurnStart(Fighter fighter) {
+        if(fighter.getTeam() != team || !fighter.isPlayer()){
+            return;
+        }
         if(fight.getFightWorker().round == 1){
             this.models.put(fighter, new Stack<>());
         }else{
@@ -44,6 +47,9 @@ public class Econome extends Challenge {
 
     @Override
     public void onTurnEnd(Fighter fighter) {
+        if(!models.containsKey(fighter)){
+            return;
+        }
         for (FightAction action : models.get(fighter)) {
             if(currentActions.stream().noneMatch(a -> a.getAction() == action.getAction() && a.getParam().equalsIgnoreCase(action.getParam()))){
                 this.failChallenge();
@@ -72,6 +78,9 @@ public class Econome extends Challenge {
 
     @Override
     public void onFighterCastSpell(Fighter fighter, SpellLevel spell) {
+        if(!models.containsKey(fighter)){
+            return;
+        }
         if(fight.getFightWorker().round == 1){
             models.get(fighter).push(new FightAction(FightActionType.CAST_SPELL, String.valueOf(spell.getId())));
         }else{
@@ -81,6 +90,9 @@ public class Econome extends Challenge {
 
     @Override
     public void onFighterCastWeapon(Fighter fighter, Weapon weapon) {
+        if(!models.containsKey(fighter)){
+            return;
+        }
         if(fight.getFightWorker().round == 1){
             models.get(fighter).push(new FightAction(FightActionType.CAST_WEAPOM, String.valueOf(weapon.getId())));
         }else{

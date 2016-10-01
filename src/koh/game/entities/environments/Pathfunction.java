@@ -129,7 +129,9 @@ public class Pathfunction {
     public static Stream<Fighter> getFightersNext(Fighter fighter){
         return Bytes.asList(Pathfunction.FIGHT_DIRECTIONS)
                 .stream()
-                .map(dir -> fighter.getFight().getCell(Pathfunction.nextCell(fighter.getCellId(), dir)).getFighter())
+                .map(dir -> fighter.getFight().getCell(Pathfunction.nextCell(fighter.getCellId(), dir)))
+                .filter(o -> o != null)
+                .map(dir -> dir.getFighter())
                 .filter(o -> o != null);
 
     }

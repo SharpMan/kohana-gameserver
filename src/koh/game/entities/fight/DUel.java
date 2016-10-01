@@ -70,7 +70,7 @@ public class Duel extends Challenge {
 
     @Override
     public void onFighterLooseLife(Fighter fighter, EffectCast cast, int damage) {
-        if(fighter.getTeam() != team && !cast.caster.hasSummoner()){
+        if(fighter.getTeam() != team && cast.caster.isPlayer()){
             if(oppositions.containsKey(fighter) && oppositions.get(fighter) != cast.caster){
                 this.failChallenge();
             }

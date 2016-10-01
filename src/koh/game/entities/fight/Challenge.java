@@ -9,11 +9,12 @@ import koh.game.fights.FightTeam;
 import koh.game.fights.FightTypeEnum;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
+import koh.game.network.WorldClient;
 import koh.protocol.client.enums.StatsEnum;
-import koh.protocol.messages.game.context.fight.challenge.ChallengeResultMessage;
 import koh.protocol.messages.game.context.fight.challenge.ChallengeTargetsListMessage;
 import lombok.Generated;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 
@@ -27,6 +28,9 @@ public abstract class Challenge {
     protected final FightTeam team;
     /*@Generated*/ @Getter
     protected Fighter target;
+
+    @Getter @Setter
+    private boolean failed;
 
     public Challenge(Fight fight, FightTeam team) {
         this.fight = fight;
@@ -43,13 +47,14 @@ public abstract class Challenge {
     public abstract void onFighterCastSpell(Fighter fighter, SpellLevel spell);
     public abstract void onFighterCastWeapon(Fighter fighter, Weapon weapon);
     public abstract void onFighterTackled(Fighter fighter);
-    //TODO must be greather than 0 and not summoned the caster
+    //TODO not summoned the caster
     public abstract void onFighterLooseLife(Fighter fighter, EffectCast cast, int damage);
     //TODO if aster is summoned pass
     public abstract void onFighterHealed(Fighter fighter,EffectCast cast, int heal);
 
     public void failChallenge(){
         this.fight.onChallengeFail(this);
+        this.failed = true;
     }
 
     public void validate(){
@@ -58,6 +63,9 @@ public abstract class Challenge {
 
     public void sendSingleTarget(){
         this.fight.sendToField(new ChallengeTargetsListMessage(new int[]{ target.getID()}, new short[] { target.getCellId()}));
+    }
+    public void sendSingleTarget(WorldClient client){
+        client.send(new ChallengeTargetsListMessage(new int[]{ target.getID()}, new short[] { target.getCellId()}));
     }
 
 
@@ -68,6 +76,10 @@ public abstract class Challenge {
 
     public static boolean canBeUsed(Fight fight, FightTeam team, int id){
         switch (id){
+            case 9:
+                if(!team.getFighters().allMatch(fr -> fr.isPlayer() && fr.getPlayer().getInventoryCache().getWeapon() != null)){
+                    return true;
+                }
             case 48:
             case 30:
             case 47:
@@ -96,6 +108,7 @@ public abstract class Challenge {
                     return false;
                 }
             case 37:
+            case 39:
                 if(team.getFighters().count() < 2L){
                     return false;
                 }
@@ -106,20 +119,20 @@ public abstract class Challenge {
             case 23:
                 if(team.getFighters().anyMatch(f-> f.isPlayer() && f.getPlayer().getMySpells().getSpells().stream().anyMatch(sp ->
                         Arrays.stream(sp.getEffects()).anyMatch(e -> e.getEffectType() == StatsEnum.SUB_RANGE)))){
-                    return false;
-                }
+                    return true;
+                }else return false;
             case 12:
                 if(team.getFighters().filter(f-> f.isPlayer() && f.getPlayer().getMySpells().hasSpell(Fossoyeur.SPELL)).count() < 2L){
                     return false;
                 }
             case 14:
                 if(team.getFighters().anyMatch(f-> f.isPlayer() && f.getPlayer().getMySpells().hasSpell(RoyalCasino.SPELL))){
-                    return false;
-                }
+                    return true;
+                }else return false;
             case 15://id
                 if(team.getFighters().anyMatch(f-> f.isPlayer() && f.getPlayer().getMySpells().hasSpell(Araknophile.SPELL))){
-                    return false;
-                }
+                    return true;
+                }else return false;
 
             default:
                 return true;

@@ -125,9 +125,12 @@ public class MonsterGrade {
         this.myStats.addBase(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, this.waterResistance);
         this.myStats.addBase(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, this.neutralResistance);
         this.myStats.addBase(StatsEnum.DAMAGE_REFLECTION, this.damageReflect);
-        this.myStats.addBase(StatsEnum.ADD_SUMMON_LIMIT, this.getMonster().isUseSummonSlot() ? 3 : 7);
+        //final int summonLimit = this.getMonster().isUseSummonSlot() ? 3 : 7;
+        this.myStats.addBase(StatsEnum.ADD_SUMMON_LIMIT, this.monsterId == 2898 ? 1 : (this.getMonster().isUseSummonSlot() ? 3 : 7));
 
     }
+
+
 
     public MonsterTemplate getMonster() {
         return DAO.getMonsters().find(this.monsterId);

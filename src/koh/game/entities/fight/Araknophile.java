@@ -7,6 +7,7 @@ import koh.game.fights.Fight;
 import koh.game.fights.FightTeam;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
+import koh.protocol.client.enums.StatsEnum;
 
 /**
  * Created by Melancholia on 8/29/16.
@@ -31,7 +32,9 @@ public class Araknophile extends Challenge {
 
     @Override
     public void onTurnEnd(Fighter fighter) {
-        if(fighter.getPlayer().getMySpells().hasSpell(SPELL) && fighter.getSpellsController().canLaunchSpellId(SPELL)){
+        if(fighter.getSpells().stream().anyMatch(s -> s.getSpellId() ==SPELL)
+                && fighter.getStats().getTotal(StatsEnum.ADD_SUMMON_LIMIT) > 0
+                && fighter.getSpellsController().canLaunchSpellId(SPELL)){
             this.failChallenge();
         }
     }

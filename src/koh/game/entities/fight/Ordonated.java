@@ -50,7 +50,7 @@ public class Ordonated extends Challenge {
             this.target = fight.getEnnemyTeam(team).getAliveFighters()
                     .sorted((e1, e2) -> Integer.compare(e1.getLevel(), e2.getLevel()))
                     .findFirst()
-                    .get();
+                    .orElse(null);
             if(this.target != null)
                 this.sendSingleTarget();
         }

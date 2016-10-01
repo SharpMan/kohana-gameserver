@@ -41,7 +41,7 @@ public class FightFormulas {
                     4.7
             };
 
-    public static int computeXpWin(CharacterFighter fighter, MonsterFighter[] droppersResults) {
+    public static int computeXpWin(CharacterFighter fighter, MonsterFighter[] droppersResults, double butin) {
         int result;
         if (droppersResults.length == 0) {
             result = 0;
@@ -69,7 +69,7 @@ public class FightFormulas {
             }
             double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
             double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
-            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.WISDOM)) / 100.0) * num8 * fighter.getCharacter().getExpBonus());
+            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.WISDOM)) / 100.0) * num8 * (fighter.getCharacter().getExpBonus() + butin -1 ));
             if(result < 0){
                 logger.error(num7+" "+num8+" "+num6+" "+num5+" "+num4+" "+num3+" "+num2+" "+num);
             }
@@ -428,19 +428,19 @@ public class FightFormulas {
     }
 
 
-    public static double adjustDropChance(Fighter looter, MonsterDrop item, MonsterGrade dropper, int monsterAgeBonus) {
-        return item.getDropRate((int) dropper.getGrade()) * ((double) looter.getStats().getTotal(StatsEnum.PROSPECTING) / 100.0) * ((double) monsterAgeBonus / 100.0 + 1.0) * DAO.getSettings().getDoubleElement("Rate.Kamas");
+    public static double adjustDropChance(Fighter looter, MonsterDrop item, MonsterGrade dropper, int monsterAgeBonus, double butin) {
+        return item.getDropRate((int) dropper.getGrade()) * ((double) looter.getStats().getTotal(StatsEnum.PROSPECTING) / 100.0) * ((double) monsterAgeBonus / 100.0 + 1.0) * DAO.getSettings().getDoubleElement("Rate.Drop") * butin;
     }
 
 
-    public static void rollLoot(Fighter looter, MonsterGrade mob, int prospectingSum, Map<MonsterDrop, Integer> droppedItems, List<DroppedItem> list) {
+    public static void rollLoot(Fighter looter, MonsterGrade mob, int prospectingSum, Map<MonsterDrop, Integer> droppedItems, List<DroppedItem> list, double butin) {
         mob.getMonster().getDrops()
                 .stream()
                 .filter(drop -> prospectingSum >= drop.getProspectingLock())
                 .forEach(current -> {
                     if ((current.getDropLimit() <= 0 || !droppedItems.containsKey(current) || droppedItems.get(current) < current.getDropLimit())) {
                         double num2 = (double) looter.getRANDOM().nextInt(100) + looter.getRANDOM().nextDouble();
-                        double num3 = adjustDropChance(looter, current, mob, (int) looter.getFight().ageBonus);
+                        double num3 = adjustDropChance(looter, current, mob, (int) looter.getFight().ageBonus,butin);
                         if (num3 >= num2) {
                             final Optional<DroppedItem> item = list.stream()
                                     .filter(dr -> dr.getItem() == current.getObjectId())

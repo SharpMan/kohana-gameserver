@@ -35,7 +35,7 @@ public class Survivant extends Challenge {
 
     @Override
     public void onFighterKilled(Fighter target, Fighter killer) {
-        if(target.getTeam() == team && !target.hasSummoner()){
+        if(target.getTeam() == team /*&& !target.hasSummoner()*/){
             this.failChallenge();
         }
     }

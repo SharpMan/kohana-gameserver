@@ -44,10 +44,13 @@ public class ZombyChallenge extends Challenge {
 
     @Override
     public void onFighterMove(Fighter fighter, MovementPath path) {
+        if(fighter.getTeam() != team || !fighter.isPlayer())
+            return;
+
         if(lastTurn == turn){
             this.failChallenge();
         }else{
-            if(path.transitCells.size() > 1){
+            if(path.transitCells.size() > 2){
                 this.failChallenge();
             }else{
                 this.lastMove = path.transitCells.size();

@@ -29,7 +29,7 @@ public class Nomade extends Challenge {
 
     @Override
     public void onTurnEnd(Fighter fighter) {
-        if(fighter.getMP() > 0){
+        if(fighter.getTeam() == team && !fighter.hasSummoner() && fighter.getMP() > 0){
             this.failChallenge();
         }
     }

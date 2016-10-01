@@ -29,7 +29,7 @@ public class Collant extends Challenge {
 
     @Override
     public void onTurnEnd(Fighter fighter) {
-        if(!fighter.hasSummoner() && fighter.getTeam() == team){
+        if(fighter.isPlayer() && fighter.getTeam() == team){
             if(Pathfunction.getFightersNext(fighter).noneMatch(f -> f.isFriendlyWith(fighter))){
                 this.failChallenge();
             }

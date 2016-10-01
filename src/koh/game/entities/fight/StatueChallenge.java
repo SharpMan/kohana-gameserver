@@ -27,11 +27,16 @@ public class StatueChallenge extends Challenge {
 
     @Override
     public void onTurnStart(Fighter fighter) {
+        if(fighter.getTeam() != team || !fighter.isPlayer())
+            return;
+
         this.cell = fighter.getCellId();
     }
 
     @Override
     public void onTurnEnd(Fighter fighter) {
+        if(fighter.getTeam() != team || !fighter.isPlayer())
+            return;
         if(cell != fighter.getCellId()){
             this.failChallenge();
         }

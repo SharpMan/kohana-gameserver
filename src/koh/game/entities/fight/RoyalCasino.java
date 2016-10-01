@@ -31,7 +31,7 @@ public class RoyalCasino extends Challenge {
 
     @Override
     public void onTurnEnd(Fighter fighter) {
-        if(fighter.getPlayer().getMySpells().hasSpell(SPELL) && fighter.getSpellsController().canLaunchSpellId(SPELL)){
+        if(fighter.getSpells().stream().anyMatch(s -> s.getSpellId() == SPELL) && fighter.getSpellsController().canLaunchSpellId(SPELL)){
             this.failChallenge();
         }
     }

@@ -28,7 +28,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
 
     private static final Logger logger = LogManager.getLogger(ItemTemplateDAO.class);
 
-    private final Map<Integer, ItemTemplate> itemTemplates = new HashMap<>(11000);
+
     private final Map<Integer, ItemSet> itemSets = new HashMap<>(377);
     private final Map<Integer, PetTemplate> pets = new HashMap<>(114);
     private final Map<Integer, ItemType> itemTypes = new HashMap<>(171);

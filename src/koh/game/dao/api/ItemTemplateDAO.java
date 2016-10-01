@@ -6,9 +6,13 @@ import koh.game.entities.spells.EffectInstance;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.EffectInstanceInteger;
 import koh.patterns.services.api.Service;
+import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static koh.game.MySQL.executeQuery;
 
@@ -19,6 +23,8 @@ import static koh.game.MySQL.executeQuery;
 public abstract class ItemTemplateDAO implements Service {
 
     private static final Logger logger = LogManager.getLogger(ItemTemplateDAO.class);
+    @Getter
+    protected final Map<Integer, ItemTemplate> itemTemplates = new HashMap<>(11000);
 
     public static EffectInstanceDice[] readDiceEffects(byte[] blob){
         final IoBuffer buf = IoBuffer.wrap(blob);

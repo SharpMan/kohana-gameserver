@@ -69,7 +69,8 @@ public class Abnegation extends Challenge {
 
     @Override
     public void onFighterHealed(Fighter fighter, EffectCast cast, int heal) {
-        if(fighter.getTeam() == team && !cast.caster.hasSummoner() && cast.caster.isFriendlyWith(fighter)){
+        if(fighter.getTeam() == team && fighter.isPlayer()
+                && cast.caster.getTeam() == team && cast.caster.isPlayer()){
             this.failChallenge();
         }
     }

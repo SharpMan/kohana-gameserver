@@ -54,6 +54,8 @@ public class SightLose extends Challenge{
 
     @Override
     public void onFighterCastSpell(Fighter fighter, SpellLevel spell) {
+        if(fighter.getTeam() != team || !fighter.isPlayer())
+            return;
         if(Arrays.stream(spell.getEffects()).anyMatch(e-> e.getEffectType() == StatsEnum.SUB_RANGE)){
             this.failChallenge();
         }

@@ -29,7 +29,7 @@ public class Petulant extends Challenge {
 
     @Override
     public void onTurnEnd(Fighter fighter) {
-        if(fighter.getAP() > 0){
+        if(fighter.getTeam() == team && fighter.isPlayer() && fighter.getAP() > 0){
             this.failChallenge();
         }
 

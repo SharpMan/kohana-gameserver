@@ -51,6 +51,8 @@ public class Versatile extends Challenge {
 
     @Override
     public void onFighterCastSpell(Fighter fighter, SpellLevel spell) {
+        if(fighter.getTeam() != team || !fighter.isPlayer())
+            return;
         if(action == null){
             this.action = new FightAction(FightActionType.CAST_SPELL, String.valueOf(spell.getId()));
         }else if(action.getAction() != FightActionType.CAST_SPELL || !action.getParam().equalsIgnoreCase(String.valueOf(spell.getId()))){
@@ -60,6 +62,8 @@ public class Versatile extends Challenge {
 
     @Override
     public void onFighterCastWeapon(Fighter fighter, Weapon weapon) {
+        if(fighter.getTeam() != team || !fighter.isPlayer())
+            return;
         if(action == null){
             this.action = new FightAction(FightActionType.CAST_WEAPOM, String.valueOf(weapon.getId()));
         }else if(action.getAction() != FightActionType.CAST_WEAPOM || !action.getParam().equalsIgnoreCase(String.valueOf(weapon.getId()))){

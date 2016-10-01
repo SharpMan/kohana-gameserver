@@ -5,7 +5,7 @@ import koh.game.dao.DAO;
 import koh.game.entities.actors.MonsterGroup;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.environments.DofusMap;
-import koh.game.entities.fight.Challenge;
+import koh.game.entities.fight.*;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
@@ -25,10 +25,7 @@ import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
 import lombok.Getter;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -39,6 +36,8 @@ public class MonsterFight extends Fight {
     @Getter
     private MonsterGroup monsterGroup;
 
+
+    static final Random rnd = new Random();
 
     public MonsterFight(DofusMap map, WorldClient player, MonsterGroup group) {
         super(FightTypeEnum.FIGHT_TYPE_PvM, map);
@@ -55,7 +54,7 @@ public class MonsterFight extends Fight {
         super.initFight(attFighter, defFighter);
 
         this.monsterGroup.getMonsters().forEach(mob -> super.joinFightTeam(new MonsterFighter(this, mob, this.getNextContextualId(), group), this.myTeam2, false, (short) -1, true));
-        while (this.challenges.size() < 2){
+        while (this.challenges.size() < 1 + (rnd.nextBoolean() ? 1 : 0)){
             final int key = DAO.getChallenges().pop();
             if(!Challenge.canBeUsed(this, myTeam1, key)){
                 continue;
@@ -111,16 +110,21 @@ public class MonsterFight extends Fight {
         final int teamPP = winners.getFighters().mapToInt(fr -> fr.getStats().getTotal(StatsEnum.PROSPECTING)).sum();
         final int baseKamas = loosers.equals(this.myTeam2) ? Arrays.stream(deadMobs).mapToInt(mob -> mob.getGrade().getMonster().getKamasWin(Fight.RANDOM)).sum() : 0; //sum min max
         final HashMap<MonsterDrop, Integer> droppedItems = new HashMap<>();
+        final double butin = (this.challenges.cellSet().stream()
+                .filter(c -> c.getColumnKey() == winners && !c.getValue().isFailed())
+                .mapToInt(c -> Challenge.getXPBonus(c.getRowKey()))
+                .sum() * 0.01) + 1;
+
 
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) { //In stream.foreach you should use final var that suck
             if (fighter instanceof CharacterFighter) {
                 super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_VICTORY);
-                final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs));
+                final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs,butin));
                 final int guildXp = FightFormulas.guildXpEarned(fighter.asPlayer(), exp), mountXp = FightFormulas.mountXpEarned(fighter.asPlayer(), exp);
                 fighter.getPlayer().addExperience(exp.get(), false);
                 final List<DroppedItem> loots = new ArrayList<>(7);
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
-                    FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots);
+                    FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots,butin);
                 });
                 loots.add(new DroppedItem(11503, Arrays.stream(deadMobs).mapToInt(MonsterFighter::getLevel).sum() / 3));
                 fighter.getPlayer().addScore(ScoreType.PVM_WIN);
@@ -167,7 +171,7 @@ public class MonsterFight extends Fight {
         for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
             if (fighter.isPlayer()) {
                 super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_LOST);
-                final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs));
+                final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs, 1));
                 final int guildXp = FightFormulas.guildXpEarned(fighter.asPlayer(), exp), mountXp = FightFormulas.mountXpEarned(fighter.asPlayer(), exp);
                 fighter.getPlayer().addExperience(exp.get(), false);
                 fighter.getPlayer().addScore(ScoreType.PVM_LOOSE);
@@ -223,7 +227,7 @@ public class MonsterFight extends Fight {
                 .map(Fighter -> ((MonsterFighter) Fighter))
                 .toArray(MonsterFighter[]::new);
 
-        final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter, deadMobs));
+        final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter, deadMobs,1));
         final int guildXp = FightFormulas.guildXpEarned(fighter, exp), mountXp = FightFormulas.mountXpEarned(fighter, exp);
         fighter.getCharacter().addExperience(exp.get(), false);
         if (this.myResult == null)

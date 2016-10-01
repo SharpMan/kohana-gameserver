@@ -72,7 +72,7 @@ public class Elitiste extends Challenge {
 
     @Override
     public void onFighterLooseLife(Fighter fighter, EffectCast cast, int damage) {
-        if(target.isAlive() && fighter != target && fighter.isFriendlyWith(target)){
+        if(target.isAlive() && fighter != target && fighter.isFriendlyWith(target) && cast.caster.isPlayer()){
             this.failChallenge();
         }
     }

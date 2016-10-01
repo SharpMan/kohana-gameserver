@@ -35,7 +35,7 @@ public class Soumis  extends Challenge {
 
     @Override
     public void onFighterKilled(Fighter target, Fighter killer) {
-        if(killer.getPlayer().hasSexe()){
+        if(killer.getTeam() == team && killer.isPlayer() && killer.getPlayer().hasSexe()){
             this.failChallenge();
         }
     }

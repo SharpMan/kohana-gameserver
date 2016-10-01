@@ -31,7 +31,7 @@ public class Anachorete extends Challenge {
 
     @Override
     public void onTurnEnd(Fighter fighter) {
-        if(!fighter.hasSummoner() && fighter.getTeam() == team){
+        if(fighter.isPlayer() && fighter.getTeam() == team){
             if(Pathfunction.getFightersNext(fighter).anyMatch(f -> f.isFriendlyWith(fighter))){
                 this.failChallenge();
             }

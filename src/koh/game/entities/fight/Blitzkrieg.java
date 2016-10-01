@@ -67,7 +67,7 @@ public class Blitzkrieg extends Challenge {
 
     @Override
     public void onFighterLooseLife(Fighter fighter, EffectCast cast, int damage) {
-        if(fighter.getTeam() != team && (target == null || !target.isAlive())){
+        if(fighter.getTeam() != team && cast.caster.isPlayer() && (target == null || !target.isAlive())){
             this.target = fighter;
             this.sendSingleTarget();
         }
