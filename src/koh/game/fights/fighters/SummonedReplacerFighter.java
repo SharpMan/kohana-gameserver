@@ -86,6 +86,28 @@ public class SummonedReplacerFighter extends SummonedFighter {
                 });
             }
 
+            for(Fighter fr : fight.getTeam1().getMyFighters()){
+                if(fr.isAlive()){
+                    fr.getBuff().getBuffsDec().values().forEach(list -> {
+                        for(BuffEffect buff : (Iterable<BuffEffect>) list.stream()::iterator){
+                            if(buff.caster == this)
+                                fr.getBuff().debuff(buff);
+                        }
+                    });
+                }
+            }
+
+            for(Fighter fr : fight.getTeam2().getMyFighters()){
+                if(fr.isAlive()){
+                    fr.getBuff().getBuffsDec().values().forEach(list -> {
+                        for(BuffEffect buff : (Iterable<BuffEffect>) list.stream()::iterator){
+                            if(buff.caster == this)
+                                fr.getBuff().debuff(buff);
+                        }
+                    });
+                }
+            }
+
             /*for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
                 fr.getBuff().getBuffsDec().values().forEach(list -> {
                     for(BuffEffect buff : (Iterable<BuffEffect>) list.stream()::iterator){

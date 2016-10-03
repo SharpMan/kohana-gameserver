@@ -234,6 +234,8 @@ public class EffectDamage extends EffectBase {
             try {
                 if(damageJet.getValue() > 0)
                 for (Challenge challenge : target.getFight().getChallenges().values()) {
+                    if(!challenge.canBeAnalyzed())
+                        continue;
                     challenge.onFighterLooseLife(target, castInfos, damageJet.intValue());
                 }
             } catch (Exception e) {

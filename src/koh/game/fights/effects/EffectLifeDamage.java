@@ -23,11 +23,11 @@ public class EffectLifeDamage extends EffectBase {
             }
         } else // Dommage direct
         {
-            for (Fighter Target : castInfos.targets) {
-                int effectBase = castInfos.randomJet(Target);
-                final MutableInt DamageValue = new MutableInt((Target.currentLife / 100) * effectBase);
+            for (Fighter target : castInfos.targets) {
+                int effectBase = castInfos.randomJet(target);
+                final MutableInt damageValue = new MutableInt((castInfos.caster.currentLife / 100) * effectBase);
                 //damageValue = (-damageValue);
-                if (EffectDamage.applyDamages(castInfos, Target, DamageValue) == -3) {
+                if (EffectDamage.applyDamages(castInfos, target, damageValue) == -3) {
                     return -3;
                 }
             }

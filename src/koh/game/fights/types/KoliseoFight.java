@@ -131,6 +131,10 @@ public class KoliseoFight extends Fight {
         log.append("\n");
 
 
+        final double butin = (this.challenges.cellSet().stream()
+                .filter(c -> c.getColumnKey() == winners && !c.getValue().isFailed())
+                .mapToInt(c -> Challenge.getXPBonus(c.getRowKey()))
+                .sum() * 0.01) + 1;
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) {
             super.addNamedParty((CharacterFighter) fighter, FightOutcomeEnum.RESULT_VICTORY);
             log.append("Winner : ").append(fighter.getPlayer().getNickName()).append("Cote ").append(fighter.getPlayer().getKolizeumRate().getRatingd()).append(" ");
@@ -145,7 +149,7 @@ public class KoliseoFight extends Fight {
                 continue;
             final int diviser = AntiCheat.deviserBy(getLoosers().getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true, FightTypeEnum.FIGHT_TYPE_PVP_ARENA);
             int cote = FightFormulas.cotePoint(fighter.asPlayer(), winners.getFighters(), loosers.getFighters(), false) / diviser;
-            final short honorWon = (short) (FightFormulas.koliseoPoint(fighter, winners.getFighters(), loosers.getFighters(), false, true) / diviser);
+            final short honorWon = (short) ((FightFormulas.koliseoPoint(fighter, winners.getFighters(), loosers.getFighters(), false, true) / diviser) * butin);
             fighter.getPlayer().setKoliseoPoints(fighter.getPlayer().getKoliseoPoints() + honorWon);
             long count;
             try {

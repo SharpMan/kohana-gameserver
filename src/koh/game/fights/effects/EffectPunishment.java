@@ -169,6 +169,8 @@ public class EffectPunishment extends EffectBase {
 
             try {
                 for (Challenge challenge : target.getFight().getChallenges().values()) {
+                    if(!challenge.canBeAnalyzed())
+                        continue;
                     challenge.onFighterLooseLife(target, castInfos, damageJet.intValue());
                 }
             }catch (Exception e){

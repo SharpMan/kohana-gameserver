@@ -54,6 +54,8 @@ public class EffectHeal extends EffectBase {
 
         try {
             for (Challenge challenge : target.getFight().getChallenges().values()) {
+                if(!challenge.canBeAnalyzed())
+                    continue;
                 challenge.onFighterHealed(target, castInfos, heal.intValue());
             }
         }

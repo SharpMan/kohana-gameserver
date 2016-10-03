@@ -6,13 +6,11 @@ import koh.game.entities.item.Weapon;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.Fight;
 import koh.game.fights.FightTeam;
-import koh.game.fights.FightTypeEnum;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.fight.challenge.ChallengeTargetsListMessage;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,11 +28,15 @@ public abstract class Challenge {
     protected Fighter target;
 
     @Getter @Setter
-    private boolean failed;
+    private boolean failed, validated;
 
     public Challenge(Fight fight, FightTeam team) {
         this.fight = fight;
         this.team = team;
+    }
+
+    public boolean canBeAnalyzed(){
+        return !validated && !failed;
     }
 
     public abstract void onFightStart();
@@ -53,12 +55,13 @@ public abstract class Challenge {
     public abstract void onFighterHealed(Fighter fighter,EffectCast cast, int heal);
 
     public void failChallenge(){
-        this.fight.onChallengeFail(this);
+        this.fight.onChallengeUpdated(this,false);
         this.failed = true;
     }
 
     public void validate(){
-
+        this.fight.onChallengeUpdated(this,true);
+        this.validated = true;
     }
 
     public void sendSingleTarget(){

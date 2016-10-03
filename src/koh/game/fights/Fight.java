@@ -645,7 +645,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 try {
                     if(!fakeLaunch)
-                        challenges.values().forEach(ch -> ch.onFighterCastSpell(fighter, spellLevel));
+                        challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterCastSpell(fighter, spellLevel));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -929,7 +929,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
 
                 try {
-                    challenges.values().forEach(ch -> ch.onFighterCastWeapon(fighter, weapon.getWeaponTemplate()));
+                    challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterCastWeapon(fighter, weapon.getWeaponTemplate()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1356,7 +1356,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         //Chalenge
         if(!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
             try {
-                this.challenges.values().forEach(ch -> ch.onTurnStart(currentFighter));
+                this.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onTurnStart(currentFighter));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1387,7 +1387,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         this.startSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
         if(!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
             try {
-                this.challenges.values().forEach(ch -> ch.onTurnEnd(currentFighter));
+                this.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onTurnEnd(currentFighter));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1425,13 +1425,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     }
 
-    public void onChallengeFail(Challenge chal) {
+    public void onChallengeUpdated(Challenge chal, boolean status) {
         this.sendToField(new ChallengeResultMessage(challenges.cellSet()
                 .stream()
                 .filter(c -> c.getValue() == chal)
                 .mapToInt(c -> c.getRowKey())
                 .findFirst()
-                .orElse(0), false)
+                .orElse(0), status)
         );
     }
 
@@ -1446,7 +1446,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             this.sendToField(new GameActionFightTackledMessage(ActionIdEnum.ACTION_CHARACTER_ACTION_TACKLED, fighter.getID(), tacklers.stream().mapToInt(x -> x.getID()).toArray()));
 
             try {
-                this.challenges.values().forEach(ch -> ch.onFighterTackled(fighter));
+                this.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterTackled(fighter));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1601,7 +1601,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         fighter.usedMP += path.getMovementLength();
         this.sendToField(new GameActionFightPointsVariationMessage(ActionIdEnum.ACTION_CHARACTER_MOVEMENT_POINTS_USE, fighter.getID(), fighter.getID(), (short) -path.getMovementLength()));
         try {
-            this.challenges.values().forEach(ch -> ch.onFighterSetCell(fighter, fighter.getCellId(), path.getEndCell()));
+            this.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterSetCell(fighter, fighter.getCellId(), path.getEndCell()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1609,7 +1609,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         fighter.setDirection(path.getEndDirection());
         this.endSequence(SequenceTypeEnum.SEQUENCE_MOVE, false);
         try {
-            this.challenges.values().forEach(ch -> ch.onFighterMove(fighter, path));
+            this.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterMove(fighter, path));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1903,6 +1903,11 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         .stream()
                         .filter(ch -> !ch.getValue().isFailed())
                         .forEach(c -> fighter.send(new ChallengeResultMessage(c.getRowKey(), false)));
+                this.challenges.cellSet()
+                        .stream()
+                        .filter(ch -> ch.getValue().isValidated())
+                        .forEach(c -> fighter.send(new ChallengeResultMessage(c.getRowKey(), true)));
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -2183,6 +2188,10 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     .stream()
                     .filter(ch -> !ch.getValue().isFailed())
                     .forEach(c -> client.send(new ChallengeResultMessage(c.getRowKey(), false)));
+            this.challenges.cellSet()
+                    .stream()
+                    .filter(ch -> ch.getValue().isValidated())
+                    .forEach(c -> client.send(new ChallengeResultMessage(c.getRowKey(), true)));
         } catch (Exception e) {
             e.printStackTrace();
         }

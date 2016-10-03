@@ -319,7 +319,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             }
 
             try {
-                this.fight.challenges.values().forEach(ch -> ch.onFighterKilled(this, fight.fighters().filter(f -> f.getID() == casterId).findFirst().orElse(this)));
+                this.fight.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterKilled(this, fight.fighters().filter(f -> f.getID() == casterId).findFirst().orElse(this)));
             }
             catch (Exception e){
                 e.printStackTrace();
