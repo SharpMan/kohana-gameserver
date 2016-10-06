@@ -33,7 +33,11 @@ public class MapCharactersCriterion extends Criterion {
     public boolean eval(Player character) {
         int count = character.getCurrentMap().playersCount();
         if (this.mapId != -1) {
-            return this.Compare((Comparable<Integer>) character.getCurrentMap().getId(), this.mapId) && this.Compare((Comparable<Integer>) count, this.charactersCount);
+            if(this.charactersCount != -1)
+                return this.Compare((Comparable<Integer>) character.getCurrentMap().getId(), this.mapId) && this.Compare((Comparable<Integer>) count, this.charactersCount);
+            else {
+                return this.Compare((Comparable<Integer>) character.getCurrentMap().getId(), this.mapId);
+            }
         } else {
             return this.Compare((Comparable<Integer>) count, this.charactersCount);
         }

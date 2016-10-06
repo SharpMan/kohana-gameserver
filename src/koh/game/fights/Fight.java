@@ -30,6 +30,7 @@ import koh.game.fights.fighters.*;
 import koh.game.fights.layers.FightActivableObject;
 import koh.game.fights.layers.FightPortal;
 import koh.game.fights.layers.FightTrap;
+import koh.game.fights.types.KoliseoFight;
 import koh.game.fights.utils.Algo;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.game.approach.CharacterHandler;
@@ -1898,14 +1899,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             fighter.send(new GameFightSynchronizeMessage(this.fighters().filter(x -> !x.isLeft()).map(x -> x.getGameContextActorInformations(fighter.getCharacter())).toArray(GameFightFighterInformations[]::new)));
 
             try {
-                this.challenges.cellSet().forEach((ch) -> fighter.send(new ChallengeInfoMessage(ch.getRowKey(), ch.getValue().getTarget() != null ? ch.getValue().getTarget().getID() : 0, (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()), (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()))));
                 this.challenges.cellSet()
                         .stream()
-                        .filter(ch -> !ch.getValue().isFailed())
+                        .filter(c -> c.getColumnKey() == fighter.getTeam())
+                        .forEach((ch) -> fighter.send(new ChallengeInfoMessage(ch.getRowKey(), ch.getValue().getTarget() != null ? ch.getValue().getTarget().getID() : 0, (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()), (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()))));
+                this.challenges.cellSet()
+                        .stream()
+                        .filter(ch -> !ch.getValue().isFailed() && ch.getColumnKey() == fighter.getTeam())
                         .forEach(c -> fighter.send(new ChallengeResultMessage(c.getRowKey(), false)));
                 this.challenges.cellSet()
                         .stream()
-                        .filter(ch -> ch.getValue().isValidated())
+                        .filter(ch -> ch.getValue().isValidated() && hc.getColumnKey() == fighter.getTeam())
                         .forEach(c -> fighter.send(new ChallengeResultMessage(c.getRowKey(), true)));
 
             } catch (Exception e) {
@@ -2066,10 +2070,17 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
             this.stopTimer("gameLoop");
 
+
+
             this.challenges.cellSet()
                     .stream()
                     .filter(ch -> !ch.getValue().isFailed())
-                    .forEach(c -> this.sendToField(new ChallengeResultMessage(c.getRowKey(), true)));
+                    .forEach(c -> this.sendToField(new FieldNotification(new ChallengeResultMessage(c.getRowKey(), true)) {
+                        @Override
+                        public boolean can(Player perso) {
+                            return !(perso.getFighter() != null && perso.getFighter().getTeam() != c.getColumnKey());
+                        }
+                    }));
 
             this.myTeam1.getFighters().filter(fr -> fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));
             this.myTeam2.getFighters().filter(fr -> fr instanceof CharacterFighter).forEach(c -> c.getPlayer().getFightsRegistred().remove(this));

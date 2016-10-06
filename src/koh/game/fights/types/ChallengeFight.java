@@ -40,22 +40,6 @@ public class ChallengeFight extends Fight {
         defender.addGameAction(new GameFight(defFighter, this));
 
         super.initFight(attFighter, defFighter);
-        try{
-            while (this.challenges.size() < 2){
-                final int key = DAO.getChallenges().pop();
-                if(!Challenge.canBeUsed(this, myTeam1, key)){
-                    continue;
-                }
-                try {
-                    final Challenge chall = DAO.getChallenges().find(key).getDeclaredConstructor(CHALLENGE_CONSTRUCTOR).newInstance(this, myTeam1);
-                    this.challenges.put(key, myTeam1,chall);
-                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e ) {
-                    e.printStackTrace();
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     @Override
