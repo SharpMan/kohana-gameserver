@@ -184,7 +184,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public abstract void leaveFight(Fighter Fighter);
-    //TODO ActionIdConverter.ACTION_FIGHT_DISABLE_PORTAL
 
     public abstract void endFight(FightTeam Winners, FightTeam Loosers);
 
@@ -645,7 +644,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
 
                 try {
-                    if(!fakeLaunch)
+                    if (!fakeLaunch)
                         challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterCastSpell(fighter, spellLevel));
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1184,7 +1183,18 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
         try {
             this.challenges.values().forEach(Challenge::onFightStart);
-            this.challenges.cellSet().forEach((ch) -> this.sendToField(new ChallengeInfoMessage(ch.getRowKey(), ch.getValue().getTarget() != null ? ch.getValue().getTarget().getID() : 0, (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()), (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()))));
+            if (this instanceof KoliseoFight) {
+                this.challenges.cellSet()
+                        .stream()
+                        .filter(ch -> !ch.getValue().isFailed())
+                        .forEach(ch -> this.sendToField(new FieldNotification(new ChallengeInfoMessage(ch.getRowKey(), ch.getValue().getTarget() != null ? ch.getValue().getTarget().getID() : 0, (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()), (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()))) {
+                            @Override
+                            public boolean can(Player perso) {
+                                return !(perso.getFighter() != null && perso.getFighter().getTeam() != ch.getColumnKey());
+                            }
+                        }));
+            } else
+                this.challenges.cellSet().forEach((ch) -> this.sendToField(new ChallengeInfoMessage(ch.getRowKey(), ch.getValue().getTarget() != null ? ch.getValue().getTarget().getID() : 0, (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()), (int) Math.round(Challenge.getXPBonus(ch.getRowKey()) * this.getChallengeCoefficient()))));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1355,7 +1365,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
 
         //Chalenge
-        if(!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
+        if (!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
             try {
                 this.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onTurnStart(currentFighter));
             } catch (Exception e) {
@@ -1386,7 +1396,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     public void endTurn(boolean finish) {
         this.startSequence(SequenceTypeEnum.SEQUENCE_TURN_END);
-        if(!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
+        if (!(currentFighter.isPlayer() && currentFighter.getPlayer().getClient() == null)) {
             try {
                 this.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onTurnEnd(currentFighter));
             } catch (Exception e) {
@@ -1427,13 +1437,26 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
     public void onChallengeUpdated(Challenge chal, boolean status) {
-        this.sendToField(new ChallengeResultMessage(challenges.cellSet()
-                .stream()
-                .filter(c -> c.getValue() == chal)
-                .mapToInt(c -> c.getRowKey())
-                .findFirst()
-                .orElse(0), status)
-        );
+        if (this instanceof KoliseoFight) {
+            final Table.Cell<Integer, FightTeam, Challenge> cell = challenges.cellSet()
+                    .stream()
+                    .filter(c -> c.getValue() == chal)
+                    .findFirst().orElse(null);
+
+            this.sendToField(new FieldNotification(new ChallengeResultMessage(cell == null ? 0 : cell.getRowKey(), status)) {
+                @Override
+                public boolean can(Player perso) {
+                    return !(perso.getFighter() != null && perso.getFighter().getTeam() != cell.getColumnKey());
+                }
+            });
+        } else
+            this.sendToField(new ChallengeResultMessage(challenges.cellSet()
+                    .stream()
+                    .filter(c -> c.getValue() == chal)
+                    .mapToInt(c -> c.getRowKey())
+                    .findFirst()
+                    .orElse(0), status)
+            );
     }
 
     protected void onTackled(Fighter fighter, int movementLength) {
@@ -1909,7 +1932,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                         .forEach(c -> fighter.send(new ChallengeResultMessage(c.getRowKey(), false)));
                 this.challenges.cellSet()
                         .stream()
-                        .filter(ch -> ch.getValue().isValidated() && hc.getColumnKey() == fighter.getTeam())
+                        .filter(ch -> ch.getValue().isValidated() && ch.getColumnKey() == fighter.getTeam())
                         .forEach(c -> fighter.send(new ChallengeResultMessage(c.getRowKey(), true)));
 
             } catch (Exception e) {
@@ -2069,7 +2092,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             }
 
             this.stopTimer("gameLoop");
-
 
 
             this.challenges.cellSet()

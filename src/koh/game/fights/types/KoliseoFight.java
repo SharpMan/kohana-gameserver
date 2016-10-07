@@ -131,7 +131,7 @@ public class KoliseoFight extends Fight {
         log.append("\n");
 
 
-        final double butin = (this.challenges.cellSet().stream()
+        final double butin = Math.abs(this.challenges.cellSet().stream()
                 .filter(c -> c.getColumnKey() == winners && !c.getValue().isFailed())
                 .mapToInt(c -> Challenge.getXPBonus(c.getRowKey()))
                 .sum() * 0.01) + 1;
