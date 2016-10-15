@@ -1,12 +1,5 @@
 package koh.game.entities.item.animal;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
@@ -14,12 +7,16 @@ import koh.game.entities.item.InventoryItem;
 import koh.protocol.client.enums.ItemsEnum;
 import koh.protocol.messages.game.inventory.items.ObjectModifiedMessage;
 import koh.protocol.types.game.data.items.ObjectEffect;
-import koh.protocol.types.game.data.items.effects.*;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
+import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.mina.core.buffer.IoBuffer;
 
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+
 /**
- *
  * @author Neo-Craft
  */
 public class PetsInventoryItem extends InventoryItem {
@@ -71,8 +68,7 @@ public class PetsInventoryItem extends InventoryItem {
             this.serializeInformations();
             this.removeEffect(995);
 
-            this.effects.add(new ObjectEffectInteger(995, this.entity.petsID));
-            this.notifyColumn("effects");
+            this.getEffects$Notify().add(new ObjectEffectInteger(995, this.entity.petsID));
 
             DAO.getPetInventories().insert(this.entity);
         }
@@ -96,7 +92,7 @@ public class PetsInventoryItem extends InventoryItem {
         return DAO.getItemTemplates().getPetTemplate(this.getTemplateId());
     }
 
-    public boolean eat(Player p, InventoryItem food) {
+    public synchronized boolean eat(Player p, InventoryItem food) {
         //TODO : refresh stat of the player
         final PetTemplate pet = getAnimal();
         if (pet == null) {
@@ -105,7 +101,6 @@ public class PetsInventoryItem extends InventoryItem {
             //TODO : life
             return true;
         } else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
-            this.removeEffect(983);
             return false;
         } else if (((int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat))) < 60 /*pet.getMinDurationBeforeMeal()*/) {
             PlayerController.sendServerMessage(p.getClient(), "Veuillez patientez " + ((/*getAnimal().getMinDurationBeforeMeal()*/60) - ((int) TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - Long.parseLong(this.entity.lastEat)))) + " minutes pour le prochain repas");
@@ -116,9 +111,10 @@ public class PetsInventoryItem extends InventoryItem {
         for (FoodItem i : getAnimal().getFoodItems()) {
             if (food.getTemplateId() == i.getItemID()) {
                 if (!this.eatedFoods.containsKey(food.getTemplateId())) {
-                    this.eatedFoods.put(food.getTemplateId(), 0);
-                }
-                this.eatedFoods.put(food.getTemplateId(), this.eatedFoods.get(food.getTemplateId()) + 1);
+                    this.eatedFoods.put(food.getTemplateId(), 1);
+                } else
+                    this.eatedFoods.put(food.getTemplateId(), this.eatedFoods.get(food.getTemplateId()) + 1);
+
                 this.entity.pointsUsed += i.getPoint();
                 this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
@@ -126,7 +122,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.checkLastEffect();
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
-                PlayerController.sendServerMessage(p.getClient(),"Next meal in 60 minutes");
+                PlayerController.sendServerMessage(p.getClient(), "Next meal in 60 minutes");
                 return true;
             }
         }
@@ -143,7 +139,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.checkLastEffect();
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
-                PlayerController.sendServerMessage(p.getClient(),"Next meal in 60 minutes");
+                PlayerController.sendServerMessage(p.getClient(), "Next meal in 60 minutes");
                 return true;
             }
         }
@@ -151,7 +147,7 @@ public class PetsInventoryItem extends InventoryItem {
         return false;
     }
 
-    public int getEatedFood(int id) {
+    public int getEatenFood(int id) {
         if (this.eatedFoods.containsKey(id)) {
             return this.eatedFoods.get(id);
         }
@@ -160,7 +156,7 @@ public class PetsInventoryItem extends InventoryItem {
 
     public void updateDate() {
         final Calendar now = Calendar.getInstance();
-        if(this.effects.stream().anyMatch(e -> e.actionId == 808))
+        if (this.effects.stream().anyMatch(e -> e.actionId == 808))
             ((ObjectEffectDate) this.getEffect(808)).SetDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR), now.get(Calendar.MINUTE));
         else
             this.effects.add(new ObjectEffectDate(808, now.get(Calendar.YEAR), (byte) now.get(Calendar.MONTH), (byte) now.get(Calendar.DAY_OF_MONTH), (byte) now.get(Calendar.HOUR), (byte) now.get(Calendar.MINUTE)));
@@ -171,7 +167,7 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public void boost(int effectID, int count) {
-         final  ObjectEffect Effect = this.getEffect(effectID);
+        final ObjectEffect Effect = this.getEffect(effectID);
         if (Effect == null) {
             this.effects.add(new ObjectEffectInteger(effectID, count));
         } else {
@@ -184,6 +180,13 @@ public class PetsInventoryItem extends InventoryItem {
     public void save() {
         this.serializeInformations();
         DAO.getPetInventories().update(entity);
+        if (this.isNeedRemove()) {
+            DAO.getItems().delete(this, "character_items");
+        } else if (this.isNeedInsert()) {
+            DAO.getItems().create(this, false, "character_items");
+        } else {
+            DAO.getItems().save(this, false, "character_items");
+        }
     }
 
     public void checkLastEffect() {

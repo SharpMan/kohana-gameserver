@@ -27,6 +27,7 @@ import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
 import koh.utils.SimpleLogger;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 /**
  * Created by Melancholia on 6/10/16.
@@ -229,6 +230,20 @@ public class KoliseoFight extends Fight {
             koliseoLog.write(log.toString());
             koliseoLog.newLine();
             koliseoLog.close();
+            /*final Map<String, Long> ips = winners.getFighters()
+                    .filter(f -> f.isPlayer() && f.getPlayer().getAccount() != null && f.getPlayer().getAccount().currentIP != null)
+                    .map(f -> f.getPlayer().getAccount().currentIP)
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+            ips.entrySet().stream()
+                    .filter(cel -> cel.getValue() > 1L)
+                    .forEach(cell -> {
+                        loosers.getFighters().filter(f -> f.isPlayer() && f.getPlayer().getAccount() != null && f.getPlayer().getAccount().currentIP != null)
+                                .forEach(losser -> {
+                                    final int P_PROPERTIES.get(losser.getID()).victimByIPS.get(FightTypeEnum.FIGHT_TYPE_PVP_ARENA).get(cell.getKey());
+                                });
+                    });*/
+
         } catch (Exception e) {
             e.printStackTrace();
         }

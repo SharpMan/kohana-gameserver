@@ -93,6 +93,8 @@ public class MonsterFight extends Fight {
 
     }
 
+    final private boolean isRazielle = DAO.getSettings().getIntElement("World.ID") == 2;
+
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {
         final MonsterFighter[] deadMobs = this.myTeam2.getDeadFighters()
@@ -121,7 +123,9 @@ public class MonsterFight extends Fight {
                 super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_VICTORY);
                 final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs,butin));
                 final int guildXp = FightFormulas.guildXpEarned(fighter.asPlayer(), exp), mountXp = FightFormulas.mountXpEarned(fighter.asPlayer(), exp);
+                final int oldLevel = fighter.getPlayer().getLevel();
                 fighter.getPlayer().addExperience(exp.get(), false);
+                final int upRanked = fighter.getPlayer().getLevel() - oldLevel;
                 final List<DroppedItem> loots = new ArrayList<>(7);
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
                     FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots,butin);
@@ -129,7 +133,25 @@ public class MonsterFight extends Fight {
                 loots.add(new DroppedItem(11503, Arrays.stream(deadMobs).mapToInt(MonsterFighter::getLevel).sum() / 3));
                 fighter.getPlayer().addScore(ScoreType.PVM_WIN);
 
-                final int kamasWin = FightFormulas.computeKamas(fighter, baseKamas, teamPP);
+                int kamasWin = FightFormulas.computeKamas(fighter, baseKamas, teamPP);
+                if(isRazielle && upRanked > 0){
+                    try {
+                        if (100 > oldLevel && fighter.getPlayer().getLevel() >= 100) {
+                            kamasWin += 10000;
+                        } else if (fighter.getPlayer().getLevel() >= 200) {
+                            kamasWin += 25000;
+                        }
+                        for (int i = oldLevel + 1; i <= (oldLevel + upRanked); ++i) {
+                            if (i % 20 == 0) {
+                                kamasWin += 50000;
+                            } else
+                                kamasWin += 150;
+                        }
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
                 final int[] serializedLoots = new int[loots.size() * 2];
                 for (int i = 0; i < serializedLoots.length; i += 2) {
                     serializedLoots[i] = loots.get(i / 2).getItem();

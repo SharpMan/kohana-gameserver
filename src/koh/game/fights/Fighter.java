@@ -990,6 +990,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (!MP) {
             int dodgeAPCaster = caster.getAPCancelling() + 1;
             int dodgeAPTarget = this.getAPDodge() + 1;
+            if(dodgeAPTarget == 0){
+                dodgeAPCaster++;
+            }
 
             for (int i = 0; i < lostPoint; i++) {
                 int ActualAP = (isBuff && this.ID == this.fight.getCurrentFighter().ID ? this.getMaxAP() : this.getAP()) - realLostPoint;

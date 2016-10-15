@@ -1486,7 +1486,13 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
+    final short defaultValue = 0;
+
     public void affectSpellTo(Fighter caster, Fighter target, int level, int... spells) {
+        affectSpellTo(caster,target,level, defaultValue, spells);
+    }
+
+    public void affectSpellTo(Fighter caster, Fighter target, int level,short fromCell, int... spells) {
         int bestResult;
         SpellLevel spell;
         for (int spellid : spells) {
@@ -1528,6 +1534,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 }
                 final EffectCast castInfos = new EffectCast(effect.getEffectType(), spellid, target.getCellId(), num1, effect, caster, targets, false, StatsEnum.NONE, 0, spell);
                 castInfos.targetKnownCellId = target.getCellId();
+                castInfos.oldCell = fromCell;
+
                 if (EffectBase.tryApplyEffect(castInfos) == -3) {
                     break;
                 }

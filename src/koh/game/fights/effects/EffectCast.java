@@ -12,6 +12,7 @@ import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.protocol.client.enums.StatsEnum;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**

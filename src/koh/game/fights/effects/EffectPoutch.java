@@ -16,7 +16,7 @@ public class EffectPoutch extends EffectBase {
     @Override
     public int applyEffect(EffectCast castInfos) {
 
-        if(castInfos.effect.diceNum == 3281 || castInfos.effect.diceNum == 3282){
+        if(castInfos.effect.diceNum == 3281 || castInfos.effect.diceNum == 3282 || castInfos.effect.diceNum == 5724){
             for (Fighter target : castInfos.targets) {
                 if(castInfos.caster.getSpellsController().canLaunchSpell(DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getID())){
                     castInfos.getFight().launchSpell(castInfos.caster, DAO.getSpells().findSpell(castInfos.effect.diceNum).getSpellLevel(castInfos.effect.diceSide), target.getCellId(), true, true, true,castInfos.spellId);
@@ -32,6 +32,9 @@ public class EffectPoutch extends EffectBase {
             }
             return -1;
         }
+        /*else if(castInfos.effect.diceNum == 5724){
+
+        }*/
 
         if (castInfos.duration > 0)
             for (Fighter target : castInfos.targets)

@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import koh.game.dao.DAO;
 import koh.look.EntityLookParser;
 import koh.protocol.types.game.context.EntityDispositionInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayActorInformations;
@@ -71,18 +73,21 @@ public class NpcTemplate {
             if (items == null) {
                 itemList = new ObjectItemToSellInNpcShop[0];
             } else {
-                Stream<NpcItem> Objects = this.items.values().stream();
+                Stream<NpcItem> objects = this.items.values().stream();
                 if (this.id == 816) {
-                    Objects = Objects.filter(Item -> Item.getTemplate().getLevel() > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().getTypeId(), e2.getTemplate().getTypeId())), ((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()))));
+                    if(DAO.getSettings().getIntElement("World.ID") == 2){
+                        objects = objects.filter(Item -> Item.getTemplate().getLevel() > 20).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().getTypeId(), e2.getTemplate().getTypeId())), ((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()))));
+                    }
+                    else objects = objects.filter(Item -> Item.getTemplate().getLevel() > 80).sorted(Compose(((e1, e2) -> Float.compare(e1.getTemplate().getTypeId(), e2.getTemplate().getTypeId())), ((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()))));
                 }
                 if (this.orderItemsByPrice) {
-                    Objects = Objects.sorted((e1, e2) -> Float.compare(e1.getPrice(), e2.getPrice()));
+                    objects = objects.sorted((e1, e2) -> Float.compare(e1.getPrice(), e2.getPrice()));
                 }
                 if (this.orderItemsByLevel) {
-                    Objects = Objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()));
+                    objects = objects.sorted((e1, e2) -> Integer.compare(e1.getTemplate().getLevel(), e2.getTemplate().getLevel()));
                 }
 
-                itemList = Objects.map(x -> x.toShop()).filter(x -> x != null).toArray(ObjectItemToSellInNpcShop[]::new);
+                itemList = objects.map(x -> x.toShop()).filter(x -> x != null).toArray(ObjectItemToSellInNpcShop[]::new);
             }
         }
         return itemList;

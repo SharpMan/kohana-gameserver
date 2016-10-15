@@ -58,7 +58,8 @@ public class BuffState extends BuffEffect {
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.target.getStates().addState(this);
         //Vise le telegraph
-        if(castInfos.effect != null && getState() == FightStateEnum.Téléfrag && target.getCellId() == castInfos.cellId && this.target instanceof SummonedFighter && target.asSummon().getGrade().getMonsterId() == 3958) { // Synchro
+        System.out.println(target.getCellId() +" "+castInfos.targetKnownCellId+" "+castInfos.oldCell +" "+castInfos.casterOldCell);
+        if(castInfos.effect != null && getState() == FightStateEnum.Téléfrag && target.getCellId() == castInfos.oldCell && this.target instanceof SummonedFighter && target.asSummon().getGrade().getMonsterId() == 3958) { // Synchro
             final SpellLevel spell = DAO.getSpells().findSpell(5435).getLevelOrNear(target.asSummon().getGrade().getLevel());
             castInfos.getFight().launchSpell(target, spell, target.getCellId(), true, true, true, castInfos.spellId);
            // target.tryDie(castInfos.caster.getID(), true);

@@ -146,7 +146,7 @@ public class Pathfunction {
                         && !(ennemy instanceof BombFighter)
                        // && !(ennemy instanceof DoubleFighter)
                         && !(ennemy instanceof StaticFighter)
-                        && !(ennemy instanceof SummonedReplacerFighter)
+                        //&& !(ennemy instanceof SummonedReplacerFighter)
                         && ! ennemy.getStates().hasState(FightStateEnum.ENRACINÉ)
                         && !(ennemy instanceof MonsterFighter && !ennemy.asMonster().getGrade().getMonster().isCanTackle())
                         && ennemy.getVisibleState() != GameActionFightInvisibilityStateEnum.INVISIBLE) {

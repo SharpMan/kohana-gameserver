@@ -90,7 +90,7 @@ public class SummonedReplacerFighter extends SummonedFighter {
                 if(fr.isAlive()){
                     fr.getBuff().getBuffsDec().values().forEach(list -> {
                         for(BuffEffect buff : (Iterable<BuffEffect>) list.stream()::iterator){
-                            if(buff.caster == this)
+                            if(buff.caster == this && fr != this)
                                 fr.getBuff().debuff(buff);
                         }
                     });
@@ -101,7 +101,7 @@ public class SummonedReplacerFighter extends SummonedFighter {
                 if(fr.isAlive()){
                     fr.getBuff().getBuffsDec().values().forEach(list -> {
                         for(BuffEffect buff : (Iterable<BuffEffect>) list.stream()::iterator){
-                            if(buff.caster == this)
+                            if(buff.caster == this & fr != this)
                                 fr.getBuff().debuff(buff);
                         }
                     });

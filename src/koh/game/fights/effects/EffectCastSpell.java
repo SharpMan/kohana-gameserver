@@ -56,7 +56,7 @@ public class EffectCastSpell extends EffectBase {
             }
             return -1;
         }
-        if(castInfos.spellId== 89){ //paradox
+        if(castInfos.spellId== 89 || castInfos.effect.diceNum == 5725 /*|| castInfos.effect.diceNum == 5492 || castInfos.effect.diceNum == 5429*/){ //paradox
             for (Fighter target : castInfos.targets) {
                 castInfos.getFight().launchSpell(castInfos.caster, spell, target.getCellId(), true, true, true,castInfos.spellId);
             }
@@ -73,7 +73,7 @@ public class EffectCastSpell extends EffectBase {
 
 
         for (Fighter target : castInfos.targets) {
-            target.getFight().affectSpellTo(castInfos.caster, target, castInfos.effect.diceSide, castInfos.effect.diceNum);
+            target.getFight().affectSpellTo(castInfos.caster, target, castInfos.effect.diceSide, castInfos.cellId, castInfos.effect.diceNum);
         }
 
         return -1;

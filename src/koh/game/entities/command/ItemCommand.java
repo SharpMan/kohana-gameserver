@@ -55,6 +55,8 @@ public class ItemCommand implements PlayerCommand {
         if (template.getTypeId() != 76)
             qua = 1;
 
+
+
         if(!spawns.containsKey(client.getAccount().getId())){
             spawns.put(client.getAccount().getId() , new ArrayList<>());
         }
@@ -63,7 +65,20 @@ public class ItemCommand implements PlayerCommand {
             return;
         }
 
-        spawns.get(client.getAccount().getId()).add(System.currentTimeMillis());
+        if (template.getTypeId() == 76){
+            if(qua > 100){
+                qua = 100;
+            }
+            if(qua > 10){
+                final int res = qua / 10;
+                for(int i = 0; i < res; i++){
+                    spawns.get(client.getAccount().getId()).add(System.currentTimeMillis());
+                }
+            }
+            else spawns.get(client.getAccount().getId()).add(System.currentTimeMillis());
+        }
+        else
+            spawns.get(client.getAccount().getId()).add(System.currentTimeMillis());
 
         final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), id, 63, client.getCharacter().getID(), qua, EffectHelper.generateIntegerEffect(template.getPossibleEffects(), type, template.isWeapon()));
         if (client.getCharacter().getInventoryCache().add(item, true))

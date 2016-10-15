@@ -5,6 +5,7 @@ import koh.game.fights.FightTypeEnum;
 import koh.game.fights.Fighter;
 import koh.utils.Couple;
 
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import static koh.game.entities.actors.character.PlayerInst.P_PROPERTIES;
@@ -18,7 +19,7 @@ public class AntiCheat {
     private final static int KOLISEO_PER_MIN = 20;
 
 
-    //TODO LIST IP
+    //TODO LIST IP for losser also
     public static short deviserBy(Stream<Fighter> versus, Fighter fighter, boolean win, FightTypeEnum type) {
         try {
             short devisedBy = 1;
@@ -26,20 +27,25 @@ public class AntiCheat {
                 PlayerInst.P_PROPERTIES.put(fighter.getID(), new PlayerInst());
             }
             if (win) {
+                final ArrayList<String> ipsIterated = new ArrayList<>(3);
                 for (Fighter target : (Iterable<Fighter>) versus::iterator) {
                     int bestScore = 0;
-                    if (!P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).containsKey(target.getPlayer().getAccount().currentIP)) {
-                        P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).put(target.getPlayer().getAccount().currentIP, new Couple<>(System.currentTimeMillis(), 1));
-                    } else {
-                        long time = P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).first;
-                        if ((System.currentTimeMillis() - time) < (type == FightTypeEnum.FIGHT_TYPE_AGRESSION ? AGGRO_PER_MIN : KOLISEO_PER_MIN) * 60 * 1000) {
-                            bestScore += P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).second;
-                            P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).second++;
+                    if(!ipsIterated.contains(target.getPlayer().getAccount().currentIP)) {
+                        if (!P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).containsKey(target.getPlayer().getAccount().currentIP)) {
+                            P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).put(target.getPlayer().getAccount().currentIP, new Couple<>(System.currentTimeMillis(), 1));
                         } else {
-                            P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).first = System.currentTimeMillis();
-                            P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).second = 1;
+                            long time = P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).first;
+                            if ((System.currentTimeMillis() - time) < (type == FightTypeEnum.FIGHT_TYPE_AGRESSION ? AGGRO_PER_MIN : KOLISEO_PER_MIN) * 60 * 1000) {
+                                bestScore += P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).second;
+                                P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).second++;
+                            } else {
+                                P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).first = System.currentTimeMillis();
+                                P_PROPERTIES.get(fighter.getID()).myVictimIPS.get(type).get(target.getPlayer().getAccount().currentIP).second = 1;
+                            }
                         }
+                        ipsIterated.add(target.getPlayer().getAccount().currentIP);
                     }
+
                     if (!P_PROPERTIES.get(fighter.getID()).myVictimsById.get(type).containsKey(target.getID())) {
                         P_PROPERTIES.get(fighter.getID()).myVictimsById.get(type).put(target.getID(), new Couple<>(System.currentTimeMillis(), 1));
                     } else {
@@ -54,6 +60,7 @@ public class AntiCheat {
                     }
                     devisedBy += bestScore;
                 }
+                ipsIterated.clear();
             } else {
                 for (Fighter target : (Iterable<Fighter>) versus::iterator) {
                     int bestScore = 0;
