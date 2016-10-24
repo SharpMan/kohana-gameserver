@@ -158,7 +158,7 @@ public class FightTeam {
     }
 
     public void endFight() {
-        this.myFighters.removeIf(fr -> fr.hasSummoner() || fr instanceof DoubleFighter || fr instanceof StaticFighter); // On delete les invocations
+        this.myFighters.removeIf(fr -> (fr.hasSummoner() && !(fr instanceof CharacterFighter)) || fr instanceof DoubleFighter || fr instanceof StaticFighter); // On delete les invocations
     }
 
     public void dispose() {

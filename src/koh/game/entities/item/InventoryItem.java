@@ -70,11 +70,11 @@ public class InventoryItem {
     }
 
     public ObjectItem getObjectItem(int withQuantity) {
-        return new ObjectItem(this.position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, withQuantity);
+        return new ObjectItem(this.position, this.templateId, effects.stream().filter(effect -> this.getTemplate().isVisibleInTooltip(effect.actionId) && !(effect.actionId == 995 && this instanceof PetsInventoryItem)).toArray(ObjectEffect[]::new), this.ID, withQuantity);
     }
 
     public ObjectItem getObjectItem() {
-        return new ObjectItem(this.position, this.templateId, effects.stream().filter(Effect -> this.getTemplate().isVisibleInTooltip(Effect.actionId)).toArray(ObjectEffect[]::new), this.ID, this.quantity);
+        return new ObjectItem(this.position, this.templateId, effects.stream().filter(effect -> this.getTemplate().isVisibleInTooltip(effect.actionId) && !(effect.actionId == 995 && this instanceof PetsInventoryItem)).toArray(ObjectEffect[]::new), this.ID, this.quantity);
     }
 
     public ItemSuperTypeEnum getSuperType() {

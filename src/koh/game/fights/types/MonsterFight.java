@@ -9,12 +9,14 @@ import koh.game.entities.fight.*;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
+import koh.game.entities.item.animal.PetsInventoryItem;
 import koh.game.entities.mob.MonsterDrop;
 import koh.game.fights.*;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.DroppedItem;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.network.WorldClient;
+import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.fight.*;
@@ -133,6 +135,7 @@ public class MonsterFight extends Fight {
                 loots.add(new DroppedItem(11503, Arrays.stream(deadMobs).mapToInt(MonsterFighter::getLevel).sum() / 3));
                 fighter.getPlayer().addScore(ScoreType.PVM_WIN);
 
+
                 int kamasWin = FightFormulas.computeKamas(fighter, baseKamas, teamPP);
                 if(isRazielle && upRanked > 0){
                     try {
@@ -142,6 +145,7 @@ public class MonsterFight extends Fight {
                             kamasWin += 25000;
                         }
                         for (int i = oldLevel + 1; i <= (oldLevel + upRanked); ++i) {
+                            //System.out.println(i);
                             if (i % 20 == 0) {
                                 kamasWin += 50000;
                             } else
@@ -164,6 +168,13 @@ public class MonsterFight extends Fight {
                     }
                 });
                 loots.clear();
+
+                if(fighter.getPlayer().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS)){
+                    final InventoryItem pet = fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS);
+                    if(pet != null && pet instanceof PetsInventoryItem){
+                        ((PetsInventoryItem)pet).eat(fighter.getPlayer(),deadMobs);
+                    }
+                }
 
                 this.myResult.results.add(new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY, fighter.getWave(), new FightLoot(serializedLoots, kamasWin), fighter.getID(), fighter.isAlive(), (byte) fighter.getLevel(), new FightResultExperienceData[]{new FightResultExperienceData() {
                     {

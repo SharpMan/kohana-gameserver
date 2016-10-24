@@ -4,9 +4,12 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
+import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.ItemsEnum;
+import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.items.ObjectModifiedMessage;
 import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.effects.ObjectEffectLadder;
 import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -22,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 public class PetsInventoryItem extends InventoryItem {
 
     /* @Param1 = FoodId , @Param2 = Count */
-    public Map<Integer, Integer> eatedFoods = Collections.synchronizedMap(new HashMap<>());
-    public Map<Integer, Integer> eatedFoodsType = Collections.synchronizedMap(new HashMap<>());
+    public Map<Integer, Integer> eatenFoods = Collections.synchronizedMap(new HashMap<>());
+    public Map<Integer, Integer> eatenFoodsType = Collections.synchronizedMap(new HashMap<>());
 
     public PetsInventoryItemEntity entity;
 
@@ -37,14 +40,14 @@ public class PetsInventoryItem extends InventoryItem {
         IoBuffer buf = IoBuffer.allocate(0xFFF)
                 .setAutoExpand(true);
 
-        buf.putInt(eatedFoods.size());
-        for (Entry<Integer, Integer> e : eatedFoods.entrySet()) {
+        buf.putInt(eatenFoods.size());
+        for (Entry<Integer, Integer> e : eatenFoods.entrySet()) {
             buf.putInt(e.getKey());
             buf.putInt(e.getValue());
         }
 
-        buf.putInt(eatedFoodsType.size());
-        for (Entry<Integer, Integer> e : eatedFoodsType.entrySet()) {
+        buf.putInt(eatenFoodsType.size());
+        for (Entry<Integer, Integer> e : eatenFoodsType.entrySet()) {
             buf.putInt(e.getKey());
             buf.putInt(e.getValue());
         }
@@ -80,16 +83,69 @@ public class PetsInventoryItem extends InventoryItem {
         }
         final IoBuffer buf = IoBuffer.wrap(this.entity.informations);
         for (int i = 0; i < buf.getInt(); ++i) {
-            this.eatedFoods.put(buf.getInt(), buf.getInt());
+            this.eatenFoods.put(buf.getInt(), buf.getInt());
         }
         for (int i = 0; i < buf.getInt(); ++i) {
-            this.eatedFoodsType.put(buf.getInt(), buf.getInt());
+            this.eatenFoodsType.put(buf.getInt(), buf.getInt());
         }
         this.myInitialized = true;
     }
 
     public PetTemplate getAnimal() {
         return DAO.getItemTemplates().getPetTemplate(this.getTemplateId());
+    }
+
+
+    public synchronized void eat(Player p, MonsterFighter[] deadMobs){
+        final PetTemplate pet = getAnimal();
+        if (pet == null) {
+            return;
+        }  else if (this.entity.pointsUsed >= getAnimal().getHormone()) {
+            return;
+        }
+        this.removeEffect(983);
+
+        boolean needUpdate = false ,needRefresh = false;
+
+
+        for(MonsterFighter mob : deadMobs){
+            final Optional<ObjectEffectLadder> effectContainer = this.getEffects().stream()
+                    .filter(e -> e instanceof ObjectEffectLadder && ((ObjectEffectLadder)e).monsterFamilyId == mob.getGrade().getMonsterId())
+                    .map(e -> (ObjectEffectLadder) e)
+                    .findFirst();
+            if(effectContainer.isPresent()){
+                final ObjectEffectLadder effect = effectContainer.get();
+                effect.monsterCount += 1;
+                this.notifyColumn("effects");
+                needRefresh = true;
+                for (MonsterBooster boost : pet.getMonsterBoosts()) {
+                    if (boost.monsterFamily == effect.monsterFamilyId && effect.monsterCount % boost.deathNumber == 0) {
+                        this.entity.pointsUsed += boost.getPoint();
+                        for(int stat : boost.getStats()){
+                            this.boost(stat, boost.getStatsBoost(stat));
+                        }
+                        needUpdate = true;
+                    }
+                }
+
+            }
+            if (this.entity.pointsUsed >= getAnimal().getHormone()) {
+                break;
+            }
+        }
+
+        if(needUpdate) {
+            this.updateDate();
+            this.save();
+        }
+
+        if(needRefresh){
+            this.checkLastEffect();
+            p.send(new ObjectModifiedMessage(this.getObjectItem()));
+            p.send(new InventoryWeightMessage(p.getInventoryCache().getWeight(), p.getInventoryCache().getTotalWeight()));
+        }
+
+
     }
 
     public synchronized boolean eat(Player p, InventoryItem food) {
@@ -108,12 +164,12 @@ public class PetsInventoryItem extends InventoryItem {
         }
         this.removeEffect(983);
 
-        for (FoodItem i : getAnimal().getFoodItems()) {
+        for (FoodItem i : pet.getFoodItems()) {
             if (food.getTemplateId() == i.getItemID()) {
-                if (!this.eatedFoods.containsKey(food.getTemplateId())) {
-                    this.eatedFoods.put(food.getTemplateId(), 1);
+                if (!this.eatenFoods.containsKey(food.getTemplateId())) {
+                    this.eatenFoods.put(food.getTemplateId(), 1);
                 } else
-                    this.eatedFoods.put(food.getTemplateId(), this.eatedFoods.get(food.getTemplateId()) + 1);
+                    this.eatenFoods.put(food.getTemplateId(), this.eatenFoods.get(food.getTemplateId()) + 1);
 
                 this.entity.pointsUsed += i.getPoint();
                 this.boost(i.getStats(), i.getStatsPoints());
@@ -126,12 +182,12 @@ public class PetsInventoryItem extends InventoryItem {
                 return true;
             }
         }
-        for (FoodItem i : getAnimal().getFoodTypes()) {
+        for (FoodItem i : pet.getFoodTypes()) {
             if (food.getTemplate().getTypeId() == i.getItemID()) {
-                if (!this.eatedFoodsType.containsKey(food.getTemplate().getTypeId())) {
-                    this.eatedFoodsType.put(food.getTemplate().getTypeId(), 0);
+                if (!this.eatenFoodsType.containsKey(food.getTemplate().getTypeId())) {
+                    this.eatenFoodsType.put(food.getTemplate().getTypeId(), 0);
                 }
-                this.eatedFoodsType.put(food.getTemplate().getTypeId(), this.eatedFoodsType.get(food.getTemplate().getTypeId()) + 1);
+                this.eatenFoodsType.put(food.getTemplate().getTypeId(), this.eatenFoodsType.get(food.getTemplate().getTypeId()) + 1);
                 this.entity.pointsUsed += i.getPoint();
                 this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
@@ -148,8 +204,8 @@ public class PetsInventoryItem extends InventoryItem {
     }
 
     public int getEatenFood(int id) {
-        if (this.eatedFoods.containsKey(id)) {
-            return this.eatedFoods.get(id);
+        if (this.eatenFoods.containsKey(id)) {
+            return this.eatenFoods.get(id);
         }
         return 0;
     }
@@ -204,10 +260,10 @@ public class PetsInventoryItem extends InventoryItem {
 
     @Override
     public void totalClear() {
-        this.eatedFoods.clear();
-        this.eatedFoods = null;
-        this.eatedFoodsType.clear();
-        this.eatedFoodsType = null;
+        this.eatenFoods.clear();
+        this.eatenFoods = null;
+        this.eatenFoodsType.clear();
+        this.eatenFoodsType = null;
         this.myInitialized = false;
         this.entity.totalClear();
         this.entity = null;

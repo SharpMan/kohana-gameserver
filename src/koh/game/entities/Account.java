@@ -43,6 +43,7 @@ public class Account {
     public Player currentCharacter = null;
 
     public List<CharacterBaseInformation> toBaseInformations() {
+
         return characters.stream().map(Player::toBaseInformations).collect(Collectors.toList());
     }
 

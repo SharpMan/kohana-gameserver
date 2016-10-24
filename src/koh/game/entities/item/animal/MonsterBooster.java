@@ -18,22 +18,22 @@ public class MonsterBooster {
     @Getter
     public int[] stats, fakeBoostStats;
 
-    public MonsterBooster(int MonsterFamily, int DeathNumber, int Point, int[] Stats, int StatsPoints, String CorrectStat) {
+    public MonsterBooster(int MonsterFamily, int DeathNumber, int Point, int[] Stats, int StatsPoints, String correctStat) {
         this.monsterFamily = MonsterFamily;
         this.deathNumber = DeathNumber;
         this.point = Point;
         this.stats = Stats;
         this.statsBoost = StatsPoints;
-        if (CorrectStat != null) {
-            this.fakeBoostStats = Enumerable.stringToIntArray(CorrectStat, ":");
+        if (correctStat != null) {
+            this.fakeBoostStats = Enumerable.stringToIntArray(correctStat, ":");
         }
     }
 
-    public int getStatsBoost(int Stat) {
+    public int getStatsBoost(int stat) {
         if (this.fakeBoostStats == null) {
             return statsBoost;
         } else {
-            return this.fakeBoostStats[Arrays.binarySearch(stats, Stat)];
+            return this.fakeBoostStats[Arrays.binarySearch(stats, stat)];
         }
     }
     
