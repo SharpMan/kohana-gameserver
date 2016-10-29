@@ -213,7 +213,7 @@ public class EffectInstance implements Serializable {
             if (((((targetInfos.stats.summoned) && (monsterInfo != null))) && (!(DAO.getMonsters().find(monsterInfo.creatureGenericId).isCanPlay())))) {
                 targetMaskPattern = ((isTargetAlly) ? "agsj" : "ASJ");
             } else {
-                if (targetInfos.stats.summoned) {
+                if (targetInfos.stats.summoned && !(pTargetId instanceof CharacterFighter)) {
                     targetMaskPattern = ((isTargetAlly) ? "agij" : "AIJ");
                 } else {
                     if ((pTargetId.getGameContextActorInformations(null) instanceof GameFightCompanionInformations)) {

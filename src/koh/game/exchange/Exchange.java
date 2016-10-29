@@ -49,13 +49,13 @@ public abstract class Exchange {
     public static InventoryItem[] getCharactersItems(Player character) {
         return character.getInventoryCache()
                 .getItems()
-                .filter(x -> !x.isLinked() && !x.isEquiped())
+                .filter(x -> !x.isLinked() && !x.isWorn())
                 .toArray(InventoryItem[]::new);
     }
 
     public static InventoryItem[] getCharactersItems(Player character, int[] ids) {
         return character.getInventoryCache().getItems()
-                .filter(x -> ArrayUtils.contains(ids, x.getID()) && !x.isLinked() && !x.isEquiped())
+                .filter(x -> ArrayUtils.contains(ids, x.getID()) && !x.isLinked() && !x.isWorn())
                 .toArray(InventoryItem[]::new);
     }
 

@@ -86,16 +86,16 @@ public class ContextHandler {
 
     @HandlerAttribute(ID = ObjectDropMessage.MESSAGE_ID)
     public static void handleObjectDropMessage(WorldClient client, ObjectDropMessage message) {
-        InventoryItem Item = client.getCharacter().getInventoryCache().find(message.objectUID);
-        if (Item == null || Item.getQuantity() < message.quantity) {
+        InventoryItem item = client.getCharacter().getInventoryCache().find(message.objectUID);
+        if (item == null || item.getQuantity() < message.quantity) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP));
             return;
-        } else if (Item.getEffect(983) != null) {
+        } else if (item.getEffect(983) != null) {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.NOT_TRADABLE));
             return;
         }
-        if (Item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
-            client.getCharacter().getInventoryCache().unEquipItem(Item);
+        if (item.getSlot() != CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED) {
+            client.getCharacter().getInventoryCache().unEquipItem(item);
             client.getCharacter().refreshStats();
         }
 
@@ -127,16 +127,16 @@ public class ContextHandler {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP_NO_PLACE));
             return;
         }
-        int newQua = Item.getQuantity() - message.quantity;
+        int newQua = item.getQuantity() - message.quantity;
         if (newQua <= 0) {
-            client.getCharacter().getInventoryCache().removeItemFromInventory(Item);
-            DAO.getItems().save(Item, false, "character_items");
+            client.getCharacter().getInventoryCache().removeItemFromInventory(item);
+            DAO.getItems().save(item, false, "character_items");
         } else {
-            client.getCharacter().getInventoryCache().updateObjectquantity(Item, newQua);
-            Item = CharacterInventory.tryCreateItem(Item.getTemplateId(), null, message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), Item.getEffectsCopy());
+            client.getCharacter().getInventoryCache().updateObjectquantity(item, newQua);
+            item = CharacterInventory.tryCreateItem(item.getTemplateId(), null, message.quantity, CharacterInventoryPositionEnum.INVENTORY_POSITION_NOT_EQUIPED.value(), item.getEffectsCopy());
         }
 
-        client.getCharacter().getCurrentMap().addItem(cellID, Item);
+        client.getCharacter().getCurrentMap().addItem(cellID, item);
         client.send(new BasicNoOperationMessage());
     }
 

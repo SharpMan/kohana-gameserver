@@ -4,14 +4,18 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.item.InventoryItem;
+import koh.game.entities.spells.EffectInstance;
+import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.protocol.client.enums.ItemsEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.inventory.InventoryWeightMessage;
 import koh.protocol.messages.game.inventory.items.ObjectModifiedMessage;
 import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.ObjectEffectLadder;
 import koh.protocol.types.game.data.items.effects.ObjectEffectDate;
 import koh.protocol.types.game.data.items.effects.ObjectEffectInteger;
+import koh.utils.SimpleLogger;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -140,7 +144,7 @@ public class PetsInventoryItem extends InventoryItem {
         }
 
         if(needRefresh){
-            this.checkLastEffect();
+            //this.checkLastEffect(pet);
             p.send(new ObjectModifiedMessage(this.getObjectItem()));
             p.send(new InventoryWeightMessage(p.getInventoryCache().getWeight(), p.getInventoryCache().getTotalWeight()));
         }
@@ -175,7 +179,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
                 this.updateDate();
-                this.checkLastEffect();
+                this.checkLastEffect(pet);
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
                 PlayerController.sendServerMessage(p.getClient(), "Next meal in 60 minutes");
@@ -192,7 +196,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
                 this.updateDate();
-                this.checkLastEffect();
+                this.checkLastEffect(pet);
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
                 PlayerController.sendServerMessage(p.getClient(), "Next meal in 60 minutes");
@@ -245,8 +249,31 @@ public class PetsInventoryItem extends InventoryItem {
         }
     }
 
-    public void checkLastEffect() {
+    public void checkLastEffect(PetTemplate animal) {
+        if(animal == null){
+            return;
+        }
+        for (ObjectEffect effect : this.getEffects()) {
+            //animal.gete
 
+            final EffectInstanceDice parent =  animal.getEffectDice(effect.actionId);
+            if(parent == null || !(effect instanceof ObjectEffectInteger))
+                continue;
+            final ObjectEffectInteger type = (ObjectEffectInteger) effect;
+            final int biggestValue = parent.diceNum >= parent.diceSide ? parent.diceNum : parent.diceSide;
+            if(type.value > biggestValue){
+                try {
+                    final SimpleLogger koliseoLog = new SimpleLogger("logs/koli/cheat_" + SimpleLogger.getCurrentDayStamp() + ".txt", 0);
+                    koliseoLog.write(this.getTemplate().getNameId() +" gives "+type.value+" on "+ StatsEnum.valueOf(effect.actionId));
+                    koliseoLog.newLine();
+                    koliseoLog.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ((ObjectEffectInteger) effect).value = biggestValue;
+                this.notifyColumn("effects");
+            }
+        }
     }
 
     public void onMonsterFightWin() {

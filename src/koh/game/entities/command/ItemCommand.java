@@ -61,7 +61,7 @@ public class ItemCommand implements PlayerCommand {
             spawns.put(client.getAccount().getId() , new ArrayList<>());
         }
 
-        if(spawns.get(client.getAccount().getId()).stream().filter(x ->  System.currentTimeMillis() < x + (24* 360 * 1000)).count() > 10){
+        if(spawns.get(client.getAccount().getId()).stream().filter(x ->  System.currentTimeMillis() < x + (24* 360 * 1000)).count() > 15){
             return;
         }
 

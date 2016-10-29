@@ -5,6 +5,7 @@ import koh.game.Logs;
 import koh.game.dao.api.ItemTemplateDAO;
 import koh.game.entities.item.ItemTemplate;
 import koh.game.entities.spells.EffectInstance;
+import koh.game.entities.spells.EffectInstanceDice;
 import koh.utils.Enumerable;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -87,6 +88,10 @@ public class PetTemplate {
 
     public EffectInstance getEffect(int id) {
         return Arrays.stream(possibleEffects).filter(x -> x.effectId == id).findFirst().orElse(null);
+    }
+
+    public EffectInstanceDice getEffectDice(int id) {
+        return Arrays.stream(possibleEffects).filter(x -> x.effectId == id).map(e -> ((EffectInstanceDice)e)).findFirst().orElse(null);
     }
 
     public String toString() {

@@ -51,7 +51,7 @@ public class PresetHandler {
                     if(item == null){
                         partial = true;
                     }
-                    else if(item.isEquiped()){
+                    else if(item.isWorn()){
                         if(item.getPosition() != object.position){
                             client.getCharacter().getInventoryCache().unEquipItem(item);
                         }

@@ -39,8 +39,11 @@ public class EffectRestitue extends EffectBase {
             zomby.setSummoner(castInfos.caster);
             zomby.setDead(false);
 
-            castInfos.caster.getFight().getFightWorker().fighters().remove(zomby);
-            castInfos.caster.getFight().getFightWorker().summonFighter(zomby);
+            if(!(zomby instanceof CharacterFighter)) {
+                castInfos.caster.getFight().getFightWorker().fighters().remove(zomby);
+                castInfos.caster.getFight().getFightWorker().summonFighter(zomby);
+            }
+
             joinFightTeam(zomby, castInfos.caster.getTeam(), false, castInfos.cellId, true);
             castInfos.caster.getFight().sendToField(Pl -> new GameActionFightSummonMessage(ActionIdEnum.ACTION_CHARACTER_SUMMON_DEAD_ALLY_IN_FIGHT, castInfos.caster.getID(), (GameFightFighterInformations) zomby.getGameContextActorInformations(Pl)));
 

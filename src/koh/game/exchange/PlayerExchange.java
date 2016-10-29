@@ -32,7 +32,6 @@ import koh.protocol.messages.game.inventory.items.ExchangeObjectsRemovedMessage;
 import koh.protocol.types.game.data.items.ObjectItem;
 import koh.utils.Enumerable;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -103,7 +102,6 @@ public class PlayerExchange extends Exchange {
                     this.myClient1.send(new ExchangeObjectsModifiedMessage(true, modifiedObjects.stream().map(x -> x.getObjectItem()).toArray(ObjectItem[]::new)));
                 }
                 modifiedObjects.clear();
-                modifiedObjects = null;
             }
 
             if (client == this.myClient1) {
@@ -132,7 +130,7 @@ public class PlayerExchange extends Exchange {
         if (item == null) {
             return false;
         }
-        if (item.isLinked() || item.isEquiped()) {
+        if (item.isLinked() || item.isWorn()) {
             client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 345, new String[]{item.getTemplateId() + "", item.getID() + ""}));
             return false;
         }

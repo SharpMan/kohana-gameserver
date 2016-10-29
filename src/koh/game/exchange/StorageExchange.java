@@ -55,7 +55,7 @@ public class StorageExchange extends Exchange {
             return false;
         } else if (quantity <= 0) { //Remove from Bank
             final InventoryItem bankItem = client.getAccount().accountData.itemscache.get(itemID);
-            if (bankItem == null) {
+            if (bankItem == null || quantity > bankItem.getQuantity() || bankItem.isNonExchangeable()) {
                 return false;
             }
             client.getAccount().accountData.updateObjectQuantity(client.getCharacter(), bankItem, bankItem.getQuantity() + quantity);
@@ -65,7 +65,7 @@ public class StorageExchange extends Exchange {
             }
         } else { //add In bank
             final InventoryItem item = client.getCharacter().getInventoryCache().find(itemID);
-            if (item == null) {
+            if (item == null || item.getQuantity() < quantity || item.isWorn() || item.isNonExchangeable()) {
                 return false;
             }
             client.getCharacter().getInventoryCache().updateObjectquantity(item, item.getQuantity() - quantity);

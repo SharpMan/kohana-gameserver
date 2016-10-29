@@ -88,12 +88,16 @@ public class InventoryItem {
         }
     }
 
-    public boolean isEquiped() {
+    public boolean isWorn() {
         return this.position != 63;
     }
 
     public boolean isLinked() { //928 = Lié 983 = Non echangeable
         return this.hasEffect(982) || this.hasEffect(983) || this.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_QUEST || this.isTokenItem();
+    }
+
+    public boolean isNonExchangeable(){
+        return this.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_QUEST || this.isTokenItem();
     }
 
     public boolean isLivingObject() {

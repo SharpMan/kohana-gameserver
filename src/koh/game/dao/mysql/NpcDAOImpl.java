@@ -156,7 +156,8 @@ public class NpcDAOImpl extends NpcDAO {
                 pStatement.setInt(8, 0);
                 pStatement.execute();
 
-                System.out.println(pStatement.toString());
+
+                logger.info(pStatement.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();

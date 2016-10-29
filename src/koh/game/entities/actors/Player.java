@@ -11,6 +11,8 @@ import koh.game.entities.actors.character.shortcut.ShortcutBook;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.guilds.Guild;
 import koh.game.entities.guilds.GuildMember;
+import koh.game.entities.item.InventoryItem;
+import koh.game.entities.item.animal.PetsInventoryItem;
 import koh.game.entities.spells.LearnableSpell;
 import koh.game.fights.Fight;
 import koh.game.fights.FightState;
@@ -487,6 +489,12 @@ public class Player extends IGameActor implements Observer {
                 client.sequenceMessage();
                 if (this.guild != null) {
                     this.guild.registerPlayer(this);
+                }
+                if(this.inventoryCache.hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS)){
+                    final InventoryItem pet = inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS);
+                    if(pet != null && pet instanceof PetsInventoryItem){
+                        ((PetsInventoryItem)pet).checkLastEffect(((PetsInventoryItem)pet).getAnimal());
+                    }
                 }
 
                 //GuildWarn

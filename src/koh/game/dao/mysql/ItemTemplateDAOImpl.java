@@ -127,7 +127,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
 
     private int loadAllPets() {
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from item_pets", 0)) {
-            ResultSet result = conn.getResult();
+            final ResultSet result = conn.getResult();
 
             while (result.next()) {
                 pets.put(result.getInt("id"), new PetTemplate(result));
@@ -147,6 +147,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             while (result.next()) {
                 itemTemplates.put(result.getInt("id"), new ItemTemplate(result));
                 ++i;
+
                 /*if(result.getInt("id") == 13834){
                     EffectInstance[] copy = itemTemplates.get(13834).getPossibleEffects();
                     copy = ArrayUtils.removeElement(copy,Arrays.stream(copy).map(e -> (EffectInstanceDice) e).filter(e -> e.diceNum== 24 || e.diceSide == 24).findFirst().get());
