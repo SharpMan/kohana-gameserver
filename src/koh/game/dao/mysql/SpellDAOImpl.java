@@ -82,11 +82,110 @@ public class SpellDAOImpl extends SpellDAO {
                 levels.put(result.getInt("id"), new SpellLevel(result));
                 i++;
 
-                if(result.getInt("spell_id") == 5590) {
+                if(result.getInt("spell_id") == 5590) { //sadi
                     for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
                         effect.targetMask = "a";
                     }
                 }
+                if(result.getInt("spell_id") == 90) { //fuite
+                    EffectInstanceDice[] effects = levels.get(result.getInt("id")).getEffects();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        if(effect.effectId == 1160){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }else if(effect.effectId == 1100){
+                            effect.targetMask = "a";
+                        }
+                    }
+                    levels.get(result.getInt("id")).setEffects(effects);
+                    effects = levels.get(result.getInt("id")).getCriticalEffect();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getCriticalEffect()) {
+                        if(effect.effectId == 1160){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }else if(effect.effectId == 1100){
+                            effect.targetMask = "a";
+                        }
+                    }
+                    levels.get(result.getInt("id")).setCriticalEffect(effects);
+                }
+
+                //rauleback
+                if(result.getInt("spell_id") == 424) { //telepor | momi
+                    EffectInstanceDice[] effects = levels.get(result.getInt("id")).getEffects();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        if(effect.effectId != 1100){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }
+                    }
+                    levels.get(result.getInt("id")).setEffects(effects);
+                    effects = levels.get(result.getInt("id")).getCriticalEffect();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getCriticalEffect()) {
+                        if(effect.effectId != 1100){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }
+                    }
+                    levels.get(result.getInt("id")).setCriticalEffect(effects);
+                }
+
+                if(result.getInt("spell_id") == 88 || result.getInt("spell_id") == 99) { //telepor | momi
+                    EffectInstanceDice[] effects = levels.get(result.getInt("id")).getEffects();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        if(effect.effectId == 1160){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }
+                    }
+                    levels.get(result.getInt("id")).setEffects(effects);
+                    effects = levels.get(result.getInt("id")).getCriticalEffect();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getCriticalEffect()) {
+                        if(effect.effectId == 1160){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }
+                    }
+                    levels.get(result.getInt("id")).setCriticalEffect(effects);
+                }
+
+                if(result.getInt("spell_id") == 87) { //demotivation
+                    EffectInstanceDice[] effects = levels.get(result.getInt("id")).getEffects();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        if(effect.effectId == 1160 && effect.diceNum == 5429){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }
+                    }
+                    levels.get(result.getInt("id")).setEffects(effects);
+                    effects = levels.get(result.getInt("id")).getCriticalEffect();
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getCriticalEffect()) {
+                        if(effect.effectId == 1160 && effect.diceNum == 5429){
+                            effects = ArrayUtils.removeElement(effects,effect);
+                        }
+                    }
+                    levels.get(result.getInt("id")).setCriticalEffect(effects);
+                }
+
+                if(result.getInt("id") == 3030){ //untrucalacon
+                    final EffectInstanceDice[] effects = new EffectInstanceDice[]{
+                      Arrays.stream(levels.get(result.getInt("id")).getEffects()).filter(e -> e.effectId == 1099).findFirst().get(),
+                      new EffectInstanceDice(new EffectInstance(131900, 950,0, "a", 1, 0,0, "C63,", 0, "I", false, true, true) , 7, 0,0)
+                    };
+                    levels.get(406).setEffects(effects);
+                    levels.get(406).setCriticalEffect(effects);
+                    levels.get(407).setEffects(effects);
+                    levels.get(407).setCriticalEffect(effects);
+                    levels.get(408).setEffects(effects);
+                    levels.get(408).setCriticalEffect(effects);
+                    levels.get(409).setEffects(effects);
+                    levels.get(409).setCriticalEffect(effects);
+                    levels.get(410).setEffects(effects);
+                    levels.get(410).setCriticalEffect(effects);
+                    levels.get(3030).setEffects(effects);
+                    levels.get(3030).setCriticalEffect(effects);
+                }
+
+
+                /*if(result.getInt("spell_id") == 99) { //5486
+                    System.out.println(result.getInt("id"));
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        System.out.println(effect.toString());
+                    }
+                }*/
 
                 //5570
                 /*if(result.getInt("spell_id") == 1071) {

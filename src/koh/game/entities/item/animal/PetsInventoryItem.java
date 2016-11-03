@@ -270,7 +270,7 @@ public class PetsInventoryItem extends InventoryItem {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                ((ObjectEffectInteger) effect).value = biggestValue;
+                type.value = biggestValue;
                 this.notifyColumn("effects");
             }
         }

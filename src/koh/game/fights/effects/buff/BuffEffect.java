@@ -55,12 +55,13 @@ public abstract class BuffEffect {
         switch (this.castInfos.effectType) {
             case DAMAGE_ARMOR_REDUCTION:
                 return castInfos.spellId != SpellIDEnum.TREVE;
-            case ADD_STATE:
+           // case ADD_STATE:
             case CHANGE_APPEARANCE:
             case SACRIFICE:
             case CHATIMENT:
             case ENDS_ROUND:
             //Domage de sort
+            case SUB_PA_ESQUIVE_2: //xelor
             case TRANSFORMATION:
                 return false;
         }

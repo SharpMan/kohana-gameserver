@@ -59,6 +59,7 @@ public class MimicryHandler {
                 symbiote == null ||
                 host == null ||
                 host.getPosition() != message.hostPos ||
+                symbiote.getTemplateId() != 14485 ||
                 symbiote.getPosition() != message.symbiotePos) {
             client.send(new BasicNoOperationMessage());
             return;

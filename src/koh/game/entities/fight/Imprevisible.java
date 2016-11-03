@@ -32,9 +32,13 @@ public class Imprevisible extends Challenge {
     @Override
     public void onTurnStart(Fighter fighter) {
         if (fighter.isPlayer() && fighter.getTeam() == team) {
+            int num = random.nextInt((int) getEnnemyTeam().getAliveFighters().count());
+            if(num < 0){
+                num = 0;
+            }
             this.target = getEnnemyTeam()
                     .getAliveFighters()
-                    .toArray(Fighter[]::new)[random.nextInt((int) getEnnemyTeam().getAliveFighters().count())];
+                    .toArray(Fighter[]::new)[num];
             this.sendSingleTarget();
         }
 

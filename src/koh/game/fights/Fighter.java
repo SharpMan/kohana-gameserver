@@ -79,7 +79,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     protected int usedAP, usedMP, turnRunning = 19, shieldPoints;
     @Getter
     protected GenericStats stats;
-    @Getter @Setter
+    @Getter
+    @Setter
     protected Fighter summoner;
     @Getter
     @Setter
@@ -120,7 +121,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         return mapPointCache;
     }
 
-    public int  setCell(FightCell cell) {
+    public int setCell(FightCell cell) {
         return this.setCell(cell, true);
     }
 
@@ -131,11 +132,13 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
 
-
     public int setCell(FightCell cell, boolean runEvent) {
         int addResult;
         if (this.myCell != null) {
-            previousCellPos.add(myCell.getId());
+            if (cell == null) {
+                this.previousCellPos.add(this.myCell.Id);
+            }
+            //previousCellPos.add(myCell.getId());
             this.myCell.removeObject(this); // On vire le fighter de la cell:
             if (this.myCell.hasGameObject(FightObjectType.OBJECT_PORTAL)) {
                 ((FightPortal) this.myCell.getObjects(FightObjectType.OBJECT_PORTAL)[0]).enable(this, true);
@@ -144,9 +147,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 if (!ArrayUtils.contains(previousPositions, myCell.Id)) {
                     this.previousPositions = ArrayUtils.add(previousPositions, this.myCell.Id);
                 }
-            } /*else {
-                this.previousCellPos.add(this.myCell.Id);
-            }*/
+            }
             if (cell != null) {
                 myCell.getGlyphStream(gl -> !cell.contains(gl)).forEach(gl -> {
                     //Osef du result ils ne peux pas mourir
@@ -161,7 +162,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
                     this.myCell = cell;
                     for (FightGlyph glyph : glyphes) {
-
+                        //todo tempcell = mycell before the assignmenet
                         if ((!previousCellPos.isEmpty() && this.fight.getCell(previousCellPos.get(previousCellPos.size() - 1)).hasGameObject(glyph))
                                 || glyph.getLastTurnActivated() == this.fight.getFightWorker().fightTurn) {
                             continue;
@@ -173,7 +174,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                             return addResult;
                         }
                     }
-                    if(myCell != cell){
+                    if (myCell != cell) {
                         if (this.myCell != null) {
                             this.mapPointCache.set_cellId(myCell.Id);
                             addResult = this.myCell.addObject(this, runEvent);
@@ -197,7 +198,8 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         }
 
 
-       this.myCell = cell;
+
+        this.myCell = cell;
 
         if (this.myCell != null) {
             this.mapPointCache.set_cellId(myCell.Id);
@@ -213,6 +215,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             if (result != -1) {
                 return result;
             }
+        }
+        if(cell == null) {
+            return -1;
         }
         return this.tryDie(this.ID);
     }
@@ -247,7 +252,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
      }*/
 
 
-    public boolean isTurnReady(){
+    public boolean isTurnReady() {
         return turnReady;
     }
 
@@ -309,10 +314,10 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 });
             }
 
-            for(Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator){
+            for (Fighter fr : (Iterable<Fighter>) this.fight.getAliveFighters()::iterator) {
                 fr.getBuff().getBuffsDec().values().forEach(list -> {
-                    for(BuffEffect buff : (Iterable<BuffEffect>) list./*parallelS*/stream()::iterator){
-                        if(buff.caster == this)
+                    for (BuffEffect buff : (Iterable<BuffEffect>) list./*parallelS*/stream()::iterator) {
+                        if (buff.caster == this)
                             fr.getBuff().debuff(buff);
                     }
                 });
@@ -320,8 +325,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
             try {
                 this.fight.challenges.values().stream().filter(cl -> cl.canBeAnalyzed()).forEach(ch -> ch.onFighterKilled(this, fight.fighters().filter(f -> f.getID() == casterId).findFirst().orElse(this)));
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             myCell.removeObject(this);
@@ -692,7 +696,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         try {
             return this.myCell.Id;
         } catch (NullPointerException e) {
-            fight.getLogger().error("map {} cell {} {} ",fight.getMap().getId(), Enumerable.join(fight.myFightCells.get(fight.getTeam1()).keySet().stream().toArray(Short[]::new)),Enumerable.join(fight.myFightCells.get(fight.getTeam2()).keySet().stream().toArray(Short[]::new)));
+            fight.getLogger().error("map {} cell {} {} ", fight.getMap().getId(), Enumerable.join(fight.myFightCells.get(fight.getTeam1()).keySet().stream().toArray(Short[]::new)), Enumerable.join(fight.myFightCells.get(fight.getTeam2()).keySet().stream().toArray(Short[]::new)));
             //this.fight.getLogger().error(this.toString());
             e.printStackTrace();
             return 0;
@@ -835,7 +839,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         for (CopyOnWriteArrayList<FightActivableObject> objs : fight.getActivableObjects().values()) {
             for (FightActivableObject Object : objs) {
                 if (Object instanceof FightPortal /*&& Object.caster.getTeam() == this.getTeam()*/ && ((FightPortal) Object).enabled) {
-                    if(object != null && ((FightPortal) Object).caster.getTeam() != ((FightPortal) Object).caster.getTeam()){
+                    if (object != null && ((FightPortal) Object).caster.getTeam() != ((FightPortal) Object).caster.getTeam()) {
                         continue;
                     }
                     _loc8_ = ArrayUtils.add(_loc8_, (FightPortal) Object);
@@ -872,7 +876,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
 
         double bonus = getShapeEfficiency(effect.zoneShape(), castCell, targetCell, effect.zoneSize() != -100000 ? effect.zoneSize() : EFFECTSHAPE_DEFAULT_AREA_SIZE, effect.zoneMinSize() != -100000 ? effect.zoneMinSize() : EFFECTSHAPE_DEFAULT_MIN_AREA_SIZE, effect.zoneEfficiencyPercent() != -100000 ? effect.zoneEfficiencyPercent() : EFFECTSHAPE_DEFAULT_EFFICIENCY, effect.zoneMaxEfficiency() != -100000 ? effect.zoneMaxEfficiency() : EFFECTSHAPE_DEFAULT_MAX_EFFICIENCY_APPLY);
 
-       // bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
+        // bonus *= getPortalsSpellEfficiencyBonus(truedCell, this.fight);
 
         jet.setValue((jet.floatValue() * bonus));
     }
@@ -990,7 +994,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
         if (!MP) {
             int dodgeAPCaster = caster.getAPCancelling() + 1;
             int dodgeAPTarget = this.getAPDodge() + 1;
-            if(dodgeAPTarget == 0){
+            if (dodgeAPTarget == 0) {
                 dodgeAPCaster++;
             }
 
@@ -1051,7 +1055,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int calculArmor(StatsEnum damageEffect) {
-        switch (damageEffect){
+        switch (damageEffect) {
             case PA_USED_LOST_X_PDV_2:
                 return 0;
         }

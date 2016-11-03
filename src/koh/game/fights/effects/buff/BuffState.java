@@ -31,6 +31,8 @@ public class BuffState extends BuffEffect {
                     || getState() == FightStateEnum.ENRACINÉ
                     || getState() == FightStateEnum.AFFAIBLI
                     || getState() == FightStateEnum.PORTAL
+                    || castInfos.effect.effectUid == 132687
+                    || castInfos.effect.effectUid == 132697
                     /*|| getState() == FightStateEnum.Invulnérable*/){
                 return;
             }
@@ -42,10 +44,8 @@ public class BuffState extends BuffEffect {
             if(getState() == FightStateEnum.INVULNERABLE && caster instanceof CharacterFighter){
                 return;
             }
-
             this.duration++;
 
-            //
         }
 
     }
@@ -57,18 +57,12 @@ public class BuffState extends BuffEffect {
     @Override
     public int applyEffect(MutableInt DamageValue, EffectCast DamageInfos) {
         this.target.getStates().addState(this);
-        //Vise le telegraph
-        System.out.println(target.getCellId() +" "+castInfos.targetKnownCellId+" "+castInfos.oldCell +" "+castInfos.casterOldCell);
-        if(castInfos.effect != null && getState() == FightStateEnum.Téléfrag && target.getCellId() == castInfos.oldCell && this.target instanceof SummonedFighter && target.asSummon().getGrade().getMonsterId() == 3958) { // Synchro
-            final SpellLevel spell = DAO.getSpells().findSpell(5435).getLevelOrNear(target.asSummon().getGrade().getLevel());
-            castInfos.getFight().launchSpell(target, spell, target.getCellId(), true, true, true, castInfos.spellId);
-           // target.tryDie(castInfos.caster.getID(), true);
-        }
         return super.applyEffect(DamageValue, DamageInfos);
     }
 
     @Override
     public int removeEffect() {
+
         this.target.getStates().delState(this);
 
         return super.removeEffect();
