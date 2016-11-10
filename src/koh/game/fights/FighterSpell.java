@@ -39,8 +39,17 @@ public class FighterSpell {
         return true;
     }
 
+    public boolean canTurnSpellID(int id, int max ){
+        if (this.myTargets.containsKey(id)) {
+            if (this.myTargets.get(id).size() >= max) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean canLaunchSpell(SpellLevel spell, int targetId) {
-        if (spell.getMinCastInterval() > 0) {
+         if (spell.getMinCastInterval() > 0) {
             if (this.initialCooldown.containsKey(spell.getSpellId())) {
                 if (this.initialCooldown.get(spell.getSpellId()) != null) {
                     int newCoolDown = minCastInterval(spell.getSpellId());
@@ -114,6 +123,14 @@ public class FighterSpell {
         }
         this.myTargets.get(spell.getSpellId()).add(new SpellTarget(targetId));
     }
+
+    public void actualize(int spellid, int targetId) {
+        if (!this.myTargets.containsKey(spellid)) {
+            this.myTargets.put(spellid, new ArrayList<>());
+        }
+        this.myTargets.get(spellid).add(new SpellTarget(targetId));
+    }
+
 
     public void setCooldown(int spellid,byte relance){
         this.initialCooldown.put(spellid, new SpellInitialCooldown(relance));

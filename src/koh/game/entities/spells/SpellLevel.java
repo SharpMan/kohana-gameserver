@@ -25,13 +25,15 @@ public class SpellLevel {
     @Getter
     private boolean needFreeCell, needTakenCell, needFreeTrapCell, rangeCanBeBoosted;
     @Getter
-    private int maxStack, maxCastPerTurn, maxCastPerTarget, globalCooldown, minPlayerLevel;
+    private int maxStack, maxCastPerTarget, globalCooldown, minPlayerLevel;
     @Getter
     private boolean criticalFailureEndsTurn, hideEffects, hidden;
     @Getter
     private int[] statesRequired, statesForbidden;
     @Getter @Setter
     private EffectInstanceDice[] effects, criticalEffect;
+    @Getter @Setter
+    private int maxCastPerTurn;
 
     public SpellLevel(ResultSet result) throws SQLException {
         this.id = result.getInt("id");

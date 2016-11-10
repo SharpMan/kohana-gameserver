@@ -12,6 +12,7 @@ import static koh.protocol.client.enums.ActionIdEnum.ACTION_CHARACTER_TELEPORT_O
 import koh.game.fights.effects.buff.BuffEffect;
 import koh.game.fights.effects.buff.BuffState;
 import koh.game.fights.fighters.SummonedFighter;
+import koh.game.fights.utils.XelorHandler;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightExchangePositionsMessage;
@@ -76,6 +77,7 @@ public class EffectTeleportSymetricFromCaster extends EffectBase {
 
                     if(castInfos.spellId == 91){ //Frape de xelor
                         applyTelegraph(castInfos,target,target2);
+                        XelorHandler.boostSynchro(castInfos.caster, castInfos.spellLevel);
                     }
 
                 }

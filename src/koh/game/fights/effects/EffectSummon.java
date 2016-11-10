@@ -4,7 +4,10 @@ import koh.game.dao.DAO;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
+import koh.game.fights.IFightObject;
 import koh.game.fights.fighters.*;
+import koh.game.fights.layers.FightPortal;
+import koh.game.utils.Three;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
@@ -35,6 +38,18 @@ public class EffectSummon extends EffectBase {
             }
             final MonsterGrade monsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
             if (monsterLevel != null) {
+                 if (castInfos.getFight().getCell(castInfos.cellId).hasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
+                     final Three<Integer, int[], Integer> portalQuery =  (castInfos.getFight().getTargetThroughPortal(castInfos.caster,
+                             castInfos.cellId,
+                             true,
+                             castInfos.getFight().getCell(castInfos.cellId).getObjects().stream()
+                                     .filter(x -> x.getObjectType() == IFightObject.FightObjectType.OBJECT_PORTAL)
+                                     .findFirst()
+                                     .map(f -> (FightPortal) f)
+                                     .get().caster.getTeam()
+                     ));
+                     castInfos.cellId = portalQuery.first.shortValue();
+                 }
                 if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
                     final Fighter summon;
                     if(monster.isStatic())

@@ -4,9 +4,12 @@ import koh.game.dao.DAO;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
+import koh.game.fights.IFightObject;
 import koh.game.fights.effects.buff.BuffActiveType;
 import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.layers.FightBomb;
+import koh.game.fights.layers.FightPortal;
+import koh.game.utils.Three;
 import koh.protocol.messages.game.actions.fight.GameActionFightSummonMessage;
 import koh.protocol.types.game.context.fight.GameFightFighterInformations;
 import org.apache.commons.lang.ArrayUtils;
@@ -28,6 +31,18 @@ public class EffectSummonBomb extends EffectBase {
         if (monster != null) {
             final MonsterGrade monsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);
             if (monsterLevel != null) {
+                if (castInfos.getFight().getCell(castInfos.cellId).hasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
+                    final Three<Integer, int[], Integer> portalQuery =  (castInfos.getFight().getTargetThroughPortal(castInfos.caster,
+                            castInfos.cellId,
+                            true,
+                            castInfos.getFight().getCell(castInfos.cellId).getObjects().stream()
+                                    .filter(x -> x.getObjectType() == IFightObject.FightObjectType.OBJECT_PORTAL)
+                                    .findFirst()
+                                    .map(f -> (FightPortal) f)
+                                    .get().caster.getTeam()
+                    ));
+                    castInfos.cellId = portalQuery.first.shortValue();
+                }
                 if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
                     final BombFighter bomb = new BombFighter(castInfos.caster.getFight(), castInfos.caster, monsterLevel);
                     bomb.joinFight();

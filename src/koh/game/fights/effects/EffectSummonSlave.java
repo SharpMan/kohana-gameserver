@@ -4,8 +4,11 @@ import koh.game.dao.DAO;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.entities.mob.MonsterTemplate;
 import koh.game.fights.Fighter;
+import koh.game.fights.IFightObject;
 import koh.game.fights.effects.buff.BuffState;
 import koh.game.fights.fighters.*;
+import koh.game.fights.layers.FightPortal;
+import koh.game.utils.Three;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -28,6 +31,18 @@ public class EffectSummonSlave extends EffectBase {
             return -1;
         }
 //3120
+        if (castInfos.getFight().getCell(castInfos.cellId).hasGameObject(IFightObject.FightObjectType.OBJECT_PORTAL)) {
+            final Three<Integer, int[], Integer> portalQuery =  (castInfos.getFight().getTargetThroughPortal(castInfos.caster,
+                    castInfos.cellId,
+                    true,
+                    castInfos.getFight().getCell(castInfos.cellId).getObjects().stream()
+                            .filter(x -> x.getObjectType() == IFightObject.FightObjectType.OBJECT_PORTAL)
+                            .findFirst()
+                            .map(f -> (FightPortal) f)
+                            .get().caster.getTeam()
+            ));
+            castInfos.cellId = portalQuery.first.shortValue();
+        }
         if (castInfos.caster.getFight().isCellWalkable(castInfos.cellId)) {
             final MonsterTemplate monster = DAO.getMonsters().find(castInfos.effect.diceNum);
             final MonsterGrade monsterLevel = monster.getLevelOrNear(castInfos.effect.diceSide);

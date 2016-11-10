@@ -3,6 +3,7 @@ package koh.game.fights.effects;
 import koh.game.dao.DAO;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.spells.EffectInstanceDice;
+import koh.game.entities.spells.Spell;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.FightCell;
 import koh.game.fights.Fighter;
@@ -124,8 +125,10 @@ public class EffectTeleportSymetricImpactcell extends EffectBase {
                 continue;
             }
             if( fighter instanceof SummonedFighter && fighter.asSummon().getGrade().getMonsterId() == 3958 && ArrayUtils.indexOf(fighters,fighter) == 0) { // Synchro
-                final SpellLevel spell = DAO.getSpells().findSpell(5435).getLevelOrNear(fighter.asSummon().getGrade().getLevel());
-                castInfos.getFight().launchSpell(fighter, spell, fighter.getCellId(), true, true, true, castInfos.spellId);
+                final SpellLevel spell = SYNCHRO_SPELL.getLevelOrNear(fighter.asSummon().getGrade().getLevel());
+                if(fighter.getSpellsController().canLaunchSpell(spell, fighter.getID())){
+                    castInfos.getFight().launchSpell(fighter, spell, fighter.getCellId(), true, true, true, castInfos.spellId);
+                }
                 continue;
             }
             final BuffEffect buff = new BuffState(new EffectCast(StatsEnum.ADD_STATE, castInfos.spellId, castInfos.cellId, 0, castInfos.caster.isEnnemyWith(fighter) ? TELEFRAG2 : TELEFRAG, castInfos.caster, new ArrayList<Fighter>(1) {{ this.add(fighter); }}, false, StatsEnum.NONE, 0, castInfos.spellLevel), fighter);
@@ -133,6 +136,8 @@ public class EffectTeleportSymetricImpactcell extends EffectBase {
             buff.applyEffect(null,null);
         }
     }
+
+    private final static Spell SYNCHRO_SPELL = DAO.getSpells().findSpell(5435);
 
     public static void unTelefrag(EffectCast parentCastInfos,Fighter... fighters){
         for (Fighter fighter : fighters) {

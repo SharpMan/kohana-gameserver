@@ -296,7 +296,7 @@ public class XelorHandler {
                             break;
                         }
 
-                        boostSynchro(fighter, spellLevel);
+                        
 
 
                         break;
@@ -321,11 +321,15 @@ public class XelorHandler {
                     final ArrayList<Fighter> synchro = new ArrayList<Fighter>(1);
                     synchro.add(target);
                     for (EffectInstanceDice effect : SYNCHRO) {
+                        if(!target.getSpellsController().canTurnSpellID(5492,1)){
+                            continue;
+                        }
                         final EffectCast castInfos = new EffectCast(effect.getEffectType(), spellLevel.getSpellId(), target.getCellId(), 0, effect, fighter, synchro, false, StatsEnum.NONE, 0, spellLevel);
                         castInfos.targetKnownCellId = target.getCellId();
                         if (EffectBase.tryApplyEffect(castInfos) == -3) {
                             break;
                         }
+                        target.getSpellsController().actualize(5492,target.getID());
                     }
                 });
     }

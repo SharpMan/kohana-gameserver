@@ -87,6 +87,9 @@ public class SpellDAOImpl extends SpellDAO {
                         effect.targetMask = "a";
                     }
                 }
+                if(result.getInt("spell_id") == 5492){ //synchro
+                    levels.get(result.getInt("id")).setMaxCastPerTurn(1);
+                }
                 if(result.getInt("spell_id") == 90) { //fuite
                     EffectInstanceDice[] effects = levels.get(result.getInt("id")).getEffects();
                     for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
