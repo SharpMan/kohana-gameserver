@@ -64,6 +64,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -421,6 +424,8 @@ public class CharacterHandler {
 
     private static final byte REGEN_RATE = 10;
 
+    //private final static ScheduledExecutorService backgroundWorker = Executors.newScheduledThreadPool(30);
+
     @HandlerAttribute(ID = CharacterCreationRequestMessage.MESSAGE_ID)
     public static void handleCharacterCreationRequestMessage(WorldClient client, CharacterCreationRequestMessage message) {
         try {
@@ -501,7 +506,12 @@ public class CharacterHandler {
 
 
                 client.getAccount().characters.add(0, character);
-                Main.getInterClient().send(new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id));
+
+                final PlayerCreatedMessage interMessage = new PlayerCreatedMessage(client.getAccount().characters.size(), client.getAccount().id);
+
+                Main.getInterClient().send(interMessage);
+                //backgroundWorker.schedule(() -> Main.getInterClient().send(interMessage),10, TimeUnit.MINUTES);
+
                 client.send(new CharacterCreationResultMessage(CharacterCreationResultEnum.OK.value()));
                 client.send(new CharactersListMessage(false, client.getAccount().toBaseInformations()));
             }

@@ -1586,7 +1586,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         for (int i = 0; i < path.getCellsPath().length; ++i) {
             if (i != (path.getCellsPath().length -1))
                 fighter.getPreviousCellPos().add(path.getCellsPath()[i].getId());
-            if (Pathfunction.isStopCell(this, fighter.getTeam(), path.getCellsPath()[i].getId(), fighter)) {
+            if (path.getCellsPath()[i].getId() != fighter.getCellId() && Pathfunction.isStopCell(this, fighter.getTeam(), path.getCellsPath()[i].getId(), fighter)) {
                 if (path.getEnd() != path.getCellsPath()[i]) {
                     path.cutPath(i + 1);
                     break;

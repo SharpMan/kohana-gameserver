@@ -255,15 +255,15 @@ public class FighterBuff {
     /// </summary>
     /// <param name="castInfos"></param>
     /// <param name="damageValue"></param>
-    public int onAttackedAfterjet(EffectCast CastInfos, MutableInt DamageValue) {
+    public int onAttackedAfterjet(EffectCast castInfos, MutableInt damageValue) {
         for (BuffEffect buff : (Iterable<BuffEffect>) buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET).stream().filter(bf -> bf instanceof BuffReduceDamage)::iterator) {
-            if (buff.applyEffect(DamageValue, CastInfos) == -3) {
+            if (buff.applyEffect(damageValue, castInfos) == -3) {
                 return -3;
             }
         }
 
         for (BuffEffect buff : (Iterable<BuffEffect>) buffsAct.get(BuffActiveType.ACTIVE_ATTACKED_AFTER_JET).stream().filter(bf -> !(bf instanceof BuffReduceDamage))::iterator) {
-            if (buff.applyEffect(DamageValue, CastInfos) == -3) {
+            if (castInfos != buff.castInfos && buff.applyEffect(damageValue, castInfos) == -3) {
                 return -3;
             }
         }

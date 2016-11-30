@@ -30,8 +30,10 @@ public class EffectTeleportSymetricMySelf extends EffectBase {
         FightCell cell;
         int toReturn = -1;
         for (Fighter target : castInfos.targets) {
-            cell = castInfos.caster.getFight().getCell(castInfos.caster.getMapPoint().pointSymetry(target.getMapPoint()).get_cellId());
-
+            try {
+                cell = castInfos.caster.getFight().getCell(castInfos.caster.getMapPoint().pointSymetry(target.getMapPoint()).get_cellId());
+            }
+            catch (NullPointerException e) { continue; }
             if (cell != null && cell.canWalk()) {
                 castInfos.caster.getFight().sendToField(new GameActionFightTeleportOnSameMapMessage(ACTION_CHARACTER_TELEPORT_ON_SAME_MAP, castInfos.caster.getID(), castInfos.caster.getID(), cell.Id));
 

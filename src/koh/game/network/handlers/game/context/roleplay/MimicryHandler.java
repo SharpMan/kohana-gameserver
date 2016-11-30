@@ -66,6 +66,7 @@ public class MimicryHandler {
         }
         if(host.getPosition() != 63 ||
                 item.getPosition() != 63 ||
+                host.getQuantity() != 1 ||
                 item.getPosition() != 63 ||
                 item.getTemplate().getTypeId() != host.getTemplate().getTypeId()){
             PlayerController.sendServerErrorMessage(client,"Desquipez vous ces items d'abord");

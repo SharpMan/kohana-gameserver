@@ -111,7 +111,7 @@ public class Pathfinder {
                     continue;
 
 
-                DofusCell newLocation = location.getNearestCellInDirection(DIRECTIONS[i]);
+                final DofusCell newLocation = location.getNearestCellInDirection(DIRECTIONS[i]);
 
                 if (newLocation == null)
                     continue;
