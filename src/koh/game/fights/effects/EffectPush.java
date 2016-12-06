@@ -11,6 +11,7 @@ import koh.game.fights.IFightObject.FightObjectType;
 import koh.game.fights.effects.buff.BuffMaximiseEffects;
 import koh.game.fights.effects.buff.BuffMinimizeEffects;
 import koh.game.fights.effects.buff.BuffPorteur;
+import koh.game.fights.fighters.BombFighter;
 import koh.game.fights.fighters.MonsterFighter;
 import koh.game.fights.fighters.SummonedFighter;
 import koh.game.fights.layers.FightPortal;
@@ -57,6 +58,9 @@ public class EffectPush extends EffectBase {
                                 .map(fightCell -> fightCell.getFighter())
                                 .noneMatch(tr -> tr.getID() == ID)) {
                             continue;
+                        }
+                        if(!(target instanceof BombFighter)){
+                            castInfos.effect.diceNum = 1;
                         }
                     }
                     if (castInfos.spellId == SpellIDEnum.DESTIN_ECA && Pathfunction.inLine(target.getFight().getMap(), castInfos.cellId, target.getCellId())) {

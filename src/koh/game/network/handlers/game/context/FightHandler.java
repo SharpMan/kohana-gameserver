@@ -5,6 +5,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameFight;
 import koh.game.actions.GameRequest;
 import koh.game.actions.requests.ChallengeFightRequest;
+import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.game.entities.fight.Challenge;
 import koh.game.fights.Fight;
@@ -227,6 +228,8 @@ public class FightHandler {
 
     }
 
+    private static final int START_MAP = DAO.getSettings().getIntElement("Register.StartMap");
+
     @HandlerAttribute(ID = GameFightJoinRequestMessage.M_ID)
     public static void HandleGameFightJoinRequestMessage(WorldClient client, GameFightJoinRequestMessage message) {
         final Fight fight = client.getCharacter().getCurrentMap().getFight(message.fightId);
@@ -234,6 +237,9 @@ public class FightHandler {
             client.send(new BasicNoOperationMessage());
         } else if (fight.getFightState() == FightState.STATE_ACTIVE) {
             if(fight.canJoinSpectator()){
+                if(client.getCharacter().getMapid() == START_MAP){
+                    client.getCharacter().teleport(fight.getMap().getId(), -1);
+                }
                 fight.joinFightSpectator(client);
             }else{
                 client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR,57));

@@ -2,7 +2,9 @@ package koh.game.network.handlers.game.context.roleplay;
 
 import koh.game.actions.*;
 import koh.game.controllers.PlayerController;
+import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Npc;
+import koh.game.entities.actors.TaxCollector;
 import koh.game.exchange.*;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
@@ -39,13 +41,31 @@ public class NpcHandler {
         if(client.getCharacter() == null || client.getCharacter().getCurrentMap() == null){
             return;
         }
-        final Npc PNJ = client.getCharacter().getCurrentMap().getNpc(message.npcId);
-        if (PNJ == null) {
+        final IGameActor actor = client.getCharacter().getCurrentMap().getActor(message.npcId);
+        if(actor == null){
             if(client.getCharacter().isOnTutorial())
                 return;
             client.send(new BasicNoOperationMessage());
             throw new Error("Le pnj " + message.npcId + " est absent");
         }
+        else if (actor instanceof TaxCollector){
+            final NpcActionTypeEnum action = NpcActionTypeEnum.valueOf(message.npcActionId);
+            if (action == null) {
+                logger.error("Unknow action {} by character {}", message.npcActionId, client.getCharacter().getNickName());
+                return;
+            }
+            if(action == NpcActionTypeEnum.ACTION_TALK){
+                if (client.canGameAction(GameActionTypeEnum.NPC_DAILOG)) {
+                    client.addGameAction(new TaxCollectorDialog((TaxCollector) actor, client.getCharacter()));
+                }
+            }
+            System.out.println(action);
+            return;
+
+        }
+
+
+        final Npc PNJ = client.getCharacter().getCurrentMap().getNpc(message.npcId);
         // ExchangeStartedBidBuyerMessage
         //ExchangeTypesExchangerDescriptionForUserMessage
         if (client.isGameAction(GameActionTypeEnum.EXCHANGE)) {

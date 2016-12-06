@@ -45,6 +45,11 @@ public class DAO {
     @Inject @Getter
     private static NpcDAO npcs;
 
+    @Inject @Getter
+    private static GuildDAO guilds;
+
+    @Inject @Getter
+    private static TaxCollectorDAO taxCollectors;
 
     @Inject @Getter
     private static MapDAO maps;
@@ -54,9 +59,6 @@ public class DAO {
 
     @Inject @Getter
     private static D2oDAO d2oTemplates;
-
-    @Inject @Getter
-    private static GuildDAO guilds;
 
     @Inject @Getter
     private static GuildMemberDAO guildMembers;
@@ -84,6 +86,8 @@ public class DAO {
 
     @Inject @Getter
     private static ChallengeDAO challenges;
+
+
 
     @Inject @Getter
     private static DatabaseSource dbSource;

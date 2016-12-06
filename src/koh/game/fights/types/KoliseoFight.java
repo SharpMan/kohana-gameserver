@@ -35,6 +35,8 @@ import java.util.Map;
 public class KoliseoFight extends Fight {
 
     private SimpleLogger koliseoLog;
+    static final FightController fightController = DAO.getMaps().findTemplate(DAO.getSettings().getIntElement("Register.StartMap")).getFightController();
+
 
 
     public KoliseoFight(DofusMap map, WorldClient attacker, WorldClient defender) {
@@ -87,9 +89,11 @@ public class KoliseoFight extends Fight {
                         ex.printStackTrace();
                     }
                     startFight();
+
                 }
             }, "startTimer");
         }
+        fightController.addFight(this);
     }
 
 
@@ -130,6 +134,7 @@ public class KoliseoFight extends Fight {
 
         final StringBuilder log = new StringBuilder(SimpleLogger.getCurrentTimeStamp());
         log.append("\n");
+        fightController.removeFight(this);
 
 
         final double butin = Math.abs(this.challenges.cellSet().stream()

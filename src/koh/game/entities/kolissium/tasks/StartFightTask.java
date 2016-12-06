@@ -44,7 +44,7 @@ public class StartFightTask implements Runnable {
             final Iterator<Player> team2Iterator = team2.iterator();
             final Player p1 = team1Iterator.next();
             final Player p2 = team2Iterator.next();
-            final Fight fight;
+            final KoliseoFight fight;
             switch (fightType){
                 case FIGHT_TYPE_PVP_ARENA:
                 default:
@@ -58,7 +58,7 @@ public class StartFightTask implements Runnable {
                             break;
                         }
                     }
-                    ((KoliseoFight)fight).initFight();
+                    fight.initFight();
                     break;
             }
 

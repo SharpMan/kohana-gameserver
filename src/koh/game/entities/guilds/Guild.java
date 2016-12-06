@@ -190,7 +190,7 @@ public class Guild extends IWorldEventObserver {
     }
 
     public GuildInfosUpgradeMessage toGuildInfosUpgradeMessage() {
-        return new GuildInfosUpgradeMessage((byte) this.getEntity().maxTaxCollectors, /*byte taxCollectorsCoun*/ (byte) 0, getTaxCollectorHealth(), gettaxCollectorDamageBonuses(), this.getEntity().pods, this.getEntity().prospecting, this.getEntity().wisdom, this.getEntity().boost, TAX_COLLECTOR_SPELLS, this.spellLevel);
+        return new GuildInfosUpgradeMessage((byte) this.getEntity().maxTaxCollectors, /*byte taxCollectorsCoun*/ (byte) 0, getTaxCollectorHealth(), getTaxCollectorDamageBonuses(), this.getEntity().pods, this.getEntity().prospecting, this.getEntity().wisdom, this.getEntity().boost, TAX_COLLECTOR_SPELLS, this.spellLevel);
     }
 
     public PaddockContentInformations[] toPaddockContentInformations() {
@@ -205,7 +205,7 @@ public class Guild extends IWorldEventObserver {
         return new TaxCollectorListMessage(new TaxCollectorInformations[0], (byte) this.getEntity().maxTaxCollectors, new TaxCollectorFightersInformation[0]);
     }
 
-    public int gettaxCollectorDamageBonuses() {
+    public int getTaxCollectorDamageBonuses() {
         return this.getEntity().level;
     }
 

@@ -167,7 +167,7 @@ public class BombFighter extends StaticFighter {
         }
         int bestValue = -1;
         for (BombFighter bomb : targets) {
-            final int result = bomb.personnalMurder(caster, true);
+            final int result = bomb.personalMurder(caster, true);
             if (result < bestValue) {
                 bestValue = result;
             }
@@ -179,7 +179,7 @@ public class BombFighter extends StaticFighter {
 
     private int result = 666;
 
-    private int personnalMurder(int casterId, boolean force) {
+    private int personalMurder(int casterId, boolean force) {
         final int result = selfMurder(casterId);
         if (this.fightBombs != null) {
             this.fightBombs.stream().distinct().forEach(Bomb -> Bomb.remove());

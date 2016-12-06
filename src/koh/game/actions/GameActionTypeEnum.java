@@ -17,6 +17,7 @@ public enum GameActionTypeEnum {
     ZAAP,
     WAITING,
     NPC_DAILOG,
+    TAX_COLLECTOR_DIALOG,
     CHALLENGE_ACCEPT,
     CHALLENGE_DENY,
     TUTORIAL,

@@ -14,17 +14,12 @@ import java.util.stream.Collectors;
 
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.InteractiveElementAction;
-import koh.game.controllers.MapController;
 import koh.game.dao.DAO;
-import koh.game.entities.actors.IGameActor;
-import koh.game.entities.actors.MonsterGroup;
-import koh.game.entities.actors.Npc;
-import koh.game.entities.actors.Player;
+import koh.game.entities.actors.*;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.maps.pathfinding.MapPoint;
 import koh.game.entities.maps.pathfinding.Path;
 import koh.game.fights.Fight;
-import koh.game.fights.FightCell;
 import koh.game.fights.FightController;
 import koh.game.network.WorldClient;
 import koh.protocol.client.Message;
@@ -38,7 +33,6 @@ import koh.protocol.messages.game.context.roleplay.objects.ObjectGroundListAdded
 import koh.protocol.messages.game.context.roleplay.objects.ObjectGroundRemovedMessage;
 import koh.protocol.messages.game.context.roleplay.objects.ObjectGroundRemovedMultipleMessage;
 import koh.protocol.messages.game.context.roleplay.paddock.PaddockPropertiesMessage;
-import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.UpdateMapPlayersAgressableStatusMessage;
 import koh.protocol.types.game.context.MapCoordinates;
 import koh.protocol.types.game.context.fight.FightCommonInformations;
@@ -94,7 +88,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private Map<Integer, MapDoor> doors;
     @Getter
     private ArrayList<MapAction> fightActions;
-    private FightController myFightController;
+    @Getter
+    private FightController fightController;
     /*After loadAll */
     @Getter
     private short[] blueCells, redCells;
@@ -300,6 +295,16 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
             }
         } catch(NullPointerException ignored) {}
 
+        try {
+            final TaxCollector tax = DAO.getTaxCollectors().find(this.id);
+            if (tax != null) {
+                tax.setID(getNextActorId());
+                tax.setActorCell(this.getCell(tax.getCellID()));
+                this.spawnActor(tax);
+            }
+        }
+        catch (Exception e) { e.printStackTrace(); }
+
         this.monsters.stream()
                 .filter(gr -> !gr.isFix())
                 .forEach(gr -> {
@@ -312,7 +317,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
 
         this.monsters.forEach(this::spawnActor);
 
-        this.myFightController = new FightController();
+        this.fightController = new FightController();
         //this.interactiveElements.forEach(x -> System.out.println(x.toString()));
     }
 
@@ -543,17 +548,17 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public short nextFightId() {
-        return (short) this.myFightController.nextFightId();
+        return (short) this.fightController.nextFightId();
     }
 
     public void addFight(Fight fight) {
-        this.myFightController.addFight(fight);
+        this.fightController.addFight(fight);
 
         this.sendMapFightCountMessage();
     }
 
     public void removeFight(Fight fight) {
-        this.myFightController.removeFight(fight);
+        this.fightController.removeFight(fight);
 
         this.sendMapFightCountMessage();
     }
@@ -564,7 +569,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public void sendMapInfo(WorldClient client) {
-        this.myFightController.sendFightInfos(client);
+        this.fightController.sendFightInfos(client);
         //FIXME : Dafuk am certain some maps have 2 paddocks
         Paddock paddock = DAO.getPaddocks().find(id);
         if (paddock != null) {
@@ -582,15 +587,15 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public void sendMapFightCountMessage() {
-        this.sendToField(new MapFightCountMessage(this.myFightController.fightCount()));
+        this.sendToField(new MapFightCountMessage(this.fightController.fightCount()));
     }
 
     public Fight getFight(int FightId) {
-        return this.myFightController.getFight(FightId);
+        return this.fightController.getFight(FightId);
     }
 
     public List<Fight> getFights() {
-        return this.myFightController.getFights();
+        return this.fightController.getFights();
     }
 
     public DofusCell[] getCells() {

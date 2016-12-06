@@ -435,6 +435,7 @@ public class Player extends IGameActor implements Observer {
         if (this.followers != null) {
             this.followers.parallelStream().forEach(e -> e.send(new CompassUpdatePartyMemberMessage(CompassTypeEnum.COMPASS_TYPE_PARTY, this.currentMap.coordinates(), this.ID)));
         }
+
     }
 
     public void addScore(ScoreType Type) {
