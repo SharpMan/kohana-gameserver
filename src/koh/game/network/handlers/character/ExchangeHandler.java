@@ -4,6 +4,7 @@ import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameExchange;
 import koh.game.actions.GameRequest;
 import koh.game.actions.requests.ExchangeRequest;
+import koh.game.controllers.PlayerController;
 import koh.game.entities.actors.Player;
 import koh.game.exchange.*;
 import koh.game.network.WorldClient;
@@ -13,21 +14,7 @@ import koh.protocol.client.Message;
 import koh.protocol.client.enums.ExchangeErrorEnum;
 import koh.protocol.client.enums.ExchangeTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeAcceptMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeBuyMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeErrorMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectMoveKamaMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectMoveMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectTransfertAllFromInvMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectTransfertAllToInvMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectTransfertExistingFromInvMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectTransfertExistingToInvMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectTransfertListFromInvMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeObjectTransfertListToInvMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangePlayerRequestMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeReadyMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeRequestedTradeMessage;
-import koh.protocol.messages.game.inventory.exchanges.ExchangeSellMessage;
+import koh.protocol.messages.game.inventory.exchanges.*;
 
 /**
  *
@@ -43,6 +30,12 @@ public class ExchangeHandler {
         }
         else
             client.getMyExchange().validate(client);
+    }
+
+    //TODO
+    @HandlerAttribute(ID = ExchangeRequestOnTaxCollectorMessage.M_ID)
+    public static void handleExchangeRequestOnTaxCollectorMessage(WorldClient client, ExchangeRequestOnTaxCollectorMessage message){
+        PlayerController.sendServerErrorMessage(client,"Bientôt...");
     }
 
     @HandlerAttribute(ID = ExchangeObjectTransfertListFromInvMessage.M_ID)

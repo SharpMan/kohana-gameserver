@@ -42,7 +42,8 @@ public class TaxCollectorDAOImpl extends TaxCollectorDAO {
                             result.getInt("id"),
                             result.getLong("experience"),
                             result.getInt("kamas"),
-                            result.getInt("level")));
+                            result.getInt("level"),
+                            result.getInt("attacks_count")));
                 }
                 catch (Exception e){
                     e.printStackTrace();

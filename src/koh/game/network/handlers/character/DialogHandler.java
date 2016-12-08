@@ -42,7 +42,11 @@ public class DialogHandler {
                 client.endGameAction(GameActionTypeEnum.ZAAP);
             } else if (client.isGameAction(GameActionTypeEnum.NPC_DAILOG)) {
                 client.endGameAction(GameActionTypeEnum.NPC_DAILOG);
-            } else {
+            }
+            else if (client.isGameAction(GameActionTypeEnum.TAX_COLLECTOR_DIALOG)) {
+                client.endGameAction(GameActionTypeEnum.TAX_COLLECTOR_DIALOG);
+            }
+            else {
                 client.send(new LeaveDialogMessage(DialogTypeEnum.DIALOG_DIALOG));
                 client.send(new BasicNoOperationMessage());
             }

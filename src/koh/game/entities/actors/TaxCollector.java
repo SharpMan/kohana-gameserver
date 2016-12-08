@@ -20,17 +20,23 @@ public class TaxCollector extends IGameActor {
     @Getter
     private short cellID;
     private final GuildInformations guildInformations;
+    @Getter
     private final Guild guild;
-    private final int firstName,lastName, mapid, iden;
+    private final int firstName,lastName, iden;
+    @Getter
     private long experience;
+    @Getter
     private int kamas,level;
+    @Getter
+    private int attacksCount;
 
 
-    public TaxCollector(short cellID, Guild guild, int firstName, int lastName, int mapid, int iden, long experience, int kamas, int level) {
+    public TaxCollector(short cellID, Guild guild, int firstName, int lastName, int mapid, int iden, long experience, int kamas, int level, int attacksCount) {
         this.cellID = cellID;
         this.guild = guild;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.attacksCount = attacksCount;
         this.mapid = mapid;
         this.iden = iden;
         this.experience = experience;
@@ -39,6 +45,14 @@ public class TaxCollector extends IGameActor {
         this.guildInformations = new GuildInformations(guild.getEntity().guildID, guild.getEntity().name, guild.getGuildEmblem());
     }
 
+
+    public int getItemValues() {
+        return 0;
+    }
+
+    public int getBagSize() {
+        return 0;
+    }
 
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
@@ -58,4 +72,5 @@ public class TaxCollector extends IGameActor {
 
 
     public static final int BASE_HEALTH = 3000;
+
 }
