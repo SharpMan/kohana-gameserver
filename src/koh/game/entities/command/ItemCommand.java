@@ -39,7 +39,7 @@ public class ItemCommand implements PlayerCommand {
 
 
 
-        if ((id == 13470 || id == 12736 || id == 11792 || id == 11563) && client.getAccount().accountData.right < 5)
+        if ((id == 13470 || id == 12736 || id == 11792 || id == 11563 || id == 958) && client.getAccount().accountData.right < 5)
             id = 8876;
 
         final ItemTemplate template = DAO.getItemTemplates().getTemplate(id);

@@ -16,6 +16,10 @@ public class SmileyHandler {
 
     @HandlerAttribute(ID = MoodSmileyRequestMessage.MESSAGE_ID)
     public static void HandleMoodSmileyRequestMessage(WorldClient client, MoodSmileyRequestMessage message) {
+        if(client.getCharacter() == null) {
+            client.forceClose();
+            return;
+        }
         //1 Error
         //2 FloodMod
         client.getCharacter().setMoodSmiley(message.smileyId);
@@ -24,6 +28,10 @@ public class SmileyHandler {
 
     @HandlerAttribute(ID = ChatSmileyRequestMessage.MESSAGE_ID)
     public static void handleChatSmileyRequestMessage(WorldClient client, ChatSmileyRequestMessage message) {
+        if(client.getCharacter() == null) {
+            client.forceClose();
+            return;
+        }
         if (client.getLastChannelMessage().get(SMILEY_CHANNEL) + 5000L > System.currentTimeMillis()) {
             client.send(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_MESSAGE, 115, new String[]{((client.getLastChannelMessage().get(SMILEY_CHANNEL) + 5000L - System.currentTimeMillis()) / 1000) + ""}));
             return;

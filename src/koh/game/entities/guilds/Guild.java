@@ -1,7 +1,9 @@
 package koh.game.entities.guilds;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -41,6 +43,8 @@ public class Guild extends IWorldEventObserver {
 
     private final Map<Integer, Player> characters = new ConcurrentHashMap<>();
     private final Map<Integer, GuildMember> members = new ConcurrentHashMap<>();
+    @Getter
+    private final CopyOnWriteArrayList<TaxCollector> taxCollectors = new CopyOnWriteArrayList<TaxCollector>(new ArrayList<TaxCollector>(3));
 
     @Getter
     private final GuildEntity entity;
@@ -161,7 +165,8 @@ public class Guild extends IWorldEventObserver {
 
     public void deleteGuild() {
         DAO.getGuilds().remove(entity);
-        //TODO : TAX
+        DAO.getTaxCollectors().removeGuild(this.entity.guildID);
+        this.taxCollectors.clear();
     }
 
     public boolean kickMember(Player kicker, GuildMember kickedMember) {
@@ -190,7 +195,7 @@ public class Guild extends IWorldEventObserver {
     }
 
     public GuildInfosUpgradeMessage toGuildInfosUpgradeMessage() {
-        return new GuildInfosUpgradeMessage((byte) this.getEntity().maxTaxCollectors, /*byte taxCollectorsCoun*/ (byte) 0, getTaxCollectorHealth(), getTaxCollectorDamageBonuses(), this.getEntity().pods, this.getEntity().prospecting, this.getEntity().wisdom, this.getEntity().boost, TAX_COLLECTOR_SPELLS, this.spellLevel);
+        return new GuildInfosUpgradeMessage((byte) this.getEntity().maxTaxCollectors, (byte) taxCollectors.size(), getTaxCollectorHealth(), getTaxCollectorDamageBonuses(), this.getEntity().pods, this.getEntity().prospecting, this.getEntity().wisdom, this.getEntity().boost, TAX_COLLECTOR_SPELLS, this.spellLevel);
     }
 
     public PaddockContentInformations[] toPaddockContentInformations() {
@@ -202,7 +207,13 @@ public class Guild extends IWorldEventObserver {
     }
 
     public TaxCollectorListMessage toTaxCollectorListMessage() {
-        return new TaxCollectorListMessage(new TaxCollectorInformations[0], (byte) this.getEntity().maxTaxCollectors, new TaxCollectorFightersInformation[0]);
+        return new TaxCollectorListMessage(taxCollectors.stream().map(TaxCollector::toTaxCollectorInformations).toArray(TaxCollectorInformations[]::new),
+                (byte) this.getEntity().maxTaxCollectors,
+                taxCollectors.stream()
+                        .filter(tax -> tax.getCurrent_fight() != null)
+                        .map(TaxCollector::toTaxCollectorFightersInformation)
+                        .toArray(TaxCollectorFightersInformation[]::new)
+        );
     }
 
     public int getTaxCollectorDamageBonuses() {
@@ -210,12 +221,16 @@ public class Guild extends IWorldEventObserver {
     }
 
     public int getTaxCollectorHealth() {
-        return TaxCollector.BASE_HEALTH + (int) (20 * this.getEntity().level);
+        return TaxCollector.BASE_HEALTH +  (20 * this.getEntity().level);
 
     }
 
+    public TaxCollector getTaxCollector(int id){
+        return taxCollectors.stream().filter(t -> t.getIden()== id).findFirst().orElse(null);
+    }
+
     public GuildInformationsGeneralMessage toGeneralInfos() {
-        return new GuildInformationsGeneralMessage(true, false, (byte) this.getEntity().level, (long) DAO.getExps().getLevel(this.getEntity().level).getGuild(), this.getEntity().getExperience(), (long) DAO.getExps().getLevel(this.getEntity().level + 1).getGuild(), this.getEntity().creationDate, this.members.size(), this.characters.size());
+        return new GuildInformationsGeneralMessage(true, false, (byte) this.getEntity().level,  DAO.getExps().getLevel(this.getEntity().level).getGuild(), this.getEntity().getExperience(), DAO.getExps().getLevel(this.getEntity().level + 1).getGuild(), this.getEntity().creationDate, this.members.size(), this.characters.size());
     }
 
     protected void updateMember(GuildMember member) {

@@ -6,11 +6,9 @@
 package koh.game.fights;
 
 import koh.game.entities.actors.Player;
+import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.FieldNotification;
-import koh.game.fights.fighters.CharacterFighter;
-import koh.game.fights.fighters.DoubleFighter;
-import koh.game.fights.fighters.MonsterFighter;
-import koh.game.fights.fighters.StaticFighter;
+import koh.game.fights.fighters.*;
 import koh.game.fights.utils.SwapPositionRequest;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.AlignmentSideEnum;
@@ -82,9 +80,10 @@ public class FightTeam {
     }
 
     public FighterRefusedReasonEnum canJoin(Player Character) {
-        if (this.leader instanceof MonsterFighter) {
+        if (this.leader instanceof MonsterFighter || this.leader instanceof TaxCollectorFighter) {
             return FighterRefusedReasonEnum.WRONG_ALIGNMENT;
         }
+
         if (this.fight.getFightState() != FightState.STATE_PLACE) {
             return FighterRefusedReasonEnum.TOO_LATE;
         }
@@ -106,6 +105,9 @@ public class FightTeam {
     public byte getTeamType() {
         if (this.leader instanceof CharacterFighter) {
             return TeamTypeEnum.TEAM_TYPE_PLAYER;
+        }
+        if(this.leader instanceof TaxCollectorFighter){
+            return TeamTypeEnum.TEAM_TYPE_TAXCOLLECTOR;
         }
         return this.leader instanceof MonsterFighter ? TeamTypeEnum.TEAM_TYPE_MONSTER : TeamTypeEnum.TEAM_TYPE_BAD_PLAYER;
     }

@@ -58,6 +58,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.chatCommands.put("fm", new FmCommand());
             this.chatCommands.put("exo", new ExoCommand());
             this.chatCommands.put("arme", new WeaponExoCommand());
+            this.chatCommands.put("event", new EventCommand());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,6 +92,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.consoleCommands.put("spawnnpc", new SpawnNPC());
             this.consoleCommands.put("debug", new DebugCommand());
             this.consoleCommands.put("rekt", new RebootCommand());
+            this.consoleCommands.put("setevent", new SetEventCommand());
 
 
             Files.walk(Paths.get("data/script/console"))

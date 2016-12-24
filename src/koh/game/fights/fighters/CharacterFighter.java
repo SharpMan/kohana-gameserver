@@ -9,6 +9,7 @@ import koh.game.entities.kolissium.KolizeumExecutor;
 import koh.game.entities.spells.SpellLevel;
 import koh.game.fights.*;
 import koh.game.fights.types.AgressionFight;
+import koh.game.fights.types.TaxCollectorFight;
 import koh.game.network.WorldClient;
 import koh.look.EntityLookParser;
 import koh.protocol.client.Message;
@@ -341,7 +342,19 @@ public class CharacterFighter extends Fighter {
                     final PlayerInst inst = PlayerInst.getPlayerInst(character.getID());
                     this.character.send(new GameRolePlayArenaUpdatePlayerInfosMessage(character.getKolizeumRate().getScreenRating(), inst.getDailyCote(), character.getScores().get(ScoreType.BEST_COTE), inst.getDailyWins(), inst.getDailyFight()));
 
-                } else if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
+                }
+                else if(fight.getFightType() == FightTypeEnum.FIGHT_TYPE_PvT && this.team == fight.getTeam2()){
+                    try{
+                        TaxCollectorFight.teleportLastPosition(character);
+                    }
+                    catch (Exception e) {
+                        if(character.getClient() != null) {
+                            this.character.send(new CurrentMapMessage(this.character.getCurrentMap().getId(), "649ae451ca33ec53bbcbcc33becf15f4"));
+                            this.character.getCurrentMap().spawnActor(this.character);
+                        }
+                    }
+                }
+                else if (fight.getFightType() != FightTypeEnum.FIGHT_TYPE_CHALLENGE
                         && this.team.id == this.fight.getLoosers().id
                         && this.character.getSavedMap() != this.character.getCurrentMap().getId()) {
                     this.character.fightTeleportation(this.character.getSavedMap(), this.character.getSavedCell());

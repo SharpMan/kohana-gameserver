@@ -84,6 +84,10 @@ public class GuildMember {
         return (((((this.isBoss()) || (this.manageRights()))) || (((2 & this.rights) > 0))));
     }
 
+    public boolean hasRight(int right) {
+        return (((((this.isBoss()) || (this.manageRights()))) || (((right & this.rights) > 0))));
+    }
+
     public boolean manageRights() {
         return (((this.isBoss()) || (((4 & this.rights) > 0))));
     }

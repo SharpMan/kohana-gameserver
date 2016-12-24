@@ -158,15 +158,16 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
     }
 
 
-    public FighterRefusedReasonEnum canJoin(FightTeam Team, Player Character) {
-        if (Team.canJoin(Character) != FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
-            return Team.canJoin(Character);
-        } else if (this.getFreeSpawnCell(Team) == null) {
+    public FighterRefusedReasonEnum canJoin(FightTeam team, Player Character) {
+        if (team.canJoin(Character) != FighterRefusedReasonEnum.FIGHTER_ACCEPTED) {
+            return team.canJoin(Character);
+        } else if (this.getFreeSpawnCell(team) == null) {
             return FighterRefusedReasonEnum.TEAM_FULL;
         } else {
             return FighterRefusedReasonEnum.FIGHTER_ACCEPTED;
         }
     }
+
 
     public boolean canJoinSpectator() {
         return this.fightState == fightState.STATE_ACTIVE && !this.myTeam1.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_SECRET) && !this.myTeam2.isToggled(FightOptionsEnum.FIGHT_OPTION_SET_SECRET);
@@ -641,7 +642,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
     };
 
-    public void launchSpell(Fighter fighter, SpellLevel spellLevel, short cellId, boolean friend, boolean fakeLaunch, boolean imTargeted, int spellId) {
+    public synchronized void launchSpell(Fighter fighter, SpellLevel spellLevel, short cellId, boolean friend, boolean fakeLaunch, boolean imTargeted, int spellId) {
         if (fighter.getMutex() == null) {
             return;
         }
@@ -2401,7 +2402,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                 .mapToInt(x -> x.getID()).toArray());
     }
 
-    private synchronized FightCell getFreeSpawnCell(FightTeam team) {
+    protected synchronized FightCell getFreeSpawnCell(FightTeam team) {
         for (FightCell cell : this.myFightCells.get(team).values()) {
             if (!cell.isWalkable()) {
                 logger.error("Cell {} map2 {} ", cell.getId(), map.getId());

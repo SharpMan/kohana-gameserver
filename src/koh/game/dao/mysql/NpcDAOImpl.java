@@ -13,6 +13,7 @@ import koh.game.entities.actors.pnj.replies.*;
 import koh.game.entities.item.ItemTemplate;
 import koh.game.utils.sql.ConnectionResult;
 import koh.game.utils.sql.ConnectionStatement;
+import koh.protocol.client.enums.ItemSuperTypeEnum;
 import koh.utils.Enumerable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -194,7 +195,7 @@ public class NpcDAOImpl extends NpcDAO {
                                 .build());
                 i++;
             }
-            /*NpcTemplate npc = this.findTemplate(812);
+            NpcTemplate npc = this.findTemplate(786);
 
                 DAO.getItemTemplates().getItemTemplates().values()
                         .stream()
@@ -212,7 +213,133 @@ public class NpcDAOImpl extends NpcDAO {
                                             .token(0)
                                             .build());
                         });
-*/
+
+            final NpcTemplate npc2 = this.findTemplate(1561)
+                    ,npc3 = this.findTemplate(1560)
+                    ,npc4 = this.findTemplate(1559)
+                    ,npc5 = this.findTemplate(313)
+                    ,npc6 = this.findTemplate(793)
+                    ,npc7 = this.findTemplate(1564)
+                    ,npc8 = this.findTemplate(1396);
+
+            DAO.getItemTemplates().getItemTemplates().values()
+                    .stream()
+                    .filter(item -> item.getTypeId() == 1 && item.getLevel() < 100 && item.getLevel() > 20)
+                    .forEach(it -> {
+                        if (npc8.getItems() == null) {
+                            npc8.setItems(new HashMap<>());
+                        }
+                        npc8.getItems().put(it.getId(),
+                                NpcItem.builder()
+                                        .customPrice(10)
+                                        .buyCriterion("")
+                                        .maximiseStats(true)
+                                        .item(it.getId())
+                                        .token(13470)
+                                        .build());
+                    });
+
+            DAO.getItemTemplates().getItemTemplates().values()
+                    .stream()
+                    .filter(item -> item.getTypeId() == 9 && item.getLevel() < 100 && item.getLevel() > 20)
+                    .forEach(it -> {
+                        if (npc7.getItems() == null) {
+                            npc7.setItems(new HashMap<>());
+                        }
+                        npc7.getItems().put(it.getId(),
+                                NpcItem.builder()
+                                        .customPrice(10)
+                                        .buyCriterion("")
+                                        .maximiseStats(true)
+                                        .item(it.getId())
+                                        .token(13470)
+                                        .build());
+                    });
+
+            DAO.getItemTemplates().getItemTemplates().values()
+                    .stream()
+                    .filter(item -> item.getTypeId() == 17 && item.getLevel() < 100 && item.getLevel() > 20)
+                    .forEach(it -> {
+                        if (npc6.getItems() == null) {
+                            npc6.setItems(new HashMap<>());
+                        }
+                        npc6.getItems().put(it.getId(),
+                                NpcItem.builder()
+                                        .customPrice(10)
+                                        .buyCriterion("")
+                                        .maximiseStats(true)
+                                        .item(it.getId())
+                                        .token(13470)
+                                        .build());
+                    });
+
+            DAO.getItemTemplates().getItemTemplates().values()
+                    .stream()
+                    .filter(item -> item.getTypeId() == 16 && item.getLevel() < 100 && item.getLevel() > 20)
+                    .forEach(it -> {
+                        if (npc5.getItems() == null) {
+                            npc5.setItems(new HashMap<>());
+                        }
+                        npc5.getItems().put(it.getId(),
+                                NpcItem.builder()
+                                        .customPrice(10)
+                                        .buyCriterion("")
+                                        .maximiseStats(true)
+                                        .item(it.getId())
+                                        .token(13470)
+                                        .build());
+                    });
+
+            DAO.getItemTemplates().getItemTemplates().values()
+                    .stream()
+                    .filter(item -> item.getTypeId() == 10 && item.getLevel() < 100 && item.getLevel() > 20)
+                    .forEach(it -> {
+                        if (npc2.getItems() == null) {
+                            npc2.setItems(new HashMap<>());
+                        }
+                        npc2.getItems().put(it.getId(),
+                                NpcItem.builder()
+                                        .customPrice(10)
+                                        .buyCriterion("")
+                                        .maximiseStats(true)
+                                        .item(it.getId())
+                                        .token(13470)
+                                        .build());
+                    });
+            DAO.getItemTemplates().getItemTemplates().values()
+                    .stream()
+                    .filter(item -> item.getTypeId() == 11 && item.getLevel() < 100 && item.getLevel() > 20)
+                    .forEach(it -> {
+                        if (npc4.getItems() == null) {
+                            npc4.setItems(new HashMap<>());
+                        }
+                        npc4.getItems().put(it.getId(),
+                                NpcItem.builder()
+                                        .customPrice(10)
+                                        .buyCriterion("")
+                                        .maximiseStats(true)
+                                        .item(it.getId())
+                                        .token(13470)
+                                        .build());
+                    });
+
+           /* DAO.getItemTemplates().getItemTemplates().values()
+                    .stream()
+                    .filter(item -> item.getSuperType() == ItemSuperTypeEnum.SUPERTYPE_WEAPON && item.getLevel() < 100 && item.getLevel() > 20)
+                    .forEach(it -> {
+                        if (npc3.getItems() == null) {
+                            npc3.setItems(new HashMap<>());
+                        }
+                        npc3.getItems().put(it.getId(),
+                                NpcItem.builder()
+                                        .customPrice(10)
+                                        .buyCriterion("")
+                                        .maximiseStats(true)
+                                        .item(it.getId())
+                                        .token(13470)
+                                        .build());
+                    });*/
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);

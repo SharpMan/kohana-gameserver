@@ -48,7 +48,7 @@ public abstract class BuffEffect {
 
     //TODO: Create List in Setting
     public boolean isDebuffable() {
-        if(this.castInfos.spellId == 103){
+        if(this.castInfos.spellId == 103 || castInfos.spellId == 59){
             return false;
         }
         logger.debug("Checkinf if buff {} is debuffable",this.castInfos.effectType);

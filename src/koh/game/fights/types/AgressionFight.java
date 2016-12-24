@@ -3,7 +3,9 @@ package koh.game.fights.types;
 import java.util.stream.Collectors;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
+import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
+import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.environments.DofusMap;
 import koh.game.fights.utils.AntiCheat;
 import koh.game.fights.Fight;
@@ -14,6 +16,8 @@ import koh.game.fights.Fighter;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.FighterRefusedReasonEnum;
+import koh.protocol.client.enums.TextInformationTypeEnum;
+import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.fight.FightOutcomeEnum;
 import koh.protocol.messages.game.context.fight.GameFightEndMessage;
 import koh.protocol.messages.game.context.fight.GameFightJoinMessage;
@@ -24,6 +28,7 @@ import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayAggressionM
 import koh.protocol.types.game.context.fight.FightLoot;
 import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
 import koh.protocol.types.game.context.fight.FightResultPvpData;
+import koh.protocol.types.game.context.fight.FightResultTaxCollectorListEntry;
 import koh.protocol.types.game.context.roleplay.party.NamedPartyTeamWithOutcome;
 
 /**
@@ -114,13 +119,14 @@ public class AgressionFight extends Fight {
 
     private static final int ARENA = 88212759;
     @Override
-    public FighterRefusedReasonEnum canJoin(FightTeam teameam, Player character) {
+    public FighterRefusedReasonEnum canJoin(FightTeam team, Player character) {
         if(map.getId() == ARENA){
             return FighterRefusedReasonEnum.MULTIACCOUNT_NOT_ALLOWED;
         }
-        return super.canJoin(teameam,character);
+        return super.canJoin(team,character);
     }
 
+    final static FightLoot EMPTY_REWARD = new FightLoot(new int[0], 0);
 
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {
@@ -129,6 +135,18 @@ public class AgressionFight extends Fight {
         if(winners.getLevel() - loosers.getLevel() > 20){ //TODO vpn Config
              this.withdrawEnd(winners,loosers);
              return;
+        }
+        final IGameActor gameActor = this.map.getMyGameActors().values()
+                .stream()
+                .filter(ac -> ac instanceof TaxCollector)
+                .findFirst()
+                .orElse(null);
+        final TaxCollector tax = gameActor != null ? (TaxCollector) gameActor : null;
+        final FightResultTaxCollectorListEntry result = gameActor != null ? new FightResultTaxCollectorListEntry(FightOutcomeEnum.RESULT_TAX, (byte) 0, EMPTY_REWARD, tax.getID(), true, (byte)tax.getLevel(), tax.getGuild().getBasicGuildInformations(), 0) : null;
+        if(tax != null){
+            this.myResult.results.add(
+                result
+            );
         }
 
         for (Fighter fighter : (Iterable<Fighter>) loosers.getFighters()::iterator) {
@@ -141,7 +159,7 @@ public class AgressionFight extends Fight {
             this.myResult.results.add(
                     new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_LOST,
                             fighter.getWave(),
-                            new FightLoot(new int[0], 0),
+                            EMPTY_REWARD,
                             fighter.getID(),
                             fighter.isAlive(),
                             (byte) fighter.getLevel(),
@@ -158,7 +176,10 @@ public class AgressionFight extends Fight {
             if(fighter.isLeft())
                 continue;
             short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_AGRESSION));
-
+            if(honorWon  > 0 && result != null) {
+                result.experienceForGuild += (int) Math.floor(honorWon * 0.10f);
+                honorWon -= (int) Math.floor(honorWon * 0.10f);
+            }
             if(fighter.getPlayer().getAccount() != null){
                 final long count = loosers.getFighters().filter(fr -> fr.isPlayer() && fr.getPlayer() != null && fr.getPlayer().getAccount() != null && fr.getPlayer().getAccount().lastIP.equalsIgnoreCase(fighter.getPlayer().getAccount().lastIP)).count();
                 if (count == getEnnemyTeam(getWinners()).getFighters().count()) {
@@ -174,7 +195,7 @@ public class AgressionFight extends Fight {
             this.myResult.results.add(
                     new FightResultPlayerListEntry(FightOutcomeEnum.RESULT_VICTORY,
                             fighter.getWave(),
-                            new FightLoot(new int[0], 0),
+                            EMPTY_REWARD,
                             fighter.getID(),
                             fighter.isAlive(),
                             (byte) fighter.getLevel(),
@@ -184,6 +205,13 @@ public class AgressionFight extends Fight {
                                             DAO.getExps().getLevel(fighter.getPlayer().getAlignmentGrade() == 10 ? 10 : fighter.getPlayer().getAlignmentGrade() + 1).getPvP(),
                                             fighter.getPlayer().getHonor(),
                                             honorWon)}));
+        }
+        if(tax != null){
+            tax.setHonor(tax.getHonor() + result.experienceForGuild);
+            DAO.getTaxCollectors().update(tax);
+            this.sendToField(new TextInformationMessage(TextInformationTypeEnum.TEXT_INFORMATION_ERROR, 16, new String[]{ tax.getGuild().getEntity().name ,
+                    "Le percepteur a taxé " + result.experienceForGuild +" de ce combat."
+            }));
         }
         super.endFight();
     }

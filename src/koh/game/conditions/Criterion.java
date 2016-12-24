@@ -139,6 +139,8 @@ public abstract class Criterion extends ConditionExpression {
                 return new MonthItemCriterion();
             case "PB":
                return new SubAreaCriterion();
+            case "Px":
+                return new GuildRightCriterion();
             case "PZ":
                return new SubscribeCriterion();
             case "BI":

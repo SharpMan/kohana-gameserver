@@ -53,7 +53,15 @@ public class TaxCollectorDialog extends GameAction {
     }
 
     @Override
-    public boolean canSubAction(GameActionTypeEnum ActionType) {
+    public boolean canSubAction(GameActionTypeEnum actionType) {
+        if(actionType == GameActionTypeEnum.BASIC_REQUEST ||
+                actionType == GameActionTypeEnum.GROUP ||
+                actionType == GameActionTypeEnum.INTERACTIVE_ELEMENT ||
+                actionType == GameActionTypeEnum.ZAAP ||
+                actionType == GameActionTypeEnum.MAP_MOVEMENT ||
+                actionType == GameActionTypeEnum.CHANGE_MAP){
+            return true;
+        }
         return false;
     }
 

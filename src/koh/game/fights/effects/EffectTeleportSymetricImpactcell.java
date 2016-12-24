@@ -153,6 +153,17 @@ public class EffectTeleportSymetricImpactcell extends EffectBase {
                 break;
             }
         }
+
+        final EffectCast castInfos2 = new EffectCast(StatsEnum.ACTION_POINTS, parentCastInfos.spellId, parentCastInfos.caster.getCellId(), 0, XelorHandler.BOOST2, parentCastInfos.caster, new ArrayList<Fighter>(1) {{
+            this.add(parentCastInfos.caster);
+        }}, false, StatsEnum.NONE, 0,parentCastInfos.spellLevel);
+        castInfos2.targetKnownCellId = parentCastInfos.caster.getCellId();
+        castInfos2.oldCell = parentCastInfos.oldCell;
+        castInfos2.casterOldCell = parentCastInfos.casterOldCell;
+        castInfos2.setCritical(parentCastInfos.isCritical());
+        if (EffectBase.tryApplyEffect(castInfos2) == -3) {
+            return;
+        }
     }
 
 

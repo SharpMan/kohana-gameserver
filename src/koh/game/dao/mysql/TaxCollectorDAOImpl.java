@@ -6,9 +6,12 @@ import koh.game.dao.DatabaseSource;
 import koh.game.dao.api.TaxCollectorDAO;
 import koh.game.entities.actors.TaxCollector;
 import koh.game.utils.sql.ConnectionResult;
+import koh.game.utils.sql.ConnectionStatement;
+import koh.utils.Enumerable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +45,11 @@ public class TaxCollectorDAOImpl extends TaxCollectorDAO {
                             result.getInt("id"),
                             result.getLong("experience"),
                             result.getInt("kamas"),
-                            result.getInt("level"),
-                            result.getInt("attacks_count")));
+                            result.getInt("attacks_count"),
+                            result.getString("caller_name"),
+                            result.getInt("honor"),
+                            result.getString("gathered_item")
+                    ));
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -60,19 +66,131 @@ public class TaxCollectorDAOImpl extends TaxCollectorDAO {
     }
 
     @Override
-    public void remove(int iden) {
+    public void update(TaxCollector tax){
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `tax_collectors` SET `honor` = ?,`experience` = ?,`kamas` = ?,`gathered_item` = ?  WHERE `id` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1, tax.getHonor());
+                pStatement.setLong(2, tax.getExperience());
+                pStatement.setInt(3, tax.getKamas());
+                pStatement.setString(4, Enumerable.join2(tax.getGatheredItem()));
+                pStatement.setInt(5, tax.getIden());
+                pStatement.executeUpdate();
 
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
     }
 
     @Override
-    public void insert(TaxCollector tax) {
+    public void updateSummmary(TaxCollector tax){
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("UPDATE `tax_collectors` SET `attacks_count` = ?  WHERE `id` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1, tax.getAttacksCount());
+                pStatement.setInt(2, tax.getIden());
+                pStatement.executeUpdate();
 
+            } catch (Exception e) {
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+    }
+
+    @Override
+    public void remove(int iden) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("DELETE from `tax_collectors` WHERE `id` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1, iden);
+                pStatement.execute();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+    }
+
+    @Override
+    public void removeGuild(int guild) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("DELETE from `tax_collectors` WHERE `guild` = ?;")) {
+                PreparedStatement pStatement = conn.getStatement();
+                pStatement.setInt(1, guild);
+                pStatement.execute();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e);
+                logger.warn(e.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            logger.warn(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean insert(TaxCollector tax) {
+        try {
+            try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("INSERT INTO `tax_collectors` VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);",true)) {
+
+                PreparedStatement pStatement = conn.getStatement();
+
+                pStatement.setInt(1, 0);
+                pStatement.setByte(2, tax.getDirection());
+                pStatement.setInt(3, tax.getMapid());
+                pStatement.setShort(4, tax.getCellID()); //10
+                pStatement.setInt(5, tax.getGuild().getEntity().guildID);
+                pStatement.setInt(6, tax.getFirstName());
+                pStatement.setInt(7, tax.getLastName());
+                pStatement.setLong(8, tax.getExperience());
+                pStatement.setInt(9, tax.getKamas());
+                pStatement.setInt(10, tax.getAttacksCount());
+                pStatement.setString(11, tax.getCallerName());
+                pStatement.setInt(12, tax.getHonor());
+                pStatement.setString(13, "");
+                pStatement.execute();
+                ResultSet resultSet = pStatement.getGeneratedKeys();
+                if (!resultSet.first())//character not created ?
+                    return false;
+                tax.setIden(resultSet.getInt(1));
+                this.taxers.put(tax.getMapid(),tax);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        finally {
+            return true;
+        }
     }
 
     @Override
     public TaxCollector find(int map) {
         return taxers.get(map);
     }
+
+    @Override
+    public boolean isPresentOn(int map) { return taxers.containsKey(map);}
 
     @Override
     public void start() {

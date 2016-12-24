@@ -25,7 +25,7 @@ public class MapAction {
     public void execute(Player actor){
         switch (InteractiveUsage.ActionType.valueOf(action)) {
             case TELEPORT:
-                actor.fightTeleportation(Integer.parseInt(param[0]), Integer.parseInt(param[1]));
+                actor.fightTeleportation(Integer.parseInt(param[0]), Integer.parseInt(param[1].trim()));
                 break;
             case CREATE_GUILDE:
                 //if (actor.client.canGameAction(GameActionTypeEnum.CREATE_GUILD)) {

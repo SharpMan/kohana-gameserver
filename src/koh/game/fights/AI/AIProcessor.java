@@ -72,11 +72,11 @@ public class AIProcessor {
         else if (fr instanceof DoubleFighter)
         {
             return IAMindEnum.BLOCKER;
-        }/*
-        else if (f instanceof PercepteurFighter)
+        }
+        else if (fr instanceof TaxCollectorFighter)
         {
             return IAMindEnum.TAXCOLLECTOR;
-        }*/
+        }
         else {
             return IAMindEnum.PASSIVE;
         }

@@ -11,6 +11,7 @@ public enum GameActionTypeEnum {
     EXCHANGE,
     BASIC_REQUEST,
     CREATE_GUILD,
+    DEFEND_TAX_COLLECTOR,
     GROUP,
     KOLI,
     INTERACTIVE_ELEMENT,

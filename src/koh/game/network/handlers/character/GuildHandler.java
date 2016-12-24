@@ -59,8 +59,8 @@ public class GuildHandler {
                 return;
             }
 
-            byte SpellLevel = Client.getCharacter().getGuild().spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, message.spellId)];
-            if (SpellLevel >= DAO.getSpells().findSpell(message.spellId).getSpellLevels().length) { //action Asyn ^^
+            byte spellLevel = Client.getCharacter().getGuild().spellLevel[ArrayUtils.indexOf(Guild.TAX_COLLECTOR_SPELLS, message.spellId)];
+            if (spellLevel >= DAO.getSpells().findSpell(message.spellId).getSpellLevels().length) {
                 Client.send(new BasicNoOperationMessage());
                 return;
             }

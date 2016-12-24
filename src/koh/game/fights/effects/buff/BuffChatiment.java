@@ -4,6 +4,7 @@ import koh.game.fights.Fighter;
 import koh.game.fights.effects.EffectCast;
 import koh.game.fights.effects.EffectHeal;
 import koh.protocol.client.enums.FightDispellableEnum;
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.types.game.actions.fight.AbstractFightDispellableEffect;
 import koh.protocol.types.game.actions.fight.FightTriggeredEffect;
@@ -26,7 +27,8 @@ public class BuffChatiment extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast damageInfos) {
-        if(damageInfos != null && damageInfos.isPoison){
+        if((damageInfos != null && damageInfos.isPoison) ||
+                (target.getStates().hasState(FightStateEnum.INVULNERABLE) || target.getStates().hasState(FightStateEnum.Invulnérable))){
             return super.applyEffect(damageValue, damageInfos);
         }
         final MutableInt buffValue = new MutableInt(damageValue.getValue() / 2); // Divise par deux les stats a boost car c'est un personnage.

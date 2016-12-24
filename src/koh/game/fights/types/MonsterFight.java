@@ -2,7 +2,9 @@ package koh.game.fights.types;
 
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
+import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.MonsterGroup;
+import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.fight.*;
@@ -20,10 +22,7 @@ import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.fight.*;
-import koh.protocol.types.game.context.fight.FightLoot;
-import koh.protocol.types.game.context.fight.FightResultExperienceData;
-import koh.protocol.types.game.context.fight.FightResultFighterListEntry;
-import koh.protocol.types.game.context.fight.FightResultPlayerListEntry;
+import koh.protocol.types.game.context.fight.*;
 import lombok.Getter;
 
 import java.lang.reflect.InvocationTargetException;
@@ -97,6 +96,8 @@ public class MonsterFight extends Fight {
 
     final private boolean isRazielle = DAO.getSettings().getIntElement("World.ID") == 2;
 
+    final static FightLoot EMPTY_REWARD = new FightLoot(new int[0], 0);
+
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {
         final MonsterFighter[] deadMobs = this.myTeam2.getDeadFighters()
@@ -111,7 +112,15 @@ public class MonsterFight extends Fight {
             this.myResult.results.removeIf(res -> ((FightResultPlayerListEntry) res).notOfficial);
             //On efface les anciens fakes results et on laisse celui des gens qui ont abondonnee maybe ils ont xp ?
         }
-        final int teamPP = winners.getFighters().mapToInt(fr -> fr.getStats().getTotal(StatsEnum.PROSPECTING)).sum();
+
+        final IGameActor gameActor = this.map.getMyGameActors().values()
+                .stream()
+                .filter(ac -> ac instanceof TaxCollector && ((TaxCollector) ac).currentState() == 0)
+                .findFirst()
+                .orElse(null);
+        final TaxCollector tax = gameActor != null ? (TaxCollector) gameActor : null;
+
+        final int teamPP = winners.getFighters().mapToInt(fr -> fr.getStats().getTotal(StatsEnum.PROSPECTING)).sum() + (tax != null ? tax.getGuild().getEntity().prospecting : 0);
         final int baseKamas = loosers.equals(this.myTeam2) ? Arrays.stream(deadMobs).mapToInt(mob -> mob.getGrade().getMonster().getKamasWin(Fight.RANDOM)).sum() : 0; //sum min max
         final HashMap<MonsterDrop, Integer> droppedItems = new HashMap<>();
         final double butin = (this.challenges.cellSet().stream()
@@ -120,10 +129,19 @@ public class MonsterFight extends Fight {
                 .sum() * 0.01) + 1;
 
 
+        final FightResultTaxCollectorListEntry result = gameActor != null ? new FightResultTaxCollectorListEntry(FightOutcomeEnum.RESULT_TAX, (byte) 0, null, tax.getID(), true, (byte)tax.getLevel(), tax.getGuild().getBasicGuildInformations(), 0) : null;
+        final List<DroppedItem> taxes = gameActor != null ? new ArrayList<>(7) : null;
+        if(tax != null){
+            this.myResult.results.add(
+                    result
+            );
+        }
+
+
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) { //In stream.foreach you should use final var that suck
             if (fighter instanceof CharacterFighter) {
                 super.addNamedParty(fighter.asPlayer(), FightOutcomeEnum.RESULT_VICTORY);
-                final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs,butin));
+                final AtomicInteger exp = new AtomicInteger(FightFormulas.computeXpWin(fighter.asPlayer(), deadMobs, butin));
                 final int guildXp = FightFormulas.guildXpEarned(fighter.asPlayer(), exp), mountXp = FightFormulas.mountXpEarned(fighter.asPlayer(), exp);
                 final int oldLevel = fighter.getPlayer().getLevel();
                 fighter.getPlayer().addExperience(exp.get(), false);
@@ -156,6 +174,7 @@ public class MonsterFight extends Fight {
                         e.printStackTrace();
                     }
                 }
+
                 final int[] serializedLoots = new int[loots.size() * 2];
                 for (int i = 0; i < serializedLoots.length; i += 2) {
                     serializedLoots[i] = loots.get(i / 2).getItem();
@@ -229,6 +248,34 @@ public class MonsterFight extends Fight {
 
                 this.myResult.results.add(new FightResultFighterListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive()));
             }
+        }
+
+        if(tax != null){
+            Arrays.stream(deadMobs).forEachOrdered(mob -> {
+                FightFormulas.rollLoot(tax, mob.getGrade(), teamPP, droppedItems, taxes,butin, this);
+            });
+            synchronized (tax.get$mutex()) {
+                for (DroppedItem loot : taxes) {
+                    final Short qua = tax.getGatheredItem().get(loot.getItem());
+                    if (qua != null) {
+                        tax.getGatheredItem().replace(loot.getItem(), (short) (qua + loot.getQuantity()));
+                    }else{
+                        tax.getGatheredItem().put(loot.getItem(), (short) (loot.getQuantity()));
+                    }
+                }
+            }
+
+            final int[] serializedLoots = new int[taxes.size() * 2];
+            for (int i = 0; i < serializedLoots.length; i += 2) {
+                serializedLoots[i] = taxes.get(i / 2).getItem();
+                serializedLoots[i + 1] = taxes.get(i / 2).getQuantity();
+            }
+
+            result.experienceForGuild = FightFormulas.computeXpPercoWin(tax, deadMobs, butin, winners);
+            result.rewards = new FightLoot(serializedLoots,FightFormulas.computeKamas(tax, baseKamas, teamPP, this));
+            tax.addExperience(result.experienceForGuild);
+            tax.addKamas(result.rewards.kamas);
+            DAO.getTaxCollectors().update(tax);
         }
 
         droppedItems.clear();

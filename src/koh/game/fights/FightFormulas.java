@@ -1,6 +1,7 @@
 package koh.game.fights;
 
 import koh.game.dao.DAO;
+import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.PlayerInst;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.guilds.GuildMember;
@@ -70,6 +71,43 @@ public class FightFormulas {
             double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
             double num8 = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
             result = (int) truncate(truncate(num7 * (double) (100 + fighter.getStats().getTotal(StatsEnum.WISDOM)) / 100.0) * num8 * (fighter.getCharacter().getExpBonus() + butin -1 ));
+            if(result < 0){
+                logger.error(num7+" "+num8+" "+num6+" "+num5+" "+num4+" "+num3+" "+num2+" "+num);
+            }
+        }
+
+        return result;
+    }
+
+    public static int computeXpPercoWin(TaxCollector fighter, MonsterFighter[] droppersResults, double butin, FightTeam winners) {
+        int result;
+        if (droppersResults.length == 0) {
+            result = 0;
+        } else {
+            final int num = winners.getFighters().mapToInt(entry -> entry.getLevel()).sum();
+            final int maxPlayerLevel = winners.getFighters().mapToInt(entry -> entry.getLevel()).max().orElse(0);
+            final int num2 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).sum();
+            final int b = Arrays.stream(droppersResults).mapToInt(dr -> dr.getLevel()).max().orElse(0);
+            final int num3 = Arrays.stream(droppersResults).mapToInt(dr -> dr.getGrade().getGradeXp()).sum();
+            double num4 = 1.0;
+            if (num - 5 > num2) {
+                num4 = (double) num2 / (double) num;
+            } else {
+                if (num + 10 < num2) {
+                    num4 = (double) (num + 10) / (double) num2;
+                }
+            }
+            final double num5 = Math.min((double) fighter.getLevel(), truncate(2.5 * (double) b)) / (double) num * 100.0;
+            int num6 = Arrays.stream(droppersResults).
+                    filter(mob -> mob.getLevel() >= maxPlayerLevel / 3)
+                    .mapToInt(x -> 1)
+                    .sum();
+            if (num6 <= 0) {
+                num6 = 1;
+            }
+            double num7 = truncate(num5 / 100.0 * truncate((double) num3 * GROUP_COEFFICIENTS[num6 - 1] * num4));
+            double num8 = (winners.fight.ageBonus <= 0) ? 1.0 : (1.0 + (double) winners.fight.ageBonus / 100.0);
+            result = (int) truncate(truncate(num7 * (double) (100 + fighter.getGuild().getEntity().wisdom) / 100.0) * num8 * (butin * 0.1f * DAO.getSettings().getDoubleElement("Rate.PvM") ) );
             if(result < 0){
                 logger.error(num7+" "+num8+" "+num6+" "+num5+" "+num4+" "+num3+" "+num2+" "+num);
             }
@@ -432,6 +470,10 @@ public class FightFormulas {
         return item.getDropRate((int) dropper.getGrade()) * ((double) looter.getStats().getTotal(StatsEnum.PROSPECTING) / 100.0) * ((double) monsterAgeBonus / 100.0 + 1.0) * DAO.getSettings().getDoubleElement("Rate.Drop") * butin;
     }
 
+    public static double adjustDropChance(TaxCollector looter, MonsterDrop item, MonsterGrade dropper, int monsterAgeBonus, double butin) {
+        return item.getDropRate((int) dropper.getGrade()) * ((double) looter.getGuild().getEntity().prospecting / 100.0) * ((double) monsterAgeBonus / 100.0 + 1.0) * DAO.getSettings().getDoubleElement("Rate.Drop") * butin;
+    }
+
 
     public static void rollLoot(Fighter looter, MonsterGrade mob, int prospectingSum, Map<MonsterDrop, Integer> droppedItems, List<DroppedItem> list, double butin) {
         mob.getMonster().getDrops()
@@ -460,9 +502,41 @@ public class FightFormulas {
                 });
     }
 
+    public static void rollLoot(TaxCollector looter, MonsterGrade mob, int prospectingSum, Map<MonsterDrop, Integer> droppedItems, List<DroppedItem> list, double butin, Fight fight) {
+        mob.getMonster().getDrops()
+                .stream()
+                .filter(drop -> prospectingSum >= drop.getProspectingLock())
+                .forEach(current -> {
+                    if ((current.getDropLimit() <= 0 || !droppedItems.containsKey(current) || droppedItems.get(current) < current.getDropLimit())) {
+                        double num2 = (double) Fight.RANDOM.nextInt(100) + Fight.RANDOM.nextDouble();
+                        double num3 = adjustDropChance(looter, current, mob, (int) fight.ageBonus,butin);
+                        if (num3 >= num2) {
+                            final Optional<DroppedItem> item = list.stream()
+                                    .filter(dr -> dr.getItem() == current.getObjectId())
+                                    .findFirst();
+                            if (item.isPresent()) {
+                                item.get().accumulateQuantity();
+                            } else
+                                list.add(new DroppedItem(current.getObjectId(), 1));
+
+                            if (!droppedItems.containsKey(current)) {
+                                droppedItems.put(current, 1);
+                            } else {
+                                droppedItems.put(current, droppedItems.get(current) + 1);
+                            }
+                        }
+                    }
+                });
+    }
+
 
     public static int computeKamas(Fighter fighter, int baseKamas, int teamPP) {
         double num = (fighter.getFight().ageBonus <= 0) ? 1.0 : (1.0 + (double) fighter.getFight().ageBonus / 100.0);
         return (int) ((double) baseKamas * ((double) fighter.getStats().getTotal(StatsEnum.PROSPECTING) / (double) teamPP) * num * DAO.getSettings().getDoubleElement("Rate.Kamas"));
+    }
+
+    public static int computeKamas(TaxCollector fighter, int baseKamas, int teamPP, Fight fight) {
+        double num = (fight.ageBonus <= 0) ? 1.0 : (1.0 + (double) fight.ageBonus / 100.0);
+        return (int) ((double) baseKamas * ((double) fighter.getGuild().getEntity().prospecting / (double) teamPP) * num * DAO.getSettings().getDoubleElement("Rate.Kamas") * 0.10f);
     }
 }

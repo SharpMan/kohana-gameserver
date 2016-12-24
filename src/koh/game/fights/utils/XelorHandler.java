@@ -158,6 +158,18 @@ public class XelorHandler {
                             break;
                         }
 
+                        castInfos = new EffectCast(StatsEnum.ACTION_POINTS, spellLevel.getSpellId(), cellId, 0, BOOST2, fighter, new ArrayList<Fighter>(1) {{
+                            this.add(fighter);
+                        }}, false, StatsEnum.NONE, 0, spellLevel);
+                        castInfos.targetKnownCellId = cellId;
+                        castInfos.oldCell = oldCell;
+                        castInfos.casterOldCell = castingCell;
+                        castInfos.setCritical(isCritical);
+                        if (EffectBase.tryApplyEffect(castInfos) == -3) {
+                            break;
+                        }
+
+
                         break;
                     }
                 } else {
@@ -447,7 +459,7 @@ public class XelorHandler {
             .findFirst()
             .get();
     private static final EffectInstanceDice[] SYNCHRO = Arrays.stream(DAO.getSpells().findLevel(24863).getEffects()).filter(e -> e.targetMask.contains("a,F3958")).toArray(EffectInstanceDice[]::new);
-    private static final EffectInstanceDice BOOST2 = Arrays.stream(DAO.getSpells().findLevel(24318).getEffects()).filter(e -> e.effectId == 111).findFirst().get();
+    public static final EffectInstanceDice BOOST2 = Arrays.stream(DAO.getSpells().findLevel(24318).getEffects()).filter(e -> e.effectId == 111).findFirst().get();
 
 
     private static final EffectInstanceDice[] DUST = new EffectInstanceDice[]{

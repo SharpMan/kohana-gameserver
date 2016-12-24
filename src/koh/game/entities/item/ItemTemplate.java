@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import koh.game.actions.GameActionTypeEnum;
 import koh.game.conditions.ConditionExpression;
 import koh.game.dao.DAO;
 import koh.game.dao.api.ItemTemplateDAO;
@@ -227,7 +228,7 @@ public class ItemTemplate {
 
 
     public boolean use(Player possessor, Player plr,int cell){
-        if(this.actions == null) {
+        if(this.actions == null || possessor.getClient().isGameAction(GameActionTypeEnum.EXCHANGE)) {
             return false;
         }
         return this.actions.stream().allMatch(x -> x.execute(possessor,plr,cell));

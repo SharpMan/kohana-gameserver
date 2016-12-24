@@ -51,7 +51,8 @@ public class BombFighter extends StaticFighter {
                 StatsEnum.WATER_ELEMENT_REDUCTION, StatsEnum.WATER_ELEMENT_RESIST_PERCENT,
                 StatsEnum.EARTH_ELEMENT_REDUCTION, StatsEnum.EARTH_ELEMENT_RESIST_PERCENT,
                 StatsEnum.AIR_ELEMENT_REDUCTION, StatsEnum.AIR_ELEMENT_RESIST_PERCENT);
-        this.stats.addBoost(StatsEnum.VITALITY, -this.summoner.getStats().getBoost(StatsEnum.VITALITY));
+        if(this.summoner.getStats().getBoost(StatsEnum.VITALITY) > 0)
+            this.stats.addBoost(StatsEnum.VITALITY, -this.summoner.getStats().getBoost(StatsEnum.VITALITY));
         super.setLife(this.getLife());
         super.setLifeMax(this.getMaxLife());
     }

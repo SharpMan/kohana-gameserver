@@ -20,6 +20,7 @@ import koh.protocol.types.game.interactive.skill.SkillActionDescription;
 import koh.protocol.types.game.interactive.skill.SkillActionDescriptionCollect;
 import koh.protocol.types.game.interactive.skill.SkillActionDescriptionCraft;
 import koh.utils.Couple;
+import lombok.ToString;
 import org.apache.mina.core.buffer.IoBuffer;
 
 /**
@@ -52,6 +53,7 @@ public class JobBook {
         actor.send(new JobExperienceUpdateMessage(new JobExperience(parentJobId, (byte) this.myJobs.get(parentJobId).jobLevel, this.myJobs.get(parentJobId).xp, DAO.getExps().getLevel(this.myJobs.get(parentJobId).jobLevel).getJob(), DAO.getExps().getLevel(this.myJobs.get(parentJobId).jobLevel + 1).getJob())));
     }
 
+    @ToString
     public class JobInfo {
 
         public byte id;
