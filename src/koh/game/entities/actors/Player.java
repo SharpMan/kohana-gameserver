@@ -199,6 +199,9 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private ArrayList<Fight> fightsRegistred;
+    @Getter
+    @Setter
+    private Timestamp last_aggression;
 
     private boolean wasSitted = false; //only for regen life
     private Fight myFight;

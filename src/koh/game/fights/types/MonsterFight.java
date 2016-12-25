@@ -150,7 +150,8 @@ public class MonsterFight extends Fight {
                 Arrays.stream(deadMobs).forEachOrdered(mob -> {
                     FightFormulas.rollLoot(fighter, mob.getGrade(), teamPP, droppedItems,loots,butin);
                 });
-                loots.add(new DroppedItem(11503, Arrays.stream(deadMobs).mapToInt(MonsterFighter::getLevel).sum() / 3));
+                if(DAO.getSettings().getIntElement("World.ID") == 1)
+                    loots.add(new DroppedItem(11503, Arrays.stream(deadMobs).mapToInt(MonsterFighter::getLevel).sum() / 3));
                 fighter.getPlayer().addScore(ScoreType.PVM_WIN);
 
 
@@ -167,7 +168,7 @@ public class MonsterFight extends Fight {
                             if (i % 20 == 0) {
                                 kamasWin += 50000;
                             } else
-                                kamasWin += 150;
+                                kamasWin += /*150*/oldLevel > 160 ? 7500 : 5000 ;
                         }
                     }
                     catch (Exception e){

@@ -11,6 +11,7 @@ import koh.game.fights.effects.buff.BuffStats;
 import koh.game.fights.effects.buff.BuffStatsByHit;
 import koh.game.fights.effects.buff.BuffStatsByPortalTeleport;
 import koh.game.fights.fighters.IllusionFighter;
+import koh.protocol.client.enums.StatsEnum;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -51,7 +52,11 @@ public class EffectStats extends EffectBase {
                     return -3;
                 }
                 target.getBuff().addBuff(buffStats);
+
+                System.out.println("2+= "+subInfos.randomJet(target)+" total "+(target.getStats().getTotal(StatsEnum.COMBO_DAMMAGES)));
+
             }
+
 
 
         }

@@ -61,6 +61,7 @@ import org.apache.logging.log4j.Logger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
@@ -491,6 +492,7 @@ public class CharacterHandler {
                         .moodSmiley((byte) -1)
                         .fighterLook(new Object())
                         .alignmentSide(AlignmentSideEnum.ALIGNMENT_NEUTRAL)
+                        .last_aggression(Timestamp.from(Instant.now()))
                         .build();
                 character.setMountInfo(new MountInformations(character));
                 character.initScore();

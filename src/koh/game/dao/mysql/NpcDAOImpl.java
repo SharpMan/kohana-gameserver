@@ -195,7 +195,8 @@ public class NpcDAOImpl extends NpcDAO {
                                 .build());
                 i++;
             }
-            NpcTemplate npc = this.findTemplate(786);
+            if(DAO.getSettings().getIntElement("World.ID") == 1) {
+                NpcTemplate npc = this.findTemplate(786);
 
                 DAO.getItemTemplates().getItemTemplates().values()
                         .stream()
@@ -213,6 +214,7 @@ public class NpcDAOImpl extends NpcDAO {
                                             .token(0)
                                             .build());
                         });
+            }
 
             final NpcTemplate npc2 = this.findTemplate(1561)
                     ,npc3 = this.findTemplate(1560)

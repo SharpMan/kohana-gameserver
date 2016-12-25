@@ -44,6 +44,9 @@ import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFight
 import koh.protocol.messages.game.context.roleplay.fight.GameRolePlayPlayerFightRequestMessage;
 import koh.protocol.messages.game.guild.ChallengeFightJoinRefusedMessage;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+
 /**
  *
  * @author Neo-Craft
@@ -333,6 +336,8 @@ public class FightHandler {
                 target.getClient().abortGameActions();
                 final Fight Fight = new AgressionFight(client.getCharacter().getCurrentMap(), client, target.getClient());
                 target.getCurrentMap().addFight(Fight);
+                target.setLast_aggression(Timestamp.from(Instant.now()));
+                client.getCharacter().setLast_aggression(Timestamp.from(Instant.now()));
             }
         }
     }

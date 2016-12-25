@@ -32,6 +32,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Neo-Craft
@@ -94,7 +95,7 @@ public class BombFighter extends StaticFighter {
 
     @Override
     public void computeDamages(StatsEnum effect, MutableInt jet) {
-        //System.out.println(this.stats.getTotal(StatsEnum.COMBO_DAMMAGES));
+
         switch (effect) {
             case DAMAGE_EARTH:
             case STEAL_EARTH:
@@ -204,6 +205,7 @@ public class BombFighter extends StaticFighter {
         if (this.getLife() <= 0 || force) {
             final int result = selfMurder(casterId);
             fight.launchSpell(this, DAO.getSpells().findSpell(DAO.getSpells().findBomb(this.grade.getMonsterId()).explodSpellId).getSpellLevel(this.grade.getGrade()), this.getCellId(), true, true, false, -1);
+
             if (this.fightBombs != null) {
                 this.fightBombs.stream().distinct().forEach(Bomb -> Bomb.remove());
             }
@@ -213,11 +215,11 @@ public class BombFighter extends StaticFighter {
         return super.tryDie(casterId, force);
     }
 
-    public ArrayList<FightBomb> fightBombs;
+    public List<FightBomb> fightBombs;
 
     public void addBomb(FightBomb Bomb) {
         if (fightBombs == null) {
-            fightBombs = new ArrayList<>(4);
+            fightBombs = new CopyOnWriteArrayList<>();
         }
         this.fightBombs.add(Bomb);
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Stream;
+
 import javafx.scene.paint.Color;
 import koh.game.entities.spells.EffectInstanceDice;
 import koh.game.entities.spells.SpellLevel;
@@ -76,6 +77,14 @@ public class FightBomb extends FightActivableObject {
 
         appearForAll();
 
+    }
+
+    @Override
+    public void remove() {
+        for (BombFighter bombFighter : this.owner) {
+            bombFighter.fightBombs.remove(this);
+        }
+        super.remove();
     }
 
     @Override
