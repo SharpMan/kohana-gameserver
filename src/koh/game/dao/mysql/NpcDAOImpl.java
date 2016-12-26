@@ -83,6 +83,9 @@ public class NpcDAOImpl extends NpcDAO {
                     case "dj":
                         npcReply = new DjReply();
                         break;
+                    case "forget":
+                        npcReply = new ForgetSpellReply();
+                        break;
                     default:
                         continue;
                 }
@@ -167,6 +170,7 @@ public class NpcDAOImpl extends NpcDAO {
 
     private int loadAllItems() {
         int i = 0;
+        String nono = ",8068,8069,8071,8154,9196,9197,9653,9930,9933,10175,10182,10184,10185,10553,10554,10555,10556,10860,10861,10862,11055,11809,12406,12420,12655,12881,12884,13518,13679,13849,13890,14298,14305,14306,14485,14591,14592,14596,14599,14600,14623,14624,14627,14641,14642,14796,14797,14800,14801,14804,14805,15110,15116,15117,15122,15123,15124,15238,15242,15254,15542,15547,";
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from npc_items", 0)) {
             ResultSet result = conn.getResult();
 
@@ -262,34 +266,38 @@ public class NpcDAOImpl extends NpcDAO {
                     .stream()
                     .filter(item -> item.getTypeId() == 17 && item.getLevel() < 100 && item.getLevel() > 20)
                     .forEach(it -> {
-                        if (npc6.getItems() == null) {
-                            npc6.setItems(new HashMap<>());
+                        if(!nono.contains(","+it.getId()+",")) {
+                            if (npc6.getItems() == null) {
+                                npc6.setItems(new HashMap<>());
+                            }
+                            npc6.getItems().put(it.getId(),
+                                    NpcItem.builder()
+                                            .customPrice(10)
+                                            .buyCriterion("")
+                                            .maximiseStats(true)
+                                            .item(it.getId())
+                                            .token(13470)
+                                            .build());
                         }
-                        npc6.getItems().put(it.getId(),
-                                NpcItem.builder()
-                                        .customPrice(10)
-                                        .buyCriterion("")
-                                        .maximiseStats(true)
-                                        .item(it.getId())
-                                        .token(13470)
-                                        .build());
                     });
 
             DAO.getItemTemplates().getItemTemplates().values()
                     .stream()
                     .filter(item -> item.getTypeId() == 16 && item.getLevel() < 100 && item.getLevel() > 20)
                     .forEach(it -> {
-                        if (npc5.getItems() == null) {
-                            npc5.setItems(new HashMap<>());
+                        if(!nono.contains(","+it.getId()+",")) {
+                            if (npc5.getItems() == null) {
+                                npc5.setItems(new HashMap<>());
+                            }
+                            npc5.getItems().put(it.getId(),
+                                    NpcItem.builder()
+                                            .customPrice(10)
+                                            .buyCriterion("")
+                                            .maximiseStats(true)
+                                            .item(it.getId())
+                                            .token(13470)
+                                            .build());
                         }
-                        npc5.getItems().put(it.getId(),
-                                NpcItem.builder()
-                                        .customPrice(10)
-                                        .buyCriterion("")
-                                        .maximiseStats(true)
-                                        .item(it.getId())
-                                        .token(13470)
-                                        .build());
                     });
 
             DAO.getItemTemplates().getItemTemplates().values()

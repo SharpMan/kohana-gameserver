@@ -208,6 +208,10 @@ public class SpellBook {
         }
     }
 
+    public SpellInfo getSpelInfo(int spellId){
+        return this.mySpells.get(spellId);
+    }
+
     public SpellLevel getSpellLevel(int spellId) {
         if (this.mySpells.containsKey(spellId)) {
             return this.mySpells.get(spellId).getSpellLevel();

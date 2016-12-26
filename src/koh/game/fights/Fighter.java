@@ -494,7 +494,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             if (num1 == 0.0) {
                 num1 = this.getTacklePercent(tackler);
             } else {
-                num1 *= this.getTacklePercent(tackler);
+                num1 *= Math.max(this.getTacklePercent(tackler),1);
             }
         }
         if (num1 == 0.0) {
@@ -563,8 +563,9 @@ public abstract class Fighter extends IGameActor implements IFightObject {
             {
                 if (num1 == 0.0) {
                     num1 = this.getTacklePercent(tackler);
+
                 } else {
-                    num1 *= this.getTacklePercent(tackler);
+                    num1 *= Math.max(this.getTacklePercent(tackler),1);
                 }
             }
         }

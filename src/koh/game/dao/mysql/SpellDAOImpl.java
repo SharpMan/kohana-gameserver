@@ -111,6 +111,11 @@ public class SpellDAOImpl extends SpellDAO {
                     levels.get(result.getInt("id")).setCriticalEffect(effects);
                 }
 
+                if(result.getInt("spell_id") == 2804){
+                    for (EffectInstanceDice effect : levels.get(result.getInt("id")).getEffects()) {
+                        effect.targetMask = "A";
+                    }
+                }
                 //rauleback
                 if(result.getInt("spell_id") == 424) { //telepor | momi
                     EffectInstanceDice[] effects = levels.get(result.getInt("id")).getEffects();

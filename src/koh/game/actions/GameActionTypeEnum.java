@@ -22,6 +22,7 @@ public enum GameActionTypeEnum {
     CHALLENGE_ACCEPT,
     CHALLENGE_DENY,
     TUTORIAL,
+    SPELL_UI,
     FIGHT;
 
 }

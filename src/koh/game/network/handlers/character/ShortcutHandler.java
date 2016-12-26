@@ -1,13 +1,19 @@
 package koh.game.network.handlers.character;
 
+import koh.game.actions.GameActionTypeEnum;
 import koh.game.controllers.PlayerController;
+import koh.game.entities.actors.character.SpellBook;
 import koh.game.entities.actors.character.shortcut.ItemShortcut;
 import koh.game.entities.actors.character.shortcut.PresetShortcut;
+import koh.game.entities.spells.SpellLevel;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.ShortcutBarEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
+import koh.protocol.messages.game.context.roleplay.spell.SpellForgottenMessage;
+import koh.protocol.messages.game.context.roleplay.spell.SpellUpgradeFailureMessage;
 import koh.protocol.messages.game.context.roleplay.spell.SpellUpgradeRequestMessage;
+import koh.protocol.messages.game.context.roleplay.spell.ValidateSpellForgetMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarAddRequestMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarRefreshMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarRemoveRequestMessage;
@@ -24,6 +30,41 @@ import org.apache.logging.log4j.Logger;
 public class ShortcutHandler {
 
     private static final Logger logger = LogManager.getLogger(ShortcutHandler.class);
+
+    @HandlerAttribute(ID = 1700)
+    public static void handleValidateSpellForgetMessage(WorldClient client, ValidateSpellForgetMessage message){
+        if(client.isGameAction(GameActionTypeEnum.SPELL_UI)){
+            return;
+        }
+        SpellBook.SpellInfo spell =  client.getCharacter().getMySpells().getSpelInfo(message.spellId);
+        if(spell == null || spell.level <= 1){
+            client.send(new SpellUpgradeFailureMessage());
+            return;
+        }
+        int point;
+        switch(spell.level){
+            case 3:
+                point = 3;
+                break;
+            case 4:
+                point = 6;
+                break;
+            case 5:
+                point = 10;
+                break;
+            case 6:
+                point = 15;
+                break;
+            case 2:
+            default:
+                point = 1;
+                break;
+        }
+        client.send(new SpellForgottenMessage(new int[] {spell.id},point));
+        client.getCharacter().setSpellPoints(client.getCharacter().getSpellPoints() + point);
+        client.getCharacter().refreshStats(true, false);
+
+    }
 
     @HandlerAttribute(ID = SpellUpgradeRequestMessage.MESSAGE_ID)
     public static void HandleSpellUpgradeRequestMessage(WorldClient Client, SpellUpgradeRequestMessage Message) {
