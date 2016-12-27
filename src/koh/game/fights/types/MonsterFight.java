@@ -1,9 +1,11 @@
 package koh.game.fights.types;
 
 import koh.game.actions.GameFight;
+import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.MonsterGroup;
+import koh.game.entities.actors.Player;
 import koh.game.entities.actors.TaxCollector;
 import koh.game.entities.actors.character.ScoreType;
 import koh.game.entities.environments.DofusMap;
@@ -13,6 +15,7 @@ import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
 import koh.game.entities.item.animal.PetsInventoryItem;
 import koh.game.entities.mob.MonsterDrop;
+import koh.game.entities.spells.EffectInstanceCreature;
 import koh.game.fights.*;
 import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.DroppedItem;
@@ -20,14 +23,21 @@ import koh.game.fights.fighters.MonsterFighter;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.CharacterInventoryPositionEnum;
 import koh.protocol.client.enums.EffectGenerationType;
+import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
 import koh.protocol.messages.game.context.fight.*;
 import koh.protocol.types.game.context.fight.*;
+import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.effects.ObjectEffectCreature;
+import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
 import lombok.Getter;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by Melancholia on 12/30/15.
@@ -136,6 +146,20 @@ public class MonsterFight extends Fight {
                     result
             );
         }
+        CharacterFighter farmer = null;
+        if(myTeam1 == winners){
+            final Optional<Fighter> element = winners.getFighters().filter(fighter -> fighter.isPlayer() &&
+                    fighter.hasState(FightStateEnum.Chercheur_dâmes.value) &&
+                    fighter.getPlayer().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) &&
+                    fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).getTemplateId() == 9686
+            ).sorted((o1, o2) -> {
+                if (o1.equals(o2)) return 0;
+                return (this.RANDOM.nextBoolean()) ? 1 : -1;
+            }).findFirst();
+            if(element.isPresent()){
+                farmer = element.get().asPlayer();
+            }
+        }
 
 
         for (Fighter fighter : (Iterable<Fighter>) winners.getFighters()::iterator) { //In stream.foreach you should use final var that suck
@@ -153,6 +177,9 @@ public class MonsterFight extends Fight {
                 if(DAO.getSettings().getIntElement("World.ID") == 1)
                     loots.add(new DroppedItem(11503, Arrays.stream(deadMobs).mapToInt(MonsterFighter::getLevel).sum() / 3));
                 fighter.getPlayer().addScore(ScoreType.PVM_WIN);
+                if(farmer == fighter){
+                    loots.add(new DroppedItem(7010, 1));
+                }
 
 
                 int kamasWin = FightFormulas.computeKamas(fighter, baseKamas, teamPP);
@@ -183,8 +210,17 @@ public class MonsterFight extends Fight {
                 }
                 loots.forEach(lot -> {
                     final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), lot.getItem(), 63, fighter.getPlayer().getID(), lot.getQuantity(), EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(lot.getItem()).getPossibleEffects(), EffectGenerationType.NORMAL, DAO.getItemTemplates().getTemplate(lot.getItem()) instanceof Weapon));
+
+                    if(lot.getItem() == 7010){
+                        item.removeEffect(623);
+                        final List<ObjectEffect> effects = Arrays.stream(deadMobs)
+                                .map(mb -> new ObjectEffectDice(623,mb.getGrade().getGrade(),0,mb.getGrade().getMonsterId()))
+                                .collect(Collectors.toList());
+                        item.getEffects$Notify().addAll(effects);
+                    }
                     if (fighter.getPlayer().getInventoryCache().add(item, true)) {
                         item.setNeedInsert(true);
+                        fighter.getPlayer().getInventoryCache().safeDelete(9686,1);
                     }
                 });
                 loots.clear();

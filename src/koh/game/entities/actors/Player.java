@@ -56,6 +56,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -259,10 +260,12 @@ public class Player extends IGameActor implements Observer {
             this.presets = DAO.getPresets().get(this);
         }
 
-        this.myInitialized = true;
         if (life == 0) {
             life++;
         }
+        //this.entityLook.addSubEntity(0,SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_BASE_FOREGROUND, new EntityLook((short)171));
+
+        this.myInitialized = true;
     }
 
     public void send(Message m) {
@@ -467,6 +470,9 @@ public class Player extends IGameActor implements Observer {
         timeStamp = new Timestamp(date.getTime());
     }*/
 
+    private static final Date aggressionDelay = Date.from(Instant.now().minus(2, ChronoUnit.DAYS));
+    private static ArrayList<Integer> sanctioned = new ArrayList<>();
+
     public synchronized void onLogged() {
         try {
             if (!this.inWorld) {
@@ -482,11 +488,14 @@ public class Player extends IGameActor implements Observer {
                 client.send(new CharacterLoadingCompleteMessage());
                 ChatChannel.register(client);
 
-                /*if (this.account.last_login != null && account.last_login.before(timeStamp)) {
-                    client.send(new PopupWarningMessage((byte) 0, "Offre Spéciale", "Jusqu'au 20 Août vous pourrez vous procurer <b>1 titre + 1 ornement<b> au choix pour la faible somme de 1 euro le tout ! Alors n'hésitez pas et <a href=\"https://kohana-serveur.com/user/ornament\">cliquez <b>ici</b> sans plus attendre !!</a>"));
-                }
-*/
+
                 PlayerController.sendServerMessage(client, DAO.getSettings().getStringElement("World.onLogged"), DAO.getSettings().getStringElement("World.onLoggedColor"));
+
+                if(honor > 0 && last_aggression.before(aggressionDelay) && sanctioned.contains(this.ID)){
+                    PlayerController.sendServerErrorMessage(client, "Suite à votre disparition de la map PvP , votre bravoure s'incline.");
+                    this.addHonor(-300, true);
+                    sanctioned.add(this.ID);
+                }
 
                 // client.send(new BasicNoOperationMessage());
                 client.send(new AlignmentRankUpdateMessage(this.alignmentGrade, false));

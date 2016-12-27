@@ -24,7 +24,7 @@ public class DjReply extends NpcReply {
                 try {
                     if (player.getClient().getParty() != null) {
                         player.getClient().getParty().getPlayers().stream()
-                                .filter(p -> p.getMapid() == player.getMapid())
+                                .filter(p -> p.getClient() != null && p.getClient().canGameAction(GameActionTypeEnum.FIGHT))
                                 .forEach(p -> p.teleport(Integer.parseInt(getParameters()[0]), Integer.parseInt(getParameters()[0])));
                     } else
                         player.teleport(Integer.parseInt(getParameters()[0]), Integer.parseInt(getParameters()[0]));

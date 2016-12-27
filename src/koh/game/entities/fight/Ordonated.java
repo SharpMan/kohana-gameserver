@@ -21,7 +21,7 @@ public class Ordonated extends Challenge {
 
     @Override
     public void onFightStart() {
-        this.target = fight.getEnnemyTeam(team).getAliveFighters()
+        this.target = fight.getEnnemyTeam(team).getAliveFightersUnsummoned()
                 .sorted((e1, e2) -> Integer.compare(e1.getLevel(), e2.getLevel()))
                 .findFirst()
                 .get();
@@ -47,7 +47,7 @@ public class Ordonated extends Challenge {
                 this.failChallenge();
                 return;
             }
-            this.target = fight.getEnnemyTeam(team).getAliveFighters()
+            this.target = fight.getEnnemyTeam(team).getAliveFightersUnsummoned()
                     .sorted((e1, e2) -> Integer.compare(e1.getLevel(), e2.getLevel()))
                     .findFirst()
                     .orElse(null);

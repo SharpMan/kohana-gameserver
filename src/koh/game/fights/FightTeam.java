@@ -65,6 +65,10 @@ public class FightTeam {
         return this.getFighters().filter(fr -> !fr.hasSummoner());
     }
 
+    public Stream<Fighter> getAliveFightersUnsummoned() {
+        return this.myFighters.stream().filter(x -> x.isAlive() && !x.hasSummoner());
+    }
+
     public Stream<Fighter> getAliveFighters() {
         return this.myFighters.stream().filter(x -> x.isAlive());
     }

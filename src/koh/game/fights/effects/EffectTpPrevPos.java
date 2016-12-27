@@ -22,7 +22,6 @@ public class EffectTpPrevPos extends EffectBase {
         int toReturn = -1;
         boolean synchroBoosted = false;
         for (final Fighter target : castInfos.targets) {
-            System.out.println(target.getPreviousCellPos().isEmpty());
             if (target.getPreviousCellPos().isEmpty()) {
                 continue;
             }

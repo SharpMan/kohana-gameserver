@@ -28,7 +28,11 @@ public class DialogHandler {
                 if (!client.getMyExchange().closeExchange()) {
                     client.endGameAction(GameActionTypeEnum.EXCHANGE);
                 }
-            } else if (client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {
+            }
+            else if(client.isGameAction(GameActionTypeEnum.SPELL_UI)){
+                client.endGameAction(GameActionTypeEnum.SPELL_UI);
+            }
+            else if (client.isGameAction(GameActionTypeEnum.CREATE_GUILD)) {
                 client.endGameAction(GameActionTypeEnum.CREATE_GUILD);
                 client.send(new BasicNoOperationMessage());
             } else if (client.isGameAction(GameActionTypeEnum.BASIC_REQUEST)) {

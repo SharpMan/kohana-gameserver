@@ -53,8 +53,6 @@ public class EffectStats extends EffectBase {
                 }
                 target.getBuff().addBuff(buffStats);
 
-                System.out.println("2+= "+subInfos.randomJet(target)+" total "+(target.getStats().getTotal(StatsEnum.COMBO_DAMMAGES)));
-
             }
 
 

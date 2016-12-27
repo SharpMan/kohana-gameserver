@@ -10,10 +10,7 @@ import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.protocol.client.enums.ShortcutBarEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
-import koh.protocol.messages.game.context.roleplay.spell.SpellForgottenMessage;
-import koh.protocol.messages.game.context.roleplay.spell.SpellUpgradeFailureMessage;
-import koh.protocol.messages.game.context.roleplay.spell.SpellUpgradeRequestMessage;
-import koh.protocol.messages.game.context.roleplay.spell.ValidateSpellForgetMessage;
+import koh.protocol.messages.game.context.roleplay.spell.*;
 import koh.protocol.messages.game.shortcut.ShortcutBarAddRequestMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarRefreshMessage;
 import koh.protocol.messages.game.shortcut.ShortcutBarRemoveRequestMessage;
@@ -33,7 +30,7 @@ public class ShortcutHandler {
 
     @HandlerAttribute(ID = 1700)
     public static void handleValidateSpellForgetMessage(WorldClient client, ValidateSpellForgetMessage message){
-        if(client.isGameAction(GameActionTypeEnum.SPELL_UI)){
+        if(!client.isGameAction(GameActionTypeEnum.SPELL_UI)){
             return;
         }
         SpellBook.SpellInfo spell =  client.getCharacter().getMySpells().getSpelInfo(message.spellId);
@@ -60,9 +57,12 @@ public class ShortcutHandler {
                 point = 1;
                 break;
         }
-        client.send(new SpellForgottenMessage(new int[] {spell.id},point));
+        spell.level = 1;
         client.getCharacter().setSpellPoints(client.getCharacter().getSpellPoints() + point);
+        client.send(new SpellUpgradeSuccessMessage(message.spellId, (byte)1));
         client.getCharacter().refreshStats(true, false);
+        client.send(new SpellForgottenMessage(new int[] {spell.id}, point));
+
 
     }
 

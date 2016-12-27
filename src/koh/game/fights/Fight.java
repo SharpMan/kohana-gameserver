@@ -1507,7 +1507,7 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    final short defaultValue = 0;
+    final static short defaultValue = 0;
 
     public void affectSpellTo(Fighter caster, Fighter target, int level, int... spells) {
         affectSpellTo(caster,target,level, defaultValue, spells);
