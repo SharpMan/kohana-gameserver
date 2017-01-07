@@ -64,6 +64,8 @@ public class AreaDAOImpl extends AreaDAO {
         return i;
     }
 
+    //public static final HashMap<String, SubArea> names = new HashMap<>();
+
     private int loadAllSubAreas() {
         int i = 0;
         try (ConnectionResult conn = dbSource.executeQuery("SELECT * from sub_areas", 0)) {
@@ -73,6 +75,7 @@ public class AreaDAOImpl extends AreaDAO {
                 mySubarea = SubArea.builder()
                         .id(result.getInt("id"))
                         .area(areas.get(result.getInt("area_id")))
+                        //.name(result.getString("name"))
                         .mapIds(Enumerable.stringToIntArray(result.getString("map_ids")))
                         .shape(Enumerable.stringToIntArray(result.getString("shape")))
                         .customWorldMaptype(Enumerable.stringToIntArray(result.getString("custom_world_map")))
@@ -90,6 +93,7 @@ public class AreaDAOImpl extends AreaDAO {
                 mySubarea.removeArchiMonster();
                 mySubarea.getArea().getSubAreas().add(mySubarea);
                 subAreas.put(result.getInt("id"), mySubarea);
+                //names.put(mySubarea.getName(),mySubarea);
 
                 ++i;
             }

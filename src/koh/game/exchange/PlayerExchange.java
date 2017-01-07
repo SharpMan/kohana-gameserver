@@ -258,6 +258,17 @@ public class PlayerExchange extends Exchange {
                 + "\n          -- P1(items=" + Enumerable.join(this.myItemsToTrade.get(this.myClient1).entrySet().stream().mapToInt(y -> y.getKey()).toArray()) + " kamas=" + this.myKamasToTrade.get(this.myClient1) + ")"
                 + "\n          -- P2(items=" + Enumerable.join(this.myItemsToTrade.get(this.myClient2).entrySet().stream().mapToInt(y -> y.getKey()).toArray()) + " kamas=" + this.myKamasToTrade.get(this.myClient2) + ")");
 
+
+        final boolean pass = this.myItemsToTrade.get(this.myClient1).keySet().stream()
+                .allMatch(i ->  this.myClient1.getCharacter().getInventoryCache().contains(i)) &&
+                this.myItemsToTrade.get(this.myClient2).keySet().stream()
+                        .allMatch(i ->  this.myClient2.getCharacter().getInventoryCache().contains(i));
+
+        if(!pass){
+            logger.error(this.myClient1.getCharacter().getNickName() + " - " + this.myClient2.getCharacter().getNickName() + " usebug");
+            return true;
+        }
+
         for (Entry<Integer, Integer> ItemData : this.myItemsToTrade.get(this.myClient1).entrySet()) {
             final InventoryItem item = this.myClient1.getCharacter().getInventoryCache().find(ItemData.getKey());
             if (item == null) {

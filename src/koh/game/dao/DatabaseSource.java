@@ -72,6 +72,7 @@ public class DatabaseSource implements Service {
         binder.bind(PresetDAO.class).to(PresetDAOImpl.class).asEagerSingleton();
         binder.bind(ChallengeDAO.class).to(ChallengeDAOImpl.class).asEagerSingleton();
         binder.bind(TaxCollectorDAO.class).to(TaxCollectorDAOImpl.class).asEagerSingleton();
+        binder.bind(AchievementDAO.class).to(AchievementDAOImpl.class).asEagerSingleton();
         binder.requestStaticInjection(DAO.class);
     }
 

@@ -110,7 +110,7 @@ public class NpcExchange extends Exchange {
             return false;
         }
 
-        if (item == null || quantity < 0) {
+        if (item == null || quantity < 0 || item.isWorn()) {
             client.send(new ExchangeErrorMessage(ExchangeErrorEnum.SELL_ERROR));
             return false;
         }else if(this.npc.getTemplate() == null){

@@ -145,7 +145,7 @@ public class ConditionParser {
                     if (Strings.isNullOrEmpty(name)) {
                         throw new Error(String.format("Cannot parse {0} : left Expression of comparaison operator index {1} is empty", this.str, length));
                     }
-                    final Criterion criterionByName = Criterion.CreateCriterionByName(name);
+                    final Criterion criterionByName = Criterion.createCriterionByName(name);
                     String str = this.str.toString().substring(length + 1, (length + 1)+this.str.length() - (length + 1));
                     
                     if (Strings.isNullOrEmpty(str)) {

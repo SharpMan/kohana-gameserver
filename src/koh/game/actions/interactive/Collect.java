@@ -37,6 +37,9 @@ public class Collect implements InteractiveAction {
     @Override
     public boolean isEnabled(Player actor) {
         try {
+            if(skill.getParentJobId() == 26 && skill.getLevelMin() == 20){
+                return false;
+            }
             return actor.getMyJobs().getJob(skill.getParentJobId()).jobLevel >= skill.getLevelMin();
         } catch (Exception e) {
             logger.error("Enabled {} with SkillLevel {}", skill.getParentJobId(), skill.getLevelMin());

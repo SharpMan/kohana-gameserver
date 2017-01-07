@@ -25,6 +25,7 @@ import koh.game.utils.Observer;
 import koh.glicko.Glicko2Player;
 import koh.protocol.client.Message;
 import koh.protocol.client.enums.*;
+import koh.protocol.messages.game.achievement.AchievementListMessage;
 import koh.protocol.messages.game.atlas.compass.CompassUpdatePartyMemberMessage;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.character.stats.*;
@@ -34,7 +35,6 @@ import koh.protocol.messages.game.context.roleplay.CurrentMapMessage;
 import koh.protocol.messages.game.context.roleplay.GameRolePlayShowActorMessage;
 import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
 import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
-import koh.protocol.messages.game.moderation.PopupWarningMessage;
 import koh.protocol.messages.game.pvp.AlignmentRankUpdateMessage;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
@@ -52,9 +52,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -132,6 +129,9 @@ public class Player extends IGameActor implements Observer {
     @Getter
     @Setter
     private PresetBook presets;
+    @Getter
+    @Setter
+    private AchievementBook achievements;
     @Getter
     @Setter
     private CharacterInventory inventoryCache;
@@ -258,6 +258,11 @@ public class Player extends IGameActor implements Observer {
 
         if (this.presets == null) {
             this.presets = DAO.getPresets().get(this);
+        }
+
+        if(this.achievements == null){
+            this.achievements = new AchievementBook(this);
+            //this.achievements.init();
         }
 
         if (life == 0) {
@@ -429,6 +434,11 @@ public class Player extends IGameActor implements Observer {
         nextMap.initialize();
         stopSitEmote();
         this.currentMap.destroyActor(this);
+        //TODO On EXIT CURRENT SUBAREA
+        //int oldSub = this.currentMap.getSubAreaId();
+        if(currentMap.getSubAreaId() != nextMap.getSubAreaId()){
+            AchievementDic.onSubAreaChange(this,nextMap.getAreaId(), nextMap.getSubAreaId());
+        }
         this.currentMap = nextMap;
         this.mapid = newMapID;
         if (nextMap.getCell((short) newCellID) == null || newCellID < 0 || newCellID > 559) {
@@ -509,6 +519,12 @@ public class Player extends IGameActor implements Observer {
                         ((PetsInventoryItem)pet).checkLastEffect(((PetsInventoryItem)pet).getAnimal());
                     }
                 }
+
+                client.send(new AchievementListMessage(client.getCharacter().getAchievements().getFinishedAchievementsIds(),
+                        client.getCharacter().getAchievements().getAchievementRewardable()
+                ));
+
+                //this.achievements.recallAwards();
 
                 //GuildWarn
             }
@@ -910,7 +926,7 @@ public class Player extends IGameActor implements Observer {
                 this.send(new CharacterLevelUpMessage((byte) this.level));
                 //friends
                 this.currentMap.sendToField(new CharacterLevelUpInformationMessage((byte) this.level, this.nickName, this.ID));
-
+                AchievementDic.onLevelUpdate(this);
             }
 
             if (this.client != null && notice) {
@@ -969,6 +985,8 @@ public class Player extends IGameActor implements Observer {
                 this.inventoryCache.save(clear);
             }
             DAO.getPlayers().update(this, clear);
+           /* if(achievements != null)
+                DAO.getAchievements().saveBook(achievements);*/
             if (!clear && this.account != null && this.account.accountData != null) {
                 this.account.accountData.save(false);
             }
@@ -1032,6 +1050,14 @@ public class Player extends IGameActor implements Observer {
         synchronized (fighterLook) {
             this.myFighter = Fighter;
         }
+    }
+
+    public void addAchievementPoints(int qua){
+        this.achievementPoints += qua;
+        if(achievementPoints > 500){
+            AchievementDic.onScoreAdded(this);
+        }
+        //TODO ON added
     }
 
     public PlayerStatus getPlayerStatus() {

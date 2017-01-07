@@ -130,7 +130,7 @@ public class ContextHandler {
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CANNOT_DROP_NO_PLACE));
             return;
         }
-        int newQua = item.getQuantity() - message.quantity;
+        final int newQua = item.getQuantity() - message.quantity;
         if (newQua <= 0) {
             client.getCharacter().getInventoryCache().removeItemFromInventory(item);
             DAO.getItems().save(item, false, "character_items");

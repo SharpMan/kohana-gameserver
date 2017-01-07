@@ -1,6 +1,7 @@
 package koh.game.dao;
 
 import com.google.inject.Inject;
+import koh.d2o.entities.Achievement;
 import koh.game.dao.api.*;
 import koh.game.dao.api.MountDAO;
 import koh.game.utils.Settings;
@@ -86,6 +87,9 @@ public class DAO {
 
     @Inject @Getter
     private static ChallengeDAO challenges;
+
+    @Inject @Getter
+    private static AchievementDAO achievements;
 
 
 

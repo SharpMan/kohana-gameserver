@@ -1,12 +1,16 @@
 package koh.game.conditions;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Neo-Craft
  */
 public abstract class Criterion extends ConditionExpression {
+
+    private static final Logger logger = LogManager.getLogger(Criterion.class);
 
     public ComparaisonOperatorEnum operator;
 
@@ -64,7 +68,28 @@ public abstract class Criterion extends ConditionExpression {
         }
     }
 
-    public static Criterion CreateCriterionByName(String name) {
+
+    public static Criterion createQuestCriterionByName(String name){
+        switch (name) {
+            case "PL":
+                return new LevelCriterion();
+            case "BI":
+                return new UnusableCriterion();
+            case "Qf":
+                return new QuestDoneCriterion();
+            case "PO":
+                return new HasItemCriterion();
+            case "Pa":
+                return new AlignementLevelCriterion();
+            case "Pr":
+                return new SpecializationCriterion();
+            default:
+               logger.error("Criterion {} doesn't not exist or not handled", name);return null;
+        }
+    }
+
+
+    public static Criterion createCriterionByName(String name) {
         if (StatsCriterion.isStatsIdentifier(name)) {
            return new StatsCriterion(name);
         }

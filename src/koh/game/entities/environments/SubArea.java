@@ -17,7 +17,8 @@ public class SubArea {
 
     @Getter
     private int id;
-    //public String nameId;
+    @Getter
+    public String name;
     @Getter
     private Area area;
     @Getter
