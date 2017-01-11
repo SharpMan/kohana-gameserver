@@ -115,6 +115,18 @@ public class WorldClient {
         this.myActions.clear();
     }
 
+    public void abortGameActionsExceptGroup() {
+        synchronized (myActions) {
+            myActions.entrySet().stream().forEach((action) -> {
+                if(!(action.getValue() instanceof GameParty)){
+                    action.getValue().abort(new Object[0]);
+                    myActions.remove(action.getKey());
+                }
+            });
+        }
+    }
+
+
     public boolean canGameAction(GameActionTypeEnum ActionType) {
         synchronized (this.myActions) {
             //this.myActions.values().stream().forEach(x -> System.out.println(x.actionType));

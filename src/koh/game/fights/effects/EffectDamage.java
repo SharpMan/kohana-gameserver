@@ -3,6 +3,7 @@ package koh.game.fights.effects;
 import koh.game.entities.fight.Challenge;
 import koh.game.fights.Fighter;
 import koh.game.fights.effects.buff.*;
+import koh.game.fights.fighters.SummonedFighter;
 import koh.protocol.client.enums.ActionIdEnum;
 import koh.protocol.client.enums.FightStateEnum;
 import koh.protocol.client.enums.StatsEnum;
@@ -79,7 +80,7 @@ public class EffectDamage extends EffectBase {
             }
 
             // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat
-            if (!castInfos.isPoison && !castInfos.isReflect) {
+            if (!castInfos.isPoison && !castInfos.isReflect && !( caster instanceof SummonedFighter && caster.asSummon().getGrade() !=null && caster.asSummon().getGrade().getMonsterId() == 3958)) {
                 if (caster.getBuff().onAttackPostJet(castInfos, damageJet) == -3) {
                     return -3; // Fin du combat
                 }

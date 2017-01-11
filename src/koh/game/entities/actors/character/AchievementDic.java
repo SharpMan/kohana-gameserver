@@ -320,9 +320,6 @@ public class AchievementDic {
     private final static Couple<Integer,Integer> EMPTY_COUPLE = new Couple<Integer,Integer>(-1,-1);
 
     public static void onSubAreaChange(Player p, int area, int subarea){
-        if(true){
-            return;
-        }
         final Couple<Integer,HashMap<Integer, Integer>> subs = areas.get(area);
         if(subs == null){
             return;
@@ -340,9 +337,6 @@ public class AchievementDic {
     }
 
     public static void onScoreAdded(Player p){
-        if(true){
-            return;
-        }
         for (Map.Entry<Integer, Integer> entry : scoreAchivements.entrySet()) {
             if(p.getAchievementPoints() >= entry.getValue() && !p.getAchievements().isUnlocked(entry.getKey().shortValue())){
                 final AchievementTemplate temp = DAO.getAchievements().find(entry.getKey());
@@ -356,16 +350,13 @@ public class AchievementDic {
 
 
     public static void onLevelUpdate(Player p){
-        if(true){
-            return;
-        }
         for (Map.Entry<Integer, Integer> entry : levelAchivements.entrySet()) {
             if(p.getLevel() >= entry.getValue() && !p.getAchievements().isUnlocked(entry.getKey().shortValue())){
                 final AchievementTemplate temp = DAO.getAchievements().find(entry.getKey());
                 final short achi = (short) temp.getId();
                 p.getAchievements().unlock(achi);
                 //p.getAchievements().emptyUnlock(temp.getCategory(), achi);
-                p.getAchievements().pushInfo(temp.getCategory(), new AchievementBook.AchievementInfo(achi,  new AchievementObjective[0], new AchievementStartedObjective[0],true));
+                p.getAchievements().pushInfo(temp.getCategory(), new AchievementBook.AchievementInfo(achi, new AchievementObjective[0], new AchievementStartedObjective[0],true));
                 p.send(new AchievementFinishedMessage(achi, (byte) p.getLevel()));
             }
         }

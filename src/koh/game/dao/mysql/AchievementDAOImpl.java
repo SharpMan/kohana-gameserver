@@ -248,7 +248,8 @@ public class AchievementDAOImpl extends AchievementDAO {
         for (int i = 0; i < list.split(",").length; i++) {
             d[i] = this.goals.get(Integer.parseInt(list.split(",")[i]));
             if (d[i] == null) {
-                dd += i + ",";
+                d[i] = AchievementGoal.builder().achievementId(Integer.parseInt(list.split(",")[i])).build();
+               //dd += i + ",";
             }
         }
         if (!dd.isEmpty()) {

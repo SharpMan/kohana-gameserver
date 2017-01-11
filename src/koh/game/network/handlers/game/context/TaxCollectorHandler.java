@@ -24,6 +24,7 @@ public class TaxCollectorHandler {
     public static void handleGuildFightJoinRequestMessage(WorldClient client, GuildFightJoinRequestMessage msg){
         if(!client.canGameAction(GameActionTypeEnum.FIGHT)){
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.OPPONENT_NOT_MEMBER));
+            return;
         }
         final TaxCollector taxCollector = client.getCharacter().getGuild().getTaxCollector(msg.taxCollectorId);
         if(taxCollector == null || taxCollector.getCurrent_fight() == null || client.isGameAction(GameActionTypeEnum.DEFEND_TAX_COLLECTOR)){
@@ -39,7 +40,7 @@ public class TaxCollectorHandler {
             client.addGameAction(new GameTaxCollectorDefenderAction(client.getCharacter(), taxCollector));
             taxCollector.getCurrent_fight().getDefenders().addIfAbsent(client.getCharacter());
             for (Player player : taxCollector.getCurrent_fight().getDefenders()) {
-                player.send(new GuildFightPlayersHelpersJoinMessage(msg.taxCollectorId, client.getCharacter().toBaseInformations()));
+                player.send(new GuildFightPlayersHelpersJoinMessage(msg.taxCollectorId, client.getCharacter().toCharacterMinimalPlusLookInformation()));
             }
          }
     }

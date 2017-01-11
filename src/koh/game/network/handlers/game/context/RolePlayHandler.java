@@ -97,7 +97,7 @@ public class RolePlayHandler {
                 client.send(new BasicNoOperationMessage());
                 return;
             }
-            client.abortGameActions();
+            client.abortGameActionsExceptGroup();
             final Fight fight = new MonsterFight(client.getCharacter().getCurrentMap(), client, (MonsterGroup) target);
             client.getCharacter().getCurrentMap().addFight(fight);
         }

@@ -144,11 +144,11 @@ public class TaxCollector extends IGameActor {
         return  new TaxCollectorFightersInformation(iden,
                 current_fight.getDefenders()
                         .stream()
-                        .map(fighter1 -> fighter1.toBaseInformations())
+                        .map(fighter1 -> fighter1.toCharacterMinimalPlusLookInformation())
                         .toArray(CharacterMinimalPlusLookInformation[]::new),
                 current_fight.getTeam1().getFighters()
                         .filter(fighter -> fighter instanceof CharacterFighter)
-                        .map(fighter1 -> fighter1.getPlayer().toBaseInformations())
+                        .map(fighter1 -> fighter1.getPlayer().toCharacterMinimalPlusLookInformation())
                         .toArray(CharacterMinimalPlusLookInformation[]::new)
         );
     }

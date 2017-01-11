@@ -37,6 +37,7 @@ import koh.protocol.messages.game.context.roleplay.TeleportOnSameMapMessage;
 import koh.protocol.messages.game.initialization.CharacterLoadingCompleteMessage;
 import koh.protocol.messages.game.pvp.AlignmentRankUpdateMessage;
 import koh.protocol.types.game.character.ActorRestrictionsInformations;
+import koh.protocol.types.game.character.CharacterMinimalPlusLookInformation;
 import koh.protocol.types.game.character.alignment.ActorAlignmentInformations;
 import koh.protocol.types.game.character.alignment.ActorExtendedAlignmentInformations;
 import koh.protocol.types.game.character.choice.CharacterBaseInformation;
@@ -262,7 +263,7 @@ public class Player extends IGameActor implements Observer {
 
         if(this.achievements == null){
             this.achievements = new AchievementBook(this);
-            //this.achievements.init();
+            this.achievements.init();
         }
 
         if (life == 0) {
@@ -516,7 +517,7 @@ public class Player extends IGameActor implements Observer {
                 if(this.inventoryCache.hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS)){
                     final InventoryItem pet = inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS);
                     if(pet != null && pet instanceof PetsInventoryItem){
-                        ((PetsInventoryItem)pet).checkLastEffect(((PetsInventoryItem)pet).getAnimal());
+                        ((PetsInventoryItem)pet).checkLastEffect(((PetsInventoryItem)pet).getAnimal(),this);
                     }
                 }
 
@@ -875,6 +876,10 @@ public class Player extends IGameActor implements Observer {
         return new CharacterBaseInformation(ID, (byte) level, nickName, getEntityLook(), breed, sexe == 1);
     }
 
+    public CharacterMinimalPlusLookInformation toCharacterMinimalPlusLookInformation(){
+        return new CharacterMinimalPlusLookInformation(ID, (byte) level, nickName, getEntityLook());
+    }
+
     public void addFollower(Player gay) {
         if (this.followers == null) {
             this.followers = new CopyOnWriteArrayList<>();
@@ -985,8 +990,8 @@ public class Player extends IGameActor implements Observer {
                 this.inventoryCache.save(clear);
             }
             DAO.getPlayers().update(this, clear);
-           /* if(achievements != null)
-                DAO.getAchievements().saveBook(achievements);*/
+            if(achievements != null)
+                DAO.getAchievements().saveBook(achievements);
             if (!clear && this.account != null && this.account.accountData != null) {
                 this.account.accountData.save(false);
             }

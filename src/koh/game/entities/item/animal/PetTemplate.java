@@ -41,16 +41,15 @@ public class PetTemplate {
         if (result.getString("food_items").isEmpty() || result.getString("food_items").equalsIgnoreCase("2239")) {
             this.foodItems = new FoodItem[0];
         } else {
-            ArrayList<FoodItem> Foods = new ArrayList<>();
+            final ArrayList<FoodItem> foods = new ArrayList<>();
             for (String s : result.getString("food_items").split(",")) {
                 if (s.equalsIgnoreCase("2239")) { //Poudre eni
                     continue;
                 }
-                Foods.add(new FoodItem(Integer.parseInt(s.split(";")[0]), Integer.parseInt(s.split(";")[1]), Integer.parseInt(s.split(";")[2]), Integer.parseInt(s.split(";")[3])));
+                foods.add(new FoodItem(Integer.parseInt(s.split(";")[0]), Integer.parseInt(s.split(";")[1]), Integer.parseInt(s.split(";")[2]), Integer.parseInt(s.split(";")[3])));
             }
-            this.foodItems = Foods.stream().toArray(FoodItem[]::new);
-            Foods.clear();
-            Foods = null;
+            this.foodItems = foods.stream().toArray(FoodItem[]::new);
+            foods.clear();
         }
         if (result.getString("food_types").isEmpty()) {
             this.foodTypes = new FoodItem[0];

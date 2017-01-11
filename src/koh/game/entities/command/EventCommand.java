@@ -1,6 +1,7 @@
 package koh.game.entities.command;
 
 import koh.game.actions.GameActionTypeEnum;
+import koh.game.dao.DAO;
 import koh.game.network.WorldClient;
 
 import java.sql.SQLException;
@@ -10,8 +11,8 @@ import java.sql.SQLException;
  */
 public class EventCommand implements PlayerCommand {
 
-    public static int MAP= 141035520;
-    public static  short CELL = 369;
+    public static int MAP= DAO.getSettings().getIntElement("World.ID") == 2 ? 74186754 : 141035520;
+    public static short CELL = (short) (DAO.getSettings().getIntElement("World.ID") == 2 ? 184 : 369);
 
 
     @Override

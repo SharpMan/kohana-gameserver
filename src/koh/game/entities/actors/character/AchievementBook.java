@@ -100,6 +100,8 @@ public class AchievementBook {
             this.finished = buf.get() == 1;
         }
 
+        public boolean isPublic() { return this.finishedObjective.length > 0 || this.startedObjectives.length > 0; }
+
         public int size(){
             return 32 + (finishedObjective.length * 64) + (startedObjectives.length * 86) + 8;
         }
@@ -157,7 +159,7 @@ public class AchievementBook {
         if (categories.containsKey(category)) {
             return categories.get(category).values()
                     .stream()
-                    .filter(a -> !a.isFinished())
+                    .filter(a -> !a.isFinished() && a .isPublic())
                     .toArray(Achievement[]::new);
         }
         return EMPTY;
@@ -168,6 +170,7 @@ public class AchievementBook {
             return categories.get(category).values()
                     .stream()
                     .filter(AchievementInfo::isFinished)
+                    .filter(AchievementInfo::isPublic)
                     .toArray(Achievement[]::new);
         }
         return EMPTY;
@@ -180,6 +183,8 @@ public class AchievementBook {
     private final static Achievement[] EMPTY = new Achievement[0];
 
     public void addToRegister(final AchievementFinishedInfo info){
+        if(info.getAchievement() == 1053)
+            return;
         this.register.put(info.getAchievement(),info);
     }
 

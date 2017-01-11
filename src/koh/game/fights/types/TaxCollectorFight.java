@@ -70,7 +70,7 @@ public class TaxCollectorFight extends Fight {
                 taxCollector.setState(TaxCollectorStateEnum.STATE_FIGHTING);
                 for (Player defender : defenders) {
                     try{
-                        if(defender.getClient().isGameAction(GameActionTypeEnum.FIGHT))
+                        if(defender.getClient().isGameAction(GameActionTypeEnum.FIGHT) || defender.getClient().isGameAction(GameActionTypeEnum.EXCHANGE) )
                             continue;
                         defender.getClient().abortGameActions();
                         //defender.getClient().endGameAction(GameActionTypeEnum.DEFEND_TAX_COLLECTOR);
@@ -122,7 +122,7 @@ public class TaxCollectorFight extends Fight {
         if(fightState == FightState.STATE_PLACE && team == this.myTeam1){
             defenders.stream().forEach(pl -> pl.send(new GuildFightPlayersEnemiesListMessage(myTeam1.getFighters()
                     .filter(fighter22 -> fighter22 instanceof CharacterFighter)
-                    .map(fighter1 -> fighter1.getPlayer().toBaseInformations())
+                    .map(fighter1 -> fighter1.getPlayer().toCharacterMinimalPlusLookInformation())
                     .toArray(CharacterMinimalPlusLookInformation[]::new),
                     taxCollector.getIden())
             ));

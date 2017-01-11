@@ -179,7 +179,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
                 this.updateDate();
-                this.checkLastEffect(pet);
+                this.checkLastEffect(pet,null);
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
                 PlayerController.sendServerMessage(p.getClient(), "Next meal in 60 minutes");
@@ -196,7 +196,7 @@ public class PetsInventoryItem extends InventoryItem {
                 this.boost(i.getStats(), i.getStatsPoints());
                 updateFood(food.getTemplateId());
                 this.updateDate();
-                this.checkLastEffect(pet);
+                this.checkLastEffect(pet,null);
                 p.send(new ObjectModifiedMessage(this.getObjectItem()));
                 this.save();
                 PlayerController.sendServerMessage(p.getClient(), "Next meal in 60 minutes");
@@ -249,7 +249,7 @@ public class PetsInventoryItem extends InventoryItem {
         }
     }
 
-    public void checkLastEffect(PetTemplate animal) {
+    public void checkLastEffect(PetTemplate animal, Player p) {
         if(animal == null){
             return;
         }
@@ -271,15 +271,13 @@ public class PetsInventoryItem extends InventoryItem {
                     e.printStackTrace();
                 }
                 type.value = biggestValue;
-                this.notifyColumn("effects");
+                if(p != null) {
+                    p.getInventoryCache().safeDelete(this, this.getQuantity());
+                    return;
+                }
             }
         }
     }
-
-    public void onMonsterFightWin() {
-
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

@@ -28,6 +28,7 @@ public class GameTutorial extends GameAction {
     private final static ExecutorService executor = Executors.newFixedThreadPool(45);
     private static final boolean CAN_CHOOSE_LEVEL = DAO.getSettings().getBoolElement("Register.ChooseLevel");
     public static final String LEVEL = DAO.getSettings().getStringElement("Register.Text");
+    public static final int SERVER = DAO.getSettings().getIntElement("World.ID");
 
     public GameTutorial(Player actor) {
         super(GameActionTypeEnum.TUTORIAL, actor);
@@ -73,7 +74,11 @@ public class GameTutorial extends GameAction {
         } catch (Exception e) {
         }
         character.setOnTutorial(false);
-        character.teleport(115083777, 474);
+        if(SERVER == 2)
+            character.teleport(84674563,315);
+        else
+            character.teleport(115083777, 474);
+
         actor.send(new PopupWarningMessage((byte) 11, "Melan", "Pour consulter les vendeurs , parlez à Hal San !. \nPour joindre la boutique prennez le portail bleu"));
         try {
             super.endExecute();

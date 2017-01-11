@@ -3,6 +3,7 @@ package koh.game.fights.types;
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.GameFight;
 import koh.game.dao.DAO;
+import koh.game.entities.actors.Player;
 import koh.game.entities.actors.character.PlayerInst;
 import koh.game.entities.environments.DofusMap;
 import koh.game.entities.fight.Challenge;
@@ -15,6 +16,7 @@ import koh.game.fights.fighters.CharacterFighter;
 import koh.game.fights.utils.AntiCheat;
 import koh.game.network.WorldClient;
 import koh.protocol.client.enums.EffectGenerationType;
+import koh.protocol.client.enums.FighterRefusedReasonEnum;
 import koh.protocol.client.enums.TextInformationTypeEnum;
 import koh.protocol.messages.game.basic.TextInformationMessage;
 import koh.protocol.messages.game.context.fight.FightOutcomeEnum;
@@ -127,6 +129,11 @@ public class KoliseoFight extends Fight {
         }
     }
 
+
+    @Override
+    public FighterRefusedReasonEnum canJoin(FightTeam team, Player character) {
+        return FighterRefusedReasonEnum.NOT_ENOUGH_ROOM;
+    }
 
     @Override
     public void endFight(FightTeam winners, FightTeam loosers) {

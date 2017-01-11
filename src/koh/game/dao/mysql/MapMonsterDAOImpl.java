@@ -169,7 +169,8 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                                                                     Integer.parseInt(x.split(",")[0]),
                                                                     Byte.parseByte(x.split(",")[1]),
                                                                     monsters.find(Integer.parseInt(x.split(",")[0])).getEntityLook()))
-                                                            .toArray(MonsterInGroupInformations[]::new)),
+                                                            .toArray(MonsterInGroupInformations[]::new)
+                                            ),
 
                                         /*result.getShort("age_bonus")*/(short) -1,
                                             result.getByte("lot_share"),
@@ -178,6 +179,9 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                                             result.getBoolean("has_hard_core_drop"),
                                             result.getBoolean("has_ava_rewaard_token")))
                             .build());
+                    if(map.getId() == 99090957){
+                        map.getMonsters().forEach(System.out::println);
+                    }
                 }
                 catch (Exception e){
                     log.error("Error at row  @{},{}",result.getInt("map"),result.getShort("cell"));
