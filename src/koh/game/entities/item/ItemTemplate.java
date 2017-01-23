@@ -120,6 +120,11 @@ public class ItemTemplate {
         return Arrays.stream(possibleEffects).filter(x -> x.effectId == uid).findFirst().orElse(null);
     }
 
+
+    public boolean hasEffect(int uid) {
+        return Arrays.stream(possibleEffects).anyMatch(x -> x.effectId == uid);
+    }
+
     public EffectInstance getEffect(int uid,int dice) {
         return Arrays.stream(possibleEffects)
                 .filter(x -> x instanceof EffectInstanceDice)

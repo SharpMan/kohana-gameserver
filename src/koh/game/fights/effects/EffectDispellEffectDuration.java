@@ -40,7 +40,7 @@ public class EffectDispellEffectDuration extends EffectBase {
 
     public int decrementEffectDurationExceptMe(Fighter t, int duration) {
         for (BuffEffect buff : t.getBuff().getBuffsDec().get(BuffDecrementType.TYPE_BEGINTURN)) {
-            if (buff.isDebuffable() && isNotBad(buff) && buff.decrementDuration(duration) <= 0) {
+            if (buff.isDebuffable() && isNotBad(buff) && buff.getCastInfos().spellId != 114 && buff.decrementDuration(duration) <= 0) {
                 if (buff.removeEffect() == -3) {
                     return -3;
                 }
@@ -48,7 +48,7 @@ public class EffectDispellEffectDuration extends EffectBase {
         }
 
         for (BuffEffect buff : t.getBuff().getBuffsDec().get(BuffDecrementType.TYPE_ENDTURN)) {
-            if (buff.isDebuffable() && isNotBad(buff) && buff.decrementDuration(duration) <= 0) {
+            if (buff.isDebuffable() && isNotBad(buff) && buff.getCastInfos().spellId != 114 && buff.decrementDuration(duration) <= 0) {
                 if (buff.removeEffect() == -3) {
                     return -3;
                 }
@@ -56,7 +56,7 @@ public class EffectDispellEffectDuration extends EffectBase {
         }
 
         for (BuffEffect buff : t.getBuff().getBuffsDec().get(BuffDecrementType.TYPE_ENDMOVE)) {
-            if (buff.isDebuffable()  && isNotBad(buff) &&  buff.decrementDuration(duration) <= 0) {
+            if (buff.isDebuffable()  && isNotBad(buff) && buff.getCastInfos().spellId != 114 &&  buff.decrementDuration(duration) <= 0) {
                 if (buff.removeEffect() == -3) {
                     return -3;
                 }

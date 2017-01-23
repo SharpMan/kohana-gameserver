@@ -931,6 +931,9 @@ public class Player extends IGameActor implements Observer {
                 this.send(new CharacterLevelUpMessage((byte) this.level));
                 //friends
                 this.currentMap.sendToField(new CharacterLevelUpInformationMessage((byte) this.level, this.nickName, this.ID));
+                if(this.guild != null && this.getGuildMember() != null){
+                    this.getGuildMember().level = this.level;
+                }
                 AchievementDic.onLevelUpdate(this);
             }
 

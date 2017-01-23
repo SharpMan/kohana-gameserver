@@ -1,17 +1,5 @@
 package koh.game.entities.environments;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.stream.Collectors;
-
 import koh.concurrency.CancellableScheduledRunnable;
 import koh.game.actions.InteractiveElementAction;
 import koh.game.dao.DAO;
@@ -37,32 +25,34 @@ import koh.protocol.messages.game.pvp.UpdateMapPlayersAgressableStatusMessage;
 import koh.protocol.types.game.context.MapCoordinates;
 import koh.protocol.types.game.context.fight.FightCommonInformations;
 import koh.protocol.types.game.context.roleplay.GameRolePlayActorInformations;
-import koh.protocol.types.game.interactive.MapObstacle;
-import koh.protocol.types.game.interactive.StatedElement;
 import koh.protocol.types.game.house.HouseInformations;
-import koh.protocol.types.game.interactive.InteractiveElement;
-import koh.protocol.types.game.interactive.InteractiveElementSkill;
-import koh.protocol.types.game.interactive.InteractiveElementWithAgeBonus;
+import koh.protocol.types.game.interactive.*;
 import koh.utils.Enumerable;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.mina.core.buffer.IoBuffer;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
+
 /**
- *
  * @author Neo-Craft
  */
 public class DofusMap extends IWorldEventObserver implements IWorldField {
 
     @Getter
     private int id;
-    private byte version,mapType;
+    private byte version, mapType;
     @Getter
-    private int relativeId,subAreaId;
+    private int relativeId, subAreaId;
     @Getter
-    public int bottomNeighbourId,topNeighbourId, leftNeighbourId, rightNeighbourId, shadowBonusOnEntities;
-    @Getter @Setter
+    public int bottomNeighbourId, topNeighbourId, leftNeighbourId, rightNeighbourId, shadowBonusOnEntities;
+    @Getter
+    @Setter
     private NeighBourStruct[] newNeighbour;
     public boolean useLowPassFilter, useReverb;
     private int presetId;
@@ -71,19 +61,21 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     private boolean myInitialized = false;
     @Getter
     private final Map<Integer, IGameActor> myGameActors = new ConcurrentHashMap<>();
-    @Getter @Setter
+    @Getter
+    @Setter
     private StatedElement[] elementsStated = new StatedElement[0];
     @Getter
     private final List<InteractiveElementStruct> interactiveElements = new ArrayList<>();
     private Map<Short, InventoryItem> droppedItems;
     @Getter
     private final List<HouseInformations> houses = new ArrayList<>();
-    @Getter @Setter
+    @Getter
+    @Setter
     public MapPosition position;
     @Getter
     private final MutableInt myNextActorId = new MutableInt(0);
     @Getter
-    private final ArrayList<MonsterGroup> monsters = new ArrayList<>(4);
+    private final ArrayList<MonsterGroup> monsters = new ArrayList<>(); //4
     @Getter
     private Map<Integer, MapDoor> doors;
     @Getter
@@ -144,11 +136,12 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         return getSubArea() != null ? getSubArea().getArea() : DAO.getAreas().getSubArea(0).getArea();
     }
 
-    public int getAreaId(){
-        try{
+    public int getAreaId() {
+        try {
             return getArea().getId();
+        } catch (Exception e) {
+            return -1;
         }
-        catch (Exception e){ return -1;}
     }
 
     public MapCoordinates coordinates() {
@@ -202,7 +195,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         //var cellEntities:Array; Obstacle glyphe ect lol ?
         //var o:IObstacle;
         if (MapPoint.isInMap(x, y)) {
-            useNewSystem =  this.usingNewMovementSystem;
+            useNewSystem = this.usingNewMovementSystem;
             cellId = MapPoint.fromCoords(x, y).get_cellId();
             cellData = this.cells[cellId];
             mov = cellData.mov() && !cellData.nonWalkableDuringFight()/*&& (((!(this.isInFight)) || (!(cellData.nonWalkableDuringFight)))))*/;
@@ -223,10 +216,14 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
                             /*if (!(o.canWalkThrough())) {
                              return (false);
                              };*/
-                        };
-                    };
-                };
-            };
+                        }
+                        ;
+                    }
+                    ;
+                }
+                ;
+            }
+            ;
         } else {
             mov = false;
         }
@@ -240,7 +237,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public MapComplementaryInformationsDataMessage getFakedMapComplementaryInformationsDataMessage(Player character) {
-        return new MapComplementaryInformationsDataMessage(subAreaId, id, houses, new ArrayList<GameRolePlayActorInformations>() {{ add( (GameRolePlayActorInformations) character.getGameContextActorInformations(null)); }}, this.toInteractiveElements(character), elementsStated, new MapObstacle[0], new FightCommonInformations[0]);
+        return new MapComplementaryInformationsDataMessage(subAreaId, id, houses, new ArrayList<GameRolePlayActorInformations>() {{
+            add((GameRolePlayActorInformations) character.getGameContextActorInformations(null));
+        }}, this.toInteractiveElements(character), elementsStated, new MapObstacle[0], new FightCommonInformations[0]);
     }
 
     public MapComplementaryInformationsDataMessage getMapComplementaryInformationsDataMessage(Player character) {
@@ -254,8 +253,8 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     @Getter
     private boolean usingNewMovementSystem = false;
 
-    
-    public DofusMap init$Return(){
+
+    public DofusMap init$Return() {
         this.initialize();
         return this;
     }
@@ -271,11 +270,11 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         int _oldMvtSystem = -1;
         for (short i = 0; i < this.cells.length; i++) {
             this.cells[i] = new DofusCell(this, i, buf);
-            if(_oldMvtSystem == -1){
+            if (_oldMvtSystem == -1) {
                 _oldMvtSystem = this.cells[i].getMoveZone();
             }
-            if(this.cells[i].getMoveZone() != _oldMvtSystem){
-               this.usingNewMovementSystem = true;
+            if (this.cells[i].getMoveZone() != _oldMvtSystem) {
+                this.usingNewMovementSystem = true;
             }
         }
         buf.clear();
@@ -296,12 +295,36 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         //throw un nullP mieux que referencer une liste on 111000 map object
         try {
             for (Npc npc : DAO.getNpcs().forMap(this.id)) {
-                    npc.setID(getNextActorId());
-                    npc.setActorCell(this.getCell(npc.getCellID()));
-                    this.spawnActor(npc);
+                npc.setID(getNextActorId());
+                npc.setActorCell(this.getCell(npc.getCellID()));
+                this.spawnActor(npc);
             }
-        } catch(NullPointerException ignored) {}
+        } catch (NullPointerException ignored) {
+        }
 
+
+        try {
+            this.monsters.stream()
+                    .filter(gr -> gr.isFix())
+                    .forEach(gr -> gr.setActorCell(this.getCell(gr.getFixedCell())));
+            this.monsters.stream()
+                    .filter(gr -> !gr.isFix())
+                    .forEach(gr -> {
+                        gr.getGameRolePlayGroupMonsterInformations().disposition.cellId = this.getRandomWalkableCell();
+                        gr.setActorCell(this.getCell(gr.getGameContextActorInformations(null).disposition.cellId));
+                    });
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        };
+
+        try {
+            if(this.id == 99090957) {
+                this.monsters.forEach(System.out::println);
+            }
+            this.monsters.forEach(this::spawnActor);
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        };
         try {
             final TaxCollector tax = DAO.getTaxCollectors().find(this.id);
             if (tax != null) {
@@ -309,41 +332,32 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
                 tax.setActorCell(this.getCell(tax.getCellID()));
                 this.spawnActor(tax);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e) { e.printStackTrace(); }
 
-        this.monsters.stream()
-                .filter(gr -> !gr.isFix())
-                .forEach(gr -> {
-                    gr.getGameRolePlayGroupMonsterInformations().disposition.cellId = this.getRandomWalkableCell();
-                    gr.setActorCell(this.getCell(gr.getGameContextActorInformations(null).disposition.cellId));
-                });
-        this.monsters.stream()
-                .filter(gr -> gr.isFix())
-                .forEach(gr -> gr.setActorCell(this.getCell(gr.getFixedCell())));
 
-        this.monsters.forEach(this::spawnActor);
+
 
         this.fightController = new FightController();
         //this.interactiveElements.forEach(x -> System.out.println(x.toString()));
     }
 
-    public synchronized void removeSpawn(final MonsterGroup grp){
+    public synchronized void removeSpawn(final MonsterGroup grp) {
         this.destroyActor(grp);
         final int timeReq = grp.getGameRolePlayGroupMonsterInformations().staticInfos.underlings.length * 20; //To wait 20s * MonsterIngroup
-        if(!grp.isFix()){
+        if (!grp.isFix()) {
             this.monsters.remove(grp);
-            final MonsterGroup newGrp = DAO.getMapMonsters().genMonsterGroup(this.getSubArea(),this);
+            final MonsterGroup newGrp = DAO.getMapMonsters().genMonsterGroup(this.getSubArea(), this);
             this.addMonster(grp);
-            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000){
+            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000) {
                 @Override
                 public void run() {
                     spawnActor(newGrp);
                 }
             };
-        }
-        else{
-            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000){
+        } else {
+            new CancellableScheduledRunnable(this.getArea().getBackGroundWorker(), timeReq * 1000) {
                 @Override
                 public void run() {
                     grp.getGameRolePlayGroupMonsterInformations().ageBonus = -1;
@@ -353,7 +367,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         }
     }
 
-    public synchronized int getNextActorId(){
+    public synchronized int getNextActorId() {
         this.myNextActorId.decrement();
         return this.myNextActorId.intValue();
     }
@@ -376,12 +390,12 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.compressedCells = sbb;
         this.compressedLayers = rc;
         this.blueCells = Enumerable.stringToShortArray(cc);
-        this.redCells =  Enumerable.stringToShortArray(sl);
+        this.redCells = Enumerable.stringToShortArray(sl);
         this.newNeighbour = new NeighBourStruct[4];
         final String[] neigh = neighboor.split(",");
         for (int i = 0; i < 4; i++) {
-            if(!neigh[i].equalsIgnoreCase("-1") && !neigh[i].isEmpty()){
-               this.newNeighbour[i] =  new NeighBourStruct(neigh[i].split(":"));
+            if (!neigh[i].equalsIgnoreCase("-1") && !neigh[i].isEmpty()) {
+                this.newNeighbour[i] = new NeighBourStruct(neigh[i].split(":"));
             }
         }
     }
@@ -570,7 +584,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         this.sendMapFightCountMessage();
     }
 
-    public void addMonster(MonsterGroup gr){
+    public void addMonster(MonsterGroup gr) {
         gr.setID(gr.getGameRolePlayGroupMonsterInformations().contextualId);
         this.monsters.add(gr);
     }
@@ -625,9 +639,9 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         return RandomCell;
     }
 
-    public String posToString(){
-        if(this.position != null){
-            return this.position.getPosX() +" " + this.position.getPosY();
+    public String posToString() {
+        if (this.position != null) {
+            return this.position.getPosX() + " " + this.position.getPosY();
         }
         return "Undefined mapid " + this.id;
     }
@@ -635,17 +649,14 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     public short getBestCellBetween(short cellId, short nextCell, List<Short> closes) {
         short bestCell = -1;
         int bestDist = 1000;
-        for (int i = 1; i < 8; i += 2)
-        {
+        for (int i = 1; i < 8; i += 2) {
             short cell = Pathfunction.computeNextCell(cellId, (byte) ((i + 2) % 8));
 
 
             if (Arrays.stream(cells).anyMatch(c -> c.getId() == cell))
-                if (!closes.contains(cell))
-                {
+                if (!closes.contains(cell)) {
                     int dist = Pathfunction.goalDistanceScore(this, cell, nextCell);
-                    if (dist <= bestDist)
-                    {
+                    if (dist <= bestDist) {
                         bestCell = cell;
                         bestDist = dist;
                     }
@@ -654,13 +665,11 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         return bestCell;
     }
 
-    public boolean isChangeZone(short cell1, short cell2)
-    {
+    public boolean isChangeZone(short cell1, short cell2) {
         final DofusCell cellData1 = this.getCell(cell1);
         final DofusCell cellData2 = this.getCell(cell2);
         int dif = Math.abs((Math.abs(cellData1.getFloor()) - Math.abs(cellData2.getFloor())));
-        if (((!((cellData1.getMoveZone() == cellData2.getMoveZone()))) && ((dif == 0))))
-        {
+        if (((!((cellData1.getMoveZone() == cellData2.getMoveZone()))) && ((dif == 0)))) {
             return (true);
         }
         return (false);

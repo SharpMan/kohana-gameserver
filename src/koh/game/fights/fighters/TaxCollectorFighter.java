@@ -36,11 +36,11 @@ public class TaxCollectorFighter extends VirtualFighter {
         this.stats.addBase(StatsEnum.STRENGTH, getLevel());
         this.stats.addBase(StatsEnum.CHANCE, getLevel());
         this.stats.addBase(StatsEnum.AGILITY, getLevel());
-        this.stats.addBase(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT, (int) Math.floor(getLevel() / 2));
-        this.stats.addBase(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, (int) Math.floor(getLevel() / 2));
-        this.stats.addBase(StatsEnum.AIR_ELEMENT_RESIST_PERCENT, (int) Math.floor(getLevel() / 2));
-        this.stats.addBase(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT, (int) Math.floor(getLevel() / 2));
-        this.stats.addBase(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, (int) Math.floor(getLevel() / 2));
+        this.stats.addBase(StatsEnum.EARTH_ELEMENT_RESIST_PERCENT, 25); //(int) Math.floor(getLevel() / 2)
+        this.stats.addBase(StatsEnum.WATER_ELEMENT_RESIST_PERCENT, 25);
+        this.stats.addBase(StatsEnum.AIR_ELEMENT_RESIST_PERCENT, 25);
+        this.stats.addBase(StatsEnum.FIRE_ELEMENT_RESIST_PERCENT, 25);
+        this.stats.addBase(StatsEnum.NEUTRAL_ELEMENT_RESIST_PERCENT, 25);
         this.stats.addBase(StatsEnum.DODGE_PA_LOST_PROBABILITY, (int) Math.floor(getLevel() / 2));
         this.stats.addBase(StatsEnum.DODGE_PM_LOST_PROBABILITY, (int) Math.floor(getLevel() / 2));
         this.stats.addBase(StatsEnum.ADD_TACKLE_BLOCK, 50);

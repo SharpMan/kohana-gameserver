@@ -55,6 +55,7 @@ public class TaxCollectorFight extends Fight {
     public TaxCollectorFight(DofusMap currentMap, WorldClient player, final TaxCollector taxCollector) {
         super(FightTypeEnum.FIGHT_TYPE_PvT, currentMap);
         this.taxCollector = taxCollector;
+        this.taxCollector.setCreated_at(System.currentTimeMillis());
         final Fighter attFighter = new CharacterFighter(this, player);
         final Fighter defFighter = new TaxCollectorFighter(this,taxCollector);
         player.addGameAction(new GameFight(attFighter, this));
@@ -232,7 +233,7 @@ public class TaxCollectorFight extends Fight {
                 if (fighter instanceof TaxCollectorFighter) {
                     this.myResult.results.add(new FightResultFighterListEntry(FightOutcomeEnum.RESULT_LOST, fighter.getWave(), new FightLoot(new int[0], 0), fighter.getID(), fighter.isAlive()));
                     taxCollector.getGuild().getTaxCollectors().remove(taxCollector);
-                    DAO.getTaxCollectors().remove(taxCollector.getIden());
+                    DAO.getTaxCollectors().remove(taxCollector.getIden(),taxCollector.getMapid());
                     taxCollector.getGuild().sendToField(new TaxCollectorAttackedResultMessage(true,taxCollector.toTaxCollectorBasicInformations(),taxCollector.getGuild().getBasicGuildInformations()));
                     continue;
                 }

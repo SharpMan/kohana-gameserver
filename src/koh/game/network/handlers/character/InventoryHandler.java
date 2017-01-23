@@ -97,7 +97,7 @@ public class InventoryHandler {
         } else if (!item.areConditionFilled(client.getCharacter())) {
             log.error("Wrond conditions");
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
-        } else if (!item.getTemplate().use(client.getCharacter(), client.getCharacter(), client.getCharacter().getCell().getId())) {
+        } else if (!item.getTemplate().use(client.getCharacter(), client.getCharacter(), item.getTemplateId() == 7010 ? item.getID() : client.getCharacter().getCell().getId())) {
             log.error("Item action criterias invalid");
             client.send(new ObjectErrorMessage(ObjectErrorEnum.CRITERIONS));
         }

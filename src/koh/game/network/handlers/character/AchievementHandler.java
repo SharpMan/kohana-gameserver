@@ -49,21 +49,12 @@ public class AchievementHandler {
         final AchievementBook.AchievementInfo info = client.getCharacter().getAchievements().getAchievement((short) msg.achievementId);
         if(info != null){
             client.send(new AchievementDetailsMessage(info));
-        }else if(!info.isFinished()){
+        }else{
             client.send(new AchievementDetailsMessage(new Achievement(msg.achievementId,
                     new AchievementObjective[0],
                     Arrays.stream(template.getObjectives())
                             .map(g-> new AchievementStartedObjective(g.getId(), 1,0))
                             .toArray(AchievementStartedObjective[]::new)
-            )));
-        }
-        else if(info.isFinished()){
-            client.send(new AchievementDetailsMessage(new Achievement(msg.achievementId,
-                    Arrays.stream(template.getObjectives())
-                            .map(g-> new AchievementObjective(g.getId(), 1))
-                            .toArray(AchievementObjective[]::new),
-                    new AchievementStartedObjective[0]
-
             )));
         }
     }

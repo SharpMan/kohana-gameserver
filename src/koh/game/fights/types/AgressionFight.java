@@ -132,7 +132,7 @@ public class AgressionFight extends Fight {
     public void endFight(FightTeam winners, FightTeam loosers) {
         this.myResult = new GameFightEndMessage(System.currentTimeMillis() - this.fightTime, this.ageBonus, this.lootShareLimitMalus);
 
-        if(winners.getLevel() - loosers.getLevel() > 20){ //TODO vpn Config
+        if(winners.getLevel() - loosers.getLevel() > 20 || (loosers.getLevel() - winners.getLevel() > 120) || (loosers.getMyFighters().size() > 1 && winners.getMyFighters().size() == 1 && loosers.getLevel() - winners.getLevel() > 100)){ //TODO vpn Config
              this.withdrawEnd(winners,loosers);
              return;
         }
@@ -176,7 +176,7 @@ public class AgressionFight extends Fight {
             if(fighter.isLeft())
                 continue;
             short honorWon = (short) (FightFormulas.honorPoint(fighter, winners.getFighters(), loosers.getFighters(), false) / AntiCheat.deviserBy(getEnnemyTeam(getWinners()).getFighters().filter(fr -> fr instanceof CharacterFighter), fighter, true,FightTypeEnum.FIGHT_TYPE_AGRESSION));
-            if(honorWon  > 0 && result != null) {
+            if(honorWon  > 0 && result != null && tax.getGuild() != fighter.getPlayer().getGuild()) {
                 result.experienceForGuild += (int) Math.floor(honorWon * 0.10f);
                 honorWon -= (int) Math.floor(honorWon * 0.10f);
             }

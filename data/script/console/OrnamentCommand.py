@@ -14,11 +14,11 @@ class OrnamentCommand(PlayerCommand):
         target = DAO.getPlayers().getCharacter(args[1]);
         if target is None or target.getClient() is None :
             client.send(ConsoleMessage(0, "The target is missing"));
-        elif ArrayUtils.contains(client.getCharacter().getOrnaments(), int(args[0])):
+        elif ArrayUtils.contains(target.getOrnaments(), int(args[0])):
             client.send(ConsoleMessage(0, "The target possesses already the ornament"));
         else:
-            client.getCharacter().setOrnaments(ArrayUtils.add(client.getCharacter().getOrnaments(), int(args[0])));
-            client.send(OrnamentGainedMessage(int(args[0])));
+            target.setOrnaments(ArrayUtils.add(target.getOrnaments(), int(args[0])));
+            target.send(OrnamentGainedMessage(int(args[0])));
             client.send(ConsoleMessage(0, "The ornament has been added"));
 
     def can(self,client):

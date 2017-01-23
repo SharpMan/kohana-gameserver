@@ -13,6 +13,7 @@ import koh.game.entities.fight.*;
 import koh.game.entities.item.EffectHelper;
 import koh.game.entities.item.InventoryItem;
 import koh.game.entities.item.Weapon;
+import koh.game.entities.item.actions.SpawnArenaAction;
 import koh.game.entities.item.animal.PetsInventoryItem;
 import koh.game.entities.mob.MonsterDrop;
 import koh.game.entities.spells.EffectInstanceCreature;
@@ -31,6 +32,7 @@ import koh.protocol.types.game.data.items.ObjectEffect;
 import koh.protocol.types.game.data.items.effects.ObjectEffectCreature;
 import koh.protocol.types.game.data.items.effects.ObjectEffectDice;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -147,11 +149,11 @@ public class MonsterFight extends Fight {
             );
         }
         CharacterFighter farmer = null;
-        if(myTeam1 == winners){
+        if(myTeam1 == winners && ArrayUtils.contains(SpawnArenaAction.MAPS,this.getMap().getId())){
             final Optional<Fighter> element = winners.getFighters().filter(fighter -> fighter.isPlayer() &&
                     fighter.hasState(FightStateEnum.Chercheur_dâmes.value) &&
                     fighter.getPlayer().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) &&
-                    fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).getTemplateId() == 9686
+                    fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON).getTemplate().getTypeId() == 83
             ).sorted((o1, o2) -> {
                 if (o1.equals(o2)) return 0;
                 return (this.RANDOM.nextBoolean()) ? 1 : -1;
@@ -217,10 +219,11 @@ public class MonsterFight extends Fight {
                                 .map(mb -> new ObjectEffectDice(623,mb.getGrade().getGrade(),0,mb.getGrade().getMonsterId()))
                                 .collect(Collectors.toList());
                         item.getEffects$Notify().addAll(effects);
+                        fighter.getPlayer().getInventoryCache().safeDelete(fighter.getPlayer().getInventoryCache().getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON),1);
+
                     }
                     if (fighter.getPlayer().getInventoryCache().add(item, true)) {
                         item.setNeedInsert(true);
-                        fighter.getPlayer().getInventoryCache().safeDelete(9686,1);
                     }
                 });
                 loots.clear();

@@ -3,6 +3,7 @@ package koh.game.network.handlers.character;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import koh.game.Main;
 import koh.game.actions.GameActionTypeEnum;

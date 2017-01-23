@@ -59,6 +59,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.chatCommands.put("exo", new ExoCommand());
             this.chatCommands.put("arme", new WeaponExoCommand());
             this.chatCommands.put("event", new EventCommand());
+            this.chatCommands.put("serianne", new SerianneCommand());
 
         } catch (Exception e) {
             e.printStackTrace();

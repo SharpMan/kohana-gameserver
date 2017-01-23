@@ -43,8 +43,8 @@ public class TaxCollector extends IGameActor {
     private final int firstName,lastName;
     @Setter @Getter
     private int iden, honor;
-    @Getter
-    private long experience;
+    @Getter @Setter
+    private long experience, created_at;
     @Getter
     private int kamas;
     @Getter
@@ -99,7 +99,7 @@ public class TaxCollector extends IGameActor {
     @Override
     public GameContextActorInformations getGameContextActorInformations(Player character) {
         if(cache == null)
-           cache = new GameRolePlayTaxCollectorInformations(this.ID, PERCEPTEUR, new EntityDispositionInformations(this.cellID,this.direction), new TaxCollectorStaticInformation(firstName, lastName, guildInformations), (byte) guild.getEntity().level, 0);
+           cache = new GameRolePlayTaxCollectorInformations(this.ID, PERCEPTEUR, new EntityDispositionInformations(this.cellID,this.direction), new TaxCollectorStaticInformation(firstName, lastName, guildInformations), (byte) guild.getEntity().level, attacksCount);
         return cache;
     }
 

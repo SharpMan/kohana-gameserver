@@ -80,7 +80,7 @@ public class EffectDamage extends EffectBase {
             }
 
             // Application des buffs avant calcul totaux des dommages, et verification qu'ils n'entrainent pas la fin du combat
-            if (!castInfos.isPoison && !castInfos.isReflect && !( caster instanceof SummonedFighter && caster.asSummon().getGrade() !=null && caster.asSummon().getGrade().getMonsterId() == 3958)) {
+            if (!castInfos.isPoison && !castInfos.isReflect) {
                 if (caster.getBuff().onAttackPostJet(castInfos, damageJet) == -3) {
                     return -3; // Fin du combat
                 }
@@ -106,6 +106,10 @@ public class EffectDamage extends EffectBase {
             caster.getStats().addBase(StatsEnum.ADD_DAMAGE_MULTIPLICATOR, /*portalEfficiencyBonus +*/ (castInfos.isCAC ? caster.getStats().getTotal(StatsEnum.WEAPON_DAMAGES_BONUS_PERCENT) : caster.getStats().getTotal(StatsEnum.SPELL_POWER)));
 
 
+
+            final boolean isSynchro = caster instanceof SummonedFighter && caster.asSummon().getGrade() !=null && caster.asSummon().getGrade().getMonsterId() == 3958;
+
+
             // Calcul jet
             if (castInfos.spellId == 181 && caster.hasSummoner()) {
                 caster.getSummoner().computeDamages(castInfos.effectType, damageJet);
@@ -129,7 +133,8 @@ public class EffectDamage extends EffectBase {
             }
 
             // Calcul resistances
-            target.computeReducedDamage(castInfos.effectType, damageJet, !castInfos.isPoison && castInfos.isCritical());
+            if(!isSynchro)
+                target.computeReducedDamage(castInfos.effectType, damageJet, !castInfos.isPoison && castInfos.isCritical());
 
 
             // Reduction des dommages grace a l'armure
@@ -163,6 +168,9 @@ public class EffectDamage extends EffectBase {
                     return -3; // Fin du combat
                 }
             }
+
+            if(isSynchro)
+                target.computeReducedDamage(castInfos.effectType, damageJet, !castInfos.isPoison && castInfos.isCritical());
 
             if (castInfos.isReturnedDamages && castInfos.getCell() != null && castInfos.getCell().hasFighter()) {
                 final BuffEffect buff = castInfos.getCell().getFighter().getBuff().getAllBuffs().filter(b -> b instanceof BuffDammageOcassioned).findFirst().orElse(null);

@@ -14,7 +14,7 @@ public abstract class TaxCollectorDAO implements Service {
 
     public abstract void updateSummmary(TaxCollector tax);
 
-    public abstract void remove(int iden);
+    public abstract void remove(int iden, int map);
 
     public abstract void removeGuild(int guild);
 

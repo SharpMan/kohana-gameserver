@@ -53,6 +53,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             put(23, OpenUI.class);
             put(24, AddBoolean.class);
             put(25, PlaceTaxCollector.class);
+            put(26, SpawnArenaAction.class);
             put(228, SpellAnimation.class);
         }
     };

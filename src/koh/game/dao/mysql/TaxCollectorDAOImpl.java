@@ -109,12 +109,13 @@ public class TaxCollectorDAOImpl extends TaxCollectorDAO {
     }
 
     @Override
-    public void remove(int iden) {
+    public void remove(int iden, int map) {
         try {
             try (ConnectionStatement<PreparedStatement> conn = dbSource.prepareStatement("DELETE from `tax_collectors` WHERE `id` = ?;")) {
                 PreparedStatement pStatement = conn.getStatement();
                 pStatement.setInt(1, iden);
                 pStatement.execute();
+                this.taxers.remove(map);
 
             } catch (Exception e) {
                 e.printStackTrace();

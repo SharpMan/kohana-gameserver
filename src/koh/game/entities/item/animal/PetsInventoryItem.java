@@ -253,6 +253,7 @@ public class PetsInventoryItem extends InventoryItem {
         if(animal == null){
             return;
         }
+        int hormone = 0;
         for (ObjectEffect effect : this.getEffects()) {
             //animal.gete
 
@@ -261,6 +262,18 @@ public class PetsInventoryItem extends InventoryItem {
                 continue;
             final ObjectEffectInteger type = (ObjectEffectInteger) effect;
             final int biggestValue = parent.diceNum >= parent.diceSide ? parent.diceNum : parent.diceSide;
+            final FoodItem item = Arrays.stream(this.getAnimal().getFoodItems())
+                    .filter(e -> e.getStats() == effect.actionId)
+                    .findFirst()
+                    .orElse(
+                            Arrays.stream(this.getAnimal().getFoodTypes())
+                                    .filter(e -> e.getStats() == effect.actionId)
+                                    .findFirst()
+                            .orElse(null)
+                    );
+            if(item != null){
+                hormone += (((float) ((ObjectEffectInteger) effect).value) / item.getStatsPoints()) * item.getStatsPoints();
+            }
             if(type.value > biggestValue){
                 try {
                     final SimpleLogger koliseoLog = new SimpleLogger("logs/koli/cheat_" + SimpleLogger.getCurrentDayStamp() + ".txt", 0);
@@ -275,6 +288,19 @@ public class PetsInventoryItem extends InventoryItem {
                     p.getInventoryCache().safeDelete(this, this.getQuantity());
                     return;
                 }
+            }
+        }
+        if(hormone > getAnimal().getHormone()){
+            final SimpleLogger koliseoLog = new SimpleLogger("logs/koli/cheat_" + SimpleLogger.getCurrentDayStamp() + ".txt", 0);
+            this.effects.forEach(e -> {
+                if(e instanceof ObjectEffectInteger)
+                    koliseoLog.write(this.getTemplate().getNameId() +" gives "+(((float) ((ObjectEffectInteger) e).value)+" on "+ StatsEnum.valueOf(e.actionId)));
+            });
+            koliseoLog.newLine();
+            koliseoLog.close();
+            if(p != null) {
+                p.getInventoryCache().safeDelete(this, this.getQuantity());
+                return;
             }
         }
     }

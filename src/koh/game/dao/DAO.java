@@ -56,6 +56,9 @@ public class DAO {
     private static MapDAO maps;
 
     @Inject @Getter
+    private static MapMonsterDAO mapMonsters;
+
+    @Inject @Getter
     private static SpellDAO spells;
 
     @Inject @Getter
@@ -70,8 +73,7 @@ public class DAO {
     @Inject @Getter
     private static MountInventoryDAO mountInventories;
 
-    @Inject @Getter
-    private static MapMonsterDAO mapMonsters;
+
 
     @Inject @Getter
     private static PlayerCommandDAO commands;

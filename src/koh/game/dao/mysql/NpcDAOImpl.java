@@ -14,6 +14,7 @@ import koh.game.entities.item.ItemTemplate;
 import koh.game.utils.sql.ConnectionResult;
 import koh.game.utils.sql.ConnectionStatement;
 import koh.protocol.client.enums.ItemSuperTypeEnum;
+import koh.protocol.client.enums.StatsEnum;
 import koh.utils.Enumerable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -179,6 +180,12 @@ public class NpcDAOImpl extends NpcDAO {
                 if (npc.getItems() == null) {
                     npc.setItems(new HashMap<>());
                 }
+                if(npc.getId() == 816){
+                    final ItemTemplate item = DAO.getItemTemplates().getTemplate(result.getInt("item_id"));
+                    if(item != null && item.hasEffect(812)){
+                        continue;
+                    }
+                }
 
                 //System.out.println(f.getMapid());
 
@@ -189,6 +196,8 @@ public class NpcDAOImpl extends NpcDAO {
                 if(dispo && DAO.getItemTemplates().getTemplate(result.getInt("item_id")) != null && DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() >= 100)
                  System.out.println("UPDATE `npc_items` set custom_price="+DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() * 1000+" WHERE item_id="+result.getInt("item_id")+" AND npc_shop_id="+result.getInt("npc_shop_id")+";");
 */
+
+
                 npc.getItems().put(result.getInt("item_id"),
                         NpcItem.builder()
                                 .customPrice(/*dispo && DAO.getItemTemplates().getTemplate(result.getInt("item_id")) != null && DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() >= 100 ? DAO.getItemTemplates().getTemplate(result.getInt("item_id")).getLevel() * 1000 :*/ result.getFloat("custom_price"))

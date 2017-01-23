@@ -2,6 +2,7 @@ package koh.game.network.handlers.game.context;
 
 import koh.game.actions.GameActionTypeEnum;
 import koh.game.actions.GameTaxCollectorDefenderAction;
+import koh.game.controllers.PlayerController;
 import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
 import koh.game.entities.actors.TaxCollector;
@@ -60,6 +61,9 @@ public class TaxCollectorHandler {
     }
 
 
+
+    static final long TAX_DELAY = (1000 * 60 * 30);
+
     @HandlerAttribute(ID = GameRolePlayTaxCollectorFightRequestMessage.M_ID)
     public static void handleGameRolePlayTaxCollectorFightRequestMessage(WorldClient client,GameRolePlayTaxCollectorFightRequestMessage msg){
         if(!client.canGameAction(GameActionTypeEnum.FIGHT) || !client.getCharacter().getCurrentMap().getMyGameActors().containsKey(msg.taxCollectorId)){
@@ -69,6 +73,9 @@ public class TaxCollectorHandler {
         final TaxCollector taxCollector = (TaxCollector) client.getCharacter().getCurrentMap().getActor(msg.taxCollectorId);
         if(taxCollector.getCurrent_fight() != null){
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.OPPONENT_OCCUPIED));
+        }
+        else if(System.currentTimeMillis() - taxCollector.getCreated_at() < TAX_DELAY){
+            PlayerController.sendServerErrorMessage(client, "Ce percepteur vient de rejoindre notre royaume, soyant acceuillant pour ces "+((TAX_DELAY - (System.currentTimeMillis() - taxCollector.getCreated_at())) / 60000)+" minutes restantes !");
         }
         else if(client.getCharacter().getGuild() == taxCollector.getGuild()){
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.WRONG_GUILD));
