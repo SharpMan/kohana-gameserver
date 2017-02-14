@@ -20,7 +20,7 @@ public class BuffDamageBecomeHeal extends BuffEffect {
 
     @Override
     public int applyEffect(MutableInt damageValue, EffectCast DamageInfos) {
-        if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison) {
+        if (DamageInfos.isReflect || DamageInfos.isReturnedDamages || DamageInfos.isPoison || damageValue.getValue() < -1) {
             return -1;
         }
         // mort

@@ -98,11 +98,11 @@ public class SummonedFighter extends MonsterFighter {
     public void adjustStats() {
         if(this.grade.getMonsterId() == 3287 || this.grade.getMonsterId() == 3288 || this.grade.getMonsterId() == 3289){
             this.stats.addBase(StatsEnum.VITALITY, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getLife() * this.getCoefficient())));
-            this.stats.addBase(StatsEnum.INTELLIGENCE, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.INTELLIGENCE) * this.getCoefficient())));
-            this.stats.addBase(StatsEnum.CHANCE, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.CHANCE) * this.getCoefficient())));
-            this.stats.addBase(StatsEnum.STRENGTH, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.STRENGTH) * this.getCoefficient())));
-            this.stats.addBase(StatsEnum.AGILITY, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.AGILITY) * this.getCoefficient())));
-            this.stats.addBase(StatsEnum.WISDOM, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * this.getCoefficient()) + (summoner.getPlayer().getStats().getTotal(StatsEnum.WISDOM) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.INTELLIGENCE, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * ((this.grade.getMonsterId() == 3287 ? 0.1 : 0) + this.getCoefficient())) + (summoner.getPlayer().getStats().getTotal(StatsEnum.INTELLIGENCE) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.CHANCE, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * ((this.grade.getMonsterId() == 3287 ? 0.1 : 0) + this.getCoefficient())) + (summoner.getPlayer().getStats().getTotal(StatsEnum.CHANCE) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.STRENGTH, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * ((this.grade.getMonsterId() == 3287 ? 0.1 : 0) + this.getCoefficient())) + (summoner.getPlayer().getStats().getTotal(StatsEnum.STRENGTH) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.AGILITY, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * ((this.grade.getMonsterId() == 3287 ? 0.1 : 0) + this.getCoefficient())) + (summoner.getPlayer().getStats().getTotal(StatsEnum.AGILITY) * this.getCoefficient())));
+            this.stats.addBase(StatsEnum.WISDOM, (int) Math.floor((((summoner.getLevel() -1) * 5 +55) * ((this.grade.getMonsterId() == 3287 ? 0.1 : 0) + this.getCoefficient())) + (summoner.getPlayer().getStats().getTotal(StatsEnum.WISDOM) * this.getCoefficient())));
 
         }
         else {

@@ -367,6 +367,7 @@ public class WorldClient {
 
     }
 
+
     public synchronized void close() {
         try {
             this.abortGameActions();

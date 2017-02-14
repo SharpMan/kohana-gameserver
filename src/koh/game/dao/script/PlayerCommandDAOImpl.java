@@ -94,7 +94,7 @@ public class PlayerCommandDAOImpl extends PlayerCommandDAO {
             this.consoleCommands.put("debug", new DebugCommand());
             this.consoleCommands.put("rekt", new RebootCommand());
             this.consoleCommands.put("setevent", new SetEventCommand());
-
+            this.consoleCommands.put("emote", new AddEmoteCommand());
 
             Files.walk(Paths.get("data/script/console"))
                     .filter(Files::isRegularFile)

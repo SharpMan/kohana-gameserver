@@ -65,6 +65,7 @@ class InterHandler extends IoHandlerAdapter {
             try {
                 Main.getWorldServer().getClient(((ExpulseAccountMessage) object).accountId).close();
             } catch (NullPointerException e) {
+                //e.printStackTrace();
             }
         }
     }

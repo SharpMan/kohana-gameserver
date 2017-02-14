@@ -149,7 +149,7 @@ public class MonsterFight extends Fight {
             );
         }
         CharacterFighter farmer = null;
-        if(myTeam1 == winners && ArrayUtils.contains(SpawnArenaAction.MAPS,this.getMap().getId())){
+        if(myTeam1 == winners && !ArrayUtils.contains(SpawnArenaAction.MAPS,this.getMap().getId())){
             final Optional<Fighter> element = winners.getFighters().filter(fighter -> fighter.isPlayer() &&
                     fighter.hasState(FightStateEnum.Chercheur_dâmes.value) &&
                     fighter.getPlayer().getInventoryCache().hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON) &&

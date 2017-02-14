@@ -22,7 +22,7 @@ public class MonsterGroup extends IGameActor {
     @Getter
     private GameRolePlayGroupMonsterInformations gameRolePlayGroupMonsterInformations;
 
-    @Getter @Setter private boolean fix;
+    @Getter @Setter private boolean fix, arena;
     @Getter @Setter private short fixedCell;
 
     @Override

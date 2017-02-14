@@ -75,7 +75,7 @@ public class TaxCollectorHandler {
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.OPPONENT_OCCUPIED));
         }
         else if(System.currentTimeMillis() - taxCollector.getCreated_at() < TAX_DELAY){
-            PlayerController.sendServerErrorMessage(client, "Ce percepteur vient de rejoindre notre royaume, soyant acceuillant pour ces "+((TAX_DELAY - (System.currentTimeMillis() - taxCollector.getCreated_at())) / 60000)+" minutes restantes !");
+            PlayerController.sendServerErrorMessage(client, "Ce percepteur vient de rejoindre notre royaume, soyons acceuillant pour ces "+((TAX_DELAY - (System.currentTimeMillis() - taxCollector.getCreated_at())) / 60000)+" minutes restantes !");
         }
         else if(client.getCharacter().getGuild() == taxCollector.getGuild()){
             client.send(new ChallengeFightJoinRefusedMessage(client.getCharacter().getID(), FighterRefusedReasonEnum.WRONG_GUILD));

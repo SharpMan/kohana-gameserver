@@ -514,12 +514,16 @@ public class Player extends IGameActor implements Observer {
                 if (this.guild != null) {
                     this.guild.registerPlayer(this);
                 }
-                if(this.inventoryCache.hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS)){
+                this.inventoryCache.getItems()
+                        .filter(pet -> pet != null && pet instanceof PetsInventoryItem)
+                        .forEach(pet -> ((PetsInventoryItem)pet).checkLastEffect(((PetsInventoryItem)pet).getAnimal(),this));
+
+                /*if(this.inventoryCache.hasItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS)){
                     final InventoryItem pet = inventoryCache.getItemInSlot(CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS);
                     if(pet != null && pet instanceof PetsInventoryItem){
                         ((PetsInventoryItem)pet).checkLastEffect(((PetsInventoryItem)pet).getAnimal(),this);
                     }
-                }
+                }*/
 
                 client.send(new AchievementListMessage(client.getCharacter().getAchievements().getFinishedAchievementsIds(),
                         client.getCharacter().getAchievements().getAchievementRewardable()

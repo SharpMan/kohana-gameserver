@@ -54,6 +54,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
             put(24, AddBoolean.class);
             put(25, PlaceTaxCollector.class);
             put(26, SpawnArenaAction.class);
+            put(27, AddEmote.class);
             put(228, SpellAnimation.class);
         }
     };
@@ -80,6 +81,7 @@ public class ItemTemplateDAOImpl extends ItemTemplateDAO {
                 ++i;
             }
         } catch (Exception e) {
+
             e.printStackTrace();
             logger.error(e);
             logger.warn(e.getMessage());

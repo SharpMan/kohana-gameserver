@@ -133,7 +133,7 @@ public class TaxCollectorFight extends Fight {
 
     public boolean isFull(FightTeam team){
         if ((this.getFightState() != FightState.STATE_PLACE)
-                || ((team.getMyFighters().size()+ defenders.size()) >= 8)
+                //|| ((team.getMyFighters().size()+ defenders.size()) >= 8)
                 || (this.getFreeSpawnCell(team) == null)) {
             return true;
         }

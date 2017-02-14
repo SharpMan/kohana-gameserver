@@ -140,7 +140,7 @@ public class InventoryItem {
 
     public void notifyColumn(String C) {
         if (this.columsToUpdate == null) {
-            this.columsToUpdate = new ArrayList<>();
+            this.columsToUpdate = new ArrayList<>(3);
         }
         if (!this.columsToUpdate.contains(C)) {
             this.columsToUpdate.add(C);

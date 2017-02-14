@@ -639,7 +639,6 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
             StatsEnum.SUMMON,
             StatsEnum.DESENVOUTEMENT,
 
-
     };
 
     public synchronized void launchSpell(Fighter fighter, SpellLevel spellLevel, short cellId, boolean friend, boolean fakeLaunch, boolean imTargeted, int spellId) {
@@ -889,8 +888,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
 
                 if (!fakeLaunch
                         && fighter.getVisibleState() == GameActionFightInvisibilityStateEnum.INVISIBLE
-                        /*&& silentCast
-                        && spellLevel.getSpellId() != 2763*/) {
+                        /*&& silentCast*/
+                        && spellLevel.getSpellId() != 2763) {
                     this.sendToField(new ShowCellMessage(fighter.getID(), fighter.getCellId()));
                 }
 
@@ -1564,13 +1563,15 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
         }
     }
 
+    private static final int[] NOT_MOVING = {3958,282};
+
     public synchronized GameMapMovement tryMove(Fighter fighter, koh.game.fights.utils.Path path) {
         if (fighter != this.currentFighter || path.isEmptyRide()) {
             return null;
         }
 
         // Pas assez de point de mouvement
-        if (path.MPCost() > fighter.getMP()) {
+        if (path.MPCost() > fighter.getMP() || (fighter instanceof MonsterFighter && (fighter.asMonster().getGrade().getMonster().isStatic() || ArrayUtils.contains(NOT_MOVING,fighter.asMonster().getGrade().getMonster().getId()) ))) {
             return null;
         }
 

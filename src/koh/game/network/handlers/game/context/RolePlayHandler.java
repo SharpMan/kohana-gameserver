@@ -98,6 +98,7 @@ public class RolePlayHandler {
                 return;
             }
             client.abortGameActionsExceptGroup();
+            client.getCharacter().getCurrentMap().removeSpawn((MonsterGroup) target);
             final Fight fight = new MonsterFight(client.getCharacter().getCurrentMap(), client, (MonsterGroup) target);
             client.getCharacter().getCurrentMap().addFight(fight);
         }

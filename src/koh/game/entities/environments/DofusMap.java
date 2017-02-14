@@ -318,9 +318,6 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         };
 
         try {
-            if(this.id == 99090957) {
-                this.monsters.forEach(System.out::println);
-            }
             this.monsters.forEach(this::spawnActor);
         } catch (Exception ignored) {
             ignored.printStackTrace();
@@ -344,7 +341,13 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public synchronized void removeSpawn(final MonsterGroup grp) {
+        if(!grp.isArena()){
+            return;
+        }
         this.destroyActor(grp);
+        if(grp.isArena()){
+            return;
+        }
         final int timeReq = grp.getGameRolePlayGroupMonsterInformations().staticInfos.underlings.length * 20; //To wait 20s * MonsterIngroup
         if (!grp.isFix()) {
             this.monsters.remove(grp);

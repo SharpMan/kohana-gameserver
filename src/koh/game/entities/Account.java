@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import koh.game.network.WorldClient;
 import koh.inter.messages.PlayerComingMessage;
 import koh.protocol.types.game.character.choice.CharacterBaseInformation;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
@@ -41,6 +43,8 @@ public class Account {
     public ArrayList<Player> characters;
     public AccountData accountData;
     public Player currentCharacter = null;
+    @Getter @Setter
+    private WorldClient client;
 
     public List<CharacterBaseInformation> toBaseInformations() {
 

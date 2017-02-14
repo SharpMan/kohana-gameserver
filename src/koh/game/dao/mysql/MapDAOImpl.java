@@ -168,26 +168,7 @@ public class MapDAOImpl extends MapDAO {
         return zaaps.size();
     }
 
-    private int loadAllTriggers() {
-        int i = 0;
-        try (ConnectionResult conn = dbSource.executeQuery("SELECT * from maps_triggers", 0)) {
-            ResultSet result = conn.getResult();
 
-            while (result.next()) {
-                try {
-                    dofusMaps.get(result.getInt("old_map")).initialize();
-                    dofusMaps.get(result.getInt("old_map")).getCell(result.getShort("old_cell")).myAction = new DofusTrigger(result);
-                } catch (Exception e) {
-                    logger.debug("map {} trigger null", result.getInt("map"));
-                }
-                i++;
-            }
-        } catch (Exception e) {
-            logger.error(e);
-            logger.warn(e.getMessage());
-        }
-        return i;
-    }
 
     private int loadAllDoors() {
         int i = 0;
@@ -425,7 +406,7 @@ public class MapDAOImpl extends MapDAO {
         logger.info("Loaded {} map positions", this.loadAllPositions());
         logger.info("Loaded {} map zaaps", this.loadAllZaaps());
         logger.info("Loaded {} map subways", this.loadAllSubways());
-        logger.info("Loaded {} map triggers", this.loadAllTriggers());
+
     }
 
     @Override

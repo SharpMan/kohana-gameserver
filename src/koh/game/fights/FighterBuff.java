@@ -337,6 +337,10 @@ public class FighterBuff {
             }
         }
 
+        this.delayedEffects.stream()
+                .filter(e -> e.first.spellId == spell)
+                .forEach(delayedEffects::remove);
+
         this.buffsDec.get(BuffDecrementType.TYPE_BEGINTURN).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
         this.buffsDec.get(BuffDecrementType.TYPE_ENDTURN).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);
         this.buffsDec.get(BuffDecrementType.TYPE_ENDMOVE).removeIf(x -> x.castInfos != null && x.castInfos.spellId == spell);

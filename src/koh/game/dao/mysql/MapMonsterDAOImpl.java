@@ -8,6 +8,7 @@ import koh.game.dao.api.MapMonsterDAO;
 import koh.game.dao.api.MonsterDAO;
 import koh.game.entities.actors.MonsterGroup;
 import koh.game.entities.environments.DofusMap;
+import koh.game.entities.environments.DofusTrigger;
 import koh.game.entities.environments.SubArea;
 import koh.game.entities.mob.MonsterGrade;
 import koh.game.utils.sql.ConnectionResult;
@@ -180,6 +181,7 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                             .gameRolePlayGroupMonsterInformations(gm)
                             .build()
                     );
+
                 }
                 catch (Exception e){
                     log.error("Error at row  @{},{}",result.getInt("map"),result.getShort("cell"));
@@ -195,9 +197,31 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
         return i;
     }
 
+    private int loadAllTriggers() {
+        int i = 0;
+        try (ConnectionResult conn = dbSource.executeQuery("SELECT * from maps_triggers", 0)) {
+            ResultSet result = conn.getResult();
+
+            while (result.next()) {
+                try {
+                    mapDAO.findTemplate(result.getInt("old_map")).init$Return().getCell(result.getShort("old_cell")).myAction = new DofusTrigger(result);
+
+                } catch (Exception e) {
+                    log.debug("map {} trigger null", result.getInt("map"));
+                }
+                i++;
+            }
+        } catch (Exception e) {
+            log.error(e);
+            log.warn(e.getMessage());
+        }
+        return i;
+    }
+
     @Override
     public void start() {
         log.info("Loaded {} map monsters fix", this.loadAll());
+        log.info("Loaded {} map triggers", this.loadAllTriggers());
         this.initMonstersOnMap();
     }
 

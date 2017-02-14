@@ -19,7 +19,17 @@ public class SpawnsCommand implements PlayerCommand {
     @Override
     public void apply(WorldClient client, String[] args) throws SQLException {
         StringBuilder sb = new StringBuilder("Monsters in ");
-        sb.append(client.getCharacter().getCurrentMap().getId()).append("\n");
+        client.getCharacter().getCurrentMap().getMonsters().forEach(e -> {
+            try {
+                client.getCharacter().getCurrentMap().spawnActor(e);
+                System.out.println(e == null);
+            }
+            catch (Exception ee){
+                ee.printStackTrace();
+            }
+                }
+        );
+        sb.append(client.getCharacter().getCurrentMap().getId()).append(" ").append(client.getCharacter().getCurrentMap().getMonsters().size()).append("\n");
         client.getCharacter().getCurrentMap().getMyGameActors()
                 .entrySet()
                 .stream()

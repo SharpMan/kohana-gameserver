@@ -5,12 +5,20 @@ import koh.game.actions.GameExchange;
 import koh.game.actions.GameRequest;
 import koh.game.actions.requests.ExchangeRequest;
 import koh.game.controllers.PlayerController;
+import koh.game.dao.DAO;
+import koh.game.entities.actors.IGameActor;
 import koh.game.entities.actors.Player;
+import koh.game.entities.actors.TaxCollector;
+import koh.game.entities.item.EffectHelper;
+import koh.game.entities.item.InventoryItem;
+import koh.game.entities.item.Weapon;
 import koh.game.exchange.*;
 import koh.game.network.WorldClient;
 import koh.game.network.handlers.HandlerAttribute;
 import koh.game.utils.SecureParser;
 import koh.protocol.client.Message;
+import koh.protocol.client.enums.AggressableStatusEnum;
+import koh.protocol.client.enums.EffectGenerationType;
 import koh.protocol.client.enums.ExchangeErrorEnum;
 import koh.protocol.client.enums.ExchangeTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
@@ -32,10 +40,48 @@ public class ExchangeHandler {
             client.getMyExchange().validate(client);
     }
 
-    //TODO
     @HandlerAttribute(ID = ExchangeRequestOnTaxCollectorMessage.M_ID)
     public static void handleExchangeRequestOnTaxCollectorMessage(WorldClient client, ExchangeRequestOnTaxCollectorMessage message){
-        PlayerController.sendServerErrorMessage(client,"Bientôt...");
+        if(client.getCharacter() == null || client.getCharacter().getCurrentMap() == null){
+            return;
+        }
+        final TaxCollector taxCollector = (TaxCollector) client.getCharacter().getCurrentMap().getActor(message.taxCollectorId);
+        if(taxCollector == null){
+            client.send(new BasicNoOperationMessage());
+            throw new Error("Le pnj " + message.taxCollectorId + " est absent");
+        }
+        if (client.isGameAction(GameActionTypeEnum.EXCHANGE)) {
+            PlayerController.sendServerMessage(client, "You're always in a exchange...");
+            return;
+        }
+        if (client.canGameAction(GameActionTypeEnum.EXCHANGE)) {
+            synchronized (taxCollector.get$mutex()){
+                taxCollector.getGatheredItem().forEach((id,qua) -> {
+                    final InventoryItem item = InventoryItem.getInstance(DAO.getItems().nextItemId(), id, 63, client.getCharacter().getID(), qua, EffectHelper.generateIntegerEffect(DAO.getItemTemplates().getTemplate(id).getPossibleEffects(), EffectGenerationType.NORMAL, DAO.getItemTemplates().getTemplate(id) instanceof Weapon));
+                    if (client.getCharacter().getInventoryCache().add(item, true)) {
+                        item.setNeedInsert(true);
+                    }
+                });
+                PlayerController.sendServerMessage(client,"Vous avez recolté "+taxCollector.getBagSize()+" items");
+                client.getCharacter().getInventoryCache().addKamas(taxCollector.getKamas(),true);
+                taxCollector.getGatheredItem().clear();
+
+                if(taxCollector.getHonor() > taxCollector.getGuild().playerStream().count()){
+                    final int honor = (int) Math.abs((float)taxCollector.getHonor() / taxCollector.getGuild().playerStream().filter(p -> p.getPvPEnabled() == AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE).count());
+                    taxCollector.getGuild().playerStream().filter(p -> p.getPvPEnabled() == AggressableStatusEnum.PvP_ENABLED_AGGRESSABLE).forEach(pl -> {
+                        pl.addHonor(honor,true);
+                        PlayerController.sendServerMessage(pl.getClient(), "Vous avez gagné "+honor+" points d'honneur suite à la recolte du percepteur par "+client.getCharacter());
+                    });
+                }
+                else{
+                    client.getCharacter().addHonor(taxCollector.getHonor(),true);
+                }
+            }
+            client.getCharacter().getCurrentMap().destroyActor(taxCollector);
+            taxCollector.getGuild().getTaxCollectors().remove(taxCollector);
+            DAO.getTaxCollectors().remove(taxCollector.getIden(),taxCollector.getMapid());
+        }
+
     }
 
     @HandlerAttribute(ID = ExchangeObjectTransfertListFromInvMessage.M_ID)

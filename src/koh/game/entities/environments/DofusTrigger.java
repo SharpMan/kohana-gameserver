@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import koh.game.conditions.ConditionExpression;
 import koh.game.entities.actors.Player;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
  *
  * @author Neo-Craft
  */
+@ToString
 public class DofusTrigger {
 
     private int type;

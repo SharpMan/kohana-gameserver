@@ -39,7 +39,8 @@ public class AccountTicketDAO {
 
         if (accountGuid.containsKey(compte.id)) {
             try {
-                accountGuid.get(compte.id).valid().currentCharacter.getClient().close();
+                accountGuid.get(compte.id).valid().getClient().close();
+               // accountGuid.get(compte.id).valid().currentCharacter.getClient().close();
             } catch (Exception e) {
             } finally {
                 accountGuid.remove(compte.id);

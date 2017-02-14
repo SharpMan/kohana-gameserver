@@ -26,7 +26,7 @@ public class MonsterTemplate {
     @Getter
     private final ArrayList<MonsterGrade> grades = new ArrayList<>(6);
     @Getter
-    private final boolean useSummonSlot, useBombSlot, canPlay,canTackle, isBoss,isStatic;
+    private final boolean useSummonSlot, useBombSlot, canPlay,canTackle, isBoss, isStatic;
     @Getter
     private final ArrayList<MonsterDrop> drops = new ArrayList<>(5);
     @Getter

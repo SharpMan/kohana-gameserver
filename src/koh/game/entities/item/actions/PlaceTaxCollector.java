@@ -26,7 +26,7 @@ public class PlaceTaxCollector  extends ItemAction {
                 || p.getGuild().getTaxCollectors().size() >= p.getGuild().getEntity().maxTaxCollectors
                 || DAO.getTaxCollectors().isPresentOn(p.getMapid()))
             return false;
-        final TaxCollector summoned = new TaxCollector(p.getCell().getId(), p.getGuild(), rnd.nextInt(154) +1, rnd.nextInt(253) +1, p.getMapid(), 0, 0, 0, 0, p.getNickName(),0,"");
+        final TaxCollector summoned = new TaxCollector(p.getCell().getId(), p.getGuild(), rnd.nextInt(154) /*+1*/, rnd.nextInt(253) /*+1*/, p.getMapid(), 0, 0, 0, 0, p.getNickName(),0,"");
         if(!DAO.getTaxCollectors().insert(summoned))
             return false;
         summoned.setCreated_at(System.currentTimeMillis() - (1000 * 60 * 17));

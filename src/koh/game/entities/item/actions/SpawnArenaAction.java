@@ -81,6 +81,7 @@ public class SpawnArenaAction extends ItemAction  {
         gr.setActorCell(possessor.getCell());
         possessor.getCurrentMap().addMonster(gr);
         possessor.getCurrentMap().spawnActor(gr);
+        gr.setArena(true);
 
         p.getInventoryCache().safeDelete(item,1);
 

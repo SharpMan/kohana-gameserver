@@ -15,6 +15,8 @@ import koh.protocol.types.game.context.fight.ProtectedEntityWaitingForHelpInfo;
 import koh.protocol.types.game.context.roleplay.GameRolePlayTaxCollectorInformations;
 import koh.protocol.types.game.context.roleplay.GuildInformations;
 import koh.protocol.types.game.context.roleplay.TaxCollectorStaticInformation;
+import koh.protocol.types.game.data.items.ObjectEffect;
+import koh.protocol.types.game.data.items.ObjectItem;
 import koh.protocol.types.game.guild.tax.*;
 import koh.protocol.types.game.look.EntityLook;
 import koh.utils.Enumerable;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -81,11 +84,11 @@ public class TaxCollector extends IGameActor {
 
 
     public int getItemValues() {
-        return 0;
+        return gatheredItem.size() * gatheredItem.values().stream().mapToInt(i -> (int) i).sum();
     }
 
     public int getBagSize() {
-        return 0;
+        return gatheredItem.size();
     }
 
     public byte currentState(){
@@ -182,5 +185,13 @@ public class TaxCollector extends IGameActor {
                         */new TaxCollectorLootInformations(kamas,experience,getBagSize(),getItemValues())
                 }
                 );
+    }
+
+    public ObjectItem[] getObjects() {
+        AtomicInteger id = new AtomicInteger(1000);
+        return new ObjectItem[0];
+        /*return this.gatheredItem.entrySet().stream()
+                .map(en -> new ObjectItem(63, en.getKey(), new ObjectEffect[0], id.incrementAndGet(), en.getValue()))
+                .toArray(ObjectItem[]::new);*/
     }
 }

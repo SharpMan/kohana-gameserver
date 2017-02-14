@@ -149,13 +149,13 @@ public abstract class Fighter extends IGameActor implements IFightObject {
                 }
             }
             if (cell != null) {
-                myCell.getGlyphStream(gl -> !cell.contains(gl)).forEach(gl -> {
+                myCell.getGlyphStream(gl -> !cell.contains(gl)).forEach(gl ->
                     //Osef du result ils ne peux pas mourir
                     this.getBuff().getAllBuffs().filter(bf -> bf.getCastInfos().glyphId == gl.ID).forEach(buff -> {
                         buff.removeEffect();
                         fight.sendToField(new GameActionFightDispellSpellMessage(ActionIdEnum.ACTION_CHARACTER_REMOVE_ALL_EFFECTS, buff.castInfos.caster.getID(), getID(), buff.getCastInfos().spellId));
-                    });
-                });
+                    })
+                );
 
                 if (cell.hasObject(FightObjectType.OBJECT_GLYPHE)) {
                     final FightGlyph[] glyphes = cell.getGlyphes(gl -> !myCell.contains(gl));

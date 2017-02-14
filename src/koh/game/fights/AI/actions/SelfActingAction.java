@@ -906,7 +906,11 @@ public class SelfActingAction extends AIAction {
             if (startCell != null) {
                 final Fighter target = startCell.getFighter();
                 if (target != null) {
-                    score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell), effect.randomJet(), false);
+                    if(AI.getFighter() instanceof SummonedFighter && AI.getFighter().asSummon().getGrade().getMonsterId() == 3289) {
+                        score += scorePush(AI, target, Pathfunction.getDirection(target.getFight().getMap(), castCell, target.getCellId()), effect.randomJet(), false);
+                    }
+                    else
+                        score += scorePush(AI, target, Pathfunction.getDirection(AI.getFight().getMap(), AI.getFighter().getCellId(), castCell), effect.randomJet(), false);
                 }
             }
         }

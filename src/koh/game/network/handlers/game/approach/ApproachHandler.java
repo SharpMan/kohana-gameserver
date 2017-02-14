@@ -33,6 +33,7 @@ public class ApproachHandler {
         client.setTempTicket(AccountTicketDAO.getWaitingCompte(message.ticket));
 
         if (client.getTempTicket() != null && client.getTempTicket().isCorrect(client.getIP(), message.ticket)) {
+            client.getTempTicket().valid().setClient(client);
             WorldServer.gameLoader.addClient(client);
             if (WorldServer.gameLoader.getPosition(client) != 1) {
                 client.send(new LoginQueueStatusMessage((short) WorldServer.gameLoader.getPosition(client), (short) WorldServer.gameLoader.getTotal()));
@@ -40,6 +41,7 @@ public class ApproachHandler {
             }
         } else {
             client.send(new AuthenticationTicketRefusedMessage());
+            client.close();
             //Diconnected After 1s
         }
         
