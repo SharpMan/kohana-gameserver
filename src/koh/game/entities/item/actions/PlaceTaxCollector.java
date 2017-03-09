@@ -11,7 +11,7 @@ import java.security.SecureRandom;
 /**
  * Created by Melancholia on 12/9/16.
  */
-public class PlaceTaxCollector  extends ItemAction {
+public class PlaceTaxCollector extends ItemAction {
 
     public PlaceTaxCollector(String[] args, String criteria, int template) {
         super(args, criteria, template);
@@ -24,13 +24,14 @@ public class PlaceTaxCollector  extends ItemAction {
         if(!super.execute(possessor,p, cell)
                 || p.getGuild() == null
                 || p.getGuild().getTaxCollectors().size() >= p.getGuild().getEntity().maxTaxCollectors
+                || p.getClient().isGameAction(GameActionTypeEnum.MAP_MOVEMENT)
                 || DAO.getTaxCollectors().isPresentOn(p.getMapid()))
             return false;
         final TaxCollector summoned = new TaxCollector(p.getCell().getId(), p.getGuild(), rnd.nextInt(154) /*+1*/, rnd.nextInt(253) /*+1*/, p.getMapid(), 0, 0, 0, 0, p.getNickName(),0,"");
         if(!DAO.getTaxCollectors().insert(summoned))
             return false;
         summoned.setCreated_at(System.currentTimeMillis() - (1000 * 60 * 17));
-        summoned.setID(p.getCurrentMap().getNextActorId());
+        summoned.setID(p.getCurrentMap().getNextTaxActorId());
         summoned.setActorCell(p.getCell());
         p.getCurrentMap().spawnActor(summoned);
 

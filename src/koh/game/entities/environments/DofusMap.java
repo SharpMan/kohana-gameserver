@@ -375,6 +375,20 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
         return this.myNextActorId.intValue();
     }
 
+    public synchronized int getNextTaxActorId() {
+        this.myNextActorId.decrement();
+        final int value = this.myNextActorId.intValue();
+
+        for(int i = value; i < 0; i++){
+            if(!this.myGameActors.containsKey(i)){
+                return value;
+            }
+        }
+        return value;
+
+    }
+
+
     public DofusMap(int id, byte v, int r, byte m, int SubAreaId, int bn, int tn, int ln, int rn, int sb, boolean u, boolean ur, int pr, String cc, String sl, byte[] sbb, byte[] rc, String neighboor) {
         this.id = id;
         this.version = v;
@@ -465,6 +479,7 @@ public class DofusMap extends IWorldEventObserver implements IWorldField {
     }
 
     public boolean staticElementIsOpened(int elementId) {
+        //return true;
         return !(this.getStatedElementById(elementId) != null && getStatedElementById(elementId).elementState > 0);
     }
 

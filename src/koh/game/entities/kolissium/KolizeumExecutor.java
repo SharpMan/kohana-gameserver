@@ -107,6 +107,10 @@ public class KolizeumExecutor extends PeriodicContestExecutor {
         playerSorter.thenComparing(Comparator.comparing(pl -> pl.getKolizeumRate().getRating()));
     }
 
+    public boolean isSleeping(){
+        return (myFuture == null || myFuture.isCancelled());
+    }
+
     @Override
     public void registerPlayer(Player p) {
         this.executeTask(() -> {

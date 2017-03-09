@@ -1114,7 +1114,8 @@ public abstract class Fight extends IWorldEventObserver implements IWorldField {
                     cell = this.getCell(MapTools.getCellNumFromXYCoordinates(p.x, p.y));
                     //fighter.send(new ShowCellMessage(0,cell.id));
                     if (lastCell != null && lastCell.hasFighter()) {
-                        if (lastCell.getFighter().isVisibleFor(fighter)) {
+                        if (lastCell.getFighter().visibleState != GameActionFightInvisibilityStateEnum.INVISIBLE) {
+                        //if (lastCell.getFighter().isVisibleFor(fighter)) {
                             result = false;
                         }
                     }

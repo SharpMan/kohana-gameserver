@@ -89,6 +89,7 @@ public class MapMonsterDAOImpl extends MapMonsterDAO {
                                 false,
                                 false))
                 .build();
+        gr.setID(gr.getGameRolePlayGroupMonsterInformations().contextualId);
         gr.getGameContextActorInformations(null).disposition.cellId = gr.getFixedCell();
         for (int ii = 0; ii  < groupCount; ii++) {
             final MonsterGrade randMonster = monsters.find(sub.getMonsters()[sub.getArea().getRANDOM().nextInt(sub.getMonsters().length)]).getRandomGrade(sub.getArea().getRANDOM());

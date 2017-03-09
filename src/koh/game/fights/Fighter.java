@@ -486,7 +486,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int getTackledMP() { //Sould be implements in summoner,getMonster return 0
-        if (this.visibleState != GameActionFightInvisibilityStateEnum.VISIBLE) {
+        if (this.visibleState == GameActionFightInvisibilityStateEnum.INVISIBLE) {
             return 0;
         }
         double num1 = 0.0;
@@ -555,7 +555,7 @@ public abstract class Fighter extends IGameActor implements IFightObject {
     }
 
     public int getTackledAP() {
-        if (this.visibleState != GameActionFightInvisibilityStateEnum.VISIBLE) {
+        if (this.visibleState == GameActionFightInvisibilityStateEnum.INVISIBLE) {
             return 0;
         }
         double num1 = 0.0;

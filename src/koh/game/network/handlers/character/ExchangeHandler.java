@@ -166,6 +166,7 @@ public class ExchangeHandler {
                 Client.send(new BasicNoOperationMessage());
             }
         } else {
+            Client.send(new ExchangeObjectAddedMessage(false, Client.getCharacter().getInventoryCache().find(Message.objectUID).getObjectItem()));
             Client.send(new BasicNoOperationMessage());
         }
     }

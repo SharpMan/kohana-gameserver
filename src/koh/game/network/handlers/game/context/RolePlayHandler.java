@@ -129,6 +129,9 @@ public class RolePlayHandler {
             client.getCharacter().updateRegenedLife(true);
             client.send(new UpdateLifePointsMessage(client.getCharacter().getLife(), client.getCharacter().getMaxLife()));
         }
+        if(message.emoteId != 1 && message.emoteId != 19 && !ArrayUtils.contains(client.getCharacter().getEmotes(), message.emoteId)){
+            return;
+        }
         client.getCharacter().getCurrentMap().sendToField(new EmotePlayMessage(message.emoteId, Instant.now().getEpochSecond(), client.getCharacter().getID(), client.getAccount().id));
     }
 

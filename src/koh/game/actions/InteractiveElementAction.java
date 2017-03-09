@@ -8,6 +8,7 @@ import koh.game.controllers.PlayerController;
 import koh.game.dao.DAO;
 import koh.game.entities.actors.Player;
 import koh.protocol.client.enums.InteractiveActionEnum;
+import koh.protocol.client.enums.ItemSuperTypeEnum;
 import koh.protocol.messages.connection.BasicNoOperationMessage;
 import koh.protocol.messages.game.interactive.InteractiveUsedMessage;
 import koh.protocol.types.game.interactive.InteractiveElementSkill;
@@ -30,6 +31,7 @@ public class InteractiveElementAction extends GameAction {
             this.put(InteractiveActionEnum.SAVE, new SavePos());
             this.put(InteractiveActionEnum.ACCESS, new Access());
             this.put(InteractiveActionEnum.TELEPORT, new TeleporterUse());
+            this.put(InteractiveActionEnum.AMELIORER_AMULETTE, new UpgradeItem(ItemSuperTypeEnum.SUPERTYPE_AMULET,169));
         }
     };
 

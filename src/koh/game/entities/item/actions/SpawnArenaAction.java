@@ -69,6 +69,7 @@ public class SpawnArenaAction extends ItemAction  {
                                             false)
                             )
                             .build();
+                    gr.setID(gr.getGameRolePlayGroupMonsterInformations().contextualId);
                 }else{
                     final MonsterGrade randMonster = DAO.getMonsters().find(ef.diceConst).getLevelOrNear(ef.diceNum);
                     gr.getGameRolePlayGroupMonsterInformations().staticInfos.underlings[ii] = new MonsterInGroupInformations(randMonster.getMonsterId(), randMonster.getGrade(), randMonster.getMonster().getEntityLook());

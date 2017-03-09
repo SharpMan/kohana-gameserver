@@ -72,6 +72,9 @@ public class JobBook {
             this.id = buf.get();
             this.xp = buf.getInt();
             this.jobLevel = buf.getInt();
+            if(id == 16 || id == 63){
+                jobLevel = 200;
+            }
             this.minLevel = buf.getInt();
             this.free = BufUtils.readBoolean(buf);
             this.gatheringItems = buf.getInt();
